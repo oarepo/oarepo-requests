@@ -1,0 +1,44 @@
+record:
+  use:
+    - invenio
+  module:
+    qualified: thesis
+  permissions:
+    presets: [ 'everyone' ]
+  service-config:
+    components:
+    - PublishDraftComponent("publish_draft", "delete_record")
+    imports:
+    - import: invenio_drafts_resources.services.RecordServiceConfig
+      alias: InvenioRecordServiceConfig
+    - import: oarepo_runtime.config.service.PermissionsPresetsConfigMixin
+    - import: oarepo_requests.components.requests.PublishDraftComponent
+  draft:
+    requests:
+      publish-draft:
+        type:
+          base-classes:
+          - SubmitDraftRequestType
+          imports:
+          - import: oarepo_requests.types.publish_draft.SubmitDraftRequestType
+        actions:
+          submit:
+            class: oarepo_requests.actions.publish_draft.PublishDraftSubmitAction
+            generate: False
+
+  requests:
+    delete-record:
+      type:
+        base-classes:
+          - DeleteRecordRequestType
+        imports:
+          - import: oarepo_requests.types.delete_record.DeleteRecordRequestType
+      actions:
+        submit:
+          class: oarepo_requests.actions.delete_topic.DeleteTopicSubmitAction
+          generate: False
+
+settings:
+  schema-server: 'local://'
+
+
