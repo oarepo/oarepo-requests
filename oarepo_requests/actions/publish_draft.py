@@ -30,12 +30,13 @@ def publish_draft(draft, identity, uow):
 class PublishDraftSubmitAction(SubmitAction):
     def execute(self, identity, uow):
         topic = self.request.topic.resolve()
-        #topic.parent.review = None
-        #uow.register(RecordCommitOp(topic.parent))
+        setattr(topic.parent, self.request.type.type_id, None)
+        uow.register(RecordCommitOp(topic.parent))
         publish_draft(topic, identity, uow)
         super().execute(identity, uow)
-
+"""
 class PublishDraftAcceptAction(AcceptAction):
     def execute(self, identity, uow):
         publish_draft(self, identity, uow)
         super().execute(identity, uow)
+"""
