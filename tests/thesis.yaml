@@ -1,6 +1,6 @@
 record:
   use:
-    - invenio
+  - invenio
   module:
     qualified: thesis
   permissions:
@@ -9,9 +9,6 @@ record:
     components:
     - PublishDraftComponent("publish_draft", "delete_record")
     imports:
-    - import: invenio_drafts_resources.services.RecordServiceConfig
-      alias: InvenioRecordServiceConfig
-    - import: oarepo_runtime.config.service.PermissionsPresetsConfigMixin
     - import: oarepo_requests.components.requests.PublishDraftComponent
   draft:
     requests:
@@ -30,9 +27,9 @@ record:
     delete-record:
       type:
         base-classes:
-          - DeleteRecordRequestType
+        - DeleteRecordRequestType
         imports:
-          - import: oarepo_requests.types.delete_record.DeleteRecordRequestType
+        - import: oarepo_requests.types.delete_record.DeleteRecordRequestType
       actions:
         submit:
           class: oarepo_requests.actions.delete_topic.DeleteTopicSubmitAction
@@ -40,5 +37,8 @@ record:
 
 settings:
   schema-server: 'local://'
+profiles:
+- record
+- draft
 
 
