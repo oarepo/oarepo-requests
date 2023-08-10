@@ -8,14 +8,24 @@ from invenio_records_resources.services.records.components import ServiceCompone
 from invenio_requests.proxies import current_requests_service, current_request_type_registry, current_events_service
 
 
-class AllowedRequestsComponent:
+class AllowedRequestsComponent(ServiceComponent):
     """Service component which sets all data in the record."""
 
     def before_ui_detail(self, identity, data=None, record=None, errors=None, **kwargs):
-        record_cls = kwargs["record_cls"]
+        # todo discriminate requests from other stuff which can be on parent in the future
+        requests = record.parent
+        requests.pop("id")
+        ret = {}
+        for request_name, request in requests.items():
+            try:
+                self.service.api_service.require_permission(identity, request["type"])
+            # todo what error this throws
+            except:
+                continue
+            ret[request_name] = request
         extra_context = kwargs["extra_context"]
-        allowed_request_types = get_allowed_request_types(record_cls)
-        extra_context["allowed_requests"] = allowed_request_types
+        extra_context["allowed_requests"] = ret
+
 
 class PublishDraftComponentPrivate(ServiceComponent):
     """Service component for request integration."""
