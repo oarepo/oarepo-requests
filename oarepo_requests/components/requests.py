@@ -13,12 +13,12 @@ class AllowedRequestsComponent(ServiceComponent):
 
     def before_ui_detail(self, identity, data=None, record=None, errors=None, **kwargs):
         # todo discriminate requests from other stuff which can be on parent in the future
-        requests = record.parent
+        requests = record["parent"]
         requests.pop("id")
         ret = {}
         for request_name, request in requests.items():
             try:
-                self.service.api_service.require_permission(identity, request["type"])
+                self.service.api_service.require_permission(identity, f"action_{request['type']}")
             # todo what error this throws
             except:
                 continue
@@ -39,7 +39,7 @@ class PublishDraftComponentPrivate(ServiceComponent):
         # topic and request_type in kwargs
         if self.publish_request_type:
             type_ = current_request_type_registry.lookup(self.publish_request_type, quiet=True)
-            request_item = current_requests_service.create(identity, {}, type_, receiver=None, topic=record)
+            request_item = current_requests_service.create(identity, {}, type_, receiver=None, topic=record, uow=self.uow)
             setattr(record.parent, self.publish_request_type, request_item._request)
             self.uow.register(RecordCommitOp(record.parent))
     def publish(self, identity, data=None, record=None, **kwargs):
@@ -58,15 +58,26 @@ class PublishDraftComponentPrivate(ServiceComponent):
 
         if self.delete_request_type:
             type_ = current_request_type_registry.lookup(self.delete_request_type, quiet=True)
-            request_item = current_requests_service.create(identity, {}, type_, receiver=None, topic=record)
+            request_item = current_requests_service.create(identity, {}, type_, receiver=None, topic=record, uow=self.uow)
             setattr(record.parent, self.delete_request_type, request_item._request)
             self.uow.register(RecordCommitOp(record.parent))
+
+
+
+class OAICreateRequestsComponentPrivate(ServiceComponent):
+    def __init__(self, delete_request_type, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.delete_request_type = delete_request_type
+
+    def create(self, identity, data=None, record=None, **kwargs):
+        type_ = current_request_type_registry.lookup(self.delete_request_type, quiet=True)
+        request_item = current_requests_service.create(identity, {}, type_, receiver=None, topic=record, uow=self.uow)
+        setattr(record.parent, self.delete_request_type, request_item._request)
+        self.uow.register(RecordCommitOp(record.parent))
 
 def PublishDraftComponent(publish_request_type, delete_request_type):
     return functools.partial(PublishDraftComponentPrivate, publish_request_type, delete_request_type)
 
+def OAICreateRequestsComponent(delete_request_type):
+    return functools.partial(OAICreateRequestsComponentPrivate, delete_request_type)
 
-"""
-class DeleteTopicComponent(ServiceComponent):
-    def create(self, identity, data=None, record=None, **kwargs):
-"""
