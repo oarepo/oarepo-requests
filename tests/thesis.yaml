@@ -15,9 +15,9 @@ record:
       publish-draft:
         type:
           base-classes:
-          - SubmitDraftRequestType
+          - PublishDraftRequestType
           imports:
-          - import: oarepo_requests.types.publish_draft.SubmitDraftRequestType
+          - import: oarepo_requests.types.publish_draft.PublishDraftRequestType
         actions:
           submit:
             class: oarepo_requests.actions.publish_draft.PublishDraftSubmitAction
