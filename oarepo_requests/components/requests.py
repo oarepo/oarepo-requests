@@ -20,7 +20,6 @@ class AllowedRequestsComponent(ServiceComponent):
         for request_name, request in requests.items():
             try:
                 self.service.api_service.require_permission(identity, f"action_{request['type']}")
-            # todo what error this throws
             except PermissionDeniedError:
                 continue
             ret[request_name] = request
