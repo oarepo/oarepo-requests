@@ -6,6 +6,7 @@ from invenio_requests.customizations import LogEventType
 from oarepo_requests.utils.utils import get_allowed_request_types
 from invenio_records_resources.services.records.components import ServiceComponent
 from invenio_requests.proxies import current_requests_service, current_request_type_registry, current_events_service
+from invenio_records_resources.services.errors import PermissionDeniedError
 
 
 class AllowedRequestsComponent(ServiceComponent):
@@ -20,7 +21,7 @@ class AllowedRequestsComponent(ServiceComponent):
             try:
                 self.service.api_service.require_permission(identity, f"action_{request['type']}")
             # todo what error this throws
-            except:
+            except PermissionDeniedError:
                 continue
             ret[request_name] = request
         extra_context = kwargs["extra_context"]
