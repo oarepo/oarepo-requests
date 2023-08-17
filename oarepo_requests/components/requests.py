@@ -18,8 +18,10 @@ class AllowedRequestsComponent(ServiceComponent):
         requests.pop("id")
         ret = {}
         for request_name, request in requests.items():
+            # todo what about other types of actions?
+            # request_type = current_request_type_registry.lookup(request["type"])
             try:
-                self.service.api_service.require_permission(identity, f"action_{request['type']}")
+                current_requests_service.require_permission(identity, f"action_submit_{request['type']}")
             except PermissionDeniedError:
                 continue
             ret[request_name] = request
