@@ -19,6 +19,7 @@ class AllowedRequestsComponent(ServiceComponent):
         ret = {}
         for request_name, request in requests.items():
             # todo what about other types of actions?
+            # should we iterate over type's actions and try for each one
             # request_type = current_request_type_registry.lookup(request["type"])
             try:
                 current_requests_service.require_permission(identity, f"action_submit_{request['type']}")
@@ -52,7 +53,7 @@ class PublishDraftComponentPrivate(ServiceComponent):
             request_status = "accepted"
             request.status = request_status
             setattr(record.parent, self.publish_request_type, None)
-            event = LogEventType(payload={"event": request_status, "content": "request was published through direct call without request"})
+            event = LogEventType(payload={"event": request_status, "content": "record was published through direct call without request"})
             _data = dict(payload=event.payload)
             current_events_service.create(
                 identity, request.id, _data, event, uow=self.uow
