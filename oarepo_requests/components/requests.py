@@ -20,7 +20,7 @@ class AllowedRequestsComponent(ServiceComponent):
         for request_name, request in requests.items():
             # todo what about other types of actions?
             # should we iterate over type's actions and try for each one
-            # request_type = current_request_type_registry.lookup(request["type"])
+            request_type = current_request_type_registry.lookup(request["type"])
             try:
                 current_requests_service.require_permission(identity, f"action_submit_{request['type']}")
             except PermissionDeniedError:
