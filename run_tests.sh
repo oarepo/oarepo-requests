@@ -25,5 +25,7 @@ python3 -m venv $MODEL_VENV
 pip install -U setuptools pip wheel
 pip install "./$BUILD_TEST_DIR/$MODEL[tests]"
 pip install .
+pip install oarepo-ui
 
 pytest $BUILD_TEST_DIR/test_requests
+pytest $BUILD_TEST_DIR/test_ui

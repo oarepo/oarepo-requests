@@ -4,7 +4,6 @@ from oarepo_requests.actions.publish_draft import PublishDraftSubmitAction
 
 
 class PublishDraftRequestType(RequestType):
-
     available_actions = {
         **RequestType.available_actions,
         "submit": PublishDraftSubmitAction,

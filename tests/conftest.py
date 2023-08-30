@@ -2,22 +2,25 @@ import os
 
 import pytest
 from flask_principal import Identity, Need, UserNeed
-from flask_security.utils import hash_password
+from flask_security.utils import hash_password, login_user
 from invenio_access.models import ActionRoles
-from invenio_access.permissions import superuser_access, system_identity
+from invenio_access.permissions import superuser_access
 from invenio_accounts.models import Role
-from invenio_records_resources.services.uow import RecordCommitOp, UnitOfWork
+from invenio_accounts.testutils import login_user_via_session
+from invenio_app.factory import create_api
 from invenio_requests.customizations import CommentEventType, LogEventType
 from invenio_requests.proxies import current_requests
 from invenio_requests.records.api import RequestEventFormat
 from thesis.proxies import current_service
-from thesis.records.api import ThesisRecord, ThesisDraft
-from invenio_app.factory import create_api
+from thesis.records.api import ThesisRecord
+
 
 @pytest.fixture(scope="module")
 def create_app(instance_path, entry_points):
     """Application factory fixture."""
     return create_api
+
+
 @pytest.fixture(scope="module")
 def app_config(app_config):
     app_config["REQUESTS_REGISTERED_EVENT_TYPES"] = [LogEventType(), CommentEventType()]
@@ -28,12 +31,12 @@ def app_config(app_config):
         }
     ]
     app_config["JSONSCHEMAS_HOST"] = "localhost"
-    app_config["RECORDS_REFRESOLVER_CLS"] = (
-        "invenio_records.resolver.InvenioRefResolver"
-    )
-    app_config["RECORDS_REFRESOLVER_STORE"] = (
-        "invenio_jsonschemas.proxies.current_refresolver_store"
-    )
+    app_config[
+        "RECORDS_REFRESOLVER_CLS"
+    ] = "invenio_records.resolver.InvenioRefResolver"
+    app_config[
+        "RECORDS_REFRESOLVER_STORE"
+    ] = "invenio_jsonschemas.proxies.current_refresolver_store"
 
     return app_config
 
@@ -133,6 +136,26 @@ def users(app):
     return [user1, user2, admin]
 
 
+@pytest.fixture(scope="module")
+def identity_simple(users):
+    """Simple identity fixture."""
+    user = users[0]
+    i = Identity(user.id)
+    i.provides.add(UserNeed(user.id))
+    i.provides.add(Need(method="system_role", value="any_user"))
+    i.provides.add(Need(method="system_role", value="authenticated_user"))
+    return i
+
+
+@pytest.fixture()
+def client_with_login(client, users):
+    """Log in a user to the client."""
+    user = users[0]
+    login_user(user)
+    login_user_via_session(client, email=user.email)
+    return client
+
+
 @pytest.fixture(scope="function")
 def request_record_input_data():
     """Input data to a Request record."""
@@ -146,21 +169,21 @@ def request_record_input_data():
     return ret
 
 
+@pytest.fixture(scope="module")
+def record_service():
+    return current_service
+
+
 @pytest.fixture(scope="function")
-def example_topic_draft(record_service):
-    draft = record_service.create(system_identity, {})
+def example_topic_draft(record_service, identity_simple):
+    draft = record_service.create(identity_simple, {})
     return draft._obj
 
 
-
 @pytest.fixture(scope="function")
-def example_topic(record_service):
-    draft = record_service.create(system_identity, {})
-    record = record_service.publish(system_identity, draft.id)
+def example_topic(record_service, identity_simple):
+    draft = record_service.create(identity_simple, {})
+    record = record_service.publish(identity_simple, draft.id)
     id_ = record.id
     record = ThesisRecord.pid.resolve(id_)
     return record
-
-@pytest.fixture
-def record_service():
-    return current_service
