@@ -1,3 +1,4 @@
+import copy
 import functools
 
 from invenio_records_resources.services.errors import PermissionDeniedError
@@ -13,11 +14,10 @@ from invenio_requests.proxies import (
 
 class AllowedRequestsComponent(ServiceComponent):
     """Service component which sets all data in the record."""
-
-    def before_ui_detail(self, identity, data=None, record=None, errors=None, **kwargs):
+    def _add_available_requests(self, identity, record, dict_to_save_result, **kwargs):
         # todo discriminate requests from other stuff which can be on parent in the future
         # todo what to throw if parent doesn't exist
-        requests = record["parent"]
+        requests = copy.deepcopy(record["parent"])
         requests.pop("id")
         available_requests = {}
 
@@ -34,9 +34,21 @@ class AllowedRequestsComponent(ServiceComponent):
                 action = RequestActions.get_action(request, action_name)
                 if not action.can_execute():
                     continue
-                available_requests[request_name] = request_dict
-        extra_context = kwargs["extra_context"]
-        extra_context["allowed_requests"] = available_requests
+                if request_name not in available_requests:
+                    saved_request_data = copy.deepcopy(request_dict)
+                    saved_request_data["actions"] = [action_name]
+                    available_requests[request_name] = saved_request_data
+                else:
+                    saved_request_data["actions"].append(action_name)
+
+        dict_to_save_result = kwargs[dict_to_save_result]
+        dict_to_save_result["allowed_requests"] = available_requests
+    def before_ui_detail(self, identity, data=None, record=None, errors=None, **kwargs):
+        self._add_available_requests(identity, record, "extra_context", **kwargs)
+    def before_ui_edit(self, identity, data=None, record=None, errors=None, **kwargs):
+        self._add_available_requests(identity, record, "extra_context", **kwargs)
+    def form_config(self, identity, data=None, record=None, errors=None, **kwargs):
+        self._add_available_requests(identity, record, "form_config", **kwargs)
 
 
 class PublishDraftComponentPrivate(ServiceComponent):

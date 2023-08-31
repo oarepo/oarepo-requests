@@ -3,3 +3,9 @@ available_requests=
 {% for request_name, request in allowed_requests.items() %}
 {{ request_name }}: {{ request }}
 {% endfor %}
+{% if form_config %}
+allowed requests in form config:
+{% for request_name, request in form_config["allowed_requests"].items() %}
+{{ request_name }}: {{ request }}
+{% endfor %}
+{% endif %}
