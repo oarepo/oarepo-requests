@@ -1,5 +1,6 @@
 import copy
 import functools
+from collections import defaultdict
 
 from invenio_records_resources.services.errors import PermissionDeniedError
 from invenio_records_resources.services.records.components import ServiceComponent
@@ -12,9 +13,48 @@ from invenio_requests.proxies import (
 )
 
 
+from invenio_communities.proxies import current_roles
+from invenio_communities.generators import CommunityRoles
+class RecordCommunitiesAction(CommunityRoles):
+    """Roles generators of all record's communities for a given member's action."""
+
+    def __init__(self, action):
+        """Initialize generator."""
+        self._action = action
+
+    def roles(self, **kwargs):
+        """Roles for a given action."""
+        return {r.name for r in current_roles.can(self._action)}
+
+class AllowedCommunitiesActionsComponent(ServiceComponent):
+    def _add_available_requests(self, identity, record, dict_to_save_result, **kwargs):
+        community_roles = defaultdict(list)
+        for need in identity.provides:
+            if need.method=="community":
+                community_roles[need.value].append(need.role)
+        requests = copy.deepcopy(record["parent"])
+        requests.pop("id")
+        available_requests = {}
+
+        # mozne komunity akce
+        # staci vzit z role
+        # ie. potrebujem mapping z idenity role na community role
+
 class AllowedRequestsComponent(ServiceComponent):
     """Service component which sets all data in the record."""
     def _add_available_requests(self, identity, record, dict_to_save_result, **kwargs):
+        community_roles = defaultdict(list)
+        for need in identity.provides:
+            if need.method=="community":
+                community_roles[need.value].append(need.role)
+        for community_roles in community_roles.values():
+            for community_role in community_roles:
+                role = current_roles[community_role]
+
+
+
+
+
         # todo discriminate requests from other stuff which can be on parent in the future
         # todo what to throw if parent doesn't exist
         requests = copy.deepcopy(record["parent"])
