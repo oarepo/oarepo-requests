@@ -1,4 +1,3 @@
-
 from oarepo_ui.resources import (
     BabelComponent,
     RecordsUIResource,
@@ -24,7 +23,7 @@ class ModelUIResourceConfig(RecordsUIResourceConfig):
         "search": {
             "layout": "test_detail.html",
         },
-        "edit": {"layout": "test_edit.html"}
+        "edit": {"layout": "test_edit.html"},
     }
 
     components = [BabelComponent, PermissionsComponent, AllowedRequestsComponent]

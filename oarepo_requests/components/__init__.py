@@ -1,7 +1,4 @@
-from .requests import (
-    AllowedRequestsComponent,
-    PublishDraftComponent,
-)
+from .requests import AllowedRequestsComponent, PublishDraftComponent
 
 __all__ = [
     "AllowedRequestsComponent",

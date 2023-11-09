@@ -1,6 +1,5 @@
 import copy
 import functools
-from collections import defaultdict
 
 from invenio_records_resources.services.errors import PermissionDeniedError
 from invenio_records_resources.services.records.components import ServiceComponent
@@ -12,8 +11,6 @@ from invenio_requests.proxies import (
     current_requests_service,
 )
 
-from invenio_communities.proxies import current_roles, current_communities
-from invenio_communities.generators import CommunityRoles
 """
 class RecordCommunitiesAction(CommunityRoles):
 
@@ -24,14 +21,19 @@ class RecordCommunitiesAction(CommunityRoles):
         return {r.name for r in current_roles.can(self._action)}
 """
 
+
 class AllowedRequestsComponent(ServiceComponent):
     """Service component which sets all data in the record."""
-    def _add_available_requests(self, identity, record, dict_to_save_result, **kwargs):
 
+    def _add_available_requests(self, identity, record, dict_to_save_result, **kwargs):
         # todo discriminate requests from other stuff which can be on parent in the future
         # todo what to throw if parent doesn't exist
         parent_copy = copy.deepcopy(record["parent"])
-        requests = {k: v for k,v in parent_copy.items() if isinstance(v, dict) and 'receiver' in v} # todo more sensible request identification
+        requests = {
+            k: v
+            for k, v in parent_copy.items()
+            if isinstance(v, dict) and "receiver" in v
+        }  # todo more sensible request identification
         available_requests = {}
 
         for request_name, request_dict in requests.items():
@@ -56,10 +58,13 @@ class AllowedRequestsComponent(ServiceComponent):
 
         dict_to_save_result = kwargs[dict_to_save_result]
         dict_to_save_result["allowed_requests"] = available_requests
+
     def before_ui_detail(self, identity, data=None, record=None, errors=None, **kwargs):
         self._add_available_requests(identity, record, "extra_context", **kwargs)
+
     def before_ui_edit(self, identity, data=None, record=None, errors=None, **kwargs):
         self._add_available_requests(identity, record, "extra_context", **kwargs)
+
     def form_config(self, identity, data=None, record=None, errors=None, **kwargs):
         self._add_available_requests(identity, record, "form_config", **kwargs)
 
