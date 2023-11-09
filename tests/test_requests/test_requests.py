@@ -1,6 +1,7 @@
 import pytest
 from invenio_pidstore.errors import PIDDeletedError, PIDUnregistered
 from sqlalchemy.orm.exc import NoResultFound
+from invenio_records_resources.services.errors import PermissionDeniedError
 
 
 def test_workflow(
@@ -71,3 +72,17 @@ def test_parent_dump(
         record_service.read_draft(identity_simple, record_id)
     with pytest.raises(PIDDeletedError):
         record_service.read(identity_simple, record_id)
+
+def test_receiver_permissions_user(request_with_receiver_user, requests_service, identity_creator, identity_receiver):
+    request_id = request_with_receiver_user.id
+
+    with pytest.raises(PermissionDeniedError):
+        receiver_submit = requests_service.execute_action(identity=identity_receiver, id_=request_id, action="submit")
+    creator_submit = requests_service.execute_action(identity=identity_creator, id_=request_id, action="submit")
+    assert creator_submit.data["status"] == "submitted"
+
+    with pytest.raises(PermissionDeniedError):
+        creator_accept = requests_service.execute_action(identity=identity_creator, id_=request_id, action="accept")
+    receiver_accept = requests_service.execute_action(identity=identity_receiver, id_=request_id, action="accept")
+    assert receiver_accept.data["status"] == "accepted"
+

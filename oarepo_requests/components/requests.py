@@ -12,53 +12,26 @@ from invenio_requests.proxies import (
     current_requests_service,
 )
 
-
-from invenio_communities.proxies import current_roles
+from invenio_communities.proxies import current_roles, current_communities
 from invenio_communities.generators import CommunityRoles
+"""
 class RecordCommunitiesAction(CommunityRoles):
-    """Roles generators of all record's communities for a given member's action."""
 
     def __init__(self, action):
-        """Initialize generator."""
         self._action = action
 
     def roles(self, **kwargs):
-        """Roles for a given action."""
         return {r.name for r in current_roles.can(self._action)}
-
-class AllowedCommunitiesActionsComponent(ServiceComponent):
-    def _add_available_requests(self, identity, record, dict_to_save_result, **kwargs):
-        community_roles = defaultdict(list)
-        for need in identity.provides:
-            if need.method=="community":
-                community_roles[need.value].append(need.role)
-        requests = copy.deepcopy(record["parent"])
-        requests.pop("id")
-        available_requests = {}
-
-        # mozne komunity akce
-        # staci vzit z role
-        # ie. potrebujem mapping z idenity role na community role
+"""
 
 class AllowedRequestsComponent(ServiceComponent):
     """Service component which sets all data in the record."""
     def _add_available_requests(self, identity, record, dict_to_save_result, **kwargs):
-        community_roles = defaultdict(list)
-        for need in identity.provides:
-            if need.method=="community":
-                community_roles[need.value].append(need.role)
-        for community_roles in community_roles.values():
-            for community_role in community_roles:
-                role = current_roles[community_role]
-
-
-
-
 
         # todo discriminate requests from other stuff which can be on parent in the future
         # todo what to throw if parent doesn't exist
-        requests = copy.deepcopy(record["parent"])
-        requests.pop("id")
+        parent_copy = copy.deepcopy(record["parent"])
+        requests = {k: v for k,v in parent_copy.items() if isinstance(v, dict) and 'receiver' in v} # todo more sensible request identification
         available_requests = {}
 
         for request_name, request_dict in requests.items():
@@ -142,27 +115,7 @@ class PublishDraftComponentPrivate(ServiceComponent):
             self.uow.register(RecordCommitOp(record.parent))
 
 
-class OAICreateRequestsComponentPrivate(ServiceComponent):
-    def __init__(self, delete_request_type, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.delete_request_type = delete_request_type
-
-    def create(self, identity, data=None, record=None, **kwargs):
-        type_ = current_request_type_registry.lookup(
-            self.delete_request_type, quiet=True
-        )
-        request_item = current_requests_service.create(
-            identity, {}, type_, receiver=None, topic=record, uow=self.uow
-        )
-        setattr(record.parent, self.delete_request_type, request_item._request)
-        self.uow.register(RecordCommitOp(record.parent))
-
-
 def PublishDraftComponent(publish_request_type, delete_request_type):
     return functools.partial(
         PublishDraftComponentPrivate, publish_request_type, delete_request_type
     )
-
-
-def OAICreateRequestsComponent(delete_request_type):
-    return functools.partial(OAICreateRequestsComponentPrivate, delete_request_type)

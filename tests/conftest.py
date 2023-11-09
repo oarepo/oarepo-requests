@@ -9,8 +9,8 @@ from invenio_accounts.models import Role
 from invenio_accounts.testutils import login_user_via_session
 from invenio_app.factory import create_api
 from invenio_requests.customizations import CommentEventType, LogEventType
-from invenio_requests.proxies import current_requests
-from invenio_requests.records.api import RequestEventFormat
+from invenio_requests.proxies import current_requests, current_request_type_registry
+from invenio_requests.records.api import RequestEventFormat, Request
 from thesis.proxies import current_service
 from thesis.records.api import ThesisRecord
 
@@ -37,6 +37,7 @@ def app_config(app_config):
     app_config[
         "RECORDS_REFRESOLVER_STORE"
     ] = "invenio_jsonschemas.proxies.current_refresolver_store"
+    app_config["CACHE_TYPE"] = "SimpleCache"
 
     return app_config
 
@@ -59,7 +60,6 @@ def identity_simple_2():
     i.provides.add(Need(method="system_role", value="any_user"))
     i.provides.add(Need(method="system_role", value="authenticated_user"))
     return i
-
 
 @pytest.fixture(scope="module")
 def requests_service(app):
@@ -135,18 +135,6 @@ def users(app):
     db.session.commit()
     return [user1, user2, admin]
 
-
-@pytest.fixture(scope="module")
-def identity_simple(users):
-    """Simple identity fixture."""
-    user = users[0]
-    i = Identity(user.id)
-    i.provides.add(UserNeed(user.id))
-    i.provides.add(Need(method="system_role", value="any_user"))
-    i.provides.add(Need(method="system_role", value="authenticated_user"))
-    return i
-
-
 @pytest.fixture()
 def client_with_login(client, users):
     """Log in a user to the client."""
@@ -187,3 +175,22 @@ def example_topic(record_service, identity_simple):
     id_ = record.id
     record = ThesisRecord.pid.resolve(id_)
     return record
+@pytest.fixture(scope="module")
+def identity_creator(identity_simple): #for readability
+    return identity_simple
+
+
+@pytest.fixture(scope="module")
+def identity_receiver(identity_simple_2): #for readability
+    return identity_simple_2
+@pytest.fixture(scope="function")
+def request_with_receiver_user(requests_service, example_topic, identity_creator, users):
+    receiver = users[1]
+    type_ = current_request_type_registry.lookup(
+        "generic_request", quiet=True
+    )
+    request_item = requests_service.create(
+        identity_creator, {}, type_, receiver=receiver, topic=example_topic
+    )
+    request = Request.get_record(request_item.id)
+    return request_item
