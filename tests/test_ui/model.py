@@ -17,13 +17,14 @@ class ModelUIResourceConfig(RecordsUIResourceConfig):
     blueprint_name = "thesis"
     url_prefix = "/thesis/"
     ui_serializer_class = ThesisUIJSONSerializer
+
     templates = {
         **RecordsUIResourceConfig.templates,
-        "detail": {"layout": "test_detail.html", "blocks": {}},
+        "detail": {"layout": "TestDetail.jinja", "blocks": {}},
         "search": {
-            "layout": "test_detail.html",
+            "layout": "TestDetail.jinja",
         },
-        "edit": {"layout": "test_edit.html"},
+        "edit": {"layout": "TestEdit.jinja"},
     }
 
     components = [BabelComponent, PermissionsComponent, AllowedRequestsComponent]
