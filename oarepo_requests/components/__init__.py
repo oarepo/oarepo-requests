@@ -1,11 +1,6 @@
-from .requests import (
-    AllowedRequestsComponent,
-    OAICreateRequestsComponent,
-    PublishDraftComponent,
-)
+from .requests import AllowedRequestsComponent, PublishDraftComponent
 
 __all__ = [
     "AllowedRequestsComponent",
     "PublishDraftComponent",
-    "OAICreateRequestsComponent",
 ]

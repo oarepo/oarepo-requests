@@ -34,6 +34,7 @@ record:
         submit:
           class: oarepo_requests.actions.delete_topic.DeleteTopicSubmitAction
           generate: False
+    generic-request: {}
 
 settings:
   schema-server: 'local://'

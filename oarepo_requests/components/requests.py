@@ -11,14 +11,29 @@ from invenio_requests.proxies import (
     current_requests_service,
 )
 
+"""
+class RecordCommunitiesAction(CommunityRoles):
+
+    def __init__(self, action):
+        self._action = action
+
+    def roles(self, **kwargs):
+        return {r.name for r in current_roles.can(self._action)}
+"""
+
 
 class AllowedRequestsComponent(ServiceComponent):
     """Service component which sets all data in the record."""
+
     def _add_available_requests(self, identity, record, dict_to_save_result, **kwargs):
         # todo discriminate requests from other stuff which can be on parent in the future
         # todo what to throw if parent doesn't exist
-        requests = copy.deepcopy(record["parent"])
-        requests.pop("id")
+        parent_copy = copy.deepcopy(record["parent"])
+        requests = {
+            k: v
+            for k, v in parent_copy.items()
+            if isinstance(v, dict) and "receiver" in v
+        }  # todo more sensible request identification
         available_requests = {}
 
         for request_name, request_dict in requests.items():
@@ -43,10 +58,13 @@ class AllowedRequestsComponent(ServiceComponent):
 
         dict_to_save_result = kwargs[dict_to_save_result]
         dict_to_save_result["allowed_requests"] = available_requests
+
     def before_ui_detail(self, identity, data=None, record=None, errors=None, **kwargs):
         self._add_available_requests(identity, record, "extra_context", **kwargs)
+
     def before_ui_edit(self, identity, data=None, record=None, errors=None, **kwargs):
         self._add_available_requests(identity, record, "extra_context", **kwargs)
+
     def form_config(self, identity, data=None, record=None, errors=None, **kwargs):
         self._add_available_requests(identity, record, "form_config", **kwargs)
 
@@ -102,27 +120,7 @@ class PublishDraftComponentPrivate(ServiceComponent):
             self.uow.register(RecordCommitOp(record.parent))
 
 
-class OAICreateRequestsComponentPrivate(ServiceComponent):
-    def __init__(self, delete_request_type, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.delete_request_type = delete_request_type
-
-    def create(self, identity, data=None, record=None, **kwargs):
-        type_ = current_request_type_registry.lookup(
-            self.delete_request_type, quiet=True
-        )
-        request_item = current_requests_service.create(
-            identity, {}, type_, receiver=None, topic=record, uow=self.uow
-        )
-        setattr(record.parent, self.delete_request_type, request_item._request)
-        self.uow.register(RecordCommitOp(record.parent))
-
-
 def PublishDraftComponent(publish_request_type, delete_request_type):
     return functools.partial(
         PublishDraftComponentPrivate, publish_request_type, delete_request_type
     )
-
-
-def OAICreateRequestsComponent(delete_request_type):
-    return functools.partial(OAICreateRequestsComponentPrivate, delete_request_type)
