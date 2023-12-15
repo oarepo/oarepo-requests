@@ -1,0 +1,3 @@
+recursive-include oarepo_requests *
+prune tests
+prune thesis
