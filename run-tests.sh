@@ -2,7 +2,6 @@
 set -e
 
 OAREPO_VERSION=${OAREPO_VERSION:-11}
-OAREPO_VERSION_MAX=$((OAREPO_VERSION+1))
 
 MODEL="thesis"
 
@@ -33,8 +32,8 @@ fi
 python3 -m venv $MODEL_VENV
 . $MODEL_VENV/bin/activate
 pip install -U setuptools pip wheel
-pip install "oarepo>=$OAREPO_VERSION,<$OAREPO_VERSION_MAX"
-pip install "./$BUILD_TEST_DIR/$MODEL[tests]"
+pip install "oarepo[tests]==$OAREPO_VERSION.*"
+pip install "./$BUILD_TEST_DIR/${MODEL}[tests]"
 pip install .
 pip install oarepo-ui
 
