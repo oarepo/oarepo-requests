@@ -64,7 +64,7 @@ target/
 
 tests/test.db
 
-.venv
+.venv*
 .direnv
 
 docs/migration/data
@@ -89,3 +89,5 @@ dist/
 
 .model_venv/
 .vscode
+
+thesis
