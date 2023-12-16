@@ -6,7 +6,7 @@ from oarepo_ui.resources import (
 from oarepo_ui.resources.components import PermissionsComponent
 from thesis.resources.records.ui import ThesisUIJSONSerializer
 
-from oarepo_requests.components import AllowedRequestsComponent
+from oarepo_requests.resources.components import AllowedRequestsComponent
 
 
 class ModelUIResourceConfig(RecordsUIResourceConfig):
@@ -20,11 +20,9 @@ class ModelUIResourceConfig(RecordsUIResourceConfig):
 
     templates = {
         **RecordsUIResourceConfig.templates,
-        "detail": {"layout": "TestDetail.jinja", "blocks": {}},
-        "search": {
-            "layout": "TestDetail.jinja",
-        },
-        "edit": {"layout": "TestEdit.jinja"},
+        "detail": "TestDetail",
+        "search": "TestDetail",
+        "edit": "TestEdit",
     }
 
     components = [BabelComponent, PermissionsComponent, AllowedRequestsComponent]
