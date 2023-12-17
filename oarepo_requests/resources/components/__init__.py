@@ -3,6 +3,7 @@ import copy
 from invenio_records_resources.services.errors import PermissionDeniedError
 from invenio_requests import current_requests_service, current_request_type_registry
 from invenio_requests.customizations import RequestActions
+from oarepo_ui.resources.components import UIResourceComponent
 
 
 class AllowedRequestsComponent(UIResourceComponent):
@@ -46,11 +47,11 @@ class AllowedRequestsComponent(UIResourceComponent):
                     saved_request_data["actions"].append(action_name) # noqa we are sure that saved_request_data exists
 
 
-    def before_ui_detail(self, identity, record=None, errors=None, **kwargs):
-        self._add_available_requests(identity, record, "extra_context", kwargs)
+    def before_ui_detail(self, identity, api_record=None, errors=None, **kwargs):
+        self._add_available_requests(identity, api_record, "extra_context", kwargs)
 
-    def before_ui_edit(self, identity, record=None, errors=None, **kwargs):
-        self._add_available_requests(identity, record, "extra_context", kwargs)
+    def before_ui_edit(self, identity, api_record=None, errors=None, **kwargs):
+        self._add_available_requests(identity, api_record, "extra_context", kwargs)
 
-    def form_config(self, identity, record=None, errors=None, **kwargs):
-        self._add_available_requests(identity, record, "form_config", kwargs)
+    def form_config(self, identity, api_record=None, errors=None, **kwargs):
+        self._add_available_requests(identity, api_record, "form_config", kwargs)
