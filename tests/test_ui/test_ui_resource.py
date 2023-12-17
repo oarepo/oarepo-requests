@@ -9,18 +9,11 @@ allowed_actions = ["submit"] if is_oarepo_11 else ["submit", "delete"]
 def test_draft_publish_request_present(
     app, record_ui_resource, example_topic_draft, client_with_login, fake_manifest
 ):
-    def check_request(ctext):
-        assert "publish_draft:" in ctext
-        assert "type&#39;: &#39;publish_draft&#39;" in ctext
-        assert "&#39;status&#39;: &#39;created&#39;" in ctext
-        assert "&#39;receiver&#39;: None" in ctext
-        assert "&#39;actions&#39;: [&#39;submit&#39;]" in ctext
-
     with client_with_login.get(f"/thesis/{example_topic_draft['id']}/edit") as c:
         assert c.status_code == 200
         data = json.loads(c.text)
         assert data["available_requests"]["publish_draft"] == {'actions': allowed_actions, 'receiver': None, 'status': 'created', 'type': 'publish_draft'}
-        assert data["form_config"]["publish_draft"] == {'actions': ['submit', 'delete'], 'receiver': None, 'status': 'created', 'type': 'publish_draft'}
+        assert data["form_config"]["publish_draft"] == {'actions': allowed_actions, 'receiver': None, 'status': 'created', 'type': 'publish_draft'}
 
 
 def test_draft_publish_unauthorized(
