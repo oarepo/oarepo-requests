@@ -1,5 +1,5 @@
 import pytest
-from invenio_pidstore.errors import PIDDeletedError, PIDUnregistered
+from invenio_pidstore.errors import PIDDeletedError, PIDUnregistered, PIDDoesNotExistError
 from invenio_records_resources.services.errors import PermissionDeniedError
 from sqlalchemy.orm.exc import NoResultFound
 
@@ -20,8 +20,16 @@ def test_workflow(
         identity_simple, resp1._obj.parent.publish_draft.id, "submit"
     )
 
-    with pytest.raises(NoResultFound):
+    try:
         record_service.read_draft(identity_simple, record_id)
+        raise Exception("Expecting PIDDoesNotExistError for RDM 12 or NoResultFound for RDM 11")
+    except PIDDoesNotExistError:
+        # RDM 12 error
+        pass
+    except NoResultFound:
+        # RDM 11 error
+        pass
+
     resp2 = record_service.read(identity_simple, record_id)
     assert resp2._obj.parent.publish_draft is None
 

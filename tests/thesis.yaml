@@ -9,7 +9,7 @@ record:
     components:
     - PublishDraftComponent("publish_draft", "delete_record")
     imports:
-    - import: oarepo_requests.components.requests.PublishDraftComponent
+    - import: oarepo_requests.services.components.PublishDraftComponent
   draft:
     requests:
       publish-draft:
