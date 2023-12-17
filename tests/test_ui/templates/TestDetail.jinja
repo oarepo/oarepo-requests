@@ -1,5 +1,11 @@
 {#def extra_context #}
-available_requests=
+{
 {% for request_name, request in extra_context.allowed_requests.items() %}
-{{ request_name }}: {{ request }}
+    "{{ request_name }}": {
+        "type": {{ request.type|tojson|safe }},
+        "status": {{ request.status|tojson|safe }},
+        "receiver": {{ request.receiver|tojson|safe }},
+        "actions": {{ request.actions|tojson|safe }}
+    }
 {% endfor %}
+}
