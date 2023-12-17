@@ -1,4 +1,4 @@
-from invenio_requests.proxies import current_request_type_registry
+from invenio_requests import current_request_type_registry
 from invenio_requests.resolvers.registry import ResolverRegistry
 
 

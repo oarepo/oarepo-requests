@@ -6,7 +6,7 @@ from oarepo_ui.resources import (
 from oarepo_ui.resources.components import PermissionsComponent
 from thesis.resources.records.ui import ThesisUIJSONSerializer
 
-from oarepo_requests.resources.components import AllowedRequestsComponent
+from oarepo_requests.ui.resources.components import AllowedRequestsComponent
 
 
 class ModelUIResourceConfig(RecordsUIResourceConfig):
