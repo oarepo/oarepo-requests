@@ -3,15 +3,6 @@ from invenio_records_resources.services.uow import RecordCommitOp
 from invenio_requests.customizations import SubmitAction
 from invenio_requests.resolvers.registry import ResolverRegistry
 
-"""
-def create_delete_request(topic_service, topic_id, identity):
-    record = topic_service.record_cls.pid.resolve(topic_id)
-    allowed_types = get_allowed_request_types(type(record))
-    type_ = next(x for x in allowed_types.values() if issubclass(x, DeleteRecordRequestType))
-    current_requests_service.create(identity=identity, data={}, request_type=type_, receiver=None, topic=record)
-"""
-
-
 def publish_draft(draft, identity, uow):
     for resolver in ResolverRegistry.get_registered_resolvers():
         if resolver.matches_entity(draft):

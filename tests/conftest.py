@@ -200,3 +200,30 @@ def request_with_receiver_user(
     )
     request = Request.get_record(request_item.id)
     return request_item
+
+#-------
+import os
+
+import pytest
+from flask_security import login_user
+from flask_security.utils import hash_password
+from invenio_accounts.testutils import login_user_via_session
+from invenio_app.factory import create_api
+
+from thesis.proxies import current_service
+@pytest.fixture
+def request_data(example_topic):
+    input_data = {
+        "receiver": {"user": "1"},
+        "request_type": "generic_request",
+        "topic": {"thesis": example_topic["id"]}
+    }
+    return input_data
+@pytest.fixture()
+def client_with_credentials(client, users):
+    """Log in a user to the client."""
+    user = users[2]
+    login_user(user, remember=True)
+    login_user_via_session(client, email=user.email)
+
+    return client

@@ -96,3 +96,9 @@ def test_receiver_permissions_user(
         identity=identity_receiver, id_=request_id, action="accept"
     )
     assert receiver_accept.data["status"] == "accepted"
+
+def test_api_create(client_with_credentials, request_data):
+    headers = {'accept': 'application/json', 'content-type': 'application/json'}
+    resp = client_with_credentials.post("/requests/create", headers=headers, json=request_data)
+    assert resp.status_code == 201
+
