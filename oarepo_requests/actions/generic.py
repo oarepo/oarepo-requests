@@ -3,6 +3,9 @@ from invenio_requests.customizations import actions
 
 from ..utils import get_matching_service
 
+"""
+
+not needed for now
 
 def set_request_on_parent(request, uow):
     topic = request.topic.resolve()
@@ -12,13 +15,14 @@ def set_request_on_parent(request, uow):
         uow.register(
             RecordCommitOp(topic, indexer=topic_service.indexer, index_refresh=True)
         )
-        """
+
         # the database query for topic parent is needed only for this; i'm leaving it here for reference and explanation 
-        for ext in topic.parent._extensions:
-            from invenio_records.systemfields.base import SystemFieldsExt
-            if isinstance(ext, SystemFieldsExt):
-                ext.declared_fields[request.type.type_id].pre_commit(topic.parent)
-        """
+        #for ext in topic.parent._extensions:
+        #    from invenio_records.systemfields.base import SystemFieldsExt
+        #    if isinstance(ext, SystemFieldsExt):
+        #        ext.declared_fields[request.type.type_id].pre_commit(topic.parent)
+
+
         uow.register(RecordCommitOp(topic.parent))
 
 
@@ -42,7 +46,6 @@ class SubmitAction(actions.SubmitAction):
 
 
 class CreateAndSubmitAction(actions.CreateAndSubmitAction):
-    """Create and submit a request."""
 
     def execute(self, identity, uow):
         super().execute(identity, uow)
@@ -50,7 +53,7 @@ class CreateAndSubmitAction(actions.CreateAndSubmitAction):
 
 
 class AcceptAction(actions.AcceptAction):
-    """Delete a request."""
+
 
     def execute(self, identity, uow):
         super().execute(identity, uow)
@@ -58,7 +61,7 @@ class AcceptAction(actions.AcceptAction):
 
 
 class DeleteAction(actions.DeleteAction):
-    """Delete a request."""
+
 
     def execute(self, identity, uow):
         super().execute(identity, uow)
@@ -66,7 +69,7 @@ class DeleteAction(actions.DeleteAction):
 
 
 class CancelAction(actions.CancelAction):
-    """Cancel a request."""
+
 
     def execute(self, identity, uow):
         super().execute(identity, uow)
@@ -74,7 +77,7 @@ class CancelAction(actions.CancelAction):
 
 
 class ExpireAction(actions.ExpireAction):
-    """Expire a request."""
+
 
     def execute(self, identity, uow):
         super().execute(identity, uow)
@@ -82,8 +85,9 @@ class ExpireAction(actions.ExpireAction):
 
 
 class DeclineAction(actions.DeclineAction):
-    """Expire a request."""
+
 
     def execute(self, identity, uow):
         super().execute(identity, uow)
         unset_request_on_parent(self.request, uow)
+"""
