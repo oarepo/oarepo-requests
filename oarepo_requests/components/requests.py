@@ -70,15 +70,12 @@ class AllowedRequestsComponent(ServiceComponent):
 
 
 class PublishDraftComponentPrivate(ServiceComponent):
-    """Service component for request integration."""
-
     def __init__(self, publish_request_type, delete_request_type, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.publish_request_type = publish_request_type
         self.delete_request_type = delete_request_type
 
     def create(self, identity, data=None, record=None, **kwargs):
-        """Create the review if requested."""
         # topic and request_type in kwargs
         if self.publish_request_type:
             type_ = current_request_type_registry.lookup(
@@ -87,8 +84,14 @@ class PublishDraftComponentPrivate(ServiceComponent):
             request_item = current_requests_service.create(
                 identity, {}, type_, receiver=None, topic=record, uow=self.uow
             )
-            setattr(record.parent, self.publish_request_type, request_item._request)
-            self.uow.register(RecordCommitOp(record.parent))
+            current_requests_service.execute_action(
+                identity, request_item["id"], "submit", uow=self.uow
+            )
+            setattr(record, "parent", self.uow._operations[2]._record.parent)
+            # record = self.uow._operations[2]._record
+            # record = self.uow._operations[1]._record
+            # setattr(record.parent, self.publish_request_type, request_item._request)
+            # self.uow.register(RecordCommitOp(record.parent))
 
     def publish(self, identity, data=None, record=None, **kwargs):
         publish_request = getattr(record.parent, self.publish_request_type)

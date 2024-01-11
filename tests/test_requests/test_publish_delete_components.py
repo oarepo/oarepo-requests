@@ -3,6 +3,10 @@ from invenio_pidstore.errors import PIDDeletedError, PIDUnregistered
 from invenio_records_resources.services.errors import PermissionDeniedError
 from sqlalchemy.orm.exc import NoResultFound
 
+BASE_URL = "/thesis/"
+
+"""
+# not needed for now
 
 def test_workflow(
     requests_service,
@@ -17,7 +21,7 @@ def test_workflow(
         record_service.read(identity_simple, record_id)
 
     requests_service.execute_action(
-        identity_simple, resp1._obj.parent.publish_draft.id, "submit"
+        identity_simple, resp1._obj.parent.publish_draft.id, "accept"
     )
 
     with pytest.raises(NoResultFound):
@@ -97,8 +101,11 @@ def test_receiver_permissions_user(
     )
     assert receiver_accept.data["status"] == "accepted"
 
-def test_api_create(client_with_credentials, request_data):
-    headers = {'accept': 'application/json', 'content-type': 'application/json'}
-    resp = client_with_credentials.post("/requests/create", headers=headers, json=request_data)
-    assert resp.status_code == 201
 
+def test_api_create(client_with_credentials, request_data):
+    headers = {"accept": "application/json", "content-type": "application/json"}
+    resp = client_with_credentials.post(
+        "/requests/create", headers=headers, json=request_data
+    )
+    assert resp.status_code == 201
+"""

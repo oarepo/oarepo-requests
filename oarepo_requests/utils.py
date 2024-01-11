@@ -54,7 +54,19 @@ def allowed_request_types_for_record_cls(queryied_record_cls):
                 break
     return ret
 
-
+"""
+{'minimum_should_match': '0<1', 
+ 'filter': [Bool(minimum_should_match=1, 
+                 must=[QueryString(query='swf1h-psj10')], 
+                 should=[Bool
+                         (must=[Terms(status=['created']), 
+                                Terms(grants=['created_by.system_role.any_user', 
+                                                  'created_by.community.a26e6dfa-86ef-4a3b-9cbb-d6f034533a45.owner', 
+                                                  'created_by.id.1', 'created_by.system_role.authenticated_user'])])
+                     , 
+                         Bool(minimum_should_match=1, must=[Terms(status=['submitted', 'deleted', 'cancelled', 'expired', 'accepted', 'declined'])], 
+                        should=[Terms(grants=['created_by.system_role.any_user', 'created_by.community.a26e6dfa-86ef-4a3b-9cbb-d6f034533a45.owner', 'created_by.id.1', 'created_by.system_role.authenticated_user']), Terms(grants=['receiver.system_role.any_user', 'receiver.community.a26e6dfa-86ef-4a3b-9cbb-d6f034533a45.owner', 'receiver.id.1', 'receiver.system_role.authenticated_user'])])])], 'should': []}
+"""
 def request_exists(
     identity,
     topic,

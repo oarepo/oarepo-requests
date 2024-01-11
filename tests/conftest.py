@@ -2,10 +2,8 @@ import os
 
 import pytest
 from flask_principal import Identity, Need, UserNeed
-from flask_security.utils import hash_password, login_user
-from invenio_access.models import ActionRoles
-from invenio_access.permissions import superuser_access
-from invenio_accounts.models import Role
+from flask_security.utils import login_user
+from invenio_access.permissions import system_identity
 from invenio_accounts.testutils import login_user_via_session
 from invenio_app.factory import create_api
 from invenio_requests.customizations import CommentEventType, LogEventType
@@ -91,6 +89,27 @@ def create_request(requests_service):
     return _create_request
 
 
+@pytest.fixture
+def request_data_factory():
+    def create_data(community, topic, data):
+        if not isinstance(community, str):
+            community_id = community.id
+        else:
+            community_id = community
+        input_data = {
+            "receiver": {"oarepo_community": community_id},
+            "request_type": type,
+            "topic": {"thesis": topic["id"]},
+        }
+        if creator:
+            input_data["creator"] = creator
+        if payload:
+            input_data["payload"] = payload
+        return input_data
+
+    return create_data
+
+
 @pytest.fixture()
 def submit_request(create_request, requests_service, **kwargs):
     """Opened Request Factory fixture."""
@@ -105,36 +124,21 @@ def submit_request(create_request, requests_service, **kwargs):
 
 
 @pytest.fixture(scope="module")
-def users(app):
-    """Create example users."""
-    # This is a convenient way to get a handle on db that, as opposed to the
-    # fixture, won't cause a DB rollback after the test is run in order
-    # to help with test performance (creating users is a module -if not higher-
-    # concern)
+def users(app, UserFixture):
     from invenio_db import db
 
-    with db.session.begin_nested():
-        datastore = app.extensions["security"].datastore
+    user1 = UserFixture(
+        email="user1@example.org",
+        password="password",
+    )
+    user1.create(app, db)
 
-        su_role = Role(name="superuser-access")
-        db.session.add(su_role)
-
-        su_action_role = ActionRoles.create(action=superuser_access, role=su_role)
-        db.session.add(su_action_role)
-
-        user1 = datastore.create_user(
-            email="user1@example.org", password=hash_password("password"), active=True
-        )
-        user2 = datastore.create_user(
-            email="user2@example.org", password=hash_password("password"), active=True
-        )
-        admin = datastore.create_user(
-            email="admin@example.org", password=hash_password("password"), active=True
-        )
-        admin.roles.append(su_role)
-
-    db.session.commit()
-    return [user1, user2, admin]
+    user2 = UserFixture(
+        email="user2@example.org",
+        password="password",
+    )
+    user2.create(app, db)
+    return [user1, user2]
 
 
 @pytest.fixture()
@@ -144,6 +148,15 @@ def client_with_login(client, users):
     login_user(user)
     login_user_via_session(client, email=user.email)
     return client
+
+
+@pytest.fixture
+def client_factory(app):
+    def _client_factory():
+        with app.test_client() as client:
+            return client
+
+    return _client_factory
 
 
 @pytest.fixture(scope="function")
@@ -168,6 +181,16 @@ def record_service():
 def example_topic_draft(record_service, identity_simple):
     draft = record_service.create(identity_simple, {})
     return draft._obj
+
+
+@pytest.fixture()
+def record_factory(record_service):
+    def record():
+        draft = record_service.create(system_identity, {})
+        record = record_service.publish(system_identity, draft.id)
+        return record._obj
+
+    return record
 
 
 @pytest.fixture(scope="function")
@@ -201,24 +224,27 @@ def request_with_receiver_user(
     request = Request.get_record(request_item.id)
     return request_item
 
-#-------
+
+# -------
 import os
 
 import pytest
 from flask_security import login_user
-from flask_security.utils import hash_password
 from invenio_accounts.testutils import login_user_via_session
 from invenio_app.factory import create_api
-
 from thesis.proxies import current_service
+
+
 @pytest.fixture
 def request_data(example_topic):
     input_data = {
         "receiver": {"user": "1"},
         "request_type": "generic_request",
-        "topic": {"thesis": example_topic["id"]}
+        "topic": {"thesis": example_topic["id"]},
     }
     return input_data
+
+
 @pytest.fixture()
 def client_with_credentials(client, users):
     """Log in a user to the client."""
