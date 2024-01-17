@@ -145,10 +145,25 @@ def users(app, UserFixture):
 def client_with_login(client, users):
     """Log in a user to the client."""
     user = users[0]
-    login_user(user)
-    login_user_via_session(client, email=user.email)
+    user.login(client)
+    #login_user(user)
+    #login_user_via_session(client, email=user.email)
     return client
 
+@pytest.fixture()
+def client_logged_as(client, users):
+    """Logs in a user to the client."""
+
+    def log_user(user_email):
+        """Log the user."""
+        available_users = users
+
+        user = next((u.user for u in available_users if u.email == user_email), None)
+        login_user(user, remember=True)
+        login_user_via_session(client, email=user_email)
+        return client
+
+    return log_user
 
 @pytest.fixture
 def client_factory(app):

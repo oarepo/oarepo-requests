@@ -1,12 +1,10 @@
 import copy
-import functools
+
 
 from invenio_records_resources.services.errors import PermissionDeniedError
 from invenio_records_resources.services.records.components import ServiceComponent
-from invenio_records_resources.services.uow import RecordCommitOp
-from invenio_requests.customizations import LogEventType, RequestActions
+from invenio_requests.customizations import RequestActions
 from invenio_requests.proxies import (
-    current_events_service,
     current_request_type_registry,
     current_requests_service,
 )
@@ -28,12 +26,15 @@ class AllowedRequestsComponent(ServiceComponent):
     def _add_available_requests(self, identity, record, dict_to_save_result, **kwargs):
         # todo discriminate requests from other stuff which can be on parent in the future
         # todo what to throw if parent doesn't exist
+        """
         parent_copy = copy.deepcopy(record["parent"])
         requests = {
             k: v
             for k, v in parent_copy.items()
             if isinstance(v, dict) and "receiver" in v
         }  # todo more sensible request identification
+        """
+        requests = record["requests"]
         available_requests = {}
 
         for request_name, request_dict in requests.items():
@@ -68,7 +69,7 @@ class AllowedRequestsComponent(ServiceComponent):
     def form_config(self, identity, data=None, record=None, errors=None, **kwargs):
         self._add_available_requests(identity, record, "form_config", **kwargs)
 
-
+"""
 class PublishDraftComponentPrivate(ServiceComponent):
     def __init__(self, publish_request_type, delete_request_type, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -127,3 +128,4 @@ def PublishDraftComponent(publish_request_type, delete_request_type):
     return functools.partial(
         PublishDraftComponentPrivate, publish_request_type, delete_request_type
     )
+"""

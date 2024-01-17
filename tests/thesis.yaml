@@ -14,7 +14,12 @@ record:
           - PublishDraftRequestType
           imports:
           - import: oarepo_requests.types.publish_draft.PublishDraftRequestType
-
+      non-duplicable:
+        type:
+          base-classes:
+          - NonDuplicableRequest
+          imports:
+          - import: tests.mock_requests.type.NonDuplicableRequest
   requests:
     delete-record:
       type:

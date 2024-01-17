@@ -45,7 +45,7 @@ def test_links_in_search(client_factory, identity_simple, users):
     print()
 """
 
-def test_publish(client_factory, identity_simple, users, monkeypatch):
+def test_publish(client_factory, identity_simple, users):
     creator_client = users[0].login(client_factory())
     receiver_client = users[1].login(client_factory())
     receiver = users[1]

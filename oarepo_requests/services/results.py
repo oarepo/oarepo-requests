@@ -75,6 +75,6 @@ class RequestsMixin:
 class RequestsAwareRecordItem(RecordItem, RequestsMixin):
     """Requests aware record result."""
 
-
+"""
 class RequestsAwareRecordList(RecordList, RequestsMixin):
-    """List of requests aware records result."""
+"""

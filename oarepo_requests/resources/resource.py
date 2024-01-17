@@ -39,14 +39,14 @@ class OARepoRequestsResource(Resource, ErrorHandlersMixin):
         items = self.service.create(
             identity=g.identity,
             data=resource_requestctx.data,
-            request_type=resource_requestctx.data.get("request_type", None),
-            receiver=stringify_first_val(resource_requestctx.data.get("receiver", None))
+            request_type=resource_requestctx.data.pop("request_type", None),
+            receiver=stringify_first_val(resource_requestctx.data.pop("receiver", None))
             if resource_requestctx.data
             else None,
-            creator=stringify_first_val(resource_requestctx.data.get("creator", None))
+            creator=stringify_first_val(resource_requestctx.data.pop("creator", None))
             if resource_requestctx.data
             else None,
-            topic=stringify_first_val(resource_requestctx.data.get("topic", None))
+            topic=stringify_first_val(resource_requestctx.data.pop("topic", None))
             if resource_requestctx.data
             else None,
             expand=resource_requestctx.args.get("expand", False),

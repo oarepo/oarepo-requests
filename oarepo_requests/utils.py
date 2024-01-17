@@ -8,6 +8,7 @@ from invenio_search.engine import dsl
 from oarepo_requests.errors import OpenRequestAlreadyExists
 from oarepo_requests.resources.config import OARepoRequestsResourceConfig
 from invenio_access.permissions import system_identity
+from invenio_records_resources.services.errors import PermissionDeniedError
 
 
 def get_matching_service(record):
@@ -16,6 +17,7 @@ def get_matching_service(record):
             return current_service_registry.get(resolver._service_id)
     return None
 
+
 def get_request_from_record(identity, record, request_type, *args, **kwargs):
     request = getattr(record.parent, request_type, None)
     #request =
@@ -23,10 +25,10 @@ def get_request_from_record(identity, record, request_type, *args, **kwargs):
     return request
 
 def get_requests_from_record(identity, record, *args, **kwargs):
-    requests = list(current_requests_service.scan(identity, extra_filter=dsl.Q("query_string", query=record["id"])).hits)
-    #request = current_requests_service.search(identity, params=None, search_preference=None, expand=False, **kwargs)
-    #request =
-
+    try:
+        requests = list(current_requests_service.scan(identity, extra_filter=dsl.Q("query_string", query=record["id"])).hits)
+    except PermissionDeniedError: # if user is not allowed to search requests, it should not return any but should still allow reading of the record
+        requests = []
     return requests
 
 def get_post_request_url():
