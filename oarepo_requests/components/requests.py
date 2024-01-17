@@ -1,6 +1,5 @@
 import copy
 
-
 from invenio_records_resources.services.errors import PermissionDeniedError
 from invenio_records_resources.services.records.components import ServiceComponent
 from invenio_requests.customizations import RequestActions
@@ -68,6 +67,7 @@ class AllowedRequestsComponent(ServiceComponent):
 
     def form_config(self, identity, data=None, record=None, errors=None, **kwargs):
         self._add_available_requests(identity, record, "form_config", **kwargs)
+
 
 """
 class PublishDraftComponentPrivate(ServiceComponent):

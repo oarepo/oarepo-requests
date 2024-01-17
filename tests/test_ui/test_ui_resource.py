@@ -7,6 +7,7 @@ def test_draft_publish_request_present(
         assert "&#39;status&#39;: &#39;created&#39;" in ctext
         assert "&#39;receiver&#39;: None" in ctext
         assert "&#39;actions&#39;: [&#39;submit&#39;]" in ctext
+
     user = users[0]
     logged_client = client_logged_as(user.email)
     with logged_client.get(f"/thesis/{example_topic_draft['id']}/edit") as c:

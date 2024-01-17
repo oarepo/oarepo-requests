@@ -1,12 +1,17 @@
-from oarepo_requests.errors import OpenRequestAlreadyExists
-from .utils import BASE_URL, BASE_URL_REQUESTS, link_api2testclient
 import pytest
+
+from oarepo_requests.errors import OpenRequestAlreadyExists
+
+from .utils import BASE_URL, BASE_URL_REQUESTS, link_api2testclient
+
+
 def data(receiver, record):
     return {
         "receiver": {"user": receiver.id},
         "request_type": "non_duplicable",
         "topic": {"thesis_draft": record.json["id"]},
     }
+
 
 def test_can_create(client_factory, identity_simple, users):
     creator_client = users[0].login(client_factory())
@@ -51,5 +56,10 @@ def test_can_possibly_create(client_factory, identity_simple, users):
         return None
 
     record_resp_request = receiver_client.get(f"{BASE_URL}{draft1.json['id']}/draft")
-    assert find_request_type(record_resp_no_request.json['request_types'], "non_duplicable")
-    assert find_request_type(record_resp_request.json['request_types'], "non_duplicable") is None
+    assert find_request_type(
+        record_resp_no_request.json["request_types"], "non_duplicable"
+    )
+    assert (
+        find_request_type(record_resp_request.json["request_types"], "non_duplicable")
+        is None
+    )

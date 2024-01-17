@@ -10,6 +10,7 @@ class OpenRequestAlreadyExists(Exception):
         """Exception's description."""
         return f"There is already an open request of {self.request.name} on {self.record.id}."
 
+
 class UnknownRequestType(Exception):
     def __init__(self, request_type):
         self.request_type = request_type

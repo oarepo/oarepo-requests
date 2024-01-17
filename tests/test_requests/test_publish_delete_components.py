@@ -1,7 +1,3 @@
-import pytest
-from invenio_pidstore.errors import PIDDeletedError, PIDUnregistered
-from invenio_records_resources.services.errors import PermissionDeniedError
-from sqlalchemy.orm.exc import NoResultFound
 
 BASE_URL = "/thesis/"
 

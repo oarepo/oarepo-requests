@@ -1,5 +1,6 @@
-
+from invenio_access.permissions import system_identity
 from invenio_records_resources.proxies import current_service_registry
+from invenio_records_resources.services.errors import PermissionDeniedError
 from invenio_requests import current_requests_service
 from invenio_requests.proxies import current_request_type_registry
 from invenio_requests.resolvers.registry import ResolverRegistry
@@ -7,8 +8,6 @@ from invenio_search.engine import dsl
 
 from oarepo_requests.errors import OpenRequestAlreadyExists
 from oarepo_requests.resources.config import OARepoRequestsResourceConfig
-from invenio_access.permissions import system_identity
-from invenio_records_resources.services.errors import PermissionDeniedError
 
 
 def get_matching_service(record):
@@ -20,16 +19,24 @@ def get_matching_service(record):
 
 def get_request_from_record(identity, record, request_type, *args, **kwargs):
     request = getattr(record.parent, request_type, None)
-    #request =
+    # request =
 
     return request
 
+
 def get_requests_from_record(identity, record, *args, **kwargs):
     try:
-        requests = list(current_requests_service.scan(identity, extra_filter=dsl.Q("query_string", query=record["id"])).hits)
-    except PermissionDeniedError: # if user is not allowed to search requests, it should not return any but should still allow reading of the record
+        requests = list(
+            current_requests_service.scan(
+                identity, extra_filter=dsl.Q("query_string", query=record["id"])
+            ).hits
+        )
+    except (
+        PermissionDeniedError
+    ):  # if user is not allowed to search requests, it should not return any but should still allow reading of the record
         requests = []
     return requests
+
 
 def get_post_request_url():
     return f"{{+api}}{OARepoRequestsResourceConfig.url_prefix}"
@@ -56,6 +63,7 @@ def allowed_request_types_for_record_cls(queryied_record_cls):
                 break
     return ret
 
+
 """
 {'minimum_should_match': '0<1', 
  'filter': [Bool(minimum_should_match=1, 
@@ -69,6 +77,8 @@ def allowed_request_types_for_record_cls(queryied_record_cls):
                          Bool(minimum_should_match=1, must=[Terms(status=['submitted', 'deleted', 'cancelled', 'expired', 'accepted', 'declined'])], 
                         should=[Terms(grants=['created_by.system_role.any_user', 'created_by.community.a26e6dfa-86ef-4a3b-9cbb-d6f034533a45.owner', 'created_by.id.1', 'created_by.system_role.authenticated_user']), Terms(grants=['receiver.system_role.any_user', 'receiver.community.a26e6dfa-86ef-4a3b-9cbb-d6f034533a45.owner', 'receiver.id.1', 'receiver.system_role.authenticated_user'])])])], 'should': []}
 """
+
+
 def request_exists(
     identity,
     topic,

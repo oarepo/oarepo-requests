@@ -1,8 +1,9 @@
 from invenio_records_resources.services.uow import RecordDeleteOp
 
-from ..utils import get_matching_service
 # from .generic import AcceptAction
 from invenio_requests.customizations import actions
+
+from ..utils import get_matching_service
 
 
 class DeleteTopicAcceptAction(actions.AcceptAction):

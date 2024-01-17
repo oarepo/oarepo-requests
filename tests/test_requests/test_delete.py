@@ -1,13 +1,5 @@
-import pytest
-from invenio_drafts_resources.services import (
-    RecordServiceConfig as InvenioRecordDraftsServiceConfig,
-)
-from oarepo_runtime.services.config.service import PermissionsPresetsConfigMixin
 from thesis.records.api import ThesisDraft, ThesisRecord
-from thesis.services.records.config import ThesisServiceConfig
 
-from oarepo_requests.errors import OpenRequestAlreadyExists
-from invenio_requests.customizations import actions
 from .utils import BASE_URL, BASE_URL_REQUESTS, link_api2testclient
 
 
@@ -15,6 +7,7 @@ def test_delete(client_factory, record_factory, identity_simple, users, monkeypa
     creator_client = users[0].login(client_factory())
     receiver_client = users[1].login(client_factory())
     receiver = users[1]
+
     def data(receiver, record):
         return {
             "receiver": {"user": receiver.id},
@@ -58,9 +51,7 @@ def test_delete(client_factory, record_factory, identity_simple, users, monkeypa
     )
     record = receiver_client.get(f"{BASE_URL}{record2['id']}")
     decline = receiver_client.post(
-        link_api2testclient(
-            record.json["requests"][0]["links"]["actions"]["decline"]
-        )
+        link_api2testclient(record.json["requests"][0]["links"]["actions"]["decline"])
     )
     declined_request = creator_client.get(
         f"{BASE_URL_REQUESTS}{resp_request_create.json['id']}"
@@ -82,6 +73,7 @@ def test_delete(client_factory, record_factory, identity_simple, users, monkeypa
         f"{BASE_URL_REQUESTS}{resp_request_create.json['id']}"
     )
     assert canceled_request.json["status"] == "cancelled"
+
 
 """
 def test_errors(client_factory, record_factory, identity_simple, users, monkeypatch):

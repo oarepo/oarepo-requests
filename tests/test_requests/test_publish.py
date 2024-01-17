@@ -1,15 +1,6 @@
-import pytest
-from invenio_drafts_resources.services import (
-    RecordServiceConfig as InvenioRecordDraftsServiceConfig,
-)
-from oarepo_runtime.services.config.service import PermissionsPresetsConfigMixin
 from thesis.records.api import ThesisDraft, ThesisRecord
-from thesis.services.records.config import ThesisServiceConfig
-
-from oarepo_requests.errors import OpenRequestAlreadyExists
 
 from .utils import BASE_URL, BASE_URL_REQUESTS, link_api2testclient
-from invenio_requests.records.api import Request
 
 
 def data(receiver, record):
@@ -18,6 +9,7 @@ def data(receiver, record):
         "request_type": "publish_draft",
         "topic": {"thesis_draft": record.json["id"]},
     }
+
 
 """
 def test_links_in_search(client_factory, identity_simple, users):
@@ -44,6 +36,7 @@ def test_links_in_search(client_factory, identity_simple, users):
     response_search = receiver_client.get(BASE_URL)
     print()
 """
+
 
 def test_publish(client_factory, identity_simple, users):
     creator_client = users[0].login(client_factory())
@@ -96,9 +89,7 @@ def test_publish(client_factory, identity_simple, users):
     )
     record = receiver_client.get(f"{BASE_URL}{draft2.json['id']}/draft")
     decline = receiver_client.post(
-        link_api2testclient(
-            record.json["requests"][0]["links"]["actions"]["decline"]
-        )
+        link_api2testclient(record.json["requests"][0]["links"]["actions"]["decline"])
     )
     declined_request = creator_client.get(
         f"{BASE_URL_REQUESTS}{resp_request_create.json['id']}"
@@ -121,6 +112,7 @@ def test_publish(client_factory, identity_simple, users):
         f"{BASE_URL_REQUESTS}{resp_request_create.json['id']}"
     )
     assert canceled_request.json["status"] == "cancelled"
+
 
 """
 def test_errors(client_factory, record_factory, identity_simple, users, monkeypatch):
@@ -148,4 +140,3 @@ def test_errors(client_factory, record_factory, identity_simple, users, monkeypa
     with pytest.raises(OpenRequestAlreadyExists):
         creator_client.post(BASE_URL_REQUESTS, json=data(receiver, draft))
 """
-

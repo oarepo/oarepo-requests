@@ -7,7 +7,6 @@ from invenio_records_resources.resources.records.resource import (
     request_headers,
     request_view_args,
 )
-from invenio_requests import current_request_type_registry
 
 
 class OARepoRequestsResource(Resource, ErrorHandlersMixin):

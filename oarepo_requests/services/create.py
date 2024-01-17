@@ -1,7 +1,7 @@
 from invenio_records_resources.services.uow import unit_of_work
+from invenio_requests.proxies import current_request_type_registry
 
 from oarepo_requests.errors import UnknownRequestType
-from invenio_requests.proxies import current_request_type_registry
 
 
 class CreateRequestsService:

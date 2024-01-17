@@ -1,5 +1,7 @@
-from ..utils import get_matching_service
 from invenio_requests.customizations import actions
+
+from ..utils import get_matching_service
+
 
 def publish_draft(draft, identity, uow):
     topic_service = get_matching_service(draft)
