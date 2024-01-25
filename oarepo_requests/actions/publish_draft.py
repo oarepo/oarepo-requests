@@ -1,10 +1,10 @@
 from invenio_requests.customizations import actions
 
-from ..utils import get_matching_service
+from ..utils import get_matching_service_for_record
 
 
 def publish_draft(draft, identity, uow):
-    topic_service = get_matching_service(draft)
+    topic_service = get_matching_service_for_record(draft)
     if not topic_service:
         raise KeyError(f"topic {draft} service not found")
     id_ = draft["id"]

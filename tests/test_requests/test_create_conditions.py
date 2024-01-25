@@ -2,7 +2,7 @@ import pytest
 
 from oarepo_requests.errors import OpenRequestAlreadyExists
 
-from .utils import BASE_URL, BASE_URL_REQUESTS, link_api2testclient
+from .utils import link_api2testclient
 
 
 def data(receiver, record):
@@ -13,15 +13,15 @@ def data(receiver, record):
     }
 
 
-def test_can_create(client_factory, identity_simple, users):
+def test_can_create(client_factory, identity_simple, users, urls):
     creator_client = users[0].login(client_factory())
     receiver_client = users[1].login(client_factory())
     receiver = users[1]
 
-    draft1 = creator_client.post(BASE_URL, json={})
+    draft1 = creator_client.post(urls["BASE_URL"], json={})
 
     resp_request_create = creator_client.post(
-        BASE_URL_REQUESTS, json=data(receiver, draft1)
+        urls["BASE_URL_REQUESTS"], json=data(receiver, draft1)
     )
 
     resp_request_submit = creator_client.post(
@@ -30,19 +30,19 @@ def test_can_create(client_factory, identity_simple, users):
 
     with pytest.raises(OpenRequestAlreadyExists):
         resp_request_create2 = creator_client.post(
-            BASE_URL_REQUESTS, json=data(receiver, draft1)
+            urls["BASE_URL_REQUESTS"], json=data(receiver, draft1)
         )
 
 
-def test_can_possibly_create(client_factory, identity_simple, users):
+def test_can_possibly_create(client_factory, identity_simple, users, urls):
     creator_client = users[0].login(client_factory())
     receiver_client = users[1].login(client_factory())
     receiver = users[1]
 
-    draft1 = creator_client.post(BASE_URL, json={})
-    record_resp_no_request = receiver_client.get(f"{BASE_URL}{draft1.json['id']}/draft")
+    draft1 = creator_client.post(urls["BASE_URL"], json={})
+    record_resp_no_request = receiver_client.get(f"{urls['BASE_URL']}{draft1.json['id']}/draft")
     resp_request_create = creator_client.post(
-        BASE_URL_REQUESTS, json=data(receiver, draft1)
+        urls["BASE_URL_REQUESTS"], json=data(receiver, draft1)
     )
 
     resp_request_submit = creator_client.post(
@@ -55,7 +55,7 @@ def test_can_possibly_create(client_factory, identity_simple, users):
                 return request
         return None
 
-    record_resp_request = receiver_client.get(f"{BASE_URL}{draft1.json['id']}/draft")
+    record_resp_request = receiver_client.get(f"{urls['BASE_URL']}{draft1.json['id']}/draft")
     assert find_request_type(
         record_resp_no_request.json["request_types"], "non_duplicable"
     )

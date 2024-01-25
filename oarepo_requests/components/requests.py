@@ -23,15 +23,14 @@ class AllowedRequestsComponent(ServiceComponent):
     """Service component which sets all data in the record."""
 
     def _add_available_requests(self, identity, record, dict_to_save_result, **kwargs):
-        # todo discriminate requests from other stuff which can be on parent in the future
-        # todo what to throw if parent doesn't exist
+        # TODO deprecated?
         """
         parent_copy = copy.deepcopy(record["parent"])
         requests = {
             k: v
             for k, v in parent_copy.items()
             if isinstance(v, dict) and "receiver" in v
-        }  # todo more sensible request identification
+        }
         """
         requests = record["requests"]
         available_requests = {}

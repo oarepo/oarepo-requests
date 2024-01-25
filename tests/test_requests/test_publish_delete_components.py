@@ -1,6 +1,3 @@
-
-BASE_URL = "/thesis/"
-
 """
 # not needed for now
 

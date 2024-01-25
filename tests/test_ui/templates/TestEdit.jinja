@@ -1,11 +1,26 @@
-{#def form_config, extra_context #}
+{#def record #}
 available_requests=
-{% for request_name, request in extra_context.allowed_requests.items() %}
-{{ request_name }}: {{ request }}
-{% endfor %}
-{% if form_config %}
-allowed requests in form config:
-{% for request_name, request in form_config["allowed_requests"].items() %}
-{{ request_name }}: {{ request }}
-{% endfor %}
+{% for request in record.requests %}
+request_id: {{ request.id }}
+{% if request['created_by'] %}
+    created_by:
+    {% for ref_obj_name, ref_object_value in request['created_by'].items()%}
+        {{ ref_obj_name }}: {{ ref_object_value }}
+    {% endfor %}
 {% endif %}
+{% if request['receiver'] %}
+    receiver:
+    {% for ref_obj_name, ref_object_value in request['receiver'].items()%}
+        {{ ref_obj_name }}: {{ ref_object_value }}
+    {% endfor %}
+{% endif %}
+{% if request['topic'] %}
+    topic:
+    {% for ref_obj_name, ref_object_value in request['topic'].items()%}
+        {{ ref_obj_name }}: {{ ref_object_value }}
+    {% endfor %}
+{% endif %}
+{% if request['description'] %}
+    description: {{ request['description'] }}
+{% endif %}
+{% endfor %}

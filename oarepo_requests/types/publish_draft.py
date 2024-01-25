@@ -10,5 +10,5 @@ class PublishDraftRequestType(OARepoRequestType):
         **RequestType.available_actions,
         "accept": PublishDraftAcceptAction,
     }
-
+    description = "request publishing of a draft"
     receiver_can_be_none = True

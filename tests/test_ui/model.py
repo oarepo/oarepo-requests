@@ -20,14 +20,13 @@ class ModelUIResourceConfig(RecordsUIResourceConfig):
 
     templates = {
         **RecordsUIResourceConfig.templates,
-        "detail": {"layout": "TestDetail.jinja", "blocks": {}},
-        "search": {
-            "layout": "TestDetail.jinja",
-        },
-        "edit": {"layout": "TestEdit.jinja"},
+        "detail": "TestDetail",
+        "search": "TestDetail",
+        "edit": "TestEdit",
     }
 
-    components = [BabelComponent, PermissionsComponent, AllowedRequestsComponent]
+    components = [BabelComponent, PermissionsComponent]
+
 
 
 class ModelUIResource(RecordsUIResource):

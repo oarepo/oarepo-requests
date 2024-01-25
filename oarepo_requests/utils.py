@@ -7,14 +7,9 @@ from invenio_requests.resolvers.registry import ResolverRegistry
 from invenio_search.engine import dsl
 
 from oarepo_requests.errors import OpenRequestAlreadyExists
-from oarepo_requests.resources.config import OARepoRequestsResourceConfig
 
 
-def get_matching_service(record):
-    for resolver in ResolverRegistry.get_registered_resolvers():
-        if resolver.matches_entity(record):
-            return current_service_registry.get(resolver._service_id)
-    return None
+
 
 
 def get_request_from_record(identity, record, request_type, *args, **kwargs):
@@ -37,9 +32,10 @@ def get_requests_from_record(identity, record, *args, **kwargs):
         requests = []
     return requests
 
-
+"""
 def get_post_request_url():
     return f"{{+api}}{OARepoRequestsResourceConfig.url_prefix}"
+"""
 
 
 def allowed_request_types_for_record_cls(queryied_record_cls):
@@ -115,7 +111,12 @@ def request_exists(
     )
     return next(results.hits)["id"] if results.total > 0 else None
 
+def open_request_exists(topic, type_id, creator=None):
+    existing_request = request_exists(system_identity, topic, type_id)
+    if existing_request:
+        raise OpenRequestAlreadyExists(existing_request, topic)
 
+# TODO these things are related and possibly could be approached in a less convoluted manner? For example, global model->services map would help
 def resolve_reference_dict(reference_dict):
     # from invenio_records_resources.references.registry.ResolverRegistryBase.reference_entity
     topic_resolver = None
@@ -132,8 +133,15 @@ def resolve_reference_dict(reference_dict):
     ).resolve()
     return obj
 
+def get_matching_service_for_refdict(reference_dict):
+    for resolver in ResolverRegistry.get_registered_resolvers():
+        if resolver.matches_reference_dict(reference_dict):
+            return current_service_registry.get(resolver._service_id)
+    return None
 
-def open_request_exists(topic, type_id, creator=None):
-    existing_request = request_exists(system_identity, topic, type_id)
-    if existing_request:
-        raise OpenRequestAlreadyExists(existing_request, topic)
+def get_matching_service_for_record(record):
+    for resolver in ResolverRegistry.get_registered_resolvers():
+        if resolver.matches_entity(record):
+            return current_service_registry.get(resolver._service_id)
+    return None
+

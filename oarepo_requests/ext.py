@@ -2,7 +2,9 @@ from invenio_requests.proxies import current_requests_service
 
 from oarepo_requests.resources.config import OARepoRequestsResourceConfig
 from oarepo_requests.resources.resource import OARepoRequestsResource
-from oarepo_requests.services.create import CreateRequestsService
+from oarepo_requests.services.config import OARepoRequestsServiceConfig
+from oarepo_requests.services.service import OARepoRequestsService
+from invenio_requests.services.requests.config import RequestsServiceConfig
 
 
 class OARepoRequests:
@@ -14,13 +16,34 @@ class OARepoRequests:
 
     def init_app(self, app):
         """Flask application initialization."""
+        self.app = app
+        self.init_services(app)
         self.init_resources()
         app.extensions["oarepo-requests"] = self
 
+    @property
+    def entity_resolvers(self):
+        return self.app.config["ENTITY_REFERENCE_UI_RESOLVERS"]
+
+    # copied from invenio_requests for now
+    def service_configs(self, app):
+        """Customized service configs."""
+
+        class ServiceConfigs:
+            requests = OARepoRequestsServiceConfig.build(app)
+            # request_events = RequestEventsServiceConfig.build(app)
+
+        return ServiceConfigs
+    def init_services(self, app):
+        service_configs = self.service_configs(app)
+        """Initialize the service and resource for Requests."""
+        self.requests_service = OARepoRequestsService(config=service_configs.requests)
+        #self.request_events_service = RequestEventsService(
+        #    config=service_configs.request_events,
+        #)
     def init_resources(self):
         """Init resources."""
-        self.service = CreateRequestsService(current_requests_service)
         self.requests_resource = OARepoRequestsResource(
-            service=self.service,
+            service=self.requests_service,
             config=OARepoRequestsResourceConfig(),
         )

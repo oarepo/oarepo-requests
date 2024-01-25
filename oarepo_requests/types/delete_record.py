@@ -10,5 +10,5 @@ class DeleteRecordRequestType(OARepoRequestType):
         **RequestType.available_actions,
         "accept": DeleteTopicAcceptAction,
     }
-
+    description = "request deletion of published record"
     receiver_can_be_none = True

@@ -89,3 +89,4 @@ dist/
 
 .model_venv/
 .vscode
+/tests/thesis/

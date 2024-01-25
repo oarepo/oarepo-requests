@@ -9,6 +9,8 @@ from invenio_app.factory import create_api
 from invenio_requests.customizations import CommentEventType, LogEventType
 from invenio_requests.proxies import current_request_type_registry, current_requests
 from invenio_requests.records.api import Request, RequestEventFormat
+
+from oarepo_requests.resolvers.ui import user_entity_reference_ui_resolver, draft_record_entity_reference_ui_resolver
 from thesis.proxies import current_service
 from thesis.records.api import ThesisRecord
 
@@ -17,7 +19,32 @@ from thesis.records.api import ThesisRecord
 def create_app(instance_path, entry_points):
     """Application factory fixture."""
     return create_api
+@pytest.fixture()
+def urls():
+    return {
+        "BASE_URL": "/thesis/",
+        "BASE_URL_REQUESTS": "/requests/"
+    }
 
+@pytest.fixture()
+def publish_request_data_function():
+    def ret_data(receiver, record):
+        return {
+            "receiver": {"user": receiver.id},
+            "request_type": "publish_draft",
+            "topic": {"thesis_draft": record.json["id"]},
+        }
+    return ret_data
+
+@pytest.fixture()
+def delete_record_data_function():
+    def ret_data(receiver, record):
+        return {
+            "receiver": {"user": receiver.id},
+            "request_type": "delete_record",
+            "topic": {"thesis": record["id"]},
+        }
+    return ret_data
 
 @pytest.fixture(scope="module")
 def app_config(app_config):
@@ -36,6 +63,11 @@ def app_config(app_config):
         "RECORDS_REFRESOLVER_STORE"
     ] = "invenio_jsonschemas.proxies.current_refresolver_store"
     app_config["CACHE_TYPE"] = "SimpleCache"
+
+    app_config["ENTITY_REFERENCE_UI_RESOLVERS"] = {
+        "user": user_entity_reference_ui_resolver,
+        "thesis_draft": draft_record_entity_reference_ui_resolver
+    }
 
     return app_config
 
@@ -130,12 +162,18 @@ def users(app, UserFixture):
     user1 = UserFixture(
         email="user1@example.org",
         password="password",
+        preferences={
+            "visibility": "public"
+        }
     )
     user1.create(app, db)
 
     user2 = UserFixture(
         email="user2@example.org",
         password="password",
+        preferences={
+            "visibility": "public"
+        }
     )
     user2.create(app, db)
     return [user1, user2]
@@ -165,6 +203,10 @@ def client_logged_as(client, users):
         return client
 
     return log_user
+
+@pytest.fixture()
+def logged_clients(users, client_logged_as):
+    return [client_logged_as(user.email) for user in users]
 
 
 @pytest.fixture
