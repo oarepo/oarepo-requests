@@ -65,6 +65,7 @@ class DraftRecordRequestsResource(RecordRequestsResource):
         )
         return hits.to_dict(), 200
 
+
 class OARepoRequestsResource(RequestsResource, ErrorHandlersMixin):
     """
     def __init__(self, config, service):

@@ -1,12 +1,16 @@
 import marshmallow as ma
 from invenio_requests.proxies import current_request_type_registry
 from marshmallow import validate
+from oarepo_runtime.i18n import lazy_gettext as _
 from oarepo_runtime.services.schema.ui import InvenioUISchema, LocalizedDateTime
 
 from oarepo_requests.proxies import current_oarepo_requests
 from oarepo_requests.resolvers.ui import fallback_entity_reference_ui_resolver
-from oarepo_requests.services.schema import RequestsSchemaMixin, RequestTypeSchema, NoneReceiverGenericRequestSchema
-from oarepo_runtime.i18n import lazy_gettext as _
+from oarepo_requests.services.schema import (
+    NoneReceiverGenericRequestSchema,
+    RequestsSchemaMixin,
+    RequestTypeSchema,
+)
 
 
 class UIReferenceSchema(ma.Schema):
@@ -50,7 +54,6 @@ class UIRequestSchemaMixin:
 
     status_code = ma.fields.String()
 
-
     @ma.pre_dump
     def add_type_details(self, data, **kwargs):
         type = data["type"]
@@ -73,7 +76,9 @@ class UIBaseRequestSchema(UIRequestSchemaMixin, NoneReceiverGenericRequestSchema
 
 
 def get_request_ui_schema(request_type_schema):
-    return type("CustomUIRequestSchema", (UIRequestSchemaMixin, request_type_schema), {})
+    return type(
+        "CustomUIRequestSchema", (UIRequestSchemaMixin, request_type_schema), {}
+    )
 
 
 class UIRequestTypeSchema(RequestTypeSchema):

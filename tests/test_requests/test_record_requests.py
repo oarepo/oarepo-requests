@@ -16,13 +16,16 @@ def test_read_requests_on_draft(
     ThesisDraft.index.refresh()
 
     r1 = creator_client.post(
-        urls["BASE_URL_REQUESTS"], json=publish_request_data_function(receiver.id, draft1.json["id"])
+        urls["BASE_URL_REQUESTS"],
+        json=publish_request_data_function(receiver.id, draft1.json["id"]),
     )
     r2 = creator_client.post(
-        urls["BASE_URL_REQUESTS"], json=publish_request_data_function(receiver.id, draft1.json["id"])
+        urls["BASE_URL_REQUESTS"],
+        json=publish_request_data_function(receiver.id, draft1.json["id"]),
     )
     r3 = creator_client.post(
-        urls["BASE_URL_REQUESTS"], json=publish_request_data_function(receiver.id, draft2.json["id"])
+        urls["BASE_URL_REQUESTS"],
+        json=publish_request_data_function(receiver.id, draft2.json["id"]),
     )
 
     creator_client.post(link_api2testclient(r1.json["links"]["actions"]["submit"]))
@@ -62,13 +65,16 @@ def test_read_requests_on_record(
     ThesisRecord.index.refresh()
     ThesisDraft.index.refresh()
     r1 = creator_client.post(
-        urls["BASE_URL_REQUESTS"], json=delete_record_data_function(receiver.id, record1["id"])
+        urls["BASE_URL_REQUESTS"],
+        json=delete_record_data_function(receiver.id, record1["id"]),
     )
     r2 = creator_client.post(
-        urls["BASE_URL_REQUESTS"], json=delete_record_data_function(receiver.id, record1["id"])
+        urls["BASE_URL_REQUESTS"],
+        json=delete_record_data_function(receiver.id, record1["id"]),
     )
     r3 = creator_client.post(
-        urls["BASE_URL_REQUESTS"], json=delete_record_data_function(receiver.id, record2["id"])
+        urls["BASE_URL_REQUESTS"],
+        json=delete_record_data_function(receiver.id, record2["id"]),
     )
 
     creator_client.post(link_api2testclient(r1.json["links"]["actions"]["submit"]))

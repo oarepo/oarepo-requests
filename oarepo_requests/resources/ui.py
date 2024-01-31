@@ -1,11 +1,9 @@
 from flask import g
 from flask_resources import BaseListSchema
 from flask_resources.serializers import JSONSerializer
-from invenio_requests.proxies import current_request_type_registry
-from oarepo_runtime.i18n import get_locale
 from oarepo_runtime.resources import LocalizedUIJSONSerializer
 
-from ..services.ui_schema import UIBaseRequestSchema, get_request_ui_schema
+from ..services.ui_schema import UIBaseRequestSchema
 
 
 class OARepoRequestsUIJSONSerializer(LocalizedUIJSONSerializer):

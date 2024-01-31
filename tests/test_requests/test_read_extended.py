@@ -1,5 +1,6 @@
 from .utils import is_valid_subdict, link_api2testclient
 
+
 def test_read_extended(
     example_topic_draft,
     client_logged_as,
@@ -9,11 +10,11 @@ def test_read_extended(
     serialization_result,
     ui_serialization_result,
 ):
-
     receiver = users[1]
     creator_client = client_logged_as(users[0].email)
     resp_request_create = creator_client.post(
-        urls["BASE_URL_REQUESTS"], json=publish_request_data_function(receiver.id, example_topic_draft["id"])
+        urls["BASE_URL_REQUESTS"],
+        json=publish_request_data_function(receiver.id, example_topic_draft["id"]),
     )
     resp_request_submit = creator_client.post(
         link_api2testclient(resp_request_create.json["links"]["actions"]["submit"])
@@ -35,7 +36,8 @@ def test_read_extended(
         new_call.json,
     )
     assert is_valid_subdict(
-        ui_serialization_result(example_topic_draft["id"], resp_request_create.json["id"]),
+        ui_serialization_result(
+            example_topic_draft["id"], resp_request_create.json["id"]
+        ),
         new_call2.json,
     )
-

@@ -1,7 +1,6 @@
-
 from thesis.records.api import ThesisDraft, ThesisRecord
 
-from .utils import link_api2testclient, is_valid_subdict
+from .utils import is_valid_subdict, link_api2testclient
 
 
 def test_publish(
@@ -21,7 +20,8 @@ def test_publish(
     ThesisDraft.index.refresh()
 
     resp_request_create = creator_client.post(
-        urls["BASE_URL_REQUESTS"], json=publish_request_data_function(receiver.id, draft1.json["id"])
+        urls["BASE_URL_REQUESTS"],
+        json=publish_request_data_function(receiver.id, draft1.json["id"]),
     )
 
     resp_request_submit = creator_client.post(
@@ -35,5 +35,6 @@ def test_publish(
     ).json
 
     assert is_valid_subdict(
-        ui_serialization_result(draft_id, ui_record["requests"][0]['id']), ui_record["requests"][0]
+        ui_serialization_result(draft_id, ui_record["requests"][0]["id"]),
+        ui_record["requests"][0],
     )

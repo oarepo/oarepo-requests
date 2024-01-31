@@ -4,7 +4,8 @@ from oarepo_requests.resources.config import OARepoRequestsResourceConfig
 from oarepo_requests.services.ui_schema import UIRequestTypeSchema
 from oarepo_requests.utils import (
     allowed_request_types_for_record_cls,
-    get_matching_service_for_record, get_requests_service_for_records_service,
+    get_matching_service_for_record,
+    get_requests_service_for_records_service,
 )
 
 
@@ -45,7 +46,9 @@ class RequestTypesComponent:
 
 class RequestsComponent:
     def update_data(self, identity, record, projection):
-        service = get_requests_service_for_records_service(get_matching_service_for_record(record))
+        service = get_requests_service_for_records_service(
+            get_matching_service_for_record(record)
+        )
         if hasattr(record, "is_draft") and record.is_draft:
             requests = list(
                 service.search_requests_for_draft(identity, record["id"]).hits

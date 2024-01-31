@@ -1,4 +1,3 @@
-
 from oarepo_requests.resources.config import OARepoRequestsResourceConfig
 from oarepo_requests.resources.resource import OARepoRequestsResource
 from oarepo_requests.services.config import OARepoRequestsServiceConfig

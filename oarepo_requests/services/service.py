@@ -1,10 +1,8 @@
+from invenio_records_resources.services.base.service import Service
 from invenio_records_resources.services.uow import unit_of_work
-from invenio_requests.proxies import (
-    current_request_type_registry,
-)
+from invenio_requests.proxies import current_request_type_registry
 from invenio_requests.services.requests.service import RequestsService
 from invenio_search.engine import dsl
-from invenio_records_resources.services.base.service import Service
 
 from oarepo_requests.errors import UnknownRequestType
 from oarepo_requests.proxies import current_oarepo_requests
@@ -66,6 +64,7 @@ class DraftRecordRequestsService(RecordRequestsService):
     def draft_cls(self):
         """Factory for creating a record class."""
         return self.config.draft_cls
+
     # from invenio_rdm_records.services.requests.service.RecordRequestsService
     def search_requests_for_draft(
         self,
@@ -137,7 +136,6 @@ class OARepoRequestsService(RequestsService):
                 expand=expand,
                 uow=uow,
             )
-
 
     def read(self, identity, id_, expand=False):
         api_request = super().read(identity, id_, expand)

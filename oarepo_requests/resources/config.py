@@ -1,7 +1,7 @@
 from flask_resources import ResponseHandler
 from invenio_records_resources.resources.records.config import RecordResourceConfig
-from invenio_requests.resources.requests.config import RequestsResourceConfig
 from invenio_records_resources.services.base.config import ConfiguratorMixin
+from invenio_requests.resources.requests.config import RequestsResourceConfig
 
 from .ui import OARepoRequestsUIJSONSerializer
 

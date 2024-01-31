@@ -1,14 +1,13 @@
-from invenio_users_resources.proxies import current_users_service
 from invenio_records_resources.resources.errors import PermissionDeniedError
+from invenio_users_resources.proxies import current_users_service
+
 from oarepo_requests.utils import get_matching_service_for_refdict
+
 
 def fallback_result(reference):
     id = list(reference.values())[0]
-    return {
-        "reference": reference,
-        "type": "user",
-        "label": f"id: {id}"
-    }
+    return {"reference": reference, "type": "user", "label": f"id: {id}"}
+
 
 def user_entity_reference_ui_resolver(identity, data):
     reference = data["reference"]

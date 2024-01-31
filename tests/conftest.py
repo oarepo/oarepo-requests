@@ -4,12 +4,13 @@ from invenio_access.permissions import system_identity
 from invenio_requests.customizations import CommentEventType, LogEventType
 from invenio_requests.proxies import current_request_type_registry, current_requests
 from invenio_requests.records.api import Request, RequestEventFormat
-from thesis.records.api import ThesisRecord, ThesisDraft
+from thesis.records.api import ThesisDraft, ThesisRecord
 
 from oarepo_requests.resolvers.ui import (
     draft_record_entity_reference_ui_resolver,
     user_entity_reference_ui_resolver,
 )
+
 
 @pytest.fixture(scope="module")
 def create_app(instance_path, entry_points):
@@ -83,7 +84,11 @@ def ui_serialization_result():
     def _result(topic_id, request_id):
         return {
             # 'created': '2024-01-26T10:06:17.945916',
-            "created_by": {'label': 'id: 1', 'reference': {'user': '1'}, 'type': 'user'},
+            "created_by": {
+                "label": "id: 1",
+                "reference": {"user": "1"},
+                "type": "user",
+            },
             "description": "request publishing of a draft",
             "expires_at": None,
             "id": request_id,
@@ -232,7 +237,6 @@ def submit_request(create_request, requests_service, **kwargs):
 
 @pytest.fixture()
 def users(app, db):
-
     with db.session.begin_nested():
         datastore = app.extensions["security"].datastore
         user1 = datastore.create_user(
@@ -294,13 +298,15 @@ def client_logged_as(client, users):
         return client
 
     return log_user
+
+
 @pytest.fixture()
 def logged_client_post(client_logged_as):
     def _logged_client_post(user, method, *args, **kwargs):
         applied_client = client_logged_as(user.email)
         return getattr(applied_client, method)(*args, **kwargs)
-    return _logged_client_post
 
+    return _logged_client_post
 
 
 @pytest.fixture()
@@ -340,6 +346,7 @@ def example_topic_draft(record_service, identity_simple):
     draft = record_service.create(identity_simple, {})
     return draft._obj
 
+
 @pytest.fixture()
 def example_draft_service_bypass(app, db):
     record = ThesisDraft.create({})
@@ -364,8 +371,6 @@ def example_topic(record_service, identity_simple):
     id_ = record.id
     record = ThesisRecord.pid.resolve(id_)
     return record
-
-
 
 
 @pytest.fixture(scope="module")
