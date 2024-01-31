@@ -1,3 +1,4 @@
+from invenio_records_resources.services.errors import PermissionDeniedError
 
 from oarepo_requests.services.schema import RequestTypeSchema
 from oarepo_requests.utils import (
@@ -36,12 +37,18 @@ class RequestsComponent:
             get_matching_service_for_record(record)
         )
         if hasattr(record, "is_draft") and record.is_draft:
-            requests = list(
-                service.search_requests_for_draft(identity, record["id"]).hits
-            )
+            try:
+                requests = list(
+                    service.search_requests_for_draft(identity, record["id"]).hits
+                )
+            except PermissionDeniedError:
+                requests = []
         else:
-            requests = list(
-                service.search_requests_for_record(identity, record["id"]).hits
-            )
+            try:
+                requests = list(
+                    service.search_requests_for_record(identity, record["id"]).hits
+                )
+            except PermissionDeniedError:
+                requests = []
         if requests:
             projection["requests"] = requests
