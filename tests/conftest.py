@@ -278,9 +278,8 @@ def users(app, db):
 def client_with_login(client, users):
     """Log in a user to the client."""
     user = users[0]
-    user.login(client)
-    # login_user(user)
-    # login_user_via_session(client, email=user.email)
+    login_user(user)
+    login_user_via_session(client, email=user.email)
     return client
 
 

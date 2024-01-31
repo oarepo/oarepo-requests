@@ -2,7 +2,11 @@ import functools
 
 from invenio_records_resources.services.records.components import ServiceComponent
 from invenio_records_resources.services.uow import RecordCommitOp
-from invenio_requests import current_request_type_registry, current_requests_service, current_events_service
+from invenio_requests import (
+    current_events_service,
+    current_request_type_registry,
+    current_requests_service,
+)
 from invenio_requests.customizations import LogEventType
 
 
