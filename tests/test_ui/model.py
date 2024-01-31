@@ -6,8 +6,6 @@ from oarepo_ui.resources import (
 from oarepo_ui.resources.components import PermissionsComponent
 from thesis.resources.records.ui import ThesisUIJSONSerializer
 
-from oarepo_requests.components import AllowedRequestsComponent
-
 
 class ModelUIResourceConfig(RecordsUIResourceConfig):
     api_service = (
@@ -26,7 +24,6 @@ class ModelUIResourceConfig(RecordsUIResourceConfig):
     }
 
     components = [BabelComponent, PermissionsComponent]
-
 
 
 class ModelUIResource(RecordsUIResource):

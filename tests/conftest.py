@@ -1,50 +1,125 @@
-import os
-
 import pytest
 from flask_principal import Identity, Need, UserNeed
-from flask_security.utils import login_user
 from invenio_access.permissions import system_identity
-from invenio_accounts.testutils import login_user_via_session
-from invenio_app.factory import create_api
 from invenio_requests.customizations import CommentEventType, LogEventType
 from invenio_requests.proxies import current_request_type_registry, current_requests
 from invenio_requests.records.api import Request, RequestEventFormat
+from thesis.records.api import ThesisRecord, ThesisDraft
 
-from oarepo_requests.resolvers.ui import user_entity_reference_ui_resolver, draft_record_entity_reference_ui_resolver
-from thesis.proxies import current_service
-from thesis.records.api import ThesisRecord
-
+from oarepo_requests.resolvers.ui import (
+    draft_record_entity_reference_ui_resolver,
+    user_entity_reference_ui_resolver,
+)
 
 @pytest.fixture(scope="module")
 def create_app(instance_path, entry_points):
     """Application factory fixture."""
     return create_api
+
+
 @pytest.fixture()
 def urls():
-    return {
-        "BASE_URL": "/thesis/",
-        "BASE_URL_REQUESTS": "/requests/"
-    }
+    return {"BASE_URL": "/thesis/", "BASE_URL_REQUESTS": "/requests/"}
+
 
 @pytest.fixture()
 def publish_request_data_function():
-    def ret_data(receiver, record):
+    def ret_data(receiver_id, record_id):
         return {
-            "receiver": {"user": receiver.id},
+            "receiver": {"user": receiver_id},
             "request_type": "publish_draft",
-            "topic": {"thesis_draft": record.json["id"]},
+            "topic": {"thesis_draft": record_id},
         }
+
     return ret_data
+
 
 @pytest.fixture()
 def delete_record_data_function():
-    def ret_data(receiver, record):
+    def ret_data(receiver_id, record_id):
         return {
-            "receiver": {"user": receiver.id},
+            "receiver": {"user": receiver_id},
             "request_type": "delete_record",
-            "topic": {"thesis": record["id"]},
+            "topic": {"thesis": record_id},
         }
+
     return ret_data
+
+
+@pytest.fixture()
+def serialization_result():
+    def _result(topic_id, request_id):
+        return {
+            "id": request_id,  #'created': '2024-01-29T22:09:13.931722',
+            #'updated': '2024-01-29T22:09:13.954850',
+            "links": {
+                "actions": {
+                    "accept": f"https://127.0.0.1:5000/api/requests/{request_id}/actions/accept"
+                },
+                "self": f"https://127.0.0.1:5000/api/requests/extended/{request_id}",
+                "comments": f"https://127.0.0.1:5000/api/requests/extended/{request_id}/comments",
+                "timeline": f"https://127.0.0.1:5000/api/requests/extended/{request_id}/timeline",
+            },
+            "revision_id": 3,
+            "type": "publish_draft",
+            "title": "",
+            "number": "1",
+            "status": "submitted",
+            "is_closed": False,
+            "is_open": True,
+            "expires_at": None,
+            "is_expired": False,
+            "created_by": {"user": "1"},
+            "receiver": {"user": "2"},
+            "topic": {"thesis_draft": topic_id},
+        }
+
+    return _result
+
+
+@pytest.fixture()
+def ui_serialization_result():
+    # TODO correct time formats, translations etc
+    def _result(topic_id, request_id):
+        return {
+            # 'created': '2024-01-26T10:06:17.945916',
+            "created_by": {'label': 'id: 1', 'reference': {'user': '1'}, 'type': 'user'},
+            "description": "request publishing of a draft",
+            "expires_at": None,
+            "id": request_id,
+            "is_closed": False,
+            "is_expired": False,
+            "is_open": True,
+            "links": {
+                "actions": {
+                    "accept": f"https://127.0.0.1:5000/api/requests/{request_id}/actions/accept"
+                },
+                "self": f"https://127.0.0.1:5000/api/requests/extended/{request_id}",
+                "comments": f"https://127.0.0.1:5000/api/requests/extended/{request_id}/comments",
+                "timeline": f"https://127.0.0.1:5000/api/requests/extended/{request_id}/timeline",
+            },
+            "number": "1",
+            "receiver": {
+                "label": "user2@example.org",
+                "link": "https://127.0.0.1:5000/api/users/2",
+                "reference": {"user": "2"},
+                "type": "user",
+            },
+            "revision_id": 3,
+            "status": "Submitted",
+            "title": "",
+            "topic": {
+                "label": "",
+                "link": f"https://127.0.0.1:5000/api/thesis/{topic_id}/draft",
+                "reference": {"thesis_draft": topic_id},
+                "type": "thesis_draft",
+            },
+            "type": "publish_draft",
+            # 'updated': '2024-01-26T10:06:18.084317'
+        }
+
+    return _result
+
 
 @pytest.fixture(scope="module")
 def app_config(app_config):
@@ -66,7 +141,7 @@ def app_config(app_config):
 
     app_config["ENTITY_REFERENCE_UI_RESOLVERS"] = {
         "user": user_entity_reference_ui_resolver,
-        "thesis_draft": draft_record_entity_reference_ui_resolver
+        "thesis_draft": draft_record_entity_reference_ui_resolver,
     }
 
     return app_config
@@ -155,28 +230,44 @@ def submit_request(create_request, requests_service, **kwargs):
     return _submit_request
 
 
-@pytest.fixture(scope="module")
-def users(app, UserFixture):
+@pytest.fixture()
+def users(app, db):
+
+    with db.session.begin_nested():
+        datastore = app.extensions["security"].datastore
+        user1 = datastore.create_user(
+            email="user1@example.org",
+            password="password",
+            active=True,
+        )
+        user2 = datastore.create_user(
+            email="user2@example.org",
+            password="beetlesmasher",
+            active=True,
+        )
+
+    db.session.commit()
+    return [user1, user2]
+
+    """
     from invenio_db import db
 
     user1 = UserFixture(
         email="user1@example.org",
         password="password",
-        preferences={
-            "visibility": "public"
-        }
+        preferences={"visibility": "public"},
     )
     user1.create(app, db)
 
     user2 = UserFixture(
         email="user2@example.org",
         password="password",
-        preferences={
-            "visibility": "public"
-        }
+        preferences={"visibility": "public"},
     )
     user2.create(app, db)
+    
     return [user1, user2]
+    """
 
 
 @pytest.fixture()
@@ -197,12 +288,20 @@ def client_logged_as(client, users):
         """Log the user."""
         available_users = users
 
-        user = next((u.user for u in available_users if u.email == user_email), None)
+        user = next((u for u in available_users if u.email == user_email), None)
         login_user(user, remember=True)
         login_user_via_session(client, email=user_email)
         return client
 
     return log_user
+@pytest.fixture()
+def logged_client_post(client_logged_as):
+    def _logged_client_post(user, method, *args, **kwargs):
+        applied_client = client_logged_as(user.email)
+        return getattr(applied_client, method)(*args, **kwargs)
+    return _logged_client_post
+
+
 
 @pytest.fixture()
 def logged_clients(users, client_logged_as):
@@ -236,10 +335,16 @@ def record_service():
     return current_service
 
 
-@pytest.fixture(scope="function")
+@pytest.fixture()
 def example_topic_draft(record_service, identity_simple):
     draft = record_service.create(identity_simple, {})
     return draft._obj
+
+@pytest.fixture()
+def example_draft_service_bypass(app, db):
+    record = ThesisDraft.create({})
+    db.session.commit()
+    return record
 
 
 @pytest.fixture()
@@ -259,6 +364,8 @@ def example_topic(record_service, identity_simple):
     id_ = record.id
     record = ThesisRecord.pid.resolve(id_)
     return record
+
+
 
 
 @pytest.fixture(scope="module")

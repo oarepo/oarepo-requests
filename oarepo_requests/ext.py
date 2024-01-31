@@ -1,10 +1,8 @@
-from invenio_requests.proxies import current_requests_service
 
 from oarepo_requests.resources.config import OARepoRequestsResourceConfig
 from oarepo_requests.resources.resource import OARepoRequestsResource
 from oarepo_requests.services.config import OARepoRequestsServiceConfig
 from oarepo_requests.services.service import OARepoRequestsService
-from invenio_requests.services.requests.config import RequestsServiceConfig
 
 
 class OARepoRequests:
@@ -18,7 +16,7 @@ class OARepoRequests:
         """Flask application initialization."""
         self.app = app
         self.init_services(app)
-        self.init_resources()
+        self.init_resources(app)
         app.extensions["oarepo-requests"] = self
 
     @property
@@ -34,16 +32,18 @@ class OARepoRequests:
             # request_events = RequestEventsServiceConfig.build(app)
 
         return ServiceConfigs
+
     def init_services(self, app):
         service_configs = self.service_configs(app)
         """Initialize the service and resource for Requests."""
         self.requests_service = OARepoRequestsService(config=service_configs.requests)
-        #self.request_events_service = RequestEventsService(
+        # self.request_events_service = RequestEventsService(
         #    config=service_configs.request_events,
-        #)
-    def init_resources(self):
+        # )
+
+    def init_resources(self, app):
         """Init resources."""
         self.requests_resource = OARepoRequestsResource(
             service=self.requests_service,
-            config=OARepoRequestsResourceConfig(),
+            config=OARepoRequestsResourceConfig.build(app),
         )

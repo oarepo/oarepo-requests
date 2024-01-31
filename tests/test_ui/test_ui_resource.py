@@ -1,8 +1,6 @@
-from test_requests.utils import BASE_URL_REQUESTS, BASE_URL, link_api2testclient
-from invenio_access.permissions import system_identity
-from thesis.records.api import ThesisDraft, ThesisRecord
-from invenio_requests.records.api import Request
 from invenio_requests.proxies import current_requests_service
+from invenio_requests.records.api import Request
+
 from oarepo_requests.proxies import current_oarepo_requests
 
 
@@ -12,6 +10,8 @@ def data(receiver, record_id):
         "request_type": "publish_draft",
         "topic": {"thesis_draft": record_id},
     }
+
+
 def test_draft_publish_request_present(
     app, record_ui_resource, example_topic_draft, client_logged_as, users, fake_manifest
 ):
@@ -30,8 +30,10 @@ def test_draft_publish_request_present(
         check_request(base_part)
         check_request(form_part)
 
-def test_ui_serialization(app, record_ui_resource, users, client_logged_as, example_topic_draft, fake_manifest):
 
+def test_ui_serialization(
+    app, record_ui_resource, users, client_logged_as, example_topic_draft, fake_manifest
+):
     creator = users[0]
     receiver = users[1]
     creator_client = client_logged_as(creator.email)
@@ -66,7 +68,6 @@ def test_ui_serialization(app, record_ui_resource, users, client_logged_as, exam
         assert c.status_code == 200
         assert "created_by" in c.text
         print()
-
 
 
 def test_draft_publish_unauthorized(

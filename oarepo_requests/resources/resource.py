@@ -2,16 +2,17 @@ from flask import g
 from flask_resources import resource_requestctx, response_handler, route
 from invenio_records_resources.resources.errors import ErrorHandlersMixin
 from invenio_records_resources.resources.records.resource import (
+    RecordResource,
     request_data,
     request_extra_args,
     request_headers,
-    request_view_args, request_search_args,
+    request_search_args,
+    request_view_args,
 )
-
-from invenio_requests.resources.requests.resource import RequestsResource
-from flask_resources.resources import Resource
-from invenio_records_resources.resources.records.resource import RecordResource
 from invenio_records_resources.resources.records.utils import search_preference
+from invenio_requests.resources.requests.resource import RequestsResource
+
+
 class RecordRequestsResource(RecordResource):
     def create_url_rules(self):
         """Create the URL rules for the record resource."""
@@ -36,6 +37,7 @@ class RecordRequestsResource(RecordResource):
             expand=resource_requestctx.args.get("expand", False),
         )
         return hits.to_dict(), 200
+
 
 class DraftRecordRequestsResource(RecordRequestsResource):
     def create_url_rules(self):
@@ -69,10 +71,12 @@ class OARepoRequestsResource(RequestsResource, ErrorHandlersMixin):
         super().__init__(config)
         self.service = service
     """
+
     def create_url_rules(self):
         """Create the URL rules for the record resource."""
         base_routes = super().create_url_rules()
         routes = self.config.routes
+
         def p(route):
             """Prefix a route with the URL prefix."""
             return f"{self.config.url_prefix}{route}"
@@ -84,7 +88,7 @@ class OARepoRequestsResource(RequestsResource, ErrorHandlersMixin):
         url_rules = [
             route("POST", p(routes["list"]), self.create),
             route("POST", p(routes["list-extended"]), self.create_extended),
-            route("GET", p(routes["item-extended"]), self.read_extended)
+            route("GET", p(routes["item-extended"]), self.read_extended),
         ]
         return url_rules + base_routes
 
@@ -153,7 +157,7 @@ class OARepoRequestsResource(RequestsResource, ErrorHandlersMixin):
     @response_handler()
     def read_extended(self):
         """Read an item."""
-        item = self.service.read_extended(
+        item = self.service.read(
             id_=resource_requestctx.view_args["id"],
             identity=g.identity,
             expand=resource_requestctx.args.get("expand", False),

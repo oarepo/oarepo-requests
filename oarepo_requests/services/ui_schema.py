@@ -1,15 +1,17 @@
-from marshmallow import validate
 import marshmallow as ma
-from oarepo_runtime.services.schema.ui import InvenioUISchema
-
-from oarepo_requests.resolvers.ui import fallback_entity_reference_ui_resolver
-from oarepo_requests.schemas.marshmallow import NoneReceiverGenericRequestSchema
-from oarepo_requests.services.schema import RequestsSchemaMixin, RequestTypeSchema
 from invenio_requests.proxies import current_request_type_registry
+from marshmallow import validate
+from oarepo_runtime.services.schema.ui import InvenioUISchema, LocalizedDateTime
+
 from oarepo_requests.proxies import current_oarepo_requests
+from oarepo_requests.resolvers.ui import fallback_entity_reference_ui_resolver
+from oarepo_requests.services.schema import RequestsSchemaMixin, RequestTypeSchema, NoneReceiverGenericRequestSchema
+from oarepo_runtime.i18n import lazy_gettext as _
+
+
 class UIReferenceSchema(ma.Schema):
     reference = ma.fields.Dict(validate=validate.Length(equal=1))
-    #reference = ma.fields.Dict(ReferenceString)
+    # reference = ma.fields.Dict(ReferenceString)
     type = ma.fields.String()
     label = ma.fields.String()
     link = ma.fields.String(required=False)
@@ -18,6 +20,7 @@ class UIReferenceSchema(ma.Schema):
     def create_reference(self, data, **kwargs):
         if data:
             return dict(reference=data)
+
     @ma.post_dump
     def dereference(self, data, **kwargs):
         reference_type = list(data["reference"].keys())[0]
@@ -29,44 +32,48 @@ class UIReferenceSchema(ma.Schema):
             return fallback_entity_reference_ui_resolver(self.context["identity"], data)
         # raise ValidationError(f"no entity reference handler for {reference_type}")
 
-class UIRequestSchema(NoneReceiverGenericRequestSchema):
-    created = ma.fields.String()
-    updated = ma.fields.String()
-
-    description = ma.fields.String()
-
-    created_by = ma.fields.Nested(UIReferenceSchema)
-    receiver = ma.fields.Nested(UIReferenceSchema)
-    topic = ma.fields.Nested(UIReferenceSchema)
-
-    @ma.pre_dump
-    def add_description(self, data, **kwargs):
-        type = data["type"]
-        type_obj = current_request_type_registry.lookup(type, quiet=True)
-        if hasattr(type_obj, "description"):
-            data["description"] = type_obj.description
-        return data
 
 class UIRequestSchemaMixin:
-    created = ma.fields.String()
-    updated = ma.fields.String()
+    created = LocalizedDateTime(dump_only=True)
+    updated = LocalizedDateTime(dump_only=True)
 
+    name = ma.fields.String()
     description = ma.fields.String()
 
     created_by = ma.fields.Nested(UIReferenceSchema)
     receiver = ma.fields.Nested(UIReferenceSchema)
     topic = ma.fields.Nested(UIReferenceSchema)
 
+    links = ma.fields.Dict(keys=ma.fields.String())
+
+    payload = ma.fields.Raw()
+
+    status_code = ma.fields.String()
+
+
     @ma.pre_dump
-    def add_description(self, data, **kwargs):
+    def add_type_details(self, data, **kwargs):
         type = data["type"]
         type_obj = current_request_type_registry.lookup(type, quiet=True)
         if hasattr(type_obj, "description"):
             data["description"] = type_obj.description
+        if hasattr(type_obj, "name"):
+            data["name"] = type_obj.name
         return data
 
-def get_request_ui_schema(request_schema):
-    return type("CustomUIRequestSchema", (UIRequestSchemaMixin, request_schema), {})
+    @ma.pre_dump
+    def process_status(self, data, **kwargs):
+        data["status_code"] = data["status"]
+        data["status"] = _(data["status"].capitalize())
+        return data
+
+
+class UIBaseRequestSchema(UIRequestSchemaMixin, NoneReceiverGenericRequestSchema):
+    """"""
+
+
+def get_request_ui_schema(request_type_schema):
+    return type("CustomUIRequestSchema", (UIRequestSchemaMixin, request_type_schema), {})
 
 
 class UIRequestTypeSchema(RequestTypeSchema):
@@ -74,11 +81,12 @@ class UIRequestTypeSchema(RequestTypeSchema):
     description = ma.fields.String()
     fast_approve = ma.fields.Boolean()
 
+
 class UIRequestsSerializationMixin(RequestsSchemaMixin):
-    requests = ma.fields.List(
-        ma.fields.Nested(UIRequestSchema)
-    )
+    requests = ma.fields.List(ma.fields.Nested(UIBaseRequestSchema))
     request_types = ma.fields.List(ma.fields.Nested(UIRequestTypeSchema))
+
+
 class RequestsUISchema(InvenioUISchema, UIRequestsSerializationMixin):
     """
     @ma.pre_dump
@@ -104,4 +112,3 @@ class RequestsUISchema(InvenioUISchema, UIRequestsSerializationMixin):
                     extended_reference = ENTITY_REFERENCE_UI_RESOLVERS[key](system_identity, request["topic"])
         return data
     """
-

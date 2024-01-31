@@ -1,12 +1,4 @@
-import copy
 
-from invenio_records_resources.services.errors import PermissionDeniedError
-from invenio_records_resources.services.records.components import ServiceComponent
-from invenio_requests.customizations import RequestActions
-from invenio_requests.proxies import (
-    current_request_type_registry,
-    current_requests_service,
-)
 
 """
 class RecordCommunitiesAction(CommunityRoles):
@@ -18,20 +10,21 @@ class RecordCommunitiesAction(CommunityRoles):
         return {r.name for r in current_roles.can(self._action)}
 """
 
-
+"""
 class AllowedRequestsComponent(ServiceComponent):
-    """Service component which sets all data in the record."""
+
+
 
     def _add_available_requests(self, identity, record, dict_to_save_result, **kwargs):
         # TODO deprecated?
-        """
+
         parent_copy = copy.deepcopy(record["parent"])
         requests = {
             k: v
             for k, v in parent_copy.items()
             if isinstance(v, dict) and "receiver" in v
         }
-        """
+
         requests = record["requests"]
         available_requests = {}
 
@@ -68,6 +61,7 @@ class AllowedRequestsComponent(ServiceComponent):
         self._add_available_requests(identity, record, "form_config", **kwargs)
 
 
+"""
 """
 class PublishDraftComponentPrivate(ServiceComponent):
     def __init__(self, publish_request_type, delete_request_type, *args, **kwargs):

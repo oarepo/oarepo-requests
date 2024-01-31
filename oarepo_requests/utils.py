@@ -1,41 +1,11 @@
 from invenio_access.permissions import system_identity
 from invenio_records_resources.proxies import current_service_registry
-from invenio_records_resources.services.errors import PermissionDeniedError
 from invenio_requests import current_requests_service
 from invenio_requests.proxies import current_request_type_registry
 from invenio_requests.resolvers.registry import ResolverRegistry
 from invenio_search.engine import dsl
 
 from oarepo_requests.errors import OpenRequestAlreadyExists
-
-
-
-
-
-def get_request_from_record(identity, record, request_type, *args, **kwargs):
-    request = getattr(record.parent, request_type, None)
-    # request =
-
-    return request
-
-
-def get_requests_from_record(identity, record, *args, **kwargs):
-    try:
-        requests = list(
-            current_requests_service.scan(
-                identity, extra_filter=dsl.Q("query_string", query=record["id"])
-            ).hits
-        )
-    except (
-        PermissionDeniedError
-    ):  # if user is not allowed to search requests, it should not return any but should still allow reading of the record
-        requests = []
-    return requests
-
-"""
-def get_post_request_url():
-    return f"{{+api}}{OARepoRequestsResourceConfig.url_prefix}"
-"""
 
 
 def allowed_request_types_for_record_cls(queryied_record_cls):
@@ -58,21 +28,6 @@ def allowed_request_types_for_record_cls(queryied_record_cls):
                 ret[request_name] = request_type
                 break
     return ret
-
-
-"""
-{'minimum_should_match': '0<1', 
- 'filter': [Bool(minimum_should_match=1, 
-                 must=[QueryString(query='swf1h-psj10')], 
-                 should=[Bool
-                         (must=[Terms(status=['created']), 
-                                Terms(grants=['created_by.system_role.any_user', 
-                                                  'created_by.community.a26e6dfa-86ef-4a3b-9cbb-d6f034533a45.owner', 
-                                                  'created_by.id.1', 'created_by.system_role.authenticated_user'])])
-                     , 
-                         Bool(minimum_should_match=1, must=[Terms(status=['submitted', 'deleted', 'cancelled', 'expired', 'accepted', 'declined'])], 
-                        should=[Terms(grants=['created_by.system_role.any_user', 'created_by.community.a26e6dfa-86ef-4a3b-9cbb-d6f034533a45.owner', 'created_by.id.1', 'created_by.system_role.authenticated_user']), Terms(grants=['receiver.system_role.any_user', 'receiver.community.a26e6dfa-86ef-4a3b-9cbb-d6f034533a45.owner', 'receiver.id.1', 'receiver.system_role.authenticated_user'])])])], 'should': []}
-"""
 
 
 def request_exists(
@@ -111,10 +66,12 @@ def request_exists(
     )
     return next(results.hits)["id"] if results.total > 0 else None
 
+
 def open_request_exists(topic, type_id, creator=None):
     existing_request = request_exists(system_identity, topic, type_id)
     if existing_request:
         raise OpenRequestAlreadyExists(existing_request, topic)
+
 
 # TODO these things are related and possibly could be approached in a less convoluted manner? For example, global model->services map would help
 def resolve_reference_dict(reference_dict):
@@ -133,11 +90,13 @@ def resolve_reference_dict(reference_dict):
     ).resolve()
     return obj
 
+
 def get_matching_service_for_refdict(reference_dict):
     for resolver in ResolverRegistry.get_registered_resolvers():
         if resolver.matches_reference_dict(reference_dict):
             return current_service_registry.get(resolver._service_id)
     return None
+
 
 def get_matching_service_for_record(record):
     for resolver in ResolverRegistry.get_registered_resolvers():
@@ -145,3 +104,13 @@ def get_matching_service_for_record(record):
             return current_service_registry.get(resolver._service_id)
     return None
 
+
+def get_type_id_for_record_cls(record_cls):
+    for resolver in ResolverRegistry.get_registered_resolvers():
+        if hasattr(resolver, "record_cls") and resolver.record_cls == record_cls:
+            return resolver.type_id
+    return None
+
+from invenio_records_resources.proxies import current_service_registry
+def get_requests_service_for_records_service(records_service):
+    return current_service_registry.get(f"{records_service.config.service_id}_requests")

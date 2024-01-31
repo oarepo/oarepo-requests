@@ -1,19 +1,16 @@
+from flask_resources import ResponseHandler
 from invenio_records_resources.resources.records.config import RecordResourceConfig
+from invenio_requests.resources.requests.config import RequestsResourceConfig
 from invenio_records_resources.services.base.config import ConfiguratorMixin
 
-import importlib_metadata
-from flask_resources import ResponseHandler
-from invenio_requests.resources.requests.config import RequestsResourceConfig
 from .ui import OARepoRequestsUIJSONSerializer
-from invenio_records_resources.resources.records.config import RecordResourceConfig
+
 
 class RecordRequestsResourceConfig(RecordResourceConfig):
     """"""
 
     blueprint_name = "record-requests"
-    routes = {
-        "list": "/<pid_value>/requests"
-    }
+    routes = {"list": "/<pid_value>/requests"}
 
     @property
     def response_handlers(self):
@@ -24,16 +21,19 @@ class RecordRequestsResourceConfig(RecordResourceConfig):
             ),
             **super().response_handlers,
         }
+
+
 class DraftRecordRequestsResourceConfig(RecordRequestsResourceConfig):
     """"""
 
     blueprint_name = "draft-record-requests"
     routes = {
         **RecordRequestsResourceConfig.routes,
-        "list-drafts": "/<pid_value>/draft/requests"
+        "list-drafts": "/<pid_value>/draft/requests",
     }
 
-class OARepoRequestsResourceConfig(RequestsResourceConfig):
+
+class OARepoRequestsResourceConfig(RequestsResourceConfig, ConfiguratorMixin):
     """"""
 
     blueprint_name = "oarepo-requests"
@@ -42,7 +42,7 @@ class OARepoRequestsResourceConfig(RequestsResourceConfig):
         **RequestsResourceConfig.routes,
         "list": "/",
         "list-extended": "/extended",
-        "item-extended": "/extended/<id>"
+        "item-extended": "/extended/<id>",
     }
 
     @property

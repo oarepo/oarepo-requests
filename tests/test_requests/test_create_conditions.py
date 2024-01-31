@@ -5,23 +5,22 @@ from oarepo_requests.errors import OpenRequestAlreadyExists
 from .utils import link_api2testclient
 
 
-def data(receiver, record):
+def data(receiver_id, record_id):
     return {
-        "receiver": {"user": receiver.id},
+        "receiver": {"user": receiver_id},
         "request_type": "non_duplicable",
-        "topic": {"thesis_draft": record.json["id"]},
+        "topic": {"thesis_draft": record_id},
     }
 
 
-def test_can_create(client_factory, identity_simple, users, urls):
-    creator_client = users[0].login(client_factory())
-    receiver_client = users[1].login(client_factory())
+def test_can_create(client_logged_as, identity_simple, users, urls):
+    creator_client = client_logged_as(users[0].email)
     receiver = users[1]
 
     draft1 = creator_client.post(urls["BASE_URL"], json={})
 
     resp_request_create = creator_client.post(
-        urls["BASE_URL_REQUESTS"], json=data(receiver, draft1)
+        urls["BASE_URL_REQUESTS"], json=data(receiver.id, draft1.json["id"])
     )
 
     resp_request_submit = creator_client.post(
@@ -30,19 +29,21 @@ def test_can_create(client_factory, identity_simple, users, urls):
 
     with pytest.raises(OpenRequestAlreadyExists):
         resp_request_create2 = creator_client.post(
-            urls["BASE_URL_REQUESTS"], json=data(receiver, draft1)
+            urls["BASE_URL_REQUESTS"], json=data(receiver.id, draft1.json["id"])
         )
 
 
-def test_can_possibly_create(client_factory, identity_simple, users, urls):
-    creator_client = users[0].login(client_factory())
-    receiver_client = users[1].login(client_factory())
+def test_can_possibly_create(client_logged_as, identity_simple, users, urls):
+    creator_client = client_logged_as(users[0].email)
+    receiver_client = client_logged_as(users[1].email)
     receiver = users[1]
 
     draft1 = creator_client.post(urls["BASE_URL"], json={})
-    record_resp_no_request = receiver_client.get(f"{urls['BASE_URL']}{draft1.json['id']}/draft")
+    record_resp_no_request = receiver_client.get(
+        f"{urls['BASE_URL']}{draft1.json['id']}/draft"
+    )
     resp_request_create = creator_client.post(
-        urls["BASE_URL_REQUESTS"], json=data(receiver, draft1)
+        urls["BASE_URL_REQUESTS"], json=data(receiver.id, draft1.json["id"])
     )
 
     resp_request_submit = creator_client.post(
@@ -55,7 +56,9 @@ def test_can_possibly_create(client_factory, identity_simple, users, urls):
                 return request
         return None
 
-    record_resp_request = receiver_client.get(f"{urls['BASE_URL']}{draft1.json['id']}/draft")
+    record_resp_request = receiver_client.get(
+        f"{urls['BASE_URL']}{draft1.json['id']}/draft"
+    )
     assert find_request_type(
         record_resp_no_request.json["request_types"], "non_duplicable"
     )
