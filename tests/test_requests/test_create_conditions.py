@@ -52,7 +52,7 @@ def test_can_possibly_create(client_logged_as, identity_simple, users, urls):
 
     def find_request_type(requests, type):
         for request in requests:
-            if request["type"] == type:
+            if request["type_id"] == type:
                 return request
         return None
 

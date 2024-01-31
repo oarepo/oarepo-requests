@@ -10,6 +10,7 @@ from oarepo_requests.services.schema import (
     NoneReceiverGenericRequestSchema,
     RequestsSchemaMixin,
     RequestTypeSchema,
+    get_links_schema,
 )
 
 
@@ -48,7 +49,7 @@ class UIRequestSchemaMixin:
     receiver = ma.fields.Nested(UIReferenceSchema)
     topic = ma.fields.Nested(UIReferenceSchema)
 
-    links = ma.fields.Dict(keys=ma.fields.String())
+    links = get_links_schema()
 
     payload = ma.fields.Raw()
 
@@ -85,6 +86,16 @@ class UIRequestTypeSchema(RequestTypeSchema):
     name = ma.fields.String()
     description = ma.fields.String()
     fast_approve = ma.fields.Boolean()
+
+    @ma.post_dump
+    def add_type_details(self, data, **kwargs):
+        type = data["type_id"]
+        type_obj = current_request_type_registry.lookup(type, quiet=True)
+        if hasattr(type_obj, "description"):
+            data["description"] = type_obj.description
+        if hasattr(type_obj, "name"):
+            data["name"] = type_obj.name
+        return data
 
 
 class UIRequestsSerializationMixin(RequestsSchemaMixin):
