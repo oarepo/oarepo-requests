@@ -91,3 +91,5 @@ dist/
 .vscode
 
 thesis
+
+**/ui/theme/**/todo.md

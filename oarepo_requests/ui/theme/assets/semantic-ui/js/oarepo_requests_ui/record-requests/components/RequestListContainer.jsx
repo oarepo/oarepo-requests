@@ -15,22 +15,6 @@ import { RequestContext } from "../contexts";
  * @param {{ requests: Request[], requestTypes: RequestType[] }} props
  */
 export const RequestListContainer = ({ requestTypes }) => {
-  const TriggerButtonForRequest = ({ onClick, request }) => (
-    <List.Item as={Button} onClick={onClick} inverted basic fluid style={{ textAlign: "left" }}>
-      {/* <List.Content floated="right" verticalAlign="middle">
-                    <RequestModal request={request} triggerButton={<Button compact size="medium" title={`${i18next.t("Open dialog for request")} ${request.id}`} content="Open Dialog" />} />
-                  </List.Content> */}
-      <List.Content>
-        <List.Header>
-          {request.name}
-        </List.Header>
-        <List.Description>
-          {request.description}
-        </List.Description>
-      </List.Content>
-    </List.Item>
-  );
-
   const [requests, setRequests] = useContext(RequestContext);
 
   let requestsToApprove = [];

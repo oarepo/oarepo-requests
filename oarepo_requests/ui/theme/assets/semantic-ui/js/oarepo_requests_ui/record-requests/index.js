@@ -9,6 +9,8 @@ const recordRequestsAppDiv = document.getElementById("record-requests");
 
 let record = JSON.parse(recordRequestsAppDiv.dataset.record)?.requests || dummyRecord;
 
+console.log(dummyRecord);
+
 ReactDOM.render(
   <RecordRequests
     record={record}

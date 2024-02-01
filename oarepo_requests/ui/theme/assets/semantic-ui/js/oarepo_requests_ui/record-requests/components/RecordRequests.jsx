@@ -12,7 +12,7 @@ import _sortBy from "lodash/sortBy";
 import { List, Segment, Header, Button } from "semantic-ui-react";
 
 import { CreateRequestButtonGroup, RequestListContainer } from ".";
-import { RequestContextProvider } from "../contexts";
+import { RequestContextProvider, RecordContextProvider } from "../contexts";
 
 /**
  * @typedef {import("../types").Request} Request
@@ -27,16 +27,17 @@ export const RecordRequests = ({ record }) => {
 
   return (
     <>
-    {/* Context for app - to not reload page after RequestModal submit */}
       {/* <OverridableContext.Provider value={overrideStore.getAll()}> */}
-      <RequestContextProvider requests={requestsState}>
-        {requestTypes && (
-          <CreateRequestButtonGroup requestTypes={requestTypes} />
-        )}
-        {record?.requests && (
-          <RequestListContainer requestTypes={requestTypes} />
-        )}
-      </RequestContextProvider>
+      <RecordContextProvider record={record}>
+        <RequestContextProvider requests={requestsState}>
+          {requestTypes && (
+            <CreateRequestButtonGroup requestTypes={requestTypes} />
+          )}
+          {record?.requests && (
+            <RequestListContainer requestTypes={requestTypes} />
+          )}
+        </RequestContextProvider>
+      </RecordContextProvider>
       {/* </OverridableContext.Provider> */}
     </>
   );

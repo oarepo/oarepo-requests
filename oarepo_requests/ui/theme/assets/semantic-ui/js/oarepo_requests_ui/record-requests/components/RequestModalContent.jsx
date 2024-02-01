@@ -59,6 +59,8 @@ export const RequestModalContent = ({ request, requestTypes, requestModalType })
   /** @type {[Request[], (requests: Request[]) => void]} */
   const [requests, setRequests] = useContext(RequestContext);
 
+  const actualRequest = requests.find(req => req.uuid === request.uuid);
+
   useEffect(() => {
     axios
       .get(request.links?.events, { headers: { 'Content-Type': 'application/json' } })
@@ -73,9 +75,7 @@ export const RequestModalContent = ({ request, requestTypes, requestModalType })
       .catch(error => {
         console.log(error);
       });
-  }, []);
-
-  const actualRequest = requests.find(req => req.uuid === request.uuid);
+  }, [actualRequest]);
 
   const requestType = requestTypes.find(requestType => requestType.id === request.type);
   const payloadUI = requestType?.payload_ui;
@@ -121,6 +121,7 @@ export const RequestModalContent = ({ request, requestTypes, requestModalType })
                 <Divider hidden />
               </Form>
             }
+            {/* Render read only data for Accept and Cancel modals */}
             {renderReadOnlyData &&
               <>
                 <List relaxed>
@@ -141,6 +142,7 @@ export const RequestModalContent = ({ request, requestTypes, requestModalType })
                     </List.Item>
                   ))}
                 </List>
+                {/* If events are enabled for this request type, you can see the timeline of events and create new events. */}
                 {!_isEmpty(eventTypes) &&
                   <>
                     <Divider horizontal>{i18next.t("Timeline")}</Divider>
@@ -186,6 +188,7 @@ export const RequestModalContent = ({ request, requestTypes, requestModalType })
             <RequestSideInfo request={request} requestType={requestType} isSidebar />
           </Grid.Column>
         </Grid.Row> ||
+        /* No Submit Form (no PayloadUI for this request type) nor Payload (read only data) available for this Request */
         <Grid.Row>
           <Grid.Column>
             <RequestSideInfo request={request} requestType={requestType} isSidebar={false} />

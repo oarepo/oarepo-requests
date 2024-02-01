@@ -4,6 +4,7 @@ import PropTypes from "prop-types";
 import { i18next } from "@translations/oarepo_requests_ui/i18next";
 import { List, Segment, SegmentGroup, Header, Button } from "semantic-ui-react";
 import _isEmpty from "lodash/isEmpty";
+import _truncate from "lodash/truncate";
 
 import { RequestModal } from ".";
 
@@ -31,14 +32,13 @@ export const RequestList = ({ requests, requestTypes, requestModalType }) => {
           <RequestModal key={request.uuid} request={request} requestTypes={requestTypes} requestModalType={modalType}
             triggerButton={
               <List.Item as="a" key={request.id}>
-                {/* {request?.created && <List.Content floated="right" verticalAlign="bottom">{new Date(request.created)?.toLocaleString("cs-CZ")}</List.Content>} */}
                 <List.Content floated="right" verticalAlign="middle">
                   <div style={{ textAlign: "right" }}>{request?.status ?? i18next.t("No status")}</div>
                   <div>{new Date(request.created)?.toLocaleString("cs-CZ")}</div>
                 </List.Content>
                 <List.Content>
                   <List.Header>{request.name}</List.Header>
-                  <List.Description>{request.description}</List.Description>
+                  <List.Description>{_truncate(request.description, { length: 30 })}</List.Description>
                 </List.Content>
               </List.Item>
             }

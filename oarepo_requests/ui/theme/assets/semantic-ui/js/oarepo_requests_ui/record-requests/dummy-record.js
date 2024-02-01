@@ -5,7 +5,8 @@ export default {
   "links": {
     "files": "https://127.0.0.1:5000/api/uct-theses/36s8e-qwz66/files",
     "self": "https://127.0.0.1:5000/api/uct-theses/36s8e-qwz66",
-    "self_html": "https://127.0.0.1:5000/theses/36s8e-qwz66"
+    "self_html": "https://127.0.0.1:5000/theses/36s8e-qwz66",
+    "requests": "https://9c2a4912-c1a0-48f8-9565-e772482c6e92.mock.pstmn.io/api/uct-theses/36s8e-qwz66/requests"
   },
   "revision_id": 2,
   "$schema": "local://uct_theses-1.0.0.json",
@@ -132,7 +133,7 @@ export default {
         },
         "self": "https://127.0.0.1:5000/api/uct-theses/36s8e-qwz66/requests/ed181799-26c5-4269-b032-4a2a4624eb9d",
         "self_html": "https://127.0.0.1:5000/api/uct-theses/36s8e-qwz66/requests/ed181799-26c5-4269-b032-4a2a4624eb9d/html",
-        "events": "https://127.0.0.1:5000/api/uct-theses/36s8e-qwz66/requests/ed181799-26c5-4269-b032-4a2a4624eb9d/events" // TODO: Shouldn't this be more specific event like "comments"?
+        "events": "https://127.0.0.1:5000/api/uct-theses/36s8e-qwz66/requests/ed181799-26c5-4269-b032-4a2a4624eb9d/events"
       },
       "created_by": {
         "reference": "6c3f6437-9197-490c-9584-d2daa5143dcf",
@@ -291,56 +292,6 @@ export default {
         "description": "Pridel DOI k objektu 36s8e-qwz66",
         "request_text": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam fringilla tortor nibh, sed sagittis lorem congue ac. Aliquam ante mauris, porttitor eu ornare ut, feugiat sit amet diam. Maecenas ut sem mi. Maecenas elementum, elit mollis vestibulum cursus, nisi ex commodo neque, id ultrices felis ligula eget massa. Integer vel justo et ligula dapibus ultrices. Nullam ultricies sed neque sed lacinia. Interdum et malesuada fames ac ante ipsum primis in faucibus. Praesent sed lectus ut diam sollicitudin malesuada a quis nibh. In tempus nibh ex, tincidunt tempus enim rutrum id. Aliquam laoreet dictum enim in vestibulum. Nam sagittis, turpis at pretium maximus, odio nibh venenatis risus, eu tempus tortor nibh id ante. Vestibulum aliquam, quam ac gravida fringilla, risus leo fermentum nunc, in fringilla magna urna a turpis. Cras sed metus vel metus lacinia auctor. In sed maximus risus, at euismod urna. Donec mi velit, euismod non orci id, pharetra eleifend tortor."
       },
-      // "events": [
-      //   {
-      //     "payload": {
-      //       "comment": "hello world"
-      //     },
-      //     "created": "2024-01-08T09:37:15.726599+00:00",
-      //     "created_by": {
-      //       "reference": "6c3f6437-9197-490c-9584-d2daa5143dcf",
-      //       "type": "user",
-      //       "label": "Ron",
-      //       "link": "https://127.0.0.1:5000/api/uct-theses/users/6c3f6437-9197-490c-9584-d2daa5143dcf"
-      //     },
-      //     "updated": "2024-01-08T09:37:15.726599+00:00",
-      //     "revision_id": 1,
-      //     "id": "53c6a7fd-6a07-41a7-8996-46852267elk0",
-      //     "type_code": "C",
-      //     "type": "Comment",
-      //     "links": {
-      //       "self": "https://127.0.0.1:5000/api/uct-theses/users/6c3f6437-9197-490c-9584-d2daa5143dcf"
-      //     },
-      //     "permissions": {
-      //       "can_update_comment": true,
-      //       "can_delete_comment": true
-      //     }
-      //   },
-      //   {
-      //     "payload": {
-
-      //     },
-      //     "created": "2024-01-08T09:37:15.726599+00:00",
-      //     "created_by": {
-      //       "reference": "6c3f6437-9197-490c-9ki9-d2daa5143dcf",
-      //       "type": "user",
-      //       "label": "Ron",
-      //       "link": "https://127.0.0.1:5000/api/uct-theses/users/6c3f6437-9197-490c-9584-d2daa5143dcf"
-      //     },
-      //     "updated": "2024-01-08T09:37:15.726599+00:00",
-      //     "revision_id": 1,
-      //     "id": "53c6a7fd-6a07-41a7-8996-46852267e940",
-      //     "type_code": "P",
-      //     "type": "Znalecký posudek",
-      //     "links": {
-      //       "self": "https://127.0.0.1:5000/api/uct-theses/users/6c3f6437-9197-490c-9584-d2daa5143dcf"
-      //     },
-      //     "permissions": {
-      //       "can_update_comment": true,
-      //       "can_delete_comment": true
-      //     }
-      //   }
-      // ]
     },
     {
       "name": "pridel doi 6",
@@ -352,7 +303,7 @@ export default {
           "submit": "https://127.0.0.1:5000/api/uct-theses/requests/ed129799-26c5-4269-b032-4a2a4624lo9d/actions/submit",
           "cancel": "https://127.0.0.1:5000/api/uct-theses/requests/ed129799-26c5-4269-b032-4a2a4624lo9d/actions/cancel"
         },
-        "self": "https://127.0.0.1:5000/api/uct-theses/36s8e-qwz66/requests/ed129799-26c5-4269-b032-4a2a4624lo9d", // PUT request: override existing record
+        "self": "https://127.0.0.1:5000/api/uct-theses/36s8e-qwz66/requests/ed129799-26c5-4269-b032-4a2a4624lo9d",
         "self_html": "https://127.0.0.1:5000/api/uct-theses/36s8e-qwz66/requests/ed129799-26c5-4269-b032-4a2a4624lo9d/html",
         "events": "https://127.0.0.1:5000/api/uct-theses/36s8e-qwz66/requests/ed129799-26c5-4269-b032-4a2a4624lo9d/events"
       },
@@ -516,11 +467,11 @@ export default {
               "fields": [
                 {
                   "field": "expert_opinion",
-                  "ui_widget": "RichInput",
+                  "ui_widget": "Input",
                   "props": {
-                    "label": "description",
-                    "placeholder": "description",
-                    "icon": "text height",
+                    "label": "name",
+                    "placeholder": "File Name",
+                    "icon": "file",
                     "required": true
                   },
                   "view_widget": "FileViewWidget",

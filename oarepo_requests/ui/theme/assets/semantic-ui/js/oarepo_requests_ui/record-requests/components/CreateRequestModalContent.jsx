@@ -33,7 +33,7 @@ export const CreateRequestModalContent = ({ requestType, extraPreSubmitEvent }) 
         </p>
       }
       {payloadUI &&
-        <Segment>
+        <Segment basic>
           <Form onSubmit={customSubmitHandler} id="request-form">
             <CustomFields
               // ref={cfRef}

@@ -10,7 +10,7 @@ import axios from "axios";
 
 import { RequestModalContent, CreateRequestModalContent } from ".";
 import { REQUEST_TYPE } from "../utils/objects";
-import { RequestContext } from "../contexts";
+import { RecordContext, RequestContext } from "../contexts";
 
 /** 
  * @typedef {import("../types").Request} Request
@@ -51,7 +51,9 @@ export const RequestModal = ({ request, requestTypes, requestModalType, isEventM
 
   const errorMessageRef = useRef(null);
 
+  /** @type {[Request[], (requests: Request[]) => void]} */
   const [requests, setRequests] = useContext(RequestContext);
+  const record = useContext(RecordContext);
 
   const formik = useFormik({
     initialValues: !isEmpty(request?.payload) ? { payload: request.payload } : mapPayloadUiToInitialValues(request?.payload_ui),
@@ -71,15 +73,15 @@ export const RequestModal = ({ request, requestTypes, requestModalType, isEventM
     }
   }, [error]);
 
-  const fetchRequests = () => {
+  const fetchUpdated = (url, setter) => {
     axios({
       method: 'get',
-      url: request.links?.self.split('/').slice(0, -1).join('/'), // TODO: link for /api/{record}/requests ?? 
+      url: url,
       headers: { 'Content-Type': 'application/json' }
     })
       .then(response => {
         console.log(response);
-        setRequests(response.data);
+        setter(response.data);
       })
       .catch(error => {
         console.log(error);
@@ -105,8 +107,8 @@ export const RequestModal = ({ request, requestTypes, requestModalType, isEventM
     return delay(1000)
       .then(response => {
         console.log(response);
+        fetchUpdated(record.links?.requests, setRequests);
         setModalOpen(false);
-        requestModalType !== REQUEST_TYPE.CREATE && fetchRequests(); // TODO: Replace with state update
         formik.resetForm();
       })
       .catch(error => {
@@ -160,7 +162,7 @@ export const RequestModal = ({ request, requestTypes, requestModalType, isEventM
 
     switch (requestType) {
       case REQUEST_TYPE.CREATE:
-        newConfirmDialogProps.header = i18next.t("Create request");
+        newConfirmDialogProps.header = isEventModal ? i18next.t("Submit event") : i18next.t("Create request");
         break;
       case REQUEST_TYPE.SUBMIT:
         newConfirmDialogProps.header = i18next.t("Submit request");
