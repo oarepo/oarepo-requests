@@ -1,7 +1,7 @@
-from oarepo_requests.resources.config import OARepoRequestsResourceConfig
-from oarepo_requests.resources.resource import OARepoRequestsResource
-from oarepo_requests.services.config import OARepoRequestsServiceConfig
-from oarepo_requests.services.service import OARepoRequestsService
+from oarepo_requests.resources.oarepo.config import OARepoRequestsResourceConfig
+from oarepo_requests.resources.oarepo.resource import OARepoRequestsResource
+from oarepo_requests.services.oarepo.config import OARepoRequestsServiceConfig
+from oarepo_requests.services.oarepo.service import OARepoRequestsService
 
 
 class OARepoRequests:

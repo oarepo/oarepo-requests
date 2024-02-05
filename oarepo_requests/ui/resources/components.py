@@ -6,6 +6,7 @@ from invenio_requests.customizations import RequestActions
 from oarepo_ui.resources.components import UIResourceComponent
 
 
+# TODO deprecatated
 class AllowedRequestsComponent(UIResourceComponent):
     """Service component which sets all data in the record."""
 
