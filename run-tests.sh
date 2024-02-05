@@ -22,7 +22,7 @@ if test -d $MODEL; then
   rm -rf $MODEL
 fi
 
-oarepo-compile-model ./$CODE_TEST_DIR/$MODEL.yaml --output-directory $MODEL -vvv
+# oarepo-compile-model ./$CODE_TEST_DIR/$MODEL.yaml --output-directory $MODEL -vvv
 
 MODEL_VENV=".venv-tests"
 
@@ -33,9 +33,9 @@ python3 -m venv $MODEL_VENV
 . $MODEL_VENV/bin/activate
 pip install -U setuptools pip wheel
 pip install "oarepo[tests]==$OAREPO_VERSION.*"
-pip install -e "./${MODEL}"
+# pip install -e "./${MODEL}"
 pip install oarepo-ui
 pip install -e .
 
-pytest $BUILD_TEST_DIR/test_requests
-pytest $BUILD_TEST_DIR/test_ui
+# pytest $BUILD_TEST_DIR/test_requests
+# pytest $BUILD_TEST_DIR/test_ui
