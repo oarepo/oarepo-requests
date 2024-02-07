@@ -19,7 +19,7 @@ record:
           base-classes:
           - NonDuplicableRequest
           imports:
-          - import: tests.mock_requests.type.NonDuplicableRequest
+          - import: mock_requests.type.NonDuplicableRequest
   requests:
     delete-record:
       type:

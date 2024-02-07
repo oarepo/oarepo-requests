@@ -9,6 +9,7 @@ def test_read_extended(
     publish_request_data_function,
     serialization_result,
     ui_serialization_result,
+    search_clear,
 ):
     receiver = users[1]
     creator_client = client_logged_as(users[0].email)

@@ -34,7 +34,8 @@ def request_exists(
     identity,
     topic,
     type_id,
-    topic_type="thesis_draft",
+    topic_type=None,
+    is_open=False,
     receiver_type=None,
     receiver_id=None,
     creator_type=None,
@@ -46,7 +47,7 @@ def request_exists(
 
     must = [
         dsl.Q("term", **{"type": type_id}),
-        dsl.Q("term", **{"is_open": True}),
+        dsl.Q("term", **{"is_open": is_open}),
     ]
     if add_args:
         must += add_args
@@ -68,14 +69,13 @@ def request_exists(
 
 
 def open_request_exists(topic, type_id, creator=None):
-    existing_request = request_exists(system_identity, topic, type_id)
+    existing_request = request_exists(system_identity, topic, type_id, is_open=True)
     if existing_request:
         raise OpenRequestAlreadyExists(existing_request, topic)
 
 
 # TODO these things are related and possibly could be approached in a less convoluted manner? For example, global model->services map would help
 def resolve_reference_dict(reference_dict):
-    # from invenio_records_resources.references.registry.ResolverRegistryBase.reference_entity
     topic_resolver = None
     for resolver in ResolverRegistry.get_registered_resolvers():
         try:

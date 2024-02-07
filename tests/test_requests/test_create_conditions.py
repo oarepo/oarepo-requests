@@ -13,7 +13,7 @@ def data(receiver_id, record_id):
     }
 
 
-def test_can_create(client_logged_as, identity_simple, users, urls):
+def test_can_create(client_logged_as, identity_simple, users, urls, search_clear):
     creator_client = client_logged_as(users[0].email)
     receiver = users[1]
 
@@ -33,7 +33,9 @@ def test_can_create(client_logged_as, identity_simple, users, urls):
         )
 
 
-def test_can_possibly_create(client_logged_as, identity_simple, users, urls):
+def test_can_possibly_create(
+    client_logged_as, identity_simple, users, urls, search_clear
+):
     creator_client = client_logged_as(users[0].email)
     receiver_client = client_logged_as(users[1].email)
     receiver = users[1]

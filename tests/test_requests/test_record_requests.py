@@ -4,7 +4,12 @@ from .utils import link_api2testclient
 
 
 def test_read_requests_on_draft(
-    logged_clients, identity_simple, users, urls, publish_request_data_function
+    logged_clients,
+    identity_simple,
+    users,
+    urls,
+    publish_request_data_function,
+    search_clear,
 ):
     creator_client = logged_clients[0]
     receiver = users[1]

@@ -19,7 +19,7 @@ class OARepoRequests:
         app.extensions["oarepo-requests"] = self
 
     @property
-    def entity_resolvers(self):
+    def entity_reference_ui_resolvers(self):
         return self.app.config["ENTITY_REFERENCE_UI_RESOLVERS"]
 
     # copied from invenio_requests for now

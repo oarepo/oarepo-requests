@@ -4,9 +4,18 @@ from invenio_users_resources.proxies import current_users_service
 from oarepo_requests.utils import get_matching_service_for_refdict
 
 
+def fallback_label_result(reference):
+    id_ = list(reference.values())[0]
+    return f"id: {id_}"
+
+
 def fallback_result(reference):
-    id = list(reference.values())[0]
-    return {"reference": reference, "type": "user", "label": f"id: {id}"}
+    type = list(reference.keys())[0]
+    return {
+        "reference": reference,
+        "type": type,
+        "label": fallback_label_result(reference),
+    }
 
 
 def user_entity_reference_ui_resolver(identity, data):
@@ -20,7 +29,7 @@ def user_entity_reference_ui_resolver(identity, data):
         if "email" in user_search.data:
             label = user_search.data["email"]
         else:
-            label = f"id: {user_search.data['id']}"
+            label = fallback_label_result(reference)
     else:
         label = user_search.data["username"]
     ret = {
@@ -37,21 +46,18 @@ def _record_entity_reference_ui_resolver_inner(identity, data, is_draft):
     reference = data["reference"]
     id = list(reference.values())[0]
     service = get_matching_service_for_refdict(reference)
-    if is_draft:
-        try:
-            response = service.read_draft(identity, id)
-        except PermissionDeniedError:
-            return fallback_result(reference)
-    else:
-        try:
-            response = service.read(identity, id)
-        except PermissionDeniedError:
-            return fallback_result(reference)
+
+    reader = service.read_draft if is_draft else service.read
+    try:
+        response = reader(identity, id)
+    except PermissionDeniedError:
+        return fallback_result(reference)
+
     record = response.data
     if "metadata" in record and "title" in record["metadata"]:
         label = record["metadata"]["title"]
     else:
-        label = ""
+        label = fallback_label_result(reference)
     ret = {
         "reference": reference,
         "type": list(reference.keys())[0],
@@ -64,29 +70,23 @@ def _record_entity_reference_ui_resolver_inner(identity, data, is_draft):
 def fallback_entity_reference_ui_resolver(identity, data):
     reference = data["reference"]
     id = list(reference.values())[0]
-    fallback_label = id
-    fallback_result = {
-        "reference": reference,
-        "type": list(reference.keys())[0],
-        "label": fallback_label,
-    }
     try:
         service = get_matching_service_for_refdict(reference)
     except:
-        return fallback_result
+        return fallback_result(reference)
     try:
         response = service.read(identity, id)
     except:
         try:
             response = service.read_draft(identity, id)
         except:
-            return fallback_result
+            return fallback_result(reference)
 
     record = response.data
     if "metadata" in record and "title" in record["metadata"]:
         label = record["metadata"]["title"]
     else:
-        label = fallback_label
+        label = fallback_label_result(reference)
 
     ret = {"reference": reference, "type": list(reference.keys())[0], "label": label}
     if "links" in record and "self" in record["links"]:

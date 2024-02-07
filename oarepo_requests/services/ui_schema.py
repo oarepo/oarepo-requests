@@ -29,7 +29,7 @@ class UIReferenceSchema(ma.Schema):
     @ma.post_dump
     def dereference(self, data, **kwargs):
         reference_type = list(data["reference"].keys())[0]
-        entity_resolvers = current_oarepo_requests.entity_resolvers
+        entity_resolvers = current_oarepo_requests.entity_reference_ui_resolvers
         if reference_type in entity_resolvers:
             return entity_resolvers[reference_type](self.context["identity"], data)
         else:

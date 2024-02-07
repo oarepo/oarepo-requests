@@ -10,6 +10,7 @@ def test_delete(
     users,
     urls,
     delete_record_data_function,
+    search_clear,
 ):
     creator = users[0]
     receiver = users[1]

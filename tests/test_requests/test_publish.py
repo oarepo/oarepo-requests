@@ -4,7 +4,12 @@ from .utils import link_api2testclient
 
 
 def test_publish(
-    logged_client_post, identity_simple, users, urls, publish_request_data_function
+    logged_client_post,
+    identity_simple,
+    users,
+    urls,
+    publish_request_data_function,
+    search_clear,
 ):
     creator = users[0]
     receiver = users[1]

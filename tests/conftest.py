@@ -114,7 +114,7 @@ def ui_serialization_result():
             "status": "Submitted",
             "title": "",
             "topic": {
-                "label": "",
+                "label": f"id: {topic_id}",
                 "link": f"https://127.0.0.1:5000/api/thesis/{topic_id}/draft",
                 "reference": {"thesis_draft": topic_id},
                 "type": "thesis_draft",
