@@ -1,15 +1,28 @@
-from invenio_records_resources.services import Service
+from types import SimpleNamespace
+
 from invenio_search.engine import dsl
 
 from oarepo_requests.proxies import current_oarepo_requests
 from oarepo_requests.utils import get_type_id_for_record_cls
 
 
-class RecordRequestsService(Service):
+class RecordRequestsService:
+    def __init__(self, record_service):
+        self.record_service = record_service
+
+    # so api doesn't fall apart
+    @property
+    def config(self):
+        return SimpleNamespace(service_id=self.service_id)
+
+    @property
+    def service_id(self):
+        return f"{self.record_service.config.service_id}_requests"
+
     @property
     def record_cls(self):
         """Factory for creating a record class."""
-        return self.config.record_cls
+        return self.record_service.config.record_cls
 
     @property
     def requests_service(self):
@@ -29,7 +42,7 @@ class RecordRequestsService(Service):
     ):
         """Search for record's requests."""
         record = self.record_cls.pid.resolve(record_id)
-        self.require_permission(identity, "read", record=record)
+        self.record_service.require_permission(identity, "read", record=record)
 
         search_filter = dsl.query.Bool(
             "must",

@@ -1,3 +1,5 @@
+import copy
+
 from flask import g
 from flask_resources import resource_requestctx, response_handler, route
 from invenio_records_resources.resources import RecordResource
@@ -10,6 +12,18 @@ from invenio_records_resources.resources.records.utils import search_preference
 
 
 class RecordRequestsResource(RecordResource):
+    def __init__(self, config, service, record_requests_config):
+        """
+        :param config: main record resource config
+        :param service:
+        :param record_requests_config: config specific for the record request serivce
+        """
+        actual_config = copy.deepcopy(config)
+        actual_config.blueprint_name = f"{config.blueprint_name}_requests"
+        # possibly do some nontrivial merge
+        actual_config.routes = record_requests_config.routes
+        super().__init__(actual_config, service)
+
     def create_url_rules(self):
         """Create the URL rules for the record resource."""
         routes = self.config.routes

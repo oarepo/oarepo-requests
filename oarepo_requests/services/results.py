@@ -1,4 +1,5 @@
 from invenio_records_resources.services.errors import PermissionDeniedError
+from oarepo_runtime.services.results import RecordItem
 
 from oarepo_requests.services.schema import RequestTypeSchema
 from oarepo_requests.utils import (
@@ -36,19 +37,18 @@ class RequestsComponent:
         service = get_requests_service_for_records_service(
             get_matching_service_for_record(record)
         )
-        if hasattr(record, "is_draft") and record.is_draft:
-            try:
-                requests = list(
-                    service.search_requests_for_draft(identity, record["id"]).hits
-                )
-            except PermissionDeniedError:
-                requests = []
-        else:
-            try:
-                requests = list(
-                    service.search_requests_for_record(identity, record["id"]).hits
-                )
-            except PermissionDeniedError:
-                requests = []
+        reader = (
+            service.search_requests_for_draft
+            if getattr(record, "is_draft", False)
+            else service.search_requests_for_record
+        )
+        try:
+            requests = list(reader(identity, record["id"]).hits)
+        except PermissionDeniedError:
+            requests = []
         if requests:
             projection["requests"] = requests
+
+
+class RequestsAwareResultItem(RecordItem):
+    components = [RequestsComponent(), RequestTypesComponent()]

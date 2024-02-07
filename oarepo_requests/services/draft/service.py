@@ -8,7 +8,7 @@ class DraftRecordRequestsService(RecordRequestsService):
     @property
     def draft_cls(self):
         """Factory for creating a record class."""
-        return self.config.draft_cls
+        return self.record_service.config.draft_cls
 
     # from invenio_rdm_records.services.requests.service.RecordRequestsService
     def search_requests_for_draft(
@@ -23,7 +23,7 @@ class DraftRecordRequestsService(RecordRequestsService):
     ):
         """Search for record's requests."""
         record = self.draft_cls.pid.resolve(record_id, registered_only=False)
-        self.require_permission(identity, "read_draft", record=record)
+        self.record_service.require_permission(identity, "read_draft", record=record)
 
         search_filter = dsl.query.Bool(
             "must",
