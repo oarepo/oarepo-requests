@@ -1,11 +1,12 @@
 import copy
 
 from invenio_records_resources.services.errors import PermissionDeniedError
-from invenio_requests import current_requests_service, current_request_type_registry
+from invenio_requests import current_request_type_registry, current_requests_service
 from invenio_requests.customizations import RequestActions
 from oarepo_ui.resources.components import UIResourceComponent
 
 
+# TODO deprecatated
 class AllowedRequestsComponent(UIResourceComponent):
     """Service component which sets all data in the record."""
 
@@ -44,8 +45,9 @@ class AllowedRequestsComponent(UIResourceComponent):
                     saved_request_data["actions"] = [action_name]
                     available_requests[request_name] = saved_request_data
                 else:
-                    saved_request_data["actions"].append(action_name) # noqa we are sure that saved_request_data exists
-
+                    saved_request_data["actions"].append(
+                        action_name
+                    )  # noqa we are sure that saved_request_data exists
 
     def before_ui_detail(self, identity, api_record=None, errors=None, **kwargs):
         self._add_available_requests(identity, api_record, "extra_context", kwargs)

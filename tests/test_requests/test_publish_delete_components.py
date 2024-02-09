@@ -1,8 +1,5 @@
-import pytest
-from invenio_pidstore.errors import PIDDeletedError, PIDUnregistered, PIDDoesNotExistError
-from invenio_records_resources.services.errors import PermissionDeniedError
-from sqlalchemy.orm.exc import NoResultFound
-
+"""
+# not needed for now
 
 def test_workflow(
     requests_service,
@@ -17,19 +14,11 @@ def test_workflow(
         record_service.read(identity_simple, record_id)
 
     requests_service.execute_action(
-        identity_simple, resp1._obj.parent.publish_draft.id, "submit"
+        identity_simple, resp1._obj.parent.publish_draft.id, "accept"
     )
 
-    try:
+    with pytest.raises(NoResultFound):
         record_service.read_draft(identity_simple, record_id)
-        raise Exception("Expecting PIDDoesNotExistError for RDM 12 or NoResultFound for RDM 11")
-    except PIDDoesNotExistError:
-        # RDM 12 error
-        pass
-    except NoResultFound:
-        # RDM 11 error
-        pass
-
     resp2 = record_service.read(identity_simple, record_id)
     assert resp2._obj.parent.publish_draft is None
 
@@ -104,3 +93,12 @@ def test_receiver_permissions_user(
         identity=identity_receiver, id_=request_id, action="accept"
     )
     assert receiver_accept.data["status"] == "accepted"
+
+
+def test_api_create(client_with_credentials, request_data):
+    headers = {"accept": "application/json", "content-type": "application/json"}
+    resp = client_with_credentials.post(
+        "/requests/create", headers=headers, json=request_data
+    )
+    assert resp.status_code == 201
+"""

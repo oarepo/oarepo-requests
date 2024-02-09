@@ -1,26 +1,28 @@
-{#def form_config, extra_context #}
+{#def record #}
 {
 "available_requests":
 {
-{% for request_name, request in extra_context.allowed_requests.items() %}
-    "{{ request_name }}": {
+{% for request in record.requests %}
+    "{{ request.name }}": {
         "type": {{ request.type|tojson|safe }},
         "status": {{ request.status|tojson|safe }},
         "receiver": {{ request.receiver|tojson|safe }},
         "actions": {{ request.actions|tojson|safe }}
-    }
+    }{% if not loop.last %}
+    ,
+{% endif %}
 {% endfor %}
 },
-
-"form_config":
+"creatable_request_types":
 {
-{% for request_name, request in form_config["allowed_requests"].items() %}
-    "{{ request_name }}": {
-        "type": {{ request.type|tojson|safe }},
-        "status": {{ request.status|tojson|safe }},
-        "receiver": {{ request.receiver|tojson|safe }},
-        "actions": {{ request.actions|tojson|safe }}
-    }
+{% for request_type in record.request_types %}
+    "{{ request_type.type_id }}": {
+        "name": {{ request_type.name|tojson|safe }},
+        "description": {{ request_type.description|tojson|safe }},
+        "links": {{ request_type.links|tojson|safe }}
+    }{% if not loop.last %}
+    ,
+{% endif %}
 {% endfor %}
 }
 }

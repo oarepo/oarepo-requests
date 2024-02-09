@@ -1,12 +1,14 @@
 from invenio_requests.customizations import RequestType
 
-from oarepo_requests.actions.delete_topic import DeleteTopicSubmitAction
+from oarepo_requests.actions.delete_topic import DeleteTopicAcceptAction
+
+from .generic import OARepoRequestType
 
 
-class DeleteRecordRequestType(RequestType):
+class DeleteRecordRequestType(OARepoRequestType):
     available_actions = {
         **RequestType.available_actions,
-        "submit": DeleteTopicSubmitAction,
+        "accept": DeleteTopicAcceptAction,
     }
-
+    description = "request deletion of published record"
     receiver_can_be_none = True
