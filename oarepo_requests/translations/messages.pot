@@ -1,0 +1,102 @@
+# Translations template for PROJECT.
+# Copyright (C) 2024 ORGANIZATION
+# This file is distributed under the same license as the PROJECT project.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2024.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: PROJECT VERSION\n"
+"Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
+"POT-Creation-Date: 2024-01-31 13:19+0100\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.14.0\n"
+
+msgid "Create Request"
+msgstr ""
+
+msgid "No status"
+msgstr ""
+
+msgid "Open dialog for request"
+msgstr ""
+
+msgid "My Requests"
+msgstr ""
+
+msgid "Requests to Approve"
+msgstr ""
+
+msgid "Are you sure?"
+msgstr ""
+
+msgid "Cancel"
+msgstr ""
+
+msgid "OK"
+msgstr ""
+
+msgid "Create request"
+msgstr ""
+
+msgid "Submit request"
+msgstr ""
+
+msgid "Delete request"
+msgstr ""
+
+msgid "Delete"
+msgstr ""
+
+msgid "Accept request"
+msgstr ""
+
+msgid "Accept"
+msgstr ""
+
+msgid "Decline request"
+msgstr ""
+
+msgid "Decline"
+msgstr ""
+
+msgid "Create and submit request"
+msgstr ""
+
+msgid "Create and submit"
+msgstr ""
+
+msgid "Error sending request"
+msgstr ""
+
+msgid "Submit"
+msgstr ""
+
+msgid "Save drafted request"
+msgstr ""
+
+msgid "Save"
+msgstr ""
+
+msgid "Create"
+msgstr ""
+
+msgid "Creator"
+msgstr ""
+
+msgid "Receiver"
+msgstr ""
+
+msgid "Request type"
+msgstr ""
+
+msgid "Created"
+msgstr ""
+
+msgid "Timeline"
+msgstr ""
