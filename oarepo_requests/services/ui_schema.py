@@ -2,7 +2,7 @@ import marshmallow as ma
 from invenio_requests.proxies import current_request_type_registry
 from marshmallow import validate
 from oarepo_runtime.i18n import lazy_gettext as _
-from oarepo_runtime.services.schema.ui import InvenioUISchema, LocalizedDateTime
+from oarepo_runtime.services.schema.ui import LocalizedDateTime
 
 from oarepo_requests.proxies import current_oarepo_requests
 from oarepo_requests.resolvers.ui import fallback_entity_reference_ui_resolver
@@ -76,12 +76,6 @@ class UIBaseRequestSchema(UIRequestSchemaMixin, NoneReceiverGenericRequestSchema
     """"""
 
 
-def get_request_ui_schema(request_type_schema):
-    return type(
-        "CustomUIRequestSchema", (UIRequestSchemaMixin, request_type_schema), {}
-    )
-
-
 class UIRequestTypeSchema(RequestTypeSchema):
     name = ma.fields.String()
     description = ma.fields.String()
@@ -101,30 +95,3 @@ class UIRequestTypeSchema(RequestTypeSchema):
 class UIRequestsSerializationMixin(RequestsSchemaMixin):
     requests = ma.fields.List(ma.fields.Nested(UIBaseRequestSchema))
     request_types = ma.fields.List(ma.fields.Nested(UIRequestTypeSchema))
-
-
-class RequestsUISchema(InvenioUISchema, UIRequestsSerializationMixin):
-    """
-    @ma.pre_dump
-    def expand_references(self, data, **kwargs):
-
-        def one_element_dict_key(dct):
-            return list(dct.keys())[0]
-
-        if "requests" in data:
-            for request in data["requests"]:
-                if "created_by" in request:
-                    key = one_element_dict_key(request["created_by"])
-                    if key in ENTITY_REFERENCE_UI_RESOLVERS:
-                        extended_reference = ENTITY_REFERENCE_UI_RESOLVERS[key](system_identity, request["created_by"])
-                        request["created_by"] = extended_reference
-                if "receiver" in request:
-                    key = one_element_dict_key(request["receiver"])
-                    if key in ENTITY_REFERENCE_UI_RESOLVERS:
-                        extended_reference = ENTITY_REFERENCE_UI_RESOLVERS[key](system_identity, request["receiver"])
-                        request["receiver"] = extended_reference
-                if "topic" in request:
-                    key = one_element_dict_key(request["topic"])
-                    extended_reference = ENTITY_REFERENCE_UI_RESOLVERS[key](system_identity, request["topic"])
-        return data
-    """
