@@ -85,3 +85,6 @@ msgstr ""
 
 msgid "Timeline"
 msgstr ""
+
+msgid "Submit event"
+msgstr ""

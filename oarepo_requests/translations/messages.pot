@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2024-01-31 13:19+0100\n"
+"POT-Creation-Date: 2024-02-13 13:12+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -21,9 +21,6 @@ msgid "Create Request"
 msgstr ""
 
 msgid "No status"
-msgstr ""
-
-msgid "Open dialog for request"
 msgstr ""
 
 msgid "My Requests"
@@ -39,6 +36,9 @@ msgid "Cancel"
 msgstr ""
 
 msgid "OK"
+msgstr ""
+
+msgid "Submit event"
 msgstr ""
 
 msgid "Create request"
