@@ -5,11 +5,7 @@ record:
     qualified: thesis
   permissions:
     presets: [ 'everyone' ]
-  service-config:
-    components:
-    - PublishDraftComponent("publish_draft", "delete_record")
-    imports:
-    - import: oarepo_requests.services.components.PublishDraftComponent
+
   draft:
     requests:
       publish-draft:
@@ -18,11 +14,12 @@ record:
           - PublishDraftRequestType
           imports:
           - import: oarepo_requests.types.publish_draft.PublishDraftRequestType
-        actions:
-          submit:
-            class: oarepo_requests.actions.publish_draft.PublishDraftSubmitAction
-            generate: False
-
+      non-duplicable:
+        type:
+          base-classes:
+          - NonDuplicableRequest
+          imports:
+          - import: mock_requests.type.NonDuplicableRequest
   requests:
     delete-record:
       type:
@@ -30,10 +27,6 @@ record:
         - DeleteRecordRequestType
         imports:
         - import: oarepo_requests.types.delete_record.DeleteRecordRequestType
-      actions:
-        submit:
-          class: oarepo_requests.actions.delete_topic.DeleteTopicSubmitAction
-          generate: False
     generic-request: {}
 
 settings:
