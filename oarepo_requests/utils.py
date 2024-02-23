@@ -8,14 +8,32 @@ from invenio_search.engine import dsl
 from oarepo_requests.errors import OpenRequestAlreadyExists
 
 
+def allowed_request_types_for_record(record):
+    request_types = current_request_type_registry._registered_types
+    ret = {}
+    try:
+        record_ref = list(ResolverRegistry.reference_entity(record).keys())[0]
+    except:
+        # log?
+        return ret
+    for request_name, request_type in request_types.items():
+        allowed_type_keys = set(request_type.allowed_topic_ref_types)
+        if record_ref in allowed_type_keys:
+            ret[request_name] = request_type
+    return ret
+
+
 def allowed_request_types_for_record_cls(queryied_record_cls):
+    # works only for record resolvers which have record_cls and type_key
+    # and assumes 1:1 type_key - record_cls mapping; type key is the serialized type name in the ref dict
+
     request_types = current_request_type_registry._registered_types
     resolvers = list(ResolverRegistry.get_registered_resolvers())
     # possibly the mapping doesn't have to be 1:1
     type_key2record_cls = {
         resolver.type_key: resolver.record_cls
         for resolver in resolvers
-        if hasattr(resolver, "type_key")
+        if hasattr(resolver, "type_key") and hasattr(resolver, "record_cls")
     }
     ret = {}
     for request_name, request_type in request_types.items():

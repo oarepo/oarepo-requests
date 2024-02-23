@@ -8,26 +8,25 @@ record:
 
   draft:
     requests:
-      publish-draft:
-        type:
+      types:
+        publish-draft:
           base-classes:
           - PublishDraftRequestType
           imports:
           - import: oarepo_requests.types.publish_draft.PublishDraftRequestType
-      non-duplicable:
-        type:
+        non-duplicable:
           base-classes:
           - NonDuplicableRequest
           imports:
           - import: mock_requests.type.NonDuplicableRequest
   requests:
-    delete-record:
-      type:
+    types:
+      delete-record:
         base-classes:
         - DeleteRecordRequestType
         imports:
         - import: oarepo_requests.types.delete_record.DeleteRecordRequestType
-    generic-request: {}
+      generic-request: {}
 
 settings:
   schema-server: 'local://'

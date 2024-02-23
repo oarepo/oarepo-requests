@@ -18,12 +18,11 @@ python3 -m venv $BUILDER_VENV
 pip install -U setuptools pip wheel
 pip install -U oarepo-model-builder-tests oarepo-model-builder-requests oarepo-model-builder-drafts
 
-
 if test -d ./$BUILD_TEST_DIR/$MODEL; then
   rm -rf ./$BUILD_TEST_DIR/$MODEL
 fi
 
-#oarepo-compile-model ./$CODE_TEST_DIR/$MODEL.yaml --output-directory ./$BUILD_TEST_DIR/$MODEL -vvv
+oarepo-compile-model ./$CODE_TEST_DIR/$MODEL.yaml --output-directory ./$BUILD_TEST_DIR/$MODEL -vvv
 
 MODEL_VENV=".venv-tests"
 
@@ -34,10 +33,10 @@ python3 -m venv $MODEL_VENV
 . $MODEL_VENV/bin/activate
 pip install -U setuptools pip wheel
 pip install "oarepo[tests]==$OAREPO_VERSION.*"
-#pip install -e "./$BUILD_TEST_DIR/${MODEL}"
+pip install -e "./$BUILD_TEST_DIR/${MODEL}"
 pip install oarepo-ui
 pip install -e .
 pip install -e ./tests/mock_requests
 
-#pytest $BUILD_TEST_DIR/test_requests
-#pytest $BUILD_TEST_DIR/test_ui
+pytest $BUILD_TEST_DIR/test_requests
+pytest $BUILD_TEST_DIR/test_ui

@@ -6,11 +6,6 @@ from invenio_requests.proxies import current_request_type_registry, current_requ
 from invenio_requests.records.api import Request, RequestEventFormat
 from thesis.records.api import ThesisDraft, ThesisRecord
 
-from oarepo_requests.resolvers.ui import (
-    draft_record_entity_reference_ui_resolver,
-    user_entity_reference_ui_resolver,
-)
-
 
 @pytest.fixture(scope="module")
 def create_app(instance_path, entry_points):
@@ -28,7 +23,7 @@ def publish_request_data_function():
     def ret_data(receiver_id, record_id):
         return {
             "receiver": {"user": receiver_id},
-            "request_type": "publish_draft",
+            "request_type": "thesis_draft_publish_draft",
             "topic": {"thesis_draft": record_id},
         }
 
@@ -40,7 +35,7 @@ def delete_record_data_function():
     def ret_data(receiver_id, record_id):
         return {
             "receiver": {"user": receiver_id},
-            "request_type": "delete_record",
+            "request_type": "thesis_delete_record",
             "topic": {"thesis": record_id},
         }
 
@@ -62,7 +57,7 @@ def serialization_result():
                 "timeline": f"https://127.0.0.1:5000/api/requests/extended/{request_id}/timeline",
             },
             "revision_id": 3,
-            "type": "publish_draft",
+            "type": "thesis_draft_publish_draft",
             "title": "",
             "number": "1",
             "status": "submitted",
@@ -119,7 +114,7 @@ def ui_serialization_result():
                 "reference": {"thesis_draft": topic_id},
                 "type": "thesis_draft",
             },
-            "type": "publish_draft",
+            "type": "thesis_draft_publish_draft",
             # 'updated': '2024-01-26T10:06:18.084317'
         }
 
@@ -136,18 +131,21 @@ def app_config(app_config):
         }
     ]
     app_config["JSONSCHEMAS_HOST"] = "localhost"
-    app_config[
-        "RECORDS_REFRESOLVER_CLS"
-    ] = "invenio_records.resolver.InvenioRefResolver"
-    app_config[
-        "RECORDS_REFRESOLVER_STORE"
-    ] = "invenio_jsonschemas.proxies.current_refresolver_store"
+    app_config["RECORDS_REFRESOLVER_CLS"] = (
+        "invenio_records.resolver.InvenioRefResolver"
+    )
+    app_config["RECORDS_REFRESOLVER_STORE"] = (
+        "invenio_jsonschemas.proxies.current_refresolver_store"
+    )
     app_config["CACHE_TYPE"] = "SimpleCache"
 
-    app_config["ENTITY_REFERENCE_UI_RESOLVERS"] = {
-        "user": user_entity_reference_ui_resolver,
-        "thesis_draft": draft_record_entity_reference_ui_resolver,
-    }
+    """
+    app_config.setdefault("ENTITY_REFERENCE_UI_RESOLVERS", {}).update({
+        #"user": user_entity_reference_ui_resolver,
+        #"thesis_draft": draft_record_entity_reference_ui_resolver,
+        "thesis": record_entity_reference_ui_resolver
+    })
+    """
 
     return app_config
 
@@ -201,6 +199,7 @@ def create_request(requests_service):
     return _create_request
 
 
+"""
 @pytest.fixture
 def request_data_factory():
     def create_data(community, topic, data):
@@ -220,6 +219,7 @@ def request_data_factory():
         return input_data
 
     return create_data
+"""
 
 
 @pytest.fixture()
