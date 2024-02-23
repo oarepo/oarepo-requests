@@ -131,12 +131,12 @@ def app_config(app_config):
         }
     ]
     app_config["JSONSCHEMAS_HOST"] = "localhost"
-    app_config[
-        "RECORDS_REFRESOLVER_CLS"
-    ] = "invenio_records.resolver.InvenioRefResolver"
-    app_config[
-        "RECORDS_REFRESOLVER_STORE"
-    ] = "invenio_jsonschemas.proxies.current_refresolver_store"
+    app_config["RECORDS_REFRESOLVER_CLS"] = (
+        "invenio_records.resolver.InvenioRefResolver"
+    )
+    app_config["RECORDS_REFRESOLVER_STORE"] = (
+        "invenio_jsonschemas.proxies.current_refresolver_store"
+    )
     app_config["CACHE_TYPE"] = "SimpleCache"
 
     """
