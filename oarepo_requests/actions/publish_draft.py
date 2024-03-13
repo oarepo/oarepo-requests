@@ -12,6 +12,8 @@ def publish_draft(draft, identity, uow):
 
 
 class PublishDraftAcceptAction(actions.AcceptAction):
+    log_event = True
+
     def execute(self, identity, uow):
         topic = self.request.topic.resolve()
         publish_draft(topic, identity, uow)
