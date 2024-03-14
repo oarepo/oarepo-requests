@@ -20,10 +20,6 @@ import { RecordContext, RequestContext } from "../contexts";
  * @typedef {import("semantic-ui-react").ConfirmProps} ConfirmProps
  */
 
-// function delay(t, val) {
-//   return new Promise(resolve => setTimeout(resolve, t, val));
-// }
-
 const mapPayloadUiToInitialValues = (payloadUi) => {
   const initialValues = { payload: {} };
   payloadUi?.forEach(section => {
@@ -95,10 +91,8 @@ export const RequestModal = ({ request, requestTypes, requestModalType, isEventM
         data: formik.values,
         headers: { 'Content-Type': 'application/json' }
       });
-      // return delay(1000)
     }
     
-    // return delay(1000)
     return axios({
       method: method,
       url: url,

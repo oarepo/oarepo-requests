@@ -3,6 +3,7 @@ import PropTypes from "prop-types";
 
 import { i18next } from "@translations/oarepo_requests_ui/i18next";
 import { List, Segment, SegmentGroup, Header, Button } from "semantic-ui-react";
+import _isEmpty from "lodash/isEmpty";
 
 import { RequestList } from ".";
 import { RequestContext } from "../contexts";
@@ -27,13 +28,13 @@ export const RequestListContainer = ({ requestTypes }) => {
     }
   }
 
-  const SegmentGroupOrEmpty = requestsToApprove.length > 0 && otherRequests.length > 0 ? SegmentGroup : <></>;
+  const SegmentGroupOrEmpty = requestsToApprove.length > 0 && otherRequests.length > 0 ? SegmentGroup : React.Fragment;
 
   return (
     <SegmentGroupOrEmpty>
       <Segment className="requests-my-requests">
         <Header size="medium">{i18next.t("My Requests")}</Header>
-        <RequestList requests={otherRequests} requestTypes={requestTypes} />
+        {!_isEmpty(otherRequests) ? <RequestList requests={otherRequests} requestTypes={requestTypes} /> : <p>{i18next.t("No requests to show")}.</p>}
       </Segment>
       {requestsToApprove.length > 0 && (
         <Segment className="requests-requests-to-approve">

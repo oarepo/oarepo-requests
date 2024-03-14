@@ -88,3 +88,6 @@ msgstr ""
 
 msgid "Submit event"
 msgstr ""
+
+msgid "No requests to show"
+msgstr ""

@@ -88,3 +88,6 @@ msgstr "Časová osa"
 
 msgid "Submit event"
 msgstr "Odeslat událost"
+
+msgid "No requests to show"
+msgstr "Žádné žádosti k zobrazení"
