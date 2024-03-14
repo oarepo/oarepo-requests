@@ -90,4 +90,7 @@ dist/
 .model_venv/
 .vscode
 
+tests/thesis
+thesis
+
 **/ui/theme/**/todo.md

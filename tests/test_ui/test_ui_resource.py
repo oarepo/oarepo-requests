@@ -20,7 +20,7 @@ def test_draft_publish_request_present(
             "name": "Non-duplicable",
         }
         assert data["creatable_request_types"]["thesis_draft_publish_draft"] == {
-            "description": "request publishing of a draft",
+            "description": "Request publishing of a draft",
             "links": {"actions": {"create": "https://127.0.0.1:5000/api/requests"}},
             "name": "Publish-draft",
         }
@@ -48,7 +48,7 @@ def test_record_delete_request_present(
             "name": "Generic-request",
         }
         assert data["creatable_request_types"]["thesis_delete_record"] == {
-            "description": "request deletion of published record",
+            "description": "Request deletion of published record",
             "links": {"actions": {"create": "https://127.0.0.1:5000/api/requests"}},
             "name": "Delete-record",
         }
