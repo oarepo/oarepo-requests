@@ -134,3 +134,10 @@ from invenio_records_resources.proxies import current_service_registry
 
 def get_requests_service_for_records_service(records_service):
     return current_service_registry.get(f"{records_service.config.service_id}_requests")
+
+
+def stringify_first_val(dct):
+    if isinstance(dct, dict):
+        for k, v in dct.items():
+            dct[k] = str(v)
+    return dct

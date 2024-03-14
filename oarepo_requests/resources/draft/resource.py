@@ -3,11 +3,12 @@ from flask_resources import resource_requestctx, response_handler, route
 from invenio_records_resources.resources.records.resource import (
     request_extra_args,
     request_search_args,
-    request_view_args,
+    request_view_args, request_data,
 )
 from invenio_records_resources.resources.records.utils import search_preference
 
 from oarepo_requests.resources.record.resource import RecordRequestsResource
+from oarepo_requests.utils import stringify_first_val
 
 
 class DraftRecordRequestsResource(RecordRequestsResource):
@@ -18,6 +19,7 @@ class DraftRecordRequestsResource(RecordRequestsResource):
 
         url_rules = [
             route("GET", routes["list-drafts"], self.search_requests_for_draft),
+            route("POST", routes["type-draft"], self.create_for_draft)
         ]
         return url_rules + old_rules
 
@@ -35,3 +37,22 @@ class DraftRecordRequestsResource(RecordRequestsResource):
             expand=resource_requestctx.args.get("expand", False),
         )
         return hits.to_dict(), 200
+
+    @request_extra_args
+    @request_view_args
+    @request_data
+    @response_handler()
+    def create_for_draft(self):
+        """Create an item."""
+        items = self.service.create_for_draft(
+            identity=g.identity,
+            data=resource_requestctx.data,
+            request_type=resource_requestctx.view_args["request_type"],
+            receiver=stringify_first_val(resource_requestctx.data.pop("receiver")),
+            creator=stringify_first_val(resource_requestctx.data.pop("creator", None)),
+            topic_id=resource_requestctx.view_args["pid_value"], # do in service; put type_id into service config, what about draft/not draft, different url?
+            expand=resource_requestctx.data.pop("expand", False), #?
+        )
+
+        return items.to_dict(), 201
+

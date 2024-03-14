@@ -9,6 +9,8 @@ from invenio_records_resources.resources.records.resource import (
 )
 from invenio_requests.resources import RequestsResource
 
+from oarepo_requests.utils import stringify_first_val
+
 
 class OARepoRequestsResource(RequestsResource, ErrorHandlersMixin):
     """
@@ -43,11 +45,6 @@ class OARepoRequestsResource(RequestsResource, ErrorHandlersMixin):
     @request_data
     @response_handler()
     def create(self):
-        def stringify_first_val(dct):
-            if isinstance(dct, dict):
-                for k, v in dct.items():
-                    dct[k] = str(v)
-            return dct
 
         items = self.service.create(
             identity=g.identity,
