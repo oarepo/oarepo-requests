@@ -77,7 +77,7 @@ export const RequestModalContent = ({ request, requestTypes, requestModalType })
       });
   }, [actualRequest]);
 
-  const requestType = requestTypes.find(requestType => requestType.id === request.type);
+  const requestType = requestTypes.find(requestType => requestType.type_id === request.type);
   const payloadUI = requestType?.payload_ui;
   const eventTypes = requestType?.event_types;
 

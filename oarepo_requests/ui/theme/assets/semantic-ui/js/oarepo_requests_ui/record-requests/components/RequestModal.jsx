@@ -20,9 +20,9 @@ import { RecordContext, RequestContext } from "../contexts";
  * @typedef {import("semantic-ui-react").ConfirmProps} ConfirmProps
  */
 
-function delay(t, val) {
-  return new Promise(resolve => setTimeout(resolve, t, val));
-}
+// function delay(t, val) {
+//   return new Promise(resolve => setTimeout(resolve, t, val));
+// }
 
 const mapPayloadUiToInitialValues = (payloadUi) => {
   const initialValues = { payload: {} };
@@ -58,7 +58,6 @@ export const RequestModal = ({ request, requestTypes, requestModalType, isEventM
   const formik = useFormik({
     initialValues: !isEmpty(request?.payload) ? { payload: request.payload } : mapPayloadUiToInitialValues(request?.payload_ui),
     onSubmit: (values) => {
-      console.log(values);
       if (requestModalType === REQUEST_TYPE.SUBMIT) {
         confirmAction(REQUEST_TYPE.SUBMIT);
       } else if (requestModalType === REQUEST_TYPE.CREATE) {
@@ -90,21 +89,22 @@ export const RequestModal = ({ request, requestTypes, requestModalType, isEventM
 
   const callApi = async (url, method, doNotHandleResolve = false) => {
     if (doNotHandleResolve) {
-      // return axios({
-      //   method: method,
-      //   url: url,
-      //   data: formik.values,
-      //   headers: { 'Content-Type': 'application/json' }
-      // });
-      return delay(1000)
+      return axios({
+        method: method,
+        url: url,
+        data: formik.values,
+        headers: { 'Content-Type': 'application/json' }
+      });
+      // return delay(1000)
     }
-    // axios({
-    //   method: method,
-    //   url: url,
-    //   data: formik.values,
-    //   headers: { 'Content-Type': 'application/json' }
-    // })
-    return delay(1000)
+    
+    // return delay(1000)
+    return axios({
+      method: method,
+      url: url,
+      data: formik.values,
+      headers: { 'Content-Type': 'application/json' }
+    })
       .then(response => {
         console.log(response);
         fetchUpdated(record.links?.requests, setRequests);
@@ -147,6 +147,7 @@ export const RequestModal = ({ request, requestTypes, requestModalType, isEventM
   }
 
   const confirmAction = (requestType, createAndSubmit = false) => {
+    console.log("confirmAction", requestType, createAndSubmit);
     /** @type {ConfirmProps} */
     let newConfirmDialogProps = {
       open: true,

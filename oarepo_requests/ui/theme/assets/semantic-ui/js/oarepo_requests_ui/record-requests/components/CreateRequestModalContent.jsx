@@ -32,11 +32,10 @@ export const CreateRequestModalContent = ({ requestType, extraPreSubmitEvent }) 
           {requestType.description}
         </p>
       }
-      {payloadUI &&
-        <Segment basic>
-          <Form onSubmit={customSubmitHandler} id="request-form">
+      <Form onSubmit={customSubmitHandler} id="request-form">
+        {payloadUI &&
+          <Segment basic>
             <CustomFields
-              // ref={cfRef}
               config={payloadUI}
               templateLoaders={[
                 (widget) => import(`@templates/custom_fields/${widget}.js`),
@@ -45,9 +44,9 @@ export const CreateRequestModalContent = ({ requestType, extraPreSubmitEvent }) 
               fieldPathPrefix="payload"
             />
             <Divider hidden />
-          </Form>
-        </Segment>
-      }
+          </Segment>
+        }
+      </Form>
     </>
   );
 }

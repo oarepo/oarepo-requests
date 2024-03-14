@@ -25,7 +25,7 @@ export const CreateRequestButtonGroup = ({ requestTypes }) => {
       <Button.Group vertical compact fluid basic>
         {createRequests.map((requestType) => (
           <RequestModal 
-            key={requestType.id} 
+            key={requestType.type_id} 
             request={requestType} 
             requestModalType="create" 
             triggerButton={<Button icon="plus" title={i18next.t(requestType.name)} basic compact content={requestType.name} />} 
