@@ -1,9 +1,8 @@
 from invenio_records_resources.services.errors import PermissionDeniedError
-from oarepo_runtime.services.results import RecordItem
 
 from oarepo_requests.services.schema import RequestTypeSchema
 from oarepo_requests.utils import (
-    allowed_request_types_for_record_cls,
+    allowed_request_types_for_record,
     get_matching_service_for_record,
     get_requests_service_for_records_service,
 )
@@ -12,7 +11,7 @@ from oarepo_requests.utils import (
 class RequestTypesComponent:
     def update_data(self, identity, record, projection):
         request_types_list = []
-        allowed_request_types = allowed_request_types_for_record_cls(type(record))
+        allowed_request_types = allowed_request_types_for_record(record)
         for request_name, request_type in allowed_request_types.items():
             if hasattr(
                 request_type, "can_possibly_create"
@@ -48,7 +47,3 @@ class RequestsComponent:
             requests = []
         if requests:
             projection["requests"] = requests
-
-
-class RequestsAwareResultItem(RecordItem):
-    components = [RequestsComponent(), RequestTypesComponent()]
