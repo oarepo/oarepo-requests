@@ -84,7 +84,7 @@ def ui_serialization_result():
                 "reference": {"user": "1"},
                 "type": "user",
             },
-            "description": "request publishing of a draft",
+            "description": "Request publishing of a draft",
             "expires_at": None,
             "id": request_id,
             "is_closed": False,
@@ -252,27 +252,6 @@ def users(app, db):
 
     db.session.commit()
     return [user1, user2]
-
-    """
-    from invenio_db import db
-
-    user1 = UserFixture(
-        email="user1@example.org",
-        password="password",
-        preferences={"visibility": "public"},
-    )
-    user1.create(app, db)
-
-    user2 = UserFixture(
-        email="user2@example.org",
-        password="password",
-        preferences={"visibility": "public"},
-    )
-    user2.create(app, db)
-    
-    return [user1, user2]
-    """
-
 
 @pytest.fixture()
 def client_with_login(client, users):
