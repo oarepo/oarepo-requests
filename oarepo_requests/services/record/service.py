@@ -1,11 +1,10 @@
 from types import SimpleNamespace
 
+from invenio_records_resources.services.uow import unit_of_work
 from invenio_search.engine import dsl
 
 from oarepo_requests.proxies import current_oarepo_requests
 from oarepo_requests.utils import get_type_id_for_record_cls
-from invenio_records_resources.services.uow import unit_of_work
-
 
 
 class RecordRequestsService:
@@ -72,16 +71,16 @@ class RecordRequestsService:
 
     @unit_of_work()
     def create(
-            self,
-            identity,
-            data,
-            request_type,
-            receiver,
-            creator=None,
-            topic_id=None,
-            expires_at=None,
-            uow=None,
-            expand=False,
+        self,
+        identity,
+        data,
+        request_type,
+        receiver,
+        creator=None,
+        topic_id=None,
+        expires_at=None,
+        uow=None,
+        expand=False,
     ):
         record = self.record_cls.pid.resolve(topic_id)
         return self.oarepo_requests_service.create(

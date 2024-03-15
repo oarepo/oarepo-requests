@@ -1,4 +1,3 @@
-from invenio_records_resources.services.uow import RecordDeleteOp
 
 # from .generic import AcceptAction
 from invenio_requests.customizations import actions

@@ -1,9 +1,10 @@
 from flask import g
 from flask_resources import resource_requestctx, response_handler, route
 from invenio_records_resources.resources.records.resource import (
+    request_data,
     request_extra_args,
     request_search_args,
-    request_view_args, request_data,
+    request_view_args,
 )
 from invenio_records_resources.resources.records.utils import search_preference
 
@@ -19,7 +20,7 @@ class DraftRecordRequestsResource(RecordRequestsResource):
 
         url_rules = [
             route("GET", routes["list-drafts"], self.search_requests_for_draft),
-            route("POST", routes["type-draft"], self.create_for_draft)
+            route("POST", routes["type-draft"], self.create_for_draft),
         ]
         return url_rules + old_rules
 
@@ -50,9 +51,10 @@ class DraftRecordRequestsResource(RecordRequestsResource):
             request_type=resource_requestctx.view_args["request_type"],
             receiver=stringify_first_val(resource_requestctx.data.pop("receiver")),
             creator=stringify_first_val(resource_requestctx.data.pop("creator", None)),
-            topic_id=resource_requestctx.view_args["pid_value"], # do in service; put type_id into service config, what about draft/not draft, different url?
-            expand=resource_requestctx.data.pop("expand", False), #?
+            topic_id=resource_requestctx.view_args[
+                "pid_value"
+            ],  # do in service; put type_id into service config, what about draft/not draft, different url?
+            expand=resource_requestctx.data.pop("expand", False),  # ?
         )
 
         return items.to_dict(), 201
-

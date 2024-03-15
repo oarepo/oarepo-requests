@@ -253,6 +253,7 @@ def users(app, db):
     db.session.commit()
     return [user1, user2]
 
+
 @pytest.fixture()
 def client_with_login(client, users):
     """Log in a user to the client."""

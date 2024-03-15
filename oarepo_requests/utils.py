@@ -102,9 +102,7 @@ def resolve_reference_dict(reference_dict):
         except ValueError:
             # Value error ignored from matches_reference_dict
             pass
-    obj = topic_resolver.get_entity_proxy(
-        reference_dict
-    ).resolve()
+    obj = topic_resolver.get_entity_proxy(reference_dict).resolve()
     return obj
 
 
