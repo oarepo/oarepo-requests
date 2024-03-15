@@ -137,10 +137,13 @@ def app_config(app_config):
     )
     app_config["CACHE_TYPE"] = "SimpleCache"
 
+    def default_receiver(*args, **kwargs):
+        return {"user": "2"}
+
     app_config["OAREPO_REQUESTS_DEFAULT_RECEIVER"] = {
-        "thesis_publish_draft": {"user": "2"},
-        "thesis_delete_record": {"user": "2"},
-        "thesis_non_duplicable": {"user": "2"},
+        "thesis_publish_draft": default_receiver,
+        "thesis_delete_record": default_receiver,
+        "thesis_non_duplicable": default_receiver,
     }
 
     """
@@ -284,12 +287,12 @@ def client_logged_as(client, users):
 
 
 @pytest.fixture()
-def logged_client_post(client_logged_as):
-    def _logged_client_post(user, method, *args, **kwargs):
+def logged_client_request(client_logged_as):
+    def _logged_client_request(user, method, *args, **kwargs):
         applied_client = client_logged_as(user.email)
         return getattr(applied_client, method)(*args, **kwargs)
 
-    return _logged_client_post
+    return _logged_client_request
 
 
 @pytest.fixture()
