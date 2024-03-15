@@ -1,5 +1,6 @@
 from types import SimpleNamespace
 
+from invenio_records_resources.services.uow import unit_of_work
 from invenio_search.engine import dsl
 
 from oarepo_requests.proxies import current_oarepo_requests
@@ -7,8 +8,9 @@ from oarepo_requests.utils import get_type_id_for_record_cls
 
 
 class RecordRequestsService:
-    def __init__(self, record_service):
+    def __init__(self, record_service, oarepo_requests_service):
         self.record_service = record_service
+        self.oarepo_requests_service = oarepo_requests_service
 
     # so api doesn't fall apart
     @property
@@ -65,4 +67,25 @@ class RecordRequestsService:
             expand=expand,
             extra_filter=search_filter,
             **kwargs,
+        )
+
+    @unit_of_work()
+    def create(
+        self,
+        identity,
+        data,
+        request_type,
+        topic_id,
+        expires_at=None,
+        uow=None,
+        expand=False,
+    ):
+        record = self.record_cls.pid.resolve(topic_id)
+        return self.oarepo_requests_service.create(
+            identity=identity,
+            data=data,
+            request_type=request_type,
+            topic=record,
+            expand=expand,
+            uow=uow,
         )

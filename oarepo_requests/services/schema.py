@@ -1,10 +1,12 @@
 import marshmallow as ma
+from invenio_drafts_resources.services.records.config import is_record
+from invenio_records_resources.services import ConditionalLink
 from invenio_records_resources.services.base.links import Link, LinksTemplate
 from invenio_requests.proxies import current_request_type_registry
 from invenio_requests.services.schemas import GenericRequestSchema
 from marshmallow import fields
 
-from oarepo_requests.proxies import current_oarepo_requests_resource
+from oarepo_requests.utils import get_matching_service_for_record
 
 
 def get_links_schema():
@@ -19,11 +21,25 @@ class RequestTypeSchema(ma.Schema):
 
     @ma.post_dump
     def create_link(self, data, **kwargs):
+        if "links" in data:
+            return data
+        if "record" not in self.context:
+            raise ma.ValidationError(
+                "record not in context for request types serialization"
+            )
         type_id = data["type_id"]
         type = current_request_type_registry.lookup(type_id, quiet=True)
-        link = Link(f"{{+api}}{current_oarepo_requests_resource.config.url_prefix}")
-        template = LinksTemplate({"create": link})
-        data["links"] = {"actions": template.expand(self.context["identity"], type)}
+        record = self.context["record"]
+        service = get_matching_service_for_record(record)
+        link = ConditionalLink(
+            cond=is_record,
+            if_=Link(f"{{+api}}{service.config.url_prefix}{{id}}/requests/{type_id}"),
+            else_=Link(
+                f"{{+api}}{service.config.url_prefix}{{id}}/draft/requests/{type_id}"
+            ),
+        )
+        template = LinksTemplate({"create": link}, context={"id": record["id"]})
+        data["links"] = {"actions": template.expand(self.context["identity"], record)}
         return data
 
 

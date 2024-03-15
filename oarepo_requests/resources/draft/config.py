@@ -7,4 +7,5 @@ class DraftRecordRequestsResourceConfig(RecordRequestsResourceConfig):
     routes = {
         **RecordRequestsResourceConfig.routes,
         "list-drafts": "/<pid_value>/draft/requests",
+        "type-draft": "/<pid_value>/draft/requests/<request_type>",
     }

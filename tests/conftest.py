@@ -20,10 +20,9 @@ def urls():
 
 @pytest.fixture()
 def publish_request_data_function():
-    def ret_data(receiver_id, record_id):
+    def ret_data(record_id):
         return {
-            "receiver": {"user": receiver_id},
-            "request_type": "thesis_draft_publish_draft",
+            "request_type": "thesis_publish_draft",
             "topic": {"thesis_draft": record_id},
         }
 
@@ -32,9 +31,8 @@ def publish_request_data_function():
 
 @pytest.fixture()
 def delete_record_data_function():
-    def ret_data(receiver_id, record_id):
+    def ret_data(record_id):
         return {
-            "receiver": {"user": receiver_id},
             "request_type": "thesis_delete_record",
             "topic": {"thesis": record_id},
         }
@@ -57,7 +55,7 @@ def serialization_result():
                 "timeline": f"https://127.0.0.1:5000/api/requests/extended/{request_id}/timeline",
             },
             "revision_id": 3,
-            "type": "thesis_draft_publish_draft",
+            "type": "thesis_publish_draft",
             "title": "",
             "number": "1",
             "status": "submitted",
@@ -114,7 +112,7 @@ def ui_serialization_result():
                 "reference": {"thesis_draft": topic_id},
                 "type": "thesis_draft",
             },
-            "type": "thesis_draft_publish_draft",
+            "type": "thesis_publish_draft",
             # 'updated': '2024-01-26T10:06:18.084317'
         }
 
@@ -138,6 +136,15 @@ def app_config(app_config):
         "invenio_jsonschemas.proxies.current_refresolver_store"
     )
     app_config["CACHE_TYPE"] = "SimpleCache"
+
+    def default_receiver(*args, **kwargs):
+        return {"user": "2"}
+
+    app_config["OAREPO_REQUESTS_DEFAULT_RECEIVER"] = {
+        "thesis_publish_draft": default_receiver,
+        "thesis_delete_record": default_receiver,
+        "thesis_non_duplicable": default_receiver,
+    }
 
     """
     app_config.setdefault("ENTITY_REFERENCE_UI_RESOLVERS", {}).update({
@@ -253,6 +260,7 @@ def users(app, db):
     db.session.commit()
     return [user1, user2]
 
+
 @pytest.fixture()
 def client_with_login(client, users):
     """Log in a user to the client."""
@@ -279,12 +287,12 @@ def client_logged_as(client, users):
 
 
 @pytest.fixture()
-def logged_client_post(client_logged_as):
-    def _logged_client_post(user, method, *args, **kwargs):
+def logged_client_request(client_logged_as):
+    def _logged_client_request(user, method, *args, **kwargs):
         applied_client = client_logged_as(user.email)
         return getattr(applied_client, method)(*args, **kwargs)
 
-    return _logged_client_post
+    return _logged_client_request
 
 
 @pytest.fixture()

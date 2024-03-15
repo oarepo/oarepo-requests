@@ -27,8 +27,7 @@ class RequestTypesComponent:
                 )
                 request_type_link = data
                 request_types_list.append(request_type_link)
-        if request_types_list:
-            projection["request_types"] = request_types_list
+        projection["request_types"] = request_types_list
 
 
 class RequestsComponent:
@@ -45,5 +44,4 @@ class RequestsComponent:
             requests = list(reader(identity, record["id"]).hits)
         except PermissionDeniedError:
             requests = []
-        if requests:
-            projection["requests"] = requests
+        projection["requests"] = requests
