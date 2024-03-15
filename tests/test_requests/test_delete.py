@@ -26,7 +26,7 @@ def test_delete(
         creator,
         "post",
         urls["BASE_URL_REQUESTS"],
-        json=delete_record_data_function(receiver.id, record1["id"]),
+        json=delete_record_data_function(record1["id"]),
     )
     resp_request_submit = logged_client_post(
         creator,
@@ -55,7 +55,7 @@ def test_delete(
         creator,
         "post",
         urls["BASE_URL_REQUESTS"],
-        json=delete_record_data_function(receiver.id, record2["id"]),
+        json=delete_record_data_function(record2["id"]),
     )
     resp_request_submit = logged_client_post(
         creator,
@@ -77,7 +77,7 @@ def test_delete(
         creator,
         "post",
         urls["BASE_URL_REQUESTS"],
-        json=delete_record_data_function(receiver.id, record3["id"]),
+        json=delete_record_data_function(record3["id"]),
     )
     resp_request_submit = logged_client_post(
         creator,

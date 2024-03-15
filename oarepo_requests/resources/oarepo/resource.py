@@ -50,16 +50,6 @@ class OARepoRequestsResource(RequestsResource, ErrorHandlersMixin):
             identity=g.identity,
             data=resource_requestctx.data,
             request_type=resource_requestctx.data.pop("request_type", None),
-            receiver=(
-                stringify_first_val(resource_requestctx.data.pop("receiver", None))
-                if resource_requestctx.data
-                else None
-            ),
-            creator=(
-                stringify_first_val(resource_requestctx.data.pop("creator", None))
-                if resource_requestctx.data
-                else None
-            ),
             topic=(
                 stringify_first_val(resource_requestctx.data.pop("topic", None))
                 if resource_requestctx.data
@@ -85,17 +75,7 @@ class OARepoRequestsResource(RequestsResource, ErrorHandlersMixin):
         items = self.service.create(
             identity=g.identity,
             data=resource_requestctx.data,
-            request_type=resource_requestctx.data.pop("request_type", None),
-            receiver=(
-                stringify_first_val(resource_requestctx.data.pop("receiver", None))
-                if resource_requestctx.data
-                else None
-            ),
-            creator=(
-                stringify_first_val(resource_requestctx.data.pop("creator", None))
-                if resource_requestctx.data
-                else None
-            ),
+            type_id=resource_requestctx.data.pop("request_type", None),
             topic=(
                 stringify_first_val(resource_requestctx.data.pop("topic", None))
                 if resource_requestctx.data

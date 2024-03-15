@@ -3,6 +3,7 @@ from invenio_requests import current_request_type_registry
 from invenio_requests.services import RequestsService
 
 from oarepo_requests.errors import UnknownRequestType
+from oarepo_requests.proxies import current_oarepo_requests
 
 
 class OARepoRequestsService(RequestsService):
@@ -12,7 +13,7 @@ class OARepoRequestsService(RequestsService):
         identity,
         data,
         request_type,
-        receiver,
+        receiver=None,
         creator=None,
         topic=None,
         expires_at=None,
@@ -22,6 +23,11 @@ class OARepoRequestsService(RequestsService):
         type_ = current_request_type_registry.lookup(request_type, quiet=True)
         if not type_:
             raise UnknownRequestType(request_type)
+
+        if receiver is None:
+            receiver = current_oarepo_requests.default_request_receiver(request_type)
+        if data is None:
+            data = {}
         if hasattr(type_, "can_create"):
             error = type_.can_create(identity, data, receiver, topic, creator)
         else:

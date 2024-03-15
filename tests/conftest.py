@@ -20,9 +20,8 @@ def urls():
 
 @pytest.fixture()
 def publish_request_data_function():
-    def ret_data(receiver_id, record_id):
+    def ret_data(record_id):
         return {
-            "receiver": {"user": receiver_id},
             "request_type": "thesis_publish_draft",
             "topic": {"thesis_draft": record_id},
         }
@@ -32,9 +31,8 @@ def publish_request_data_function():
 
 @pytest.fixture()
 def delete_record_data_function():
-    def ret_data(receiver_id, record_id):
+    def ret_data(record_id):
         return {
-            "receiver": {"user": receiver_id},
             "request_type": "thesis_delete_record",
             "topic": {"thesis": record_id},
         }
@@ -138,6 +136,12 @@ def app_config(app_config):
         "invenio_jsonschemas.proxies.current_refresolver_store"
     )
     app_config["CACHE_TYPE"] = "SimpleCache"
+
+    app_config["OAREPO_REQUESTS_DEFAULT_RECEIVER"] = {
+        "thesis_publish_draft": {"user": "2"},
+        "thesis_delete_record": {"user": "2"},
+        "thesis_non_duplicable": {"user": "2"},
+    }
 
     """
     app_config.setdefault("ENTITY_REFERENCE_UI_RESOLVERS", {}).update({

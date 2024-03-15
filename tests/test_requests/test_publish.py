@@ -28,7 +28,7 @@ def test_publish(
         creator,
         "post",
         urls["BASE_URL_REQUESTS"],
-        json=publish_request_data_function(receiver.id, draft1.json["id"]),
+        json=publish_request_data_function(draft1.json["id"]),
     )
 
     resp_request_submit = logged_client_post(
@@ -67,7 +67,7 @@ def test_publish(
         creator,
         "post",
         urls["BASE_URL_REQUESTS"],
-        json=publish_request_data_function(receiver.id, draft2.json["id"]),
+        json=publish_request_data_function(draft2.json["id"]),
     )
     resp_request_submit = logged_client_post(
         creator,
@@ -94,7 +94,7 @@ def test_publish(
         creator,
         "post",
         urls["BASE_URL_REQUESTS"],
-        json=publish_request_data_function(receiver.id, draft3.json["id"]),
+        json=publish_request_data_function(draft3.json["id"]),
     )
     resp_request_submit = logged_client_post(
         creator,

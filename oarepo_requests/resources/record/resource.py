@@ -11,8 +11,6 @@ from invenio_records_resources.resources.records.resource import (
 )
 from invenio_records_resources.resources.records.utils import search_preference
 
-from oarepo_requests.utils import stringify_first_val
-
 
 class RecordRequestsResource(RecordResource):
     def __init__(self, record_requests_config, config, service):
@@ -65,12 +63,7 @@ class RecordRequestsResource(RecordResource):
             identity=g.identity,
             data=resource_requestctx.data,
             request_type=resource_requestctx.view_args["request_type"],
-            receiver=stringify_first_val(resource_requestctx.data.pop("receiver")),
-            creator=stringify_first_val(resource_requestctx.data.pop("creator", None)),
-            topic_id=resource_requestctx.view_args[
-                "pid_value"
-            ],  # do in service; put type_id into service config, what about draft/not draft, different url?
-            expand=resource_requestctx.data.pop("expand", False),  # ?
+            topic_id=resource_requestctx.view_args["pid_value"],
         )
 
         return items.to_dict(), 201

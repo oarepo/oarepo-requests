@@ -34,7 +34,6 @@ def test_record(
         creator,
         "post",
         link,
-        json={"receiver": {"user": receiver.id}},
     )
     assert resp_request_create.status_code == 201
     resp_request_submit = logged_client_post(
@@ -74,12 +73,7 @@ def test_draft(
         ]["actions"]["create"]
     )
 
-    resp_request_create = logged_client_post(
-        creator,
-        "post",
-        link,
-        json={"receiver": {"user": receiver.id}},
-    )
+    resp_request_create = logged_client_post(creator, "post", link)
     assert resp_request_create.status_code == 201
     resp_request_submit = logged_client_post(
         creator,

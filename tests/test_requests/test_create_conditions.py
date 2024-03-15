@@ -5,9 +5,8 @@ from oarepo_requests.errors import OpenRequestAlreadyExists
 from .utils import link_api2testclient
 
 
-def data(receiver_id, record_id):
+def data(record_id):
     return {
-        "receiver": {"user": receiver_id},
         "request_type": "thesis_non_duplicable",
         "topic": {"thesis_draft": record_id},
     }
@@ -20,7 +19,7 @@ def test_can_create(client_logged_as, identity_simple, users, urls, search_clear
     draft1 = creator_client.post(urls["BASE_URL"], json={})
 
     resp_request_create = creator_client.post(
-        urls["BASE_URL_REQUESTS"], json=data(receiver.id, draft1.json["id"])
+        urls["BASE_URL_REQUESTS"], json=data(draft1.json["id"])
     )
 
     resp_request_submit = creator_client.post(
@@ -29,7 +28,7 @@ def test_can_create(client_logged_as, identity_simple, users, urls, search_clear
 
     with pytest.raises(OpenRequestAlreadyExists):
         resp_request_create2 = creator_client.post(
-            urls["BASE_URL_REQUESTS"], json=data(receiver.id, draft1.json["id"])
+            urls["BASE_URL_REQUESTS"], json=data(draft1.json["id"])
         )
 
 
@@ -45,7 +44,7 @@ def test_can_possibly_create(
         f"{urls['BASE_URL']}{draft1.json['id']}/draft"
     )
     resp_request_create = creator_client.post(
-        urls["BASE_URL_REQUESTS"], json=data(receiver.id, draft1.json["id"])
+        urls["BASE_URL_REQUESTS"], json=data(draft1.json["id"])
     )
 
     resp_request_submit = creator_client.post(

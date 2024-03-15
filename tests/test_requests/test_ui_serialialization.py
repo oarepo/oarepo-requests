@@ -24,7 +24,7 @@ def test_publish(
 
     resp_request_create = creator_client.post(
         urls["BASE_URL_REQUESTS"],
-        json=publish_request_data_function(receiver.id, draft1.json["id"]),
+        json=publish_request_data_function(draft1.json["id"]),
     )
 
     resp_request_submit = creator_client.post(
@@ -65,7 +65,7 @@ def test_resolver_fallback(
 
     resp_request_create = creator_client.post(
         urls["BASE_URL_REQUESTS"],
-        json=publish_request_data_function(receiver.id, draft1.json["id"]),
+        json=publish_request_data_function(draft1.json["id"]),
     )
 
     resp_request_submit = creator_client.post(

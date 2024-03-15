@@ -49,12 +49,16 @@ class DraftRecordRequestsResource(RecordRequestsResource):
             identity=g.identity,
             data=resource_requestctx.data,
             request_type=resource_requestctx.view_args["request_type"],
-            receiver=stringify_first_val(resource_requestctx.data.pop("receiver")),
-            creator=stringify_first_val(resource_requestctx.data.pop("creator", None)),
             topic_id=resource_requestctx.view_args[
                 "pid_value"
             ],  # do in service; put type_id into service config, what about draft/not draft, different url?
-            expand=resource_requestctx.data.pop("expand", False),  # ?
+            expand=(
+                stringify_first_val(
+                    resource_requestctx.data.pop("expand", False)
+                )  # for what is this used, or can i just delete it
+                if resource_requestctx.data
+                else None
+            ),
         )
 
         return items.to_dict(), 201
