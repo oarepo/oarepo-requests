@@ -23,7 +23,7 @@ def publish_request_data_function():
     def ret_data(receiver_id, record_id):
         return {
             "receiver": {"user": receiver_id},
-            "request_type": "thesis_draft_publish_draft",
+            "request_type": "thesis_publish_draft",
             "topic": {"thesis_draft": record_id},
         }
 
@@ -57,7 +57,7 @@ def serialization_result():
                 "timeline": f"https://127.0.0.1:5000/api/requests/extended/{request_id}/timeline",
             },
             "revision_id": 3,
-            "type": "thesis_draft_publish_draft",
+            "type": "thesis_publish_draft",
             "title": "",
             "number": "1",
             "status": "submitted",
@@ -114,7 +114,7 @@ def ui_serialization_result():
                 "reference": {"thesis_draft": topic_id},
                 "type": "thesis_draft",
             },
-            "type": "thesis_draft_publish_draft",
+            "type": "thesis_publish_draft",
             # 'updated': '2024-01-26T10:06:18.084317'
         }
 

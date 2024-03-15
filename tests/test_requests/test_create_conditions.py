@@ -8,7 +8,7 @@ from .utils import link_api2testclient
 def data(receiver_id, record_id):
     return {
         "receiver": {"user": receiver_id},
-        "request_type": "thesis_draft_non_duplicable",
+        "request_type": "thesis_non_duplicable",
         "topic": {"thesis_draft": record_id},
     }
 
@@ -62,7 +62,7 @@ def test_can_possibly_create(
         f"{urls['BASE_URL']}{draft1.json['id']}/draft"
     )
     assert find_request_type(
-        record_resp_no_request.json["request_types"], "thesis_draft_non_duplicable"
+        record_resp_no_request.json["request_types"], "thesis_non_duplicable"
     )
     assert (
         find_request_type(record_resp_request.json["request_types"], "non_duplicable")
