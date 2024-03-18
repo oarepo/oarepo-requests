@@ -42,3 +42,36 @@ def test_read_extended(
         ),
         new_call2.json,
     )
+
+
+def test_update_self_link(
+    example_topic_draft,
+    client_logged_as,
+    users,
+    urls,
+    publish_request_data_function,
+    serialization_result,
+    ui_serialization_result,
+    search_clear,
+):
+    receiver = users[1]
+    creator_client = client_logged_as(users[0].email)
+    resp_request_create = creator_client.post(
+        urls["BASE_URL_REQUESTS"],
+        json=publish_request_data_function(example_topic_draft["id"]),
+    )
+    resp_request_submit = creator_client.post(
+        link_api2testclient(resp_request_create.json["links"]["actions"]["submit"])
+    )
+    read_before = creator_client.get(
+        link_api2testclient(resp_request_submit.json["links"]["self"])
+    )
+    update = creator_client.put(
+        link_api2testclient(resp_request_submit.json["links"]["self"]),
+        json={"title": "lalala"},
+    )
+    read_after = creator_client.get(
+        link_api2testclient(resp_request_submit.json["links"]["self"])
+    )
+    assert read_before.json["title"] == ""
+    assert read_after.json["title"] == "lalala"

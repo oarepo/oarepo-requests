@@ -55,6 +55,6 @@ class OARepoRequests:
     def init_resources(self, app):
         """Init resources."""
         self.requests_resource = OARepoRequestsResource(
-            service=self.requests_service,
+            oarepo_requests_service=self.requests_service,
             config=OARepoRequestsResourceConfig.build(app),
         )
