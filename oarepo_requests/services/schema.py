@@ -5,13 +5,8 @@ from invenio_requests.proxies import current_request_type_registry
 from invenio_requests.services.schemas import GenericRequestSchema
 from marshmallow import fields
 
-from oarepo_requests.utils import get_matching_service_for_record
+from oarepo_requests.utils import get_matching_service_for_record, is_record
 
-def is_record(record, ctx):
-    """Shortcut for links to determine if record is a record."""
-    if not hasattr(record, "is_draft"):
-        return True
-    return not record.is_draft
 
 def get_links_schema():
     # TODO possibly specify more

@@ -5,6 +5,11 @@ from oarepo_requests.resources.oarepo.resource import OARepoRequestsResource
 from oarepo_requests.services.oarepo.config import OARepoRequestsServiceConfig
 from oarepo_requests.services.oarepo.service import OARepoRequestsService
 
+from oarepo_requests.resources.events.resource import OARepoRequestsCommentsResource
+from oarepo_requests.resources.events.config import OARepoRequestsCommentsResourceConfig
+
+from invenio_requests.proxies import current_events_service
+
 
 class OARepoRequests:
     def __init__(self, app=None):
@@ -48,13 +53,14 @@ class OARepoRequests:
         service_configs = self.service_configs(app)
         """Initialize the service and resource for Requests."""
         self.requests_service = OARepoRequestsService(config=service_configs.requests)
-        # self.request_events_service = RequestEventsService(
-        #    config=service_configs.request_events,
-        # )
 
     def init_resources(self, app):
         """Init resources."""
         self.requests_resource = OARepoRequestsResource(
             oarepo_requests_service=self.requests_service,
             config=OARepoRequestsResourceConfig.build(app),
+        )
+        self.request_events_resource = OARepoRequestsCommentsResource(
+            service=current_events_service,
+            config=OARepoRequestsCommentsResourceConfig.build(app),
         )
