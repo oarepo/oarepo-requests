@@ -42,6 +42,7 @@ class OARepoRequestsResource(RequestsResource, ErrorHandlersMixin):
             route("POST", p(routes["list"]), self.create),
             route("POST", p(routes["list-extended"]), self.create_extended),
             route("GET", p(routes["item-extended"]), self.read_extended),
+            route("PUT", p(routes["item-extended"]), self.update_extended),
         ]
         return url_rules + base_routes
 
@@ -105,10 +106,5 @@ class OARepoRequestsResource(RequestsResource, ErrorHandlersMixin):
         return item.to_dict(), 200
 
     # from parent
-    @request_extra_args
-    @request_headers
-    @request_view_args
-    @request_data
-    @response_handler()
     def update_extended(self):
         return super().update()

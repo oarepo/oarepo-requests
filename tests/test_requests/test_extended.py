@@ -64,14 +64,24 @@ def test_update_self_link(
         link_api2testclient(resp_request_create.json["links"]["actions"]["submit"])
     )
     read_before = creator_client.get(
-        link_api2testclient(resp_request_submit.json["links"]["self"])
-    )
-    update = creator_client.put(
         link_api2testclient(resp_request_submit.json["links"]["self"]),
+        headers={"Accept": "application/vnd.inveniordm.v1+json"},
+    )
+    read_from_record = creator_client.get(
+        f"{urls['BASE_URL']}{example_topic_draft['id']}/draft",
+    )
+    link_to_extended = link_api2testclient(
+        read_from_record.json["requests"][0]["links"]["self"]
+    )
+
+    update_extended = creator_client.put(
+        link_to_extended,
         json={"title": "lalala"},
     )
+    assert update_extended.status_code == 200
     read_after = creator_client.get(
-        link_api2testclient(resp_request_submit.json["links"]["self"])
+        link_api2testclient(resp_request_submit.json["links"]["self"]),
+        headers={"Accept": "application/vnd.inveniordm.v1+json"},
     )
     assert read_before.json["title"] == ""
     assert read_after.json["title"] == "lalala"
