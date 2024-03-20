@@ -2,6 +2,7 @@ from flask_resources import route
 from invenio_records_resources.resources.errors import ErrorHandlersMixin
 from invenio_requests.resources.events.resource import RequestCommentsResource
 
+
 class OARepoRequestsCommentsResource(RequestCommentsResource, ErrorHandlersMixin):
 
     def create_url_rules(self):

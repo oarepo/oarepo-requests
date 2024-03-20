@@ -381,6 +381,7 @@ def request_with_receiver_user(
     request = Request.get_record(request_item.id)
     return request_item
 
+
 @pytest.fixture()
 def events_resource_data():
     """Input data for the Request Events Resource (REST body)."""

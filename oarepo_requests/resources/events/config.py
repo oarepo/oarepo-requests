@@ -3,7 +3,11 @@ from invenio_records_resources.services.base.config import ConfiguratorMixin
 from invenio_requests.resources.events.config import RequestCommentsResourceConfig
 
 from oarepo_requests.resources.ui import OARepoRequestsUIJSONSerializer
-class OARepoRequestsCommentsResourceConfig(RequestCommentsResourceConfig, ConfiguratorMixin):
+
+
+class OARepoRequestsCommentsResourceConfig(
+    RequestCommentsResourceConfig, ConfiguratorMixin
+):
     """"""
 
     blueprint_name = "oarepo_request_events"

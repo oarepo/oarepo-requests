@@ -1,14 +1,12 @@
 from invenio_base.utils import obj_or_import_string
+from invenio_requests.proxies import current_events_service
 
+from oarepo_requests.resources.events.config import OARepoRequestsCommentsResourceConfig
+from oarepo_requests.resources.events.resource import OARepoRequestsCommentsResource
 from oarepo_requests.resources.oarepo.config import OARepoRequestsResourceConfig
 from oarepo_requests.resources.oarepo.resource import OARepoRequestsResource
 from oarepo_requests.services.oarepo.config import OARepoRequestsServiceConfig
 from oarepo_requests.services.oarepo.service import OARepoRequestsService
-
-from oarepo_requests.resources.events.resource import OARepoRequestsCommentsResource
-from oarepo_requests.resources.events.config import OARepoRequestsCommentsResourceConfig
-
-from invenio_requests.proxies import current_events_service
 
 
 class OARepoRequests:

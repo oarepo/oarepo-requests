@@ -4,6 +4,7 @@ def create_oarepo_requests(app):
     blueprint = ext.requests_resource.as_blueprint()
     return blueprint
 
+
 def create_oarepo_requests_events(app):
     """Create requests blueprint."""
     ext = app.extensions["oarepo-requests"]

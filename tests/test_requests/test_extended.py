@@ -1,5 +1,7 @@
-from .utils import is_valid_subdict, link_api2testclient
 from invenio_requests.records.api import RequestEvent
+
+from .utils import is_valid_subdict, link_api2testclient
+
 
 def test_read_extended(
     example_topic_draft,
@@ -85,6 +87,7 @@ def test_update_self_link(
     assert read_before.json["title"] == ""
     assert read_after.json["title"] == "lalala"
 
+
 def test_events_resource(
     example_topic_draft,
     client_logged_as,
@@ -112,8 +115,12 @@ def test_events_resource(
         f"{urls['BASE_URL']}{example_topic_draft['id']}/draft",
     )
 
-    comments_link = link_api2testclient(read_from_record.json['requests'][0]["links"]["comments"])
-    timeline_link = link_api2testclient(read_from_record.json['requests'][0]["links"]["timeline"])
+    comments_link = link_api2testclient(
+        read_from_record.json["requests"][0]["links"]["comments"]
+    )
+    timeline_link = link_api2testclient(
+        read_from_record.json["requests"][0]["links"]["timeline"]
+    )
 
     comments_extended = creator_client.post(
         comments_link,
@@ -130,8 +137,3 @@ def test_events_resource(
     )
     assert comments_extended_timeline.status_code == 200
     assert len(comments_extended_timeline.json["hits"]["hits"]) == 1
-
-
-
-
-
