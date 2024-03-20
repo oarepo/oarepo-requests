@@ -1,3 +1,4 @@
+from invenio_records_resources.services.uow import unit_of_work
 from invenio_search.engine import dsl
 
 from oarepo_requests.services.record.service import RecordRequestsService
@@ -46,4 +47,25 @@ class DraftRecordRequestsService(RecordRequestsService):
             expand=expand,
             extra_filter=search_filter,
             **kwargs,
+        )
+
+    @unit_of_work()
+    def create_for_draft(
+        self,
+        identity,
+        data,
+        request_type,
+        topic_id,
+        expires_at=None,
+        uow=None,
+        expand=False,
+    ):
+        record = self.draft_cls.pid.resolve(topic_id, registered_only=False)
+        return self.oarepo_requests_service.create(
+            identity=identity,
+            data=data,
+            request_type=request_type,
+            topic=record,
+            expand=expand,
+            uow=uow,
         )

@@ -9,6 +9,8 @@ from invenio_records_resources.resources.records.resource import (
 )
 from invenio_requests.resources import RequestsResource
 
+from oarepo_requests.utils import stringify_first_val
+
 
 class OARepoRequestsResource(RequestsResource, ErrorHandlersMixin):
     """
@@ -43,26 +45,11 @@ class OARepoRequestsResource(RequestsResource, ErrorHandlersMixin):
     @request_data
     @response_handler()
     def create(self):
-        def stringify_first_val(dct):
-            if isinstance(dct, dict):
-                for k, v in dct.items():
-                    dct[k] = str(v)
-            return dct
 
         items = self.service.create(
             identity=g.identity,
             data=resource_requestctx.data,
             request_type=resource_requestctx.data.pop("request_type", None),
-            receiver=(
-                stringify_first_val(resource_requestctx.data.pop("receiver", None))
-                if resource_requestctx.data
-                else None
-            ),
-            creator=(
-                stringify_first_val(resource_requestctx.data.pop("creator", None))
-                if resource_requestctx.data
-                else None
-            ),
             topic=(
                 stringify_first_val(resource_requestctx.data.pop("topic", None))
                 if resource_requestctx.data
@@ -88,17 +75,7 @@ class OARepoRequestsResource(RequestsResource, ErrorHandlersMixin):
         items = self.service.create(
             identity=g.identity,
             data=resource_requestctx.data,
-            request_type=resource_requestctx.data.pop("request_type", None),
-            receiver=(
-                stringify_first_val(resource_requestctx.data.pop("receiver", None))
-                if resource_requestctx.data
-                else None
-            ),
-            creator=(
-                stringify_first_val(resource_requestctx.data.pop("creator", None))
-                if resource_requestctx.data
-                else None
-            ),
+            type_id=resource_requestctx.data.pop("request_type", None),
             topic=(
                 stringify_first_val(resource_requestctx.data.pop("topic", None))
                 if resource_requestctx.data

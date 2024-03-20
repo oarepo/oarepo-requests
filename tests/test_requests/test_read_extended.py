@@ -15,7 +15,7 @@ def test_read_extended(
     creator_client = client_logged_as(users[0].email)
     resp_request_create = creator_client.post(
         urls["BASE_URL_REQUESTS"],
-        json=publish_request_data_function(receiver.id, example_topic_draft["id"]),
+        json=publish_request_data_function(example_topic_draft["id"]),
     )
     resp_request_submit = creator_client.post(
         link_api2testclient(resp_request_create.json["links"]["actions"]["submit"])

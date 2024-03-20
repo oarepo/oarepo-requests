@@ -1,3 +1,5 @@
+from invenio_base.utils import obj_or_import_string
+
 from oarepo_requests.resources.oarepo.config import OARepoRequestsResourceConfig
 from oarepo_requests.resources.oarepo.resource import OARepoRequestsResource
 from oarepo_requests.services.oarepo.config import OARepoRequestsServiceConfig
@@ -21,6 +23,16 @@ class OARepoRequests:
     @property
     def entity_reference_ui_resolvers(self):
         return self.app.config["ENTITY_REFERENCE_UI_RESOLVERS"]
+
+    def default_request_receiver(self, request_type_id):
+        """
+        returns function that returns default request receiver
+        def receiver_getter(identity, request_type, topic, creator):
+            return <dark magic here>
+        """
+        return obj_or_import_string(
+            self.app.config["OAREPO_REQUESTS_DEFAULT_RECEIVER"]
+        )[request_type_id]
 
     # copied from invenio_requests for now
     def service_configs(self, app):

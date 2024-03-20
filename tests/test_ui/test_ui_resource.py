@@ -14,14 +14,22 @@ def test_draft_publish_request_present(
     with client_with_login.get(f"/thesis/{example_topic_draft['id']}/edit") as c:
         assert c.status_code == 200
         data = json.loads(c.text)
-        assert data["creatable_request_types"]["thesis_draft_non_duplicable"] == {
+        assert data["creatable_request_types"]["thesis_non_duplicable"] == {
             "description": "",
-            "links": {"actions": {"create": "https://127.0.0.1:5000/api/requests"}},
+            "links": {
+                "actions": {
+                    "create": f"https://127.0.0.1:5000/api/thesis/{example_topic_draft['id']}/draft/requests/thesis_non_duplicable"
+                }
+            },
             "name": "Non-duplicable",
         }
-        assert data["creatable_request_types"]["thesis_draft_publish_draft"] == {
+        assert data["creatable_request_types"]["thesis_publish_draft"] == {
             "description": "Request publishing of a draft",
-            "links": {"actions": {"create": "https://127.0.0.1:5000/api/requests"}},
+            "links": {
+                "actions": {
+                    "create": f"https://127.0.0.1:5000/api/thesis/{example_topic_draft['id']}/draft/requests/thesis_publish_draft"
+                }
+            },
             "name": "Publish-draft",
         }
 
@@ -44,12 +52,20 @@ def test_record_delete_request_present(
         assert len(data["creatable_request_types"]) == 2
         assert data["creatable_request_types"]["thesis_generic_request"] == {
             "description": "",
-            "links": {"actions": {"create": "https://127.0.0.1:5000/api/requests"}},
+            "links": {
+                "actions": {
+                    "create": f"https://127.0.0.1:5000/api/thesis/{example_topic['id']}/requests/thesis_generic_request"
+                }
+            },
             "name": "Generic-request",
         }
         assert data["creatable_request_types"]["thesis_delete_record"] == {
             "description": "Request deletion of published record",
-            "links": {"actions": {"create": "https://127.0.0.1:5000/api/requests"}},
+            "links": {
+                "actions": {
+                    "create": f"https://127.0.0.1:5000/api/thesis/{example_topic['id']}/requests/thesis_delete_record"
+                }
+            },
             "name": "Delete-record",
         }
 
