@@ -21,7 +21,7 @@ import { RecordContext, RequestContext } from "../contexts";
  */
 
 const mapPayloadUiToInitialValues = (payloadUi) => {
-  const initialValues = { payload: {} };
+  const initialValues = { payload: { content: "hello world" } }; // TODO: is this correct?
   payloadUi?.forEach(section => {
     section.fields.forEach(field => {
       initialValues.payload[field.field] = "";
@@ -76,27 +76,30 @@ export const RequestModal = ({ request, requestTypes, requestModalType, isEventM
     })
       .then(response => {
         console.log(response);
-        setter(response.data);
+        setter(response.data?.hits?.hits);
       })
       .catch(error => {
         console.log(error);
       });
   }
 
-  const callApi = async (url, method, doNotHandleResolve = false) => {
+  const callApi = async (url, method, data = formik.values, doNotHandleResolve = false) => {
     if (doNotHandleResolve) {
+      console.log("doNotHandleResolve", url, method, data);
       return axios({
         method: method,
         url: url,
-        data: formik.values,
+        data: data, // TODO: is this correct?
         headers: { 'Content-Type': 'application/json' }
       });
     }
+
+    console.log(url, method);
     
     return axios({
       method: method,
       url: url,
-      data: formik.values,
+      data: data, // TODO: is this correct?
       headers: { 'Content-Type': 'application/json' }
     })
       .then(response => {
@@ -115,9 +118,17 @@ export const RequestModal = ({ request, requestTypes, requestModalType, isEventM
   }
 
   const createAndSubmitRequest = async () => {
+    let createPayload = formik.values;
+    if (isEmpty(formik.values?.payload?.content) && Object.keys(formik.values?.payload).length <= 1) {
+      createPayload = {};
+    }
+    console.log("createAndSubmitRequest", createPayload);
     try {
-      await callApi(request.links.actions?.create, 'post', true);
-      await callApi(request.links.actions?.submit, 'post', true);
+      await callApi(request.links.actions?.create, 'post', createPayload, true);
+      console.log("created");
+      await callApi(request.links.actions?.submit, 'post', formik.values, true);
+      console.log("submitted");
+      fetchUpdated(record.links?.requests, setRequests);
       setModalOpen(false);
       formik.resetForm();
     } catch (error) {
@@ -132,10 +143,18 @@ export const RequestModal = ({ request, requestTypes, requestModalType, isEventM
     formik.setSubmitting(true);
     setError(null);
     if (createAndSubmit) {
-      return createAndSubmitRequest();
+      return await createAndSubmitRequest();
     }
+
+    let customPayload = formik.values;
+    if (isEmpty(formik.values?.payload?.content) && formik.values?.payload?.content != "hello world" && Object.keys(formik.values?.payload).length <= 1) { // TODO: remove hardcoded value
+      customPayload = {};
+    }
+
     if (requestType === REQUEST_TYPE.SAVE) {
-      return callApi(request.links.self, 'put');
+      return callApi(request.links.self, 'put', {});
+    } else if (requestType === REQUEST_TYPE.CREATE) {
+      return callApi(request.links.actions?.create, 'post', customPayload);
     }
     return callApi(!isEventModal ? request.links.actions[requestType] : request.links[requestType], 'post');
   }
@@ -206,6 +225,10 @@ export const RequestModal = ({ request, requestTypes, requestModalType, isEventM
     }
   }
 
+  const requestType = requestTypes?.find(requestType => requestType.type_id === request.type) ?? {};
+  const formWillBeRendered = requestModalType === REQUEST_TYPE.SUBMIT && requestType?.payload_ui;
+  const submitButtonExtraProps = formWillBeRendered ? { type: "submit", form: "request-form" } : { onClick: () => confirmAction(REQUEST_TYPE.SUBMIT) };
+
   return (
     <>
       <Modal
@@ -237,14 +260,14 @@ export const RequestModal = ({ request, requestTypes, requestModalType, isEventM
           <FormikContext.Provider value={formik}>
             {requestModalType === REQUEST_TYPE.CREATE &&
               <CreateRequestModalContent requestType={request} extraPreSubmitEvent={extraPreSubmitEvent} /> ||
-              <RequestModalContent request={request} requestTypes={requestTypes} requestModalType={requestModalType} />
+              <RequestModalContent request={request} requestType={requestType} requestModalType={requestModalType} />
             }
           </FormikContext.Provider>
         </Modal.Content>
         <Modal.Actions>
           {requestModalType === REQUEST_TYPE.SUBMIT &&
             <>
-              <Button type="submit" form="request-form" title={i18next.t("Submit request")} color="blue" icon labelPosition="left" floated="right">
+              <Button title={i18next.t("Submit request")} color="blue" icon labelPosition="left" floated="right" {...submitButtonExtraProps}>
                 <Icon name="paper plane" />
                 {i18next.t("Submit")}
               </Button>

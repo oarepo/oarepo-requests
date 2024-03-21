@@ -26,10 +26,12 @@ export const RequestList = ({ requests, requestTypes, requestModalType }) => {
             modalType = "submit";
           } else if ("cancel" in request.links?.actions) {
             modalType = "cancel";
+          } else {
+            modalType = "submit";
           }
         }
         return (
-          <RequestModal key={request.uuid} request={request} requestTypes={requestTypes} requestModalType={modalType}
+          <RequestModal key={request.id} request={request} requestTypes={requestTypes} requestModalType={modalType}
             triggerButton={
               <List.Item as="a" key={request.id}>
                 <List.Content floated="right" verticalAlign="middle">

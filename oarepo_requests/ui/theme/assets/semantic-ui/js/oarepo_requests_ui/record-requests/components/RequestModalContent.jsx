@@ -54,19 +54,19 @@ const RequestSideInfo = ({ request, requestType, isSidebar = false }) => {
   )
 };
 
-/** @param {{ request: Request, requestModalType: RequestTypeEnum, requestTypes: RequestType[] }} props */
-export const RequestModalContent = ({ request, requestTypes, requestModalType }) => {
+/** @param {{ request: Request, requestModalType: RequestTypeEnum, requestType: RequestType }} props */
+export const RequestModalContent = ({ request, requestType, requestModalType }) => {
   /** @type {[Request[], (requests: Request[]) => void]} */
   const [requests, setRequests] = useContext(RequestContext);
 
-  const actualRequest = requests.find(req => req.uuid === request.uuid);
+  const actualRequest = requests.find(req => req.id === request.id);
 
   useEffect(() => {
     axios
       .get(request.links?.events, { headers: { 'Content-Type': 'application/json' } })
       .then(response => {
         setRequests(requests => requests.map(req => {
-          if (req.uuid === request.uuid) {
+          if (req.id === request.id) {
             req.events = response.data;
           }
           return req;
@@ -77,7 +77,6 @@ export const RequestModalContent = ({ request, requestTypes, requestModalType })
       });
   }, [actualRequest]);
 
-  const requestType = requestTypes.find(requestType => requestType.type_id === request.type);
   const payloadUI = requestType?.payload_ui;
   const eventTypes = requestType?.event_types;
 
@@ -201,5 +200,5 @@ export const RequestModalContent = ({ request, requestTypes, requestModalType })
 
 RequestModalContent.propTypes = {
   request: PropTypes.object.isRequired,
-  requestTypes: PropTypes.array.isRequired,
+  requestType: PropTypes.object.isRequired,
 };

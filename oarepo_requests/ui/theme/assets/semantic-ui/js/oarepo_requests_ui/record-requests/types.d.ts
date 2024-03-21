@@ -1,7 +1,7 @@
 export interface Request {
   name: string;
   description: string;
-  uuid: string;
+  id: string;
   type: string;
   links: Links;
   created_by: Creator;
