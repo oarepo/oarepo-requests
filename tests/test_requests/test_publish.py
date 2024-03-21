@@ -60,7 +60,7 @@ def test_publish(
     ThesisDraft.index.refresh()
     draft_lst = logged_client_request(creator, "get", f"/user{urls['BASE_URL']}")
     lst = logged_client_request(creator, "get", urls["BASE_URL"])
-    assert len(draft_lst.json["hits"]["hits"]) == 2
+    assert len(draft_lst.json["hits"]["hits"]) == 3
     assert len(lst.json["hits"]["hits"]) == 1
 
     resp_request_create = logged_client_request(

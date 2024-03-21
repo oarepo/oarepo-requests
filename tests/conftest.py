@@ -382,6 +382,17 @@ def request_with_receiver_user(
     return request_item
 
 
+@pytest.fixture()
+def events_resource_data():
+    """Input data for the Request Events Resource (REST body)."""
+    return {
+        "payload": {
+            "content": "This is a comment.",
+            "format": RequestEventFormat.HTML.value,
+        }
+    }
+
+
 # -------
 import os
 

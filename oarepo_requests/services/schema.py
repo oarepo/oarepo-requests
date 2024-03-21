@@ -1,12 +1,11 @@
 import marshmallow as ma
-from invenio_drafts_resources.services.records.config import is_record
 from invenio_records_resources.services import ConditionalLink
 from invenio_records_resources.services.base.links import Link, LinksTemplate
 from invenio_requests.proxies import current_request_type_registry
 from invenio_requests.services.schemas import GenericRequestSchema
 from marshmallow import fields
 
-from oarepo_requests.utils import get_matching_service_for_record
+from oarepo_requests.utils import get_matching_service_for_record, is_record
 
 
 def get_links_schema():
