@@ -275,8 +275,8 @@ export const RequestModal = ({ request, requestTypes, requestModalType, isEventM
           }
           <FormikContext.Provider value={formik}>
             {requestModalType === REQUEST_TYPE.CREATE &&
-              <CreateRequestModalContent requestType={request} customSubmitHandler={customSubmitHandler} fetchNewEvents={fetchUpdated} /> ||
-              <RequestModalContent request={request} requestType={requestType} requestModalType={requestModalType} customSubmitHandler={customSubmitHandler} />
+              <CreateRequestModalContent requestType={request} customSubmitHandler={customSubmitHandler} /> ||
+              <RequestModalContent request={request} requestType={requestType} requestModalType={requestModalType} customSubmitHandler={customSubmitHandler} fetchNewEvents={fetchUpdated} />
             }
           </FormikContext.Provider>
         </Modal.Content>
