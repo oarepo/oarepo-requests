@@ -63,7 +63,12 @@ export const RequestModalContent = ({ request, requestType, requestModalType }) 
 
   useEffect(() => {
     axios
-      .get(request.links?.events, { headers: { 'Content-Type': 'application/json' } })
+      .get(request.links?.events, { 
+        headers: { 
+          'Content-Type': 'application/json',
+          'Accept': 'application/vnd.inveniordm.v1+json'
+        } 
+      })
       .then(response => {
         setRequests(requests => requests.map(req => {
           if (req.id === request.id) {

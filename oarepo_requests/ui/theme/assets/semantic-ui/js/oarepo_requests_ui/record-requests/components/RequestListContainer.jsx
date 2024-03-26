@@ -33,12 +33,12 @@ export const RequestListContainer = ({ requestTypes }) => {
   return (
     <SegmentGroupOrEmpty>
       <Segment className="requests-my-requests">
-        <Header size="medium">{i18next.t("My Requests")}</Header>
+        <Header size="small" className="detail-sidebar-header">{i18next.t("My Requests")}</Header>
         {!_isEmpty(otherRequests) ? <RequestList requests={otherRequests} requestTypes={requestTypes} /> : <p>{i18next.t("No requests to show")}.</p>}
       </Segment>
       {requestsToApprove.length > 0 && (
         <Segment className="requests-requests-to-approve">
-          <Header size="medium">{i18next.t("Requests to Approve")}</Header>
+          <Header size="small" className="detail-sidebar-header">{i18next.t("Requests to Approve")}</Header>
           <RequestList requests={requestsToApprove} requestTypes={requestTypes} requestModalType="accept" />
         </Segment>
       )}
