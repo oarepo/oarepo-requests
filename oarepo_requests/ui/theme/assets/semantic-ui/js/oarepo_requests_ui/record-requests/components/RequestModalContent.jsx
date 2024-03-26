@@ -9,7 +9,7 @@ import { useFormikContext } from "formik";
 
 import { CustomFields } from "react-invenio-forms";
 
-import { RequestModal } from ".";
+import { RequestModal, ModalContentSideInfo } from ".";
 import { RequestContext } from "../contexts";
 import { REQUEST_TYPE } from "../utils/objects";
 import ReadOnlyCustomFields from "./common/ReadOnlyCustomFields";
@@ -20,38 +20,6 @@ import ReadOnlyCustomFields from "./common/ReadOnlyCustomFields";
  * @typedef {import("../types").RequestTypeEnum} RequestTypeEnum
  * @typedef {import("../types").Event} Event
  */
-
-/** @param {{ request: Request, requestType: RequestType, isSidebar: boolean }} props */
-const RequestSideInfo = ({ request, requestType, isSidebar = false }) => {
-  return (
-    <List divided={isSidebar} relaxed={isSidebar}>
-      <List.Item>
-        <List.Content>
-          <List.Header>{i18next.t("Creator")}</List.Header>
-          {request.created_by?.link && <a href={request.created_by.link}>{request.created_by.label}</a> || request.created_by?.label}
-        </List.Content>
-      </List.Item>
-      <List.Item>
-        <List.Content>
-          <List.Header>{i18next.t("Receiver")}</List.Header>
-          {request.receiver?.link && <a href={request.receiver?.link}>{request.receiver?.label}</a> || request.receiver?.label}
-        </List.Content>
-      </List.Item>
-      <List.Item>
-        <List.Content>
-          <List.Header>{i18next.t("Request type")}</List.Header>
-          {requestType.name}
-        </List.Content>
-      </List.Item>
-      <List.Item>
-        <List.Content>
-          <List.Header>{i18next.t("Created")}</List.Header>
-          {`${Math.ceil(Math.abs(new Date(request?.created) - new Date()) / 3.6e6)} hours ago`}
-        </List.Content>
-      </List.Item>
-    </List>
-  )
-};
 
 /** @param {{ request: Request, requestModalType: RequestTypeEnum, requestType: RequestType, fetchNewEvents: (url: string, setter: (events: Event[]) => void) => Promise<Event>, customSubmitHandler: (e) => void }} props */
 export const RequestModalContent = ({ request, requestType, requestModalType, fetchNewEvents, customSubmitHandler }) => {
@@ -105,7 +73,7 @@ export const RequestModalContent = ({ request, requestType, requestModalType, fe
       {(renderSubmitForm || renderReadOnlyData) &&
         <Grid.Row>
           <Grid.Column width={3} only="mobile">
-            <RequestSideInfo request={request} requestType={requestType} isSidebar />
+            <ModalContentSideInfo request={request} requestType={requestType} isSidebar />
           </Grid.Column>
           <Grid.Column width={13}>
             {renderSubmitForm &&
@@ -186,13 +154,13 @@ export const RequestModalContent = ({ request, requestType, requestModalType, fe
             }
           </Grid.Column>
           <Grid.Column width={3} only="tablet computer">
-            <RequestSideInfo request={request} requestType={requestType} isSidebar />
+            <ModalContentSideInfo request={request} requestType={requestType} isSidebar />
           </Grid.Column>
         </Grid.Row> ||
         /* No Submit Form (no PayloadUI for this request type) nor Payload (read only data) available for this Request */
         <Grid.Row>
           <Grid.Column>
-            <RequestSideInfo request={request} requestType={requestType} isSidebar={false} />
+            <ModalContentSideInfo request={request} requestType={requestType} isSidebar={false} />
           </Grid.Column>
         </Grid.Row>
       }
