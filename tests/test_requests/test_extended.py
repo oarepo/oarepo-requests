@@ -122,6 +122,9 @@ def test_events_resource(
         read_from_record.json["requests"][0]["links"]["timeline"]
     )
 
+    assert comments_link.startswith("/requests/extended")
+    assert timeline_link.startswith("/requests/extended")
+
     comments_extended = creator_client.post(
         comments_link,
         json=events_resource_data,
