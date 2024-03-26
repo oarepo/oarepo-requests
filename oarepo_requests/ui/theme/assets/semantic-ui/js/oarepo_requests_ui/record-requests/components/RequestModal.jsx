@@ -72,7 +72,10 @@ export const RequestModal = ({ request, requestTypes, requestModalType, isEventM
     axios({
       method: 'get',
       url: url,
-      headers: { 'Content-Type': 'application/json' }
+      headers: { 
+        'Content-Type': 'application/json', 
+        'Accept': 'application/vnd.inveniordm.v1+json' // TODO: add to events request
+      }
     })
       .then(response => {
         console.log(response);
@@ -156,6 +159,8 @@ export const RequestModal = ({ request, requestTypes, requestModalType, isEventM
     } else if (requestType === REQUEST_TYPE.CREATE) {
       return callApi(request.links.actions?.create, 'post', customPayload);
     }
+    console.log("bla", requestType, request.links);
+    console.log(!isEventModal ? request.links.actions[requestType] : request.links[requestType]);
     return callApi(!isEventModal ? request.links.actions[requestType] : request.links[requestType], 'post');
   }
 
