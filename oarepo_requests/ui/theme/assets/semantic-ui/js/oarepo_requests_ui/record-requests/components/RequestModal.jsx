@@ -3,7 +3,7 @@ import PropTypes from "prop-types";
 
 import { i18next } from "@translations/oarepo_requests_ui/i18next";
 import { Dimmer, Loader, Modal, Button, Icon, Message, Confirm } from "semantic-ui-react";
-import { isEmpty } from "lodash";
+import _isEmpty from "lodash/isEmpty";
 
 import { useFormik, FormikContext } from "formik";
 import axios from "axios";
@@ -52,7 +52,7 @@ export const RequestModal = ({ request, requestTypes, requestModalType, isEventM
   const record = useContext(RecordContext);
 
   const formik = useFormik({
-    initialValues: !isEmpty(request?.payload) ? { payload: request.payload } : mapPayloadUiToInitialValues(request?.payload_ui),
+    initialValues: !_isEmpty(request?.payload) ? { payload: request.payload } : mapPayloadUiToInitialValues(request?.payload_ui),
     onSubmit: (values) => {
       if (requestModalType === REQUEST_TYPE.SUBMIT) {
         confirmAction(REQUEST_TYPE.SUBMIT);
@@ -87,7 +87,7 @@ export const RequestModal = ({ request, requestTypes, requestModalType, isEventM
   }
 
   const callApi = async (url, method, data = formik.values, doNotHandleResolve = false) => {
-    if (isEmpty(url)) {
+    if (_isEmpty(url)) {
       console.log(`Wrong or empty URL: ${url} for method: ${method}`);
       setError(new Error(i18next.t("Cannot send request. Please try again later.")));
       formik.setSubmitting(false);
@@ -129,7 +129,7 @@ export const RequestModal = ({ request, requestTypes, requestModalType, isEventM
 
   const createAndSubmitRequest = async () => {
     let createPayload = formik.values;
-    if (isEmpty(formik.values?.payload?.content) && Object.keys(formik.values?.payload).length <= 1) {
+    if (_isEmpty(formik.values?.payload?.content) && Object.keys(formik.values?.payload).length <= 1) {
       createPayload = {};
     }
     console.log("createAndSubmitRequest", createPayload);
@@ -157,7 +157,7 @@ export const RequestModal = ({ request, requestTypes, requestModalType, isEventM
     }
 
     let customPayload = formik.values;
-    if (isEmpty(formik.values?.payload?.content) && formik.values?.payload?.content != "hello world" && Object.keys(formik.values?.payload).length <= 1) { // TODO: remove hardcoded value
+    if (_isEmpty(formik.values?.payload?.content) && formik.values?.payload?.content != "hello world" && Object.keys(formik.values?.payload).length <= 1) { // TODO: remove hardcoded value
       customPayload = {};
     }
 
