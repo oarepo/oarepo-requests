@@ -12,5 +12,5 @@ class EditTopicAcceptAction(actions.AcceptAction):
         topic_service = get_matching_service_for_record(topic)
         if not topic_service:
             raise KeyError(f"topic {topic} service not found")
-        topic_service.edit(identity, topic.id, uow=uow)
+        topic_service.edit(identity, topic['id'], uow=uow)
         super().execute(identity, uow)
