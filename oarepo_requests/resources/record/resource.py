@@ -19,13 +19,15 @@ class RecordRequestsResource(RecordResource):
         :param service:
         :param record_requests_config: config specific for the record request serivce
         """
-        actual_config = copy.deepcopy(config)
+        actual_config = copy.deepcopy(record_requests_config)
         actual_config.blueprint_name = f"{config.blueprint_name}_requests"
         vars_to_overwrite = [
-            x for x in dir(record_requests_config) if not x.startswith("_")
+            x for x in dir(config) if not x.startswith("_")
         ]
+        actual_keys = dir(actual_config)
         for var in vars_to_overwrite:
-            setattr(actual_config, var, getattr(record_requests_config, var))
+            if var not in actual_keys:
+                setattr(actual_config, var, getattr(config, var))
         super().__init__(actual_config, service)
 
     def create_url_rules(self):
