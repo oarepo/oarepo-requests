@@ -10,6 +10,7 @@ import axios from "axios";
 
 import { RequestModalContent, CreateRequestModalContent } from ".";
 import { REQUEST_TYPE } from "../utils/objects";
+import isDeepEmpty from "../utils/isDeepEmpty";
 import { RecordContext, RequestContext } from "../contexts";
 
 /** 
@@ -21,7 +22,7 @@ import { RecordContext, RequestContext } from "../contexts";
  */
 
 const mapPayloadUiToInitialValues = (payloadUi) => {
-  const initialValues = { payload: { content: "hello world" } }; // TODO: is this correct?
+  const initialValues = { payload: {} };
   payloadUi?.forEach(section => {
     section.fields.forEach(field => {
       initialValues.payload[field.field] = "";
@@ -36,7 +37,7 @@ const fetchUpdated = async (url, setter) => {
     url: url,
     headers: { 
       'Content-Type': 'application/json', 
-      'Accept': 'application/vnd.inveniordm.v1+json' // TODO: add to events request
+      'Accept': 'application/vnd.inveniordm.v1+json'
     }
   })
     .then(response => {
@@ -70,7 +71,7 @@ export const RequestModal = ({ request, requestTypes, requestModalType, isEventM
   const record = useContext(RecordContext);
 
   const formik = useFormik({
-    initialValues: !_isEmpty(request?.payload) ? { payload: request.payload } : mapPayloadUiToInitialValues(request?.payload_ui),
+    initialValues: !_isEmpty(request?.payload) ? { payload: request.payload } : (request?.payload_ui ? mapPayloadUiToInitialValues(request?.payload_ui) : {}),
     onSubmit: () => {}
   });
 
@@ -89,26 +90,25 @@ export const RequestModal = ({ request, requestTypes, requestModalType, isEventM
     }
 
     if (doNotHandleResolve) {
-      console.log("doNotHandleResolve", url, method, data);
       return axios({
         method: method,
         url: url,
-        data: data, // TODO: is this correct?
+        data: data,
         headers: { 'Content-Type': 'application/json' }
       });
     }
 
     console.log(url, method);
-    
+
     return axios({
       method: method,
       url: url,
-      data: data, // TODO: is this correct?
+      data: data,
       headers: { 'Content-Type': 'application/json' }
     })
       .then(response => {
         console.log(response);
-        fetchUpdated(record.links?.requests, setRequests);
+        fetchUpdated(record.links?.requests, (requests) => { setRequests(_sortBy(requests, ["status_code"])); });
         setModalOpen(false);
         formik.resetForm();
       })
@@ -122,14 +122,10 @@ export const RequestModal = ({ request, requestTypes, requestModalType, isEventM
   }
 
   const createAndSubmitRequest = async () => {
-    let createPayload = formik.values;
-    if (_isEmpty(formik.values?.payload?.content) && Object.keys(formik.values?.payload).length <= 1) {
-      createPayload = {};
-    }
     try {
-      const createdRequest = await callApi(request.links.actions?.create, 'post', createPayload, true);
-      await callApi(createdRequest.data?.links?.actions?.submit, 'post', formik.values, true);
-      fetchUpdated(record.links?.requests, setRequests);
+      const createdRequest = await callApi(request.links.actions?.create, 'post', formik.values, true);
+      await callApi(createdRequest.data?.links?.actions?.submit, 'post', {}, true);
+      fetchUpdated(record.links?.requests, (requests) => { setRequests(_sortBy(requests, ["status_code"])); });
       setModalOpen(false);
       formik.resetForm();
     } catch (error) {
@@ -140,26 +136,18 @@ export const RequestModal = ({ request, requestTypes, requestModalType, isEventM
     }
   }
 
-  const sendRequest = async (requestType, createAndSubmit = false) => {
+  const sendRequest = (requestType, createAndSubmit = false) => {
     formik.setSubmitting(true);
     setError(null);
     if (createAndSubmit) {
-      return await createAndSubmitRequest();
+      return createAndSubmitRequest();
     }
-
-    let customPayload = formik.values;
-    if (_isEmpty(formik.values?.payload?.content) && formik.values?.payload?.content != "hello world" && Object.keys(formik.values?.payload).length <= 1) { // TODO: remove hardcoded value
-      customPayload = {};
-    }
-
     if (requestType === REQUEST_TYPE.SAVE) {
-      return callApi(request.links.self, 'put', {});
-    } else if (requestType === REQUEST_TYPE.CREATE) {
-      return callApi(request.links.actions?.create, 'post', customPayload);
+      return callApi(request.links.self, 'put');
     }
-    console.log("bla", requestType, request.links);
-    console.log(!isEventModal ? request.links.actions[requestType] : request.links[requestType]);
-    return callApi(!isEventModal ? request.links.actions[requestType] : request.links[requestType], 'post');
+    const mappedData = !isDeepEmpty(formik.values) ? {} : formik.values;
+    const actionUrl = !isEventModal ? request.links.actions[requestType] : request.links[requestType];
+    return callApi(actionUrl, 'post', mappedData);
   }
 
   const confirmAction = (requestType, createAndSubmit = false) => {
@@ -244,6 +232,7 @@ export const RequestModal = ({ request, requestTypes, requestModalType, isEventM
   const requestType = requestTypes?.find(requestType => requestType.type_id === request.type) ?? {};
   const formWillBeRendered = requestModalType === REQUEST_TYPE.SUBMIT && requestType?.payload_ui;
   const submitButtonExtraProps = formWillBeRendered ? { type: "submit", form: "request-form" } : { onClick: () => confirmAction(REQUEST_TYPE.SUBMIT) };
+  const requestModalHeader = !_isEmpty(request?.title) ? request.title : (!_isEmpty(request?.name) ? request.name : request.type);
 
   return (
     <>
@@ -265,7 +254,7 @@ export const RequestModal = ({ request, requestTypes, requestModalType, isEventM
         <Dimmer active={formik.isSubmitting}>
           <Loader inverted size="large" />
         </Dimmer>
-        <Modal.Header as="h1" id="request-modal-header">{request.name}</Modal.Header>
+        <Modal.Header as="h1" id="request-modal-header">{requestModalHeader}</Modal.Header>
         <Modal.Content>
           {error &&
             <Message negative>

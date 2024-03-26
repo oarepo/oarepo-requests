@@ -2,6 +2,7 @@ export interface Request {
   name: string;
   description: string;
   id: string;
+  title: string;
   type: string;
   links: Links;
   created_by: Creator;
@@ -38,8 +39,8 @@ export interface Creator {
 
 export interface Receiver {
   reference: Reference;
-  type: Type;
-  label: Label;
+  type: string;
+  label: string;
   link: string;
 }
 
