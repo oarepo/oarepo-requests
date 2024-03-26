@@ -26,6 +26,8 @@ export const RequestList = ({ requests, requestTypes, requestModalType }) => {
             modalType = "submit";
           } else if ("cancel" in request.links?.actions) {
             modalType = "cancel";
+          } else if (_isEmpty(request.links?.actions)) {
+            modalType = "view_only";
           } else {
             modalType = "submit";
           }

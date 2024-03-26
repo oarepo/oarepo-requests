@@ -4,6 +4,7 @@ import PropTypes from "prop-types";
 import { i18next } from "@translations/oarepo_requests_ui/i18next";
 import { Dimmer, Loader, Modal, Button, Icon, Message, Confirm } from "semantic-ui-react";
 import _isEmpty from "lodash/isEmpty";
+import _sortBy from "lodash/sortBy";
 
 import { useFormik, FormikContext } from "formik";
 import axios from "axios";
@@ -333,7 +334,7 @@ export const RequestModal = ({ request, requestTypes, requestModalType, isEventM
 
 RequestModal.propTypes = {
   request: PropTypes.object.isRequired,
-  requestModalType: PropTypes.oneOf(["create", "submit", "cancel", "accept"]).isRequired,
+  requestModalType: PropTypes.oneOf(["create", "submit", "cancel", "accept", "view_only"]).isRequired,
   requestTypes: PropTypes.array,
   isEventModal: PropTypes.bool,
   triggerButton: PropTypes.element,

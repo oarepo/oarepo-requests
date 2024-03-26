@@ -29,17 +29,19 @@ export const RequestModalContent = ({ request, requestType, requestModalType, fe
   const actualRequest = requests.find(req => req.id === request.id);
 
   useEffect(() => {
-    fetchNewEvents(request.links?.events, (events) => {
-      setRequests(requests => requests.map(req => {
-        if (req.id === request.id) {
-          req.events = events;
-        }
-        return req;
-      }));
-    });
+    if (!_isEmpty(request.links?.events)) {
+      fetchNewEvents(request.links.events, (events) => {
+        setRequests(requests => requests.map(req => {
+          if (req.id === request.id) {
+            req.events = events;
+          }
+          return req;
+        }));
+      });
+    }
   }, [actualRequest]);
 
-  const { isSubmitting, isValid, handleSubmit } = useFormikContext();
+  const { handleSubmit } = useFormikContext();
 
   const onSubmit = (event) => {
     if (_isFunction(customSubmitHandler)) {
