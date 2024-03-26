@@ -36,10 +36,10 @@ export const RequestList = ({ requests, requestTypes, requestModalType }) => {
               <List.Item as="a" key={request.id}>
                 <List.Content floated="right" verticalAlign="middle">
                   <div style={{ textAlign: "right" }}>{request?.status ?? i18next.t("No status")}</div>
-                  <div>{new Date(request.created)?.toLocaleString("cs-CZ")}</div>
+                  {request?.created && <div>{request.created}</div>}
                 </List.Content>
                 <List.Content>
-                  <List.Header>{request.name}</List.Header>
+                  <List.Header>{!_isEmpty(request?.title) ? request.title : (!_isEmpty(request?.name) ? request.name : request.type)}</List.Header>
                   <List.Description>{_truncate(request.description, { length: 30 })}</List.Description>
                 </List.Content>
               </List.Item>

@@ -17,7 +17,7 @@ import { CustomFields } from "react-invenio-forms";
 export const CreateRequestModalContent = ({ requestType, customSubmitHandler }) => {
   const payloadUI = requestType?.payload_ui;
 
-  const { isSubmitting, isValid, handleSubmit } = useFormikContext();
+  const { handleSubmit } = useFormikContext();
 
   const onSubmit = (event) => {
     if (_isFunction(customSubmitHandler)) {
