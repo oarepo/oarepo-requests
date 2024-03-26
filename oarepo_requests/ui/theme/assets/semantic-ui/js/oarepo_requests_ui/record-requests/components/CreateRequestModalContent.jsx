@@ -13,15 +13,18 @@ import { CustomFields } from "react-invenio-forms";
  * @typedef {import("formik").FormikConfig} FormikConfig
  */
 
-/** @param {{ requestType: RequestType }} props */
-export const CreateRequestModalContent = ({ requestType, extraPreSubmitEvent }) => {
+/** @param {{ requestType: RequestType, customSubmitHandler: (e) => void }} props */
+export const CreateRequestModalContent = ({ requestType, customSubmitHandler }) => {
   const payloadUI = requestType?.payload_ui;
 
   const { isSubmitting, isValid, handleSubmit } = useFormikContext();
 
-  const customSubmitHandler = (event) => {
-    _isFunction(extraPreSubmitEvent) && extraPreSubmitEvent(event);
-    handleSubmit(event);
+  const onSubmit = (event) => {
+    if (_isFunction(customSubmitHandler)) {
+      customSubmitHandler(event?.nativeEvent?.submitter?.name);
+    } else {
+      handleSubmit(event);
+    }
   }
 
   return (
@@ -31,7 +34,7 @@ export const CreateRequestModalContent = ({ requestType, extraPreSubmitEvent }) 
           {requestType.description}
         </p>
       }
-      <Form onSubmit={customSubmitHandler} id="request-form">
+      <Form onSubmit={onSubmit} id="request-form">
         {payloadUI &&
           <Segment basic>
             <CustomFields

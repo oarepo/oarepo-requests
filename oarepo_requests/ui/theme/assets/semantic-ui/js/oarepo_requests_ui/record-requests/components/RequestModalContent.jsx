@@ -6,7 +6,6 @@ import { Button, Grid, List, Form, Divider, Comment } from "semantic-ui-react";
 import _isEmpty from "lodash/isEmpty";
 import _sortBy from "lodash/sortBy";
 import { useFormikContext } from "formik";
-import axios from "axios";
 
 import { CustomFields } from "react-invenio-forms";
 
@@ -54,33 +53,33 @@ const RequestSideInfo = ({ request, requestType, isSidebar = false }) => {
   )
 };
 
-/** @param {{ request: Request, requestModalType: RequestTypeEnum, requestType: RequestType }} props */
-export const RequestModalContent = ({ request, requestType, requestModalType }) => {
+/** @param {{ request: Request, requestModalType: RequestTypeEnum, requestType: RequestType, fetchNewEvents: (url: string, setter: (events: Event[]) => void) => Promise<Event>, customSubmitHandler: (e) => void }} props */
+export const RequestModalContent = ({ request, requestType, requestModalType, fetchNewEvents, customSubmitHandler }) => {
   /** @type {[Request[], (requests: Request[]) => void]} */
   const [requests, setRequests] = useContext(RequestContext);
 
   const actualRequest = requests.find(req => req.id === request.id);
 
   useEffect(() => {
-    axios
-      .get(request.links?.events, { 
-        headers: { 
-          'Content-Type': 'application/json',
-          'Accept': 'application/vnd.inveniordm.v1+json'
-        } 
-      })
-      .then(response => {
-        setRequests(requests => requests.map(req => {
-          if (req.id === request.id) {
-            req.events = response.data;
-          }
-          return req;
-        }));
-      })
-      .catch(error => {
-        console.log(error);
-      });
+    fetchNewEvents(request.links?.events, (events) => {
+      setRequests(requests => requests.map(req => {
+        if (req.id === request.id) {
+          req.events = events;
+        }
+        return req;
+      }));
+    });
   }, [actualRequest]);
+
+  const { isSubmitting, isValid, handleSubmit } = useFormikContext();
+
+  const onSubmit = (event) => {
+    if (_isFunction(customSubmitHandler)) {
+      customSubmitHandler(event?.nativeEvent?.submitter?.name);
+    } else {
+      handleSubmit(event);
+    }
+  }
 
   const payloadUI = requestType?.payload_ui;
   const eventTypes = requestType?.event_types;
@@ -96,8 +95,6 @@ export const RequestModalContent = ({ request, requestType, requestModalType }) 
   const renderSubmitForm = requestModalType === REQUEST_TYPE.SUBMIT && payloadUI;
   const renderReadOnlyData = (requestModalType === REQUEST_TYPE.ACCEPT || requestModalType === REQUEST_TYPE.CANCEL) && request?.payload;
 
-  const { isSubmitting, isValid, handleSubmit } = useFormikContext();
-
   return (
     <Grid doubling stackable>
       <Grid.Row>
@@ -112,7 +109,7 @@ export const RequestModalContent = ({ request, requestType, requestModalType }) 
           </Grid.Column>
           <Grid.Column width={13}>
             {renderSubmitForm &&
-              <Form onSubmit={handleSubmit} id="request-form">
+              <Form onSubmit={onSubmit} id="request-form">
                 <CustomFields
                   className="requests-form-cf"
                   config={payloadUI}
