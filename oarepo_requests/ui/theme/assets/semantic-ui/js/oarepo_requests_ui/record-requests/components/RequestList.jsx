@@ -2,7 +2,7 @@ import React from "react";
 import PropTypes from "prop-types";
 
 import { i18next } from "@translations/oarepo_requests_ui/i18next";
-import { List, Segment, SegmentGroup, Header, Button } from "semantic-ui-react";
+import { List } from "semantic-ui-react";
 import _isEmpty from "lodash/isEmpty";
 import _truncate from "lodash/truncate";
 

@@ -1,8 +1,7 @@
-import React, { useState, useRef, useEffect } from "react";
+import React from "react";
 import PropTypes from "prop-types";
 
-import { i18next } from "@translations/oarepo_requests_ui/i18next";
-import { Dimmer, Loader, Segment, Modal, Button, Header, Icon, Grid, Input, List, Container, Message, Form, Divider } from "semantic-ui-react";
+import { Segment, Form, Divider } from "semantic-ui-react";
 import { useFormikContext } from "formik";
 
 import _isFunction from "lodash/isFunction";

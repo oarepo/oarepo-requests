@@ -1,8 +1,7 @@
 import React, { useContext } from "react";
-import PropTypes from "prop-types";
 
 import { i18next } from "@translations/oarepo_requests_ui/i18next";
-import { List, Segment, SegmentGroup, Header, Button } from "semantic-ui-react";
+import { Segment, SegmentGroup, Header } from "semantic-ui-react";
 import _isEmpty from "lodash/isEmpty";
 
 import { RequestList } from ".";
@@ -16,7 +15,7 @@ import { RequestContext } from "../contexts";
  * @param {{ requests: Request[], requestTypes: RequestType[] }} props
  */
 export const RequestListContainer = ({ requestTypes }) => {
-  const [requests, setRequests] = useContext(RequestContext);
+  const [requests,] = useContext(RequestContext);
 
   let requestsToApprove = [];
   let otherRequests = [];

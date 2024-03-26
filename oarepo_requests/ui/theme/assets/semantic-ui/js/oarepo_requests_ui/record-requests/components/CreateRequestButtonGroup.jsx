@@ -1,10 +1,8 @@
-import React, { useState } from "react";
-import PropTypes from "prop-types";
+import React from "react";
 
 import { i18next } from "@translations/oarepo_requests_ui/i18next";
 
-import Overridable from "react-overridable";
-import { List, Segment, Header, Button } from "semantic-ui-react";
+import { Segment, Header, Button } from "semantic-ui-react";
 
 import { RequestModal } from "./RequestModal";
 
