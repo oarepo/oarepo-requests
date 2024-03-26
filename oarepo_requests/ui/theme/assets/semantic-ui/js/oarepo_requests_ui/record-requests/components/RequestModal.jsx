@@ -87,6 +87,13 @@ export const RequestModal = ({ request, requestTypes, requestModalType, isEventM
   }
 
   const callApi = async (url, method, data = formik.values, doNotHandleResolve = false) => {
+    if (isEmpty(url)) {
+      console.log(`Wrong or empty URL: ${url} for method: ${method}`);
+      setError(new Error(i18next.t("Cannot send request. Please try again later.")));
+      formik.setSubmitting(false);
+      return;
+    }
+
     if (doNotHandleResolve) {
       console.log("doNotHandleResolve", url, method, data);
       return axios({
