@@ -17,7 +17,7 @@ export const RecordRequests = ({ record }) => {
   /** @type {RequestType[]} */
   const requestTypes = record?.request_types ?? [];
 
-  const requestsState = useState(sortByStatusCode(record?.requests ?? []) ?? []);
+  const [requests, setRequests] = useState(sortByStatusCode(record?.requests ?? []) ?? []);
 
   useEffect(() => {
     axios({
@@ -29,7 +29,7 @@ export const RecordRequests = ({ record }) => {
       }
     })
       .then(response => {
-        requestsState[1](sortByStatusCode(response.data?.hits?.hits));
+        setRequests(sortByStatusCode(response.data?.hits?.hits));
       })
       .catch(error => {
         console.log(error);
@@ -42,7 +42,7 @@ export const RecordRequests = ({ record }) => {
         {!_isEmpty(requestTypes) && (
           <CreateRequestButtonGroup requestTypes={requestTypes} />
         )}
-        {!_isEmpty(requestsState[0]) && (
+        {!_isEmpty(requests) && (
           <RequestListContainer requestTypes={requestTypes} />
         )}
       </RequestContextProvider>
