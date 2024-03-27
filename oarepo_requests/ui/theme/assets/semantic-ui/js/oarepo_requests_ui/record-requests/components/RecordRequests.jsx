@@ -2,11 +2,11 @@ import React, { useEffect, useState } from "react";
 import PropTypes from "prop-types";
 
 import axios from "axios";
-import _sortBy from "lodash/sortBy";
 import _isEmpty from "lodash/isEmpty";
 
 import { CreateRequestButtonGroup, RequestListContainer } from ".";
 import { RequestContextProvider, RecordContextProvider } from "../contexts";
+import { sortByStatusCode } from "../utils";
 
 /**
  * @typedef {import("../types").Request} Request
@@ -17,7 +17,7 @@ export const RecordRequests = ({ record }) => {
   /** @type {RequestType[]} */
   const requestTypes = record?.request_types ?? [];
 
-  const requestsState = useState(_sortBy(record?.requests ?? [], ["status_code"]) ?? []);
+  const requestsState = useState(sortByStatusCode(record?.requests ?? []) ?? []);
 
   useEffect(() => {
     axios({
@@ -29,7 +29,7 @@ export const RecordRequests = ({ record }) => {
       }
     })
       .then(response => {
-        requestsState[1](_sortBy(response.data?.hits?.hits, ["status_code"]));
+        requestsState[1](sortByStatusCode(response.data?.hits?.hits));
       })
       .catch(error => {
         console.log(error);

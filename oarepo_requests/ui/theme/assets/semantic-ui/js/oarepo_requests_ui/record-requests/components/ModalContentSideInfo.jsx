@@ -2,8 +2,6 @@ import React from "react";
 
 import { i18next } from "@translations/oarepo_requests_ui/i18next";
 import { List } from "semantic-ui-react";
-import _isEmpty from "lodash/isEmpty";
-import _sortBy from "lodash/sortBy";
 
 /** 
  * @typedef {import("../types").Request} Request

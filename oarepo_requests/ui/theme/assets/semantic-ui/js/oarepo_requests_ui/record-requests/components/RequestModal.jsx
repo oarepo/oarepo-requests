@@ -4,14 +4,13 @@ import PropTypes from "prop-types";
 import { i18next } from "@translations/oarepo_requests_ui/i18next";
 import { Dimmer, Loader, Modal, Button, Icon, Message, Confirm } from "semantic-ui-react";
 import _isEmpty from "lodash/isEmpty";
-import _sortBy from "lodash/sortBy";
 
 import { useFormik, FormikContext } from "formik";
 import axios from "axios";
 
 import { RequestModalContent, CreateRequestModalContent } from ".";
 import { REQUEST_TYPE } from "../utils/objects";
-import isDeepEmpty from "../utils/isDeepEmpty";
+import { sortByStatusCode, isDeepEmpty } from "../utils";
 import { RecordContext, RequestContext } from "../contexts";
 
 /** 
@@ -109,7 +108,7 @@ export const RequestModal = ({ request, requestTypes, requestModalType, isEventM
     })
       .then(response => {
         console.log(response);
-        fetchUpdated(record.links?.requests, (requests) => { setRequests(_sortBy(requests, ["status_code"])); });
+        fetchUpdated(record.links?.requests, (requests) => { setRequests(sortByStatusCode(requests)); });
         setModalOpen(false);
         formik.resetForm();
       })
@@ -126,7 +125,7 @@ export const RequestModal = ({ request, requestTypes, requestModalType, isEventM
     try {
       const createdRequest = await callApi(request.links.actions?.create, 'post', formik.values, true);
       await callApi(createdRequest.data?.links?.actions?.submit, 'post', {}, true);
-      fetchUpdated(record.links?.requests, (requests) => { setRequests(_sortBy(requests, ["status_code"])); });
+      fetchUpdated(record.links?.requests, (requests) => { setRequests(sortByStatusCode(requests)); });
       setModalOpen(false);
       formik.resetForm();
     } catch (error) {
