@@ -3,7 +3,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2024-03-26 21:45+0100\n"
+"POT-Creation-Date: 2024-03-27 09:01+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language: cs\n"
@@ -19,6 +19,126 @@ msgstr ""
 msgid "status"
 msgstr "Stav"
 
+#: oarepo_requests/translations/_only_for_translations.py:3
+msgid "Create Request"
+msgstr "Vytvořit žádost"
+
+#: oarepo_requests/translations/_only_for_translations.py:4
+msgid "Open dialog for request"
+msgstr "Otevřít dialogové okno pro žádost"
+
+#: oarepo_requests/translations/_only_for_translations.py:5
+msgid "My Requests"
+msgstr "Moje žádosti"
+
+#: oarepo_requests/translations/_only_for_translations.py:6
+msgid "Requests to Approve"
+msgstr "Žádosti ke schválení"
+
+#: oarepo_requests/translations/_only_for_translations.py:7
+msgid "Are you sure?"
+msgstr "Jste si jistí?"
+
+#: oarepo_requests/translations/_only_for_translations.py:8
+msgid "Cancel"
+msgstr "Zrušit"
+
+#: oarepo_requests/translations/_only_for_translations.py:9
+msgid "OK"
+msgstr "OK"
+
+#: oarepo_requests/translations/_only_for_translations.py:10
+msgid "Create request"
+msgstr "Vytvořit žádost"
+
+#: oarepo_requests/translations/_only_for_translations.py:11
+msgid "Submit request"
+msgstr "Odeslat žádost"
+
+#: oarepo_requests/translations/_only_for_translations.py:12
+msgid "Delete request"
+msgstr "Smazat žádost"
+
+#: oarepo_requests/translations/_only_for_translations.py:13
+msgid "Delete"
+msgstr "Smazat"
+
+#: oarepo_requests/translations/_only_for_translations.py:14
+msgid "Accept request"
+msgstr "Přijmout žádost"
+
+#: oarepo_requests/translations/_only_for_translations.py:15
+msgid "Accept"
+msgstr "Přijmout"
+
+#: oarepo_requests/translations/_only_for_translations.py:16
+msgid "Decline request"
+msgstr "Zamítnout žádost"
+
+#: oarepo_requests/translations/_only_for_translations.py:17
+msgid "Decline"
+msgstr "Zamítnout"
+
+#: oarepo_requests/translations/_only_for_translations.py:18
+msgid "Create and submit request"
+msgstr "Vytvořit a odeslat žádost"
+
+#: oarepo_requests/translations/_only_for_translations.py:19
+msgid "Create and submit"
+msgstr "Vytvořit a odeslat"
+
+#: oarepo_requests/translations/_only_for_translations.py:20
+msgid "Error sending request"
+msgstr "Chyba při odesílání žádosti"
+
+#: oarepo_requests/translations/_only_for_translations.py:21
+msgid "Submit"
+msgstr "Odeslat"
+
+#: oarepo_requests/translations/_only_for_translations.py:22
+msgid "Save drafted request"
+msgstr "Uložit koncept žádosti"
+
+#: oarepo_requests/translations/_only_for_translations.py:23
+msgid "Save"
+msgstr "Uložit"
+
+#: oarepo_requests/translations/_only_for_translations.py:24
+msgid "Create"
+msgstr "Vytvořit"
+
+#: oarepo_requests/translations/_only_for_translations.py:25
+msgid "Creator"
+msgstr "Tvůrce"
+
+#: oarepo_requests/translations/_only_for_translations.py:26
+msgid "Receiver"
+msgstr "Příjemce"
+
+#: oarepo_requests/translations/_only_for_translations.py:27
+msgid "Request type"
+msgstr "Typ žádosti"
+
+#: oarepo_requests/translations/_only_for_translations.py:28
+msgid "Created"
+msgstr "Vytvořeno"
+
+#: oarepo_requests/translations/_only_for_translations.py:29
+msgid "Timeline"
+msgstr "Časová osa"
+
+#: oarepo_requests/translations/_only_for_translations.py:30
+msgid "Submit event"
+msgstr "Odeslat událost"
+
+#: oarepo_requests/translations/_only_for_translations.py:31
+msgid "No requests to show"
+msgstr "Žádné žádosti k zobrazení"
+
+#: oarepo_requests/translations/_only_for_translations.py:32
+msgid "api.requests"
+msgstr "API pro žádosti záznamu"
+
 #: oarepo_requests/types/delete_record.py:14
 msgid "Request deletion of published record"
 msgstr "Požádat o smazání zveřejněného záznamu"
@@ -30,91 +150,4 @@ msgstr "Požádat o znovuotevření zveřejněného záznamu"
 #: oarepo_requests/types/publish_draft.py:14
 msgid "Request publishing of a draft"
 msgstr "Požádat o kontrolu a zveřejnění konceptu"
-
-msgid "Create Request"
-msgstr "Vytvořit žádost"
-
-msgid "Open dialog for request"
-msgstr "Otevřít dialogové okno pro žádost"
-
-msgid "My Requests"
-msgstr "Moje žádosti"
-
-msgid "Requests to Approve"
-msgstr "Žádosti ke schválení"
-
-msgid "Are you sure?"
-msgstr "Jste si jistí?"
-
-msgid "Cancel"
-msgstr "Zrušit"
-
-msgid "OK"
-msgstr "OK"
-
-msgid "Create request"
-msgstr "Vytvořit žádost"
-
-msgid "Submit request"
-msgstr "Odeslat žádost"
-
-msgid "Delete request"
-msgstr "Smazat žádost"
-
-msgid "Delete"
-msgstr "Smazat"
-
-msgid "Accept request"
-msgstr "Přijmout žádost"
-
-msgid "Accept"
-msgstr "Přijmout"
-
-msgid "Decline request"
-msgstr "Zamítnout žádost"
-
-msgid "Decline"
-msgstr "Zamítnout"
-
-msgid "Create and submit request"
-msgstr "Vytvořit a odeslat žádost"
-
-msgid "Create and submit"
-msgstr "Vytvořit a odeslat"
-
-msgid "Error sending request"
-msgstr "Chyba při odesílání žádosti"
-
-msgid "Submit"
-msgstr "Odeslat"
-
-msgid "Save drafted request"
-msgstr "Uložit koncept žádosti"
-
-msgid "Save"
-msgstr "Uložit"
-
-msgid "Create"
-msgstr "Vytvořit"
-
-msgid "Creator"
-msgstr "Tvůrce"
-
-msgid "Receiver"
-msgstr "Příjemce"
-
-msgid "Request type"
-msgstr "Typ žádosti"
-
-msgid "Created"
-msgstr "Vytvořeno"
-
-msgid "Timeline"
-msgstr "Časová osa"
-
-msgid "Submit event"
-msgstr "Odeslat událost"
-
-msgid "No requests to show"
-msgstr "Žádné žádosti k zobrazení"
 

@@ -3,7 +3,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2024-03-26 21:45+0100\n"
+"POT-Creation-Date: 2024-03-27 09:01+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language: en\n"
@@ -18,6 +18,126 @@ msgstr ""
 msgid "status"
 msgstr ""
 
+#: oarepo_requests/translations/_only_for_translations.py:3
+msgid "Create Request"
+msgstr ""
+
+#: oarepo_requests/translations/_only_for_translations.py:4
+msgid "Open dialog for request"
+msgstr ""
+
+#: oarepo_requests/translations/_only_for_translations.py:5
+msgid "My Requests"
+msgstr ""
+
+#: oarepo_requests/translations/_only_for_translations.py:6
+msgid "Requests to Approve"
+msgstr ""
+
+#: oarepo_requests/translations/_only_for_translations.py:7
+msgid "Are you sure?"
+msgstr ""
+
+#: oarepo_requests/translations/_only_for_translations.py:8
+msgid "Cancel"
+msgstr ""
+
+#: oarepo_requests/translations/_only_for_translations.py:9
+msgid "OK"
+msgstr ""
+
+#: oarepo_requests/translations/_only_for_translations.py:10
+msgid "Create request"
+msgstr ""
+
+#: oarepo_requests/translations/_only_for_translations.py:11
+msgid "Submit request"
+msgstr ""
+
+#: oarepo_requests/translations/_only_for_translations.py:12
+msgid "Delete request"
+msgstr ""
+
+#: oarepo_requests/translations/_only_for_translations.py:13
+msgid "Delete"
+msgstr ""
+
+#: oarepo_requests/translations/_only_for_translations.py:14
+msgid "Accept request"
+msgstr ""
+
+#: oarepo_requests/translations/_only_for_translations.py:15
+msgid "Accept"
+msgstr ""
+
+#: oarepo_requests/translations/_only_for_translations.py:16
+msgid "Decline request"
+msgstr ""
+
+#: oarepo_requests/translations/_only_for_translations.py:17
+msgid "Decline"
+msgstr ""
+
+#: oarepo_requests/translations/_only_for_translations.py:18
+msgid "Create and submit request"
+msgstr ""
+
+#: oarepo_requests/translations/_only_for_translations.py:19
+msgid "Create and submit"
+msgstr ""
+
+#: oarepo_requests/translations/_only_for_translations.py:20
+msgid "Error sending request"
+msgstr ""
+
+#: oarepo_requests/translations/_only_for_translations.py:21
+msgid "Submit"
+msgstr ""
+
+#: oarepo_requests/translations/_only_for_translations.py:22
+msgid "Save drafted request"
+msgstr ""
+
+#: oarepo_requests/translations/_only_for_translations.py:23
+msgid "Save"
+msgstr ""
+
+#: oarepo_requests/translations/_only_for_translations.py:24
+msgid "Create"
+msgstr ""
+
+#: oarepo_requests/translations/_only_for_translations.py:25
+msgid "Creator"
+msgstr ""
+
+#: oarepo_requests/translations/_only_for_translations.py:26
+msgid "Receiver"
+msgstr ""
+
+#: oarepo_requests/translations/_only_for_translations.py:27
+msgid "Request type"
+msgstr ""
+
+#: oarepo_requests/translations/_only_for_translations.py:28
+msgid "Created"
+msgstr ""
+
+#: oarepo_requests/translations/_only_for_translations.py:29
+msgid "Timeline"
+msgstr ""
+
+#: oarepo_requests/translations/_only_for_translations.py:30
+msgid "Submit event"
+msgstr ""
+
+#: oarepo_requests/translations/_only_for_translations.py:31
+msgid "No requests to show"
+msgstr ""
+
+#: oarepo_requests/translations/_only_for_translations.py:32
+msgid "api.requests"
+msgstr "Requests API"
+
 #: oarepo_requests/types/delete_record.py:14
 msgid "Request deletion of published record"
 msgstr ""
@@ -30,93 +150,6 @@ msgstr ""
 msgid "Request publishing of a draft"
 msgstr ""
 
-msgid "Create Request"
-msgstr ""
-
-msgid "No status"
-msgstr ""
-
-msgid "Open dialog for request"
-msgstr ""
-
-msgid "My Requests"
-msgstr ""
-
-msgid "Requests to Approve"
-msgstr ""
-
-msgid "Are you sure?"
-msgstr ""
-
-msgid "Cancel"
-msgstr ""
-
-msgid "OK"
-msgstr ""
-
-msgid "Create request"
-msgstr ""
-
-msgid "Submit request"
-msgstr ""
-
-msgid "Delete request"
-msgstr ""
-
-msgid "Delete"
-msgstr ""
-
-msgid "Accept request"
-msgstr ""
-
-msgid "Accept"
-msgstr ""
-
-msgid "Decline request"
-msgstr ""
-
-msgid "Decline"
-msgstr ""
-
-msgid "Create and submit request"
-msgstr ""
-
-msgid "Create and submit"
-msgstr ""
-
-msgid "Error sending request"
-msgstr ""
-
-msgid "Submit"
-msgstr ""
-
-msgid "Save drafted request"
-msgstr ""
-
-msgid "Save"
-msgstr ""
-
-msgid "Create"
-msgstr ""
-
-msgid "Creator"
-msgstr ""
-
-msgid "Receiver"
-msgstr ""
-
-msgid "Request type"
-msgstr ""
-
-msgid "Created"
-msgstr ""
-
-msgid "Timeline"
-msgstr ""
-
-msgid "Submit event"
-msgstr ""
-
-msgid "No requests to show"
-msgstr ""
+#~ msgid "No status"
+#~ msgstr ""
 
