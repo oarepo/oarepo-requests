@@ -30,6 +30,17 @@ def publish_request_data_function():
 
 
 @pytest.fixture()
+def edit_record_data_function():
+    def ret_data(record_id):
+        return {
+            "request_type": "thesis_edit_record",
+            "topic": {"thesis": record_id},
+        }
+
+    return ret_data
+
+
+@pytest.fixture()
 def delete_record_data_function():
     def ret_data(record_id):
         return {
@@ -140,10 +151,14 @@ def app_config(app_config):
     def default_receiver(*args, **kwargs):
         return {"user": "2"}
 
+    def none_receiver(*args, **kwargs):
+        return None
+
     app_config["OAREPO_REQUESTS_DEFAULT_RECEIVER"] = {
         "thesis_publish_draft": default_receiver,
         "thesis_delete_record": default_receiver,
         "thesis_non_duplicable": default_receiver,
+        "thesis_edit_record": none_receiver,
     }
 
     """

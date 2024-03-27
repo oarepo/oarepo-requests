@@ -3,10 +3,10 @@ from oarepo_runtime.i18n import lazy_gettext as _
 
 from oarepo_requests.actions.publish_draft import PublishDraftAcceptAction
 
-from .generic import OARepoRequestType
+from .generic import NonDuplicableOARepoRequestType
 
 
-class PublishDraftRequestType(OARepoRequestType):
+class PublishDraftRequestType(NonDuplicableOARepoRequestType):
     available_actions = {
         **RequestType.available_actions,
         "accept": PublishDraftAcceptAction,
