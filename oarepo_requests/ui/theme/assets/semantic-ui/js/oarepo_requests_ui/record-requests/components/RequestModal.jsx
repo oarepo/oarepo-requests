@@ -170,10 +170,11 @@ export const RequestModal = ({ request, requestTypes, requestModalType, isEventM
         break;
       case REQUEST_TYPE.SUBMIT:
         newConfirmDialogProps.header = i18next.t("Submit request");
+        newConfirmDialogProps.confirmButton = i18next.t("OK");
         break;
       case REQUEST_TYPE.CANCEL:
-        newConfirmDialogProps.header = i18next.t("Delete request");
-        newConfirmDialogProps.confirmButton = <Button negative>{i18next.t("Delete")}</Button>;
+        newConfirmDialogProps.header = i18next.t("Cancel request");
+        newConfirmDialogProps.confirmButton = <Button negative>{i18next.t("Cancel request")}</Button>;
         break;
       case REQUEST_TYPE.ACCEPT:
         newConfirmDialogProps.header = i18next.t("Accept request");
@@ -276,9 +277,9 @@ export const RequestModal = ({ request, requestTypes, requestModalType, isEventM
                 <Icon name="paper plane" />
                 {i18next.t("Submit")}
               </Button>
-              <Button title={i18next.t("Delete request")} onClick={() => confirmAction(REQUEST_TYPE.CANCEL)} negative icon labelPosition="left" floated="left">
+              <Button title={i18next.t("Cancel request")} onClick={() => confirmAction(REQUEST_TYPE.CANCEL)} negative icon labelPosition="left" floated="left">
                 <Icon name="trash alternate" />
-                {i18next.t("Delete")}
+                {i18next.t("Cancel request")}
               </Button>
               <Button title={i18next.t("Save drafted request")} onClick={() => sendRequest(REQUEST_TYPE.SAVE)} color="grey" icon labelPosition="left" floated="right">
                 <Icon name="save" />
@@ -287,9 +288,9 @@ export const RequestModal = ({ request, requestTypes, requestModalType, isEventM
             </>
           }
           {requestModalType === REQUEST_TYPE.CANCEL &&
-            <Button title={i18next.t("Delete request")} onClick={() => confirmAction(REQUEST_TYPE.CANCEL)} negative icon labelPosition="left" floated="left">
+            <Button title={i18next.t("Cancel request")} onClick={() => confirmAction(REQUEST_TYPE.CANCEL)} negative icon labelPosition="left" floated="left">
               <Icon name="trash alternate" />
-              {i18next.t("Delete")}
+              {i18next.t("Cancel request")}
             </Button>
           }
           {requestModalType === REQUEST_TYPE.ACCEPT &&
