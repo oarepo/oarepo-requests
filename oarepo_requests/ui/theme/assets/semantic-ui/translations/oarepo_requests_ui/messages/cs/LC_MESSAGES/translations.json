@@ -1,7 +1,6 @@
 {
   "Create Request": "Vytvořit žádost",
   "No status": "Neznámý stav",
-  "Open dialog for request": "Otevřít dialogové okno pro žádost",
   "My Requests": "Moje Žádosti",
   "Requests to Approve": "Žádosti ke schválení",
   "Are you sure?": "Jste si jistí?",
@@ -9,8 +8,6 @@
   "OK": "OK",
   "Create request": "Vytvořit žádost",
   "Submit request": "Odeslat žádost",
-  "Delete request": "Smazat žádost",
-  "Delete": "Smazat",
   "Accept request": "Přijmout žádost",
   "Accept": "Přijmout",
   "Decline request": "Zamítnout žádost",
@@ -28,5 +25,7 @@
   "Created": "Vytvořeno",
   "Timeline": "Časová osa",
   "Submit event": "Odeslat událost",
-  "No requests to show": "Žádné žádosti k zobrazení"
+  "No requests to show": "Žádné žádosti k zobrazení",
+  "Cannot send request. Please try again later.": "Nelze odeslat žádost. Zkuste to prosím později.",
+  "Cancel request": "Zrušit žádost"
 }
