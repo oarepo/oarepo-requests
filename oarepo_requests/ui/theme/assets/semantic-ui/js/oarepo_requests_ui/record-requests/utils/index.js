@@ -5,6 +5,8 @@ import _partition from "lodash/partition";
 import _isEmpty from "lodash/isEmpty";
 
 export function sortByStatusCode(requests) {
+  // TODO: why we are checking status_code of first request
+  // instead of just checking if requests array is empty 
   if (!_has(requests[0], "status_code")) {
     return requests;
   }
