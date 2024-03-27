@@ -10,14 +10,14 @@ class RecordRequestsResourceConfig:
     request_view_args = RecordResourceConfig.request_view_args | {
         "request_type": ma.fields.Str()
     }
+
     """
     @property
     def response_handlers(self):
         return {
-            **RequestsResourceConfig.routes,
+            **RecordResourceConfig.response_handlers,
             "application/vnd.inveniordm.v1+json": ResponseHandler(
                 OARepoRequestsUIJSONSerializer()
             ),
-            **super().response_handlers,
         }
     """

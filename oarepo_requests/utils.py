@@ -4,8 +4,6 @@ from invenio_requests.proxies import current_request_type_registry
 from invenio_requests.resolvers.registry import ResolverRegistry
 from invenio_search.engine import dsl
 
-from oarepo_requests.errors import OpenRequestAlreadyExists
-
 
 def allowed_request_types_for_record(record):
     request_types = current_request_type_registry._registered_types
@@ -53,7 +51,7 @@ def _reference_query_term(term, reference):
     )
 
 
-def request_exists(
+def search_requests(
     identity,
     type_id,
     topic_reference=None,
@@ -83,16 +81,15 @@ def request_exists(
             must=must,
         ),
     )
-    return next(results.hits)["id"] if results.total > 0 else None
+    return results.hits
 
 
 def open_request_exists(topic_or_reference, type_id):
     topic_reference = ResolverRegistry.reference_entity(topic_or_reference, raise_=True)
-    existing_request = request_exists(
+    existing_requests = search_requests(
         system_identity, type_id, topic_reference=topic_reference, is_open=True
     )
-    if existing_request:
-        raise OpenRequestAlreadyExists(existing_request, topic_or_reference)
+    return bool(list(existing_requests))
 
 
 # TODO these things are related and possibly could be approached in a less convoluted manner? For example, global model->services map would help

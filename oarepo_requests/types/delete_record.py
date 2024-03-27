@@ -3,10 +3,10 @@ from oarepo_runtime.i18n import lazy_gettext as _
 
 from oarepo_requests.actions.delete_topic import DeleteTopicAcceptAction
 
-from .generic import OARepoRequestType
+from .generic import NonDuplicableOARepoRequestType
 
 
-class DeleteRecordRequestType(OARepoRequestType):
+class DeleteRecordRequestType(NonDuplicableOARepoRequestType):
     available_actions = {
         **RequestType.available_actions,
         "accept": DeleteTopicAcceptAction,
