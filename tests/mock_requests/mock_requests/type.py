@@ -3,7 +3,7 @@ from invenio_requests.proxies import current_requests_service
 
 from oarepo_requests.errors import OpenRequestAlreadyExists
 from oarepo_requests.types.generic import OARepoRequestType
-from oarepo_requests.utils import open_request_exists, resolve_reference_dict
+from oarepo_requests.utils import open_request_exists
 
 
 class NonDuplicableRequest(OARepoRequestType):

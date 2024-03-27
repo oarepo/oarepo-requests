@@ -46,8 +46,13 @@ def allowed_request_types_for_record_cls(queryied_record_cls):
                 break
     return ret
 
+
 def _reference_query_term(term, reference):
-    return dsl.Q("term", **{f"{term}.{list(reference.keys())[0]}": list(reference.values())[0]})
+    return dsl.Q(
+        "term", **{f"{term}.{list(reference.keys())[0]}": list(reference.values())[0]}
+    )
+
+
 def request_exists(
     identity,
     type_id,
@@ -83,7 +88,9 @@ def request_exists(
 
 def open_request_exists(topic_or_reference, type_id):
     topic_reference = ResolverRegistry.reference_entity(topic_or_reference, raise_=True)
-    existing_request = request_exists(system_identity, type_id, topic_reference=topic_reference, is_open=True)
+    existing_request = request_exists(
+        system_identity, type_id, topic_reference=topic_reference, is_open=True
+    )
     if existing_request:
         raise OpenRequestAlreadyExists(existing_request, topic_or_reference)
 

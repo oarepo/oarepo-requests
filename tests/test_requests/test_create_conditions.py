@@ -32,12 +32,11 @@ def test_can_create(client_logged_as, identity_simple, users, urls, search_clear
             urls["BASE_URL_REQUESTS"], json=data(draft1.json["id"])
         )
 
-    #should still be creatable for draft2
+    # should still be creatable for draft2
     create_for_request_draft2 = creator_client.post(
         urls["BASE_URL_REQUESTS"], json=data(draft2.json["id"])
     )
     assert create_for_request_draft2.status_code == 201
-
 
 
 def test_can_possibly_create(
@@ -80,6 +79,8 @@ def test_can_possibly_create(
         record_resp_draft2.json["request_types"], "thesis_non_duplicable"
     )
     assert (
-        find_request_type(record_resp_with_request.json["request_types"], "thesis_non_duplicable")
+        find_request_type(
+            record_resp_with_request.json["request_types"], "thesis_non_duplicable"
+        )
         is None
     )
