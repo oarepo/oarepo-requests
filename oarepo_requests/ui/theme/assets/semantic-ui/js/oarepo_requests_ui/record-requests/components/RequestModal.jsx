@@ -98,8 +98,6 @@ export const RequestModal = ({ request, requestTypes, requestModalType, isEventM
       });
     }
 
-    console.log(url, method);
-
     return axios({
       method: method,
       url: url,
@@ -136,7 +134,7 @@ export const RequestModal = ({ request, requestTypes, requestModalType, isEventM
     }
   }
 
-  const sendRequest = (requestType, createAndSubmit = false) => {
+  const sendRequest = async (requestType, createAndSubmit = false) => {
     formik.setSubmitting(true);
     setError(null);
     if (createAndSubmit) {
@@ -144,6 +142,10 @@ export const RequestModal = ({ request, requestTypes, requestModalType, isEventM
     }
     if (requestType === REQUEST_TYPE.SAVE) {
       return callApi(request.links.self, 'put');
+    } else if (requestType === REQUEST_TYPE.ACCEPT) { // Reload page after succesful "Accept" operation
+      await callApi(request.links.actions?.accept, 'post');
+      location.reload();
+      return;
     }
     const mappedData = !isDeepEmpty(formik.values) ? {} : formik.values;
     const actionUrl = !isEventModal ? request.links.actions[requestType] : request.links[requestType];
