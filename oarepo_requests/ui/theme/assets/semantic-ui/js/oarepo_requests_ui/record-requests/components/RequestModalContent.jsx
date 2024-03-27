@@ -39,7 +39,7 @@ export const RequestModalContent = ({ request, requestType, requestModalType, fe
         }));
       });
     }
-  }, [actualRequest]);
+  }, [actualRequest, setRequests]);
 
   const { handleSubmit } = useFormikContext();
 

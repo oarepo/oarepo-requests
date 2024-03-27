@@ -18,6 +18,7 @@ export const RecordRequests = ({ record }) => {
   const requestTypes = record?.request_types ?? [];
 
   const [requests, setRequests] = useState(sortByStatusCode(record?.requests ?? []) ?? []);
+  const requestsSetter = React.useCallback(newRequests => setRequests(newRequests), [])
 
   useEffect(() => {
     axios({
@@ -38,7 +39,7 @@ export const RecordRequests = ({ record }) => {
 
   return (
     <RecordContextProvider record={record}>
-      <RequestContextProvider requests={{ requests, setRequests }}>
+      <RequestContextProvider requests={{ requests, setRequests: requestsSetter }}>
         {!_isEmpty(requestTypes) && (
           <CreateRequestButtonGroup requestTypes={requestTypes} />
         )}
