@@ -20,7 +20,7 @@ export const CreateRequestButtonGroup = ({ requestTypes }) => {
   return (
     <Segment>
       <Header size="small" className="detail-sidebar-header">{i18next.t("Create Request")}</Header>
-      <Button.Group vertical compact fluid basic>
+      <Button.Group vertical compact fluid>
         {createRequests.map((requestType) => (
           <RequestModal 
             key={requestType.type_id} 

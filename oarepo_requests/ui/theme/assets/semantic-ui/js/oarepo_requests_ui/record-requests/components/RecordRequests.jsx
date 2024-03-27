@@ -42,7 +42,7 @@ export const RecordRequests = ({ record }) => {
         {!_isEmpty(requestTypes) && (
           <CreateRequestButtonGroup requestTypes={requestTypes} />
         )}
-        {!_isEmpty(record?.requests) && (
+        {!_isEmpty(requestsState[0]) && (
           <RequestListContainer requestTypes={requestTypes} />
         )}
       </RequestContextProvider>
