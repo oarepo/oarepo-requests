@@ -3,7 +3,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2024-03-27 09:01+0100\n"
+"POT-Creation-Date: 2024-03-27 11:31+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language: cs\n"
@@ -141,13 +141,13 @@ msgstr "API pro žádosti záznamu"
 
 #: oarepo_requests/types/delete_record.py:14
 msgid "Request deletion of published record"
-msgstr "Požádat o smazání zveřejněného záznamu"
+msgstr "Žádost o smazání zveřejněného záznamu"
 
 #: oarepo_requests/types/edit_record.py:14
 msgid "Request re-opening of published record"
-msgstr "Požádat o znovuotevření zveřejněného záznamu"
+msgstr "Žádost o znovuotevření zveřejněného záznamu"
 
 #: oarepo_requests/types/publish_draft.py:14
 msgid "Request publishing of a draft"
-msgstr "Požádat o kontrolu a zveřejnění konceptu"
+msgstr "Žádost o kontrolu a zveřejnění konceptu"
 
