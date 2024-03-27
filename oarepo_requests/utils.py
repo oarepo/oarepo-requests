@@ -4,8 +4,6 @@ from invenio_requests.proxies import current_request_type_registry
 from invenio_requests.resolvers.registry import ResolverRegistry
 from invenio_search.engine import dsl
 
-from oarepo_requests.errors import OpenRequestAlreadyExists
-
 
 def allowed_request_types_for_record(record):
     request_types = current_request_type_registry._registered_types
@@ -47,17 +45,19 @@ def allowed_request_types_for_record_cls(queryied_record_cls):
     return ret
 
 
-def request_exists(
+def _reference_query_term(term, reference):
+    return dsl.Q(
+        "term", **{f"{term}.{list(reference.keys())[0]}": list(reference.values())[0]}
+    )
+
+
+def search_requests(
     identity,
-    topic,
     type_id,
-    topic_type=None,
+    topic_reference=None,
+    receiver_reference=None,
+    creator_reference=None,
     is_open=False,
-    receiver_type=None,
-    receiver_id=None,
-    creator_type=None,
-    creator_id=None,
-    topic_id=None,
     add_args=None,
 ):
     """Return the request id if an open request already exists, else None."""
@@ -66,15 +66,14 @@ def request_exists(
         dsl.Q("term", **{"type": type_id}),
         dsl.Q("term", **{"is_open": is_open}),
     ]
+    if receiver_reference:
+        must.append(_reference_query_term("receiver", receiver_reference))
+    if creator_reference:
+        must.append(_reference_query_term("creator", creator_reference))
+    if topic_reference:
+        must.append(_reference_query_term("topic", topic_reference))
     if add_args:
         must += add_args
-    if receiver_type:
-        must.append(dsl.Q("term", **{f"receiver.{receiver_type}": receiver_id}))
-    if creator_type:
-        must.append(dsl.Q("term", **{f"creator.{creator_type}": creator_id}))
-    if topic_type:
-        topic_id = topic_id if topic_id is not None else topic.pid.pid_value
-        must.append(dsl.Q("term", **{f"topic.{topic_type}": topic_id}))
     results = current_requests_service.search(
         identity,
         extra_filter=dsl.query.Bool(
@@ -82,13 +81,15 @@ def request_exists(
             must=must,
         ),
     )
-    return next(results.hits)["id"] if results.total > 0 else None
+    return results.hits
 
 
-def open_request_exists(topic, type_id, creator=None):
-    existing_request = request_exists(system_identity, topic, type_id, is_open=True)
-    if existing_request:
-        raise OpenRequestAlreadyExists(existing_request, topic)
+def open_request_exists(topic_or_reference, type_id):
+    topic_reference = ResolverRegistry.reference_entity(topic_or_reference, raise_=True)
+    existing_requests = search_requests(
+        system_identity, type_id, topic_reference=topic_reference, is_open=True
+    )
+    return bool(list(existing_requests))
 
 
 # TODO these things are related and possibly could be approached in a less convoluted manner? For example, global model->services map would help

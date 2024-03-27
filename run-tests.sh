@@ -36,7 +36,6 @@ pip install "oarepo[tests]==$OAREPO_VERSION.*"
 pip install -e "./$BUILD_TEST_DIR/${MODEL}"
 pip install oarepo-ui
 pip install -e .
-pip install -e ./tests/mock_requests
 
 pytest $BUILD_TEST_DIR/test_requests
 pytest $BUILD_TEST_DIR/test_ui
