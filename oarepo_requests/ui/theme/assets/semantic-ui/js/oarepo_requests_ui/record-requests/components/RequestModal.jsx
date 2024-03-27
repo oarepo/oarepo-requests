@@ -67,7 +67,7 @@ export const RequestModal = ({ request, requestTypes, requestModalType, isEventM
   const errorMessageRef = useRef(null);
 
   /** @type {[Request[], (requests: Request[]) => void]} */
-  const [requests, setRequests] = useContext(RequestContext);
+  const { setRequests } = useContext(RequestContext);
   const record = useContext(RecordContext);
 
   const formik = useFormik({

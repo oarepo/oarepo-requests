@@ -15,7 +15,7 @@ import { RequestContext } from "../contexts";
  * @param {{ requests: Request[], requestTypes: RequestType[] }} props
  */
 export const RequestListContainer = ({ requestTypes }) => {
-  const [requests,] = useContext(RequestContext);
+  const { requests } = useContext(RequestContext);
 
   let requestsToApprove = [];
   let otherRequests = [];

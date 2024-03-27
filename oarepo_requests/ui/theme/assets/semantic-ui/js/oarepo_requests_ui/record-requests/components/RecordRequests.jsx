@@ -38,7 +38,7 @@ export const RecordRequests = ({ record }) => {
 
   return (
     <RecordContextProvider record={record}>
-      <RequestContextProvider requests={requestsState}>
+      <RequestContextProvider requests={{ requests, setRequests }}>
         {!_isEmpty(requestTypes) && (
           <CreateRequestButtonGroup requestTypes={requestTypes} />
         )}

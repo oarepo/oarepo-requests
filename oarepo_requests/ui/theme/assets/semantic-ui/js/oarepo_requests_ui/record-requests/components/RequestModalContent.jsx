@@ -24,7 +24,7 @@ import ReadOnlyCustomFields from "./common/ReadOnlyCustomFields";
 /** @param {{ request: Request, requestModalType: RequestTypeEnum, requestType: RequestType, fetchNewEvents: (url: string, setter: (events: Event[]) => void) => Promise<Event>, customSubmitHandler: (e) => void }} props */
 export const RequestModalContent = ({ request, requestType, requestModalType, fetchNewEvents, customSubmitHandler }) => {
   /** @type {[Request[], (requests: Request[]) => void]} */
-  const [requests, setRequests] = useContext(RequestContext);
+  const { requests, setRequests } = useContext(RequestContext);
 
   const actualRequest = requests.find(req => req.id === request.id);
 
