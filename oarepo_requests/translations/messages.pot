@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2024-03-26 21:45+0100\n"
+"POT-Creation-Date: 2024-03-27 09:01+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -135,6 +135,10 @@ msgstr ""
 
 #: oarepo_requests/translations/_only_for_translations.py:31
 msgid "No requests to show"
+msgstr ""
+
+#: oarepo_requests/translations/_only_for_translations.py:32
+msgid "api.requests"
 msgstr ""
 
 #: oarepo_requests/types/delete_record.py:14

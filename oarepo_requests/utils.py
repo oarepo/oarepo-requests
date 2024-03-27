@@ -140,9 +140,3 @@ def stringify_first_val(dct):
             dct[k] = str(v)
     return dct
 
-
-def is_record(record, ctx):
-    """Shortcut for links to determine if record is a record."""
-    if not hasattr(record, "is_draft"):
-        return True
-    return not record.is_draft
