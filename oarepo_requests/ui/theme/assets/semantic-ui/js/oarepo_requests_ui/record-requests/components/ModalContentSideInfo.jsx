@@ -33,7 +33,7 @@ export const ModalContentSideInfo = ({ request, requestType, isSidebar = false }
       <List.Item>
         <List.Content>
           <List.Header>{i18next.t("Created")}</List.Header>
-          {`${Math.ceil(Math.abs(new Date(request?.created) - new Date()) / 3.6e6)} hours ago`}
+          {request?.created}
         </List.Content>
       </List.Item>
     </List>
