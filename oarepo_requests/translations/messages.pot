@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2024-03-27 11:31+0100\n"
+"POT-Creation-Date: 2024-03-27 18:06+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -17,139 +17,147 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 2.14.0\n"
 
-#: oarepo_requests/services/ui_schema.py:71
+#: /Users/m/w/cesnet/oarepo-requests/oarepo_requests/services/ui_schema.py:71
 msgid "status"
 msgstr ""
 
-#: oarepo_requests/translations/_only_for_translations.py:3
+#: /Users/m/w/cesnet/oarepo-requests/oarepo_requests/translations/_only_for_translations.py:3
 msgid "Create Request"
 msgstr ""
 
-#: oarepo_requests/translations/_only_for_translations.py:4
+#: /Users/m/w/cesnet/oarepo-requests/oarepo_requests/translations/_only_for_translations.py:4
 msgid "Open dialog for request"
 msgstr ""
 
-#: oarepo_requests/translations/_only_for_translations.py:5
+#: /Users/m/w/cesnet/oarepo-requests/oarepo_requests/translations/_only_for_translations.py:5
 msgid "My Requests"
 msgstr ""
 
-#: oarepo_requests/translations/_only_for_translations.py:6
+#: /Users/m/w/cesnet/oarepo-requests/oarepo_requests/translations/_only_for_translations.py:6
 msgid "Requests to Approve"
 msgstr ""
 
-#: oarepo_requests/translations/_only_for_translations.py:7
+#: /Users/m/w/cesnet/oarepo-requests/oarepo_requests/translations/_only_for_translations.py:7
 msgid "Are you sure?"
 msgstr ""
 
-#: oarepo_requests/translations/_only_for_translations.py:8
+#: /Users/m/w/cesnet/oarepo-requests/oarepo_requests/translations/_only_for_translations.py:8
 msgid "Cancel"
 msgstr ""
 
-#: oarepo_requests/translations/_only_for_translations.py:9
+#: /Users/m/w/cesnet/oarepo-requests/oarepo_requests/translations/_only_for_translations.py:9
 msgid "OK"
 msgstr ""
 
-#: oarepo_requests/translations/_only_for_translations.py:10
+#: /Users/m/w/cesnet/oarepo-requests/oarepo_requests/translations/_only_for_translations.py:10
 msgid "Create request"
 msgstr ""
 
-#: oarepo_requests/translations/_only_for_translations.py:11
+#: /Users/m/w/cesnet/oarepo-requests/oarepo_requests/translations/_only_for_translations.py:11
 msgid "Submit request"
 msgstr ""
 
-#: oarepo_requests/translations/_only_for_translations.py:12
+#: /Users/m/w/cesnet/oarepo-requests/oarepo_requests/translations/_only_for_translations.py:12
 msgid "Delete request"
 msgstr ""
 
-#: oarepo_requests/translations/_only_for_translations.py:13
+#: /Users/m/w/cesnet/oarepo-requests/oarepo_requests/translations/_only_for_translations.py:13
 msgid "Delete"
 msgstr ""
 
-#: oarepo_requests/translations/_only_for_translations.py:14
+#: /Users/m/w/cesnet/oarepo-requests/oarepo_requests/translations/_only_for_translations.py:14
 msgid "Accept request"
 msgstr ""
 
-#: oarepo_requests/translations/_only_for_translations.py:15
+#: /Users/m/w/cesnet/oarepo-requests/oarepo_requests/translations/_only_for_translations.py:15
 msgid "Accept"
 msgstr ""
 
-#: oarepo_requests/translations/_only_for_translations.py:16
+#: /Users/m/w/cesnet/oarepo-requests/oarepo_requests/translations/_only_for_translations.py:16
 msgid "Decline request"
 msgstr ""
 
-#: oarepo_requests/translations/_only_for_translations.py:17
+#: /Users/m/w/cesnet/oarepo-requests/oarepo_requests/translations/_only_for_translations.py:17
 msgid "Decline"
 msgstr ""
 
-#: oarepo_requests/translations/_only_for_translations.py:18
+#: /Users/m/w/cesnet/oarepo-requests/oarepo_requests/translations/_only_for_translations.py:18
 msgid "Create and submit request"
 msgstr ""
 
-#: oarepo_requests/translations/_only_for_translations.py:19
+#: /Users/m/w/cesnet/oarepo-requests/oarepo_requests/translations/_only_for_translations.py:19
 msgid "Create and submit"
 msgstr ""
 
-#: oarepo_requests/translations/_only_for_translations.py:20
+#: /Users/m/w/cesnet/oarepo-requests/oarepo_requests/translations/_only_for_translations.py:20
 msgid "Error sending request"
 msgstr ""
 
-#: oarepo_requests/translations/_only_for_translations.py:21
+#: /Users/m/w/cesnet/oarepo-requests/oarepo_requests/translations/_only_for_translations.py:21
 msgid "Submit"
 msgstr ""
 
-#: oarepo_requests/translations/_only_for_translations.py:22
+#: /Users/m/w/cesnet/oarepo-requests/oarepo_requests/translations/_only_for_translations.py:22
 msgid "Save drafted request"
 msgstr ""
 
-#: oarepo_requests/translations/_only_for_translations.py:23
+#: /Users/m/w/cesnet/oarepo-requests/oarepo_requests/translations/_only_for_translations.py:23
 msgid "Save"
 msgstr ""
 
-#: oarepo_requests/translations/_only_for_translations.py:24
+#: /Users/m/w/cesnet/oarepo-requests/oarepo_requests/translations/_only_for_translations.py:24
 msgid "Create"
 msgstr ""
 
-#: oarepo_requests/translations/_only_for_translations.py:25
+#: /Users/m/w/cesnet/oarepo-requests/oarepo_requests/translations/_only_for_translations.py:25
 msgid "Creator"
 msgstr ""
 
-#: oarepo_requests/translations/_only_for_translations.py:26
+#: /Users/m/w/cesnet/oarepo-requests/oarepo_requests/translations/_only_for_translations.py:26
 msgid "Receiver"
 msgstr ""
 
-#: oarepo_requests/translations/_only_for_translations.py:27
+#: /Users/m/w/cesnet/oarepo-requests/oarepo_requests/translations/_only_for_translations.py:27
 msgid "Request type"
 msgstr ""
 
-#: oarepo_requests/translations/_only_for_translations.py:28
+#: /Users/m/w/cesnet/oarepo-requests/oarepo_requests/translations/_only_for_translations.py:28
 msgid "Created"
 msgstr ""
 
-#: oarepo_requests/translations/_only_for_translations.py:29
+#: /Users/m/w/cesnet/oarepo-requests/oarepo_requests/translations/_only_for_translations.py:29
 msgid "Timeline"
 msgstr ""
 
-#: oarepo_requests/translations/_only_for_translations.py:30
+#: /Users/m/w/cesnet/oarepo-requests/oarepo_requests/translations/_only_for_translations.py:30
 msgid "Submit event"
 msgstr ""
 
-#: oarepo_requests/translations/_only_for_translations.py:31
+#: /Users/m/w/cesnet/oarepo-requests/oarepo_requests/translations/_only_for_translations.py:31
 msgid "No requests to show"
 msgstr ""
 
-#: oarepo_requests/translations/_only_for_translations.py:32
+#: /Users/m/w/cesnet/oarepo-requests/oarepo_requests/translations/_only_for_translations.py:32
 msgid "api.requests"
 msgstr ""
 
-#: oarepo_requests/types/delete_record.py:14
+#: /Users/m/w/cesnet/oarepo-requests/oarepo_requests/types/delete_record.py:14
 msgid "Request deletion of published record"
 msgstr ""
 
-#: oarepo_requests/types/edit_record.py:14
+#: /Users/m/w/cesnet/oarepo-requests/oarepo_requests/types/edit_record.py:16
 msgid "Request re-opening of published record"
 msgstr ""
 
-#: oarepo_requests/types/publish_draft.py:14
+#: /Users/m/w/cesnet/oarepo-requests/oarepo_requests/types/publish_draft.py:14
 msgid "Request publishing of a draft"
 msgstr ""
 
+msgid "No status"
+msgstr ""
+
+msgid "Cannot send request. Please try again later."
+msgstr ""
+
+msgid "Cancel request"
+msgstr ""
