@@ -10,8 +10,6 @@ class NonDuplicableRequest(OARepoRequestType):
     receiver_can_be_none = True
 
     def can_create(self, identity, data, receiver, topic, creator, *args, **kwargs):
-        if isinstance(topic, dict):
-            topic = resolve_reference_dict(topic)
         open_request_exists(topic, self.type_id)
         current_requests_service.require_permission(identity, "create")
 
