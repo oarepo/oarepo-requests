@@ -15,9 +15,9 @@ import { RequestContextProvider, RecordContextProvider } from "../contexts";
 
 export const RecordRequests = ({ record }) => {
   /** @type {RequestType[]} */
-  const requestTypes = record.request_types ?? [];
+  const requestTypes = record?.request_types ?? [];
 
-  const requestsState = useState([]);
+  const requestsState = useState(_sortBy(record?.requests ?? [], ["status_code"]) ?? []);
 
   useEffect(() => {
     axios({
@@ -39,10 +39,10 @@ export const RecordRequests = ({ record }) => {
   return (
     <RecordContextProvider record={record}>
       <RequestContextProvider requests={requestsState}>
-        {requestTypes && (
+        {!_isEmpty(requestTypes) && (
           <CreateRequestButtonGroup requestTypes={requestTypes} />
         )}
-        {!_isEmpty(requestsState[0]) && (
+        {!_isEmpty(record?.requests) && (
           <RequestListContainer requestTypes={requestTypes} />
         )}
       </RequestContextProvider>
