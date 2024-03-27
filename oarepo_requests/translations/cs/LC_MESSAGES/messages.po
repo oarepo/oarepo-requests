@@ -1,0 +1,161 @@
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: PROJECT VERSION\n"
+"Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
+"POT-Creation-Date: 2024-03-27 11:31+0100\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: cs <LL@li.org>\n"
+"Language: cs\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=3; plural=((n==1) ? 0 : (n>=2 && n<=4) ? 1 : 2);\n"
+"Generated-By: Babel 2.14.0\n"
+
+#: oarepo_requests/services/ui_schema.py:71
+#, fuzzy
+msgid "status"
+msgstr "Stav"
+
+#: oarepo_requests/translations/_only_for_translations.py:3
+msgid "Create Request"
+msgstr "Vytvořit žádost"
+
+#: oarepo_requests/translations/_only_for_translations.py:4
+msgid "Open dialog for request"
+msgstr "Otevřít dialogové okno pro žádost"
+
+#: oarepo_requests/translations/_only_for_translations.py:5
+msgid "My Requests"
+msgstr "Moje žádosti"
+
+#: oarepo_requests/translations/_only_for_translations.py:6
+msgid "Requests to Approve"
+msgstr "Žádosti ke schválení"
+
+#: oarepo_requests/translations/_only_for_translations.py:7
+msgid "Are you sure?"
+msgstr "Jste si jistí?"
+
+#: oarepo_requests/translations/_only_for_translations.py:8
+msgid "Cancel"
+msgstr "Zrušit"
+
+#: oarepo_requests/translations/_only_for_translations.py:9
+msgid "OK"
+msgstr "OK"
+
+#: oarepo_requests/translations/_only_for_translations.py:10
+msgid "Create request"
+msgstr "Vytvořit žádost"
+
+#: oarepo_requests/translations/_only_for_translations.py:11
+msgid "Submit request"
+msgstr "Odeslat žádost"
+
+#: oarepo_requests/translations/_only_for_translations.py:12
+msgid "Delete request"
+msgstr "Smazat žádost"
+
+#: oarepo_requests/translations/_only_for_translations.py:13
+msgid "Delete"
+msgstr "Smazat"
+
+#: oarepo_requests/translations/_only_for_translations.py:14
+msgid "Accept request"
+msgstr "Přijmout žádost"
+
+#: oarepo_requests/translations/_only_for_translations.py:15
+msgid "Accept"
+msgstr "Přijmout"
+
+#: oarepo_requests/translations/_only_for_translations.py:16
+msgid "Decline request"
+msgstr "Zamítnout žádost"
+
+#: oarepo_requests/translations/_only_for_translations.py:17
+msgid "Decline"
+msgstr "Zamítnout"
+
+#: oarepo_requests/translations/_only_for_translations.py:18
+msgid "Create and submit request"
+msgstr "Vytvořit a odeslat žádost"
+
+#: oarepo_requests/translations/_only_for_translations.py:19
+msgid "Create and submit"
+msgstr "Vytvořit a odeslat"
+
+#: oarepo_requests/translations/_only_for_translations.py:20
+msgid "Error sending request"
+msgstr "Chyba při odesílání žádosti"
+
+#: oarepo_requests/translations/_only_for_translations.py:21
+msgid "Submit"
+msgstr "Odeslat"
+
+#: oarepo_requests/translations/_only_for_translations.py:22
+msgid "Save drafted request"
+msgstr "Uložit koncept žádosti"
+
+#: oarepo_requests/translations/_only_for_translations.py:23
+msgid "Save"
+msgstr "Uložit"
+
+#: oarepo_requests/translations/_only_for_translations.py:24
+msgid "Create"
+msgstr "Vytvořit"
+
+#: oarepo_requests/translations/_only_for_translations.py:25
+msgid "Creator"
+msgstr "Tvůrce"
+
+#: oarepo_requests/translations/_only_for_translations.py:26
+msgid "Receiver"
+msgstr "Příjemce"
+
+#: oarepo_requests/translations/_only_for_translations.py:27
+msgid "Request type"
+msgstr "Typ žádosti"
+
+#: oarepo_requests/translations/_only_for_translations.py:28
+msgid "Created"
+msgstr "Vytvořeno"
+
+#: oarepo_requests/translations/_only_for_translations.py:29
+msgid "Timeline"
+msgstr "Časová osa"
+
+#: oarepo_requests/translations/_only_for_translations.py:30
+msgid "Submit event"
+msgstr "Odeslat událost"
+
+#: oarepo_requests/translations/_only_for_translations.py:31
+msgid "No requests to show"
+msgstr "Žádné žádosti k zobrazení"
+
+#: oarepo_requests/translations/_only_for_translations.py:32
+msgid "api.requests"
+msgstr "API pro žádosti záznamu"
+
+#: oarepo_requests/types/delete_record.py:14
+msgid "Request deletion of published record"
+msgstr "Žádost o smazání zveřejněného záznamu"
+
+#: oarepo_requests/types/edit_record.py:14
+msgid "Request re-opening of published record"
+msgstr "Žádost o znovuotevření zveřejněného záznamu"
+
+#: oarepo_requests/types/publish_draft.py:14
+msgid "Request publishing of a draft"
+msgstr "Žádost o kontrolu a zveřejnění konceptu"
+
+msgid "No status"
+msgstr "Beze stavu"
+
+msgid "Cannot send request. Please try again later."
+msgstr "Nemohu poslat žádost. Prosím, zkuste později."
+
+msgid "Cancel request"
+msgstr ""

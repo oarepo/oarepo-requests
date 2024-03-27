@@ -5,8 +5,8 @@ from invenio_requests.proxies import current_request_type_registry
 from invenio_requests.services.schemas import GenericRequestSchema
 from marshmallow import fields
 
-from oarepo_requests.utils import get_matching_service_for_record, is_record
-
+from oarepo_requests.utils import get_matching_service_for_record
+from oarepo_runtime.records import is_published_record
 
 def get_links_schema():
     # TODO possibly specify more
@@ -31,7 +31,7 @@ class RequestTypeSchema(ma.Schema):
         record = self.context["record"]
         service = get_matching_service_for_record(record)
         link = ConditionalLink(
-            cond=is_record,
+            cond=is_published_record,
             if_=Link(f"{{+api}}{service.config.url_prefix}{{id}}/requests/{type_id}"),
             else_=Link(
                 f"{{+api}}{service.config.url_prefix}{{id}}/draft/requests/{type_id}"

@@ -92,3 +92,6 @@ dist/
 
 tests/thesis
 thesis
+
+**/ui/theme/**/todo.md
+node_modules
