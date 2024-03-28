@@ -1,4 +1,5 @@
 import marshmallow as ma
+from invenio_pidstore.errors import PIDDeletedError
 from invenio_requests.proxies import current_request_type_registry
 from marshmallow import validate
 from oarepo_runtime.i18n import lazy_gettext as _
@@ -28,15 +29,19 @@ class UIReferenceSchema(ma.Schema):
 
     @ma.post_dump
     def dereference(self, data, **kwargs):
-        reference_type = list(data["reference"].keys())[0]
-        entity_resolvers = current_oarepo_requests.entity_reference_ui_resolvers
-        if reference_type in entity_resolvers:
-            return entity_resolvers[reference_type](self.context["identity"], data)
-        else:
-            # TODO log warning
-            return fallback_entity_reference_ui_resolver(self.context["identity"], data)
-        # raise ValidationError(f"no entity reference handler for {reference_type}")
-
+        try:
+            reference_type = list(data["reference"].keys())[0]
+            entity_resolvers = current_oarepo_requests.entity_reference_ui_resolvers
+            if reference_type in entity_resolvers:
+                return entity_resolvers[reference_type](self.context["identity"], data)
+            else:
+                # TODO log warning
+                return fallback_entity_reference_ui_resolver(self.context["identity"], data)
+        except PIDDeletedError:
+            return {
+                **data,
+                "status": "removed"
+            }
 
 class UIRequestSchemaMixin:
     created = LocalizedDateTime(dump_only=True)
