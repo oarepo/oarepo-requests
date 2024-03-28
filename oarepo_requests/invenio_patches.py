@@ -52,9 +52,23 @@ def override_invenio_requests_config(*args, **kwargs):
     # this monkey patch should be done better (support from invenio)
     RequestsServiceConfig.search = EnhancedRequestSearchOptions
     RequestsResourceConfig.request_search_args = ExtendedRequestSearchRequestArgsSchema
+
+    class LazySerializer:
+        def __get_instance(self):
+            return OARepoRequestsUIJSONSerializer()
+
+        @property
+        def serialize_object_list(self):
+            return self.__get_instance().serialize_object_list
+
+        @property
+        def serialize_object(self):
+            return self.__get_instance().serialize_object
+
+
     RequestsResourceConfig.response_handlers = {
-        "application/json": ResponseHandler(JSONSerializer(), headers=etag_headers),
-        "application/vnd.inveniordm.v1+json": ResponseHandler(
-            OARepoRequestsUIJSONSerializer()
-        ),
-    }
+            "application/json": ResponseHandler(JSONSerializer(), headers=etag_headers),
+            "application/vnd.inveniordm.v1+json": ResponseHandler(
+                LazySerializer()
+            )
+        }
