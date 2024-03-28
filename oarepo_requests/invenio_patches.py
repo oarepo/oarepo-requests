@@ -1,3 +1,5 @@
+from functools import cached_property
+
 from flask_resources import ResponseHandler, JSONSerializer
 from invenio_records_resources.resources.records.headers import etag_headers
 from invenio_records_resources.services.records.params import FilterParam
@@ -54,16 +56,17 @@ def override_invenio_requests_config(*args, **kwargs):
     RequestsResourceConfig.request_search_args = ExtendedRequestSearchRequestArgsSchema
 
     class LazySerializer:
-        def __get_instance(self):
+        @cached_property
+        def __instance(self):
             return OARepoRequestsUIJSONSerializer()
 
         @property
         def serialize_object_list(self):
-            return self.__get_instance().serialize_object_list
+            return self.__instance.serialize_object_list
 
         @property
         def serialize_object(self):
-            return self.__get_instance().serialize_object
+            return self.__instance.serialize_object
 
 
     RequestsResourceConfig.response_handlers = {
