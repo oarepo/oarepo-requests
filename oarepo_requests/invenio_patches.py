@@ -1,8 +1,12 @@
+from flask_resources import ResponseHandler, JSONSerializer
+from invenio_records_resources.resources.records.headers import etag_headers
 from invenio_records_resources.services.records.params import FilterParam
 from invenio_requests.resources.requests.config import RequestSearchRequestArgsSchema, RequestsResourceConfig
 from invenio_requests.services.requests.config import RequestSearchOptions, RequestsServiceConfig
 from marshmallow import fields
 from opensearch_dsl.query import Bool, Term
+
+from oarepo_requests.resources.ui import OARepoRequestsUIJSONSerializer
 
 
 class RequestOwnerFilterParam(FilterParam):
@@ -44,7 +48,13 @@ class ExtendedRequestSearchRequestArgsSchema(RequestSearchRequestArgsSchema):
     assigned = fields.Boolean()
 
 
-def override_invenio_request_search_options(*args, **kwargs):
-    # this monkey patch should be done better
+def override_invenio_requests_config(*args, **kwargs):
+    # this monkey patch should be done better (support from invenio)
     RequestsServiceConfig.search = EnhancedRequestSearchOptions
     RequestsResourceConfig.request_search_args = ExtendedRequestSearchRequestArgsSchema
+    RequestsResourceConfig.response_handlers = {
+        "application/json": ResponseHandler(JSONSerializer(), headers=etag_headers),
+        "application/vnd.inveniordm.v1+json": ResponseHandler(
+            OARepoRequestsUIJSONSerializer()
+        ),
+    }
