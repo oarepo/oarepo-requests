@@ -46,7 +46,9 @@ class OARepoRequestsService(RequestsService):
                 expand=expand,
                 uow=uow,
             )
-            uow.register(IndexRefreshOp(indexer=self.indexer, index=self.record_cls.index))
+            uow.register(
+                IndexRefreshOp(indexer=self.indexer, index=self.record_cls.index)
+            )
             return result
 
     def read(self, identity, id_, expand=False):

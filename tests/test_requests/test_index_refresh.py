@@ -28,21 +28,7 @@ def test_search(
 
     link = link_api2testclient(requests_search["hits"]["hits"][0]["links"]["self"])
     extended_link = link.replace("/requests/", "/requests/extended/")
-    # todo the non-extended link is probably in race condition between the new and invenio resource
-    """
-    update = logged_client_request(
-        creator,
-        "put",
-        link,
-        json={"title": "lalala"},
-    )
 
-    requests_search = logged_client_request(
-        creator, "get", urls["BASE_URL_REQUESTS"]
-    ).json
-
-    assert requests_search["hits"]["hits"][0]["title"] == "lalala"
-    """
     update = logged_client_request(
         creator,
         "put",
