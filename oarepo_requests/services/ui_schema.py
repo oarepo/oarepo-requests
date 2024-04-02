@@ -36,12 +36,12 @@ class UIReferenceSchema(ma.Schema):
                 return entity_resolvers[reference_type](self.context["identity"], data)
             else:
                 # TODO log warning
-                return fallback_entity_reference_ui_resolver(self.context["identity"], data)
+                return fallback_entity_reference_ui_resolver(
+                    self.context["identity"], data
+                )
         except PIDDeletedError:
-            return {
-                **data,
-                "status": "removed"
-            }
+            return {**data, "status": "removed"}
+
 
 class UIRequestSchemaMixin:
     created = LocalizedDateTime(dump_only=True)

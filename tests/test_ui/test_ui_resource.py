@@ -42,7 +42,7 @@ def test_record_delete_request_present(
         data = json.loads(c.text)
         assert len(data["creatable_request_types"]) == 2
         assert data["creatable_request_types"]["thesis_edit_record"] == {
-            "description": 'Request re-opening of published record',
+            "description": "Request re-opening of published record",
             "links": {
                 "actions": {
                     "create": f"https://127.0.0.1:5000/api/thesis/{example_topic['id']}/requests/thesis_edit_record"

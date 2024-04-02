@@ -4,6 +4,7 @@ def create_oarepo_requests(app):
     blueprint = ext.requests_resource.as_blueprint()
 
     from oarepo_requests.invenio_patches import override_invenio_requests_config
+
     blueprint.record_once(override_invenio_requests_config)
 
     return blueprint

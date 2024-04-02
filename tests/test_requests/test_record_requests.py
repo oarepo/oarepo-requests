@@ -64,9 +64,9 @@ def test_read_requests_on_record(
 ):
     creator_client = logged_clients[0]
     receiver = users[1]
-    record1 = record_factory()
-    record2 = record_factory()
-    record3 = record_factory()
+    record1 = record_factory(identity_simple)
+    record2 = record_factory(identity_simple)
+    record3 = record_factory(identity_simple)
     ThesisRecord.index.refresh()
     ThesisDraft.index.refresh()
     r1 = creator_client.post(
