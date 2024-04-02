@@ -46,7 +46,7 @@ class OARepoRequestsService(RequestsService):
                 expand=expand,
                 uow=uow,
             )
-            uow.register(IndexRefreshOp(indexer=self.indexer))
+            uow.register(IndexRefreshOp(indexer=self.indexer, index=self.record_cls.index))
             return result
 
     def read(self, identity, id_, expand=False):
@@ -58,5 +58,5 @@ class OARepoRequestsService(RequestsService):
         result = super().update(
             identity, id_, data, revision_id=revision_id, uow=uow, expand=expand
         )
-        uow.register(IndexRefreshOp(indexer=self.indexer))
+        uow.register(IndexRefreshOp(indexer=self.indexer, index=self.record_cls.index))
         return result
