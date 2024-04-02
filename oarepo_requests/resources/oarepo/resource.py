@@ -100,8 +100,5 @@ class OARepoRequestsResource(RequestsResource, ErrorHandlersMixin):
     def create_extended(self):
         return self._create()
 
-    def update(self):
-        return self._update_with_refresh()
-
     def update_extended(self):
         return self._update_with_refresh()
