@@ -1,4 +1,4 @@
-from invenio_records_resources.services.uow import unit_of_work
+from invenio_records_resources.services.uow import IndexRefreshOp, unit_of_work
 from invenio_requests import current_request_type_registry
 from invenio_requests.services import RequestsService
 
@@ -36,7 +36,7 @@ class OARepoRequestsService(RequestsService):
         else:
             error = None
         if not error:
-            return super().create(
+            result = super().create(
                 identity=identity,
                 data=data,
                 request_type=type_,
@@ -46,7 +46,17 @@ class OARepoRequestsService(RequestsService):
                 expand=expand,
                 uow=uow,
             )
+            uow.register(IndexRefreshOp(indexer=self.indexer))
+            return result
 
     def read(self, identity, id_, expand=False):
         api_request = super().read(identity, id_, expand)
         return api_request
+
+    @unit_of_work()
+    def update(self, identity, id_, data, revision_id=None, uow=None, expand=False):
+        result = super().update(
+            identity, id_, data, revision_id=revision_id, uow=uow, expand=expand
+        )
+        uow.register(IndexRefreshOp(indexer=self.indexer))
+        return result
