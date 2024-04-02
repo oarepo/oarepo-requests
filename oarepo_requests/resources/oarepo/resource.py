@@ -32,27 +32,27 @@ class OARepoRequestsResource(RequestsResource, ErrorHandlersMixin):
             """Prefix a route with the URL prefix."""
             return f"{self.config.url_prefix}{route}"
 
-        def s(route):
-            """Suffix a route with the URL prefix."""
-            return f"{route}{self.config.url_prefix}"
-
-        base_rules = super().create_url_rules()
         routes = self.config.routes
 
         url_rules = [
             route("POST", p(routes["list"]), self.create),
-            route("POST", p(routes["list-extended"]), self.create_extended),
+            route(
+                "POST",
+                p(routes["list-extended"]),
+                self.create,
+                endpoint="extended_create",
+            ),
             route("GET", p(routes["item-extended"]), self.read_extended),
-            route("PUT", p(routes["item-extended"]), self.update_extended),
+            route("PUT", p(routes["item-extended"]), self.update),
         ]
-        return url_rules + base_rules
+        return url_rules
 
     @request_extra_args
     @request_headers
     @request_view_args
     @request_data
     @response_handler()
-    def _update_with_refresh(self):
+    def update(self):
         item = self.oarepo_requests_service.update(
             id_=resource_requestctx.view_args["id"],
             identity=g.identity,
@@ -66,7 +66,7 @@ class OARepoRequestsResource(RequestsResource, ErrorHandlersMixin):
     @request_headers
     @request_data
     @response_handler()
-    def _create(self):
+    def create(self):
 
         items = self.oarepo_requests_service.create(
             identity=g.identity,
@@ -93,12 +93,3 @@ class OARepoRequestsResource(RequestsResource, ErrorHandlersMixin):
             expand=resource_requestctx.args.get("expand", False),
         )
         return item.to_dict(), 200
-
-    def create(self):
-        return self._create()
-
-    def create_extended(self):
-        return self._create()
-
-    def update_extended(self):
-        return self._update_with_refresh()
