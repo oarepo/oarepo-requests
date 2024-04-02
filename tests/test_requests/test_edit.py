@@ -13,7 +13,7 @@ def test_edit_autoaccept(
     search_clear,
 ):
     creator = users[0]
-    record1 = record_factory()
+    record1 = record_factory(identity_simple)
 
     resp_request_create = logged_client_request(
         creator,
