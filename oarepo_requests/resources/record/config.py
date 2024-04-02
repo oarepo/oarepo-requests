@@ -1,5 +1,5 @@
 import marshmallow as ma
-from flask_resources import ResponseHandler, JSONSerializer
+from flask_resources import JSONSerializer, ResponseHandler
 from invenio_records_resources.resources import RecordResourceConfig
 from invenio_records_resources.resources.records.headers import etag_headers
 
@@ -21,5 +21,5 @@ class RecordRequestsResourceConfig:
             "application/vnd.inveniordm.v1+json": ResponseHandler(
                 OARepoRequestsUIJSONSerializer()
             ),
-            "application/json": ResponseHandler(JSONSerializer(), headers=etag_headers)
+            "application/json": ResponseHandler(JSONSerializer(), headers=etag_headers),
         }

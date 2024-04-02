@@ -1,10 +1,16 @@
 from functools import cached_property
 
-from flask_resources import ResponseHandler, JSONSerializer
+from flask_resources import JSONSerializer, ResponseHandler
 from invenio_records_resources.resources.records.headers import etag_headers
 from invenio_records_resources.services.records.params import FilterParam
-from invenio_requests.resources.requests.config import RequestSearchRequestArgsSchema, RequestsResourceConfig
-from invenio_requests.services.requests.config import RequestSearchOptions, RequestsServiceConfig
+from invenio_requests.resources.requests.config import (
+    RequestSearchRequestArgsSchema,
+    RequestsResourceConfig,
+)
+from invenio_requests.services.requests.config import (
+    RequestSearchOptions,
+    RequestsServiceConfig,
+)
 from marshmallow import fields
 from opensearch_dsl.query import Bool, Term
 
@@ -22,26 +28,30 @@ class RequestOwnerFilterParam(FilterParam):
 class RequestReceiverFilterParam(FilterParam):
     def apply(self, identity, search, params):
         value = params.pop(self.param_name, None)
-        my_groups = [
-            n.value for n in identity.provides if n.method == 'role'
-        ]
+        my_groups = [n.value for n in identity.provides if n.method == "role"]
         if value is not None:
-            search = search.filter(Bool(should=[
-                # explicitly myself
-                Term(**{f"{self.field_name}.user": identity.id}),
-                # my roles
-                *[
-                    Term(**{f"{self.field_name}.group": group_id}) for group_id in my_groups
-                ],
-                # TODO: add my communities where I have a role to accept requests
-            ], minimum_should_match=1))
+            search = search.filter(
+                Bool(
+                    should=[
+                        # explicitly myself
+                        Term(**{f"{self.field_name}.user": identity.id}),
+                        # my roles
+                        *[
+                            Term(**{f"{self.field_name}.group": group_id})
+                            for group_id in my_groups
+                        ],
+                        # TODO: add my communities where I have a role to accept requests
+                    ],
+                    minimum_should_match=1,
+                )
+            )
         return search
 
 
 class EnhancedRequestSearchOptions(RequestSearchOptions):
     params_interpreters_cls = RequestSearchOptions.params_interpreters_cls + [
         RequestOwnerFilterParam.factory("mine", "created_by.user"),
-        RequestReceiverFilterParam.factory("assigned", "receiver")
+        RequestReceiverFilterParam.factory("assigned", "receiver"),
     ]
 
 
@@ -68,10 +78,7 @@ def override_invenio_requests_config(*args, **kwargs):
         def serialize_object(self):
             return self.__instance.serialize_object
 
-
     RequestsResourceConfig.response_handlers = {
-            "application/json": ResponseHandler(JSONSerializer(), headers=etag_headers),
-            "application/vnd.inveniordm.v1+json": ResponseHandler(
-                LazySerializer()
-            )
-        }
+        "application/json": ResponseHandler(JSONSerializer(), headers=etag_headers),
+        "application/vnd.inveniordm.v1+json": ResponseHandler(LazySerializer()),
+    }
