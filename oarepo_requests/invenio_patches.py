@@ -101,4 +101,4 @@ def override_invenio_requests_config(blueprint, *args, **kwargs):
         type._value_labels = {
             rt.type_id: rt.name for rt in iter(current_request_type_registry)
         }
-        type._label = _("Type"),
+        type._label = _("Type")
