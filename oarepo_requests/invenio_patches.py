@@ -60,25 +60,45 @@ class ExtendedRequestSearchRequestArgsSchema(RequestSearchRequestArgsSchema):
     assigned = fields.Boolean()
 
 
-def override_invenio_requests_config(*args, **kwargs):
-    # this monkey patch should be done better (support from invenio)
-    RequestsServiceConfig.search = EnhancedRequestSearchOptions
-    RequestsResourceConfig.request_search_args = ExtendedRequestSearchRequestArgsSchema
+def override_invenio_requests_config(blueprint, *args, **kwargs):
+    with blueprint.app.app_context():
+        # this monkey patch should be done better (support from invenio)
+        RequestsServiceConfig.search = EnhancedRequestSearchOptions
+        RequestsResourceConfig.request_search_args = ExtendedRequestSearchRequestArgsSchema
 
-    class LazySerializer:
-        @cached_property
-        def __instance(self):
-            return OARepoRequestsUIJSONSerializer()
+        class LazySerializer:
+            @cached_property
+            def __instance(self):
+                return OARepoRequestsUIJSONSerializer()
 
-        @property
-        def serialize_object_list(self):
-            return self.__instance.serialize_object_list
+            @property
+            def serialize_object_list(self):
+                return self.__instance.serialize_object_list
 
-        @property
-        def serialize_object(self):
-            return self.__instance.serialize_object
+            @property
+            def serialize_object(self):
+                return self.__instance.serialize_object
 
-    RequestsResourceConfig.response_handlers = {
-        "application/json": ResponseHandler(JSONSerializer(), headers=etag_headers),
-        "application/vnd.inveniordm.v1+json": ResponseHandler(LazySerializer()),
-    }
+        RequestsResourceConfig.response_handlers = {
+            "application/json": ResponseHandler(JSONSerializer(), headers=etag_headers),
+            "application/vnd.inveniordm.v1+json": ResponseHandler(LazySerializer()),
+        }
+
+        from invenio_requests.services.requests.facets import type, status
+        from oarepo_runtime.i18n import lazy_gettext as _
+        from invenio_requests.proxies import current_request_type_registry
+
+        status._value_labels = {
+            "submitted": _("Submitted"),
+            "expired": _("Expired"),
+            "accepted": _("Accepted"),
+            "declined": _("Declined"),
+            "cancelled": _("Cancelled"),
+        }
+        status._label = _("Status")
+
+        # add extra request types dynamically
+        type._value_labels = {
+            rt.type_id: rt.name for rt in iter(current_request_type_registry)
+        }
+        type._label = _("Type"),
