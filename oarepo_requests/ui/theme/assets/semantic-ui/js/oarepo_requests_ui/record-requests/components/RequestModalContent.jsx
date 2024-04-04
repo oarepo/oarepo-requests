@@ -126,7 +126,7 @@ export const RequestModalContent = ({ request, requestType, requestModalType, fe
                               <Comment.Content>
                                 <Comment.Author as="a" href={event.created_by?.link}>{event.created_by.label}</Comment.Author>
                                 <Comment.Metadata>
-                                  <div>{new Date(event?.created)?.toLocaleString("cs-CZ")}</div>
+                                  <div>{event?.created}</div>
                                 </Comment.Metadata>
                                 <Comment.Text>
                                   <ReadOnlyCustomFields
