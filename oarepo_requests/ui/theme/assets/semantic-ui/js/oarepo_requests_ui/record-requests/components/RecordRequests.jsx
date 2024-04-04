@@ -2,6 +2,8 @@ import React, { useEffect, useState } from "react";
 import PropTypes from "prop-types";
 
 import axios from "axios";
+import { i18next } from "@translations/oarepo_requests_ui/i18next";
+import { Loader, Dimmer } from "semantic-ui-react";
 import _isEmpty from "lodash/isEmpty";
 
 import { CreateRequestButtonGroup, RequestListContainer } from ".";
@@ -17,10 +19,13 @@ export const RecordRequests = ({ record }) => {
   /** @type {RequestType[]} */
   const requestTypes = record?.request_types ?? [];
 
+  const [isLoading, setIsLoading] = useState(true);
+
   const [requests, setRequests] = useState(sortByStatusCode(record?.requests ?? []) ?? []);
   const requestsSetter = React.useCallback(newRequests => setRequests(newRequests), [])
 
   useEffect(() => {
+    setIsLoading(true);
     axios({
       method: 'get',
       url: record.links?.requests,
@@ -34,7 +39,11 @@ export const RecordRequests = ({ record }) => {
       })
       .catch(error => {
         console.log(error);
+      })
+      .finally(() => {
+        setIsLoading(false);
       });
+    return () => setIsLoading(false);
   }, []);
 
   return (
@@ -43,9 +52,7 @@ export const RecordRequests = ({ record }) => {
         {!_isEmpty(requestTypes) && (
           <CreateRequestButtonGroup requestTypes={requestTypes} />
         )}
-        {!_isEmpty(requests) && (
-          <RequestListContainer requestTypes={requestTypes} />
-        )}
+        <RequestListContainer requestTypes={requestTypes} isLoading={isLoading} />
       </RequestContextProvider>
     </RecordContextProvider>
   );
