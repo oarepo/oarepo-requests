@@ -41,8 +41,7 @@ const fetchUpdated = async (url, setter) => {
     }
   })
     .then(response => {
-      console.log(response);
-      setter(response.data?.hits?.hits);
+      setter(response.data);
     })
     .catch(error => {
       console.log(error);
@@ -68,7 +67,7 @@ export const RequestModal = ({ request, requestTypes, requestModalType, isEventM
 
   /** @type {[Request[], (requests: Request[]) => void]} */
   const { setRequests } = useContext(RequestContext);
-  const record = useContext(RecordContext);
+  const { record, setRecord } = useContext(RecordContext);
 
   const formik = useFormik({
     initialValues: !_isEmpty(request?.payload) ? { payload: request.payload } : (request?.payload_ui ? mapPayloadUiToInitialValues(request?.payload_ui) : {}),
@@ -80,6 +79,13 @@ export const RequestModal = ({ request, requestTypes, requestModalType, isEventM
       errorMessageRef.current?.scrollIntoView({ behavior: "smooth" });
     }
   }, [error]);
+
+  const fetchUpdatedRequests = async () => {
+    return Promise.allSettled([
+      fetchUpdated(record.links?.self, (responseData) => { setRecord(responseData); }),
+      fetchUpdated(record.links?.requests, (responseData) => { setRequests(sortByStatusCode(responseData?.hits?.hits)); })
+    ]);
+  }
 
   const callApi = async (url, method, data = formik.values, doNotHandleResolve = false) => {
     if (_isEmpty(url)) {
@@ -106,7 +112,7 @@ export const RequestModal = ({ request, requestTypes, requestModalType, isEventM
     })
       .then(response => {
         console.log(response);
-        fetchUpdated(record.links?.requests, (requests) => { setRequests(sortByStatusCode(requests)); });
+        fetchUpdatedRequests();
         setModalOpen(false);
         formik.resetForm();
       })
@@ -123,7 +129,7 @@ export const RequestModal = ({ request, requestTypes, requestModalType, isEventM
     try {
       const createdRequest = await callApi(request.links.actions?.create, 'post', formik.values, true);
       await callApi(createdRequest.data?.links?.actions?.submit, 'post', {}, true);
-      fetchUpdated(record.links?.requests, (requests) => { setRequests(sortByStatusCode(requests)); });
+      fetchUpdatedRequests();
       setModalOpen(false);
       formik.resetForm();
     } catch (error) {

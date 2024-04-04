@@ -30,10 +30,10 @@ export const RequestModalContent = ({ request, requestType, requestModalType, fe
 
   useEffect(() => {
     if (!_isEmpty(request.links?.events)) {
-      fetchNewEvents(request.links.events, (events) => {
+      fetchNewEvents(request.links.events, (responseData) => {
         setRequests(requests => requests.map(req => {
           if (req.id === request.id) {
-            req.events = events;
+            req.events = responseData?.hits?.hits ?? [];
           }
           return req;
         }));

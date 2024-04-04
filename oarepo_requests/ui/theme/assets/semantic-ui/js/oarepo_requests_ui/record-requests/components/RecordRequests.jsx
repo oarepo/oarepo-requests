@@ -17,6 +17,8 @@ export const RecordRequests = ({ record: initialRecord }) => {
 
   const [record, setRecord] = useState(initialRecord);
   const [requests, setRequests] = useState(sortByStatusCode(record?.requests ?? []) ?? []);
+
+  const recordSetter = useCallback(newRecord => setRecord(newRecord), [])
   const requestsSetter = useCallback(newRequests => setRequests(newRequests), [])
 
   useEffect(() => {
@@ -66,7 +68,7 @@ export const RecordRequests = ({ record: initialRecord }) => {
   }, []);
 
   return (
-    <RecordContextProvider record={record}>
+    <RecordContextProvider record={{record, setRecord: recordSetter}}>
       <RequestContextProvider requests={{ requests, setRequests: requestsSetter }}>
         <CreateRequestButtonGroup requestTypes={record?.request_types ?? []} isLoading={recordLoading} loadingError={recordLoadingError} />
         <RequestListContainer requestTypes={record?.request_types ?? []} isLoading={requestsLoading} loadingError={requestsLoadingError} />
