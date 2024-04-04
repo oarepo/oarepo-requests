@@ -140,3 +140,7 @@ def stringify_first_val(dct):
         for k, v in dct.items():
             dct[k] = str(v)
     return dct
+
+
+def reference_to_tuple(reference):
+    return (list(reference.keys())[0], list(reference.values())[0])

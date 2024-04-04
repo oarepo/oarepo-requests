@@ -3,64 +3,62 @@ from collections import defaultdict
 from flask import g
 from flask_resources import BaseListSchema
 from flask_resources.serializers import JSONSerializer
-from invenio_records_resources.resources.errors import PermissionDeniedError
-from invenio_search.engine import dsl
-from invenio_users_resources.proxies import (
-    current_groups_service,
-    current_users_service,
-)
 from oarepo_runtime.resources import LocalizedUIJSONSerializer
 
+from ..proxies import current_oarepo_requests
+from ..resolvers.ui import resolve
 from ..services.ui_schema import UIBaseRequestSchema
-from ..utils import get_matching_service_for_refdict
+from ..utils import reference_to_tuple
 
 
-def groups_search(identity, reference_type, values, *args, **kwargs):
-    result = []
-    for user in values:
-        try:
-            user = current_groups_service.read(identity, user)
-            result.append(user)
-        except PermissionDeniedError:
-            pass
-    return result
+def _reference_map_from_list(obj_list):
+    if not obj_list:
+        return {}
+    hits = obj_list["hits"]["hits"]
+    reference_map = defaultdict(set)
+    reference_types = current_oarepo_requests.ui_serialization_referenced_fields
+    for hit in hits:
+        for reference_type in reference_types:
+            if reference_type in hit:
+                reference = hit[reference_type]
+                reference_map[list(reference.keys())[0]].add(
+                    list(reference.values())[0]
+                )
+    return reference_map
 
 
-def users_search(identity, reference_type, values, *args, **kwargs):
-    result = []
-    for user in values:
-        try:
-            user = current_users_service.read(identity, user)
-            result.append(user)
-        except PermissionDeniedError:
-            pass
-    return result
+def _create_cache(identity, reference_map):
+    cache = {}
+    entity_resolvers = current_oarepo_requests.entity_reference_ui_resolvers
+    for reference_type, values in reference_map.items():
+        if reference_type in entity_resolvers:
+            resolver = entity_resolvers[reference_type]
+            results = resolver.resolve_many(identity, values)
+            # we are expecting "reference" in results
+            cache_for_type = {
+                reference_to_tuple(result["reference"]): result for result in results
+            }
+            cache |= cache_for_type
+    return cache
 
 
-def drafts_search(identity, reference_type, values, *args, **kwargs):
-    service = get_matching_service_for_refdict({reference_type: list(values)[0]})
-    # service.draft_cls.index.refresh()
-    filter = dsl.Q("terms", **{"id": list(values)})
-    return list(service.search_drafts(identity, extra_filter=filter).hits)
+class CachedReferenceResolver:
+    def __init__(self, identity, references):
+        reference_map = _reference_map_from_list(references)
+        self._cache = _create_cache(identity, reference_map)
+        self._identity = identity
 
-
-def records_search(identity, reference_type, values, *args, **kwargs):
-    service = get_matching_service_for_refdict({reference_type: list(values)[0]})
-    # service.record_cls.index.refresh()
-    filter = dsl.Q("terms", **{"id": list(values)})
-    return list(service.search(identity, extra_filter=filter).hits)
-
-
-BULK_SEARCHES = {
-    "user": users_search,
-    # "group": groups_search,
-    "documents_draft": drafts_search,
-    "documents": records_search,
-    "thesis_draft": drafts_search,
-    "thesis": records_search,
-}
-
-REFERENCE_TYPES = {"created_by", "receiver", "topic"}
+    def dereference(self, reference, **kwargs):
+        key = reference_to_tuple(reference)
+        if key in self._cache:
+            return self._cache[key]
+        else:
+            return resolve(self._identity, reference)
+            # todo move to ma? ---
+            """
+            except PIDDeletedError:
+                return {**data, "status": "removed"}
+            """
 
 
 class OARepoRequestsUIJSONSerializer(LocalizedUIJSONSerializer):
@@ -85,39 +83,17 @@ class OARepoRequestsUIJSONSerializer(LocalizedUIJSONSerializer):
                 )
         return reference_map
 
-    def _reference_map_from_list(self, obj_list):
-        hits = obj_list["hits"]["hits"]
-        reference_map = defaultdict(set)
-        for hit in hits:
-            for reference_type in REFERENCE_TYPES:
-                if reference_type in hit:
-                    reference = hit[reference_type]
-                    reference_map[list(reference.keys())[0]].add(
-                        list(reference.values())[0]
-                    )
-        return reference_map
-
-    def _get_resolved_map(self, reference_map, ctx):
-        resolved_map = {}
-        for reference_type, values in reference_map.items():
-            if reference_type in BULK_SEARCHES:
-                search_method = BULK_SEARCHES[reference_type]
-                result = search_method(ctx["identity"], reference_type, values)
-                resolved_map[reference_type] = result
-        return resolved_map
-
     def dump_obj(self, obj, *args, **kwargs):
+        # do not create; there's no benefit for caching single objects now
         extra_context = {
-            "resolved": self._get_resolved_map(
-                self._reference_map_from_object(obj), self.schema_context
-            )
+            "resolved": CachedReferenceResolver(self.schema_context["identity"], [])
         }
         return super().dump_obj(obj, *args, extra_context=extra_context, **kwargs)
 
     def dump_list(self, obj_list, *args, **kwargs):
         extra_context = {
-            "resolved": self._get_resolved_map(
-                self._reference_map_from_list(obj_list), self.schema_context
+            "resolved": CachedReferenceResolver(
+                self.schema_context["identity"], obj_list
             )
         }
         return super().dump_list(obj_list, *args, extra_context=extra_context, **kwargs)
