@@ -87,7 +87,12 @@ def ui_serialization_result():
     def _result(topic_id, request_id):
         return {
             # 'created': '2024-01-26T10:06:17.945916',
-            "created_by": {'label': 'user1@example.org', 'link': 'https://127.0.0.1:5000/api/users/1', 'reference': {'user': '1'}, 'type': 'user'},
+            "created_by": {
+                "label": "user1@example.org",
+                "link": "https://127.0.0.1:5000/api/users/1",
+                "reference": {"user": "1"},
+                "type": "user",
+            },
             "description": "Request publishing of a draft",
             "expires_at": None,
             "id": request_id,
@@ -103,7 +108,7 @@ def ui_serialization_result():
                 "timeline": f"https://127.0.0.1:5000/api/requests/extended/{request_id}/timeline",
             },
             "number": "1",
-            "receiver": {'label': 'id: 2', 'reference': {'user': '2'}, 'type': 'user'},
+            "receiver": {"label": "id: 2", "reference": {"user": "2"}, "type": "user"},
             "revision_id": 3,
             "status": "Submitted",
             "title": "",

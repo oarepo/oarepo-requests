@@ -1,5 +1,3 @@
-from invenio_records_resources.resources.errors import PermissionDeniedError
-from invenio_users_resources.proxies import current_users_service
 
 from oarepo_requests.utils import get_matching_service_for_refdict
 
@@ -25,11 +23,12 @@ def user_entity_reference_ui_resolver(identity, data, ctx):
     ref_key = list(reference.keys())[0]
     id = reference["user"]
 
-    by_id = [resolved for resolved in ctx["resolved"][ref_key] if resolved.data["id"] == id]
+    by_id = [
+        resolved for resolved in ctx["resolved"][ref_key] if resolved.data["id"] == id
+    ]
     if not by_id:
         return fallback_result(reference)
     record = by_id[0]
-
 
     """
     try:
@@ -114,8 +113,12 @@ def fallback_entity_reference_ui_resolver(identity, data, ctx):
 
 
 def record_entity_reference_ui_resolver(identity, data, ctx):
-    return _record_entity_reference_ui_resolver_inner(identity, data, ctx, is_draft=False)
+    return _record_entity_reference_ui_resolver_inner(
+        identity, data, ctx, is_draft=False
+    )
 
 
 def draft_record_entity_reference_ui_resolver(identity, data, ctx):
-    return _record_entity_reference_ui_resolver_inner(identity, data, ctx, is_draft=True)
+    return _record_entity_reference_ui_resolver_inner(
+        identity, data, ctx, is_draft=True
+    )

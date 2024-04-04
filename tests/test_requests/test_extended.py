@@ -1,7 +1,8 @@
 from invenio_requests.records.api import RequestEvent
-
 from thesis.records.api import ThesisDraft
+
 from .utils import is_valid_subdict, link_api2testclient
+
 
 def test_listing(
     logged_client_request,
@@ -30,8 +31,12 @@ def test_listing(
         json=publish_request_data_function(draft2.json["id"]),
     )
     ThesisDraft.index.refresh()
-    search = logged_client_request(creator, "get", urls["BASE_URL_REQUESTS"], headers={"Accept": "application/vnd.inveniordm.v1+json"})
-
+    search = logged_client_request(
+        creator,
+        "get",
+        urls["BASE_URL_REQUESTS"],
+        headers={"Accept": "application/vnd.inveniordm.v1+json"},
+    )
 
 
 def test_read_extended(
@@ -49,21 +54,29 @@ def test_read_extended(
     draft1 = logged_client_request(creator, "post", urls["BASE_URL"], json={})
     draft_id = draft1.json["id"]
 
-    resp_request_create = logged_client_request(creator, "post",
+    resp_request_create = logged_client_request(
+        creator,
+        "post",
         urls["BASE_URL_REQUESTS"],
         json=publish_request_data_function(draft_id),
     )
-    resp_request_submit = logged_client_request(creator, "post",
-        link_api2testclient(resp_request_create.json["links"]["actions"]["submit"])
+    resp_request_submit = logged_client_request(
+        creator,
+        "post",
+        link_api2testclient(resp_request_create.json["links"]["actions"]["submit"]),
     )
 
-    old_call = logged_client_request(creator, "get",
-        f"{urls['BASE_URL_REQUESTS']}{resp_request_create.json['id']}"
+    old_call = logged_client_request(
+        creator, "get", f"{urls['BASE_URL_REQUESTS']}{resp_request_create.json['id']}"
     )
-    new_call = logged_client_request(creator, "get",
-        f"{urls['BASE_URL_REQUESTS']}extended/{resp_request_create.json['id']}"
+    new_call = logged_client_request(
+        creator,
+        "get",
+        f"{urls['BASE_URL_REQUESTS']}extended/{resp_request_create.json['id']}",
     )
-    new_call2 = logged_client_request(creator, "get",
+    new_call2 = logged_client_request(
+        creator,
+        "get",
         f"{urls['BASE_URL_REQUESTS']}extended/{resp_request_create.json['id']}",
         headers={"Accept": "application/vnd.inveniordm.v1+json"},
     )
@@ -73,9 +86,7 @@ def test_read_extended(
         new_call.json,
     )
     assert is_valid_subdict(
-        ui_serialization_result(
-            draft_id, resp_request_create.json["id"]
-        ),
+        ui_serialization_result(draft_id, resp_request_create.json["id"]),
         new_call2.json,
     )
 
