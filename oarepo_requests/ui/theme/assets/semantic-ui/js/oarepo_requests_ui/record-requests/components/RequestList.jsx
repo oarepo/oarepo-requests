@@ -18,7 +18,7 @@ import { RequestModal } from ".";
  */
 export const RequestList = ({ requests, requestTypes, requestModalType }) => {
   return (
-    <List link divided relaxed>
+    <List link divided relaxed size="small">
       {requests.map((request) => {
         let modalType = requestModalType;
         if (_isEmpty(requestModalType)) {
@@ -36,13 +36,13 @@ export const RequestList = ({ requests, requestTypes, requestModalType }) => {
           <RequestModal key={request.id} request={request} requestTypes={requestTypes} requestModalType={modalType}
             triggerButton={
               <List.Item as="a" key={request.id}>
-                <List.Content floated="right" verticalAlign="middle">
+                <List.Content floated="right" verticalAlign="middle" style={{ fontSize: "0.8rem" }}>
                   <div style={{ textAlign: "right" }}>{request?.status ?? i18next.t("No status")}</div>
                   {request?.created && <div>{request.created}</div>}
                 </List.Content>
-                <List.Content>
-                  <List.Header>{!_isEmpty(request?.title) ? request.title : (!_isEmpty(request?.name) ? request.name : request.type)}</List.Header>
-                  <List.Description>{_truncate(request.description, { length: 30 })}</List.Description>
+                <List.Content style={{ lineHeight: "1.3rem" }}>
+                  <List.Header style={{ fontWeight: 500 }}>{!_isEmpty(request?.title) ? request.title : (!_isEmpty(request?.name) ? request.name : request.type)}</List.Header>
+                  <List.Description style={{ fontSize: "0.9rem" }}>{_truncate(request.description, { length: 30 })}</List.Description>
                 </List.Content>
               </List.Item>
             }
