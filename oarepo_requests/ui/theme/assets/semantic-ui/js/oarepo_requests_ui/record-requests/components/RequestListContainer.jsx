@@ -1,7 +1,7 @@
 import React, { useContext } from "react";
 
 import { i18next } from "@translations/oarepo_requests_ui/i18next";
-import { Segment, SegmentGroup, Header, Dimmer, Loader, Placeholder } from "semantic-ui-react";
+import { Segment, SegmentGroup, Header, Dimmer, Loader, Placeholder, Message } from "semantic-ui-react";
 import _isEmpty from "lodash/isEmpty";
 
 import { RequestList } from ".";
@@ -14,7 +14,7 @@ import { RequestContext } from "../contexts";
 /**
  * @param {{ requestTypes: RequestType[], isLoading: boolean }} props
  */
-export const RequestListContainer = ({ requestTypes, isLoading }) => {
+export const RequestListContainer = ({ requestTypes, isLoading, loadingError }) => {
   const { requests } = useContext(RequestContext);
 
   let requestsToApprove = [];
@@ -32,7 +32,7 @@ export const RequestListContainer = ({ requestTypes, isLoading }) => {
   return (
     <SegmentGroupOrEmpty>
       <Segment className="requests-my-requests">
-        <Header size="small" className="detail-sidebar-header">{!isLoading ? i18next.t("My Requests") : i18next.t("Requests")}</Header>
+        <Header size="small" className="detail-sidebar-header">{(!isLoading && !loadingError) ? i18next.t("My Requests") : i18next.t("Requests")}</Header>
         <Dimmer.Dimmable dimmed={isLoading}>
           <Dimmer active={isLoading} inverted>
             <Loader indeterminate>{i18next.t("Loading requests")}...</Loader>
@@ -46,7 +46,12 @@ export const RequestListContainer = ({ requestTypes, isLoading }) => {
               </Placeholder.Paragraph>
             ))}
           </Placeholder> :
-            !_isEmpty(otherRequests) ? <RequestList requests={otherRequests} requestTypes={requestTypes} /> : <p>{i18next.t("No requests to show")}.</p>
+            loadingError ?
+              <Message negative>
+                <Message.Header>{i18next.t("Error loading requests")}</Message.Header>
+                <p>{loadingError?.message}</p>
+              </Message> :
+              !_isEmpty(otherRequests) ? <RequestList requests={otherRequests} requestTypes={requestTypes} /> : <p>{i18next.t("No requests to show")}.</p>
           }
         </Dimmer.Dimmable>
       </Segment>

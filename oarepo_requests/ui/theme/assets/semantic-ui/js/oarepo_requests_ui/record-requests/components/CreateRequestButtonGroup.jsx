@@ -2,7 +2,7 @@ import React from "react";
 
 import { i18next } from "@translations/oarepo_requests_ui/i18next";
 
-import { Segment, Header, Button, Dimmer, Loader, Placeholder } from "semantic-ui-react";
+import { Segment, Header, Button, Dimmer, Loader, Placeholder, Message } from "semantic-ui-react";
 
 import { RequestModal } from "./RequestModal";
 
@@ -14,7 +14,7 @@ import { RequestModal } from "./RequestModal";
 /**
  * @param {{ requestTypes: RequestType[], isLoading: boolean }} props
  */
-export const CreateRequestButtonGroup = ({ requestTypes, isLoading }) => {
+export const CreateRequestButtonGroup = ({ requestTypes, isLoading, loadingError }) => {
   const createRequests = requestTypes.filter(requestType => requestType.links.actions?.create);
 
   return (
@@ -33,16 +33,21 @@ export const CreateRequestButtonGroup = ({ requestTypes, isLoading }) => {
             </Placeholder.Paragraph>
           ))}
         </Placeholder> :
-          <Button.Group vertical compact fluid>
-            {createRequests.map((requestType) => (
-              <RequestModal
-                key={requestType.type_id}
-                request={requestType}
-                requestModalType="create"
-                triggerButton={<Button icon="plus" title={i18next.t(requestType.name)} basic compact content={requestType.name} />}
-              />
-            ))}
-          </Button.Group>
+          loadingError ?
+            <Message negative>
+              <Message.Header>{i18next.t("Error loading request types")}</Message.Header>
+              <p>{loadingError?.message}</p>
+            </Message> :
+            <Button.Group vertical compact fluid>
+              {createRequests.map((requestType) => (
+                <RequestModal
+                  key={requestType.type_id}
+                  request={requestType}
+                  requestModalType="create"
+                  triggerButton={<Button icon="plus" title={i18next.t(requestType.name)} basic compact content={requestType.name} />}
+                />
+              ))}
+            </Button.Group>
         }
       </Dimmer.Dimmable>
     </Segment>

@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useCallback } from "react";
 import PropTypes from "prop-types";
 
 import axios from "axios";
@@ -11,13 +11,17 @@ import { sortByStatusCode } from "../utils";
 export const RecordRequests = ({ record: initialRecord }) => {
   const [recordLoading, setRecordLoading] = useState(true);
   const [requestsLoading, setRequestsLoading] = useState(true);
+  
+  const [recordLoadingError, setRecordLoadingError] = useState(null);
+  const [requestsLoadingError, setRequestsLoadingError] = useState(null);
 
   const [record, setRecord] = useState(initialRecord);
   const [requests, setRequests] = useState(sortByStatusCode(record?.requests ?? []) ?? []);
-  const requestsSetter = React.useCallback(newRequests => setRequests(newRequests), [])
+  const requestsSetter = useCallback(newRequests => setRequests(newRequests), [])
 
   useEffect(() => {
     setRecordLoading(true);
+    setRecordLoadingError(null);
     axios({
       method: 'get',
       url: record.links?.self,
@@ -30,7 +34,7 @@ export const RecordRequests = ({ record: initialRecord }) => {
         setRecord(response.data);
       })
       .catch(error => {
-        console.log(error);
+        setRecordLoadingError(error);
       })
       .finally(() => {
         setRecordLoading(false);
@@ -40,6 +44,7 @@ export const RecordRequests = ({ record: initialRecord }) => {
 
   useEffect(() => {
     setRequestsLoading(true);
+    setRequestsLoadingError(null);
     axios({
       method: 'get',
       url: record.links?.requests,
@@ -52,7 +57,7 @@ export const RecordRequests = ({ record: initialRecord }) => {
         setRequests(sortByStatusCode(response.data?.hits?.hits));
       })
       .catch(error => {
-        console.log(error);
+        setRequestsLoadingError(error);
       })
       .finally(() => {
         setRequestsLoading(false);
@@ -63,8 +68,8 @@ export const RecordRequests = ({ record: initialRecord }) => {
   return (
     <RecordContextProvider record={record}>
       <RequestContextProvider requests={{ requests, setRequests: requestsSetter }}>
-        <CreateRequestButtonGroup requestTypes={record?.request_types ?? []} isLoading={recordLoading} />
-        <RequestListContainer requestTypes={record?.request_types ?? []} isLoading={requestsLoading} />
+        <CreateRequestButtonGroup requestTypes={record?.request_types ?? []} isLoading={recordLoading} loadingError={recordLoadingError} />
+        <RequestListContainer requestTypes={record?.request_types ?? []} isLoading={requestsLoading} loadingError={requestsLoadingError} />
       </RequestContextProvider>
     </RecordContextProvider>
   );
