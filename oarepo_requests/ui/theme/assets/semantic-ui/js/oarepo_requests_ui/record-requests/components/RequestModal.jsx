@@ -44,7 +44,7 @@ const fetchUpdated = async (url, setter) => {
       setter(response.data);
     })
     .catch(error => {
-      console.log(error);
+      console.error(error);
     });
 }
 
@@ -89,7 +89,6 @@ export const RequestModal = ({ request, requestTypes, requestModalType, isEventM
 
   const callApi = async (url, method, data = formik.values, doNotHandleResolve = false) => {
     if (_isEmpty(url)) {
-      console.log(`Wrong or empty URL: ${url} for method: ${method}`);
       setError(new Error(i18next.t("Cannot send request. Please try again later.")));
       formik.setSubmitting(false);
       return;
@@ -111,13 +110,12 @@ export const RequestModal = ({ request, requestTypes, requestModalType, isEventM
       headers: { 'Content-Type': 'application/json' }
     })
       .then(response => {
-        console.log(response);
         fetchUpdatedRequests();
         setModalOpen(false);
         formik.resetForm();
       })
       .catch(error => {
-        console.log(error);
+        console.error(error);
         setError(error);
       })
       .finally(() => {
@@ -133,7 +131,7 @@ export const RequestModal = ({ request, requestTypes, requestModalType, isEventM
       setModalOpen(false);
       formik.resetForm();
     } catch (error) {
-      console.log(error);
+      console.error(error);
       setError(error);
     } finally {
       formik.setSubmitting(false);
@@ -197,7 +195,6 @@ export const RequestModal = ({ request, requestTypes, requestModalType, isEventM
     }
 
     if (createAndSubmit) {
-      console.log("createAndSubmit");
       newConfirmDialogProps = {
         ...newConfirmDialogProps,
         header: i18next.t("Create and submit request"),
@@ -231,7 +228,7 @@ export const RequestModal = ({ request, requestTypes, requestModalType, isEventM
         sendRequest(REQUEST_TYPE.CREATE);
       }
     } catch (error) {
-      console.log(error);
+      console.error(error);
       setError(error);
     } finally {
       formik.setSubmitting(false);
