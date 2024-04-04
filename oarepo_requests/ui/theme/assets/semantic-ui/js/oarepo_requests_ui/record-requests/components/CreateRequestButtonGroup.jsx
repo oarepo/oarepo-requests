@@ -2,7 +2,7 @@ import React from "react";
 
 import { i18next } from "@translations/oarepo_requests_ui/i18next";
 
-import { Segment, Header, Button } from "semantic-ui-react";
+import { Segment, Header, Button, Dimmer, Loader, Placeholder } from "semantic-ui-react";
 
 import { RequestModal } from "./RequestModal";
 
@@ -12,24 +12,39 @@ import { RequestModal } from "./RequestModal";
  */
 
 /**
- * @param {{ requestTypes: RequestType[] }} props
+ * @param {{ requestTypes: RequestType[], isLoading: boolean }} props
  */
-export const CreateRequestButtonGroup = ({ requestTypes }) => {
+export const CreateRequestButtonGroup = ({ requestTypes, isLoading }) => {
   const createRequests = requestTypes.filter(requestType => requestType.links.actions?.create);
 
   return (
     <Segment>
       <Header size="small" className="detail-sidebar-header">{i18next.t("Create Request")}</Header>
-      <Button.Group vertical compact fluid>
-        {createRequests.map((requestType) => (
-          <RequestModal 
-            key={requestType.type_id} 
-            request={requestType} 
-            requestModalType="create" 
-            triggerButton={<Button icon="plus" title={i18next.t(requestType.name)} basic compact content={requestType.name} />} 
-          />
-        ))}
-      </Button.Group>
+      <Dimmer.Dimmable dimmed={isLoading}>
+        <Dimmer active={isLoading} inverted>
+          <Loader indeterminate>{i18next.t("Loading request types")}...</Loader>
+        </Dimmer>
+        {isLoading ? <Placeholder fluid>
+          {Array.from({ length: 3 }).map((_, index) => (
+            <Placeholder.Paragraph key={index}>
+              <Placeholder.Line length="full" />
+              <Placeholder.Line length="medium" />
+              <Placeholder.Line length="short" />
+            </Placeholder.Paragraph>
+          ))}
+        </Placeholder> :
+          <Button.Group vertical compact fluid>
+            {createRequests.map((requestType) => (
+              <RequestModal
+                key={requestType.type_id}
+                request={requestType}
+                requestModalType="create"
+                triggerButton={<Button icon="plus" title={i18next.t(requestType.name)} basic compact content={requestType.name} />}
+              />
+            ))}
+          </Button.Group>
+        }
+      </Dimmer.Dimmable>
     </Segment>
   );
 }

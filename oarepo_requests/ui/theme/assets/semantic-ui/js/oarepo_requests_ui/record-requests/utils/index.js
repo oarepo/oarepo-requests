@@ -7,7 +7,7 @@ import _isEmpty from "lodash/isEmpty";
 export function sortByStatusCode(requests) {
   // TODO: why we are checking status_code of first request
   // instead of just checking if requests array is empty 
-  if (!_has(requests[0], "status_code")) {
+  if (_isEmpty(requests) || !_has(requests[0], "status_code")) {
     return requests;
   }
   const [acceptedDeclined, other] = _partition(requests, (r) => r?.status_code == "accepted" || r?.status_code == "declined");
