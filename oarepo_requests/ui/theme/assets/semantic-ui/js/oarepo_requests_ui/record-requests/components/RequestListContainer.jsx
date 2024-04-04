@@ -14,7 +14,7 @@ import { RequestContext } from "../contexts";
 /**
  * @param {{ requestTypes: RequestType[], isLoading: boolean }} props
  */
-export const RequestListContainer = ({ requestTypes, isLoading, loadingError }) => {
+export const RequestListContainer = ({ requestTypes, isLoading, loadingError, fetchNewRequests }) => {
   const { requests } = useContext(RequestContext);
 
   let requestsToApprove = [];
@@ -51,14 +51,14 @@ export const RequestListContainer = ({ requestTypes, isLoading, loadingError }) 
                 <Message.Header>{i18next.t("Error loading requests")}</Message.Header>
                 <p>{loadingError?.message}</p>
               </Message> :
-              !_isEmpty(otherRequests) ? <RequestList requests={otherRequests} requestTypes={requestTypes} /> : <p>{i18next.t("No requests to show")}.</p>
+              !_isEmpty(otherRequests) ? <RequestList requests={otherRequests} requestTypes={requestTypes} fetchNewRequests={fetchNewRequests} /> : <p>{i18next.t("No requests to show")}.</p>
           }
         </Dimmer.Dimmable>
       </Segment>
       {requestsToApprove.length > 0 && (
         <Segment className="requests-requests-to-approve">
           <Header size="small" className="detail-sidebar-header">{i18next.t("Requests to Approve")}</Header>
-          <RequestList requests={requestsToApprove} requestTypes={requestTypes} requestModalType="accept" />
+          <RequestList requests={requestsToApprove} requestTypes={requestTypes} requestModalType="accept" fetchNewRequests={fetchNewRequests} />
         </Segment>
       )}
     </SegmentGroupOrEmpty>

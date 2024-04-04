@@ -11,6 +11,7 @@ import { CustomFields } from "react-invenio-forms";
 
 import { RequestModal, ModalContentSideInfo } from ".";
 import { RequestContext } from "../contexts";
+import { fetchUpdated as fetchNewEvents } from "../utils";
 import { REQUEST_TYPE } from "../utils/objects";
 import ReadOnlyCustomFields from "./common/ReadOnlyCustomFields";
 
@@ -21,8 +22,8 @@ import ReadOnlyCustomFields from "./common/ReadOnlyCustomFields";
  * @typedef {import("../types").Event} Event
  */
 
-/** @param {{ request: Request, requestModalType: RequestTypeEnum, requestType: RequestType, fetchNewEvents: (url: string, setter: (events: Event[]) => void) => Promise<Event>, customSubmitHandler: (e) => void }} props */
-export const RequestModalContent = ({ request, requestType, requestModalType, fetchNewEvents, customSubmitHandler }) => {
+/** @param {{ request: Request, requestModalType: RequestTypeEnum, requestType: RequestType, customSubmitHandler: (e) => void }} props */
+export const RequestModalContent = ({ request, requestType, requestModalType, customSubmitHandler }) => {
   /** @type {[Request[], (requests: Request[]) => void]} */
   const { requests, setRequests } = useContext(RequestContext);
 

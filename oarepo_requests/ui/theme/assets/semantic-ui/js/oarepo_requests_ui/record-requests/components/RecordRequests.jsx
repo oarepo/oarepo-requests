@@ -6,24 +6,22 @@ import _isEmpty from "lodash/isEmpty";
 
 import { CreateRequestButtonGroup, RequestListContainer } from ".";
 import { RequestContextProvider, RecordContextProvider } from "../contexts";
-import { sortByStatusCode } from "../utils";
+import { sortByStatusCode, fetchUpdated } from "../utils";
 
 export const RecordRequests = ({ record: initialRecord }) => {
   const [recordLoading, setRecordLoading] = useState(true);
   const [requestsLoading, setRequestsLoading] = useState(true);
-  
+
   const [recordLoadingError, setRecordLoadingError] = useState(null);
   const [requestsLoadingError, setRequestsLoadingError] = useState(null);
 
   const [record, setRecord] = useState(initialRecord);
   const [requests, setRequests] = useState(sortByStatusCode(record?.requests ?? []) ?? []);
 
-  const recordSetter = useCallback(newRecord => setRecord(newRecord), [])
-  const requestsSetter = useCallback(newRequests => setRequests(newRequests), [])
+  const recordSetter = useCallback(newRecord => setRecord(newRecord), []);
+  const requestsSetter = useCallback(newRequests => setRequests(newRequests), []);
 
-  useEffect(() => {
-    setRecordLoading(true);
-    setRecordLoadingError(null);
+  const fetchRecord = useCallback(() => {
     axios({
       method: 'get',
       url: record.links?.self,
@@ -41,12 +39,9 @@ export const RecordRequests = ({ record: initialRecord }) => {
       .finally(() => {
         setRecordLoading(false);
       });
-    return () => setRecordLoading(false);
-  }, []);
+  }, [record.links?.self]);
 
-  useEffect(() => {
-    setRequestsLoading(true);
-    setRequestsLoadingError(null);
+  const fetchRequests = useCallback(() => {
     axios({
       method: 'get',
       url: record.links?.requests,
@@ -64,14 +59,47 @@ export const RecordRequests = ({ record: initialRecord }) => {
       .finally(() => {
         setRequestsLoading(false);
       });
+  }, [record.links?.requests]);
+
+  const fetchNewRequests = useCallback(async () => {
+    setRecordLoading(true);
+    setRequestsLoading(true);
+    setRecordLoadingError(null);
+    setRequestsLoadingError(null);
+    return Promise.all([
+      fetchUpdated(record.links?.self, (responseData) => { setRecord(responseData); }),
+      fetchUpdated(record.links?.requests, (responseData) => { setRequests(sortByStatusCode(responseData?.hits?.hits)); })
+    ])
+      .catch(error => {
+        setRecordLoadingError(error);
+        setRequestsLoadingError(error);
+      })
+      .finally(() => {
+        setRecordLoading(false);
+        setRequestsLoading(false);
+      }
+    );
+  }, []);
+
+  useEffect(() => {
+    setRecordLoading(true);
+    setRecordLoadingError(null);
+    fetchRecord();
+    return () => setRecordLoading(false);
+  }, []);
+
+  useEffect(() => {
+    setRequestsLoading(true);
+    setRequestsLoadingError(null);
+    fetchRequests();
     return () => setRequestsLoading(false);
   }, []);
 
   return (
-    <RecordContextProvider record={{record, setRecord: recordSetter}}>
+    <RecordContextProvider record={{ record, setRecord: recordSetter }}>
       <RequestContextProvider requests={{ requests, setRequests: requestsSetter }}>
-        <CreateRequestButtonGroup requestTypes={record?.request_types ?? []} isLoading={recordLoading} loadingError={recordLoadingError} />
-        <RequestListContainer requestTypes={record?.request_types ?? []} isLoading={requestsLoading} loadingError={requestsLoadingError} />
+        <CreateRequestButtonGroup requestTypes={record?.request_types ?? []} isLoading={recordLoading} loadingError={recordLoadingError} fetchNewRequests={fetchNewRequests} />
+        <RequestListContainer requestTypes={record?.request_types ?? []} isLoading={requestsLoading} loadingError={requestsLoadingError} fetchNewRequests={fetchNewRequests} />
       </RequestContextProvider>
     </RecordContextProvider>
   );

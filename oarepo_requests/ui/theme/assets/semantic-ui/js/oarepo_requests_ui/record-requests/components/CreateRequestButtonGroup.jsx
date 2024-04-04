@@ -14,7 +14,7 @@ import { RequestModal } from "./RequestModal";
 /**
  * @param {{ requestTypes: RequestType[], isLoading: boolean }} props
  */
-export const CreateRequestButtonGroup = ({ requestTypes, isLoading, loadingError }) => {
+export const CreateRequestButtonGroup = ({ requestTypes, isLoading, loadingError, fetchNewRequests }) => {
   const createRequests = requestTypes.filter(requestType => requestType.links.actions?.create);
 
   return (
@@ -45,6 +45,7 @@ export const CreateRequestButtonGroup = ({ requestTypes, isLoading, loadingError
                   request={requestType}
                   requestModalType="create"
                   triggerButton={<Button icon="plus" title={i18next.t(requestType.name)} basic compact content={requestType.name} />}
+                  fetchNewRequests={fetchNewRequests}
                 />
               ))}
             </Button.Group>

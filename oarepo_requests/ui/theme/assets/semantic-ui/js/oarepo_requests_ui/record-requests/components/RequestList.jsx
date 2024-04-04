@@ -16,7 +16,7 @@ import { RequestModal } from ".";
 /**
  * @param {{ requests: Request[], requestModalType: RequestTypeEnum }} props
  */
-export const RequestList = ({ requests, requestTypes, requestModalType }) => {
+export const RequestList = ({ requests, requestTypes, requestModalType, fetchNewRequests }) => {
   return (
     <List link divided relaxed size="small">
       {requests.map((request) => {
@@ -46,6 +46,7 @@ export const RequestList = ({ requests, requestTypes, requestModalType }) => {
                 </List.Content>
               </List.Item>
             }
+            fetchNewRequests={fetchNewRequests}
           />
         )
       })}
@@ -56,5 +57,6 @@ export const RequestList = ({ requests, requestTypes, requestModalType }) => {
 RequestList.propTypes = {
   requests: PropTypes.array.isRequired,
   requestTypes: PropTypes.array.isRequired,
-  requestModalType: PropTypes.oneOf(["create", "accept", "submit", "cancel"])
+  requestModalType: PropTypes.oneOf(["create", "accept", "submit", "cancel"]),
+  fetchNewRequests: PropTypes.func,
 };

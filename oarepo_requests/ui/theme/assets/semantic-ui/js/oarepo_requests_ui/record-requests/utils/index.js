@@ -1,8 +1,11 @@
+import axios from "axios";
+
 import _sortBy from "lodash/sortBy";
 import _concat from "lodash/concat";
 import _has from "lodash/has";
 import _partition from "lodash/partition";
 import _isEmpty from "lodash/isEmpty";
+import _isFunction from "lodash/isFunction";
 
 export function sortByStatusCode(requests) {
   // TODO: why we are checking status_code of first request
@@ -29,4 +32,24 @@ export function isDeepEmpty(input) {
     return true;
   }
   return _isEmpty(input);
+}
+
+export const fetchUpdated = async (url, setter, onError) => {
+  return axios({
+    method: 'get',
+    url: url,
+    headers: { 
+      'Content-Type': 'application/json', 
+      'Accept': 'application/vnd.inveniordm.v1+json'
+    }
+  })
+    .then(response => {
+      setter(response.data);
+    })
+    .catch(error => {
+      if(!_isFunction(onError)) {
+        throw error;
+      }
+      onError(error); 
+    });
 }
