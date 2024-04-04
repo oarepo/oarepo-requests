@@ -1,11 +1,41 @@
 from invenio_requests.records.api import RequestEvent
 
+from thesis.records.api import ThesisDraft
 from .utils import is_valid_subdict, link_api2testclient
+
+def test_listing(
+    logged_client_request,
+    identity_simple,
+    users,
+    urls,
+    publish_request_data_function,
+    search_clear,
+):
+    creator = users[0]
+
+    draft1 = logged_client_request(creator, "post", urls["BASE_URL"], json={})
+    draft2 = logged_client_request(creator, "post", urls["BASE_URL"], json={})
+
+    logged_client_request(
+        creator,
+        "post",
+        urls["BASE_URL_REQUESTS"],
+        json=publish_request_data_function(draft1.json["id"]),
+    )
+
+    logged_client_request(
+        creator,
+        "post",
+        urls["BASE_URL_REQUESTS"],
+        json=publish_request_data_function(draft2.json["id"]),
+    )
+    ThesisDraft.index.refresh()
+    search = logged_client_request(creator, "get", urls["BASE_URL_REQUESTS"], headers={"Accept": "application/vnd.inveniordm.v1+json"})
+
 
 
 def test_read_extended(
-    example_topic_draft,
-    client_logged_as,
+    logged_client_request,
     users,
     urls,
     publish_request_data_function,
@@ -13,34 +43,38 @@ def test_read_extended(
     ui_serialization_result,
     search_clear,
 ):
+    creator = users[0]
     receiver = users[1]
-    creator_client = client_logged_as(users[0].email)
-    resp_request_create = creator_client.post(
+
+    draft1 = logged_client_request(creator, "post", urls["BASE_URL"], json={})
+    draft_id = draft1.json["id"]
+
+    resp_request_create = logged_client_request(creator, "post",
         urls["BASE_URL_REQUESTS"],
-        json=publish_request_data_function(example_topic_draft["id"]),
+        json=publish_request_data_function(draft_id),
     )
-    resp_request_submit = creator_client.post(
+    resp_request_submit = logged_client_request(creator, "post",
         link_api2testclient(resp_request_create.json["links"]["actions"]["submit"])
     )
-    receiver_client = client_logged_as(users[1].email)
-    old_call = receiver_client.get(
+
+    old_call = logged_client_request(creator, "get",
         f"{urls['BASE_URL_REQUESTS']}{resp_request_create.json['id']}"
     )
-    new_call = receiver_client.get(
+    new_call = logged_client_request(creator, "get",
         f"{urls['BASE_URL_REQUESTS']}extended/{resp_request_create.json['id']}"
     )
-    new_call2 = receiver_client.get(
+    new_call2 = logged_client_request(creator, "get",
         f"{urls['BASE_URL_REQUESTS']}extended/{resp_request_create.json['id']}",
         headers={"Accept": "application/vnd.inveniordm.v1+json"},
     )
 
     assert is_valid_subdict(
-        serialization_result(example_topic_draft["id"], resp_request_create.json["id"]),
+        serialization_result(draft_id, resp_request_create.json["id"]),
         new_call.json,
     )
     assert is_valid_subdict(
         ui_serialization_result(
-            example_topic_draft["id"], resp_request_create.json["id"]
+            draft_id, resp_request_create.json["id"]
         ),
         new_call2.json,
     )

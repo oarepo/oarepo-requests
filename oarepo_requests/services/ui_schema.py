@@ -33,15 +33,15 @@ class UIReferenceSchema(ma.Schema):
             reference_type = list(data["reference"].keys())[0]
             entity_resolvers = current_oarepo_requests.entity_reference_ui_resolvers
             if reference_type in entity_resolvers:
-                return entity_resolvers[reference_type](self.context["identity"], data)
+                return entity_resolvers[reference_type](self.context["identity"], data, self.context)
             else:
                 # TODO log warning
-                return fallback_entity_reference_ui_resolver(self.context["identity"], data)
+                return fallback_entity_reference_ui_resolver(
+                    self.context["identity"], data, self.context
+                )
         except PIDDeletedError:
-            return {
-                **data,
-                "status": "removed"
-            }
+            return {**data, "status": "removed"}
+
 
 class UIRequestSchemaMixin:
     created = LocalizedDateTime(dump_only=True)

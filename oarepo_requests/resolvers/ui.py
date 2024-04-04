@@ -18,42 +18,61 @@ def fallback_result(reference):
     }
 
 
-def user_entity_reference_ui_resolver(identity, data):
+def user_entity_reference_ui_resolver(identity, data, ctx):
+    # return fallback_result(reference)
+
     reference = data["reference"]
-    user_id = reference["user"]
+    ref_key = list(reference.keys())[0]
+    id = reference["user"]
+
+    by_id = [resolved for resolved in ctx["resolved"][ref_key] if resolved.data["id"] == id]
+    if not by_id:
+        return fallback_result(reference)
+    record = by_id[0]
+
+
+    """
     try:
-        user_search = current_users_service.read(identity, user_id)
+        record = current_users_service.read(identity, user_id)
     except PermissionDeniedError:
         return fallback_result(reference)
-    if user_search.data["username"] is None:  # username undefined?
-        if "email" in user_search.data:
-            label = user_search.data["email"]
+    """
+    if record.data["username"] is None:  # username undefined?
+        if "email" in record.data:
+            label = record.data["email"]
         else:
             label = fallback_label_result(reference)
     else:
-        label = user_search.data["username"]
+        label = record.data["username"]
     ret = {
         "reference": reference,
         "type": "user",
         "label": label,
     }
-    if "links" in user_search.data and "self" in user_search.data["links"]:
-        ret["link"] = user_search.data["links"]["self"]
+    if "links" in record.data and "self" in record.data["links"]:
+        ret["link"] = record.data["links"]["self"]
     return ret
 
 
-def _record_entity_reference_ui_resolver_inner(identity, data, is_draft):
+def _record_entity_reference_ui_resolver_inner(identity, data, ctx, is_draft):
     reference = data["reference"]
+    ref_key = list(reference.keys())[0]
     id = list(reference.values())[0]
     service = get_matching_service_for_refdict(reference)
 
     reader = service.read_draft if is_draft else service.read
+    """
     try:
         response = reader(identity, id)
     except PermissionDeniedError:
         return fallback_result(reference)
+        record = response.data
+    """
+    by_id = [resolved for resolved in ctx["resolved"][ref_key] if resolved["id"] == id]
+    if not by_id:
+        return fallback_result(reference)
+    record = by_id[0]
 
-    record = response.data
     if "metadata" in record and "title" in record["metadata"]:
         label = record["metadata"]["title"]
     else:
@@ -67,7 +86,7 @@ def _record_entity_reference_ui_resolver_inner(identity, data, is_draft):
     return ret
 
 
-def fallback_entity_reference_ui_resolver(identity, data):
+def fallback_entity_reference_ui_resolver(identity, data, ctx):
     reference = data["reference"]
     id = list(reference.values())[0]
     try:
@@ -94,9 +113,9 @@ def fallback_entity_reference_ui_resolver(identity, data):
     return ret
 
 
-def record_entity_reference_ui_resolver(identity, data):
-    return _record_entity_reference_ui_resolver_inner(identity, data, is_draft=False)
+def record_entity_reference_ui_resolver(identity, data, ctx):
+    return _record_entity_reference_ui_resolver_inner(identity, data, ctx, is_draft=False)
 
 
-def draft_record_entity_reference_ui_resolver(identity, data):
-    return _record_entity_reference_ui_resolver_inner(identity, data, is_draft=True)
+def draft_record_entity_reference_ui_resolver(identity, data, ctx):
+    return _record_entity_reference_ui_resolver_inner(identity, data, ctx, is_draft=True)
