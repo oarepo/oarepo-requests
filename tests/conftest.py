@@ -1,6 +1,5 @@
 import pytest
 from flask_principal import Identity, Need, UserNeed
-from invenio_access.permissions import system_identity
 from invenio_requests.customizations import CommentEventType, LogEventType
 from invenio_requests.proxies import current_request_type_registry, current_requests
 from invenio_requests.records.api import Request, RequestEventFormat
@@ -348,9 +347,9 @@ def example_draft_service_bypass(app, db):
 
 @pytest.fixture()
 def record_factory(record_service):
-    def record():
-        draft = record_service.create(system_identity, {})
-        record = record_service.publish(system_identity, draft.id)
+    def record(identity):
+        draft = record_service.create(identity, {})
+        record = record_service.publish(identity, draft.id)
         return record._obj
 
     return record

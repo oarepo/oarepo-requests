@@ -21,9 +21,7 @@ class RecordRequestsResource(RecordResource):
         """
         actual_config = copy.deepcopy(record_requests_config)
         actual_config.blueprint_name = f"{config.blueprint_name}_requests"
-        vars_to_overwrite = [
-            x for x in dir(config) if not x.startswith("_")
-        ]
+        vars_to_overwrite = [x for x in dir(config) if not x.startswith("_")]
         actual_keys = dir(actual_config)
         for var in vars_to_overwrite:
             if var not in actual_keys:

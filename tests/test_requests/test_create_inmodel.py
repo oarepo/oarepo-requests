@@ -21,7 +21,7 @@ def test_record(
 ):
     creator = users[0]
     receiver = users[1]
-    record1 = record_factory()
+    record1 = record_factory(identity_simple)
     record1 = logged_client_request(
         creator, "get", f"{urls['BASE_URL']}{record1['id']}"
     )
