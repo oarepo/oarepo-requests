@@ -11,7 +11,7 @@ import axios from "axios";
 
 import { RequestModalContent, CreateRequestModalContent } from ".";
 import { REQUEST_TYPE } from "../utils/objects";
-import { isDeepEmpty, useIsMounted } from "../utils";
+import { isDeepEmpty } from "../utils";
 
 /** 
  * @typedef {import("../types").Request} Request
@@ -53,8 +53,6 @@ export const RequestModal = ({ request, requestTypes, requestModalType, isEventM
     onSubmit: () => {}
   });
 
-  const isMounted = useIsMounted();
-
   useEffect(() => {
     if (error) {
       errorMessageRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -84,17 +82,12 @@ export const RequestModal = ({ request, requestTypes, requestModalType, isEventM
       headers: { 'Content-Type': 'application/json' }
     })
       .then(response => {
-        if (isMounted.current) {
-          setModalOpen(false);
-          formik.resetForm();
-        }
+        setModalOpen(false);
+        formik.resetForm();
         fetchNewRequests();
       })
       .catch(error => {
         setError(error);
-      })
-      .finally(() => {
-        isMounted.current && formik.setSubmitting(false);
       });
   }
 
@@ -102,16 +95,12 @@ export const RequestModal = ({ request, requestTypes, requestModalType, isEventM
     try {
       const createdRequest = await callApi(request.links.actions?.create, 'post', formik.values, true);
       await callApi(createdRequest.data?.links?.actions?.submit, 'post', {}, true);
-      if (isMounted.current) {
-        setModalOpen(false);
-        formik.resetForm();
-      }
+      setModalOpen(false);
+      formik.resetForm();
       fetchNewRequests();
     } catch (error) {
       setError(error);
-    } finally {
-      isMounted.current && formik.setSubmitting(false);
-    }
+    };
   }
 
   const sendRequest = async (requestType, createAndSubmit = false) => {
