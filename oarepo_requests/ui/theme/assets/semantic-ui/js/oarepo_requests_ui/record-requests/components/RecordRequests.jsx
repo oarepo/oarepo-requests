@@ -5,7 +5,7 @@ import axios from "axios";
 import _isEmpty from "lodash/isEmpty";
 
 import { CreateRequestButtonGroup, RequestListContainer } from ".";
-import { RequestContextProvider, RecordContextProvider } from "../contexts";
+import { RequestContextProvider } from "../contexts";
 import { sortByStatusCode } from "../utils";
 
 export const RecordRequests = ({ record: initialRecord }) => {
@@ -18,7 +18,6 @@ export const RecordRequests = ({ record: initialRecord }) => {
   const [record, setRecord] = useState(initialRecord);
   const [requests, setRequests] = useState(sortByStatusCode(record?.requests ?? []) ?? []);
 
-  const recordSetter = useCallback(newRecord => setRecord(newRecord), []);
   const requestsSetter = useCallback(newRequests => setRequests(newRequests), []);
 
   const fetchRecord = useCallback(async () => {
@@ -81,12 +80,12 @@ export const RecordRequests = ({ record: initialRecord }) => {
   }, []);
 
   return (
-    <RecordContextProvider record={{ record, setRecord: recordSetter }}>
+    <>
+      <CreateRequestButtonGroup requestTypes={record?.request_types ?? []} isLoading={recordLoading} loadingError={recordLoadingError} fetchNewRequests={fetchNewRequests} />
       <RequestContextProvider requests={{ requests, setRequests: requestsSetter }}>
-        <CreateRequestButtonGroup requestTypes={record?.request_types ?? []} isLoading={recordLoading} loadingError={recordLoadingError} fetchNewRequests={fetchNewRequests} />
         <RequestListContainer requestTypes={record?.request_types ?? []} isLoading={requestsLoading} loadingError={requestsLoadingError} fetchNewRequests={fetchNewRequests} />
       </RequestContextProvider>
-    </RecordContextProvider>
+    </>
   );
 }
 
