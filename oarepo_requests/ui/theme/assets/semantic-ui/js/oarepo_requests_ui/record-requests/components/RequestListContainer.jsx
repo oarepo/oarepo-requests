@@ -1,4 +1,4 @@
-import React, { useContext } from "react";
+import React, { useContext, useEffect } from "react";
 
 import { i18next } from "@translations/oarepo_requests_ui/i18next";
 import { Segment, SegmentGroup, Header, Dimmer, Loader, Placeholder, Message } from "semantic-ui-react";
@@ -12,10 +12,14 @@ import { RequestContext } from "../contexts";
  * @typedef {import("../types").RequestType} RequestType
  */
 /**
- * @param {{ requestTypes: RequestType[], isLoading: boolean }} props
+ * @param {{ requestTypes: RequestType[], isLoading: boolean, loadingError: Error, fetchNewRequests: () => void, fetchRequests: () => void }} props
  */
-export const RequestListContainer = ({ requestTypes, isLoading, loadingError, fetchNewRequests }) => {
+export const RequestListContainer = ({ requestTypes, isLoading, loadingError, fetchNewRequests, fetchRequests }) => {
   const { requests } = useContext(RequestContext);
+
+  useEffect(() => {
+    fetchRequests();
+  }, []);
 
   let requestsToApprove = [];
   let otherRequests = [];

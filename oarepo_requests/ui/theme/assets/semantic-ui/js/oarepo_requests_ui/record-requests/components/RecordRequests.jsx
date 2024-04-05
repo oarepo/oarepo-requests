@@ -71,19 +71,24 @@ export const RecordRequests = ({ record: initialRecord }) => {
 
   useEffect(() => {
     fetchRecord();
-    return () => setRecordLoading(false);
-  }, []);
-
-  useEffect(() => {
-    fetchRequests();
-    return () => setRequestsLoading(false);
   }, []);
 
   return (
     <>
-      <CreateRequestButtonGroup requestTypes={record?.request_types ?? []} isLoading={recordLoading} loadingError={recordLoadingError} fetchNewRequests={fetchNewRequests} />
+      <CreateRequestButtonGroup 
+        requestTypes={record?.request_types ?? []} 
+        isLoading={recordLoading} 
+        loadingError={recordLoadingError} 
+        fetchNewRequests={fetchNewRequests} 
+      />
       <RequestContextProvider requests={{ requests, setRequests: requestsSetter }}>
-        <RequestListContainer requestTypes={record?.request_types ?? []} isLoading={requestsLoading} loadingError={requestsLoadingError} fetchNewRequests={fetchNewRequests} />
+        <RequestListContainer 
+          requestTypes={record?.request_types ?? []} 
+          isLoading={requestsLoading} 
+          loadingError={requestsLoadingError} 
+          fetchNewRequests={fetchNewRequests} 
+          fetchRequests={fetchRequests} 
+      />
       </RequestContextProvider>
     </>
   );
