@@ -194,7 +194,64 @@ class RecordEntityDraftReferenceUIResolver(RecordEntityReferenceUIResolver):
         )
         # todo extra filter doesn't work in rdm-11
         filter = dsl.Q("terms", **{"id": list(values)})
-        return list(service.search_drafts(identity, extra_filter=filter).hits)
+        try:
+            ret = list(service.search_drafts(identity, extra_filter=filter).hits)
+        except TypeError:
+            # ----
+            from invenio_records_resources.services.base.links import LinksTemplate
+            # rdm-12 version
+            def search_drafts(
+                service,
+                identity,
+                params=None,
+                search_preference=None,
+                expand=False,
+                extra_filter=None,
+                **kwargs,
+            ):
+                """Search for drafts records matching the querystring."""
+                service.require_permission(identity, "search_drafts")
+
+                # Prepare and execute the search
+                params = params or {}
+
+                search_draft_filter = dsl.Q("term", has_draft=False)
+
+                if extra_filter:
+                    search_draft_filter &= extra_filter
+
+                search_result = service._search(
+                    "search_drafts",
+                    identity,
+                    params,
+                    search_preference,
+                    record_cls=service.draft_cls,
+                    search_opts=service.config.search_drafts,
+                    # `has_draft` systemfield is not defined here. This is not ideal
+                    # but it helps avoid overriding the method. See how is used in
+                    # https://github.com/inveniosoftware/invenio-rdm-records
+                    extra_filter=dsl.Q("term", has_draft=False),
+                    permission_action="read_draft",
+                    **kwargs,
+                ).execute()
+
+                return service.result_list(
+                    service,
+                    identity,
+                    search_result,
+                    params,
+                    links_tpl=LinksTemplate(
+                        service.config.links_search_drafts, context={"args": params}
+                    ),
+                    links_item_tpl=service.links_item_tpl,
+                    expandable_fields=service.expandable_fields,
+                    expand=expand,
+                )
+
+            ret = list(search_drafts(service, identity, extra_filter=filter).hits)
+
+            # ----
+        return ret
 
     def _search_one(self, identity, reference, *args, **kwargs):
         id = list(reference.values())[0]

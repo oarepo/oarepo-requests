@@ -28,15 +28,16 @@ class UIReferenceSchema(ma.Schema):
 
     @ma.post_dump
     def dereference(self, data, **kwargs):
-        try:
-            # todo makeshift for serializing records (record calls do not have this)
-            if "resolved" not in self.context:
+        # todo makeshift for serializing records (record calls do not have 'resolved' cache in context)
+        if "resolved" not in self.context:
+            try:
                 return resolve(self.context["identity"], data["reference"])
-            resolved_cache = self.context["resolved"]
-            # todo PIDDeletedError might be thrown in creating the cache too i guess; test if that works
-            return resolved_cache.dereference(data["reference"])
-        except PIDDeletedError:
-            return {**data, "status": "removed"}
+            except PIDDeletedError:
+                return {**data, "status": "removed"}
+        # todo PIDDeletedError might be thrown in creating the cache too i guess; test if that works
+        resolved_cache = self.context["resolved"]
+        return resolved_cache.dereference(data["reference"])
+
 
 
 class UIRequestSchemaMixin:

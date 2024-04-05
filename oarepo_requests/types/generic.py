@@ -27,7 +27,6 @@ class OARepoRequestType(RequestType):
 
 
 class NonDuplicableOARepoRequestType(OARepoRequestType):
-
     def can_create(self, identity, data, receiver, topic, creator, *args, **kwargs):
         if open_request_exists(topic, self.type_id):
             raise OpenRequestAlreadyExists(self, topic)

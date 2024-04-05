@@ -4,7 +4,6 @@ from invenio_requests.resources.events.resource import RequestCommentsResource
 
 
 class OARepoRequestsCommentsResource(RequestCommentsResource, ErrorHandlersMixin):
-
     def create_url_rules(self):
         """Create the URL rules for the record resource."""
         base_routes = super().create_url_rules()

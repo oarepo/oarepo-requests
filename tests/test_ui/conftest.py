@@ -25,12 +25,12 @@ def app_config(app_config):
             "port": os.environ.get("OPENSEARCH_PORT", "9200"),
         }
     ]
-    app_config["RECORDS_REFRESOLVER_CLS"] = (
-        "invenio_records.resolver.InvenioRefResolver"
-    )
-    app_config["RECORDS_REFRESOLVER_STORE"] = (
-        "invenio_jsonschemas.proxies.current_refresolver_store"
-    )
+    app_config[
+        "RECORDS_REFRESOLVER_CLS"
+    ] = "invenio_records.resolver.InvenioRefResolver"
+    app_config[
+        "RECORDS_REFRESOLVER_STORE"
+    ] = "invenio_jsonschemas.proxies.current_refresolver_store"
 
     # for ui tests
     app_config["APP_THEME"] = ["semantic-ui"]
