@@ -92,7 +92,6 @@ export const RequestModal = ({ request, requestTypes, requestModalType, isEventM
         formik.resetForm();
       })
       .catch(error => {
-        console.error(error);
         setError(error);
       })
       .finally(() => {
@@ -108,7 +107,6 @@ export const RequestModal = ({ request, requestTypes, requestModalType, isEventM
       setModalOpen(false);
       formik.resetForm();
     } catch (error) {
-      console.error(error);
       setError(error);
     } finally {
       formik.setSubmitting(false);
@@ -205,7 +203,6 @@ export const RequestModal = ({ request, requestTypes, requestModalType, isEventM
         sendRequest(REQUEST_TYPE.CREATE);
       }
     } catch (error) {
-      console.error(error);
       setError(error);
     } finally {
       formik.setSubmitting(false);

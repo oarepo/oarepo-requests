@@ -79,7 +79,7 @@ export const RecordRequests = ({ record: initialRecord }) => {
         setRequestsLoading(false);
       }
     );
-  }, []);
+  }, [record.links?.self, record.links?.requests]);
 
   useEffect(() => {
     setRecordLoading(true);
