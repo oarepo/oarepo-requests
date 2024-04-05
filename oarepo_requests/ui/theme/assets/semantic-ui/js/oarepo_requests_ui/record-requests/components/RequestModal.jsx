@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useContext, useRef } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import PropTypes from "prop-types";
 
 import { i18next } from "@translations/oarepo_requests_ui/i18next";
@@ -11,8 +11,7 @@ import axios from "axios";
 
 import { RequestModalContent, CreateRequestModalContent } from ".";
 import { REQUEST_TYPE } from "../utils/objects";
-import { isDeepEmpty } from "../utils";
-import { RecordContext, RequestContext } from "../contexts";
+import { isDeepEmpty, useIsMounted } from "../utils";
 
 /** 
  * @typedef {import("../types").Request} Request
@@ -54,6 +53,8 @@ export const RequestModal = ({ request, requestTypes, requestModalType, isEventM
     onSubmit: () => {}
   });
 
+  const isMounted = useIsMounted();
+
   useEffect(() => {
     if (error) {
       errorMessageRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -83,15 +84,17 @@ export const RequestModal = ({ request, requestTypes, requestModalType, isEventM
       headers: { 'Content-Type': 'application/json' }
     })
       .then(response => {
+        if (isMounted.current) {
+          setModalOpen(false);
+          formik.resetForm();
+        }
         fetchNewRequests();
-        setModalOpen(false);
-        formik.resetForm();
       })
       .catch(error => {
         setError(error);
       })
       .finally(() => {
-        formik.setSubmitting(false);
+        isMounted.current && formik.setSubmitting(false);
       });
   }
 
@@ -99,13 +102,15 @@ export const RequestModal = ({ request, requestTypes, requestModalType, isEventM
     try {
       const createdRequest = await callApi(request.links.actions?.create, 'post', formik.values, true);
       await callApi(createdRequest.data?.links?.actions?.submit, 'post', {}, true);
+      if (isMounted.current) {
+        setModalOpen(false);
+        formik.resetForm();
+      }
       fetchNewRequests();
-      setModalOpen(false);
-      formik.resetForm();
     } catch (error) {
       setError(error);
     } finally {
-      formik.setSubmitting(false);
+      isMounted.current && formik.setSubmitting(false);
     }
   }
 

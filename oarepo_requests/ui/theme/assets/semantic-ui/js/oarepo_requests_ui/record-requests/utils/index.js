@@ -1,3 +1,4 @@
+import { useEffect, useRef } from "react";
 import axios from "axios";
 
 import _sortBy from "lodash/sortBy";
@@ -52,4 +53,15 @@ export const fetchUpdated = async (url, setter, onError) => {
       }
       onError(error); 
     });
+}
+
+export function useIsMounted() {
+  const isMounted = useRef(false);
+
+  useEffect(() => {
+    isMounted.current = true;
+    return () => isMounted.current = false;
+  }, []);
+
+  return isMounted;
 }
