@@ -9,9 +9,7 @@ import _isEmpty from "lodash/isEmpty";
 import _isFunction from "lodash/isFunction";
 
 export function sortByStatusCode(requests) {
-  // TODO: why we are checking status_code of first request
-  // instead of just checking if requests array is empty 
-  if (_isEmpty(requests) || !_has(requests[0], "status_code")) {
+  if (_isEmpty(requests)) {
     return requests;
   }
   const [acceptedDeclined, other] = _partition(requests, (r) => r?.status_code == "accepted" || r?.status_code == "declined");
@@ -23,10 +21,10 @@ export function isDeepEmpty(input) {
     return true;
   }
   if (typeof input === 'object') {
-    for(const item of Object.values(input)) {
+    for (const item of Object.values(input)) {
       // if item is not undefined and is a primitive, return false
       // otherwise dig deeper
-      if((item !== undefined && typeof item !== 'object') || !isDeepEmpty(item)) {
+      if ((item !== undefined && typeof item !== 'object') || !isDeepEmpty(item)) {
         return false
       }
     }
@@ -39,8 +37,8 @@ export const fetchUpdated = async (url, setter, onError) => {
   return axios({
     method: 'get',
     url: url,
-    headers: { 
-      'Content-Type': 'application/json', 
+    headers: {
+      'Content-Type': 'application/json',
       'Accept': 'application/vnd.inveniordm.v1+json'
     }
   })
@@ -48,10 +46,10 @@ export const fetchUpdated = async (url, setter, onError) => {
       setter(response.data);
     })
     .catch(error => {
-      if(!_isFunction(onError)) {
+      if (!_isFunction(onError)) {
         throw error;
       }
-      onError(error); 
+      onError(error);
     });
 }
 
