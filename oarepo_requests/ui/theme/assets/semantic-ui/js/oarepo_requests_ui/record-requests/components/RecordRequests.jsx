@@ -6,7 +6,7 @@ import _isEmpty from "lodash/isEmpty";
 
 import { CreateRequestButtonGroup, RequestListContainer } from ".";
 import { RequestContextProvider, RecordContextProvider } from "../contexts";
-import { sortByStatusCode, fetchUpdated } from "../utils";
+import { sortByStatusCode } from "../utils";
 
 export const RecordRequests = ({ record: initialRecord }) => {
   const [recordLoading, setRecordLoading] = useState(true);
@@ -21,8 +21,10 @@ export const RecordRequests = ({ record: initialRecord }) => {
   const recordSetter = useCallback(newRecord => setRecord(newRecord), []);
   const requestsSetter = useCallback(newRequests => setRequests(newRequests), []);
 
-  const fetchRecord = useCallback(() => {
-    axios({
+  const fetchRecord = useCallback(async () => {
+    setRecordLoading(true);
+    setRecordLoadingError(null);
+    return axios({
       method: 'get',
       url: record.links?.self,
       headers: {
@@ -41,8 +43,10 @@ export const RecordRequests = ({ record: initialRecord }) => {
       });
   }, [record.links?.self]);
 
-  const fetchRequests = useCallback(() => {
-    axios({
+  const fetchRequests = useCallback(async () => {
+    setRequestsLoading(true);
+    setRequestsLoadingError(null);
+    return axios({
       method: 'get',
       url: record.links?.requests,
       headers: {
@@ -61,36 +65,17 @@ export const RecordRequests = ({ record: initialRecord }) => {
       });
   }, [record.links?.requests]);
 
-  const fetchNewRequests = useCallback(async () => {
-    setRecordLoading(true);
-    setRequestsLoading(true);
-    setRecordLoadingError(null);
-    setRequestsLoadingError(null);
-    return Promise.all([
-      fetchUpdated(record.links?.self, (responseData) => { setRecord(responseData); }),
-      fetchUpdated(record.links?.requests, (responseData) => { setRequests(sortByStatusCode(responseData?.hits?.hits)); })
-    ])
-      .catch(error => {
-        setRecordLoadingError(error);
-        setRequestsLoadingError(error);
-      })
-      .finally(() => {
-        setRecordLoading(false);
-        setRequestsLoading(false);
-      }
-    );
+  const fetchNewRequests = useCallback(() => {
+    fetchRecord();
+    fetchRequests();
   }, [record.links?.self, record.links?.requests]);
 
   useEffect(() => {
-    setRecordLoading(true);
-    setRecordLoadingError(null);
     fetchRecord();
     return () => setRecordLoading(false);
   }, []);
 
   useEffect(() => {
-    setRequestsLoading(true);
-    setRequestsLoadingError(null);
     fetchRequests();
     return () => setRequestsLoading(false);
   }, []);
