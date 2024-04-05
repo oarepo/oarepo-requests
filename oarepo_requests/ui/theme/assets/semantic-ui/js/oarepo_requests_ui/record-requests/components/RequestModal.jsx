@@ -32,7 +32,7 @@ const mapPayloadUiToInitialValues = (payloadUi) => {
   return initialValues;
 };
 
-/** @param {{ request: Request, requestTypes: RequestType[], requestModalType: RequestTypeEnum, isEventModal: boolean, triggerButton: ReactElement }} props */
+/** @param {{ request: Request, requestTypes: RequestType[], requestModalType: RequestTypeEnum, isEventModal: boolean, triggerButton: ReactElement, fetchNewRequests: () => void }} props */
 export const RequestModal = ({ request, requestTypes, requestModalType, isEventModal = false, triggerButton, fetchNewRequests }) => {
   const [modalOpen, setModalOpen] = useState(false);
   const [error, setError] = useState(null);
@@ -48,10 +48,6 @@ export const RequestModal = ({ request, requestTypes, requestModalType, isEventM
   });
 
   const errorMessageRef = useRef(null);
-
-  /** @type {[Request[], (requests: Request[]) => void]} */
-  const { setRequests } = useContext(RequestContext);
-  const { record, setRecord } = useContext(RecordContext);
 
   const formik = useFormik({
     initialValues: !_isEmpty(request?.payload) ? { payload: request.payload } : (request?.payload_ui ? mapPayloadUiToInitialValues(request?.payload_ui) : {}),

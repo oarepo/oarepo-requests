@@ -30,14 +30,14 @@ export const RequestListContainer = ({ requestTypes, isLoading, loadingError, fe
   const SegmentGroupOrEmpty = requestsToApprove.length > 0 && otherRequests.length > 0 ? SegmentGroup : React.Fragment;
 
   return (
-    <SegmentGroupOrEmpty>
+    isLoading ?
       <Segment className="requests-my-requests">
-        <Header size="small" className="detail-sidebar-header">{(!isLoading && !loadingError) ? i18next.t("My Requests") : i18next.t("Requests")}</Header>
+        <Header size="small" className="detail-sidebar-header">{i18next.t("Requests")}</Header>
         <Dimmer.Dimmable dimmed={isLoading}>
           <Dimmer active={isLoading} inverted>
             <Loader indeterminate>{i18next.t("Loading requests")}...</Loader>
           </Dimmer>
-          {isLoading ? <Placeholder fluid>
+          <Placeholder fluid>
             {Array.from({ length: 3 }).map((_, index) => (
               <Placeholder.Paragraph key={index}>
                 <Placeholder.Line length="full" />
@@ -45,22 +45,25 @@ export const RequestListContainer = ({ requestTypes, isLoading, loadingError, fe
                 <Placeholder.Line length="short" />
               </Placeholder.Paragraph>
             ))}
-          </Placeholder> :
-            loadingError ?
-              <Message negative>
-                <Message.Header>{i18next.t("Error loading requests")}</Message.Header>
-                <p>{loadingError?.message}</p>
-              </Message> :
-              !_isEmpty(otherRequests) ? <RequestList requests={otherRequests} requestTypes={requestTypes} fetchNewRequests={fetchNewRequests} /> : <p>{i18next.t("No requests to show")}.</p>
-          }
+          </Placeholder>
         </Dimmer.Dimmable>
-      </Segment>
-      {requestsToApprove.length > 0 && (
-        <Segment className="requests-requests-to-approve">
-          <Header size="small" className="detail-sidebar-header">{i18next.t("Requests to Approve")}</Header>
-          <RequestList requests={requestsToApprove} requestTypes={requestTypes} requestModalType="accept" fetchNewRequests={fetchNewRequests} />
-        </Segment>
-      )}
-    </SegmentGroupOrEmpty>
+      </Segment> :
+      loadingError ?
+        <Message negative>
+          <Message.Header>{i18next.t("Error loading requests")}</Message.Header>
+          <p>{loadingError?.message}</p>
+        </Message> :
+        <SegmentGroupOrEmpty>
+          <Segment className="requests-my-requests">
+            <Header size="small" className="detail-sidebar-header">{i18next.t("My Requests")}</Header>
+            {!_isEmpty(otherRequests) ? <RequestList requests={otherRequests} requestTypes={requestTypes} fetchNewRequests={fetchNewRequests} /> : <p>{i18next.t("No requests to show")}.</p>}
+          </Segment>
+          {requestsToApprove.length > 0 && (
+            <Segment className="requests-requests-to-approve">
+              <Header size="small" className="detail-sidebar-header">{i18next.t("Requests to Approve")}</Header>
+              <RequestList requests={requestsToApprove} requestTypes={requestTypes} requestModalType="accept" fetchNewRequests={fetchNewRequests} />
+            </Segment>
+          )}
+        </SegmentGroupOrEmpty>
   );
 };
