@@ -73,16 +73,6 @@ class OARepoRequestsUIJSONSerializer(LocalizedUIJSONSerializer):
             schema_context={"object_key": "ui", "identity": g.identity},
         )
 
-    def _reference_map_from_object(self, obj):
-        reference_map = defaultdict(set)
-        for reference_type in REFERENCE_TYPES:
-            if reference_type in obj:
-                reference = obj[reference_type]
-                reference_map[list(reference.keys())[0]].add(
-                    list(reference.values())[0]
-                )
-        return reference_map
-
     def dump_obj(self, obj, *args, **kwargs):
         # do not create; there's no benefit for caching single objects now
         extra_context = {
