@@ -35,14 +35,14 @@ export const RequestList = ({ requests, requestTypes, requestModalType, fetchNew
         return (
           <RequestModal key={request.id} request={request} requestTypes={requestTypes} requestModalType={modalType}
             triggerButton={
-              <List.Item as="a" key={request.id}>
-                <List.Content floated="right" verticalAlign="middle" style={{ fontSize: "0.8rem" }}>
+              <List.Item as="a" key={request.id} className="ui request-list-item">
+                <List.Content floated="right" verticalAlign="middle" className="status-and-datetime">
                   <div style={{ textAlign: "right" }}>{request?.status ?? i18next.t("No status")}</div>
                   {request?.created && <div>{request.created}</div>}
                 </List.Content>
-                <List.Content style={{ lineHeight: "1.3rem" }}>
-                  <List.Header style={{ fontWeight: 500 }}>{!_isEmpty(request?.title) ? request.title : (!_isEmpty(request?.name) ? request.name : request.type)}</List.Header>
-                  <List.Description style={{ fontSize: "0.9rem" }}>{_truncate(request.description, { length: 30 })}</List.Description>
+                <List.Content className="header-and-description">
+                  <List.Header>{!_isEmpty(request?.title) ? request.title : (!_isEmpty(request?.name) ? request.name : request.type)}</List.Header>
+                  <List.Description>{_truncate(request.description, { length: 30 })}</List.Description>
                 </List.Content>
               </List.Item>
             }
