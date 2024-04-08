@@ -15,7 +15,6 @@ msgstr ""
 "Generated-By: Babel 2.14.0\n"
 
 #: oarepo_requests/services/ui_schema.py:71
-#, fuzzy
 msgid "status"
 msgstr "Stav"
 
@@ -158,4 +157,32 @@ msgid "Cannot send request. Please try again later."
 msgstr "Nemohu poslat žádost. Prosím, zkuste později."
 
 msgid "Cancel request"
-msgstr ""
+msgstr "Zrušit žádost"
+
+#: /Users/m/w/cesnet/oarepo-requests/oarepo_requests/invenio_patches.py:92
+msgid "Submitted"
+msgstr "Odeslána"
+
+#: /Users/m/w/cesnet/oarepo-requests/oarepo_requests/invenio_patches.py:93
+msgid "Expired"
+msgstr "Expirována"
+
+#: /Users/m/w/cesnet/oarepo-requests/oarepo_requests/invenio_patches.py:94
+msgid "Accepted"
+msgstr "Přijata"
+
+#: /Users/m/w/cesnet/oarepo-requests/oarepo_requests/invenio_patches.py:95
+msgid "Declined"
+msgstr "Zamítnuta"
+
+#: /Users/m/w/cesnet/oarepo-requests/oarepo_requests/invenio_patches.py:96
+msgid "Cancelled"
+msgstr "Zrušena"
+
+#: /Users/m/w/cesnet/oarepo-requests/oarepo_requests/invenio_patches.py:98
+msgid "Status"
+msgstr "Stav"
+
+#: /Users/m/w/cesnet/oarepo-requests/oarepo_requests/invenio_patches.py:104
+msgid "Type"
+msgstr "Typ"

@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2024-03-27 18:06+0100\n"
+"POT-Creation-Date: 2024-04-08 12:47+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -17,7 +17,35 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 2.14.0\n"
 
-#: /Users/m/w/cesnet/oarepo-requests/oarepo_requests/services/ui_schema.py:71
+#: /Users/m/w/cesnet/oarepo-requests/oarepo_requests/invenio_patches.py:92
+msgid "Submitted"
+msgstr ""
+
+#: /Users/m/w/cesnet/oarepo-requests/oarepo_requests/invenio_patches.py:93
+msgid "Expired"
+msgstr ""
+
+#: /Users/m/w/cesnet/oarepo-requests/oarepo_requests/invenio_patches.py:94
+msgid "Accepted"
+msgstr ""
+
+#: /Users/m/w/cesnet/oarepo-requests/oarepo_requests/invenio_patches.py:95
+msgid "Declined"
+msgstr ""
+
+#: /Users/m/w/cesnet/oarepo-requests/oarepo_requests/invenio_patches.py:96
+msgid "Cancelled"
+msgstr ""
+
+#: /Users/m/w/cesnet/oarepo-requests/oarepo_requests/invenio_patches.py:98
+msgid "Status"
+msgstr ""
+
+#: /Users/m/w/cesnet/oarepo-requests/oarepo_requests/invenio_patches.py:104
+msgid "Type"
+msgstr ""
+
+#: /Users/m/w/cesnet/oarepo-requests/oarepo_requests/services/ui_schema.py:76
 msgid "status"
 msgstr ""
 
