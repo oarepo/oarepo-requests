@@ -188,19 +188,19 @@ msgid "Type"
 msgstr "Typ"
 
 msgid "Loading request types"
-msgstr ""
+msgstr "Načítám typy žádostí"
 
 msgid "Error loading request types"
-msgstr ""
+msgstr "Chyba při načítání typů žádostí"
 
 msgid "No new requests to create"
-msgstr ""
+msgstr "Nejsou dostupné žádné žádosti"
 
 msgid "Requests"
-msgstr ""
+msgstr "Žádosti"
 
 msgid "Error loading requests"
-msgstr ""
+msgstr "Chyba při načítání žádostí"
 
 msgid "Loading requests"
-msgstr ""
+msgstr "Načítám žádosti"
