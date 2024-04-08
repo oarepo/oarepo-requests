@@ -186,3 +186,21 @@ msgstr "Stav"
 #: /Users/m/w/cesnet/oarepo-requests/oarepo_requests/invenio_patches.py:104
 msgid "Type"
 msgstr "Typ"
+
+msgid "Loading request types"
+msgstr "Načítám typy žádostí"
+
+msgid "Error loading request types"
+msgstr "Chyba při načítání typů žádostí"
+
+msgid "No new requests to create"
+msgstr "Nejsou dostupné žádné žádosti"
+
+msgid "Requests"
+msgstr "Žádosti"
+
+msgid "Error loading requests"
+msgstr "Chyba při načítání žádostí"
+
+msgid "Loading requests"
+msgstr "Načítám žádosti"

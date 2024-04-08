@@ -1,27 +1,51 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useCallback } from "react";
 import PropTypes from "prop-types";
 
 import axios from "axios";
 import _isEmpty from "lodash/isEmpty";
 
 import { CreateRequestButtonGroup, RequestListContainer } from ".";
-import { RequestContextProvider, RecordContextProvider } from "../contexts";
+import { RequestContextProvider } from "../contexts";
 import { sortByStatusCode } from "../utils";
 
-/**
- * @typedef {import("../types").Request} Request
- * @typedef {import("../types").RequestType} RequestType
- */
+export const RecordRequests = ({ record: initialRecord }) => {
+  const [recordLoading, setRecordLoading] = useState(true);
+  const [requestsLoading, setRequestsLoading] = useState(true);
 
-export const RecordRequests = ({ record }) => {
-  /** @type {RequestType[]} */
-  const requestTypes = record?.request_types ?? [];
+  const [recordLoadingError, setRecordLoadingError] = useState(null);
+  const [requestsLoadingError, setRequestsLoadingError] = useState(null);
 
+  const [record, setRecord] = useState(initialRecord);
   const [requests, setRequests] = useState(sortByStatusCode(record?.requests ?? []) ?? []);
-  const requestsSetter = React.useCallback(newRequests => setRequests(newRequests), [])
 
-  useEffect(() => {
-    axios({
+  const requestsSetter = useCallback(newRequests => setRequests(newRequests), []);
+
+  const fetchRecord = useCallback(async () => {
+    setRecordLoading(true);
+    setRecordLoadingError(null);
+    return axios({
+      method: 'get',
+      url: record.links?.self,
+      headers: {
+        'Content-Type': 'application/json',
+        'Accept': 'application/vnd.inveniordm.v1+json'
+      }
+    })
+      .then(response => {
+        setRecord(response.data);
+      })
+      .catch(error => {
+        setRecordLoadingError(error);
+      })
+      .finally(() => {
+        setRecordLoading(false);
+      });
+  }, [record.links?.self]);
+
+  const fetchRequests = useCallback(async () => {
+    setRequestsLoading(true);
+    setRequestsLoadingError(null);
+    return axios({
       method: 'get',
       url: record.links?.requests,
       headers: {
@@ -33,21 +57,40 @@ export const RecordRequests = ({ record }) => {
         setRequests(sortByStatusCode(response.data?.hits?.hits));
       })
       .catch(error => {
-        console.log(error);
+        setRequestsLoadingError(error);
+      })
+      .finally(() => {
+        setRequestsLoading(false);
       });
+  }, [record.links?.requests]);
+
+  const fetchNewRequests = useCallback(() => {
+    fetchRecord();
+    fetchRequests();
+  }, [record.links?.self, record.links?.requests]);
+
+  useEffect(() => {
+    fetchRecord();
   }, []);
 
   return (
-    <RecordContextProvider record={record}>
+    <>
+      <CreateRequestButtonGroup 
+        requestTypes={record?.request_types ?? []} 
+        isLoading={recordLoading} 
+        loadingError={recordLoadingError} 
+        fetchNewRequests={fetchNewRequests} 
+      />
       <RequestContextProvider requests={{ requests, setRequests: requestsSetter }}>
-        {!_isEmpty(requestTypes) && (
-          <CreateRequestButtonGroup requestTypes={requestTypes} />
-        )}
-        {!_isEmpty(requests) && (
-          <RequestListContainer requestTypes={requestTypes} />
-        )}
+        <RequestListContainer 
+          requestTypes={record?.request_types ?? []} 
+          isLoading={requestsLoading} 
+          loadingError={requestsLoadingError} 
+          fetchNewRequests={fetchNewRequests} 
+          fetchRequests={fetchRequests} 
+      />
       </RequestContextProvider>
-    </RecordContextProvider>
+    </>
   );
 }
 

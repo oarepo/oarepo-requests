@@ -184,5 +184,23 @@ msgstr ""
 msgid "Type"
 msgstr ""
 
+msgid "Loading request types"
+msgstr ""
+
+msgid "Error loading request types"
+msgstr ""
+
+msgid "No new requests to create"
+msgstr ""
+
+msgid "Requests"
+msgstr ""
+
+msgid "Error loading requests"
+msgstr ""
+
+msgid "Loading requests"
+msgstr ""
+
 #~ msgid "No status"
 #~ msgstr ""
