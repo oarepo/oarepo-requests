@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2024-03-27 18:06+0100\n"
+"POT-Creation-Date: 2024-04-08 13:55+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -17,143 +17,189 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 2.14.0\n"
 
-#: /Users/m/w/cesnet/oarepo-requests/oarepo_requests/services/ui_schema.py:71
+#: /Users/miroslavbauer/Code/github.com/oarepo/oarepo-requests/oarepo_requests/invenio_patches.py:92
+msgid "Submitted"
+msgstr ""
+
+#: /Users/miroslavbauer/Code/github.com/oarepo/oarepo-requests/oarepo_requests/invenio_patches.py:93
+msgid "Expired"
+msgstr ""
+
+#: /Users/miroslavbauer/Code/github.com/oarepo/oarepo-requests/oarepo_requests/invenio_patches.py:94
+msgid "Accepted"
+msgstr ""
+
+#: /Users/miroslavbauer/Code/github.com/oarepo/oarepo-requests/oarepo_requests/invenio_patches.py:95
+msgid "Declined"
+msgstr ""
+
+#: /Users/miroslavbauer/Code/github.com/oarepo/oarepo-requests/oarepo_requests/invenio_patches.py:96
+msgid "Cancelled"
+msgstr ""
+
+#: /Users/miroslavbauer/Code/github.com/oarepo/oarepo-requests/oarepo_requests/invenio_patches.py:98
+msgid "Status"
+msgstr ""
+
+#: /Users/miroslavbauer/Code/github.com/oarepo/oarepo-requests/oarepo_requests/invenio_patches.py:104
+msgid "Type"
+msgstr ""
+
+#: /Users/miroslavbauer/Code/github.com/oarepo/oarepo-requests/oarepo_requests/services/ui_schema.py:76
 msgid "status"
 msgstr ""
 
-#: /Users/m/w/cesnet/oarepo-requests/oarepo_requests/translations/_only_for_translations.py:3
+#: /Users/miroslavbauer/Code/github.com/oarepo/oarepo-requests/oarepo_requests/translations/_only_for_translations.py:3
 msgid "Create Request"
 msgstr ""
 
-#: /Users/m/w/cesnet/oarepo-requests/oarepo_requests/translations/_only_for_translations.py:4
+#: /Users/miroslavbauer/Code/github.com/oarepo/oarepo-requests/oarepo_requests/translations/_only_for_translations.py:4
 msgid "Open dialog for request"
 msgstr ""
 
-#: /Users/m/w/cesnet/oarepo-requests/oarepo_requests/translations/_only_for_translations.py:5
+#: /Users/miroslavbauer/Code/github.com/oarepo/oarepo-requests/oarepo_requests/translations/_only_for_translations.py:5
 msgid "My Requests"
 msgstr ""
 
-#: /Users/m/w/cesnet/oarepo-requests/oarepo_requests/translations/_only_for_translations.py:6
+#: /Users/miroslavbauer/Code/github.com/oarepo/oarepo-requests/oarepo_requests/translations/_only_for_translations.py:6
 msgid "Requests to Approve"
 msgstr ""
 
-#: /Users/m/w/cesnet/oarepo-requests/oarepo_requests/translations/_only_for_translations.py:7
+#: /Users/miroslavbauer/Code/github.com/oarepo/oarepo-requests/oarepo_requests/translations/_only_for_translations.py:7
 msgid "Are you sure?"
 msgstr ""
 
-#: /Users/m/w/cesnet/oarepo-requests/oarepo_requests/translations/_only_for_translations.py:8
+#: /Users/miroslavbauer/Code/github.com/oarepo/oarepo-requests/oarepo_requests/translations/_only_for_translations.py:8
 msgid "Cancel"
 msgstr ""
 
-#: /Users/m/w/cesnet/oarepo-requests/oarepo_requests/translations/_only_for_translations.py:9
+#: /Users/miroslavbauer/Code/github.com/oarepo/oarepo-requests/oarepo_requests/translations/_only_for_translations.py:9
 msgid "OK"
 msgstr ""
 
-#: /Users/m/w/cesnet/oarepo-requests/oarepo_requests/translations/_only_for_translations.py:10
+#: /Users/miroslavbauer/Code/github.com/oarepo/oarepo-requests/oarepo_requests/translations/_only_for_translations.py:10
 msgid "Create request"
 msgstr ""
 
-#: /Users/m/w/cesnet/oarepo-requests/oarepo_requests/translations/_only_for_translations.py:11
+#: /Users/miroslavbauer/Code/github.com/oarepo/oarepo-requests/oarepo_requests/translations/_only_for_translations.py:11
 msgid "Submit request"
 msgstr ""
 
-#: /Users/m/w/cesnet/oarepo-requests/oarepo_requests/translations/_only_for_translations.py:12
+#: /Users/miroslavbauer/Code/github.com/oarepo/oarepo-requests/oarepo_requests/translations/_only_for_translations.py:12
 msgid "Delete request"
 msgstr ""
 
-#: /Users/m/w/cesnet/oarepo-requests/oarepo_requests/translations/_only_for_translations.py:13
+#: /Users/miroslavbauer/Code/github.com/oarepo/oarepo-requests/oarepo_requests/translations/_only_for_translations.py:13
 msgid "Delete"
 msgstr ""
 
-#: /Users/m/w/cesnet/oarepo-requests/oarepo_requests/translations/_only_for_translations.py:14
+#: /Users/miroslavbauer/Code/github.com/oarepo/oarepo-requests/oarepo_requests/translations/_only_for_translations.py:14
 msgid "Accept request"
 msgstr ""
 
-#: /Users/m/w/cesnet/oarepo-requests/oarepo_requests/translations/_only_for_translations.py:15
+#: /Users/miroslavbauer/Code/github.com/oarepo/oarepo-requests/oarepo_requests/translations/_only_for_translations.py:15
 msgid "Accept"
 msgstr ""
 
-#: /Users/m/w/cesnet/oarepo-requests/oarepo_requests/translations/_only_for_translations.py:16
+#: /Users/miroslavbauer/Code/github.com/oarepo/oarepo-requests/oarepo_requests/translations/_only_for_translations.py:16
 msgid "Decline request"
 msgstr ""
 
-#: /Users/m/w/cesnet/oarepo-requests/oarepo_requests/translations/_only_for_translations.py:17
+#: /Users/miroslavbauer/Code/github.com/oarepo/oarepo-requests/oarepo_requests/translations/_only_for_translations.py:17
 msgid "Decline"
 msgstr ""
 
-#: /Users/m/w/cesnet/oarepo-requests/oarepo_requests/translations/_only_for_translations.py:18
+#: /Users/miroslavbauer/Code/github.com/oarepo/oarepo-requests/oarepo_requests/translations/_only_for_translations.py:18
 msgid "Create and submit request"
 msgstr ""
 
-#: /Users/m/w/cesnet/oarepo-requests/oarepo_requests/translations/_only_for_translations.py:19
+#: /Users/miroslavbauer/Code/github.com/oarepo/oarepo-requests/oarepo_requests/translations/_only_for_translations.py:19
 msgid "Create and submit"
 msgstr ""
 
-#: /Users/m/w/cesnet/oarepo-requests/oarepo_requests/translations/_only_for_translations.py:20
+#: /Users/miroslavbauer/Code/github.com/oarepo/oarepo-requests/oarepo_requests/translations/_only_for_translations.py:20
 msgid "Error sending request"
 msgstr ""
 
-#: /Users/m/w/cesnet/oarepo-requests/oarepo_requests/translations/_only_for_translations.py:21
+#: /Users/miroslavbauer/Code/github.com/oarepo/oarepo-requests/oarepo_requests/translations/_only_for_translations.py:21
 msgid "Submit"
 msgstr ""
 
-#: /Users/m/w/cesnet/oarepo-requests/oarepo_requests/translations/_only_for_translations.py:22
+#: /Users/miroslavbauer/Code/github.com/oarepo/oarepo-requests/oarepo_requests/translations/_only_for_translations.py:22
 msgid "Save drafted request"
 msgstr ""
 
-#: /Users/m/w/cesnet/oarepo-requests/oarepo_requests/translations/_only_for_translations.py:23
+#: /Users/miroslavbauer/Code/github.com/oarepo/oarepo-requests/oarepo_requests/translations/_only_for_translations.py:23
 msgid "Save"
 msgstr ""
 
-#: /Users/m/w/cesnet/oarepo-requests/oarepo_requests/translations/_only_for_translations.py:24
+#: /Users/miroslavbauer/Code/github.com/oarepo/oarepo-requests/oarepo_requests/translations/_only_for_translations.py:24
 msgid "Create"
 msgstr ""
 
-#: /Users/m/w/cesnet/oarepo-requests/oarepo_requests/translations/_only_for_translations.py:25
+#: /Users/miroslavbauer/Code/github.com/oarepo/oarepo-requests/oarepo_requests/translations/_only_for_translations.py:25
 msgid "Creator"
 msgstr ""
 
-#: /Users/m/w/cesnet/oarepo-requests/oarepo_requests/translations/_only_for_translations.py:26
+#: /Users/miroslavbauer/Code/github.com/oarepo/oarepo-requests/oarepo_requests/translations/_only_for_translations.py:26
 msgid "Receiver"
 msgstr ""
 
-#: /Users/m/w/cesnet/oarepo-requests/oarepo_requests/translations/_only_for_translations.py:27
+#: /Users/miroslavbauer/Code/github.com/oarepo/oarepo-requests/oarepo_requests/translations/_only_for_translations.py:27
 msgid "Request type"
 msgstr ""
 
-#: /Users/m/w/cesnet/oarepo-requests/oarepo_requests/translations/_only_for_translations.py:28
+#: /Users/miroslavbauer/Code/github.com/oarepo/oarepo-requests/oarepo_requests/translations/_only_for_translations.py:28
 msgid "Created"
 msgstr ""
 
-#: /Users/m/w/cesnet/oarepo-requests/oarepo_requests/translations/_only_for_translations.py:29
+#: /Users/miroslavbauer/Code/github.com/oarepo/oarepo-requests/oarepo_requests/translations/_only_for_translations.py:29
 msgid "Timeline"
 msgstr ""
 
-#: /Users/m/w/cesnet/oarepo-requests/oarepo_requests/translations/_only_for_translations.py:30
+#: /Users/miroslavbauer/Code/github.com/oarepo/oarepo-requests/oarepo_requests/translations/_only_for_translations.py:30
 msgid "Submit event"
 msgstr ""
 
-#: /Users/m/w/cesnet/oarepo-requests/oarepo_requests/translations/_only_for_translations.py:31
+#: /Users/miroslavbauer/Code/github.com/oarepo/oarepo-requests/oarepo_requests/translations/_only_for_translations.py:31
 msgid "No requests to show"
 msgstr ""
 
-#: /Users/m/w/cesnet/oarepo-requests/oarepo_requests/translations/_only_for_translations.py:32
+#: /Users/miroslavbauer/Code/github.com/oarepo/oarepo-requests/oarepo_requests/translations/_only_for_translations.py:32
 msgid "api.requests"
 msgstr ""
 
-#: /Users/m/w/cesnet/oarepo-requests/oarepo_requests/types/delete_record.py:14
+#: /Users/miroslavbauer/Code/github.com/oarepo/oarepo-requests/oarepo_requests/types/delete_record.py:14
 msgid "Request deletion of published record"
 msgstr ""
 
-#: /Users/m/w/cesnet/oarepo-requests/oarepo_requests/types/edit_record.py:16
+#: /Users/miroslavbauer/Code/github.com/oarepo/oarepo-requests/oarepo_requests/types/edit_record.py:16
 msgid "Request re-opening of published record"
 msgstr ""
 
-#: /Users/m/w/cesnet/oarepo-requests/oarepo_requests/types/publish_draft.py:14
+#: /Users/miroslavbauer/Code/github.com/oarepo/oarepo-requests/oarepo_requests/types/publish_draft.py:14
 msgid "Request publishing of a draft"
 msgstr ""
 
+msgid "Loading request types"
+msgstr ""
+
+msgid "Error loading request types"
+msgstr ""
+
+msgid "No new requests to create"
+msgstr ""
+
 msgid "No status"
+msgstr ""
+
+msgid "Requests"
+msgstr ""
+
+msgid "Error loading requests"
+msgstr ""
+
+msgid "Loading requests"
 msgstr ""
 
 msgid "Cannot send request. Please try again later."

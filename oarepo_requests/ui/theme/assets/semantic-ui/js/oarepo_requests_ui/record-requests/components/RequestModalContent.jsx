@@ -11,6 +11,7 @@ import { CustomFields } from "react-invenio-forms";
 
 import { RequestModal, ModalContentSideInfo } from ".";
 import { RequestContext } from "../contexts";
+import { fetchUpdated as fetchNewEvents } from "../utils";
 import { REQUEST_TYPE } from "../utils/objects";
 import ReadOnlyCustomFields from "./common/ReadOnlyCustomFields";
 
@@ -21,23 +22,26 @@ import ReadOnlyCustomFields from "./common/ReadOnlyCustomFields";
  * @typedef {import("../types").Event} Event
  */
 
-/** @param {{ request: Request, requestModalType: RequestTypeEnum, requestType: RequestType, fetchNewEvents: (url: string, setter: (events: Event[]) => void) => Promise<Event>, customSubmitHandler: (e) => void }} props */
-export const RequestModalContent = ({ request, requestType, requestModalType, fetchNewEvents, customSubmitHandler }) => {
-  /** @type {[Request[], (requests: Request[]) => void]} */
+/** @param {{ request: Request, requestModalType: RequestTypeEnum, requestType: RequestType, customSubmitHandler: (e) => void }} props */
+export const RequestModalContent = ({ request, requestType, requestModalType, customSubmitHandler }) => {
+  /** @type {{requests: Request[], setRequests: (requests: Request[]) => void}} */
   const { requests, setRequests } = useContext(RequestContext);
 
   const actualRequest = requests.find(req => req.id === request.id);
 
   useEffect(() => {
     if (!_isEmpty(request.links?.events)) {
-      fetchNewEvents(request.links.events, (events) => {
-        setRequests(requests => requests.map(req => {
-          if (req.id === request.id) {
-            req.events = events;
-          }
-          return req;
-        }));
-      });
+      fetchNewEvents(request.links.events,
+        (responseData) => {
+          setRequests(requests => requests.map(req => {
+            if (req.id === request.id) {
+              req.events = responseData?.hits?.hits ?? [];
+            }
+            return req;
+          }));
+        }, (error) => {
+          console.error(error);
+        });
     }
   }, [actualRequest, setRequests]);
 
@@ -126,7 +130,7 @@ export const RequestModalContent = ({ request, requestType, requestModalType, fe
                               <Comment.Content>
                                 <Comment.Author as="a" href={event.created_by?.link}>{event.created_by.label}</Comment.Author>
                                 <Comment.Metadata>
-                                  <div>{new Date(event?.created)?.toLocaleString("cs-CZ")}</div>
+                                  <div>{event?.created}</div>
                                 </Comment.Metadata>
                                 <Comment.Text>
                                   <ReadOnlyCustomFields
@@ -173,4 +177,6 @@ export const RequestModalContent = ({ request, requestType, requestModalType, fe
 RequestModalContent.propTypes = {
   request: PropTypes.object.isRequired,
   requestType: PropTypes.object.isRequired,
+  requestModalType: PropTypes.string.isRequired,
+  customSubmitHandler: PropTypes.func,
 };

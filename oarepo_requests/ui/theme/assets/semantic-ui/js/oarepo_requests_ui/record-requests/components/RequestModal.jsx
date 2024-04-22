@@ -1,17 +1,17 @@
-import React, { useState, useEffect, useContext, useRef } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import PropTypes from "prop-types";
 
 import { i18next } from "@translations/oarepo_requests_ui/i18next";
 import { Dimmer, Loader, Modal, Button, Icon, Message, Confirm } from "semantic-ui-react";
 import _isEmpty from "lodash/isEmpty";
+import _isFunction from "lodash/isFunction";
 
 import { useFormik, FormikContext } from "formik";
 import axios from "axios";
 
 import { RequestModalContent, CreateRequestModalContent } from ".";
 import { REQUEST_TYPE } from "../utils/objects";
-import { sortByStatusCode, isDeepEmpty } from "../utils";
-import { RecordContext, RequestContext } from "../contexts";
+import { isDeepEmpty } from "../utils";
 
 /** 
  * @typedef {import("../types").Request} Request
@@ -31,26 +31,8 @@ const mapPayloadUiToInitialValues = (payloadUi) => {
   return initialValues;
 };
 
-const fetchUpdated = async (url, setter) => {
-  return axios({
-    method: 'get',
-    url: url,
-    headers: { 
-      'Content-Type': 'application/json', 
-      'Accept': 'application/vnd.inveniordm.v1+json'
-    }
-  })
-    .then(response => {
-      console.log(response);
-      setter(response.data?.hits?.hits);
-    })
-    .catch(error => {
-      console.log(error);
-    });
-}
-
-/** @param {{ request: Request, requestTypes: RequestType[], requestModalType: RequestTypeEnum, isEventModal: boolean, triggerButton: ReactElement }} props */
-export const RequestModal = ({ request, requestTypes, requestModalType, isEventModal = false, triggerButton }) => {
+/** @param {{ request: Request, requestTypes: RequestType[], requestModalType: RequestTypeEnum, isEventModal: boolean, triggerButton: ReactElement, fetchNewRequests: () => void }} props */
+export const RequestModal = ({ request, requestTypes, requestModalType, isEventModal = false, triggerButton, fetchNewRequests }) => {
   const [modalOpen, setModalOpen] = useState(false);
   const [error, setError] = useState(null);
 
@@ -66,10 +48,6 @@ export const RequestModal = ({ request, requestTypes, requestModalType, isEventM
 
   const errorMessageRef = useRef(null);
 
-  /** @type {[Request[], (requests: Request[]) => void]} */
-  const { setRequests } = useContext(RequestContext);
-  const record = useContext(RecordContext);
-
   const formik = useFormik({
     initialValues: !_isEmpty(request?.payload) ? { payload: request.payload } : (request?.payload_ui ? mapPayloadUiToInitialValues(request?.payload_ui) : {}),
     onSubmit: () => {}
@@ -83,7 +61,6 @@ export const RequestModal = ({ request, requestTypes, requestModalType, isEventM
 
   const callApi = async (url, method, data = formik.values, doNotHandleResolve = false) => {
     if (_isEmpty(url)) {
-      console.log(`Wrong or empty URL: ${url} for method: ${method}`);
       setError(new Error(i18next.t("Cannot send request. Please try again later.")));
       formik.setSubmitting(false);
       return;
@@ -105,17 +82,12 @@ export const RequestModal = ({ request, requestTypes, requestModalType, isEventM
       headers: { 'Content-Type': 'application/json' }
     })
       .then(response => {
-        console.log(response);
-        fetchUpdated(record.links?.requests, (requests) => { setRequests(sortByStatusCode(requests)); });
         setModalOpen(false);
         formik.resetForm();
+        fetchNewRequests();
       })
       .catch(error => {
-        console.log(error);
         setError(error);
-      })
-      .finally(() => {
-        formik.setSubmitting(false);
       });
   }
 
@@ -123,15 +95,12 @@ export const RequestModal = ({ request, requestTypes, requestModalType, isEventM
     try {
       const createdRequest = await callApi(request.links.actions?.create, 'post', formik.values, true);
       await callApi(createdRequest.data?.links?.actions?.submit, 'post', {}, true);
-      fetchUpdated(record.links?.requests, (requests) => { setRequests(sortByStatusCode(requests)); });
       setModalOpen(false);
       formik.resetForm();
+      fetchNewRequests();
     } catch (error) {
-      console.log(error);
       setError(error);
-    } finally {
-      formik.setSubmitting(false);
-    }
+    };
   }
 
   const sendRequest = async (requestType, createAndSubmit = false) => {
@@ -191,7 +160,6 @@ export const RequestModal = ({ request, requestTypes, requestModalType, isEventM
     }
 
     if (createAndSubmit) {
-      console.log("createAndSubmit");
       newConfirmDialogProps = {
         ...newConfirmDialogProps,
         header: i18next.t("Create and submit request"),
@@ -225,7 +193,6 @@ export const RequestModal = ({ request, requestTypes, requestModalType, isEventM
         sendRequest(REQUEST_TYPE.CREATE);
       }
     } catch (error) {
-      console.log(error);
       setError(error);
     } finally {
       formik.setSubmitting(false);
@@ -268,7 +235,7 @@ export const RequestModal = ({ request, requestTypes, requestModalType, isEventM
           <FormikContext.Provider value={formik}>
             {requestModalType === REQUEST_TYPE.CREATE &&
               <CreateRequestModalContent requestType={request} customSubmitHandler={customSubmitHandler} /> ||
-              <RequestModalContent request={request} requestType={requestType} requestModalType={requestModalType} customSubmitHandler={customSubmitHandler} fetchNewEvents={fetchUpdated} />
+              <RequestModalContent request={request} requestType={requestType} requestModalType={requestModalType} customSubmitHandler={customSubmitHandler} />
             }
           </FormikContext.Provider>
         </Modal.Content>
