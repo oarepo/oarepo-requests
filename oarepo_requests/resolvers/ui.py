@@ -199,6 +199,7 @@ class RecordEntityDraftReferenceUIResolver(RecordEntityReferenceUIResolver):
         except TypeError:
             # ----
             from invenio_records_resources.services.base.links import LinksTemplate
+
             # rdm-12 version
             def search_drafts(
                 service,

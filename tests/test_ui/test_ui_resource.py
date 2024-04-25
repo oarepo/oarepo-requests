@@ -9,9 +9,9 @@ allowed_actions = ["submit"] if is_oarepo_11 else ["submit", "delete"]
 
 
 def test_draft_publish_request_present(
-    app, record_ui_resource, example_topic_draft, client_with_login, fake_manifest
+    app, logged_client, users, record_ui_resource, example_topic_draft, fake_manifest
 ):
-    with client_with_login.get(f"/thesis/{example_topic_draft['id']}/edit") as c:
+    with logged_client(users[0]).get(f"/thesis/{example_topic_draft['id']}/edit") as c:
         assert c.status_code == 200
         data = json.loads(c.text)
         assert data["creatable_request_types"]["thesis_publish_draft"] == {
@@ -35,9 +35,9 @@ def test_draft_publish_unauthorized(
 
 
 def test_record_delete_request_present(
-    app, record_ui_resource, example_topic, client_with_login, fake_manifest
+    app, logged_client, users, record_ui_resource, example_topic, fake_manifest
 ):
-    with client_with_login.get(f"/thesis/{example_topic['id']}") as c:
+    with logged_client(users[0]).get(f"/thesis/{example_topic['id']}") as c:
         assert c.status_code == 200
         data = json.loads(c.text)
         assert len(data["creatable_request_types"]) == 2

@@ -6,8 +6,7 @@ from .utils import link_api2testclient
 
 
 def test_can_create(
-    logged_client_request,
-    identity_simple,
+    logged_client,
     users,
     urls,
     publish_request_data_function,
@@ -16,67 +15,52 @@ def test_can_create(
     creator = users[0]
     receiver = users[1]
 
-    draft1 = logged_client_request(creator, "post", urls["BASE_URL"], json={})
-    draft2 = logged_client_request(creator, "post", urls["BASE_URL"], json={})
+    creator_client = logged_client(creator)
+    receiver_client = logged_client(receiver)
 
-    resp_request_create = logged_client_request(
-        creator,
-        "post",
+    draft1 = creator_client.post(urls["BASE_URL"], json={})
+    draft2 = creator_client.post(urls["BASE_URL"], json={})
+
+    resp_request_create = creator_client.post(
         urls["BASE_URL_REQUESTS"],
         json=publish_request_data_function(draft1.json["id"]),
     )
 
-    resp_request_submit = logged_client_request(
-        creator,
-        "post",
+    resp_request_submit = creator_client.post(
         link_api2testclient(resp_request_create.json["links"]["actions"]["submit"]),
     )
 
     with pytest.raises(OpenRequestAlreadyExists):
-        resp_request_create_duplicated = logged_client_request(
-            creator,
-            "post",
+        resp_request_create_duplicated = creator_client.post(
             urls["BASE_URL_REQUESTS"],
             json=publish_request_data_function(draft1.json["id"]),
         )
 
     # should still be creatable for draft2
-    create_for_request_draft2 = logged_client_request(
-        creator,
-        "post",
+    create_for_request_draft2 = creator_client.post(
         urls["BASE_URL_REQUESTS"],
         json=publish_request_data_function(draft2.json["id"]),
     )
     assert create_for_request_draft2.status_code == 201
 
     # try declining the request for draft2, we should be able to create again then
-    resp_request_submit = logged_client_request(
-        creator,
-        "post",
+    resp_request_submit = creator_client.post(
         link_api2testclient(
             create_for_request_draft2.json["links"]["actions"]["submit"]
         ),
     )
 
     with pytest.raises(OpenRequestAlreadyExists):
-        create_for_request_draft2 = logged_client_request(
-            creator,
-            "post",
+        create_for_request_draft2 = creator_client.post(
             urls["BASE_URL_REQUESTS"],
             json=publish_request_data_function(draft2.json["id"]),
         )
-    record = logged_client_request(
-        receiver, "get", f"{urls['BASE_URL']}{draft2.json['id']}/draft"
-    )
-    decline = logged_client_request(
-        receiver,
-        "post",
+    record = receiver_client.get(f"{urls['BASE_URL']}{draft2.json['id']}/draft")
+    decline = receiver_client.post(
         link_api2testclient(record.json["requests"][0]["links"]["actions"]["decline"]),
     )
 
-    resp_request_create_again = logged_client_request(
-        creator,
-        "post",
+    resp_request_create_again = creator_client.post(
         urls["BASE_URL_REQUESTS"],
         json=publish_request_data_function(draft2.json["id"]),
     )
@@ -84,8 +68,7 @@ def test_can_create(
 
 
 def test_can_possibly_create(
-    logged_client_request,
-    identity_simple,
+    logged_client,
     users,
     urls,
     publish_request_data_function,
@@ -94,22 +77,21 @@ def test_can_possibly_create(
     creator = users[0]
     receiver = users[1]
 
-    draft1 = logged_client_request(creator, "post", urls["BASE_URL"], json={})
-    draft2 = logged_client_request(creator, "post", urls["BASE_URL"], json={})
+    creator_client = logged_client(creator)
+    receiver_client = logged_client(receiver)
 
-    record_resp_no_request = logged_client_request(
-        receiver, "get", f"{urls['BASE_URL']}{draft1.json['id']}/draft"
+    draft1 = creator_client.post(urls["BASE_URL"], json={})
+    draft2 = creator_client.post(urls["BASE_URL"], json={})
+
+    record_resp_no_request = receiver_client.get(
+        f"{urls['BASE_URL']}{draft1.json['id']}/draft"
     )
-    resp_request_create = logged_client_request(
-        creator,
-        "post",
+    resp_request_create = creator_client.post(
         urls["BASE_URL_REQUESTS"],
         json=publish_request_data_function(draft1.json["id"]),
     )
 
-    resp_request_submit = logged_client_request(
-        creator,
-        "post",
+    resp_request_submit = creator_client.post(
         link_api2testclient(resp_request_create.json["links"]["actions"]["submit"]),
     )
 
@@ -119,11 +101,11 @@ def test_can_possibly_create(
                 return request
         return None
 
-    record_resp_with_request = logged_client_request(
-        receiver, "get", f"{urls['BASE_URL']}{draft1.json['id']}/draft"
+    record_resp_with_request = receiver_client.get(
+        f"{urls['BASE_URL']}{draft1.json['id']}/draft"
     )
-    record_resp_draft2 = logged_client_request(
-        receiver, "get", f"{urls['BASE_URL']}{draft2.json['id']}/draft"
+    record_resp_draft2 = receiver_client.get(
+        f"{urls['BASE_URL']}{draft2.json['id']}/draft"
     )
     assert find_request_type(
         record_resp_no_request.json["request_types"], "thesis_publish_draft"

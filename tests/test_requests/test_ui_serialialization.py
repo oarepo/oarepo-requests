@@ -12,34 +12,27 @@ def test_publish(
     urls,
     publish_request_data_function,
     ui_serialization_result,
-    logged_client_request,
+    logged_client,
     search_clear,
 ):
     creator = users[0]
+    creator_client = logged_client(creator)
 
-    draft1 = logged_client_request(creator, "post", urls["BASE_URL"], json={})
+    draft1 = creator_client.post(urls["BASE_URL"], json={})
     draft_id = draft1.json["id"]
     ThesisRecord.index.refresh()
     ThesisDraft.index.refresh()
 
-    resp_request_create = logged_client_request(
-        creator,
-        "post",
+    resp_request_create = creator_client.post(
         urls["BASE_URL_REQUESTS"],
         json=publish_request_data_function(draft1.json["id"]),
     )
 
-    resp_request_submit = logged_client_request(
-        creator,
-        "post",
+    resp_request_submit = creator_client.post(
         link_api2testclient(resp_request_create.json["links"]["actions"]["submit"]),
     )
-    record = logged_client_request(
-        creator, "get", f"{urls['BASE_URL']}{draft_id}/draft"
-    ).json
-    ui_record = logged_client_request(
-        creator,
-        "get",
+    record = creator_client.get(f"{urls['BASE_URL']}{draft_id}/draft").json
+    ui_record = creator_client.get(
         f"{urls['BASE_URL']}{draft_id}/draft",
         headers={"Accept": "application/vnd.inveniordm.v1+json"},
     ).json
@@ -56,7 +49,7 @@ def test_resolver_fallback(
     urls,
     publish_request_data_function,
     ui_serialization_result,
-    logged_client_request,
+    logged_client,
     search_clear,
 ):
     config_restore = copy.deepcopy(app.config["ENTITY_REFERENCE_UI_RESOLVERS"])
@@ -65,27 +58,22 @@ def test_resolver_fallback(
     }
 
     creator = users[0]
+    creator_client = logged_client(creator)
 
-    draft1 = logged_client_request(creator, "post", urls["BASE_URL"], json={})
+    draft1 = creator_client.post(urls["BASE_URL"], json={})
     draft_id = draft1.json["id"]
     ThesisRecord.index.refresh()
     ThesisDraft.index.refresh()
 
-    resp_request_create = logged_client_request(
-        creator,
-        "post",
+    resp_request_create = creator_client.post(
         urls["BASE_URL_REQUESTS"],
         json=publish_request_data_function(draft1.json["id"]),
     )
 
-    resp_request_submit = logged_client_request(
-        creator,
-        "post",
+    resp_request_submit = creator_client.post(
         link_api2testclient(resp_request_create.json["links"]["actions"]["submit"]),
     )
-    ui_record = logged_client_request(
-        creator,
-        "post",
+    ui_record = creator_client.post(
         f"{urls['BASE_URL']}{draft_id}/draft",
         headers={"Accept": "application/vnd.inveniordm.v1+json"},
     ).json

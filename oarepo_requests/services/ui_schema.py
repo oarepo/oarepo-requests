@@ -39,7 +39,6 @@ class UIReferenceSchema(ma.Schema):
         return resolved_cache.dereference(data["reference"])
 
 
-
 class UIRequestSchemaMixin:
     created = LocalizedDateTime(dump_only=True)
     updated = LocalizedDateTime(dump_only=True)
