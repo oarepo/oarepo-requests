@@ -11,6 +11,7 @@ def pick_request_type(types_list, queried_type):
 
 
 def test_record(
+    vocab_cf,
     logged_client_request,
     record_factory,
     identity_simple,
@@ -54,8 +55,6 @@ def test_record(
     )
     ThesisRecord.index.refresh()
     lst = logged_client_request(creator, "get", urls["BASE_URL"])
-    print(lst.status_code)
-    print(lst.json)
     assert len(lst.json["hits"]["hits"]) == 0
 
 

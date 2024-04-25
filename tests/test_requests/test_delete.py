@@ -4,6 +4,7 @@ from .utils import link_api2testclient
 
 
 def test_delete(
+    vocab_cf,
     logged_client_request,
     record_factory,
     identity_simple,

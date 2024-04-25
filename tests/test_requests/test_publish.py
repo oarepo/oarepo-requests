@@ -4,6 +4,7 @@ from .utils import link_api2testclient
 
 
 def test_publish(
+    vocab_cf,
     logged_client_request,
     identity_simple,
     users,

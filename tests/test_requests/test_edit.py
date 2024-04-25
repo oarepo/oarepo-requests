@@ -4,6 +4,7 @@ from tests.test_requests.utils import link_api2testclient
 
 
 def test_edit_autoaccept(
+    vocab_cf,
     logged_client_request,
     identity_simple,
     users,
