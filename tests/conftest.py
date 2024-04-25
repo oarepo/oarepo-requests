@@ -11,6 +11,12 @@ def create_app(instance_path, entry_points):
     """Application factory fixture."""
     return create_api
 
+@pytest.fixture()
+def vocab_cf(app, db, cache):
+    from oarepo_runtime.services.custom_fields.mappings import prepare_cf_indices
+
+    prepare_cf_indices()
+    ThesisDraft.index.refresh()
 
 @pytest.fixture()
 def urls():
@@ -278,7 +284,6 @@ def client_with_login(client, users):
     login_user(user)
     login_user_via_session(client, email=user.email)
     return client
-
 
 @pytest.fixture()
 def client_logged_as(client, users):

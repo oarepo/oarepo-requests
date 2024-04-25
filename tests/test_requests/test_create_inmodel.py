@@ -54,10 +54,13 @@ def test_record(
     )
     ThesisRecord.index.refresh()
     lst = logged_client_request(creator, "get", urls["BASE_URL"])
+    print(lst.status_code)
+    print(lst.json)
     assert len(lst.json["hits"]["hits"]) == 0
 
 
 def test_draft(
+    vocab_cf,
     logged_client_request,
     identity_simple,
     users,
