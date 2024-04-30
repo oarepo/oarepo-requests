@@ -1,8 +1,14 @@
+import os
+
 import pytest
-from flask_principal import Identity, Need, UserNeed
+from flask_security import login_user
+from invenio_accounts.testutils import login_user_via_session
+from invenio_app.factory import create_api
 from invenio_requests.customizations import CommentEventType, LogEventType
-from invenio_requests.proxies import current_request_type_registry, current_requests
-from invenio_requests.records.api import Request, RequestEventFormat
+from invenio_requests.proxies import current_requests
+from invenio_requests.records.api import RequestEventFormat
+from invenio_users_resources.records import UserAggregate
+from thesis.proxies import current_service
 from thesis.records.api import ThesisDraft, ThesisRecord
 
 
@@ -10,6 +16,14 @@ from thesis.records.api import ThesisDraft, ThesisRecord
 def create_app(instance_path, entry_points):
     """Application factory fixture."""
     return create_api
+
+
+@pytest.fixture()
+def vocab_cf(app, db, cache):
+    from oarepo_runtime.services.custom_fields.mappings import prepare_cf_indices
+
+    prepare_cf_indices()
+    ThesisDraft.index.refresh()
 
 
 @pytest.fixture()
@@ -58,7 +72,7 @@ def serialization_result():
             #'updated': '2024-01-29T22:09:13.954850',
             "links": {
                 "actions": {
-                    "accept": f"https://127.0.0.1:5000/api/requests/{request_id}/actions/accept"
+                    "cancel": f"https://127.0.0.1:5000/api/requests/{request_id}/actions/cancel"
                 },
                 "self": f"https://127.0.0.1:5000/api/requests/extended/{request_id}",
                 "comments": f"https://127.0.0.1:5000/api/requests/extended/{request_id}/comments",
@@ -88,7 +102,8 @@ def ui_serialization_result():
         return {
             # 'created': '2024-01-26T10:06:17.945916',
             "created_by": {
-                "label": "id: 1",
+                "label": "user1@example.org",
+                "link": "https://127.0.0.1:5000/api/users/1",
                 "reference": {"user": "1"},
                 "type": "user",
             },
@@ -100,19 +115,14 @@ def ui_serialization_result():
             "is_open": True,
             "links": {
                 "actions": {
-                    "accept": f"https://127.0.0.1:5000/api/requests/{request_id}/actions/accept"
+                    "cancel": f"https://127.0.0.1:5000/api/requests/{request_id}/actions/cancel"
                 },
                 "self": f"https://127.0.0.1:5000/api/requests/extended/{request_id}",
                 "comments": f"https://127.0.0.1:5000/api/requests/extended/{request_id}/comments",
                 "timeline": f"https://127.0.0.1:5000/api/requests/extended/{request_id}/timeline",
             },
             "number": "1",
-            "receiver": {
-                "label": "user2@example.org",
-                "link": "https://127.0.0.1:5000/api/users/2",
-                "reference": {"user": "2"},
-                "type": "user",
-            },
+            "receiver": {"label": "id: 2", "reference": {"user": "2"}, "type": "user"},
             "revision_id": 3,
             "status": "Submitted",
             "title": "",
@@ -172,26 +182,6 @@ def app_config(app_config):
 
 
 @pytest.fixture(scope="module")
-def identity_simple():
-    """Simple identity fixture."""
-    i = Identity(1)
-    i.provides.add(UserNeed(1))
-    i.provides.add(Need(method="system_role", value="any_user"))
-    i.provides.add(Need(method="system_role", value="authenticated_user"))
-    return i
-
-
-@pytest.fixture(scope="module")
-def identity_simple_2():
-    """Simple identity fixture."""
-    i = Identity(2)
-    i.provides.add(UserNeed(2))
-    i.provides.add(Need(method="system_role", value="any_user"))
-    i.provides.add(Need(method="system_role", value="authenticated_user"))
-    return i
-
-
-@pytest.fixture(scope="module")
 def requests_service(app):
     """Request Factory fixture."""
 
@@ -220,107 +210,75 @@ def create_request(requests_service):
     return _create_request
 
 
-"""
-@pytest.fixture
-def request_data_factory():
-    def create_data(community, topic, data):
-        if not isinstance(community, str):
-            community_id = community.id
-        else:
-            community_id = community
-        input_data = {
-            "receiver": {"oarepo_community": community_id},
-            "request_type": type,
-            "topic": {"thesis": topic["id"]},
-        }
-        if creator:
-            input_data["creator"] = creator
-        if payload:
-            input_data["payload"] = payload
-        return input_data
-
-    return create_data
-"""
-
-
 @pytest.fixture()
-def submit_request(create_request, requests_service, **kwargs):
-    """Opened Request Factory fixture."""
+def users(app, db, UserFixture):
 
-    def _submit_request(identity, data, **kwargs):
-        """Create and submit a request."""
-        request = create_request(identity, input_data=data, **kwargs)
-        id_ = request.id
-        return requests_service.execute_action(identity, id_, "submit", data)._request
+    user1 = UserFixture(
+        email="user1@example.org",
+        password="password",
+        active=True,
+        confirmed=True,
+    )
+    user1.create(app, db)
 
-    return _submit_request
+    user2 = UserFixture(
+        email="user2@example.org",
+        password="beetlesmasher",
+        active=True,
+        confirmed=True,
+    )
+    user2.create(app, db)
 
-
-@pytest.fixture()
-def users(app, db):
-    with db.session.begin_nested():
-        datastore = app.extensions["security"].datastore
-        user1 = datastore.create_user(
-            email="user1@example.org",
-            password="password",
-            active=True,
-        )
-        user2 = datastore.create_user(
-            email="user2@example.org",
-            password="beetlesmasher",
-            active=True,
-        )
+    user3 = UserFixture(
+        email="user3@example.org",
+        password="beetlesmasher",
+        active=True,
+        confirmed=True,
+    )
+    user3.create(app, db)
 
     db.session.commit()
-    return [user1, user2]
+    UserAggregate.index.refresh()
+    return [user1, user2, user3]
 
 
 @pytest.fixture()
-def client_with_login(client, users):
-    """Log in a user to the client."""
-    user = users[0]
-    login_user(user)
-    login_user_via_session(client, email=user.email)
-    return client
+def identity_simple(users):
+    return users[0].identity
+
+
+class LoggedClient:
+    def __init__(self, client, user_fixture):
+        self.client = client
+        self.user_fixture = user_fixture
+
+    def _login(self):
+        login_user(self.user_fixture.user, remember=True)
+        login_user_via_session(self.client, email=self.user_fixture.email)
+
+    def post(self, *args, **kwargs):
+        self._login()
+        return self.client.post(*args, **kwargs)
+
+    def get(self, *args, **kwargs):
+        self._login()
+        return self.client.get(*args, **kwargs)
+
+    def put(self, *args, **kwargs):
+        self._login()
+        return self.client.put(*args, **kwargs)
+
+    def delete(self, *args, **kwargs):
+        self._login()
+        return self.client.delete(*args, **kwargs)
 
 
 @pytest.fixture()
-def client_logged_as(client, users):
-    """Logs in a user to the client."""
+def logged_client(client):
+    def _logged_client(user):
+        return LoggedClient(client, user)
 
-    def log_user(user_email):
-        """Log the user."""
-        available_users = users
-
-        user = next((u for u in available_users if u.email == user_email), None)
-        login_user(user, remember=True)
-        login_user_via_session(client, email=user_email)
-        return client
-
-    return log_user
-
-
-@pytest.fixture()
-def logged_client_request(client_logged_as):
-    def _logged_client_request(user, method, *args, **kwargs):
-        applied_client = client_logged_as(user.email)
-        return getattr(applied_client, method)(*args, **kwargs)
-
-    return _logged_client_request
-
-
-@pytest.fixture()
-def logged_clients(users, client_logged_as):
-    return [client_logged_as(user.email) for user in users]
-
-
-@pytest.fixture
-def client_factory(app):
-    def _client_factory():
-        with app.test_client() as client:
-            return client
-
-    return _client_factory
+    return _logged_client
 
 
 @pytest.fixture(scope="function")
@@ -348,13 +306,6 @@ def example_topic_draft(record_service, identity_simple):
 
 
 @pytest.fixture()
-def example_draft_service_bypass(app, db):
-    record = ThesisDraft.create({})
-    db.session.commit()
-    return record
-
-
-@pytest.fixture()
 def record_factory(record_service):
     def record(identity):
         draft = record_service.create(identity, {})
@@ -373,29 +324,6 @@ def example_topic(record_service, identity_simple):
     return record
 
 
-@pytest.fixture(scope="module")
-def identity_creator(identity_simple):  # for readability
-    return identity_simple
-
-
-@pytest.fixture(scope="module")
-def identity_receiver(identity_simple_2):  # for readability
-    return identity_simple_2
-
-
-@pytest.fixture(scope="function")
-def request_with_receiver_user(
-    requests_service, example_topic, identity_creator, users
-):
-    receiver = users[1]
-    type_ = current_request_type_registry.lookup("generic_request", quiet=True)
-    request_item = requests_service.create(
-        identity_creator, {}, type_, receiver=receiver, topic=example_topic
-    )
-    request = Request.get_record(request_item.id)
-    return request_item
-
-
 @pytest.fixture()
 def events_resource_data():
     """Input data for the Request Events Resource (REST body)."""
@@ -405,33 +333,3 @@ def events_resource_data():
             "format": RequestEventFormat.HTML.value,
         }
     }
-
-
-# -------
-import os
-
-import pytest
-from flask_security import login_user
-from invenio_accounts.testutils import login_user_via_session
-from invenio_app.factory import create_api
-from thesis.proxies import current_service
-
-
-@pytest.fixture
-def request_data(example_topic):
-    input_data = {
-        "receiver": {"user": "1"},
-        "request_type": "generic_request",
-        "topic": {"thesis": example_topic["id"]},
-    }
-    return input_data
-
-
-@pytest.fixture()
-def client_with_credentials(client, users):
-    """Log in a user to the client."""
-    user = users[2]
-    login_user(user, remember=True)
-    login_user_via_session(client, email=user.email)
-
-    return client

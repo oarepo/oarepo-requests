@@ -2,20 +2,21 @@ import copy
 
 from thesis.records.api import ThesisDraft, ThesisRecord
 
+from oarepo_requests.resolvers.ui import FallbackEntityReferenceUIResolver
+
 from .utils import is_valid_subdict, link_api2testclient
 
 
 def test_publish(
-    client_logged_as,
     users,
     urls,
     publish_request_data_function,
     ui_serialization_result,
+    logged_client,
     search_clear,
 ):
-    creator_client = client_logged_as(users[0].email)
-
-    receiver = users[1]
+    creator = users[0]
+    creator_client = logged_client(creator)
 
     draft1 = creator_client.post(urls["BASE_URL"], json={})
     draft_id = draft1.json["id"]
@@ -28,11 +29,10 @@ def test_publish(
     )
 
     resp_request_submit = creator_client.post(
-        link_api2testclient(resp_request_create.json["links"]["actions"]["submit"])
+        link_api2testclient(resp_request_create.json["links"]["actions"]["submit"]),
     )
-    receiver_client = client_logged_as(users[1].email)
-    record = receiver_client.get(f"{urls['BASE_URL']}{draft_id}/draft").json
-    ui_record = receiver_client.get(
+    record = creator_client.get(f"{urls['BASE_URL']}{draft_id}/draft").json
+    ui_record = creator_client.get(
         f"{urls['BASE_URL']}{draft_id}/draft",
         headers={"Accept": "application/vnd.inveniordm.v1+json"},
     ).json
@@ -45,18 +45,20 @@ def test_publish(
 
 def test_resolver_fallback(
     app,
-    client_logged_as,
     users,
     urls,
     publish_request_data_function,
     ui_serialization_result,
+    logged_client,
     search_clear,
 ):
-    creator_client = client_logged_as(users[0].email)
     config_restore = copy.deepcopy(app.config["ENTITY_REFERENCE_UI_RESOLVERS"])
-    app.config["ENTITY_REFERENCE_UI_RESOLVERS"] = {}
+    app.config["ENTITY_REFERENCE_UI_RESOLVERS"] = {
+        "fallback": FallbackEntityReferenceUIResolver("fallback"),
+    }
 
-    receiver = users[1]
+    creator = users[0]
+    creator_client = logged_client(creator)
 
     draft1 = creator_client.post(urls["BASE_URL"], json={})
     draft_id = draft1.json["id"]
@@ -69,17 +71,16 @@ def test_resolver_fallback(
     )
 
     resp_request_submit = creator_client.post(
-        link_api2testclient(resp_request_create.json["links"]["actions"]["submit"])
+        link_api2testclient(resp_request_create.json["links"]["actions"]["submit"]),
     )
-    receiver_client = client_logged_as(users[1].email)
-    ui_record = receiver_client.get(
+    ui_record = creator_client.post(
         f"{urls['BASE_URL']}{draft_id}/draft",
         headers={"Accept": "application/vnd.inveniordm.v1+json"},
     ).json
     expected_result = ui_serialization_result(draft_id, ui_record["requests"][0]["id"])
-    expected_result["receiver"][
+    expected_result["created_by"][
         "label"
-    ] = f"id: {users[1].id}"  # the user resolver uses name or email as label, the fallback doesn't know what to use
+    ] = f"id: {creator.id}"  # the user resolver uses name or email as label, the fallback doesn't know what to use
     assert is_valid_subdict(
         expected_result,
         ui_record["requests"][0],

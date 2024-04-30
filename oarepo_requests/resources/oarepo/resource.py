@@ -14,7 +14,6 @@ from oarepo_requests.utils import stringify_first_val
 
 
 class OARepoRequestsResource(RequestsResource, ErrorHandlersMixin):
-
     def __init__(
         self,
         config,
@@ -67,7 +66,6 @@ class OARepoRequestsResource(RequestsResource, ErrorHandlersMixin):
     @request_data
     @response_handler()
     def create(self):
-
         items = self.oarepo_requests_service.create(
             identity=g.identity,
             data=resource_requestctx.data,

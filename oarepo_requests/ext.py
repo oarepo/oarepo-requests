@@ -27,6 +27,10 @@ class OARepoRequests:
     def entity_reference_ui_resolvers(self):
         return self.app.config["ENTITY_REFERENCE_UI_RESOLVERS"]
 
+    @property
+    def ui_serialization_referenced_fields(self):
+        return self.app.config["REQUESTS_UI_SERIALIZATION_REFERENCED_FIELDS"]
+
     def default_request_receiver(self, request_type_id):
         """
         returns function that returns default request receiver

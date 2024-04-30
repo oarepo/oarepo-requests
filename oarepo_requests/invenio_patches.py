@@ -64,7 +64,9 @@ def override_invenio_requests_config(blueprint, *args, **kwargs):
     with blueprint.app.app_context():
         # this monkey patch should be done better (support from invenio)
         RequestsServiceConfig.search = EnhancedRequestSearchOptions
-        RequestsResourceConfig.request_search_args = ExtendedRequestSearchRequestArgsSchema
+        RequestsResourceConfig.request_search_args = (
+            ExtendedRequestSearchRequestArgsSchema
+        )
 
         class LazySerializer:
             @cached_property
@@ -84,9 +86,9 @@ def override_invenio_requests_config(blueprint, *args, **kwargs):
             "application/vnd.inveniordm.v1+json": ResponseHandler(LazySerializer()),
         }
 
-        from invenio_requests.services.requests.facets import type, status
-        from oarepo_runtime.i18n import lazy_gettext as _
         from invenio_requests.proxies import current_request_type_registry
+        from invenio_requests.services.requests.facets import status, type
+        from oarepo_runtime.i18n import lazy_gettext as _
 
         status._value_labels = {
             "submitted": _("Submitted"),

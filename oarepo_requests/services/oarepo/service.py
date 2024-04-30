@@ -28,7 +28,7 @@ class OARepoRequestsService(RequestsService):
             receiver_getter = current_oarepo_requests.default_request_receiver(
                 request_type
             )
-            receiver = receiver_getter(identity, request_type, topic, creator)
+            receiver = receiver_getter(identity, request_type, topic, creator, data)
         if data is None:
             data = {}
         if hasattr(type_, "can_create"):

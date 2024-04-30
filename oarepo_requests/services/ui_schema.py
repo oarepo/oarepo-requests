@@ -5,8 +5,7 @@ from marshmallow import validate
 from oarepo_runtime.i18n import lazy_gettext as _
 from oarepo_runtime.services.schema.ui import LocalizedDateTime
 
-from oarepo_requests.proxies import current_oarepo_requests
-from oarepo_requests.resolvers.ui import fallback_entity_reference_ui_resolver
+from oarepo_requests.resolvers.ui import resolve
 from oarepo_requests.services.schema import (
     NoneReceiverGenericRequestSchema,
     RequestsSchemaMixin,
@@ -29,18 +28,15 @@ class UIReferenceSchema(ma.Schema):
 
     @ma.post_dump
     def dereference(self, data, **kwargs):
-        try:
-            reference_type = list(data["reference"].keys())[0]
-            entity_resolvers = current_oarepo_requests.entity_reference_ui_resolvers
-            if reference_type in entity_resolvers:
-                return entity_resolvers[reference_type](self.context["identity"], data)
-            else:
-                # TODO log warning
-                return fallback_entity_reference_ui_resolver(
-                    self.context["identity"], data
-                )
-        except PIDDeletedError:
-            return {**data, "status": "removed"}
+        # todo makeshift for serializing records (record calls do not have 'resolved' cache in context)
+        if "resolved" not in self.context:
+            try:
+                return resolve(self.context["identity"], data["reference"])
+            except PIDDeletedError:
+                return {**data, "status": "removed"}
+        # todo PIDDeletedError might be thrown in creating the cache too i guess; test if that works
+        resolved_cache = self.context["resolved"]
+        return resolved_cache.dereference(data["reference"])
 
 
 class UIRequestSchemaMixin:

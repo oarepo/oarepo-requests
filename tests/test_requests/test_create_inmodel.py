@@ -11,9 +11,9 @@ def pick_request_type(types_list, queried_type):
 
 
 def test_record(
-    logged_client_request,
+    vocab_cf,
+    logged_client,
     record_factory,
-    identity_simple,
     users,
     urls,
     delete_record_data_function,
@@ -21,10 +21,11 @@ def test_record(
 ):
     creator = users[0]
     receiver = users[1]
-    record1 = record_factory(identity_simple)
-    record1 = logged_client_request(
-        creator, "get", f"{urls['BASE_URL']}{record1['id']}"
-    )
+    creator_client = logged_client(creator)
+    receiver_client = logged_client(receiver)
+
+    record1 = record_factory(creator.identity)
+    record1 = creator_client.get(f"{urls['BASE_URL']}{record1['id']}")
 
     link = link_api2testclient(
         pick_request_type(record1.json["request_types"], "thesis_delete_record")[
@@ -32,34 +33,24 @@ def test_record(
         ]["actions"]["create"]
     )
 
-    resp_request_create = logged_client_request(
-        creator,
-        "post",
-        link,
-    )
+    resp_request_create = creator_client.post(link)
     assert resp_request_create.status_code == 201
-    resp_request_submit = logged_client_request(
-        creator,
-        "post",
+    resp_request_submit = creator_client.post(
         link_api2testclient(resp_request_create.json["links"]["actions"]["submit"]),
     )
 
-    record = logged_client_request(
-        receiver, "get", f"{urls['BASE_URL']}{record1.json['id']}"
-    )
-    delete = logged_client_request(
-        receiver,
-        "post",
-        link_api2testclient(record.json["requests"][0]["links"]["actions"]["accept"]),
+    record = receiver_client.get(f"{urls['BASE_URL']}{record1.json['id']}")
+    delete = receiver_client.post(
+        link_api2testclient(record.json["requests"][0]["links"]["actions"]["accept"])
     )
     ThesisRecord.index.refresh()
-    lst = logged_client_request(creator, "get", urls["BASE_URL"])
+    lst = creator_client.get(urls["BASE_URL"])
     assert len(lst.json["hits"]["hits"]) == 0
 
 
 def test_draft(
-    logged_client_request,
-    identity_simple,
+    vocab_cf,
+    logged_client,
     users,
     urls,
     publish_request_data_function,
@@ -67,30 +58,25 @@ def test_draft(
 ):
     creator = users[0]
     receiver = users[1]
+    creator_client = logged_client(creator)
+    receiver_client = logged_client(receiver)
 
-    draft1 = logged_client_request(creator, "post", urls["BASE_URL"], json={})
+    draft1 = creator_client.post(urls["BASE_URL"], json={})
     link = link_api2testclient(
         pick_request_type(draft1.json["request_types"], "thesis_publish_draft")[
             "links"
         ]["actions"]["create"]
     )
 
-    resp_request_create = logged_client_request(creator, "post", link)
+    resp_request_create = creator_client.post(link)
     assert resp_request_create.status_code == 201
-    resp_request_submit = logged_client_request(
-        creator,
-        "post",
+    resp_request_submit = creator_client.post(
         link_api2testclient(resp_request_create.json["links"]["actions"]["submit"]),
     )
-
-    record = logged_client_request(
-        receiver, "get", f"{urls['BASE_URL']}{draft1.json['id']}/draft"
-    )
-    delete = logged_client_request(
-        receiver,
-        "post",
-        link_api2testclient(record.json["requests"][0]["links"]["actions"]["accept"]),
+    record = receiver_client.get(f"{urls['BASE_URL']}{draft1.json['id']}/draft")
+    delete = receiver_client.post(
+        link_api2testclient(record.json["requests"][0]["links"]["actions"]["accept"])
     )
     ThesisRecord.index.refresh()
-    lst = logged_client_request(creator, "get", urls["BASE_URL"])
+    lst = creator_client.get(urls["BASE_URL"])
     assert len(lst.json["hits"]["hits"]) == 1

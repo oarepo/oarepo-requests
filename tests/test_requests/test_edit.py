@@ -4,8 +4,8 @@ from tests.test_requests.utils import link_api2testclient
 
 
 def test_edit_autoaccept(
-    logged_client_request,
-    identity_simple,
+    vocab_cf,
+    logged_client,
     users,
     urls,
     edit_record_data_function,
@@ -13,23 +13,19 @@ def test_edit_autoaccept(
     search_clear,
 ):
     creator = users[0]
-    record1 = record_factory(identity_simple)
+    creator_client = logged_client(creator)
 
-    resp_request_create = logged_client_request(
-        creator,
-        "post",
+    record1 = record_factory(creator.identity)
+
+    resp_request_create = creator_client.post(
         urls["BASE_URL_REQUESTS"],
         json=edit_record_data_function(record1["id"]),
     )
-    resp_request_submit = logged_client_request(
-        creator,
-        "post",
+    resp_request_submit = creator_client.post(
         link_api2testclient(resp_request_create.json["links"]["actions"]["submit"]),
     )
     # is request accepted and closed?
-    request = logged_client_request(
-        creator,
-        "get",
+    request = creator_client.get(
         f'{urls["BASE_URL_REQUESTS"]}{resp_request_create.json["id"]}',
     ).json
 
@@ -40,9 +36,7 @@ def test_edit_autoaccept(
     ThesisRecord.index.refresh()
     ThesisDraft.index.refresh()
     # edit action worked?
-    search = logged_client_request(
-        creator,
-        "get",
+    search = creator_client.get(
         f'user{urls["BASE_URL"]}',
     ).json[
         "hits"
