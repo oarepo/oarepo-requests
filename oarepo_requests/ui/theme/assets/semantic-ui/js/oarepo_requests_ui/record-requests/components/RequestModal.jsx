@@ -40,7 +40,7 @@ export const RequestModal = ({ request, requestTypes, requestModalType, isEventM
   const [confirmDialogProps, setConfirmDialogProps] = useState({
     open: false,
     content: i18next.t("Are you sure?"),
-    cancelButton: i18next.t("Cancel"),
+    cancelButton: i18next.t("Close"),
     confirmButton: i18next.t("OK"),
     onCancel: () => setConfirmDialogProps(props => ({ ...props, open: false })),
     onConfirm: () => setConfirmDialogProps(props => ({ ...props, open: false }))
@@ -250,10 +250,12 @@ export const RequestModal = ({ request, requestTypes, requestModalType, isEventM
                 <Icon name="trash alternate" />
                 {i18next.t("Cancel request")}
               </Button>
-              <Button title={i18next.t("Save drafted request")} onClick={() => sendRequest(REQUEST_TYPE.SAVE)} color="grey" icon labelPosition="left" floated="right">
-                <Icon name="save" />
-                {i18next.t("Save")}
-              </Button>
+              {formWillBeRendered && 
+                <Button title={i18next.t("Save drafted request")} onClick={() => sendRequest(REQUEST_TYPE.SAVE)} color="grey" icon labelPosition="left" floated="right">
+                  <Icon name="save" />
+                  {i18next.t("Save")}
+                </Button>
+              }
             </>
           }
           {requestModalType === REQUEST_TYPE.CANCEL &&
@@ -276,10 +278,12 @@ export const RequestModal = ({ request, requestTypes, requestModalType, isEventM
           }
           {requestModalType === REQUEST_TYPE.CREATE && (!isEventModal &&
             <>
-              <Button type="submit" form="request-form" name="create-request" title={i18next.t("Create request")} color="blue" icon labelPosition="left" floated="right">
-                <Icon name="plus" />
-                {i18next.t("Create")}
-              </Button>
+              {requestType?.payload_ui && 
+                <Button type="submit" form="request-form" name="create-request" title={i18next.t("Create request")} color="blue" icon labelPosition="left" floated="right">
+                  <Icon name="plus" />
+                  {i18next.t("Create")}
+                </Button>
+              }
               <Button type="submit" form="request-form" name="create-and-submit-request" title={i18next.t("Submit request")} color="blue" icon labelPosition="left" floated="left">
                 <Icon name="paper plane" />
                 {i18next.t("Submit")}
@@ -292,7 +296,7 @@ export const RequestModal = ({ request, requestTypes, requestModalType, isEventM
           }
           <Button onClick={onClose} icon labelPosition="left">
             <Icon name="cancel" />
-            {i18next.t("Cancel")}
+            {i18next.t("Close")}
           </Button>
         </Modal.Actions>
         <Confirm {...confirmDialogProps} />
