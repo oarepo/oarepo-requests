@@ -101,7 +101,7 @@ def test_update_self_link(
         link_api2testclient(resp_request_submit.json["links"]["self"]),
     )
     read_from_record = creator_client.get(
-        f"{urls['BASE_URL']}{example_topic_draft['id']}/draft",
+        f"{urls['BASE_URL']}{example_topic_draft['id']}/draft?expand=true",
     )
     link_to_extended = link_api2testclient(
         read_from_record.json["requests"][0]["links"]["self"]
@@ -146,7 +146,7 @@ def test_events_resource(
         headers={"Accept": "application/vnd.inveniordm.v1+json"},
     )
     read_from_record = creator_client.get(
-        f"{urls['BASE_URL']}{example_topic_draft['id']}/draft",
+        f"{urls['BASE_URL']}{example_topic_draft['id']}/draft?expand=true",
     )
 
     comments_link = link_api2testclient(
