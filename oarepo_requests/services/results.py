@@ -9,7 +9,6 @@ from oarepo_requests.utils import (
 )
 
 
-# todo base class in oarepo runtime
 class RequestTypesComponent(ResultsComponent):
     def update_data(self, identity, record, projection, expand):
         request_types_list = []
