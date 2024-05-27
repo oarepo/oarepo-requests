@@ -46,7 +46,7 @@ export const CreateRequestButtonGroup = ({ requestTypes, isLoading, loadingError
                     key={requestType.type_id}
                     request={requestType}
                     requestModalType="create"
-                    triggerButton={<Button icon="plus" title={i18next.t(requestType.name)} basic compact content={requestType.name} />}
+                    triggerButton={<Button icon="plus" className="pl-0" title={i18next.t(requestType.name)} basic compact content={requestType.name} />}
                     fetchNewRequests={fetchNewRequests}
                   />
                 ))}
