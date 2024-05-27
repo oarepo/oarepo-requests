@@ -8,7 +8,6 @@ from oarepo_requests.resources.ui import OARepoRequestsUIJSONSerializer
 class OARepoRequestsCommentsResourceConfig(
     RequestCommentsResourceConfig, ConfiguratorMixin
 ):
-    """"""
 
     blueprint_name = "oarepo_request_events"
     url_prefix = "/requests"
