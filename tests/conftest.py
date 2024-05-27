@@ -333,3 +333,38 @@ def events_resource_data():
             "format": RequestEventFormat.HTML.value,
         }
     }
+
+
+from invenio_accounts.proxies import current_datastore
+
+
+def _create_group(id, name, description, is_managed, database):
+    """Creates a Role/Group."""
+    r = current_datastore.create_role(
+        id=id, name=name, description=description, is_managed=is_managed
+    )
+    current_datastore.commit()
+    return r
+
+
+@pytest.fixture()
+def group(database):
+    """A single group."""
+    r = _create_group(
+        id="it-dep",
+        name="it-dep",
+        description="IT Department",
+        is_managed=False,
+        database=database,
+    )
+    return r
+
+
+@pytest.fixture()
+def group_ui_serialization():
+    return {
+        "label": "it-dep",
+        "link": "https://127.0.0.1:5000/api/groups/it-dep",
+        "reference": {"group": "it-dep"},
+        "type": "group",
+    }
