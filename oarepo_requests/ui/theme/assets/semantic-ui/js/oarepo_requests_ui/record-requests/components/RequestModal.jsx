@@ -11,7 +11,7 @@ import axios from "axios";
 
 import { RequestModalContent, CreateRequestModalContent } from ".";
 import { REQUEST_TYPE } from "../utils/objects";
-import { isDeepEmpty } from "../utils";
+import { isDeepEmpty, mapPayloadUiToInitialValues } from "../utils";
 
 /** 
  * @typedef {import("../types").Request} Request
@@ -20,16 +20,6 @@ import { isDeepEmpty } from "../utils";
  * @typedef {import("react").ReactElement} ReactElement
  * @typedef {import("semantic-ui-react").ConfirmProps} ConfirmProps
  */
-
-const mapPayloadUiToInitialValues = (payloadUi) => {
-  const initialValues = { payload: {} };
-  payloadUi?.forEach(section => {
-    section.fields.forEach(field => {
-      initialValues.payload[field.field] = "";
-    });
-  });
-  return initialValues;
-};
 
 /** @param {{ request: Request, requestTypes: RequestType[], requestModalType: RequestTypeEnum, isEventModal: boolean, triggerButton: ReactElement, fetchNewRequests: () => void }} props */
 export const RequestModal = ({ request, requestTypes, requestModalType, isEventModal = false, triggerButton, fetchNewRequests }) => {
@@ -184,7 +174,7 @@ export const RequestModal = ({ request, requestTypes, requestModalType, isEventM
     try {
       await formik.submitForm();
       if (submitButtonName === "create-and-submit-request") {
-        confirmAction(REQUEST_TYPE.SUBMIT, true);
+        !_isEmpty(requestType?.payload_ui) ? confirmAction(REQUEST_TYPE.SUBMIT, true) : sendRequest(REQUEST_TYPE.SUBMIT, true);
         return;
       }
       if (requestModalType === REQUEST_TYPE.SUBMIT) {
