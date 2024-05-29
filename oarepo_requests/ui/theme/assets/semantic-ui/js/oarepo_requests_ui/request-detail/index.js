@@ -1,11 +1,13 @@
 import React from "react";
 import ReactDOM from "react-dom";
 
+import { RequestDetail } from "./components";
+
 const recordRequestsAppDiv = document.getElementById("request-detail");
 
-let request = JSON.parse(recordRequestsAppDiv.dataset?.request);
+let request = recordRequestsAppDiv.dataset?.request ? JSON.parse(recordRequestsAppDiv.dataset.request) : {};
 
 ReactDOM.render(
-  <div>Hello World!</div>,
+  <RequestDetail request={request} />,
   recordRequestsAppDiv
 );

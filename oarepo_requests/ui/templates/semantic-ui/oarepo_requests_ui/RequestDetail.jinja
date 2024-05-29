@@ -1,6 +1,13 @@
 {#def record #}
 
-{%- extends config.BASE_TEMPLATE %}
+{%- set title = _("Request") ~ " | " ~ _("NR Document repository") %}
+
+{% extends "oarepo_ui/detail.html" %}
+
+{%- block page_body %}
+    <div class="ui main container" id="request-detail" data-request='{{ record | tojson }}'></div>
+    <pre>{{ record | pprint }}</pre>
+{%- endblock page_body %}
 
 {%- block javascript %}
   {{super()}}
@@ -8,8 +15,3 @@
   {{webpack["oarepo_requests_ui_components.js"]}}
   {{webpack["oarepo_requests_ui_components.css"]}}
 {%- endblock javascript %}
-
-{%- block page_body %}
-    <pre>{{ record | pprint }}</pre>
-    <div id="request-detail" data-request='{{ record | tojson }}'></div>
-{%- endblock page_body %}
