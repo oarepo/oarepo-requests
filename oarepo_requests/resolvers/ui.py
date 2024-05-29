@@ -50,8 +50,6 @@ class OARepoUIResolver:
         raise NotImplementedError("Parent entity ui resolver should be abstract")
 
     def resolve_one(self, identity, reference):
-        # todo - control if reference aligns with reference_type
-        # reference is on input for copying the invenio pattern (?)
         record = self._search_one(identity, reference)
         if not record:
             return fallback_result(reference)
@@ -76,10 +74,10 @@ class GroupEntityReferenceUIResolver(OARepoUIResolver):
 
     def _search_many(self, identity, values, *args, **kwargs):
         result = []
-        for user in values:
+        for group in values:
             try:
-                user = current_groups_service.read(identity, user)
-                result.append(user)
+                group = current_groups_service.read(identity, group)
+                result.append(group)
             except PermissionDeniedError:
                 pass
         return result
@@ -87,23 +85,22 @@ class GroupEntityReferenceUIResolver(OARepoUIResolver):
     def _search_one(self, identity, reference, *args, **kwargs):
         value = list(reference.values())[0]
         try:
-            user = current_groups_service.read(identity, value)
-            return user
+            group = current_groups_service.read(identity, value)
+            return group
         except PermissionDeniedError:
             return None
 
     def _resolve(self, record, reference):
-        # todo; this is copyied from user
-        if record.data["username"] is None:  # username undefined?
-            if "email" in record.data:
-                label = record.data["email"]
+        if record.data["name"] is None:
+            if "id" in record.data:
+                label = record.data["id"]
             else:
                 label = fallback_label_result(reference)
         else:
-            label = record.data["username"]
+            label = record.data["name"]
         ret = {
             "reference": reference,
-            "type": "user",
+            "type": "group",
             "label": label,
         }
         if "links" in record.data and "self" in record.data["links"]:
@@ -159,6 +156,7 @@ class RecordEntityReferenceUIResolver(OARepoUIResolver):
         # using values instead of references breaks the pattern, perhaps it's lesser evil to construct them on go?
         if not values:
             return []
+        # todo what if search not permitted?
         service = get_matching_service_for_refdict(
             {self.reference_type: list(values)[0]}
         )
@@ -192,7 +190,6 @@ class RecordEntityDraftReferenceUIResolver(RecordEntityReferenceUIResolver):
         service = get_matching_service_for_refdict(
             {self.reference_type: list(values)[0]}
         )
-        # todo extra filter doesn't work in rdm-11
         filter = dsl.Q("terms", **{"id": list(values)})
         try:
             ret = list(service.search_drafts(identity, extra_filter=filter).hits)

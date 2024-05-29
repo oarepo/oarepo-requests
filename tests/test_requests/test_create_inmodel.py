@@ -39,7 +39,7 @@ def test_record(
         link_api2testclient(resp_request_create.json["links"]["actions"]["submit"]),
     )
 
-    record = receiver_client.get(f"{urls['BASE_URL']}{record1.json['id']}")
+    record = receiver_client.get(f"{urls['BASE_URL']}{record1.json['id']}?expand=true")
     delete = receiver_client.post(
         link_api2testclient(record.json["requests"][0]["links"]["actions"]["accept"])
     )
@@ -73,7 +73,9 @@ def test_draft(
     resp_request_submit = creator_client.post(
         link_api2testclient(resp_request_create.json["links"]["actions"]["submit"]),
     )
-    record = receiver_client.get(f"{urls['BASE_URL']}{draft1.json['id']}/draft")
+    record = receiver_client.get(
+        f"{urls['BASE_URL']}{draft1.json['id']}/draft?expand=true"
+    )
     delete = receiver_client.post(
         link_api2testclient(record.json["requests"][0]["links"]["actions"]["accept"])
     )

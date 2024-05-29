@@ -1,4 +1,3 @@
-# from .generic import AcceptAction
 from invenio_requests.customizations import actions
 
 from ..utils import get_matching_service_for_record

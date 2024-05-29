@@ -1,3 +1,4 @@
+from invenio_records.api import RecordBase
 from invenio_records_resources.services.uow import IndexRefreshOp, unit_of_work
 from invenio_requests import current_request_type_registry
 from invenio_requests.services import RequestsService
@@ -15,7 +16,7 @@ class OARepoRequestsService(RequestsService):
         request_type,
         receiver=None,
         creator=None,
-        topic=None,
+        topic: RecordBase = None,
         expires_at=None,
         uow=None,
         expand=False,

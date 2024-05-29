@@ -39,7 +39,9 @@ def test_publish(
     ThesisRecord.index.refresh()
     ThesisDraft.index.refresh()
 
-    record = receiver_client.get(f"{urls['BASE_URL']}{draft1.json['id']}/draft")
+    record = receiver_client.get(
+        f"{urls['BASE_URL']}{draft1.json['id']}/draft?expand=true"
+    )
     assert record.json["requests"][0]["links"]["actions"].keys() == {
         "accept",
         "decline",
@@ -64,7 +66,9 @@ def test_publish(
     resp_request_submit = creator_client.post(
         link_api2testclient(resp_request_create.json["links"]["actions"]["submit"]),
     )
-    record = receiver_client.get(f"{urls['BASE_URL']}{draft2.json['id']}/draft")
+    record = receiver_client.get(
+        f"{urls['BASE_URL']}{draft2.json['id']}/draft?expand=true"
+    )
     decline = receiver_client.post(
         link_api2testclient(record.json["requests"][0]["links"]["actions"]["decline"]),
     )
@@ -81,7 +85,9 @@ def test_publish(
     resp_request_submit = creator_client.post(
         link_api2testclient(resp_request_create.json["links"]["actions"]["submit"]),
     )
-    record = creator_client.get(f"{urls['BASE_URL']}{draft3.json['id']}/draft")
+    record = creator_client.get(
+        f"{urls['BASE_URL']}{draft3.json['id']}/draft?expand=true"
+    )
     assert record.json["requests"][0]["links"]["actions"].keys() == {"cancel"}
     cancel = creator_client.post(
         link_api2testclient(record.json["requests"][0]["links"]["actions"]["cancel"]),
