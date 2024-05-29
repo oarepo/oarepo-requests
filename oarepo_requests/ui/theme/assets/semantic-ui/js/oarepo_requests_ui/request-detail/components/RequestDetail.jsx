@@ -7,7 +7,7 @@ import _isEmpty from "lodash/isEmpty";
 import _sortBy from "lodash/sortBy";
 
 import { ReadOnlyCustomFields } from "@js/oarepo_requests/components";
-import { SideRequestInfo } from ".";
+import { SideRequestInfo, ActionButtons } from ".";
 
 export const RequestDetail = ({ request }) => {
   const requestModalHeader = !_isEmpty(request?.title) ? request.title : (!_isEmpty(request?.name) ? request.name : request.type);
@@ -25,9 +25,7 @@ export const RequestDetail = ({ request }) => {
           }
         </Grid.Column>
         <Grid.Column floated="right" textAlign="right">
-          <Button positive compact icon="check" content={i18next.t("Accept")} />
-          <Button compact icon="close" content={i18next.t("Cancel")} />
-          <Button negative compact icon="close" content={i18next.t("Decline")} />
+          <ActionButtons request={request} />
         </Grid.Column>
       </Grid.Row>
       <Grid.Row columns={2}>

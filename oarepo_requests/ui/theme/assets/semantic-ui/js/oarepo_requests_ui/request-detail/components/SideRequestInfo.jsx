@@ -1,7 +1,7 @@
 import React from "react";
 
 import { i18next } from "@translations/oarepo_requests_ui/i18next";
-import { List } from "semantic-ui-react";
+import { Header, Divider, Icon, Label } from "semantic-ui-react";
 
 /** 
  * @typedef {import("../types").Request} Request
@@ -10,37 +10,50 @@ import { List } from "semantic-ui-react";
 /** @param {{ request: Request }} props */
 export const SideRequestInfo = ({ request }) => {
   return (
-    <List relaxed>
-      <List.Item>
-        <List.Content>
-          <List.Header>{i18next.t("Creator")}</List.Header>
-          {request.created_by?.link && <a href={request.created_by.link}>{request.created_by.label}</a> || request.created_by?.label}
-        </List.Content>
-      </List.Item>
-      <List.Item>
-        <List.Content>
-          <List.Header>{i18next.t("Receiver")}</List.Header>
-          {request.receiver?.link && <a href={request.receiver?.link}>{request.receiver?.label}</a> || request.receiver?.label}
-        </List.Content>
-      </List.Item>
-      <List.Item>
-        <List.Content>
-          <List.Header>{i18next.t("Request type")}</List.Header>
-          {request?.type}
-        </List.Content>
-      </List.Item>
-      <List.Item>
-        <List.Content>
-          <List.Header>{i18next.t("Status")}</List.Header>
-          {request?.status}
-        </List.Content>
-      </List.Item>
-      <List.Item>
-        <List.Content>
-          <List.Header>{i18next.t("Created")}</List.Header>
-          {request?.created}
-        </List.Content>
-      </List.Item>
-    </List>
+    <>
+      <Header as="h3" size="tiny">
+        {i18next.t("Creator")}
+      </Header>
+      <div>
+        <Icon name="user circle outline" />
+        <span>{request.created_by?.link && <a href={request.created_by.link}>{request.created_by.label}</a> || request.created_by?.label}</span>
+      </div>
+
+      <Divider />
+
+      <Header as="h3"  size="tiny">
+        {i18next.t("Receiver")}
+      </Header>
+      <div>
+        <Icon name="mail outline" />
+        <span>{request.receiver?.link && <a href={request.receiver?.link}>{request.receiver?.label}</a> || request.receiver?.label}</span>
+      </div>
+
+      <Divider />
+
+      <Header as="h3"  size="tiny">
+        {i18next.t("Request type")}
+      </Header>
+      <Label size="small">{request?.type}</Label>
+
+      <Divider />
+
+      <Header as="h3"  size="tiny">
+        {i18next.t("Status")}
+      </Header>
+      <div>
+        <Icon name="clock outline" />
+        <span>{request?.status}</span>
+      </div>
+
+      <Divider />
+
+      <Header as="h3"  size="tiny">
+        {i18next.t("Created")}
+      </Header>
+      {request?.created}
+
+      <Divider hidden />
+    </>
   )
 };
