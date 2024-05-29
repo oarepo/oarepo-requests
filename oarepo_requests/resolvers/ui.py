@@ -76,10 +76,10 @@ class GroupEntityReferenceUIResolver(OARepoUIResolver):
 
     def _search_many(self, identity, values, *args, **kwargs):
         result = []
-        for user in values:
+        for group in values:
             try:
-                user = current_groups_service.read(identity, user)
-                result.append(user)
+                group = current_groups_service.read(identity, group)
+                result.append(group)
             except PermissionDeniedError:
                 pass
         return result
@@ -87,23 +87,22 @@ class GroupEntityReferenceUIResolver(OARepoUIResolver):
     def _search_one(self, identity, reference, *args, **kwargs):
         value = list(reference.values())[0]
         try:
-            user = current_groups_service.read(identity, value)
-            return user
+            group = current_groups_service.read(identity, value)
+            return group
         except PermissionDeniedError:
             return None
 
     def _resolve(self, record, reference):
-        # todo; this is copyied from user
-        if record.data["username"] is None:  # username undefined?
-            if "email" in record.data:
-                label = record.data["email"]
+        if record.data["name"] is None:
+            if "id" in record.data:
+                label = record.data["id"]
             else:
                 label = fallback_label_result(reference)
         else:
-            label = record.data["username"]
+            label = record.data["name"]
         ret = {
             "reference": reference,
-            "type": "user",
+            "type": "group",
             "label": label,
         }
         if "links" in record.data and "self" in record.data["links"]:

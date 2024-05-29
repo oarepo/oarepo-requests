@@ -1,0 +1,15 @@
+{#def record #}
+
+{%- extends config.BASE_TEMPLATE %}
+
+{%- block javascript %}
+  {{super()}}
+  {{webpack["oarepo_requests_ui_request_detail.js"]}}
+  {{webpack["oarepo_requests_ui_components.js"]}}
+  {{webpack["oarepo_requests_ui_components.css"]}}
+{%- endblock javascript %}
+
+{%- block page_body %}
+    <pre>{{ record | pprint }}</pre>
+    <div id="request-detail" data-request='{{ record | tojson }}'></div>
+{%- endblock page_body %}

@@ -90,5 +90,7 @@ dist/
 tests/thesis
 thesis
 
-**/ui/theme/**/todo.md
+todo.md
 node_modules
+
+dummy-record.js
