@@ -55,7 +55,9 @@ def test_can_create(
             urls["BASE_URL_REQUESTS"],
             json=publish_request_data_function(draft2.json["id"]),
         )
-    record = receiver_client.get(f"{urls['BASE_URL']}{draft2.json['id']}/draft")
+    record = receiver_client.get(
+        f"{urls['BASE_URL']}{draft2.json['id']}/draft?expand=true"
+    )
     decline = receiver_client.post(
         link_api2testclient(record.json["requests"][0]["links"]["actions"]["decline"]),
     )

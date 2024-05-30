@@ -34,7 +34,7 @@ def test_delete(
     )
     print()
 
-    record = receiver_client.get(f"{urls['BASE_URL']}{record1['id']}")
+    record = receiver_client.get(f"{urls['BASE_URL']}{record1['id']}?expand=true")
     assert record.json["requests"][0]["links"]["actions"].keys() == {
         "accept",
         "decline",
@@ -55,7 +55,7 @@ def test_delete(
     resp_request_submit = creator_client.post(
         link_api2testclient(resp_request_create.json["links"]["actions"]["submit"]),
     )
-    record = receiver_client.get(f"{urls['BASE_URL']}{record2['id']}")
+    record = receiver_client.get(f"{urls['BASE_URL']}{record2['id']}?expand=true")
     decline = receiver_client.post(
         link_api2testclient(record.json["requests"][0]["links"]["actions"]["decline"])
     )
@@ -71,7 +71,7 @@ def test_delete(
     resp_request_submit = creator_client.post(
         link_api2testclient(resp_request_create.json["links"]["actions"]["submit"]),
     )
-    record = creator_client.get(f"{urls['BASE_URL']}{record3['id']}")
+    record = creator_client.get(f"{urls['BASE_URL']}{record3['id']}?expand=true")
     assert record.json["requests"][0]["links"]["actions"].keys() == {"cancel"}
     cancel = creator_client.post(
         link_api2testclient(record.json["requests"][0]["links"]["actions"]["cancel"]),

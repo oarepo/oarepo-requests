@@ -50,8 +50,6 @@ class OARepoUIResolver:
         raise NotImplementedError("Parent entity ui resolver should be abstract")
 
     def resolve_one(self, identity, reference):
-        # todo - control if reference aligns with reference_type
-        # reference is on input for copying the invenio pattern (?)
         record = self._search_one(identity, reference)
         if not record:
             return fallback_result(reference)
@@ -158,6 +156,7 @@ class RecordEntityReferenceUIResolver(OARepoUIResolver):
         # using values instead of references breaks the pattern, perhaps it's lesser evil to construct them on go?
         if not values:
             return []
+        # todo what if search not permitted?
         service = get_matching_service_for_refdict(
             {self.reference_type: list(values)[0]}
         )
@@ -191,7 +190,6 @@ class RecordEntityDraftReferenceUIResolver(RecordEntityReferenceUIResolver):
         service = get_matching_service_for_refdict(
             {self.reference_type: list(values)[0]}
         )
-        # todo extra filter doesn't work in rdm-11
         filter = dsl.Q("terms", **{"id": list(values)})
         try:
             ret = list(service.search_drafts(identity, extra_filter=filter).hits)
