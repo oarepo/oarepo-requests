@@ -78,7 +78,7 @@ export const ConfirmModal = ({ request, requestModalHeader, handleSubmit, trigge
         validationSchema={PayloadSchema}
         onSubmit={onSubmit}
       >
-        {({ isSubmitting, errors, touched }) => (
+        {({ isSubmitting }) => (
           <>
             <Dimmer active={isSubmitting}>
               <Loader inverted size="large" />
