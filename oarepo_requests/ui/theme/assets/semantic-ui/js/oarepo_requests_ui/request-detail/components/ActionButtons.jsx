@@ -32,6 +32,14 @@ const callApi = async (url, method = "GET", data = null) => {
 export const ActionButtons = ({ request }) => {
   return (
     <>
+      {request.links?.actions?.submit && 
+        <ConfirmModal request={request} requestModalHeader={i18next.t("Submit") + " " + i18next.t("request")} 
+          handleSubmit={(values) => callApi(request.links.actions.accept, "POST", values)}
+          triggerButton={
+            <Button compact color="blue" icon="send" content={i18next.t("Submit")} />
+          }
+        />
+      }
       {request.links?.actions?.accept && 
         <ConfirmModal request={request} requestModalHeader={i18next.t("Accept") + " " + i18next.t("request")} 
           handleSubmit={(values) => callApi(request.links.actions.accept, "POST", values)}

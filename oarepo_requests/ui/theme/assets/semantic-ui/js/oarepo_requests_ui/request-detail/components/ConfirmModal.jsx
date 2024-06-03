@@ -51,7 +51,7 @@ export const ConfirmModal = ({ request, requestModalHeader, handleSubmit, trigge
   const PayloadSchema = Yup.object().shape({
     payload: Yup.object().shape({
       content: Yup.string()
-      .min(1, 'Too Short!')
+      .min(1, i18next.t("Comment must be at least 1 character long."))
     })
   });
 

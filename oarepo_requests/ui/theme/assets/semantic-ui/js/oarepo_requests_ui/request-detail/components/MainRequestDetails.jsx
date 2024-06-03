@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import PropTypes from "prop-types";
 
 import { i18next } from "@translations/oarepo_requests_ui/i18next";
-import { Button, Grid, List, Form, Divider, Comment, Header, Container, Icon, Menu } from "semantic-ui-react";
+import { Button, Grid, List, Form, Divider, Comment, Header, Container, Icon, Menu, Message } from "semantic-ui-react";
 import _isEmpty from "lodash/isEmpty";
 import _sortBy from "lodash/sortBy";
 
@@ -18,7 +18,7 @@ export const MainRequestDetails = ({ request }) => {
           <SideRequestInfo request={request} />
         </Grid.Column>
         <Grid.Column as="article" width={13}>
-          {renderReadOnlyData &&
+          {renderReadOnlyData ?
             <List relaxed>
               {Object.keys(request.payload).map(key => (
                 <List.Item key={key}>
@@ -36,7 +36,11 @@ export const MainRequestDetails = ({ request }) => {
                   </List.Content>
                 </List.Item>
               ))}
-            </List>
+            </List> :
+            <Message info>
+              <Message.Header>{i18next.t("No events to submit")}</Message.Header>
+              <p>{i18next.t("No events, i.e. messages or timeline, available for this request.")}</p>
+            </Message>
           }
           {/* If events are enabled for this request type, you can see the timeline of events and create new events. */}
           {/* {!_isEmpty(eventTypes) &&

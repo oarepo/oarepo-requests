@@ -1,4 +1,4 @@
-{#def record #}
+{#def record, extra_context, ui #}
 
 {%- set title = _("Request") ~ " | " ~ _("NR Document repository") %}
 
@@ -7,6 +7,8 @@
 {%- block page_body %}
     <div class="ui main container" id="request-detail" data-request='{{ record | tojson }}'></div>
     <pre>{{ record | pprint }}</pre>
+    {# <pre>{{ extra_context | pprint }}</pre>
+    <pre>{{ ui | pprint }}</pre> #}
 {%- endblock page_body %}
 
 {%- block javascript %}
