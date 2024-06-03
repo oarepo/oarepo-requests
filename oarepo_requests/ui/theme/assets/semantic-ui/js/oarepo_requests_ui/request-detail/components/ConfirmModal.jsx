@@ -5,6 +5,10 @@ import { i18next } from "@translations/oarepo_requests_ui/i18next";
 import { Dimmer, Loader, Modal, Button, Icon, Message, Divider, FormTextArea, FormField } from "semantic-ui-react";
 import _isEmpty from "lodash/isEmpty";
 import _isFunction from "lodash/isFunction";
+import {
+  RichEditor,
+} from "react-invenio-forms";
+import { sanitizeInput } from "@js/oarepo_ui";
 
 import { Formik, Field, Form, ErrorMessage } from "formik";
 import * as Yup from 'yup';
@@ -78,7 +82,7 @@ export const ConfirmModal = ({ request, requestModalHeader, handleSubmit, trigge
         validationSchema={PayloadSchema}
         onSubmit={onSubmit}
       >
-        {({ isSubmitting }) => (
+        {({ isSubmitting, values, setFieldValue, setFieldTouched }) => (
           <>
             <Dimmer active={isSubmitting}>
               <Loader inverted size="large" />
@@ -97,7 +101,19 @@ export const ConfirmModal = ({ request, requestModalHeader, handleSubmit, trigge
                     <FormField>
                       <label htmlFor={field.id || field.name}>{`${i18next.t("Add comment")} (${i18next.t("optional")})`}</label>
                       <Divider hidden />
-                      <FormTextArea placeholder={i18next.t("Comment")} {...field} />
+                      <RichEditor
+                        value={values.payload.content}
+                        optimized
+                        onBlur={(event, editor) => {
+                          const cleanedContent = sanitizeInput(
+                            editor.getContent(),
+                            null
+                          );
+                          setFieldValue("payload.content", cleanedContent);
+                          setFieldTouched("payload.content", true);
+                        }}
+                        {...field}
+                      />
                     </FormField>
                   )}
                 </Field>

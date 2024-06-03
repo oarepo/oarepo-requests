@@ -52,12 +52,12 @@ export const SideRequestInfo = ({ request }) => {
 
       <Divider />
 
-      <Header as="h3"  size="tiny">
+      {/* <Header as="h3"  size="tiny">
         {i18next.t("Request type")}
       </Header>
       <Label size="small">{request?.type}</Label>
 
-      <Divider />
+      <Divider /> */}
 
       <Header as="h3"  size="tiny">
         {i18next.t("Status")}
