@@ -9,6 +9,27 @@ import { Header, Divider, Icon, Label } from "semantic-ui-react";
 
 /** @param {{ request: Request }} props */
 export const SideRequestInfo = ({ request }) => {
+  const statusIcon = (function () { 
+    switch (request?.status_code.toLowerCase()) {
+      case "created":
+        return "clock outline";
+      case "submitted":
+        return "clock";
+      case "cancelled":
+        return "square";
+      case "accepted":
+        return "check circle";
+      case "declined":
+        return "close";
+      case "expired":
+        return "hourglass end";
+      case "deleted":
+        return "trash";
+      default:
+        return null;
+    }
+  })();
+
   return (
     <>
       <Header as="h3" size="tiny">
@@ -42,7 +63,7 @@ export const SideRequestInfo = ({ request }) => {
         {i18next.t("Status")}
       </Header>
       <div>
-        <Icon name="clock outline" />
+        {statusIcon && <Icon name={statusIcon} />}
         <span>{request?.status}</span>
       </div>
 
