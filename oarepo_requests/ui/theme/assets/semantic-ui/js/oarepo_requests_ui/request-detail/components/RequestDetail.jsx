@@ -33,19 +33,21 @@ export const RequestDetail = ({ request }) => {
           <Menu tabular attached>
             <Menu.Item 
               name='details'
+              content={i18next.t("Details")}
               active={activeTab === 'details'}
               onClick={() => setActiveTab('details')}
             />
             <Menu.Item 
-            name='record'
-            active={activeTab === 'record'}
-            onClick={() => setActiveTab('record')}
+              name='topic'
+              content={`${i18next.t("Record")} ${i18next.t("preview")}`}
+              active={activeTab === 'topic'}
+              onClick={() => setActiveTab('topic')}
             />
           </Menu>
         </Grid.Column>
       </Grid.Row>
       {activeTab === 'details' && <MainRequestDetails request={request} />}
-      {activeTab === 'record' && <TopicPreview request={request} />}
+      {activeTab === 'topic' && <TopicPreview request={request} />}
     </Grid>
   );
 }
