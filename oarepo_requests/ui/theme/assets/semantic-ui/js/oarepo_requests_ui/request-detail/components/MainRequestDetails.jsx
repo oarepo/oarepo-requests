@@ -7,7 +7,7 @@ import _isEmpty from "lodash/isEmpty";
 import _sortBy from "lodash/sortBy";
 
 import { ReadOnlyCustomFields } from "@js/oarepo_requests/components";
-import { SideRequestInfo } from ".";
+import { SideRequestInfo, Timeline } from ".";
 
 export const MainRequestDetails = ({ request }) => {
   const renderReadOnlyData = !_isEmpty(request?.payload);
@@ -38,10 +38,11 @@ export const MainRequestDetails = ({ request }) => {
               ))}
             </List> :
             <Message info>
-              <Message.Header>{i18next.t("No events to submit")}</Message.Header>
-              <p>{i18next.t("No events, i.e. messages or timeline, available for this request.")}</p>
+              <Message.Header>{i18next.t("No request data")}</Message.Header>
+              <p>{i18next.t("No data available for this request.")}</p>
             </Message>
           }
+          <Timeline request={request} />
           {/* If events are enabled for this request type, you can see the timeline of events and create new events. */}
           {/* {!_isEmpty(eventTypes) &&
             <>
