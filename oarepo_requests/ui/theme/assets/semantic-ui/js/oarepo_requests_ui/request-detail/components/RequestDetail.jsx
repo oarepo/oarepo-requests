@@ -6,7 +6,7 @@ import { Button, Grid, List, Form, Divider, Comment, Header, Container, Icon, Me
 import _isEmpty from "lodash/isEmpty";
 import _sortBy from "lodash/sortBy";
 
-import { ActionButtons, MainRequestDetails } from ".";
+import { ActionButtons, MainRequestDetails, TopicPreview } from ".";
 
 export const RequestDetail = ({ request }) => {
   const [activeTab, setActiveTab] = useState("details");
@@ -45,7 +45,7 @@ export const RequestDetail = ({ request }) => {
         </Grid.Column>
       </Grid.Row>
       {activeTab === 'details' && <MainRequestDetails request={request} />}
-      {activeTab === 'record' && <Grid.Row>Record</Grid.Row>}
+      {activeTab === 'record' && <TopicPreview request={request} />}
     </Grid>
   );
 }
