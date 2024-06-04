@@ -62,27 +62,27 @@ export const Timeline = ({ request }) => {
             </Segment> :
             !_isEmpty(events) ?
               <Feed>
-                {events.map(event => (
+                {events.map(event => {
+                  const isRenderable = event?.payload?.event && event?.created;
+                  return isRenderable ? (
                   <Feed.Event key={event.id}>
                     <Feed.Label>
-                      <Icon name='pencil' />
+                      <Icon name='user circle' />
                     </Feed.Label>
-                    {/* <Feed.Content>
+                    <Feed.Content>
                       <Feed.Summary>
-                        {event._source.created_by.label}
-                        <Feed.Date>{event._source.created}</Feed.Date>
+                        {event?.created_by?.user ? 
+                          <><Feed.User>{event.created_by.user}</Feed.User> {event.payload.event} this request on<Feed.Date>{event.created}</Feed.Date></> : 
+                          <span>Request {event.payload.event} on {event.created}</span>
+                        } 
                       </Feed.Summary>
-                      <Feed.Extra text>
-                        {event._source.message}
-                      </Feed.Extra>
-                    </Feed.Content> */}
+                      {event?.payload?.content && <Feed.Extra text>{event.payload.content}</Feed.Extra>}
+                    </Feed.Content>
                   </Feed.Event>
-                ))}
+                  ) : null;
+                })}
               </Feed> :
-              <Message info>
-                <Message.Header>{i18next.t("No events")}</Message.Header>
-                <p>{i18next.t("No events, i.e. messages or timeline, available for this request.")}</p>
-              </Message>
+              null
         }
       </Dimmer.Dimmable>
     </>
