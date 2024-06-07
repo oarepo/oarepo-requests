@@ -7,7 +7,7 @@ import _isEmpty from "lodash/isEmpty";
 import _sortBy from "lodash/sortBy";
 
 import { ReadOnlyCustomFields } from "@js/oarepo_requests/components";
-import { SideRequestInfo, Timeline, EventSubmitForm } from ".";
+import { SideRequestInfo, Timeline } from ".";
 
 export const MainRequestDetails = ({ request }) => {
   const renderReadOnlyData = !_isEmpty(request?.payload);
@@ -43,7 +43,6 @@ export const MainRequestDetails = ({ request }) => {
             </Message>
           }
           <Timeline request={request} />
-          <EventSubmitForm request={request} />
           {/* If events are enabled for this request type, you can see the timeline of events and create new events. */}
           {/* {!_isEmpty(eventTypes) &&
             <>

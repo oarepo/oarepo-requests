@@ -7,9 +7,10 @@ import _isEmpty from "lodash/isEmpty";
 import _sortBy from "lodash/sortBy";
 import _has from "lodash/has";
 import axios from "axios";
+import { delay } from "bluebird";
 
 import { ReadOnlyCustomFields } from "@js/oarepo_requests/components";
-import { SideRequestInfo } from ".";
+import { EventSubmitForm } from ".";
 import { hasAll, hasAny, sanitizeInput } from "../utils";
 
 export const Timeline = ({ request }) => {
@@ -21,6 +22,7 @@ export const Timeline = ({ request }) => {
     setIsLoading(true);
     setError(null);
     try {
+      await delay(2000); // TODO: The backend is super slow to resolve the Timeline. Added super slow delay.
       const response = await axios.get(request.links?.timeline, {
         headers: {
           'Content-Type': 'application/json',
@@ -54,7 +56,7 @@ export const Timeline = ({ request }) => {
           isLoading ?
             <Segment basic>
               <Placeholder fluid>
-                {Array.from({ length: 5 }).map((_, index) => (
+                {Array.from({ length: events.length < 5 ? 5 : events.length }).map((_, index) => (
                   <Placeholder.Header image key={index}>
                     <Placeholder.Line />
                     <Placeholder.Line />
@@ -92,6 +94,7 @@ export const Timeline = ({ request }) => {
               null
         }
       </Dimmer.Dimmable>
+      <EventSubmitForm request={request} fetchEvents={fetchEvents} />
     </>
   );
 }

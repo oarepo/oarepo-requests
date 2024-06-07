@@ -15,8 +15,10 @@ import { ReadOnlyCustomFields } from "@js/oarepo_requests/components";
 import { SideRequestInfo } from ".";
 import { sanitizeInput } from "../utils";
 
-export const EventSubmitForm = ({ request }) => {
+export const EventSubmitForm = ({ request, fetchEvents }) => {
   const [error, setError] = useState(null);
+  
+  const editorRef = useRef(null);
 
   const callApi = async (url, method = "POST", data = null) => {
     if (_isEmpty(url)) {
@@ -32,7 +34,7 @@ export const EventSubmitForm = ({ request }) => {
       data: data
   })};
 
-  const onSubmit = async (values, { setSubmitting }) => {
+  const onSubmit = async (values, { setSubmitting, resetForm }) => {
     setSubmitting(true);
     setError(null);
     try {
@@ -40,6 +42,9 @@ export const EventSubmitForm = ({ request }) => {
     } catch (error) {
       setError(error);
     } finally {
+      editorRef.current.setContent("");
+      resetForm();
+      fetchEvents();
       setSubmitting(false);
     }
   }
@@ -78,6 +83,7 @@ export const EventSubmitForm = ({ request }) => {
                 <RichEditor
                   value={values.payload.content}
                   optimized
+                  onFocus={(event, editor) => editorRef.current = editor}
                   onBlur={(event, editor) => {
                     const cleanedContent = sanitizeInput(editor.getContent());
                     setFieldValue("payload.content", cleanedContent);
