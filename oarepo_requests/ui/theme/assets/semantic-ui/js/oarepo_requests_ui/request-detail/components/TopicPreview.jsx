@@ -18,7 +18,7 @@ export const TopicPreview = ({ request }) => {
     setLoading(false);
   }
 
-  const selfHtml = request.topic.link.replace("/api", "");
+  const selfHtml = request.topic.link.replace("/api", "") + "?embed=true";
 
 
   return (

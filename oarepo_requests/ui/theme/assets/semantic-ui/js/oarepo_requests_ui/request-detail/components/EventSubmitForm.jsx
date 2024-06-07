@@ -6,26 +6,14 @@ import { Button, Grid, List, Divider, Comment, Header, Container, Icon, Menu, Me
 import _isEmpty from "lodash/isEmpty";
 import _sortBy from "lodash/sortBy";
 import axios from "axios";
-import { RichEditor } from "react-invenio-forms";
-import { RichInputField } from "@js/oarepo_ui";
+import { RichEditor, FieldLabel, RichInputField } from "react-invenio-forms";
 
 import { Formik, Field, Form, ErrorMessage } from "formik";
 import * as Yup from 'yup';
-import { sanitizeHtml } from "sanitize-html";
 
 import { ReadOnlyCustomFields } from "@js/oarepo_requests/components";
 import { SideRequestInfo } from ".";
-
-const sanitizeInput = (htmlString, validTags) => {
-  const decodedString = decode(htmlString);
-  const cleanInput = sanitizeHtml(decodedString, {
-    allowedTags: validTags || ["b", "i", "em", "strong", "a", "div", "li", "p"],
-    allowedAttributes: {
-      a: ["href"],
-    },
-  });
-  return cleanInput;
-};
+import { sanitizeInput } from "../utils";
 
 export const EventSubmitForm = ({ request }) => {
   const [error, setError] = useState(null);
@@ -48,7 +36,6 @@ export const EventSubmitForm = ({ request }) => {
     setSubmitting(true);
     setError(null);
     try {
-      console.log("Sending request");
       await callApi(request.links?.comments, "POST", values);
     } catch (error) {
       setError(error);
@@ -60,7 +47,8 @@ export const EventSubmitForm = ({ request }) => {
   const CommentPayloadSchema = Yup.object().shape({
     payload: Yup.object().shape({
       content: Yup.string()
-        .min(1, i18next.t("Comment must be at least 1 character long.")),
+        .min(1, i18next.t("Comment must be at least 1 character long."))
+        .required(i18next.t("Comment must be at least 1 character long.")),
       format: Yup.string().equals(["html"], i18next.t("Invalid format."))
     })
   });
@@ -78,30 +66,27 @@ export const EventSubmitForm = ({ request }) => {
     >
       {({ values, isSubmitting, setFieldValue, setFieldTouched }) => (
         <Form>
-          <Field name="payload.content">
-            {({ field }) => (
-              <FormField className={error ? "mt-25" : "mt-25 mb-25"}>
-                <label htmlFor={field.id || field.name} hidden>{i18next.t("Comment")}</label>
+          <FormField className={error ? "mt-25" : "mt-25 mb-25"}>
+            <RichInputField
+              fieldPath="payload.content"
+              label={
+                <label htmlFor="payload.content" hidden>{i18next.t("Comment")}</label>
+              }
+              optimized="true"
+              placeholder={i18next.t('Your comment here...')}
+              editor={
                 <RichEditor
                   value={values.payload.content}
                   optimized
                   onBlur={(event, editor) => {
-                    // const cleanedContent = sanitizeInput(
-                    //   editor.getContent(),
-                    //   null
-                    // );
-                    console.log(event, editor);
-                    const cleanedContent = editor.getContent();
-                    console.log(cleanedContent);
+                    const cleanedContent = sanitizeInput(editor.getContent());
                     setFieldValue("payload.content", cleanedContent);
                     setFieldTouched("payload.content", true);
                   }}
-                  {...field}
                 />
-                <ErrorMessage name="payload.content" render={(message) => <Message error attached="bottom">{message}</Message>} />
-              </FormField>
-            )}
-          </Field>
+              }
+            />
+          </FormField>
           {error && (
             <Message error>
               <Message.Header>{i18next.t("Error while submitting the comment")}</Message.Header>

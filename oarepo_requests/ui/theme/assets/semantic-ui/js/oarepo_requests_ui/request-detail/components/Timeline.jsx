@@ -5,36 +5,38 @@ import { i18next } from "@translations/oarepo_requests_ui/i18next";
 import { Button, Grid, List, Form, Divider, Comment, Header, Container, Icon, Menu, Message, Feed, Dimmer, Loader, Placeholder, Segment } from "semantic-ui-react";
 import _isEmpty from "lodash/isEmpty";
 import _sortBy from "lodash/sortBy";
+import _has from "lodash/has";
 import axios from "axios";
 
 import { ReadOnlyCustomFields } from "@js/oarepo_requests/components";
 import { SideRequestInfo } from ".";
+import { hasAll, hasAny, sanitizeInput } from "../utils";
 
 export const Timeline = ({ request }) => {
   const [events, setEvents] = useState([]);
   const [error, setError] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
 
-  useEffect(() => {
+  const fetchEvents = async () => {
     setIsLoading(true);
     setError(null);
-    axios
-      .get(`${request.links.timeline}`, {
+    try {
+      const response = await axios.get(request.links?.timeline, {
         headers: {
           'Content-Type': 'application/json',
-          'Accept': 'application/json'
+          'Accept': 'application/json',
         }
-      })
-      .then(response => {
-        setEvents(response.data.hits.hits)
-      })
-      .catch(error => {
-        console.error("Error while fetching timeline events", error);
-        setError(error);
-      })
-      .finally(() => {
-        setIsLoading(false);
       });
+      setEvents(response.data.hits.hits);
+    } catch (error) {
+      setError(error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchEvents();
   }, []);
 
   return (
@@ -63,7 +65,8 @@ export const Timeline = ({ request }) => {
             !_isEmpty(events) ?
               <Feed>
                 {events.map(event => {
-                  const isRenderable = event?.payload?.event && event?.created;
+                  const isRenderable = hasAll(event, 'created', 'payload') && hasAny(event.payload, 'event', 'content');
+                  const eventLabel = isRenderable ? event.payload?.event ?? i18next.t("commented") : null;
                   return isRenderable ? (
                   <Feed.Event key={event.id}>
                     <Feed.Label>
@@ -71,12 +74,16 @@ export const Timeline = ({ request }) => {
                     </Feed.Label>
                     <Feed.Content>
                       <Feed.Summary>
-                        {event?.created_by?.user ? 
-                          <><Feed.User>{event.created_by.user}</Feed.User> {event.payload.event} this request on<Feed.Date>{event.created}</Feed.Date></> : 
-                          <span>Request {event.payload.event} on {event.created}</span>
+                        {_has(event, "created_by.user") ? 
+                          <><Feed.User>{event.created_by.user}</Feed.User> {eventLabel} this request on<Feed.Date>{event.created}</Feed.Date></> : 
+                          <span>Request {eventLabel} on {event.created}</span>
                         } 
                       </Feed.Summary>
-                      {event?.payload?.content && <Feed.Extra text>{event.payload.content}</Feed.Extra>}
+                      {_has(event.payload, "content") && 
+                        <Feed.Extra text>
+                          <div dangerouslySetInnerHTML={{ __html: sanitizeInput(event.payload.content) }} />
+                        </Feed.Extra>
+                      }
                     </Feed.Content>
                   </Feed.Event>
                   ) : null;
