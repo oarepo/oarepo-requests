@@ -1,6 +1,5 @@
-from thesis.records.api import ThesisDraft, ThesisRecord
-
 from tests.test_requests.utils import link_api2testclient
+from thesis.records.api import ThesisDraft, ThesisRecord
 
 
 def test_edit_autoaccept(

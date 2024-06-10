@@ -10,8 +10,9 @@ from oarepo_requests.utils import get_matching_service_for_record
 
 
 def get_links_schema():
-    # TODO possibly specify more
-    return ma.fields.Dict(keys=ma.fields.String())
+    return ma.fields.Dict(
+        keys=ma.fields.String()
+    )  # value is either string or dict of strings (for actions)
 
 
 class RequestTypeSchema(ma.Schema):
