@@ -8,6 +8,7 @@ from invenio_requests.customizations import CommentEventType, LogEventType
 from invenio_requests.proxies import current_requests
 from invenio_requests.records.api import RequestEventFormat
 from invenio_users_resources.records import UserAggregate
+
 from thesis.proxies import current_service
 from thesis.records.api import ThesisDraft, ThesisRecord
 
@@ -103,7 +104,7 @@ def ui_serialization_result():
             # 'created': '2024-01-26T10:06:17.945916',
             "created_by": {
                 "label": "user1@example.org",
-                "link": "https://127.0.0.1:5000/api/users/1",
+                "links": {"self": "https://127.0.0.1:5000/api/users/1"},
                 "reference": {"user": "1"},
                 "type": "user",
             },
@@ -128,7 +129,10 @@ def ui_serialization_result():
             "title": "",
             "topic": {
                 "label": f"id: {topic_id}",
-                "link": f"https://127.0.0.1:5000/api/thesis/{topic_id}/draft",
+                "links": {
+                    "self": f"https://127.0.0.1:5000/api/thesis/{topic_id}/draft",
+                    "self_html": f"https://127.0.0.1:5000/thesis/{topic_id}/preview",
+                },
                 "reference": {"thesis_draft": topic_id},
                 "type": "thesis_draft",
             },
@@ -364,7 +368,7 @@ def group(database):
 def group_ui_serialization():
     return {
         "label": "it-dep",
-        "link": "https://127.0.0.1:5000/api/groups/it-dep",
+        "links": {"self": "https://127.0.0.1:5000/api/groups/it-dep"},
         "reference": {"group": "it-dep"},
         "type": "group",
     }

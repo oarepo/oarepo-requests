@@ -4,6 +4,7 @@ from oarepo_ui.resources import (
     RecordsUIResourceConfig,
 )
 from oarepo_ui.resources.components import PermissionsComponent
+
 from thesis.resources.records.ui import ThesisUIJSONSerializer
 
 
