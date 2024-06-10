@@ -1,12 +1,8 @@
-import React, { useRef, useEffect } from "react";
-import PropTypes from "prop-types";
+import React, { useRef } from "react";
 
-import { i18next } from "@translations/oarepo_requests_ui/i18next";
-import { Button, Grid, List, Form, Divider, Comment, Header, Container, Icon, Menu, Loader, Segment } from "semantic-ui-react";
+import { Grid, Loader, Segment } from "semantic-ui-react";
 import _isEmpty from "lodash/isEmpty";
 import _sortBy from "lodash/sortBy";
-
-import { ActionButtons, MainRequestDetails } from ".";
 
 export const TopicPreview = ({ request }) => {
   const iframeRef = useRef(null);
@@ -18,9 +14,6 @@ export const TopicPreview = ({ request }) => {
     setLoading(false);
   }
 
-  const selfHtml = request.topic.link.replace("/api", "") + "?embed=true";
-
-
   return (
     <Grid.Row>
       <Grid.Column>
@@ -31,7 +24,7 @@ export const TopicPreview = ({ request }) => {
         }
         <iframe 
           ref={iframeRef} 
-          src={selfHtml} 
+          src={request.topic.links.self_html} 
           onLoad={iframeOnLoad} 
           title={request.topic.label + " record preview"} 
           width="100%" 
