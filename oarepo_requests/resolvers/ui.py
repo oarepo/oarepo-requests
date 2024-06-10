@@ -67,6 +67,20 @@ class OARepoUIResolver:
             )
         return ret
 
+    def _resolve_links(self, record):
+        links = {}
+        record_links = {}
+        if isinstance(record, dict):
+            if "links" in record:
+                record_links = record["links"]
+        elif hasattr(record, "data"):
+            if "links" in record.data:
+                record_links = record.data["links"]
+        for link_type in ("self", "self_html"):
+            if link_type in record_links:
+                links[link_type] = record_links[link_type]
+        return links
+
 
 class GroupEntityReferenceUIResolver(OARepoUIResolver):
     def _get_id(self, result):
@@ -102,9 +116,8 @@ class GroupEntityReferenceUIResolver(OARepoUIResolver):
             "reference": reference,
             "type": "group",
             "label": label,
+            "links": self._resolve_links(record),
         }
-        if "links" in record.data and "self" in record.data["links"]:
-            ret["link"] = record.data["links"]["self"]
         return ret
 
 
@@ -142,9 +155,8 @@ class UserEntityReferenceUIResolver(OARepoUIResolver):
             "reference": reference,
             "type": "user",
             "label": label,
+            "links": self._resolve_links(record),
         }
-        if "links" in record.data and "self" in record.data["links"]:
-            ret["link"] = record.data["links"]["self"]
         return ret
 
 
@@ -177,7 +189,7 @@ class RecordEntityReferenceUIResolver(OARepoUIResolver):
             "reference": reference,
             "type": list(reference.keys())[0],
             "label": label,
-            "link": record["links"]["self"],
+            "links": self._resolve_links(record),
         }
         return ret
 
@@ -293,7 +305,6 @@ class FallbackEntityReferenceUIResolver(OARepoUIResolver):
             "reference": reference,
             "type": list(reference.keys())[0],
             "label": label,
+            "links": self._resolve_links(record),
         }
-        if "links" in record and "self" in record["links"]:
-            ret["link"] = record["links"]["self"]
         return ret
