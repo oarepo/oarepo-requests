@@ -3,6 +3,7 @@ from collections import defaultdict
 from flask import g
 from flask_resources import BaseListSchema
 from flask_resources.serializers import JSONSerializer
+from invenio_pidstore.errors import PIDDeletedError
 from oarepo_runtime.resources import LocalizedUIJSONSerializer
 
 from ..proxies import current_oarepo_requests
@@ -53,12 +54,10 @@ class CachedReferenceResolver:
         if key in self._cache:
             return self._cache[key]
         else:
-            return resolve(self._identity, reference)
-            # todo move to ma? ---
-            """
+            try:
+                return resolve(self._identity, reference)
             except PIDDeletedError:
-                return {**data, "status": "removed"}
-            """
+                return {"reference": reference, "status": "deleted"}
 
 
 class OARepoRequestsUIJSONSerializer(LocalizedUIJSONSerializer):
