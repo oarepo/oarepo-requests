@@ -10,7 +10,7 @@ import axios from "axios";
 import { delay } from "bluebird";
 
 import { ReadOnlyCustomFields } from "@js/oarepo_requests/components";
-import { EventSubmitForm } from ".";
+import { EventSubmitForm, TimelineEvent } from ".";
 import { hasAll, hasAny, sanitizeInput } from "../utils";
 
 export const Timeline = ({ request }) => {
@@ -66,30 +66,7 @@ export const Timeline = ({ request }) => {
             </Segment> :
             !_isEmpty(events) ?
               <Feed>
-                {events.map(event => {
-                  const isRenderable = hasAll(event, 'created', 'payload') && hasAny(event.payload, 'event', 'content');
-                  const eventLabel = isRenderable ? event.payload?.event ?? i18next.t("commented") : null;
-                  return isRenderable ? (
-                  <Feed.Event key={event.id}>
-                    <Feed.Label>
-                      <Icon name='user circle' />
-                    </Feed.Label>
-                    <Feed.Content>
-                      <Feed.Summary>
-                        {_has(event, "created_by.user") ? 
-                          <><Feed.User>{event.created_by.user}</Feed.User> {eventLabel} this request on<Feed.Date>{event.created}</Feed.Date></> : 
-                          <span>Request {eventLabel} on {event.created}</span>
-                        } 
-                      </Feed.Summary>
-                      {_has(event.payload, "content") && 
-                        <Feed.Extra text>
-                          <div dangerouslySetInnerHTML={{ __html: sanitizeInput(event.payload.content) }} />
-                        </Feed.Extra>
-                      }
-                    </Feed.Content>
-                  </Feed.Event>
-                  ) : null;
-                })}
+                {events.map(event => <TimelineEvent key={event.id} event={event} />)}
               </Feed> :
               null
         }
