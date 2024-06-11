@@ -5,6 +5,7 @@ import { i18next } from "@translations/oarepo_requests_ui/i18next";
 import { Button, Grid, List, Form, Divider, Comment } from "semantic-ui-react";
 import _isEmpty from "lodash/isEmpty";
 import _sortBy from "lodash/sortBy";
+import _isFunction from "lodash/isFunction";
 import { useFormikContext } from "formik";
 
 import { CustomFields } from "react-invenio-forms";
