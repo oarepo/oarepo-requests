@@ -40,18 +40,6 @@ class OARepoRequestsService(RequestsService):
             error = type_.can_create(identity, data, receiver, topic, creator)
         else:
             error = None
-
-        self.run_components(
-            "oarepo_create",
-            identity,
-            data=data,
-            request_type=request_type,
-            created_by=creator,
-            topic=topic,
-            receiver=receiver,
-            uow=uow,
-        )
-
         if not error:
             result = super().create(
                 identity=identity,
