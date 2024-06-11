@@ -40,7 +40,6 @@ export const Timeline = ({ request }) => {
 
   return (
     <>
-      <Divider horizontal>{i18next.t("Timeline")}</Divider>
       <Dimmer.Dimmable blurring dimmed={isLoading}>
         <Dimmer active={isLoading} inverted>
           <Loader indeterminate size="big">{i18next.t("Loading timeline...")}</Loader>

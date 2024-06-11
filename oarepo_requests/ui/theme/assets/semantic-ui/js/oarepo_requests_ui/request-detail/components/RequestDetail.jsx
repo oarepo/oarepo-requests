@@ -6,12 +6,13 @@ import { Button, Grid, List, Form, Divider, Comment, Header, Container, Icon, Me
 import _isEmpty from "lodash/isEmpty";
 import _sortBy from "lodash/sortBy";
 
-import { ActionButtons, MainRequestDetails, TopicPreview } from ".";
+import { ActionButtons, Timeline, TopicPreview, SideRequestInfo } from ".";
 
 export const RequestDetail = ({ request }) => {
-  const [activeTab, setActiveTab] = useState("details");
+  const [activeTab, setActiveTab] = useState("timeline");
 
-  const requestModalHeader = !_isEmpty(request?.title) ? request.title : (!_isEmpty(request?.name) ? request.name : request.type);
+  const renderReadOnlyData = !_isEmpty(request?.payload);
+  const requestHeader = !_isEmpty(request?.title) ? request.title : (!_isEmpty(request?.name) ? request.name : request.type);
 
   return (
     <Grid relaxed>
@@ -28,22 +29,43 @@ export const RequestDetail = ({ request }) => {
       </Grid.Row>
       <Grid.Row>
         <Grid.Column>
-          <Header as="h1">{requestModalHeader}</Header>
+          <Header as="h1">{requestHeader}</Header>
           {request?.description &&
             <Grid.Row as="p">
               {request.description}
             </Grid.Row>
           }
+          {renderReadOnlyData &&
+            <List relaxed>
+              {Object.keys(request.payload).map(key => (
+                <List.Item key={key}>
+                  <List.Content>
+                    <List.Header>{key}</List.Header>
+                    <ReadOnlyCustomFields
+                      className="requests-form-cf"
+                      config={payloadUI}
+                      data={{ [key]: request.payload[key] }}
+                      templateLoaders={[
+                        (widget) => import(`@js/oarepo_requests/components/common/${widget}.jsx`),
+                        (widget) => import(`react-invenio-forms`)
+                      ]}
+                    />
+                  </List.Content>
+                </List.Item>
+              ))}
+            </List>
+          }
+          <SideRequestInfo request={request} />
         </Grid.Column>
       </Grid.Row>
       <Grid.Row>
         <Grid.Column>
           <Menu tabular attached>
             <Menu.Item
-              name='details'
-              content={i18next.t("Details")}
-              active={activeTab === 'details'}
-              onClick={() => setActiveTab('details')}
+              name='timeline'
+              content={i18next.t("Timeline")}
+              active={activeTab === 'timeline'}
+              onClick={() => setActiveTab('timeline')}
             />
             <Menu.Item
               name='topic'
@@ -54,8 +76,12 @@ export const RequestDetail = ({ request }) => {
           </Menu>
         </Grid.Column>
       </Grid.Row>
-      {activeTab === 'details' && <MainRequestDetails request={request} />}
-      {activeTab === 'topic' && <TopicPreview request={request} />}
+      <Grid.Row>
+        <Grid.Column>
+          {activeTab === 'timeline' && <Timeline request={request} />}
+          {activeTab === 'topic' && <TopicPreview request={request} />}
+        </Grid.Column>
+      </Grid.Row>
     </Grid>
   );
 }
