@@ -1,6 +1,7 @@
+from invenio_requests.records.api import RequestEvent
+
 from tests.test_requests.test_create_inmodel import pick_request_type
 from tests.test_requests.utils import link_api2testclient
-from invenio_requests.records.api import RequestEvent
 
 
 def test_timeline(
@@ -49,3 +50,17 @@ def test_timeline(
     )
     assert timeline_resp.status_code == 200
     assert len(timeline_resp.json["hits"]["hits"]) == 1
+    comment = timeline_resp.json["hits"]["hits"][0]
+    assert (
+        comment.items()
+        >= {
+            "created_by": {
+                "reference": {"user": "1"},
+                "type": "user",
+                "label": "user1@example.org",
+                "links": {"self": "https://127.0.0.1:5000/api/users/1"},
+            },
+            "permissions": {},
+            "payload": {"content": "test", "format": "html"},
+        }.items()
+    )

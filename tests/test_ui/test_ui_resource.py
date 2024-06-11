@@ -1,5 +1,7 @@
 import json
+
 from invenio_requests.proxies import current_requests_service
+
 from thesis.records.requests.edit_record.types import EditRecordRequestType
 
 allowed_actions = ["submit", "delete"]
@@ -66,9 +68,16 @@ def test_record_delete_unauthorized(
         data = json.loads(c.text)
         assert "delete_record" not in data["creatable_request_types"]
 
+
 def test_request_detail_page(
-    app, logged_client, record_ui_resource, example_topic, client,
-        fake_manifest, users, urls
+    app,
+    logged_client,
+    record_ui_resource,
+    example_topic,
+    client,
+    fake_manifest,
+    users,
+    urls,
 ):
     creator_client = logged_client(users[0])
     creator_identity = users[0].identity
@@ -78,7 +87,7 @@ def test_request_detail_page(
         EditRecordRequestType,
         topic=example_topic,
         receiver=users[1].user,
-        creator=users[0].user
+        creator=users[0].user,
     )
     # resp_request_submit = creator_client.post(
     #     link_api2testclient(resp_request_create.json["links"]["actions"]["submit"]),
