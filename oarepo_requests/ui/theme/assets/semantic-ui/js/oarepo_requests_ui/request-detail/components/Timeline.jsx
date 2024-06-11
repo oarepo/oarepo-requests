@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 
 import { i18next } from "@translations/oarepo_requests_ui/i18next";
 import { Message, Feed, Dimmer, Loader, Placeholder, Segment } from "semantic-ui-react";
@@ -13,7 +13,7 @@ export const Timeline = ({ request }) => {
   const [error, setError] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
 
-  const fetchEvents = async () => {
+  const fetchEvents = useCallback(async () => {
     setIsLoading(true);
     setError(null);
     try {
@@ -30,11 +30,11 @@ export const Timeline = ({ request }) => {
     } finally {
       setIsLoading(false);
     }
-  };
+  }, [request.links.timeline]);
 
   useEffect(() => {
     fetchEvents();
-  }, []);
+  }, [fetchEvents]);
 
   return (
     <>
