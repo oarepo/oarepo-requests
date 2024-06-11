@@ -1,14 +1,10 @@
 import React from "react";
-import PropTypes from "prop-types";
 
 import { i18next } from "@translations/oarepo_requests_ui/i18next";
-import { Button, Grid, List, Form, Divider, Comment, Header, Container, Icon } from "semantic-ui-react";
+import { Button } from "semantic-ui-react";
 import _isEmpty from "lodash/isEmpty";
-import _sortBy from "lodash/sortBy";
-import _has from "lodash/has";
 import axios from "axios";
 
-// import { isDeepEmpty } from "@js/oarepo_requests/utils";
 import { ConfirmModal } from ".";
 
 const callApi = async (url, method = "GET", data = null) => {

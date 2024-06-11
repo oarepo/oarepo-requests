@@ -4,7 +4,6 @@ import { i18next } from "@translations/oarepo_requests_ui/i18next";
 import { scrollTop } from "@js/oarepo_ui";
 import { Button, Grid, List, Header, TransitionablePortal, Icon, Menu } from "semantic-ui-react";
 import _isEmpty from "lodash/isEmpty";
-import _sortBy from "lodash/sortBy";
 
 import { ActionButtons, Timeline, TopicPreview, SideRequestInfo } from ".";
 
@@ -22,7 +21,7 @@ export const RequestDetail = ({ request }) => {
     };
   }, []);
 
-  const renderReadOnlyData = !_isEmpty(request?.payload);
+  // const renderReadOnlyData = !_isEmpty(request?.payload);
   const requestHeader = !_isEmpty(request?.title) ? request.title : (!_isEmpty(request?.name) ? request.name : request.type);
 
   return (
@@ -47,7 +46,7 @@ export const RequestDetail = ({ request }) => {
                 {request.description}
               </Grid.Row>
             }
-            {renderReadOnlyData &&
+            {/* {renderReadOnlyData ?
               <List relaxed>
                 {Object.keys(request.payload).map(key => (
                   <List.Item key={key}>
@@ -65,8 +64,8 @@ export const RequestDetail = ({ request }) => {
                     </List.Content>
                   </List.Item>
                 ))}
-              </List>
-            }
+              </List> : null
+            } */}
             <SideRequestInfo request={request} />
           </Grid.Column>
         </Grid.Row>

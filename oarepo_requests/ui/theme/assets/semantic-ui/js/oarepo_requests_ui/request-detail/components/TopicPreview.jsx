@@ -1,8 +1,6 @@
 import React, { useRef } from "react";
 
 import { Grid, Loader, Segment } from "semantic-ui-react";
-import _isEmpty from "lodash/isEmpty";
-import _sortBy from "lodash/sortBy";
 
 export const TopicPreview = ({ request }) => {
   const iframeRef = useRef(null);

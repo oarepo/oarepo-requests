@@ -1,19 +1,13 @@
-import React, { useState, useEffect, useRef } from "react";
-import PropTypes from "prop-types";
+import React, { useState, useRef } from "react";
 
 import { i18next } from "@translations/oarepo_requests_ui/i18next";
-import { Button, Grid, List, Divider, Comment, Header, Container, Icon, Menu, Message, Feed, Dimmer, Loader, Placeholder, Segment, FormField } from "semantic-ui-react";
+import { Button, Message, FormField } from "semantic-ui-react";
 import _isEmpty from "lodash/isEmpty";
-import _sortBy from "lodash/sortBy";
 import axios from "axios";
-import { RichEditor, FieldLabel, RichInputField } from "react-invenio-forms";
+import { RichEditor, RichInputField } from "react-invenio-forms";
 
-import { Formik, Field, Form, ErrorMessage } from "formik";
-import * as Yup from 'yup';
-
-import { ReadOnlyCustomFields } from "@js/oarepo_requests/components";
-import { SideRequestInfo } from ".";
-import { sanitizeInput } from "../utils";
+import { Formik, Form } from "formik";
+import { CommentPayloadSchema, sanitizeInput } from "../utils";
 
 export const EventSubmitForm = ({ request, fetchEvents }) => {
   const [error, setError] = useState(null);
@@ -47,16 +41,7 @@ export const EventSubmitForm = ({ request, fetchEvents }) => {
       fetchEvents();
       setSubmitting(false);
     }
-  }
-
-  const CommentPayloadSchema = Yup.object().shape({
-    payload: Yup.object().shape({
-      content: Yup.string()
-        .min(1, i18next.t("Comment must be at least 1 character long."))
-        .required(i18next.t("Comment must be at least 1 character long.")),
-      format: Yup.string().equals(["html"], i18next.t("Invalid format."))
-    })
-  });
+  };
 
   return (
     <Formik

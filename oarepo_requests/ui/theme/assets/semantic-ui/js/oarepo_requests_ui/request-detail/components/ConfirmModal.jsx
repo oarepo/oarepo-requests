@@ -1,18 +1,16 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState } from "react";
 import PropTypes from "prop-types";
 
 import { i18next } from "@translations/oarepo_requests_ui/i18next";
-import { Dimmer, Loader, Modal, Button, Icon, Message, Divider, FormTextArea, FormField } from "semantic-ui-react";
-import _isEmpty from "lodash/isEmpty";
-import _isFunction from "lodash/isFunction";
+import { Dimmer, Loader, Modal, Button, Icon, Message, FormField } from "semantic-ui-react";
 import {
   RichEditor,
+  FieldLabel,
+  RichInputField,
 } from "react-invenio-forms";
-import { sanitizeInput } from "@js/oarepo_ui";
+import { CommentPayloadSchema, sanitizeInput } from "../utils";
 
-import { Formik, Field, Form, ErrorMessage } from "formik";
-import * as Yup from 'yup';
-import { delay } from "bluebird";
+import { Formik, Form } from "formik";
 
 /** 
  * @typedef {import("../types").Request} Request
@@ -27,37 +25,22 @@ export const ConfirmModal = ({ request, requestModalHeader, handleSubmit, trigge
   const [modalOpen, setModalOpen] = useState(false);
   const [error, setError] = useState(null);
 
-  const errorMessageRef = useRef(null);
-
-  useEffect(() => {
-    if (error) {
-      errorMessageRef.current?.scrollIntoView({ behavior: "smooth" });
-    }
-  }, [error]);
-
   const onClose = () => {
     setModalOpen(false);
     setError(null);
   };
 
   const onSubmit = async (values, { setSubmitting }) => {
+    setError(null);
     try {
-      console.log("Sending request");
-      await delay(1000);
-      _isFunction(handleSubmit) && await handleSubmit(values);
+      await handleSubmit(values);
+      location.reload();
     } catch (error) {
       setError(error);
     } finally {
       setSubmitting(false);
     }
-  }
-
-  const PayloadSchema = Yup.object().shape({
-    payload: Yup.object().shape({
-      content: Yup.string()
-      .min(1, i18next.t("Comment must be at least 1 character long."))
-    })
-  });
+  };
 
   return (
     <Modal
@@ -75,11 +58,12 @@ export const ConfirmModal = ({ request, requestModalHeader, handleSubmit, trigge
     >
       <Formik 
         initialValues={{ 
-          "payload": {
-            "content": "" 
+          payload: { 
+            content: "",
+            format: "html"
           }
-        }} 
-        validationSchema={PayloadSchema}
+        }}
+        validationSchema={CommentPayloadSchema}
         onSubmit={onSubmit}
       >
         {({ isSubmitting, values, setFieldValue, setFieldTouched }) => (
@@ -89,35 +73,34 @@ export const ConfirmModal = ({ request, requestModalHeader, handleSubmit, trigge
             </Dimmer>
             <Modal.Header as="h2" id="request-modal-header">{requestModalHeader ?? request?.type}</Modal.Header>
             <Modal.Content>
-              {error &&
-                <Message ref={errorMessageRef} negative>
-                  <Message.Header>{i18next.t("Error")}</Message.Header>
+              {error && (
+                <Message error>
+                  <Message.Header>{i18next.t("Error while submitting comment.")}</Message.Header>
                   <p>{error?.message}</p>
                 </Message>
-              }
+              )}
               <Form id="submit-request-form">
-                <Field name="payload.content">
-                  {({ field }) => (
-                    <FormField>
-                      <label htmlFor={field.id || field.name}>{`${i18next.t("Add comment")} (${i18next.t("optional")})`}</label>
-                      <Divider hidden />
+                <FormField>
+                  <RichInputField
+                    fieldPath="payload.content"
+                    label={
+                      <FieldLabel htmlFor="payload.content" label={`${i18next.t("Add comment")} (${i18next.t("optional")})`} className="rel-mb-25" />
+                    }
+                    optimized="true"
+                    placeholder={i18next.t('Your comment here...')}
+                    editor={
                       <RichEditor
                         value={values.payload.content}
                         optimized
                         onBlur={(event, editor) => {
-                          const cleanedContent = sanitizeInput(
-                            editor.getContent(),
-                            null
-                          );
+                          const cleanedContent = sanitizeInput(editor.getContent());
                           setFieldValue("payload.content", cleanedContent);
                           setFieldTouched("payload.content", true);
                         }}
-                        {...field}
                       />
-                    </FormField>
-                  )}
-                </Field>
-                <ErrorMessage name="payload.content" render={(message) => <Message negative attached="bottom">{message}</Message>} />
+                    }
+                  />
+                </FormField>
               </Form>
             </Modal.Content>
             <Modal.Actions>

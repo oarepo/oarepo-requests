@@ -1,10 +1,8 @@
 import React, { useState, useEffect } from "react";
 
 import { i18next } from "@translations/oarepo_requests_ui/i18next";
-import { Divider, Message, Feed, Dimmer, Loader, Placeholder, Segment } from "semantic-ui-react";
+import { Message, Feed, Dimmer, Loader, Placeholder, Segment } from "semantic-ui-react";
 import _isEmpty from "lodash/isEmpty";
-import _sortBy from "lodash/sortBy";
-import _has from "lodash/has";
 import axios from "axios";
 import { delay } from "bluebird";
 

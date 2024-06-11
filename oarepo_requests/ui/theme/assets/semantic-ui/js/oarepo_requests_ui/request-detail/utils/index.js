@@ -1,4 +1,6 @@
 import _has from "lodash/has";
+import { i18next } from "@translations/oarepo_requests_ui/i18next";
+import * as Yup from 'yup';
 import sanitizeHtml from "sanitize-html";
 import { decode } from "html-entities";
 
@@ -54,3 +56,12 @@ export const sanitizeInput = (htmlString, validTags) => {
   });
   return cleanInput;
 };
+
+export const CommentPayloadSchema = Yup.object().shape({
+  payload: Yup.object().shape({
+    content: Yup.string()
+      .min(1, i18next.t("Comment must be at least 1 character long."))
+      .required(i18next.t("Comment must be at least 1 character long.")),
+    format: Yup.string().equals(["html"], i18next.t("Invalid format."))
+  })
+});

@@ -1,7 +1,7 @@
 import React from "react";
 
 import { i18next } from "@translations/oarepo_requests_ui/i18next";
-import { Header, Divider, Icon, Label, List } from "semantic-ui-react";
+import { Icon, List } from "semantic-ui-react";
 
 /** 
  * @typedef {import("../types").Request} Request

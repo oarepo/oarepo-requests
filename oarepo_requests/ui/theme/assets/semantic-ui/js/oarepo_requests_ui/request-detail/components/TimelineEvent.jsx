@@ -2,8 +2,6 @@ import React, { memo } from "react";
 
 import { i18next } from "@translations/oarepo_requests_ui/i18next";
 import { Icon, Feed } from "semantic-ui-react";
-import _isEmpty from "lodash/isEmpty";
-import _sortBy from "lodash/sortBy";
 import _has from "lodash/has";
 import { hasAll, hasAny, sanitizeInput } from "../utils";
 
