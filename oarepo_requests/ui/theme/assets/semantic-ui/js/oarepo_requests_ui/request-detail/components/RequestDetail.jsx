@@ -17,12 +17,10 @@ export const RequestDetail = ({ request }) => {
     <Grid relaxed>
       <Grid.Row columns={2}>
         <Grid.Column>
-          <Header as="h1">{requestModalHeader}</Header>
-          {request?.description &&
-            <Grid.Row as="p">
-              {request.description}
-            </Grid.Row>
-          }
+          <Button as="a" compact href="/me/requests/" icon labelPosition="left">
+            <Icon name="arrow left" />
+            {i18next.t("Back to requests")}
+          </Button>
         </Grid.Column>
         <Grid.Column floated="right" textAlign="right">
           <ActionButtons request={request} />
@@ -30,14 +28,24 @@ export const RequestDetail = ({ request }) => {
       </Grid.Row>
       <Grid.Row>
         <Grid.Column>
+          <Header as="h1">{requestModalHeader}</Header>
+          {request?.description &&
+            <Grid.Row as="p">
+              {request.description}
+            </Grid.Row>
+          }
+        </Grid.Column>
+      </Grid.Row>
+      <Grid.Row>
+        <Grid.Column>
           <Menu tabular attached>
-            <Menu.Item 
+            <Menu.Item
               name='details'
               content={i18next.t("Details")}
               active={activeTab === 'details'}
               onClick={() => setActiveTab('details')}
             />
-            <Menu.Item 
+            <Menu.Item
               name='topic'
               content={`${i18next.t("Record")} ${i18next.t("preview")}`}
               active={activeTab === 'topic'}
