@@ -1,34 +1,20 @@
-import React, { useRef } from "react";
+import React from "react";
 
-import { Grid, Loader, Segment } from "semantic-ui-react";
+import { Grid } from "semantic-ui-react";
+import IframeResizer from "@iframe-resizer/react";
 
 export const TopicPreview = ({ request }) => {
-  const iframeRef = useRef(null);
-  const [height, setHeight] = React.useState("0px");
-  const [loading, setLoading] = React.useState(true);
-
-  const iframeOnLoad = () => {
-    setHeight(iframeRef.current.contentWindow.document.body.scrollHeight + "px");
-    setLoading(false);
-  }
-
   return (
     <Grid.Row>
       <Grid.Column>
-        {loading && 
-          <Segment placeholder loading className="borderless">
-            <Loader active size="massive" />
-          </Segment>
-        }
-        <iframe 
-          ref={iframeRef} 
+        <IframeResizer
+          license='GPLv3'
           src={request.topic.links.self_html} 
-          onLoad={iframeOnLoad} 
           title={request.topic.label + " record preview"} 
-          width="100%" 
-          height={height} 
-          scrolling="no" 
+          inPageLinks
           style={{
+            width: '100%',
+            height: '100vh',
             outline: "none",
             border: "none",
             overflow: "hidden",
