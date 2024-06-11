@@ -51,9 +51,6 @@ export const sanitizeInput = (htmlString, validTags) => {
   const cleanInput = sanitizeHtml(decodedString, {
     allowedTags: validTags || ALLOWED_HTML_TAGS,
     allowedAttributes: ALLOWED_HTML_ATTRS,
-    allowedAttributes: {
-      a: ["href"],
-    },
   });
   return cleanInput;
 };

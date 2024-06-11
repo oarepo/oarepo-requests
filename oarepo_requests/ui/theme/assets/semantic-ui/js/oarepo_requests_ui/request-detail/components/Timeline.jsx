@@ -1,17 +1,14 @@
 import React, { useState, useEffect } from "react";
-import PropTypes from "prop-types";
 
 import { i18next } from "@translations/oarepo_requests_ui/i18next";
-import { Button, Grid, List, Form, Divider, Comment, Header, Container, Icon, Menu, Message, Feed, Dimmer, Loader, Placeholder, Segment } from "semantic-ui-react";
+import { Divider, Message, Feed, Dimmer, Loader, Placeholder, Segment } from "semantic-ui-react";
 import _isEmpty from "lodash/isEmpty";
 import _sortBy from "lodash/sortBy";
 import _has from "lodash/has";
 import axios from "axios";
 import { delay } from "bluebird";
 
-import { ReadOnlyCustomFields } from "@js/oarepo_requests/components";
 import { EventSubmitForm, TimelineEvent } from ".";
-import { hasAll, hasAny, sanitizeInput } from "../utils";
 
 export const Timeline = ({ request }) => {
   const [events, setEvents] = useState([]);

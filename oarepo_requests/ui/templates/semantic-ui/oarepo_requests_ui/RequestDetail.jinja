@@ -5,6 +5,18 @@
 {% extends "oarepo_ui/detail.html" %}
 
 {%- block page_body %}
+    {# Custom Dashboard Header #}
+    <div class="ui container fluid page-subheader-outer shadowless with-submenu ml-0-mobile mr-0-mobile mb-0 rel-pt-2" id="dashboard-user-header-container">
+      <div class="ui container secondary pointing menu page-subheader pl-0">
+        {% for item in current_menu.submenu('user_dashboard').children %}
+        <a
+          class="item {{ 'active' if loop.index == 3 }} {{ 'disabled' if not item.url }}"
+          href="{{ item.url }}">{{ item.text }}</a>
+    
+        {% endfor %}
+      </div>
+    </div>
+    {# Main content #}
     <div class="ui main container" id="request-detail" data-request='{{ record | tojson }}'></div>
     <pre>{{ record | pprint }}</pre>
     {# <pre>{{ extra_context | pprint }}</pre>
