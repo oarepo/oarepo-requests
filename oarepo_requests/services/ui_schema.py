@@ -19,7 +19,7 @@ class UIReferenceSchema(ma.Schema):
     # reference = ma.fields.Dict(ReferenceString)
     type = ma.fields.String()
     label = ma.fields.String()
-    link = ma.fields.String(required=False)
+    links = get_links_schema()
 
     @ma.pre_dump
     def create_reference(self, data, **kwargs):

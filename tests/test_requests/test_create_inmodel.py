@@ -1,6 +1,5 @@
-from thesis.records.api import ThesisRecord
-
 from tests.test_requests.utils import link_api2testclient
+from thesis.records.api import ThesisRecord
 
 
 def pick_request_type(types_list, queried_type):
