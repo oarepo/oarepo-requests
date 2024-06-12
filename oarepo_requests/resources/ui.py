@@ -8,7 +8,7 @@ from oarepo_runtime.resources import LocalizedUIJSONSerializer
 
 from ..proxies import current_oarepo_requests
 from ..resolvers.ui import resolve
-from ..services.ui_schema import UIBaseRequestSchema
+from ..services.ui_schema import UIBaseRequestEventSchema, UIBaseRequestSchema
 from ..utils import reference_to_tuple
 
 
@@ -86,3 +86,14 @@ class OARepoRequestsUIJSONSerializer(LocalizedUIJSONSerializer):
             )
         }
         return super().dump_list(obj_list, *args, extra_context=extra_context, **kwargs)
+
+
+class OARepoRequestEventsUIJSONSerializer(LocalizedUIJSONSerializer):
+    def __init__(self):
+        """Initialise Serializer."""
+        super().__init__(
+            format_serializer_cls=JSONSerializer,
+            object_schema_cls=UIBaseRequestEventSchema,
+            list_schema_cls=BaseListSchema,
+            schema_context={"object_key": "ui", "identity": g.identity},
+        )

@@ -1,8 +1,13 @@
 import marshmallow as ma
 from invenio_pidstore.errors import PIDDeletedError
-from invenio_requests.proxies import current_request_type_registry
+from invenio_requests.proxies import current_request_type_registry, current_requests
+from invenio_requests.services.schemas import (
+    CommentEventType,
+    EventTypeMarshmallowField,
+)
 from marshmallow import validate
 from oarepo_runtime.i18n import lazy_gettext as _
+from oarepo_runtime.services.schema.marshmallow import BaseRecordSchema
 from oarepo_runtime.services.schema.ui import LocalizedDateTime
 
 from oarepo_requests.resolvers.ui import resolve
@@ -96,3 +101,30 @@ class UIRequestTypeSchema(RequestTypeSchema):
 class UIRequestsSerializationMixin(RequestsSchemaMixin):
     requests = ma.fields.List(ma.fields.Nested(UIBaseRequestSchema))
     request_types = ma.fields.List(ma.fields.Nested(UIRequestTypeSchema))
+
+
+class UIBaseRequestEventSchema(BaseRecordSchema):
+    created = LocalizedDateTime(dump_only=True)
+    updated = LocalizedDateTime(dump_only=True)
+
+    type = EventTypeMarshmallowField(dump_only=True)
+    created_by = ma.fields.Nested(UIReferenceSchema)
+    permissions = ma.fields.Method("get_permissions", dump_only=True)
+    payload = ma.fields.Raw()
+
+    def get_permissions(self, obj):
+        """Return permissions to act on comments or empty dict."""
+        type = self.get_attribute(obj, "type", None)
+        is_comment = type == CommentEventType
+        if is_comment:
+            service = current_requests.request_events_service
+            return {
+                "can_update_comment": service.check_permission(
+                    self.context["identity"], "update_comment", event=obj
+                ),
+                "can_delete_comment": service.check_permission(
+                    self.context["identity"], "delete_comment", event=obj
+                ),
+            }
+        else:
+            return {}
