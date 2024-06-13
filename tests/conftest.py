@@ -312,7 +312,19 @@ def example_topic_draft(record_service, identity_simple):
 @pytest.fixture()
 def record_factory(record_service):
     def record(identity):
-        draft = record_service.create(identity, {})
+        draft = record_service.create(
+            identity,
+            {
+                "metadata": {
+                    "title": "Title",
+                    "creators": [
+                        "Creator 1",
+                        "Creator 2",
+                    ],
+                    "contributors": ["Contributor 1"],
+                }
+            },
+        )
         record = record_service.publish(identity, draft.id)
         return record._obj
 

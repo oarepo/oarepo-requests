@@ -27,6 +27,15 @@ record:
           - EditRecordRequestType
         imports:
           - import: oarepo_requests.types.edit_record.EditRecordRequestType
+  properties:
+    metadata:
+      properties:
+        title:
+          type: fulltext
+        creators[]:
+          type: keyword
+        contributors[]:
+          type: keyword
 
 settings:
   schema-server: 'local://'
