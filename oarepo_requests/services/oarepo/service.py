@@ -26,16 +26,6 @@ class OARepoRequestsService(RequestsService):
             raise UnknownRequestType(request_type)
 
         if receiver is None:
-            self.run_components(
-                "create",
-                identity,
-                data=data,
-                request_type=request_type,
-                topic=topic,
-                created_by=creator,
-                receiver=receiver,
-                uow=uow,
-            )
             receiver = current_oarepo_requests.default_request_receiver(
                 identity, request_type, topic, creator, data
             )
