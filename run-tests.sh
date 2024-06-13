@@ -22,6 +22,9 @@ if test -d ./$BUILD_TEST_DIR/$MODEL; then
   rm -rf ./$BUILD_TEST_DIR/$MODEL
 fi
 
+# local override
+pip install --config-settings editable_mode=compat -e ../oarepo-model-builder-requests
+
 oarepo-compile-model ./$CODE_TEST_DIR/$MODEL.yaml --output-directory ./$BUILD_TEST_DIR/$MODEL -vvv
 
 MODEL_VENV=".venv-tests"
@@ -36,6 +39,9 @@ pip install "oarepo[tests]==$OAREPO_VERSION.*"
 pip install -e "./$BUILD_TEST_DIR/${MODEL}"
 pip install oarepo-ui
 pip install -e .
+
+# local override
+pip install --config-settings editable_mode=compat -e ../oarepo-runtime
 
 pytest $BUILD_TEST_DIR/test_requests
 pytest $BUILD_TEST_DIR/test_ui
