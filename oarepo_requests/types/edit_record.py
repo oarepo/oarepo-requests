@@ -7,7 +7,9 @@ from oarepo_requests.actions.generic import AutoAcceptSubmitAction
 from .generic import NonDuplicableOARepoRequestType
 
 
-class EditRecordRequestType(NonDuplicableOARepoRequestType):
+class EditPublishedRecordRequestType(NonDuplicableOARepoRequestType):
+    type_id = "edit-published-record"
+
     available_actions = {
         **RequestType.available_actions,
         "submit": AutoAcceptSubmitAction,

@@ -2,7 +2,7 @@ import json
 
 from invenio_requests.proxies import current_requests_service
 
-from thesis.records.requests.edit_record.types import EditRecordRequestType
+from thesis.records.requests.edit_record.types import EditPublishedRecordRequestType
 
 allowed_actions = ["submit", "delete"]
 
@@ -84,7 +84,7 @@ def test_request_detail_page(
     request = current_requests_service.create(
         creator_identity,
         {},
-        EditRecordRequestType,
+        EditPublishedRecordRequestType,
         topic=example_topic,
         receiver=users[1].user,
         creator=users[0].user,

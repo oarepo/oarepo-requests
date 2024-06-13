@@ -7,6 +7,8 @@ from .generic import NonDuplicableOARepoRequestType
 
 
 class PublishDraftRequestType(NonDuplicableOARepoRequestType):
+    type_id = "publish-draft"
+
     available_actions = {
         **RequestType.available_actions,
         "accept": PublishDraftAcceptAction,

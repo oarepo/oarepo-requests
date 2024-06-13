@@ -6,7 +6,9 @@ from oarepo_requests.actions.delete_topic import DeleteTopicAcceptAction
 from .generic import NonDuplicableOARepoRequestType
 
 
-class DeleteRecordRequestType(NonDuplicableOARepoRequestType):
+class DeletePublishedRecordRequestType(NonDuplicableOARepoRequestType):
+    type_id = "delete-published-record"
+
     available_actions = {
         **RequestType.available_actions,
         "accept": DeleteTopicAcceptAction,

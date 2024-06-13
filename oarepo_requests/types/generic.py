@@ -5,6 +5,8 @@ from invenio_requests.proxies import current_requests_service
 from oarepo_requests.errors import OpenRequestAlreadyExists
 from oarepo_requests.utils import open_request_exists
 
+from .ref_types import ModelRefTypes, ReceiverRefTypes
+
 
 class OARepoRequestType(RequestType):
     def can_create(self, identity, data, receiver, topic, creator, *args, **kwargs):
@@ -28,6 +30,9 @@ class OARepoRequestType(RequestType):
         except PermissionDeniedError:
             return False
         return True
+
+    allowed_topic_ref_types = ModelRefTypes()
+    allowed_receiver_ref_types = ReceiverRefTypes()
 
 
 class NonDuplicableOARepoRequestType(OARepoRequestType):
