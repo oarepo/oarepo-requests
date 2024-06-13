@@ -23,7 +23,7 @@ if test -d ./$BUILD_TEST_DIR/$MODEL; then
 fi
 
 # local override
-pip install --config-settings editable_mode=compat -e ../oarepo-model-builder-requests
+# pip install --config-settings editable_mode=compat -e ../oarepo-model-builder-requests
 
 oarepo-compile-model ./$CODE_TEST_DIR/$MODEL.yaml --output-directory ./$BUILD_TEST_DIR/$MODEL -vvv
 
@@ -41,7 +41,7 @@ pip install oarepo-ui
 pip install -e .
 
 # local override
-pip install --config-settings editable_mode=compat -e ../oarepo-runtime
+# pip install --config-settings editable_mode=compat -e ../oarepo-runtime
 
 #pytest $BUILD_TEST_DIR/test_requests
 #pytest $BUILD_TEST_DIR/test_ui
