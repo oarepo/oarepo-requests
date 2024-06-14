@@ -9,9 +9,8 @@ export const TopicPreview = ({ request }) => {
       <Grid.Column>
         <IframeResizer
           license='GPLv3'
-          src={request.topic.links.self_html} 
+          src={request.topic.links.self_html + "?embed=true"} 
           title={request.topic.label + " record preview"} 
-          inPageLinks
           style={{
             width: '100%',
             height: '100vh',
