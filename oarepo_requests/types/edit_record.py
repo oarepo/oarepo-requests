@@ -4,7 +4,7 @@ from oarepo_runtime.i18n import lazy_gettext as _
 from oarepo_requests.actions.edit_topic import EditTopicAcceptAction
 from oarepo_requests.actions.generic import AutoAcceptSubmitAction
 
-from . import ModelRefTypes
+from .ref_types import ModelRefTypes
 from .generic import NonDuplicableOARepoRequestType
 
 

@@ -3,7 +3,7 @@ from oarepo_runtime.i18n import lazy_gettext as _
 
 from oarepo_requests.actions.delete_topic import DeleteTopicAcceptAction
 
-from . import ModelRefTypes
+from .ref_types import ModelRefTypes
 from .generic import NonDuplicableOARepoRequestType
 
 
