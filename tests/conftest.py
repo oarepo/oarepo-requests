@@ -36,7 +36,7 @@ def urls():
 def publish_request_data_function():
     def ret_data(record_id):
         return {
-            "request_type": "thesis_publish_draft",
+            "request_type": "publish-draft",
             "topic": {"thesis_draft": record_id},
         }
 
@@ -47,7 +47,7 @@ def publish_request_data_function():
 def edit_record_data_function():
     def ret_data(record_id):
         return {
-            "request_type": "thesis_edit_record",
+            "request_type": "edit-published-record",
             "topic": {"thesis": record_id},
         }
 
@@ -58,7 +58,7 @@ def edit_record_data_function():
 def delete_record_data_function():
     def ret_data(record_id):
         return {
-            "request_type": "thesis_delete_record",
+            "request_type": "delete-published-record",
             "topic": {"thesis": record_id},
         }
 
@@ -80,7 +80,7 @@ def serialization_result():
                 "timeline": f"https://127.0.0.1:5000/api/requests/extended/{request_id}/timeline",
             },
             "revision_id": 3,
-            "type": "thesis_publish_draft",
+            "type": "publish-draft",
             "title": "",
             "number": "1",
             "status": "submitted",
@@ -136,7 +136,7 @@ def ui_serialization_result():
                 "reference": {"thesis_draft": topic_id},
                 "type": "thesis_draft",
             },
-            "type": "thesis_publish_draft",
+            "type": "publish-draft",
             # 'updated': '2024-01-26T10:06:18.084317'
         }
 
@@ -161,18 +161,12 @@ def app_config(app_config):
     )
     app_config["CACHE_TYPE"] = "SimpleCache"
 
-    def default_receiver(*args, **kwargs):
-        return {"user": "2"}
-
-    def none_receiver(*args, **kwargs):
+    def default_receiver(*args, request_type=None, **kwargs):
+        if request_type != "edit-published-record":
+            return {"user": "2"}
         return None
 
-    app_config["OAREPO_REQUESTS_DEFAULT_RECEIVER"] = {
-        "thesis_publish_draft": default_receiver,
-        "thesis_delete_record": default_receiver,
-        "thesis_non_duplicable": default_receiver,
-        "thesis_edit_record": none_receiver,
-    }
+    app_config["OAREPO_REQUESTS_DEFAULT_RECEIVER"] = default_receiver
 
     """
     app_config.setdefault("ENTITY_REFERENCE_UI_RESOLVERS", {}).update({
@@ -354,7 +348,7 @@ def events_resource_data():
 from invenio_accounts.proxies import current_datastore
 
 
-def _create_group(id, name, description, is_managed, database):
+def _create_role(id, name, description, is_managed, database):
     """Creates a Role/Group."""
     r = current_datastore.create_role(
         id=id, name=name, description=description, is_managed=is_managed
@@ -364,9 +358,9 @@ def _create_group(id, name, description, is_managed, database):
 
 
 @pytest.fixture()
-def group(database):
+def role(database):
     """A single group."""
-    r = _create_group(
+    r = _create_role(
         id="it-dep",
         name="it-dep",
         description="IT Department",
@@ -377,7 +371,7 @@ def group(database):
 
 
 @pytest.fixture()
-def group_ui_serialization():
+def role_ui_serialization():
     return {
         "label": "it-dep",
         "links": {"self": "https://127.0.0.1:5000/api/groups/it-dep"},

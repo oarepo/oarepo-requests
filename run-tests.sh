@@ -38,6 +38,7 @@ pip install -U setuptools pip wheel
 pip install "oarepo[tests]==$OAREPO_VERSION.*"
 pip install -e "./$BUILD_TEST_DIR/${MODEL}"
 pip install oarepo-ui
+pip install deepdiff
 pip install -e .
 
 # local override

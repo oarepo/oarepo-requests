@@ -24,12 +24,12 @@ def test_record(
     receiver_client = logged_client(receiver)
 
     record1 = record_factory(creator.identity)
-    record1 = creator_client.get(f"{urls['BASE_URL']}{record1['id']}")
+    record1 = creator_client.get(f"{urls['BASE_URL']}{record1['id']}?expand=true")
 
     link = link_api2testclient(
-        pick_request_type(record1.json["request_types"], "thesis_delete_record")[
-            "links"
-        ]["actions"]["create"]
+        pick_request_type(
+            record1.json["expanded"]["request_types"], "delete-published-record"
+        )["links"]["actions"]["create"]
     )
 
     resp_request_create = creator_client.post(link)
@@ -40,7 +40,9 @@ def test_record(
 
     record = receiver_client.get(f"{urls['BASE_URL']}{record1.json['id']}?expand=true")
     delete = receiver_client.post(
-        link_api2testclient(record.json["requests"][0]["links"]["actions"]["accept"])
+        link_api2testclient(
+            record.json["expanded"]["requests"][0]["links"]["actions"]["accept"]
+        )
     )
     ThesisRecord.index.refresh()
     lst = creator_client.get(urls["BASE_URL"])
@@ -60,9 +62,9 @@ def test_draft(
     creator_client = logged_client(creator)
     receiver_client = logged_client(receiver)
 
-    draft1 = creator_client.post(urls["BASE_URL"], json={})
+    draft1 = creator_client.post(urls["BASE_URL"] + "?expand=true", json={})
     link = link_api2testclient(
-        pick_request_type(draft1.json["request_types"], "thesis_publish_draft")[
+        pick_request_type(draft1.json["expanded"]["request_types"], "publish-draft")[
             "links"
         ]["actions"]["create"]
     )
@@ -76,7 +78,9 @@ def test_draft(
         f"{urls['BASE_URL']}{draft1.json['id']}/draft?expand=true"
     )
     delete = receiver_client.post(
-        link_api2testclient(record.json["requests"][0]["links"]["actions"]["accept"])
+        link_api2testclient(
+            record.json["expanded"]["requests"][0]["links"]["actions"]["accept"]
+        )
     )
     ThesisRecord.index.refresh()
     lst = creator_client.get(urls["BASE_URL"])

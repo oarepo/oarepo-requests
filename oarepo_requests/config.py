@@ -1,8 +1,15 @@
-from oarepo_requests.resolvers.ui import UserEntityReferenceUIResolver, FallbackEntityReferenceUIResolver, \
-    GroupEntityReferenceUIResolver
-from oarepo_requests.types import DeletePublishedRecordRequestType, EditPublishedRecordRequestType, PublishDraftRequestType
-from invenio_users_resources.entity_resolvers import UserResolver, GroupResolver
+from invenio_users_resources.entity_resolvers import GroupResolver, UserResolver
 
+from oarepo_requests.resolvers.ui import (
+    FallbackEntityReferenceUIResolver,
+    GroupEntityReferenceUIResolver,
+    UserEntityReferenceUIResolver,
+)
+from oarepo_requests.types import (
+    DeletePublishedRecordRequestType,
+    EditPublishedRecordRequestType,
+    PublishDraftRequestType,
+)
 
 REQUESTS_REGISTERED_TYPES = [
     DeletePublishedRecordRequestType(),
@@ -10,9 +17,7 @@ REQUESTS_REGISTERED_TYPES = [
     PublishDraftRequestType(),
 ]
 
-REQUESTS_ALLOWED_RECEIVERS = [
-    "user", "role"
-]
+REQUESTS_ALLOWED_RECEIVERS = ["user", "group"]
 
 REQUESTS_ENTITY_RESOLVERS = [
     UserResolver(),

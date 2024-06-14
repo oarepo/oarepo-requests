@@ -28,7 +28,7 @@ class RequestOwnerFilterParam(FilterParam):
 class RequestReceiverFilterParam(FilterParam):
     def apply(self, identity, search, params):
         value = params.pop(self.param_name, None)
-        my_groups = [n.value for n in identity.provides if n.method == "role"]
+        my_roles = [n.value for n in identity.provides if n.method == "role"]
         if value is not None:
             search = search.filter(
                 Bool(
@@ -37,8 +37,8 @@ class RequestReceiverFilterParam(FilterParam):
                         Term(**{f"{self.field_name}.user": identity.id}),
                         # my roles
                         *[
-                            Term(**{f"{self.field_name}.group": group_id})
-                            for group_id in my_groups
+                            Term(**{f"{self.field_name}.group": role_id})
+                            for role_id in my_roles
                         ],
                         # TODO: add my communities where I have a role to accept requests
                     ],

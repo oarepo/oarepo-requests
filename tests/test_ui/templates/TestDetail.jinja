@@ -2,7 +2,7 @@
 {
 "available_requests":
 {
-{% for request in record.requests %}
+{% for request in record.expanded.requests %}
     "{{ request.name }}": {
         "type": {{ request.type|tojson|safe }},
         "status": {{ request.status|tojson|safe }},
@@ -15,7 +15,7 @@
 },
 "creatable_request_types":
 {
-{% for request_type in record.request_types %}
+{% for request_type in record.expanded.request_types %}
     "{{ request_type.type_id }}": {
         "name": {{ request_type.name|tojson|safe }},
         "description": {{ request_type.description|tojson|safe }},

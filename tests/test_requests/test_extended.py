@@ -105,7 +105,7 @@ def test_update_self_link(
         f"{urls['BASE_URL']}{example_topic_draft['id']}/draft?expand=true",
     )
     link_to_extended = link_api2testclient(
-        read_from_record.json["requests"][0]["links"]["self"]
+        read_from_record.json["expanded"]["requests"][0]["links"]["self"]
     )
 
     assert link_to_extended.startswith(f"{urls['BASE_URL_REQUESTS']}extended")
@@ -151,10 +151,10 @@ def test_events_resource(
     )
 
     comments_link = link_api2testclient(
-        read_from_record.json["requests"][0]["links"]["comments"]
+        read_from_record.json["expanded"]["requests"][0]["links"]["comments"]
     )
     timeline_link = link_api2testclient(
-        read_from_record.json["requests"][0]["links"]["timeline"]
+        read_from_record.json["expanded"]["requests"][0]["links"]["timeline"]
     )
 
     assert comments_link.startswith("/requests/extended")

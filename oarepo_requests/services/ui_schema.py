@@ -13,7 +13,6 @@ from oarepo_runtime.services.schema.ui import LocalizedDateTime
 from oarepo_requests.resolvers.ui import resolve
 from oarepo_requests.services.schema import (
     NoneReceiverGenericRequestSchema,
-    RequestsSchemaMixin,
     RequestTypeSchema,
     get_links_schema,
 )
@@ -98,9 +97,22 @@ class UIRequestTypeSchema(RequestTypeSchema):
         return data
 
 
-class UIRequestsSerializationMixin(RequestsSchemaMixin):
-    requests = ma.fields.List(ma.fields.Nested(UIBaseRequestSchema))
-    request_types = ma.fields.List(ma.fields.Nested(UIRequestTypeSchema))
+class UIRequestsSerializationMixin(ma.Schema):
+
+    @ma.post_dump()
+    def add_request_types(self, data, **kwargs):
+        expanded = data.get("expanded", {})
+        if not expanded:
+            return data
+        if "request_types" in expanded:
+            expanded["request_types"] = UIRequestTypeSchema(context=self.context).dump(
+                expanded["request_types"], many=True
+            )
+        if "requests" in expanded:
+            expanded["requests"] = UIBaseRequestSchema(context=self.context).dump(
+                expanded["requests"], many=True
+            )
+        return data
 
 
 class UIBaseRequestEventSchema(BaseRecordSchema):
