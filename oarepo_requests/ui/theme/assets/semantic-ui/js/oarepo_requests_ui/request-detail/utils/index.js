@@ -65,3 +65,24 @@ export const CommentPayloadSchema = Yup.object().shape({
     format: Yup.string().equals(["html"], i18next.t("Invalid format."))
   })
 });
+
+export const getRequestStatusIcon = (requestStatus) => { 
+  switch (requestStatus?.toLowerCase()) {
+    case "created":
+      return { name: "clock outline", color: "grey" };
+    case "submitted":
+      return { name: "clock", color: "grey" };
+    case "cancelled":
+      return { name: "square", color: "black" };
+    case "accepted":
+      return { name: "check circle", color: "green" };
+    case "declined":
+      return { name: "close", color: "red" };
+    case "expired":
+      return { name: "hourglass end", color: "orange" };
+    case "deleted":
+      return { name: "thrash", color: "black" };
+    default:
+      return null;
+  }
+};
