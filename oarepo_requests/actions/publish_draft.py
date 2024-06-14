@@ -1,5 +1,6 @@
-from ..utils import get_matching_service_for_record
 from invenio_requests.customizations import actions
+
+from ..utils import get_matching_service_for_record
 
 
 def publish_draft(draft, identity, uow, *args, **kwargs):

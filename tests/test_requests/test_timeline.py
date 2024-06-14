@@ -15,9 +15,9 @@ def test_timeline(
     creator = users[0]
     creator_client = logged_client(creator)
 
-    draft1 = creator_client.post(urls["BASE_URL"], json={})
+    draft1 = creator_client.post(urls["BASE_URL"] + "?expand=true", json={})
     link = link_api2testclient(
-        pick_request_type(draft1.json["request_types"], "thesis_publish_draft")[
+        pick_request_type(draft1.json["expanded"]["request_types"], "publish-draft")[
             "links"
         ]["actions"]["create"]
     )

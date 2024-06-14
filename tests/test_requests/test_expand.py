@@ -15,9 +15,9 @@ def test_requests_field(
     creator_client = logged_client(creator)
     receiver_client = logged_client(receiver)
 
-    draft1 = creator_client.post(urls["BASE_URL"], json={})
+    draft1 = creator_client.post(urls["BASE_URL"] + "?expand=true", json={})
     link = link_api2testclient(
-        pick_request_type(draft1.json["request_types"], "thesis_publish_draft")[
+        pick_request_type(draft1.json["expanded"]["request_types"], "publish-draft")[
             "links"
         ]["actions"]["create"]
     )
@@ -32,5 +32,5 @@ def test_requests_field(
         f"{urls['BASE_URL']}{draft1.json['id']}/draft?expand=true"
     )
 
-    assert "requests" not in record.json
-    assert "requests" in expanded_record.json
+    assert "requests" not in record.json.get("expanded", {})
+    assert "requests" in expanded_record.json["expanded"]

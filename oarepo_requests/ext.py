@@ -39,12 +39,22 @@ class OARepoRequests:
         # otherwise use the default receiver
         return obj_or_import_string(
             self.app.config["OAREPO_REQUESTS_DEFAULT_RECEIVER"]
-        )(identity=identity, request_type=request_type, topic=topic, creator=creator, data=data)
+        )(
+            identity=identity,
+            request_type=request_type,
+            topic=topic,
+            creator=creator,
+            data=data,
+        )
 
     @cached_property
     def allowed_topic_ref_types(self):
         entity_resolvers = self.app.config.get("REQUESTS_ENTITY_RESOLVERS", [])
         return {x.type_key for x in entity_resolvers}
+
+    @cached_property
+    def requests_entity_resolvers(self):
+        return self.app.config.get("REQUESTS_ENTITY_RESOLVERS", [])
 
     @property
     def allowed_receiver_ref_types(self):
@@ -80,10 +90,19 @@ class OARepoRequests:
         """Initialize configuration."""
 
         from . import config
-        app.config.setdefault("REQUESTS_REGISTERED_TYPES", []).extend(config.REQUESTS_REGISTERED_TYPES)
-        app.config.setdefault("REQUESTS_ALLOWED_RECEIVERS", []).extend(config.REQUESTS_ALLOWED_RECEIVERS)
-        app.config.setdefault("REQUESTS_ENTITY_RESOLVERS", []).extend(config.REQUESTS_ENTITY_RESOLVERS)
-        app.config.setdefault("ENTITY_REFERENCE_UI_RESOLVERS", {}).update(config.ENTITY_REFERENCE_UI_RESOLVERS)
+
+        app.config.setdefault("REQUESTS_REGISTERED_TYPES", []).extend(
+            config.REQUESTS_REGISTERED_TYPES
+        )
+        app.config.setdefault("REQUESTS_ALLOWED_RECEIVERS", []).extend(
+            config.REQUESTS_ALLOWED_RECEIVERS
+        )
+        app.config.setdefault("REQUESTS_ENTITY_RESOLVERS", []).extend(
+            config.REQUESTS_ENTITY_RESOLVERS
+        )
+        app.config.setdefault("ENTITY_REFERENCE_UI_RESOLVERS", {}).update(
+            config.ENTITY_REFERENCE_UI_RESOLVERS
+        )
         app.config.setdefault("REQUESTS_UI_SERIALIZATION_REFERENCED_FIELDS", []).extend(
             config.REQUESTS_UI_SERIALIZATION_REFERENCED_FIELDS
         )
