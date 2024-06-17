@@ -19,9 +19,10 @@ class ModelRefTypes:
         for ref_type in current_oarepo_requests.requests_entity_resolvers:
             if not isinstance(ref_type, RecordResolver):
                 continue
-            if self.published and not ref_type.record_cls.is_draft:
+            is_draft = getattr(ref_type.record_cls, 'is_draft', False)
+            if self.published and not is_draft:
                 ret.append(ref_type.type_key)
-            elif self.draft and ref_type.record_cls.is_draft:
+            elif self.draft and is_draft:
                 ret.append(ref_type.type_key)
         return ret
 
