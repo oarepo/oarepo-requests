@@ -1,5 +1,7 @@
 import copy
 
+from deepdiff import DeepDiff
+
 from oarepo_requests.resolvers.ui import FallbackEntityReferenceUIResolver
 from thesis.records.api import ThesisDraft, ThesisRecord
 
@@ -35,11 +37,12 @@ def test_publish(
         f"{urls['BASE_URL']}{draft_id}/draft?expand=true",
         headers={"Accept": "application/vnd.inveniordm.v1+json"},
     ).json
-
-    assert is_valid_subdict(
-        ui_serialization_result(draft_id, ui_record["requests"][0]["id"]),
-        ui_record["requests"][0],
+    diff = DeepDiff(
+        ui_serialization_result(draft_id, ui_record["expanded"]["requests"][0]["id"]),
+        ui_record["expanded"]["requests"][0],
     )
+    assert "dictionary_item_removed" not in diff
+    assert "dictionary_item_changed" not in diff
 
 
 def test_resolver_fallback(
@@ -76,53 +79,58 @@ def test_resolver_fallback(
         f"{urls['BASE_URL']}{draft_id}/draft?expand=true",
         headers={"Accept": "application/vnd.inveniordm.v1+json"},
     ).json
-    expected_result = ui_serialization_result(draft_id, ui_record["requests"][0]["id"])
+    expected_result = ui_serialization_result(
+        draft_id, ui_record["expanded"]["requests"][0]["id"]
+    )
     expected_result["created_by"][
         "label"
     ] = f"id: {creator.id}"  # the user resolver uses name or email as label, the fallback doesn't know what to use
     assert is_valid_subdict(
         expected_result,
-        ui_record["requests"][0],
+        ui_record["expanded"]["requests"][0],
     )
     app.config["ENTITY_REFERENCE_UI_RESOLVERS"] = config_restore
 
 
-def test_group(
+def test_role(
     app,
     users,
-    group,
+    role,
     urls,
     publish_request_data_function,
     logged_client,
-    group_ui_serialization,
+    role_ui_serialization,
     search_clear,
 ):
 
-    def default_group_receiver(*args, **kwargs):
-        return {"group": group.id}
+    config_restore = app.config["OAREPO_REQUESTS_DEFAULT_RECEIVER"]
 
-    config_restore = copy.deepcopy(app.config["OAREPO_REQUESTS_DEFAULT_RECEIVER"])
-    app.config["OAREPO_REQUESTS_DEFAULT_RECEIVER"][
-        "thesis_publish_draft"
-    ] = default_group_receiver
+    def current_receiver(identity, request_type, topic, creator, data):
+        if request_type == "publish-draft":
+            return role
+        return config_restore(identity, request_type, topic, creator, data)
 
-    creator = users[0]
-    creator_client = logged_client(creator)
+    try:
+        app.config["OAREPO_REQUESTS_DEFAULT_RECEIVER"] = current_receiver
 
-    draft1 = creator_client.post(urls["BASE_URL"], json={})
-    draft_id = draft1.json["id"]
-    ThesisRecord.index.refresh()
-    ThesisDraft.index.refresh()
+        creator = users[0]
+        creator_client = logged_client(creator)
 
-    resp_request_create = creator_client.post(
-        urls["BASE_URL_REQUESTS"],
-        json=publish_request_data_function(draft1.json["id"]),
-    )
+        draft1 = creator_client.post(urls["BASE_URL"], json={})
+        draft_id = draft1.json["id"]
+        ThesisRecord.index.refresh()
+        ThesisDraft.index.refresh()
 
-    ui_record = creator_client.get(
-        f"{urls['BASE_URL']}{draft_id}/draft?expand=true",
-        headers={"Accept": "application/vnd.inveniordm.v1+json"},
-    ).json
+        resp_request_create = creator_client.post(
+            urls["BASE_URL_REQUESTS"],
+            json=publish_request_data_function(draft1.json["id"]),
+        )
 
-    assert ui_record["requests"][0]["receiver"] == group_ui_serialization
-    app.config["OAREPO_REQUESTS_DEFAULT_RECEIVER"] = config_restore
+        ui_record = creator_client.get(
+            f"{urls['BASE_URL']}{draft_id}/draft?expand=true",
+            headers={"Accept": "application/vnd.inveniordm.v1+json"},
+        ).json
+
+        assert ui_record["expanded"]["requests"][0]["receiver"] == role_ui_serialization
+    finally:
+        app.config["OAREPO_REQUESTS_DEFAULT_RECEIVER"] = config_restore

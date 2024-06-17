@@ -26,16 +26,18 @@ class OARepoRequestsService(RequestsService):
             raise UnknownRequestType(request_type)
 
         if receiver is None:
-            receiver_getter = current_oarepo_requests.default_request_receiver(
-                request_type
+            receiver = current_oarepo_requests.default_request_receiver(
+                identity, request_type, topic, creator, data
             )
-            receiver = receiver_getter(identity, request_type, topic, creator, data)
+
         if data is None:
             data = {}
+
         if hasattr(type_, "can_create"):
             error = type_.can_create(identity, data, receiver, topic, creator)
         else:
             error = None
+
         if not error:
             result = super().create(
                 identity=identity,

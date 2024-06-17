@@ -5,28 +5,7 @@ record:
     qualified: thesis
   permissions:
     presets: [ 'everyone' ]
-
-  draft:
-    requests:
-      types:
-        publish-draft:
-          base-classes:
-          - PublishDraftRequestType
-          imports:
-          - import: oarepo_requests.types.publish_draft.PublishDraftRequestType
-          allowed-receiver-ref-types: ["user", "group"]
-  requests:
-    types:
-      delete-record:
-        base-classes:
-        - DeleteRecordRequestType
-        imports:
-        - import: oarepo_requests.types.delete_record.DeleteRecordRequestType
-      edit-record:
-        base-classes:
-          - EditRecordRequestType
-        imports:
-          - import: oarepo_requests.types.edit_record.EditRecordRequestType
+  draft: {}
   properties:
     metadata:
       properties:

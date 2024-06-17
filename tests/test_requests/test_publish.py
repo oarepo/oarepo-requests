@@ -42,12 +42,14 @@ def test_publish(
     record = receiver_client.get(
         f"{urls['BASE_URL']}{draft1.json['id']}/draft?expand=true"
     )
-    assert record.json["requests"][0]["links"]["actions"].keys() == {
+    assert record.json["expanded"]["requests"][0]["links"]["actions"].keys() == {
         "accept",
         "decline",
     }
     publish = receiver_client.post(
-        link_api2testclient(record.json["requests"][0]["links"]["actions"]["accept"]),
+        link_api2testclient(
+            record.json["expanded"]["requests"][0]["links"]["actions"]["accept"]
+        ),
     )
     record = receiver_client.get(f"{urls['BASE_URL']}{draft2.json['id']}/draft")
     assert "publish_draft" not in record.json["parent"]
@@ -70,7 +72,9 @@ def test_publish(
         f"{urls['BASE_URL']}{draft2.json['id']}/draft?expand=true"
     )
     decline = receiver_client.post(
-        link_api2testclient(record.json["requests"][0]["links"]["actions"]["decline"]),
+        link_api2testclient(
+            record.json["expanded"]["requests"][0]["links"]["actions"]["decline"]
+        ),
     )
     declined_request = creator_client.get(
         f"{urls['BASE_URL_REQUESTS']}{resp_request_create.json['id']}"
@@ -88,9 +92,13 @@ def test_publish(
     record = creator_client.get(
         f"{urls['BASE_URL']}{draft3.json['id']}/draft?expand=true"
     )
-    assert record.json["requests"][0]["links"]["actions"].keys() == {"cancel"}
+    assert record.json["expanded"]["requests"][0]["links"]["actions"].keys() == {
+        "cancel"
+    }
     cancel = creator_client.post(
-        link_api2testclient(record.json["requests"][0]["links"]["actions"]["cancel"]),
+        link_api2testclient(
+            record.json["expanded"]["requests"][0]["links"]["actions"]["cancel"]
+        ),
     )
     canceled_request = logged_client(creator).get(
         f"{urls['BASE_URL_REQUESTS']}{resp_request_create.json['id']}"
