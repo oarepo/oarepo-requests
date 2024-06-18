@@ -24,7 +24,7 @@ export const RecordRequests = ({ record: initialRecord }) => {
     setRecordLoadingError(null);
     return axios({
       method: 'get',
-      url: record.links?.self,
+      url: record.links?.self + "?expand=true",
       headers: {
         'Content-Type': 'application/json',
         'Accept': 'application/vnd.inveniordm.v1+json'
@@ -75,14 +75,14 @@ export const RecordRequests = ({ record: initialRecord }) => {
   return (
     <>
       <CreateRequestButtonGroup 
-        requestTypes={record?.request_types ?? []} 
+        requestTypes={record?.expanded?.request_types ?? []} 
         isLoading={recordLoading} 
         loadingError={recordLoadingError} 
         fetchNewRequests={fetchNewRequests} 
       />
       <RequestContextProvider requests={{ requests, setRequests: requestsSetter }}>
         <RequestListContainer 
-          requestTypes={record?.request_types ?? []} 
+          requestTypes={record?.expanded?.request_types ?? []} 
           isLoading={requestsLoading} 
           loadingError={requestsLoadingError} 
           fetchNewRequests={fetchNewRequests} 
