@@ -17,9 +17,9 @@ const TimelineEvent = ({ event }) => {
       </Feed.Label>
       <Feed.Content>
         <Feed.Summary>
-          {_has(event, "created_by.user") ? 
-            <><Feed.User>{event.created_by.user}</Feed.User> {eventLabel} {i18next.t('this request')}<Feed.Date>{event.created}</Feed.Date></> : 
-            <span>{i18next.t('Request')} {eventLabel} {event.created}</span>
+          {_has(event, "created_by.label") ? 
+            <><Feed.User href={event.created_by?.links?.self} target="_blank" rel="noreferrer">{event.created_by.label}</Feed.User> {eventLabel} {i18next.t('this request')}<Feed.Date>{event.created}</Feed.Date></> : 
+            <>{i18next.t('Request')} {eventLabel}<Feed.Date>{event.created}</Feed.Date></>
           } 
         </Feed.Summary>
         {_has(event.payload, "content") && 

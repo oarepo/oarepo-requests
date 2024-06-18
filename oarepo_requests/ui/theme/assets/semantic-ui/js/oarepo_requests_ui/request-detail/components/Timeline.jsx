@@ -21,7 +21,7 @@ export const Timeline = ({ request }) => {
       const response = await axios.get(request.links?.timeline, {
         headers: {
           'Content-Type': 'application/json',
-          'Accept': 'application/json',
+          'Accept': 'application/vnd.inveniordm.v1+json'
         }
       });
       setEvents(response.data.hits.hits);

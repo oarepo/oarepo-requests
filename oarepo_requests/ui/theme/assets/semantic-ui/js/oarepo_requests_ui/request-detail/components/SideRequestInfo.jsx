@@ -2,14 +2,10 @@ import React from "react";
 
 import { i18next } from "@translations/oarepo_requests_ui/i18next";
 import { Icon, List } from "semantic-ui-react";
+import _has from "lodash/has";
 
 import { getRequestStatusIcon } from "../utils";
 
-/** 
- * @typedef {import("../types").Request} Request
- */
-
-/** @param {{ request: Request }} props */
 export const SideRequestInfo = ({ request }) => {
   const statusIcon = getRequestStatusIcon(request?.status_code);
 
@@ -21,7 +17,7 @@ export const SideRequestInfo = ({ request }) => {
         </List.Header>
         <List.Content>
           <Icon name="user circle outline" />
-          <span>{request.created_by?.link && <a href={request.created_by.link}>{request.created_by.label}</a> || request.created_by?.label}</span>
+          <span>{_has(request, "created_by.links.self") ? <a href={request.created_by.links.self} target="_blank" rel="noreferrer">{request.created_by.label}</a> : request.created_by?.label}</span>
         </List.Content>
       </List.Item>
       
@@ -31,7 +27,7 @@ export const SideRequestInfo = ({ request }) => {
         </List.Header>
         <List.Content>
           <Icon name="mail outline" />
-          <span>{request.receiver?.link && <a href={request.receiver?.link}>{request.receiver?.label}</a> || request.receiver?.label}</span>
+          <span>{_has(request, "receiver.links.self") ? <a href={request.receiver.links.self} target="_blank" rel="noreferrer">{request.receiver.label}</a> : request.receiver?.label}</span>
         </List.Content>
       </List.Item>
 
@@ -48,7 +44,7 @@ export const SideRequestInfo = ({ request }) => {
         </List.Header>
         <List.Content>
           {statusIcon && <Icon name={statusIcon.name} color={statusIcon.color} />}
-          <span>{request?.status}</span>
+          <span>{request.status}</span>
         </List.Content>
       </List.Item>
 
@@ -57,7 +53,7 @@ export const SideRequestInfo = ({ request }) => {
           {i18next.t("Created")}
         </List.Header>
         <List.Content>
-          {request?.created}
+          {request.created}
         </List.Content>
       </List.Item>
     </List>
