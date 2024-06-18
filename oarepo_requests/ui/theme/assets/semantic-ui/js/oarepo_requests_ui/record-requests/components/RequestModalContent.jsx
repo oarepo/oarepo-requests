@@ -44,7 +44,7 @@ export const RequestModalContent = ({ request, requestType, requestModalType, cu
           console.error(error);
         });
     }
-  }, [actualRequest, setRequests]);
+  }, [setRequests, request.links?.events, request.id]);
 
   const { handleSubmit } = useFormikContext();
 

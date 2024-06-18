@@ -19,12 +19,12 @@ export const RequestListContainer = ({ requestTypes, isLoading, loadingError, fe
 
   useEffect(() => {
     fetchRequests();
-  }, []);
+  }, [fetchRequests]);
 
   let requestsToApprove = [];
   let otherRequests = [];
   for (const request of requests) {
-    if ("accept" in request.links?.actions) {
+    if ("accept" in request.links.actions) {
       requestsToApprove.push(request);
     } else {
       otherRequests.push(request);

@@ -2,7 +2,6 @@ import React, { useEffect, useState, useCallback } from "react";
 import PropTypes from "prop-types";
 
 import axios from "axios";
-import _isEmpty from "lodash/isEmpty";
 
 import { CreateRequestButtonGroup, RequestListContainer } from ".";
 import { RequestContextProvider } from "../contexts";
@@ -67,11 +66,11 @@ export const RecordRequests = ({ record: initialRecord }) => {
   const fetchNewRequests = useCallback(() => {
     fetchRecord();
     fetchRequests();
-  }, [record.links?.self, record.links?.requests]);
+  }, [fetchRecord, fetchRequests]);
 
   useEffect(() => {
     fetchRecord();
-  }, []);
+  }, [fetchRecord]);
 
   return (
     <>

@@ -4,7 +4,6 @@ import PropTypes from "prop-types";
 import { i18next } from "@translations/oarepo_requests_ui/i18next";
 import { Dimmer, Loader, Modal, Button, Icon, Message, Confirm } from "semantic-ui-react";
 import _isEmpty from "lodash/isEmpty";
-import _isFunction from "lodash/isFunction";
 
 import { useFormik, FormikContext } from "formik";
 import axios from "axios";
