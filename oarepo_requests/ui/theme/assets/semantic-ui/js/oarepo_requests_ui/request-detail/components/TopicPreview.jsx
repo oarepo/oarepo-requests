@@ -1,19 +1,45 @@
-import React from "react";
+import React, { useRef, useEffect } from "react";
 
-import { Grid } from "semantic-ui-react";
-import IframeResizer from "@iframe-resizer/react";
+import { Grid, Loader, Segment } from "semantic-ui-react";
 
 export const TopicPreview = ({ request }) => {
+  const iframeRef = useRef(null);
+  const [pxHeight, setPxHeight] = React.useState(0);
+  const [loading, setLoading] = React.useState(true);
+
+  const updateIframeHeight = () => {
+    setPxHeight(iframeRef.current.contentWindow.document.body.scrollHeight);
+  }
+
+  useEffect(() => {
+    const iframe = iframeRef.current;
+    if (iframe) {
+      iframe.contentWindow.addEventListener("resize", updateIframeHeight);
+    }
+    return () => {
+      iframe.contentWindow.removeEventListener("resize", updateIframeHeight);
+    }
+  }, []);
+
   return (
     <Grid.Row>
       <Grid.Column>
-        <IframeResizer
-          license='GPLv3'
-          src={request.topic.links.self_html + "?embed=true"} 
-          title={request.topic.label + " record preview"} 
+        {loading &&
+          <Segment placeholder loading className="borderless">
+            <Loader active size="massive" />
+          </Segment>
+        }
+        <iframe
+          ref={iframeRef}
+          src={request.topic.links.self_html + "?embed=true"}
+          onLoad={() => {
+            updateIframeHeight();
+            setLoading(false);
+          }}
+          title={request.topic.label + " record preview"}
+          width="100%"
+          height={pxHeight + "px"}
           style={{
-            width: '100%',
-            height: '100vh',
             outline: "none",
             border: "none",
             overflow: "hidden",
