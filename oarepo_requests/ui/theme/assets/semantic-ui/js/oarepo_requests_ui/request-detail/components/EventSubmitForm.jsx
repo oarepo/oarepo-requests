@@ -10,7 +10,7 @@ import { Formik, Form } from "formik";
 import { sanitizeInput } from "@js/oarepo_ui";
 import { CommentPayloadSchema } from "../utils";
 
-export const EventSubmitForm = ({ request, fetchEvents }) => {
+export const EventSubmitForm = ({ request, setEvents }) => {
   const [error, setError] = useState(null);
   
   const editorRef = useRef(null);
@@ -33,13 +33,16 @@ export const EventSubmitForm = ({ request, fetchEvents }) => {
     setSubmitting(true);
     setError(null);
     try {
-      await callApi(request.links?.comments, "POST", values);
+      const response = await callApi(request.links?.comments, "POST", values);
+      if (response.status !== 201) {
+        throw new Error(i18next.t("Comment was not created successfully."));
+      }
+      setEvents((events) => [...events, response.data]);
     } catch (error) {
       setError(error);
     } finally {
       editorRef.current.setContent("");
       resetForm();
-      fetchEvents();
       setSubmitting(false);
     }
   };

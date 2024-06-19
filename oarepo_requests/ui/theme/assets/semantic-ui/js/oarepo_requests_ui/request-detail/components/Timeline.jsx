@@ -77,7 +77,7 @@ export const Timeline = ({ request }) => {
               null
         }
       </Dimmer.Dimmable>
-      <EventSubmitForm request={request} fetchEvents={fetchEvents} />
+      <EventSubmitForm request={request} setEvents={setEvents} />
     </>
   );
 }
