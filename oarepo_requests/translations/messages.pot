@@ -8,40 +8,40 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2024-04-08 13:55+0200\n"
+"POT-Creation-Date: 2024-06-19 14:40+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Generated-By: Babel 2.14.0\n"
+"Generated-By: Babel 2.15.0\n"
 
-#: /Users/miroslavbauer/Code/github.com/oarepo/oarepo-requests/oarepo_requests/invenio_patches.py:92
+#: /Users/miroslavbauer/Code/github.com/oarepo/oarepo-requests/oarepo_requests/invenio_patches.py:94
 msgid "Submitted"
 msgstr ""
 
-#: /Users/miroslavbauer/Code/github.com/oarepo/oarepo-requests/oarepo_requests/invenio_patches.py:93
+#: /Users/miroslavbauer/Code/github.com/oarepo/oarepo-requests/oarepo_requests/invenio_patches.py:95
 msgid "Expired"
 msgstr ""
 
-#: /Users/miroslavbauer/Code/github.com/oarepo/oarepo-requests/oarepo_requests/invenio_patches.py:94
+#: /Users/miroslavbauer/Code/github.com/oarepo/oarepo-requests/oarepo_requests/invenio_patches.py:96
 msgid "Accepted"
 msgstr ""
 
-#: /Users/miroslavbauer/Code/github.com/oarepo/oarepo-requests/oarepo_requests/invenio_patches.py:95
+#: /Users/miroslavbauer/Code/github.com/oarepo/oarepo-requests/oarepo_requests/invenio_patches.py:97
 msgid "Declined"
 msgstr ""
 
-#: /Users/miroslavbauer/Code/github.com/oarepo/oarepo-requests/oarepo_requests/invenio_patches.py:96
+#: /Users/miroslavbauer/Code/github.com/oarepo/oarepo-requests/oarepo_requests/invenio_patches.py:98
 msgid "Cancelled"
 msgstr ""
 
-#: /Users/miroslavbauer/Code/github.com/oarepo/oarepo-requests/oarepo_requests/invenio_patches.py:98
+#: /Users/miroslavbauer/Code/github.com/oarepo/oarepo-requests/oarepo_requests/invenio_patches.py:100
 msgid "Status"
 msgstr ""
 
-#: /Users/miroslavbauer/Code/github.com/oarepo/oarepo-requests/oarepo_requests/invenio_patches.py:104
+#: /Users/miroslavbauer/Code/github.com/oarepo/oarepo-requests/oarepo_requests/invenio_patches.py:106
 msgid "Type"
 msgstr ""
 
@@ -169,15 +169,27 @@ msgstr ""
 msgid "api.requests"
 msgstr ""
 
-#: /Users/miroslavbauer/Code/github.com/oarepo/oarepo-requests/oarepo_requests/types/delete_record.py:14
+#: /Users/miroslavbauer/Code/github.com/oarepo/oarepo-requests/oarepo_requests/types/delete_record.py:12
+msgid "Delete record"
+msgstr ""
+
+#: /Users/miroslavbauer/Code/github.com/oarepo/oarepo-requests/oarepo_requests/types/delete_record.py:18
 msgid "Request deletion of published record"
 msgstr ""
 
-#: /Users/miroslavbauer/Code/github.com/oarepo/oarepo-requests/oarepo_requests/types/edit_record.py:16
+#: /Users/miroslavbauer/Code/github.com/oarepo/oarepo-requests/oarepo_requests/types/edit_record.py:13
+msgid "Edit record"
+msgstr ""
+
+#: /Users/miroslavbauer/Code/github.com/oarepo/oarepo-requests/oarepo_requests/types/edit_record.py:20
 msgid "Request re-opening of published record"
 msgstr ""
 
-#: /Users/miroslavbauer/Code/github.com/oarepo/oarepo-requests/oarepo_requests/types/publish_draft.py:14
+#: /Users/miroslavbauer/Code/github.com/oarepo/oarepo-requests/oarepo_requests/types/publish_draft.py:12
+msgid "Publish draft"
+msgstr ""
+
+#: /Users/miroslavbauer/Code/github.com/oarepo/oarepo-requests/oarepo_requests/types/publish_draft.py:18
 msgid "Request publishing of a draft"
 msgstr ""
 
@@ -206,4 +218,7 @@ msgid "Cannot send request. Please try again later."
 msgstr ""
 
 msgid "Cancel request"
+msgstr ""
+
+msgid "Close"
 msgstr ""
