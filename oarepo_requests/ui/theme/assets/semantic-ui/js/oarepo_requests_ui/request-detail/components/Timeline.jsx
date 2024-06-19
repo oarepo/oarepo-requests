@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useState, useEffect, useCallback, useRef } from "react";
 
 import { i18next } from "@translations/oarepo_requests_ui/i18next";
 import { Message, Feed, Dimmer, Loader, Placeholder, Segment } from "semantic-ui-react";
@@ -13,7 +13,10 @@ export const Timeline = ({ request }) => {
   const [error, setError] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
 
+  const abortControllerRef = useRef(new AbortController());
+
   const fetchEvents = useCallback(async () => {
+    const abortController = abortControllerRef.current;
     setIsLoading(true);
     setError(null);
     try {
@@ -22,18 +25,27 @@ export const Timeline = ({ request }) => {
         headers: {
           'Content-Type': 'application/json',
           'Accept': 'application/vnd.inveniordm.v1+json'
-        }
+        },
+        signal: abortController.signal
       });
-      setEvents(response.data.hits.hits);
+      if (!abortController.signal.aborted) {
+        setEvents(response.data.hits.hits);
+      }
     } catch (error) {
       setError(error);
     } finally {
-      setIsLoading(false);
+      if (!abortController.signal.aborted) {
+        setIsLoading(false);
+      }
     }
   }, [request.links.timeline]);
 
   useEffect(() => {
+    const abortController = abortControllerRef.current;
     fetchEvents();
+    return () => {
+      abortController.abort();
+    }
   }, [fetchEvents]);
 
   return (
