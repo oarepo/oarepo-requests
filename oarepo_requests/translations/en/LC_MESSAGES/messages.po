@@ -202,5 +202,20 @@ msgstr ""
 msgid "Loading requests"
 msgstr ""
 
+#: /Users/miroslavbauer/Code/github.com/oarepo/oarepo-requests/oarepo_requests/types/delete_record.py:12
+msgid "Delete record"
+msgstr ""
+
+#: /Users/miroslavbauer/Code/github.com/oarepo/oarepo-requests/oarepo_requests/types/edit_record.py:13
+msgid "Edit record"
+msgstr ""
+
+#: /Users/miroslavbauer/Code/github.com/oarepo/oarepo-requests/oarepo_requests/types/publish_draft.py:12
+msgid "Publish draft"
+msgstr ""
+
+msgid "Close"
+msgstr ""
+
 #~ msgid "No status"
 #~ msgstr ""
