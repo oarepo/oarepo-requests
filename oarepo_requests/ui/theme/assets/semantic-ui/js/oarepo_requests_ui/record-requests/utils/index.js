@@ -1,4 +1,3 @@
-import { useEffect, useRef } from "react";
 import axios from "axios";
 
 import _sortBy from "lodash/sortBy";
@@ -52,3 +51,13 @@ export const fetchUpdated = async (url, setter, onError) => {
       onError(error);
     });
 }
+
+export const mapPayloadUiToInitialValues = (payloadUi) => {
+  const initialValues = { payload: {} };
+  payloadUi?.forEach(section => {
+    section.fields.forEach(field => {
+      initialValues.payload[field.field] = "";
+    });
+  });
+  return initialValues;
+};
