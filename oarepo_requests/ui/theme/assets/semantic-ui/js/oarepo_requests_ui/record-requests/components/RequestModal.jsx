@@ -214,12 +214,12 @@ export const RequestModal = ({ request, requestTypes, requestModalType, isEventM
                   {i18next.t("Create")}
                 </Button>
               }
-              <Button type="submit" form="request-form" name="create-and-submit-request" title={i18next.t("Submit request")} color="blue" icon labelPosition="left" floated="left">
+              <Button type="submit" form="request-form" name="create-and-submit-request" title={i18next.t("Submit request")} color="blue" icon labelPosition="left" floated="right">
                 <Icon name="paper plane" />
                 {i18next.t("Submit")}
               </Button>
             </> ||
-            <Button type="submit" form="request-form" name="create-event" title={i18next.t("Submit")} color="blue" icon labelPosition="left" floated="left">
+            <Button type="submit" form="request-form" name="create-event" title={i18next.t("Submit")} color="blue" icon labelPosition="left" floated="right">
               <Icon name="plus" />
               {i18next.t("Submit")}
             </Button>)
