@@ -2,13 +2,12 @@ from flask_resources import ResponseHandler
 from invenio_records_resources.services.base.config import ConfiguratorMixin
 from invenio_requests.resources.events.config import RequestCommentsResourceConfig
 
-from oarepo_requests.resources.ui import OARepoRequestsUIJSONSerializer
+from oarepo_requests.resources.ui import OARepoRequestEventsUIJSONSerializer
 
 
 class OARepoRequestsCommentsResourceConfig(
     RequestCommentsResourceConfig, ConfiguratorMixin
 ):
-    """"""
 
     blueprint_name = "oarepo_request_events"
     url_prefix = "/requests"
@@ -23,7 +22,7 @@ class OARepoRequestsCommentsResourceConfig(
     def response_handlers(self):
         return {
             "application/vnd.inveniordm.v1+json": ResponseHandler(
-                OARepoRequestsUIJSONSerializer()
+                OARepoRequestEventsUIJSONSerializer()
             ),
             **super().response_handlers,
         }

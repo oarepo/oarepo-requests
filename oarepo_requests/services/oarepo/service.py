@@ -1,3 +1,4 @@
+from invenio_records.api import RecordBase
 from invenio_records_resources.services.uow import IndexRefreshOp, unit_of_work
 from invenio_requests import current_request_type_registry
 from invenio_requests.services import RequestsService
@@ -15,7 +16,7 @@ class OARepoRequestsService(RequestsService):
         request_type,
         receiver=None,
         creator=None,
-        topic=None,
+        topic: RecordBase = None,
         expires_at=None,
         uow=None,
         expand=False,
@@ -25,16 +26,18 @@ class OARepoRequestsService(RequestsService):
             raise UnknownRequestType(request_type)
 
         if receiver is None:
-            receiver_getter = current_oarepo_requests.default_request_receiver(
-                request_type
+            receiver = current_oarepo_requests.default_request_receiver(
+                identity, request_type, topic, creator, data
             )
-            receiver = receiver_getter(identity, request_type, topic, creator, data)
+
         if data is None:
             data = {}
+
         if hasattr(type_, "can_create"):
             error = type_.can_create(identity, data, receiver, topic, creator)
         else:
             error = None
+
         if not error:
             result = super().create(
                 identity=identity,

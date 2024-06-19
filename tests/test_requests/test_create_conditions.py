@@ -55,9 +55,13 @@ def test_can_create(
             urls["BASE_URL_REQUESTS"],
             json=publish_request_data_function(draft2.json["id"]),
         )
-    record = receiver_client.get(f"{urls['BASE_URL']}{draft2.json['id']}/draft")
+    record = receiver_client.get(
+        f"{urls['BASE_URL']}{draft2.json['id']}/draft?expand=true"
+    )
     decline = receiver_client.post(
-        link_api2testclient(record.json["requests"][0]["links"]["actions"]["decline"]),
+        link_api2testclient(
+            record.json["expanded"]["requests"][0]["links"]["actions"]["decline"]
+        ),
     )
 
     resp_request_create_again = creator_client.post(
@@ -84,7 +88,7 @@ def test_can_possibly_create(
     draft2 = creator_client.post(urls["BASE_URL"], json={})
 
     record_resp_no_request = receiver_client.get(
-        f"{urls['BASE_URL']}{draft1.json['id']}/draft"
+        f"{urls['BASE_URL']}{draft1.json['id']}/draft?expand=true"
     )
     resp_request_create = creator_client.post(
         urls["BASE_URL_REQUESTS"],
@@ -102,20 +106,20 @@ def test_can_possibly_create(
         return None
 
     record_resp_with_request = receiver_client.get(
-        f"{urls['BASE_URL']}{draft1.json['id']}/draft"
+        f"{urls['BASE_URL']}{draft1.json['id']}/draft?expand=true"
     )
     record_resp_draft2 = receiver_client.get(
-        f"{urls['BASE_URL']}{draft2.json['id']}/draft"
+        f"{urls['BASE_URL']}{draft2.json['id']}/draft?expand=true"
     )
     assert find_request_type(
-        record_resp_no_request.json["request_types"], "thesis_publish_draft"
+        record_resp_no_request.json["expanded"]["request_types"], "publish-draft"
     )
     assert find_request_type(
-        record_resp_draft2.json["request_types"], "thesis_publish_draft"
+        record_resp_draft2.json["expanded"]["request_types"], "publish-draft"
     )
     assert (
         find_request_type(
-            record_resp_with_request.json["request_types"], "thesis_publish_draft"
+            record_resp_with_request.json["expanded"]["request_types"], "publish-draft"
         )
         is None
     )

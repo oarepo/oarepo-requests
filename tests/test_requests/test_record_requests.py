@@ -50,8 +50,6 @@ def test_read_requests_on_draft(
     assert len(resp2) == 1
     assert len(resp3) == 0
 
-    # todo test permissions?
-
 
 def test_read_requests_on_record(
     logged_client,

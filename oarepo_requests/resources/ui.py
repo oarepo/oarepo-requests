@@ -3,11 +3,12 @@ from collections import defaultdict
 from flask import g
 from flask_resources import BaseListSchema
 from flask_resources.serializers import JSONSerializer
+from invenio_pidstore.errors import PIDDeletedError
 from oarepo_runtime.resources import LocalizedUIJSONSerializer
 
 from ..proxies import current_oarepo_requests
 from ..resolvers.ui import resolve
-from ..services.ui_schema import UIBaseRequestSchema
+from ..services.ui_schema import UIBaseRequestEventSchema, UIBaseRequestSchema
 from ..utils import reference_to_tuple
 
 
@@ -53,12 +54,10 @@ class CachedReferenceResolver:
         if key in self._cache:
             return self._cache[key]
         else:
-            return resolve(self._identity, reference)
-            # todo move to ma? ---
-            """
+            try:
+                return resolve(self._identity, reference)
             except PIDDeletedError:
-                return {**data, "status": "removed"}
-            """
+                return {"reference": reference, "status": "deleted"}
 
 
 class OARepoRequestsUIJSONSerializer(LocalizedUIJSONSerializer):
@@ -87,3 +86,14 @@ class OARepoRequestsUIJSONSerializer(LocalizedUIJSONSerializer):
             )
         }
         return super().dump_list(obj_list, *args, extra_context=extra_context, **kwargs)
+
+
+class OARepoRequestEventsUIJSONSerializer(LocalizedUIJSONSerializer):
+    def __init__(self):
+        """Initialise Serializer."""
+        super().__init__(
+            format_serializer_cls=JSONSerializer,
+            object_schema_cls=UIBaseRequestEventSchema,
+            list_schema_cls=BaseListSchema,
+            schema_context={"object_key": "ui", "identity": g.identity},
+        )

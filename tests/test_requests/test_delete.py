@@ -34,13 +34,15 @@ def test_delete(
     )
     print()
 
-    record = receiver_client.get(f"{urls['BASE_URL']}{record1['id']}")
-    assert record.json["requests"][0]["links"]["actions"].keys() == {
+    record = receiver_client.get(f"{urls['BASE_URL']}{record1['id']}?expand=true")
+    assert record.json["expanded"]["requests"][0]["links"]["actions"].keys() == {
         "accept",
         "decline",
     }
     delete = receiver_client.post(
-        link_api2testclient(record.json["requests"][0]["links"]["actions"]["accept"]),
+        link_api2testclient(
+            record.json["expanded"]["requests"][0]["links"]["actions"]["accept"]
+        ),
     )
 
     ThesisRecord.index.refresh()
@@ -55,9 +57,11 @@ def test_delete(
     resp_request_submit = creator_client.post(
         link_api2testclient(resp_request_create.json["links"]["actions"]["submit"]),
     )
-    record = receiver_client.get(f"{urls['BASE_URL']}{record2['id']}")
+    record = receiver_client.get(f"{urls['BASE_URL']}{record2['id']}?expand=true")
     decline = receiver_client.post(
-        link_api2testclient(record.json["requests"][0]["links"]["actions"]["decline"])
+        link_api2testclient(
+            record.json["expanded"]["requests"][0]["links"]["actions"]["decline"]
+        )
     )
     declined_request = creator_client.get(
         f"{urls['BASE_URL_REQUESTS']}{resp_request_create.json['id']}"
@@ -71,10 +75,14 @@ def test_delete(
     resp_request_submit = creator_client.post(
         link_api2testclient(resp_request_create.json["links"]["actions"]["submit"]),
     )
-    record = creator_client.get(f"{urls['BASE_URL']}{record3['id']}")
-    assert record.json["requests"][0]["links"]["actions"].keys() == {"cancel"}
+    record = creator_client.get(f"{urls['BASE_URL']}{record3['id']}?expand=true")
+    assert record.json["expanded"]["requests"][0]["links"]["actions"].keys() == {
+        "cancel"
+    }
     cancel = creator_client.post(
-        link_api2testclient(record.json["requests"][0]["links"]["actions"]["cancel"]),
+        link_api2testclient(
+            record.json["expanded"]["requests"][0]["links"]["actions"]["cancel"]
+        ),
     )
     canceled_request = creator_client.get(
         f"{urls['BASE_URL_REQUESTS']}{resp_request_create.json['id']}"

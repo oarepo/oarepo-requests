@@ -8,6 +8,7 @@ from invenio_requests.customizations import CommentEventType, LogEventType
 from invenio_requests.proxies import current_requests
 from invenio_requests.records.api import RequestEventFormat
 from invenio_users_resources.records import UserAggregate
+
 from thesis.proxies import current_service
 from thesis.records.api import ThesisDraft, ThesisRecord
 
@@ -35,7 +36,7 @@ def urls():
 def publish_request_data_function():
     def ret_data(record_id):
         return {
-            "request_type": "thesis_publish_draft",
+            "request_type": "publish-draft",
             "topic": {"thesis_draft": record_id},
         }
 
@@ -46,7 +47,7 @@ def publish_request_data_function():
 def edit_record_data_function():
     def ret_data(record_id):
         return {
-            "request_type": "thesis_edit_record",
+            "request_type": "edit-published-record",
             "topic": {"thesis": record_id},
         }
 
@@ -57,7 +58,7 @@ def edit_record_data_function():
 def delete_record_data_function():
     def ret_data(record_id):
         return {
-            "request_type": "thesis_delete_record",
+            "request_type": "delete-published-record",
             "topic": {"thesis": record_id},
         }
 
@@ -79,7 +80,7 @@ def serialization_result():
                 "timeline": f"https://127.0.0.1:5000/api/requests/extended/{request_id}/timeline",
             },
             "revision_id": 3,
-            "type": "thesis_publish_draft",
+            "type": "publish-draft",
             "title": "",
             "number": "1",
             "status": "submitted",
@@ -103,7 +104,7 @@ def ui_serialization_result():
             # 'created': '2024-01-26T10:06:17.945916',
             "created_by": {
                 "label": "user1@example.org",
-                "link": "https://127.0.0.1:5000/api/users/1",
+                "links": {"self": "https://127.0.0.1:5000/api/users/1"},
                 "reference": {"user": "1"},
                 "type": "user",
             },
@@ -128,11 +129,14 @@ def ui_serialization_result():
             "title": "",
             "topic": {
                 "label": f"id: {topic_id}",
-                "link": f"https://127.0.0.1:5000/api/thesis/{topic_id}/draft",
+                "links": {
+                    "self": f"https://127.0.0.1:5000/api/thesis/{topic_id}/draft",
+                    "self_html": f"https://127.0.0.1:5000/thesis/{topic_id}/preview",
+                },
                 "reference": {"thesis_draft": topic_id},
                 "type": "thesis_draft",
             },
-            "type": "thesis_publish_draft",
+            "type": "publish-draft",
             # 'updated': '2024-01-26T10:06:18.084317'
         }
 
@@ -157,18 +161,12 @@ def app_config(app_config):
     )
     app_config["CACHE_TYPE"] = "SimpleCache"
 
-    def default_receiver(*args, **kwargs):
-        return {"user": "2"}
-
-    def none_receiver(*args, **kwargs):
+    def default_receiver(*args, request_type=None, **kwargs):
+        if request_type != "edit-published-record":
+            return {"user": "2"}
         return None
 
-    app_config["OAREPO_REQUESTS_DEFAULT_RECEIVER"] = {
-        "thesis_publish_draft": default_receiver,
-        "thesis_delete_record": default_receiver,
-        "thesis_non_duplicable": default_receiver,
-        "thesis_edit_record": none_receiver,
-    }
+    app_config["OAREPO_REQUESTS_DEFAULT_RECEIVER"] = default_receiver
 
     """
     app_config.setdefault("ENTITY_REFERENCE_UI_RESOLVERS", {}).update({
@@ -308,7 +306,19 @@ def example_topic_draft(record_service, identity_simple):
 @pytest.fixture()
 def record_factory(record_service):
     def record(identity):
-        draft = record_service.create(identity, {})
+        draft = record_service.create(
+            identity,
+            {
+                "metadata": {
+                    "title": "Title",
+                    "creators": [
+                        "Creator 1",
+                        "Creator 2",
+                    ],
+                    "contributors": ["Contributor 1"],
+                }
+            },
+        )
         record = record_service.publish(identity, draft.id)
         return record._obj
 
@@ -332,4 +342,39 @@ def events_resource_data():
             "content": "This is a comment.",
             "format": RequestEventFormat.HTML.value,
         }
+    }
+
+
+from invenio_accounts.proxies import current_datastore
+
+
+def _create_role(id, name, description, is_managed, database):
+    """Creates a Role/Group."""
+    r = current_datastore.create_role(
+        id=id, name=name, description=description, is_managed=is_managed
+    )
+    current_datastore.commit()
+    return r
+
+
+@pytest.fixture()
+def role(database):
+    """A single group."""
+    r = _create_role(
+        id="it-dep",
+        name="it-dep",
+        description="IT Department",
+        is_managed=False,
+        database=database,
+    )
+    return r
+
+
+@pytest.fixture()
+def role_ui_serialization():
+    return {
+        "label": "it-dep",
+        "links": {"self": "https://127.0.0.1:5000/api/groups/it-dep"},
+        "reference": {"group": "it-dep"},
+        "type": "group",
     }

@@ -1,4 +1,5 @@
 from invenio_records_resources.services.errors import PermissionDeniedError
+from oarepo_runtime.services.results import ResultsComponent
 
 from oarepo_requests.services.schema import RequestTypeSchema
 from oarepo_requests.utils import (
@@ -8,8 +9,10 @@ from oarepo_requests.utils import (
 )
 
 
-class RequestTypesComponent:
-    def update_data(self, identity, record, projection):
+class RequestTypesComponent(ResultsComponent):
+    def update_data(self, identity, record, projection, expand):
+        if not expand:
+            return
         request_types_list = []
         allowed_request_types = allowed_request_types_for_record(record)
         for request_name, request_type in allowed_request_types.items():
@@ -27,11 +30,14 @@ class RequestTypesComponent:
                 )
                 request_type_link = data
                 request_types_list.append(request_type_link)
-        projection["request_types"] = request_types_list
+        projection["expanded"]["request_types"] = request_types_list
 
 
-class RequestsComponent:
-    def update_data(self, identity, record, projection):
+class RequestsComponent(ResultsComponent):
+    def update_data(self, identity, record, projection, expand):
+        if not expand:
+            return
+
         service = get_requests_service_for_records_service(
             get_matching_service_for_record(record)
         )
@@ -44,4 +50,4 @@ class RequestsComponent:
             requests = list(reader(identity, record["id"]).hits)
         except PermissionDeniedError:
             requests = []
-        projection["requests"] = requests
+        projection["expanded"]["requests"] = requests

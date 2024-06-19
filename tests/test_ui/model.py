@@ -1,9 +1,13 @@
+from flask import g
+from flask_principal import PermissionDenied
 from oarepo_ui.resources import (
     BabelComponent,
     RecordsUIResource,
     RecordsUIResourceConfig,
 )
 from oarepo_ui.resources.components import PermissionsComponent
+from werkzeug.exceptions import Forbidden
+
 from thesis.resources.records.ui import ThesisUIJSONSerializer
 
 
@@ -27,4 +31,18 @@ class ModelUIResourceConfig(RecordsUIResourceConfig):
 
 
 class ModelUIResource(RecordsUIResource):
-    pass
+
+    def _get_record(self, resource_requestctx, allow_draft=False):
+        try:
+            if allow_draft:
+                read_method = (
+                    getattr(self.api_service, "read_draft") or self.api_service.read
+                )
+            else:
+                read_method = self.api_service.read
+
+            return read_method(
+                g.identity, resource_requestctx.view_args["pid_value"], expand=True
+            )
+        except PermissionDenied as e:
+            raise Forbidden() from e
