@@ -5,9 +5,10 @@ import { Button, Message, FormField } from "semantic-ui-react";
 import _isEmpty from "lodash/isEmpty";
 import axios from "axios";
 import { RichEditor, RichInputField } from "react-invenio-forms";
-
 import { Formik, Form } from "formik";
-import { CommentPayloadSchema, sanitizeInput } from "../utils";
+
+import { sanitizeInput } from "@js/oarepo_ui";
+import { CommentPayloadSchema } from "../utils";
 
 export const EventSubmitForm = ({ request, fetchEvents }) => {
   const [error, setError] = useState(null);
@@ -23,7 +24,7 @@ export const EventSubmitForm = ({ request, fetchEvents }) => {
       method: method,
       headers: {
         'Content-Type': 'application/json',
-        'Accept': 'application/json'
+        'Accept': 'application/vnd.inveniordm.v1+json'
       },
       data: data
   })};
