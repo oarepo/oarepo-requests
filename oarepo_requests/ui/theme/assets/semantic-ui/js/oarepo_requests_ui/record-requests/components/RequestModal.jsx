@@ -33,8 +33,6 @@ export const RequestModal = ({ request, requestTypes, requestModalType, isEventM
     onSubmit: () => {}
   });
 
-  const { confirmDialogProps, confirmAction } = useConfirmDialog(formik, sendRequest, isEventModal);
-
   useEffect(() => {
     if (error) {
       errorMessageRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -102,6 +100,8 @@ export const RequestModal = ({ request, requestTypes, requestModalType, isEventM
     const actionUrl = !isEventModal ? request.links.actions[requestType] : request.links[requestType];
     return callApi(actionUrl, 'post', mappedData);
   }
+
+  const { confirmDialogProps, confirmAction } = useConfirmDialog(formik, sendRequest, isEventModal);
 
   const onClose = () => {
     setModalOpen(false);
