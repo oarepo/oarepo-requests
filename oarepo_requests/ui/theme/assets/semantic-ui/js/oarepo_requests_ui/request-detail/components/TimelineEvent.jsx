@@ -3,7 +3,9 @@ import React, { memo } from "react";
 import { i18next } from "@translations/oarepo_requests_ui/i18next";
 import { Icon, Feed } from "semantic-ui-react";
 import _has from "lodash/has";
-import { hasAll, hasAny, sanitizeInput, getRequestStatusIcon } from "../utils";
+import { sanitizeInput } from "@js/oarepo_ui";
+
+import { hasAll, hasAny, getRequestStatusIcon } from "../utils";
 
 const TimelineEvent = ({ event }) => {
   const isRenderable = hasAll(event, 'created', 'payload') && hasAny(event.payload, 'event', 'content');
