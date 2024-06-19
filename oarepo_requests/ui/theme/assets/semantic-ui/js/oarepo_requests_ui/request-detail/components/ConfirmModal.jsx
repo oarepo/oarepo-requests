@@ -8,19 +8,11 @@ import {
   FieldLabel,
   RichInputField,
 } from "react-invenio-forms";
-import { CommentPayloadSchema, sanitizeInput } from "../utils";
-
 import { Formik, Form } from "formik";
 
-/** 
- * @typedef {import("../types").Request} Request
- * @typedef {import("../types").RequestType} RequestType
- * @typedef {import("../types").RequestTypeEnum} RequestTypeEnum
- * @typedef {import("react").ReactElement} ReactElement
- * @typedef {import("semantic-ui-react").ConfirmProps} ConfirmProps
- */
+import { sanitizeInput } from "../utils";
 
-/** @param {{ request: Request, requestModalHeader: string, handleSubmit: (v) => Promise, triggerButton: ReactElement, submitButton: ReactElement }} props */
+/** @param {{ request: import("../types").Request, requestModalHeader: string, handleSubmit: (v) => Promise, triggerButton: ReactElement, submitButton: ReactElement }} props */
 export const ConfirmModal = ({ request, requestModalHeader, handleSubmit, triggerButton, submitButton }) => {
   const [modalOpen, setModalOpen] = useState(false);
   const [error, setError] = useState(null);
@@ -63,7 +55,6 @@ export const ConfirmModal = ({ request, requestModalHeader, handleSubmit, trigge
             format: "html"
           }
         }}
-        validationSchema={CommentPayloadSchema}
         onSubmit={onSubmit}
       >
         {({ isSubmitting, values, setFieldValue, setFieldTouched }) => (
