@@ -1,19 +1,5 @@
-from oarepo_ui.resources.config import RecordsUIResourceConfig
-from oarepo_ui.resources.resource import RecordsUIResource
-
-class RequestUIResourceConfig(RecordsUIResourceConfig):
-    url_prefix = "/requests"
-    blueprint_name = "oarepo_requests_ui"
-    template_folder = "templates"
-    templates = {
-        "detail": "RequestDetail",
-    }
-    api_service = "requests"
-    ui_serializer_class = "oarepo_requests.resources.ui.OARepoRequestsUIJSONSerializer"
-
-
-class RequestUIResource(RecordsUIResource):
-    pass
+from oarepo_requests.ui.config import RequestUIResourceConfig
+from oarepo_requests.ui.resource import RequestUIResource
 
 
 def create_blueprint(app):
