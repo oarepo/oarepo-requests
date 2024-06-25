@@ -11,6 +11,11 @@
       "path": "/invenio/instance/static/dist/css/bottom_css.78b33add02920b2d01b2.css",
       "publicPath": "/static/dist/css/bottom_css.78b33add02920b2d01b2.css"
     },
+    "css/oarepo_requests_ui_components.1d6e681d1180d043359e.css": {
+      "name": "css/oarepo_requests_ui_components.1d6e681d1180d043359e.css",
+      "path": "/Users/miroslavbauer/Code/github.com/Narodni-repozitar/nr-docs/.venv/var/instance/static/dist/css/oarepo_requests_ui_components.1d6e681d1180d043359e.css",
+      "publicPath": "/static/dist/css/oarepo_requests_ui_components.1d6e681d1180d043359e.css"
+    },
     "css/oarepo_vocabularies_ui_components.22a6dcb4ec850142e289.css": {
       "name": "css/oarepo_vocabularies_ui_components.22a6dcb4ec850142e289.css",
       "path": "/invenio/instance/static/dist/css/oarepo_vocabularies_ui_components.22a6dcb4ec850142e289.css",
@@ -240,6 +245,11 @@
       "name": "img/outline-icons.9c4845b.svg",
       "path": "/invenio/instance/static/dist/img/outline-icons.9c4845b.svg",
       "publicPath": "/static/dist/img/outline-icons.9c4845b.svg"
+    },
+    "js/manifest.0bd1cd6f2a86cfd3e86f.js": {
+      "name": "js/manifest.0bd1cd6f2a86cfd3e86f.js",
+      "path": "/invenio/var/instance/static/dist/js/manifest.0bd1cd6f2a86cfd3e86f.js",
+      "publicPath": "/static/dist/js/manifest.0bd1cd6f2a86cfd3e86f.js"
     },
     "js/0.f0b23abc5a3b7894b82c.js": {
       "name": "js/0.f0b23abc5a3b7894b82c.js",
@@ -500,6 +510,16 @@
       "name": "js/manifest.4695496aebf9efb0cd82.js",
       "path": "/invenio/instance/static/dist/js/manifest.4695496aebf9efb0cd82.js",
       "publicPath": "/static/dist/js/manifest.4695496aebf9efb0cd82.js"
+    },
+    "js/oarepo_requests_ui_request_detail.bf8562e4d37cab6e43c0.js": {
+      "name": "js/oarepo_requests_ui_request_detail.bf8562e4d37cab6e43c0.js",
+      "path": "/invenio/instance/static/dist/js/oarepo_requests_ui_request_detail.bf8562e4d37cab6e43c0.js",
+      "publicPath": "/static/dist/js/oarepo_requests_ui_request_detail.bf8562e4d37cab6e43c0.js"
+    },
+    "js/oarepo_requests_ui_components.521a0701146bb580d0ef.js": {
+      "name": "js/oarepo_requests_ui_components.521a0701146bb580d0ef.js",
+      "path": "/invenio/instance/static/dist/js/oarepo_requests_ui_components.521a0701146bb580d0ef.js",
+      "publicPath": "/static/dist/js/oarepo_requests_ui_components.521a0701146bb580d0ef.js"
     },
     "js/oarepo_ui_forms.b28a0864bf143cb9a055.js": {
       "name": "js/oarepo_ui_forms.b28a0864bf143cb9a055.js",
@@ -1185,6 +1205,15 @@
       "js/vendors~invenio-communities-invitations~invenio-communities-requests~invenio-requests-base.71782eb9a729b4a1f6dc.js",
       "js/invenio-communities-invitations~invenio-communities-requests~invenio-requests-base.7acd261e6dae4dc01ab9.js",
       "js/invenio-requests-base.06522baeacd35f179168.js"
+    ],
+    "oarepo_requests_ui_request_detail": [
+      "js/manifest.0bd1cd6f2a86cfd3e86f.js",
+      "js/oarepo_requests_ui_request_detail.bf8562e4d37cab6e43c0.js"
+    ],
+    "oarepo_requests_ui_components": [
+      "js/manifest.0bd1cd6f2a86cfd3e86f.js",
+      "css/oarepo_requests_ui_components.1d6e681d1180d043359e.css",
+      "js/oarepo_requests_ui_components.521a0701146bb580d0ef.js"
     ],
     "oarepo_ui": [
       "js/manifest.4695496aebf9efb0cd82.js",

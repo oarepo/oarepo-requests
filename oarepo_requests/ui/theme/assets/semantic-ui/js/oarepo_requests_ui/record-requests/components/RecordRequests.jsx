@@ -2,7 +2,6 @@ import React, { useEffect, useState, useCallback } from "react";
 import PropTypes from "prop-types";
 
 import axios from "axios";
-import _isEmpty from "lodash/isEmpty";
 
 import { CreateRequestButtonGroup, RequestListContainer } from ".";
 import { RequestContextProvider } from "../contexts";
@@ -25,7 +24,7 @@ export const RecordRequests = ({ record: initialRecord }) => {
     setRecordLoadingError(null);
     return axios({
       method: 'get',
-      url: record.links?.self,
+      url: record.links?.self + "?expand=true",
       headers: {
         'Content-Type': 'application/json',
         'Accept': 'application/vnd.inveniordm.v1+json'
@@ -33,9 +32,11 @@ export const RecordRequests = ({ record: initialRecord }) => {
     })
       .then(response => {
         setRecord(response.data);
+        return response.data;
       })
       .catch(error => {
         setRecordLoadingError(error);
+        throw error;
       })
       .finally(() => {
         setRecordLoading(false);
@@ -67,28 +68,36 @@ export const RecordRequests = ({ record: initialRecord }) => {
   const fetchNewRequests = useCallback(() => {
     fetchRecord();
     fetchRequests();
-  }, [record.links?.self, record.links?.requests]);
+  }, [fetchRecord, fetchRequests]);
 
   useEffect(() => {
-    fetchRecord();
-  }, []);
+    fetchRecord()
+      .then(record => {
+        setRequests(sortByStatusCode(record?.expanded?.requests ?? []));
+      })
+      .catch(error => {
+        setRequestsLoadingError(error);
+      })
+      .finally(() => {
+        setRequestsLoading(false);
+      });
+  }, [fetchRecord]);
 
   return (
     <>
-      <CreateRequestButtonGroup 
-        requestTypes={record?.request_types ?? []} 
-        isLoading={recordLoading} 
-        loadingError={recordLoadingError} 
-        fetchNewRequests={fetchNewRequests} 
+      <CreateRequestButtonGroup
+        requestTypes={record?.expanded?.request_types ?? []}
+        isLoading={recordLoading}
+        loadingError={recordLoadingError}
+        fetchNewRequests={fetchNewRequests}
       />
       <RequestContextProvider requests={{ requests, setRequests: requestsSetter }}>
-        <RequestListContainer 
-          requestTypes={record?.request_types ?? []} 
-          isLoading={requestsLoading} 
-          loadingError={requestsLoadingError} 
-          fetchNewRequests={fetchNewRequests} 
-          fetchRequests={fetchRequests} 
-      />
+        <RequestListContainer
+          requestTypes={record?.expanded?.request_types ?? []}
+          isLoading={requestsLoading}
+          loadingError={requestsLoadingError}
+          fetchNewRequests={fetchNewRequests}
+        />
       </RequestContextProvider>
     </>
   );
