@@ -4,7 +4,6 @@ import PropTypes from "prop-types";
 import { i18next } from "@translations/oarepo_requests_ui/i18next";
 import { Dimmer, Loader, Modal, Button, Icon, Message, Confirm } from "semantic-ui-react";
 import _isEmpty from "lodash/isEmpty";
-import _isFunction from "lodash/isFunction";
 
 import { useFormik, FormikContext } from "formik";
 import axios from "axios";
@@ -33,8 +32,6 @@ export const RequestModal = ({ request, requestTypes, requestModalType, isEventM
     initialValues: !_isEmpty(request?.payload) ? { payload: request.payload } : (request?.payload_ui ? mapPayloadUiToInitialValues(request?.payload_ui) : {}),
     onSubmit: () => {}
   });
-
-  const { confirmDialogProps, confirmAction } = useConfirmDialog(formik, sendRequest, isEventModal);
 
   useEffect(() => {
     if (error) {
@@ -103,6 +100,8 @@ export const RequestModal = ({ request, requestTypes, requestModalType, isEventM
     const actionUrl = !isEventModal ? request.links.actions[requestType] : request.links[requestType];
     return callApi(actionUrl, 'post', mappedData);
   }
+
+  const { confirmDialogProps, confirmAction } = useConfirmDialog(formik, sendRequest, isEventModal);
 
   const onClose = () => {
     setModalOpen(false);

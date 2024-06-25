@@ -14,17 +14,13 @@ import { RequestContext } from "../contexts";
 /**
  * @param {{ requestTypes: RequestType[], isLoading: boolean, loadingError: Error, fetchNewRequests: () => void, fetchRequests: () => void }} props
  */
-export const RequestListContainer = ({ requestTypes, isLoading, loadingError, fetchNewRequests, fetchRequests }) => {
+export const RequestListContainer = ({ requestTypes, isLoading, loadingError, fetchNewRequests }) => {
   const { requests } = useContext(RequestContext);
-
-  useEffect(() => {
-    fetchRequests();
-  }, []);
 
   let requestsToApprove = [];
   let otherRequests = [];
   for (const request of requests) {
-    if ("accept" in request.links?.actions) {
+    if ("accept" in request.links.actions) {
       requestsToApprove.push(request);
     } else {
       otherRequests.push(request);

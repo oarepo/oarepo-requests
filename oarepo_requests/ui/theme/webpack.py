@@ -8,6 +8,7 @@ theme = WebpackThemeBundle(
         "semantic-ui": dict(
             entry={
                 "oarepo_requests_ui_record_requests": "./js/oarepo_requests_ui/record-requests/index.js",
+                "oarepo_requests_ui_request_detail": "./js/oarepo_requests_ui/request-detail/index.js",
                 "oarepo_requests_ui_components": "./js/oarepo_requests_ui/custom-components.js",
             },
             dependencies={},

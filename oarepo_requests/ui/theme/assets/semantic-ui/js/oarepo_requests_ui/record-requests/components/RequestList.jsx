@@ -4,7 +4,7 @@ import PropTypes from "prop-types";
 import { i18next } from "@translations/oarepo_requests_ui/i18next";
 import { List, Label } from "semantic-ui-react";
 import _isEmpty from "lodash/isEmpty";
-import _truncate from "lodash/truncate";
+import _has from "lodash/has";
 
 import { RequestModal } from ".";
 
@@ -21,12 +21,12 @@ export const RequestList = ({ requests, requestTypes, requestModalType, fetchNew
     <List link divided size="small">
       {requests.map((request) => {
         let modalType = requestModalType;
-        if (_isEmpty(requestModalType)) {
-          if ("submit" in request.links?.actions) {
+        if (_isEmpty(requestModalType) && _has(request, "links.actions")) {
+          if ("submit" in request.links.actions) {
             modalType = "submit";
-          } else if ("cancel" in request.links?.actions) {
+          } else if ("cancel" in request.links.actions) {
             modalType = "cancel";
-          } else if (_isEmpty(request.links?.actions)) {
+          } else if (_isEmpty(request.links.actions)) {
             modalType = "view_only";
           } else {
             modalType = "submit";
