@@ -3,6 +3,7 @@ import { i18next } from "@translations/oarepo_requests_ui/i18next";
 import * as Yup from 'yup';
 
 export const hasAll = (obj, ...keys) => keys.every(key => _has(obj, key));
+
 export const hasAny = (obj, ...keys) => keys.some(key => _has(obj, key));
 
 export const CommentPayloadSchema = Yup.object().shape({

@@ -10,7 +10,7 @@ import {
 } from "react-invenio-forms";
 import { Formik, Form } from "formik";
 
-import { sanitizeInput } from "../utils";
+import { sanitizeInput } from "@js/oarepo_ui";
 
 /** @param {{ request: import("../types").Request, requestModalHeader: string, handleSubmit: (v) => Promise, triggerButton: ReactElement, submitButton: ReactElement }} props */
 export const ConfirmModal = ({ request, requestModalHeader, handleSubmit, triggerButton, submitButton }) => {
