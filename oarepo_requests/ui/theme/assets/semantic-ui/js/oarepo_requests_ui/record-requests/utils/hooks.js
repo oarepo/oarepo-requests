@@ -1,7 +1,13 @@
 import React, { useState } from "react";
 
+import _isEmpty from "lodash/isEmpty";
+import axios from "axios";
+
+import { isDeepEmpty } from "../utils";
+
 import { i18next } from "@translations/oarepo_requests_ui/i18next";
 import { Button } from "semantic-ui-react";
+import { useFormikContext } from "formik";
 
 import { REQUEST_TYPE } from "./objects";
 
@@ -9,7 +15,9 @@ import { REQUEST_TYPE } from "./objects";
  * @typedef {import("semantic-ui-react").ConfirmProps} ConfirmProps
  */
 
-export const useConfirmDialog = (formik, sendRequest, isEventModal) => {
+export const useConfirmDialog = (formik, isEventModal = false) => {
+  const { setSubmitting } = formik;
+
   /** @type {[ConfirmProps, (props: ConfirmProps) => void]} */
   const [confirmDialogProps, setConfirmDialogProps] = useState({
     open: false,
@@ -20,17 +28,17 @@ export const useConfirmDialog = (formik, sendRequest, isEventModal) => {
     onConfirm: () => setConfirmDialogProps(props => ({ ...props, open: false }))
   });
 
-  const confirmAction = (requestType, createAndSubmit = false) => {
+  const confirmAction = (onConfirm, requestType, createAndSubmit = false) => {
     /** @type {ConfirmProps} */
     let newConfirmDialogProps = {
       open: true,
       onConfirm: () => {
         setConfirmDialogProps(props => ({ ...props, open: false }));
-        sendRequest(requestType);
+        onConfirm(requestType);
       },
       onCancel: () => {
         setConfirmDialogProps(props => ({ ...props, open: false }));
-        formik.setSubmitting(false);
+        setSubmitting(false);
       }
     };
 
@@ -65,7 +73,7 @@ export const useConfirmDialog = (formik, sendRequest, isEventModal) => {
         confirmButton: <Button positive>{i18next.t("Create and submit")}</Button>,
         onConfirm: () => {
           setConfirmDialogProps(props => ({ ...props, open: false }));
-          sendRequest(REQUEST_TYPE.CREATE, createAndSubmit);
+          onConfirm(requestType, true);
         }
       }
     }
@@ -74,4 +82,80 @@ export const useConfirmDialog = (formik, sendRequest, isEventModal) => {
   };
 
   return { confirmDialogProps, confirmAction };
+}
+
+export const useRequestsApi = (setModalOpen, fetchNewRequests) => {
+  const formik = useFormikContext();
+  const {
+    isSubmitting,
+    values: formValues,
+    resetForm,
+    setSubmitting,
+    setValues,
+    setFieldError,
+    setFieldValue,
+    setErrors,
+  } = formik;
+
+  const setError = error => { setErrors({ api: error }); };
+
+  const callApi = async (url, method, data = formValues, doNotHandleResolve = false) => {
+    if (_isEmpty(url)) {
+      setError(new Error(i18next.t("Cannot send request. Please try again later.")));
+      setSubmitting(false);
+      return;
+    }
+
+    const request = axios({
+      method: method,
+      url: url,
+      data: data,
+      headers: { 'Content-Type': 'application/json' }
+    });
+
+    if (doNotHandleResolve) {
+      return request;
+    }
+
+    return request
+      .then(() => {
+        setModalOpen(false);
+        resetForm();
+        fetchNewRequests();
+      })
+      .catch(error => {
+        setError(error);
+      });
+  };
+
+  const createAndSubmitRequest = async (actionUrl) => {
+    try {
+      const createdRequest = await callApi(actionUrl, 'post', formValues, true);
+      await callApi(createdRequest.data?.links?.actions?.submit, 'post', {}, true);
+      setModalOpen(false);
+      resetForm();
+      fetchNewRequests();
+    } catch (error) {
+      setError(error);
+    }
+  }
+
+  const sendRequest = async (actionUrl, requestType, createAndSubmit = false) => {
+    setSubmitting(true);
+    setErrors({});
+    if (createAndSubmit) {
+      return createAndSubmitRequest();
+    }
+    if (requestType === REQUEST_TYPE.SAVE) {
+      return callApi(actionUrl, 'put');
+    } else if (requestType === REQUEST_TYPE.ACCEPT) { // Reload page after succesful "Accept" operation
+      await callApi(actionUrl, 'post');
+      window.location.reload();
+      return;
+    }
+    const mappedData = !isDeepEmpty(formValues) ? {} : formValues;
+    return callApi(actionUrl, 'post', mappedData);
+  };
+
+  return { sendRequest };
 }

@@ -20,6 +20,7 @@ export const RequestList = ({ requests, requestTypes, requestModalType, fetchNew
   return (
     <List link divided size="small">
       {requests.map((request) => {
+        const requestType = requestTypes?.find(requestType => requestType.type_id === request.type) ?? {};
         let modalType = requestModalType;
         if (_isEmpty(requestModalType) && _has(request, "links.actions")) {
           if ("submit" in request.links.actions) {
@@ -35,7 +36,7 @@ export const RequestList = ({ requests, requestTypes, requestModalType, fetchNew
         return (
           <RequestModal key={request.id} request={request} requestTypes={requestTypes} requestModalType={modalType}
             triggerButton={
-              <List.Item as="a" key={request.id} className="ui request-list-item">
+              <List.Item as="a" key={request.id} className="ui request-list-item" role="button">
                   <List.Content style={{position: 'relative'}}>
                     <Label size="mini" className="text-muted"  attached='top right'>
                       {request?.status ?? i18next.t("No status")}

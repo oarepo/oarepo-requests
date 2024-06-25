@@ -1,4 +1,4 @@
-import React, { useEffect, useContext } from "react";
+import React, { useEffect } from "react";
 import PropTypes from "prop-types";
 
 import { i18next } from "@translations/oarepo_requests_ui/i18next";
@@ -11,7 +11,7 @@ import { useFormikContext } from "formik";
 import { CustomFields } from "react-invenio-forms";
 
 import { RequestModal, ModalContentSideInfo } from ".";
-import { RequestContext } from "../contexts";
+import { useRequestContext } from "../contexts";
 import { fetchUpdated as fetchNewEvents } from "../utils";
 import { REQUEST_TYPE } from "../utils/objects";
 import ReadOnlyCustomFields from "./common/ReadOnlyCustomFields";
@@ -26,7 +26,7 @@ import ReadOnlyCustomFields from "./common/ReadOnlyCustomFields";
 /** @param {{ request: Request, requestModalType: RequestTypeEnum, requestType: RequestType, customSubmitHandler: (e) => void }} props */
 export const RequestModalContent = ({ request, requestType, requestModalType, customSubmitHandler }) => {
   /** @type {{requests: Request[], setRequests: (requests: Request[]) => void}} */
-  const { requests, setRequests } = useContext(RequestContext);
+  const { requests, setRequests } = useRequestContext();
 
   const actualRequest = requests.find(req => req.id === request.id);
 

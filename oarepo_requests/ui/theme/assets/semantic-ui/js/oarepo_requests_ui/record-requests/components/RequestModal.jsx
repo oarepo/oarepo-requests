@@ -4,7 +4,6 @@ import PropTypes from "prop-types";
 import { i18next } from "@translations/oarepo_requests_ui/i18next";
 import { Dimmer, Loader, Modal, Button, Icon, Message, Confirm } from "semantic-ui-react";
 import _isEmpty from "lodash/isEmpty";
-
 import { useFormik, FormikContext } from "formik";
 import axios from "axios";
 
@@ -113,11 +112,11 @@ export const RequestModal = ({ request, requestTypes, requestModalType, isEventM
     try {
       await formik.submitForm();
       if (submitButtonName === "create-and-submit-request") {
-        !_isEmpty(requestType?.payload_ui) ? confirmAction(REQUEST_TYPE.SUBMIT, true) : sendRequest(REQUEST_TYPE.SUBMIT, true);
+        !_isEmpty(requestType?.payload_ui) ? confirmAction(sendRequest, REQUEST_TYPE.SUBMIT, true) : sendRequest(REQUEST_TYPE.SUBMIT, true);
         return;
       }
       if (requestModalType === REQUEST_TYPE.SUBMIT) {
-        confirmAction(REQUEST_TYPE.SUBMIT);
+        confirmAction(sendRequest, REQUEST_TYPE.SUBMIT);
       } else if (requestModalType === REQUEST_TYPE.CREATE) {
         sendRequest(REQUEST_TYPE.CREATE);
       }
@@ -130,7 +129,7 @@ export const RequestModal = ({ request, requestTypes, requestModalType, isEventM
 
   const requestType = requestTypes?.find(requestType => requestType.type_id === request.type) ?? {};
   const formWillBeRendered = requestModalType === REQUEST_TYPE.SUBMIT && requestType?.payload_ui;
-  const submitButtonExtraProps = formWillBeRendered ? { type: "submit", form: "request-form" } : { onClick: () => confirmAction(REQUEST_TYPE.SUBMIT) };
+  const submitButtonExtraProps = formWillBeRendered ? { type: "submit", form: "request-form" } : { onClick: () => confirmAction(sendRequest, REQUEST_TYPE.SUBMIT) };
   const requestModalHeader = !_isEmpty(request?.title) ? request.title : (!_isEmpty(request?.name) ? request.name : request.type);
 
   return (
@@ -175,12 +174,12 @@ export const RequestModal = ({ request, requestTypes, requestModalType, isEventM
                 <Icon name="paper plane" />
                 {i18next.t("Submit")}
               </Button>
-              <Button title={i18next.t("Cancel request")} onClick={() => confirmAction(REQUEST_TYPE.CANCEL)} negative icon labelPosition="left" floated="left">
+              <Button title={i18next.t("Cancel request")} onClick={() => confirmAction(sendRequest, REQUEST_TYPE.CANCEL)} negative icon labelPosition="left" floated="left">
                 <Icon name="trash alternate" />
                 {i18next.t("Cancel request")}
               </Button>
               {formWillBeRendered && 
-                <Button title={i18next.t("Save drafted request")} onClick={() => sendRequest(REQUEST_TYPE.SAVE)} color="grey" icon labelPosition="left" floated="right">
+                <Button title={i18next.t("Save drafted request")} onClick={() => sendRequest(sendRequest, REQUEST_TYPE.SAVE)} color="grey" icon labelPosition="left" floated="right">
                   <Icon name="save" />
                   {i18next.t("Save")}
                 </Button>
@@ -188,18 +187,18 @@ export const RequestModal = ({ request, requestTypes, requestModalType, isEventM
             </>
           }
           {requestModalType === REQUEST_TYPE.CANCEL &&
-            <Button title={i18next.t("Cancel request")} onClick={() => confirmAction(REQUEST_TYPE.CANCEL)} negative icon labelPosition="left" floated="left">
+            <Button title={i18next.t("Cancel request")} onClick={() => confirmAction(sendRequest, REQUEST_TYPE.CANCEL)} negative icon labelPosition="left" floated="left">
               <Icon name="trash alternate" />
               {i18next.t("Cancel request")}
             </Button>
           }
           {requestModalType === REQUEST_TYPE.ACCEPT &&
             <>
-              <Button title={i18next.t("Accept request")} onClick={() => confirmAction(REQUEST_TYPE.ACCEPT)} positive icon labelPosition="left" floated="right">
+              <Button title={i18next.t("Accept request")} onClick={() => confirmAction(sendRequest, REQUEST_TYPE.ACCEPT)} positive icon labelPosition="left" floated="right">
                 <Icon name="check" />
                 {i18next.t("Accept")}
               </Button>
-              <Button title={i18next.t("Decline request")} onClick={() => confirmAction(REQUEST_TYPE.DECLINE)} negative icon labelPosition="left" floated="left">
+              <Button title={i18next.t("Decline request")} onClick={() => confirmAction(sendRequest, REQUEST_TYPE.DECLINE)} negative icon labelPosition="left" floated="left">
                 <Icon name="cancel" />
                 {i18next.t("Decline")}
               </Button>

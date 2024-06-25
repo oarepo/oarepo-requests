@@ -1,11 +1,11 @@
-import React, { useContext, useEffect } from "react";
+import React from "react";
 
 import { i18next } from "@translations/oarepo_requests_ui/i18next";
 import { Segment, SegmentGroup, Header, Dimmer, Loader, Placeholder, Message } from "semantic-ui-react";
 import _isEmpty from "lodash/isEmpty";
 
 import { RequestList } from ".";
-import { RequestContext } from "../contexts";
+import { useRequestContext } from "../contexts";
 
 /**
  * @typedef {import("../types").Request} Request
@@ -15,7 +15,7 @@ import { RequestContext } from "../contexts";
  * @param {{ requestTypes: RequestType[], isLoading: boolean, loadingError: Error, fetchNewRequests: () => void, fetchRequests: () => void }} props
  */
 export const RequestListContainer = ({ requestTypes, isLoading, loadingError, fetchNewRequests }) => {
-  const { requests } = useContext(RequestContext);
+  const { requests } = useRequestContext();
 
   let requestsToApprove = [];
   let otherRequests = [];
