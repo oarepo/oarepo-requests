@@ -179,7 +179,7 @@ export const RequestModal = ({ request, requestTypes, requestModalType, isEventM
                 {i18next.t("Cancel request")}
               </Button>
               {formWillBeRendered && 
-                <Button title={i18next.t("Save drafted request")} onClick={() => sendRequest(sendRequest, REQUEST_TYPE.SAVE)} color="grey" icon labelPosition="left" floated="right">
+                <Button title={i18next.t("Save drafted request")} onClick={() => sendRequest(REQUEST_TYPE.SAVE)} color="grey" icon labelPosition="left" floated="right">
                   <Icon name="save" />
                   {i18next.t("Save")}
                 </Button>

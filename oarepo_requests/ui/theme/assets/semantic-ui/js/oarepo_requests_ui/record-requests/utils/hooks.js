@@ -84,18 +84,14 @@ export const useConfirmDialog = (formik, isEventModal = false) => {
   return { confirmDialogProps, confirmAction };
 }
 
-export const useRequestsApi = (setModalOpen, fetchNewRequests) => {
-  const formik = useFormikContext();
+export const useRequestsApi = () => {
   const {
-    isSubmitting,
     values: formValues,
     resetForm,
+    submitForm,
     setSubmitting,
-    setValues,
-    setFieldError,
-    setFieldValue,
     setErrors,
-  } = formik;
+  } = useFormikContext();
 
   const setError = error => { setErrors({ api: error }); };
 
@@ -119,9 +115,7 @@ export const useRequestsApi = (setModalOpen, fetchNewRequests) => {
 
     return request
       .then(() => {
-        setModalOpen(false);
         resetForm();
-        fetchNewRequests();
       })
       .catch(error => {
         setError(error);
@@ -132,9 +126,7 @@ export const useRequestsApi = (setModalOpen, fetchNewRequests) => {
     try {
       const createdRequest = await callApi(actionUrl, 'post', formValues, true);
       await callApi(createdRequest.data?.links?.actions?.submit, 'post', {}, true);
-      setModalOpen(false);
       resetForm();
-      fetchNewRequests();
     } catch (error) {
       setError(error);
     }

@@ -7,6 +7,7 @@ import _isEmpty from "lodash/isEmpty";
 import _has from "lodash/has";
 
 import { RequestModal } from ".";
+import { SubmitModal } from ".";
 
 /**
  * @typedef {import("../types").Request} Request
@@ -22,19 +23,27 @@ export const RequestList = ({ requests, requestTypes, requestModalType, fetchNew
       {requests.map((request) => {
         const requestType = requestTypes?.find(requestType => requestType.type_id === request.type) ?? {};
         let modalType = requestModalType;
+        let ModalComponent = RequestModal;
         if (_isEmpty(requestModalType) && _has(request, "links.actions")) {
           if ("submit" in request.links.actions) {
             modalType = "submit";
+            ModalComponent = SubmitModal;
           } else if ("cancel" in request.links.actions) {
             modalType = "cancel";
           } else if (_isEmpty(request.links.actions)) {
             modalType = "view_only";
           } else {
             modalType = "submit";
+            ModalComponent = SubmitModal;
           }
         }
         return (
-          <RequestModal key={request.id} request={request} requestTypes={requestTypes} requestModalType={modalType}
+          <ModalComponent 
+            key={request.id} 
+            request={request} 
+            requestType={requestType} 
+            requestTypes={requestTypes} 
+            requestModalType={modalType}
             triggerButton={
               <List.Item as="a" key={request.id} className="ui request-list-item" role="button">
                   <List.Content style={{position: 'relative'}}>
