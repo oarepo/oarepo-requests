@@ -32,9 +32,11 @@ export const RecordRequests = ({ record: initialRecord }) => {
     })
       .then(response => {
         setRecord(response.data);
+        return response.data;
       })
       .catch(error => {
         setRecordLoadingError(error);
+        throw error;
       })
       .finally(() => {
         setRecordLoading(false);
@@ -69,25 +71,33 @@ export const RecordRequests = ({ record: initialRecord }) => {
   }, [fetchRecord, fetchRequests]);
 
   useEffect(() => {
-    fetchRecord();
+    fetchRecord()
+      .then(record => {
+        setRequests(sortByStatusCode(record?.expanded?.requests ?? []));
+      })
+      .catch(error => {
+        setRequestsLoadingError(error);
+      })
+      .finally(() => {
+        setRequestsLoading(false);
+      });
   }, [fetchRecord]);
 
   return (
     <>
-      <CreateRequestButtonGroup 
-        requestTypes={record?.expanded?.request_types ?? []} 
-        isLoading={recordLoading} 
-        loadingError={recordLoadingError} 
-        fetchNewRequests={fetchNewRequests} 
+      <CreateRequestButtonGroup
+        requestTypes={record?.expanded?.request_types ?? []}
+        isLoading={recordLoading}
+        loadingError={recordLoadingError}
+        fetchNewRequests={fetchNewRequests}
       />
       <RequestContextProvider requests={{ requests, setRequests: requestsSetter }}>
-        <RequestListContainer 
-          requestTypes={record?.expanded?.request_types ?? []} 
-          isLoading={requestsLoading} 
-          loadingError={requestsLoadingError} 
-          fetchNewRequests={fetchNewRequests} 
-          fetchRequests={fetchRequests} 
-      />
+        <RequestListContainer
+          requestTypes={record?.expanded?.request_types ?? []}
+          isLoading={requestsLoading}
+          loadingError={requestsLoadingError}
+          fetchNewRequests={fetchNewRequests}
+        />
       </RequestContextProvider>
     </>
   );
