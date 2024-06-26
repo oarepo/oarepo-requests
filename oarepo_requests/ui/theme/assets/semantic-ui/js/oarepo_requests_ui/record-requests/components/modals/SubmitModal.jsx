@@ -30,7 +30,7 @@ export const SubmitModal = ({ request, requestType, fetchNewRequests, triggerEle
     } catch (e) { /* empty */ }
   };
 
-  const submitActionConfirmationHandler = () => confirmAction(() => onSubmit(() => sendRequest(request.links.actions.submit, REQUEST_TYPE.SUBMIT)));
+  const submitActionConfirmationHandler = () => confirmAction(() => onSubmit(() => sendRequest(request.links.actions.submit, REQUEST_TYPE.SUBMIT)), REQUEST_TYPE.SUBMIT);
 
   const customSubmitHandler = async () => {
     try {

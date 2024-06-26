@@ -88,7 +88,6 @@ export const useRequestsApi = () => {
   const {
     values: formValues,
     resetForm,
-    submitForm,
     setSubmitting,
     setErrors,
   } = useFormikContext();
@@ -97,9 +96,10 @@ export const useRequestsApi = () => {
 
   const callApi = async (url, method, data = formValues, doNotHandleResolve = false) => {
     if (_isEmpty(url)) {
-      setError(new Error(i18next.t("Cannot send request. Please try again later.")));
+      const err = new Error(i18next.t("Cannot send request. Please try again later."));
+      setError(err);
       setSubmitting(false);
-      return;
+      throw err;
     }
 
     const request = axios({
@@ -119,6 +119,7 @@ export const useRequestsApi = () => {
       })
       .catch(error => {
         setError(error);
+        throw error;
       });
   };
 
@@ -131,15 +132,11 @@ export const useRequestsApi = () => {
       resetForm();
     } catch (error) {
       setError(error);
+      throw error;
     }
   }
 
-  const sendRequest = async (actionUrl, requestType, createAndSubmit = false) => {
-    setSubmitting(true);
-    setErrors({});
-    if (createAndSubmit) {
-      return createAndSubmitRequest();
-    }
+  const sendRequest = async (actionUrl, requestType) => {
     if (requestType === REQUEST_TYPE.SAVE) {
       return callApi(actionUrl, 'put');
     } else if (requestType === REQUEST_TYPE.ACCEPT) { // Reload page after succesful "Accept" operation

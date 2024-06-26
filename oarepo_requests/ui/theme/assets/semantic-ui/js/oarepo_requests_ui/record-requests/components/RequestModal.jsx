@@ -20,8 +20,8 @@ import { useConfirmDialog } from "../utils/hooks";
  * @typedef {import("semantic-ui-react").ConfirmProps} ConfirmProps
  */
 
-/** @param {{ request: Request, requestTypes: RequestType[], requestModalType: RequestTypeEnum, isEventModal: boolean, triggerButton: ReactElement, fetchNewRequests: () => void }} props */
-export const RequestModal = ({ request, requestTypes, requestModalType, isEventModal = false, triggerButton, fetchNewRequests }) => {
+/** @param {{ request: Request, requestTypes: RequestType[], requestModalType: RequestTypeEnum, isEventModal: boolean, triggerElement: ReactElement, fetchNewRequests: () => void }} props */
+export const RequestModal = ({ request, requestTypes, requestModalType, isEventModal = false, triggerElement, fetchNewRequests }) => {
   const [modalOpen, setModalOpen] = useState(false);
   const [error, setError] = useState(null);
 
@@ -141,7 +141,7 @@ export const RequestModal = ({ request, requestTypes, requestModalType, isEventM
         onClose={onClose}
         onOpen={() => setModalOpen(true)}
         open={modalOpen}
-        trigger={triggerButton || <Button content="Open Modal" />}
+        trigger={triggerElement || <Button content="Open Modal" />}
         closeIcon
         closeOnDocumentClick={false}
         closeOnDimmerClick={false}
@@ -231,12 +231,4 @@ export const RequestModal = ({ request, requestTypes, requestModalType, isEventM
       </Modal>
     </>
   );
-};
-
-RequestModal.propTypes = {
-  request: PropTypes.object.isRequired,
-  requestModalType: PropTypes.oneOf(["create", "submit", "cancel", "accept", "view_only"]).isRequired,
-  requestTypes: PropTypes.array,
-  isEventModal: PropTypes.bool,
-  triggerButton: PropTypes.element,
 };
