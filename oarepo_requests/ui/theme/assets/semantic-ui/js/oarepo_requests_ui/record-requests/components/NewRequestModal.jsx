@@ -2,12 +2,9 @@ import React, { useEffect, useRef } from "react";
 import PropTypes from "prop-types";
 
 import { i18next } from "@translations/oarepo_requests_ui/i18next";
-import { Dimmer, Loader, Modal, Button, Icon, Message, Confirm } from "semantic-ui-react";
+import { Dimmer, Loader, Modal, Button, Icon, Message } from "semantic-ui-react";
 import _isEmpty from "lodash/isEmpty";
 import { useFormikContext } from "formik";
-
-import { RequestModalContent, CreateRequestModalContent } from ".";
-import { REQUEST_TYPE } from "../utils/objects";
 
 /** 
  * @typedef {import("../types").Request} Request
@@ -17,8 +14,8 @@ import { REQUEST_TYPE } from "../utils/objects";
  * @typedef {import("semantic-ui-react").ConfirmProps} ConfirmProps
  */
 
-/** @param {{ request: Request, requestType: RequestType, trigger: ReactElement, actions: ReactElement, content: ReactElement }} props */
-export const NewRequestModal = ({ request, isOpen, closeModal, trigger, actions, content }) => {
+/** @param {{ header: string | ReactElement, requestType: RequestType, trigger: ReactElement, actions: ReactElement, content: ReactElement }} props */
+export const NewRequestModal = ({ header, isOpen, closeModal, openModal, trigger, actions, content }) => {
   const errorMessageRef = useRef(null);
   const {
     isSubmitting,
@@ -39,9 +36,7 @@ export const NewRequestModal = ({ request, isOpen, closeModal, trigger, actions,
     closeModal();
     setErrors({});
     resetForm();
-  }
-
-  const requestModalHeader = !_isEmpty(request?.title) ? request.title : (!_isEmpty(request?.name) ? request.name : request.type);
+  };
 
   return (
     <Modal
@@ -49,6 +44,7 @@ export const NewRequestModal = ({ request, isOpen, closeModal, trigger, actions,
       as={Dimmer.Dimmable}
       blurring
       onClose={onClose}
+      onOpen={openModal}
       open={isOpen}
       trigger={trigger || <Button content="Open Modal" />}
       closeIcon
@@ -61,7 +57,7 @@ export const NewRequestModal = ({ request, isOpen, closeModal, trigger, actions,
       <Dimmer active={isSubmitting}>
         <Loader inverted size="large" />
       </Dimmer>
-      <Modal.Header as="h1" id="request-modal-header">{requestModalHeader}</Modal.Header>
+      <Modal.Header as="h1" id="request-modal-header">{header}</Modal.Header>
       <Modal.Content>
         {error &&
           <Message negative>

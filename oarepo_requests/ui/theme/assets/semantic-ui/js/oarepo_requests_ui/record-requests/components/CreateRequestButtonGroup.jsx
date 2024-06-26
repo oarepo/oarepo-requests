@@ -1,11 +1,12 @@
 import React from "react";
 
 import { i18next } from "@translations/oarepo_requests_ui/i18next";
-
 import { Segment, Header, Button, Dimmer, Loader, Placeholder, Message } from "semantic-ui-react";
 import _isEmpty from "lodash/isEmpty";
+import { Formik } from "formik";
 
-import { RequestModal } from "./RequestModal";
+import { CreateModal } from "./modals";
+import { mapPayloadUiToInitialValues } from "../utils";
 
 /**
  * @typedef {import("../types").Request} Request
@@ -17,7 +18,6 @@ import { RequestModal } from "./RequestModal";
  */
 export const CreateRequestButtonGroup = ({ requestTypes, isLoading, loadingError, fetchNewRequests }) => {
   const createRequests = requestTypes.filter(requestType => requestType.links.actions?.create);
-
   return (
     <Segment>
       <Header size="small" className="detail-sidebar-header">{i18next.t("Create Request")}</Header>
@@ -42,13 +42,17 @@ export const CreateRequestButtonGroup = ({ requestTypes, isLoading, loadingError
             !_isEmpty(createRequests) ?
               <Button.Group vertical compact fluid>
                 {createRequests.map((requestType) => (
-                  <RequestModal
+                  <Formik
                     key={requestType.type_id}
-                    request={requestType}
-                    requestModalType="create"
-                    triggerButton={<Button icon="plus" className="pl-0" title={i18next.t(requestType.name)} basic compact content={requestType.name} />}
-                    fetchNewRequests={fetchNewRequests}
-                  />
+                    initialValues={!_isEmpty(requestType?.payload) ? { payload: requestType.payload } : (requestType?.payload_ui ? mapPayloadUiToInitialValues(requestType?.payload_ui) : {})}
+                    onSubmit={() => { }} // We'll redefine with customSubmitHandler
+                  >
+                    <CreateModal
+                      requestType={requestType}
+                      triggerElement={<Button icon="plus" className="pl-0" title={i18next.t(requestType.name)} basic compact content={requestType.name} />}
+                      fetchNewRequests={fetchNewRequests}
+                    />
+                  </Formik>
                 ))}
               </Button.Group> :
               <p>{i18next.t("No new requests to create")}.</p>

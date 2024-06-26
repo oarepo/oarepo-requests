@@ -15,8 +15,8 @@ import { REQUEST_TYPE } from "./objects";
  * @typedef {import("semantic-ui-react").ConfirmProps} ConfirmProps
  */
 
-export const useConfirmDialog = (formik, isEventModal = false) => {
-  const { setSubmitting } = formik;
+export const useConfirmDialog = (formik = null, isEventModal = false) => {
+  const { setSubmitting } = useFormikContext() || formik;
 
   /** @type {[ConfirmProps, (props: ConfirmProps) => void]} */
   const [confirmDialogProps, setConfirmDialogProps] = useState({
@@ -34,7 +34,7 @@ export const useConfirmDialog = (formik, isEventModal = false) => {
       open: true,
       onConfirm: () => {
         setConfirmDialogProps(props => ({ ...props, open: false }));
-        onConfirm(requestType);
+        onConfirm();
       },
       onCancel: () => {
         setConfirmDialogProps(props => ({ ...props, open: false }));
@@ -73,7 +73,7 @@ export const useConfirmDialog = (formik, isEventModal = false) => {
         confirmButton: <Button positive>{i18next.t("Create and submit")}</Button>,
         onConfirm: () => {
           setConfirmDialogProps(props => ({ ...props, open: false }));
-          onConfirm(requestType, true);
+          onConfirm();
         }
       }
     }
@@ -122,9 +122,11 @@ export const useRequestsApi = () => {
       });
   };
 
-  const createAndSubmitRequest = async (actionUrl) => {
+  const createAndSubmitRequest = async (createRequestLink) => {
+    setSubmitting(true);
+    setErrors({});
     try {
-      const createdRequest = await callApi(actionUrl, 'post', formValues, true);
+      const createdRequest = await callApi(createRequestLink, 'post', formValues, true);
       await callApi(createdRequest.data?.links?.actions?.submit, 'post', {}, true);
       resetForm();
     } catch (error) {
@@ -149,5 +151,5 @@ export const useRequestsApi = () => {
     return callApi(actionUrl, 'post', mappedData);
   };
 
-  return { sendRequest };
+  return { sendRequest, createAndSubmitRequest };
 }

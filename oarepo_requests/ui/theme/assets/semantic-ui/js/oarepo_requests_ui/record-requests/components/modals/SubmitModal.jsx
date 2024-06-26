@@ -16,40 +16,44 @@ export const SubmitModal = ({ request, requestType, fetchNewRequests, triggerEle
   const {
     isOpen: isModalOpen,
     close: closeModal,
+    open: openModal
   } = useConfirmationModal();
   const { sendRequest } = useRequestsApi();
   const { confirmDialogProps, confirmAction } = useConfirmDialog();
   const { setSubmitting, submitForm, setErrors } = useFormikContext();
 
-  const customSubmitHandler = async (submitButtonName) => {
+  const onSubmit = async (submitEvent) => {
     try {
-      await submitForm();
-      confirmAction(sendRequest, REQUEST_TYPE.SUBMIT);
-    } catch (error) {
-      setErrors({ api: error });
-    } finally {
-      setSubmitting(false);
-    }
-  }
-
-  const onConfirm = async (requestType) => {
-    try {
-      await sendRequest(requestType);
+      await submitEvent();
       closeModal();
       fetchNewRequests();
     } catch (e) { /* empty */ }
   };
 
+  const submitActionConfirmationHandler = () => confirmAction(() => onSubmit(() => sendRequest(request.links.actions.submit, REQUEST_TYPE.SUBMIT)));
+
+  const customSubmitHandler = async () => {
+    try {
+      await submitForm();
+      submitActionConfirmationHandler();
+    } catch (error) {
+      setErrors({ api: error });
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
   const formWillBeRendered = !_isEmpty(requestType?.payload_ui);
-  const submitButtonExtraProps = formWillBeRendered ? { type: "submit", form: "request-form" } : { onClick: () => confirmAction(onConfirm, REQUEST_TYPE.SUBMIT) };
+  const submitButtonExtraProps = formWillBeRendered ? { type: "submit", form: "request-form" } : { onClick: submitActionConfirmationHandler };
+  const requestModalHeader = !_isEmpty(request?.title) ? request.title : (!_isEmpty(request?.name) ? request.name : request.type);
 
   return (
     <>
       <NewRequestModal
-        key={request.id}
-        request={request}
+        header={requestModalHeader}
         isOpen={isModalOpen}
         closeModal={closeModal}
+        openModal={openModal}
         trigger={triggerElement}
         actions={
           <>
@@ -57,12 +61,20 @@ export const SubmitModal = ({ request, requestType, fetchNewRequests, triggerEle
               <Icon name="paper plane" />
               {i18next.t("Submit")}
             </Button>
-            <Button title={i18next.t("Cancel request")} onClick={() => confirmAction(onConfirm, REQUEST_TYPE.CANCEL)} negative icon labelPosition="left" floated="left">
+            <Button 
+              title={i18next.t("Cancel request")} 
+              onClick={() => confirmAction(() => onSubmit(() => sendRequest(request.links.actions.cancel, REQUEST_TYPE.CANCEL)), REQUEST_TYPE.CANCEL)} 
+              negative icon labelPosition="left" floated="left"
+            >
               <Icon name="trash alternate" />
               {i18next.t("Cancel request")}
             </Button>
             {formWillBeRendered && 
-              <Button title={i18next.t("Save drafted request")} onClick={() => sendRequest(REQUEST_TYPE.SAVE)} color="grey" icon labelPosition="left" floated="right">
+              <Button 
+                title={i18next.t("Save drafted request")} 
+                onClick={() => onSubmit(() => sendRequest(request.links.self, REQUEST_TYPE.SAVE))} 
+                color="grey" icon labelPosition="left" floated="right"
+              >
                 <Icon name="save" />
                 {i18next.t("Save")}
               </Button>
