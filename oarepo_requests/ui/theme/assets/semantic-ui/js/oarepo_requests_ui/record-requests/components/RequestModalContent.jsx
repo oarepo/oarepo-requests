@@ -10,7 +10,7 @@ import { useFormikContext } from "formik";
 
 import { CustomFields } from "react-invenio-forms";
 
-import { RequestModal, ModalContentSideInfo } from ".";
+import { ModalContentSideInfo, CreateEventModal } from ".";
 import { useRequestContext } from "../contexts";
 import { fetchUpdated as fetchNewEvents } from "../utils";
 import { REQUEST_TYPE } from "../utils/objects";
@@ -152,8 +152,9 @@ export const RequestModalContent = ({ request, requestType, requestModalType, cu
                       </Comment.Group>
                     }
                     {eventTypes.map(event => (
-                      <RequestModal key={event.id} request={event} requestModalType={REQUEST_TYPE.CREATE} isEventModal
-                        triggerButton={<Button key={event.id} compact primary icon="plus" labelPosition="left" content={event.name} />} />
+                      <CreateEventModal key={event.id} eventType={event} triggerButton={
+                        <Button compact primary icon="plus" labelPosition="left" content={event.name} />
+                      } />
                     ))}
                   </>
                 }

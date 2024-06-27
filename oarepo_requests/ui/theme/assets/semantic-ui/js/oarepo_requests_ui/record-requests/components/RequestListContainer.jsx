@@ -12,9 +12,9 @@ import { useRequestContext } from "../contexts";
  * @typedef {import("../types").RequestType} RequestType
  */
 /**
- * @param {{ requestTypes: RequestType[], isLoading: boolean, loadingError: Error, fetchNewRequests: () => void, fetchRequests: () => void }} props
+ * @param {{ requestTypes: RequestType[], isLoading: boolean, loadingError: Error }} props
  */
-export const RequestListContainer = ({ requestTypes, isLoading, loadingError, fetchNewRequests }) => {
+export const RequestListContainer = ({ requestTypes, isLoading, loadingError }) => {
   const { requests } = useRequestContext();
 
   let requestsToApprove = [];
@@ -57,12 +57,12 @@ export const RequestListContainer = ({ requestTypes, isLoading, loadingError, fe
       <SegmentGroupOrEmpty>
         <Segment className="requests-my-requests">
           <Header size="small" className="detail-sidebar-header">{i18next.t("My Requests")}</Header>
-          {!_isEmpty(otherRequests) ? <RequestList requests={otherRequests} requestTypes={requestTypes} fetchNewRequests={fetchNewRequests} /> : <p>{i18next.t("No requests to show")}.</p>}
+          {!_isEmpty(otherRequests) ? <RequestList requests={otherRequests} requestTypes={requestTypes} /> : <p>{i18next.t("No requests to show")}.</p>}
         </Segment>
         {requestsToApprove.length > 0 && (
           <Segment className="requests-requests-to-approve">
             <Header size="small" className="detail-sidebar-header">{i18next.t("Requests to Approve")}</Header>
-            <RequestList requests={requestsToApprove} requestTypes={requestTypes} requestModalType="accept" fetchNewRequests={fetchNewRequests} />
+            <RequestList requests={requestsToApprove} requestTypes={requestTypes} requestModalType="accept" />
           </Segment>
         )}
       </SegmentGroupOrEmpty>

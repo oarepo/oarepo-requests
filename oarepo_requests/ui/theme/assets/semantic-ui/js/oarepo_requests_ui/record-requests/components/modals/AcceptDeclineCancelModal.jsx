@@ -1,15 +1,15 @@
 import React from "react";
-import PropTypes from "prop-types";
 
 import { i18next } from "@translations/oarepo_requests_ui/i18next";
 import { Button, Icon, Confirm } from "semantic-ui-react";
-import _isEmpty from "lodash/isEmpty";
 
 import { NewRequestModal, RequestModalContent } from "..";
 import { REQUEST_TYPE } from "../../utils/objects";
 import { useRequestsApi, useConfirmDialog, useRequestModal } from "../../utils/hooks";
+import { useRequestContext } from "../../contexts";
 
-export const AcceptDeclineCancelModal = ({ request, requestType, fetchNewRequests, triggerElement, modalHeader }) => {
+export const AcceptDeclineCancelModal = ({ request, requestType, triggerElement, modalHeader }) => {
+  const { fetchNewRequests } = useRequestContext();
   const {
     isOpen: isModalOpen,
     close: closeModal,

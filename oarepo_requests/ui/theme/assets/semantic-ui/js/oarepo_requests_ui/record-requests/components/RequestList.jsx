@@ -7,9 +7,8 @@ import _isEmpty from "lodash/isEmpty";
 import _has from "lodash/has";
 import { Formik } from "formik";
 
-import { SubmitModal, AcceptDeclineCancelModal, RequestModalContent, ViewOnlyModal } from ".";
+import { SubmitModal, AcceptDeclineCancelModal, ViewOnlyModal } from ".";
 import { mapPayloadUiToInitialValues } from "../utils";
-import { REQUEST_TYPE } from "../utils/objects";
 
 /**
  * @typedef {import("../types").Request} Request
@@ -19,7 +18,7 @@ import { REQUEST_TYPE } from "../utils/objects";
 /**
  * @param {{ requests: Request[], requestModalType: RequestTypeEnum }} props
  */
-export const RequestList = ({ requests, requestTypes, requestModalType, fetchNewRequests }) => {
+export const RequestList = ({ requests, requestTypes, requestModalType }) => {
   return (
     <List link divided size="small">
       {requests.map((request) => {
@@ -58,11 +57,7 @@ export const RequestList = ({ requests, requestTypes, requestModalType, fetchNew
                   </List.Content>
                 </List.Item>
               }
-              fetchNewRequests={fetchNewRequests}
               modalHeader={requestModalHeader}
-              content={
-                <RequestModalContent request={request} requestType={requestType} requestModalType={REQUEST_TYPE.SUBMIT} />
-              }
             />
           </Formik>
         )

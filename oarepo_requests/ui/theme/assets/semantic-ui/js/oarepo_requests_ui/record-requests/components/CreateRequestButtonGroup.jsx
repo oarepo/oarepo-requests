@@ -14,9 +14,9 @@ import { mapPayloadUiToInitialValues } from "../utils";
  */
 
 /**
- * @param {{ requestTypes: RequestType[], isLoading: boolean, loadingError: Error, fetchNewRequests: () => void }} props
+ * @param {{ requestTypes: RequestType[], isLoading: boolean, loadingError: Error }} props
  */
-export const CreateRequestButtonGroup = ({ requestTypes, isLoading, loadingError, fetchNewRequests }) => {
+export const CreateRequestButtonGroup = ({ requestTypes, isLoading, loadingError }) => {
   const createRequests = requestTypes.filter(requestType => requestType.links.actions?.create);
   return (
     <Segment>
@@ -50,7 +50,6 @@ export const CreateRequestButtonGroup = ({ requestTypes, isLoading, loadingError
                     <CreateModal
                       requestType={requestType}
                       triggerElement={<Button icon="plus" className="pl-0" title={i18next.t(requestType.name)} basic compact content={requestType.name} />}
-                      fetchNewRequests={fetchNewRequests}
                     />
                   </Formik>
                 ))}

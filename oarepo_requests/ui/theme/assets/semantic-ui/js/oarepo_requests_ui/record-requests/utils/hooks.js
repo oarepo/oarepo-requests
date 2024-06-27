@@ -34,8 +34,8 @@ export const useRequestModal = (postSubmitEvent = () => {}, onError = () => {}) 
   return { isOpen, close, open, onSubmit };
 };
 
-export const useConfirmDialog = (formik = null, isEventModal = false) => {
-  const { setSubmitting } = useFormikContext() || formik;
+export const useConfirmDialog = (isEventModal = false) => {
+  const { setSubmitting } = useFormikContext();
 
   /** @type {[ConfirmProps, (props: ConfirmProps) => void]} */
   const [confirmDialogProps, setConfirmDialogProps] = useState({

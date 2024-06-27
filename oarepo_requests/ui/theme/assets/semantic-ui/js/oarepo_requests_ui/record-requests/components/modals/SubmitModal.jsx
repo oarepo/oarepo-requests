@@ -8,8 +8,10 @@ import { useFormikContext } from "formik";
 import { NewRequestModal, RequestModalContent } from "..";
 import { REQUEST_TYPE } from "../../utils/objects";
 import { useRequestsApi, useConfirmDialog, useRequestModal } from "../../utils/hooks";
+import { useRequestContext } from "../../contexts";
 
-export const SubmitModal = ({ request, requestType, fetchNewRequests, triggerElement, modalHeader }) => {
+export const SubmitModal = ({ request, requestType, triggerElement, modalHeader }) => {
+  const { fetchNewRequests } = useRequestContext();
   const {
     isOpen: isModalOpen,
     close: closeModal,
