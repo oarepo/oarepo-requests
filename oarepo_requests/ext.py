@@ -9,6 +9,7 @@ from oarepo_requests.resources.oarepo.config import OARepoRequestsResourceConfig
 from oarepo_requests.resources.oarepo.resource import OARepoRequestsResource
 from oarepo_requests.services.oarepo.config import OARepoRequestsServiceConfig
 from oarepo_requests.services.oarepo.service import OARepoRequestsService
+from oarepo_workflows.proxies import current_oarepo_workflows
 
 
 class OARepoRequests:

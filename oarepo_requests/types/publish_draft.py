@@ -5,6 +5,8 @@ from oarepo_requests.actions.publish_draft import PublishDraftAcceptAction
 
 from .ref_types import ModelRefTypes
 from .generic import NonDuplicableOARepoRequestType
+from ..actions.generic import TopicStateChangingSubmitAction, TopicStateChangingDeclineAction, OARepoSubmitAction, \
+    OARepoDeclineAction
 
 
 class PublishDraftRequestType(NonDuplicableOARepoRequestType):
@@ -13,6 +15,8 @@ class PublishDraftRequestType(NonDuplicableOARepoRequestType):
 
     available_actions = {
         **RequestType.available_actions,
+        "submit": OARepoSubmitAction,
+        "decline": OARepoDeclineAction,
         "accept": PublishDraftAcceptAction,
     }
     description = _("Request publishing of a draft")

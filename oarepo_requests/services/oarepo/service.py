@@ -20,6 +20,8 @@ class OARepoRequestsService(RequestsService):
         expires_at=None,
         uow=None,
         expand=False,
+        *args,
+        **kwargs,
     ):
         type_ = current_request_type_registry.lookup(request_type, quiet=True)
         if not type_:

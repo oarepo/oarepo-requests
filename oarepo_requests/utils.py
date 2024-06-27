@@ -3,6 +3,14 @@ from invenio_requests import current_requests_service
 from invenio_requests.proxies import current_request_type_registry
 from invenio_requests.resolvers.registry import ResolverRegistry
 from invenio_search.engine import dsl
+from oarepo_workflows.proxies import current_oarepo_workflows
+from invenio_records.dictutils import dict_lookup
+
+
+def get_from_requests_workflow(workflow_id, type_id, segment):
+    ret = dict_lookup(current_oarepo_workflows.record_workflows,
+                f"{workflow_id}.requests.{type_id}.{segment}")
+    return ret
 
 
 def allowed_request_types_for_record(record):

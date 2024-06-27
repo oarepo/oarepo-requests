@@ -1,0 +1,27 @@
+record:
+  use:
+  - invenio
+  module:
+    qualified: thesis
+  fields:
+    state: "{{oarepo_workflows.records.systemfields.state.RecordStateField}}(initial='published')"
+  draft:
+    fields:
+      state: "{{oarepo_workflows.records.systemfields.state.RecordStateField}}()"
+  service-config:
+
+  properties:
+    metadata:
+      properties:
+        title:
+          type: fulltext
+        creators[]:
+          type: keyword
+        contributors[]:
+          type: keyword
+
+settings:
+  schema-server: 'local://'
+profiles:
+- record
+- draft

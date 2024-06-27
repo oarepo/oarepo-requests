@@ -18,3 +18,4 @@ class DeletePublishedRecordRequestType(NonDuplicableOARepoRequestType):
     description = _("Request deletion of published record")
     receiver_can_be_none = True
     allowed_topic_ref_types = ModelRefTypes(published=True, draft=False)
+

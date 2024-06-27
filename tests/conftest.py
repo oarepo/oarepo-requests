@@ -1,5 +1,5 @@
 import os
-
+from invenio_i18n import lazy_gettext as _
 import pytest
 from flask_security import login_user
 from invenio_accounts.testutils import login_user_via_session
@@ -8,10 +8,166 @@ from invenio_requests.customizations import CommentEventType, LogEventType
 from invenio_requests.proxies import current_requests
 from invenio_requests.records.api import RequestEventFormat
 from invenio_users_resources.records import UserAggregate
+from oarepo_workflows.permissions.generators import IfInState
+from oarepo_workflows.permissions.policy import WorkflowPermissionPolicy
+from oarepo_workflows.requests.classes import WorkflowRequest, WorkflowTransitions
 
+from oarepo_requests.actions.generic import TopicStateChangingSubmitAction, TopicStateChangingDeclineAction, \
+    StatusChangingAcceptAction, OARepoAcceptAction, OARepoSubmitAction, OARepoDeclineAction
+from oarepo_requests.permissions.generators import AutoRequest
+from oarepo_requests.permissions.requester import RequestAction
+from oarepo_requests.types import NonDuplicableOARepoRequestType, ModelRefTypes
+from oarepo_requests.utils import get_from_requests_workflow
 from thesis.proxies import current_service
 from thesis.records.api import ThesisDraft, ThesisRecord
+from oarepo_runtime.services.generators import RecordOwners
+from invenio_records.dictutils import dict_lookup
+from oarepo_workflows.proxies import current_oarepo_workflows
 
+
+def default_receiver(*args, request_type=None, **kwargs):
+    if request_type != "edit-published-record":
+        return {"user": "2"}
+
+def workflow_receiver(*args, request_type=None, **kwargs):
+    workflow_id = kwargs["topic"].parent.workflow if "topic" in kwargs else "default"
+    try:
+        receiver_fnc = get_from_requests_workflow(workflow_id, request_type, "recipients")
+    except KeyError: #auto requester also creates innate invenio requests which don't have permission anyway
+        receiver_fnc = default_receiver
+    receiver = receiver_fnc(*args, request_type, **kwargs)
+    return receiver
+
+def user_receiver(*args, **kwargs):
+    return {"user": "2"}
+
+REQUESTS_DEFAULT_WORKFLOW = {
+    "status-changing-publish-draft":
+        {
+            "requesters": [IfInState("draft", [RecordOwners()])],
+            "recipients": user_receiver,
+            "transitions": {
+                "submit": "publishing",
+                "accept": "published",
+                "decline": "draft",
+            }
+        },
+    "publish-draft":
+        {
+            "requesters": [IfInState("draft", [RecordOwners()])],
+            "recipients": user_receiver,
+            "transitions": {
+                "submit": "publishing",
+                "accept": "published",
+                "decline": "draft",
+            }
+        },
+    "delete-published-record":
+        {
+            "requesters": [IfInState("published", [RecordOwners()])],
+            "recipients": user_receiver,
+            "transitions": {
+                "submit": "deleting",
+                "accept": "deleted"
+            }
+        },
+    "edit-published-record":
+        {
+            "requesters": [IfInState("published", [RecordOwners()])],
+            #"recipients": auto_approver,
+            "recipients": user_receiver,
+            "transitions": {
+            }
+        }
+}
+
+from invenio_access.factory import action_factory
+class ApproveRequestType(NonDuplicableOARepoRequestType):
+    type_id = "approve-draft"
+    name = _("Approve draft")
+
+    available_actions = {
+        **NonDuplicableOARepoRequestType.available_actions,
+        "accept": OARepoAcceptAction,
+        "submit": OARepoSubmitAction,
+        "decline": OARepoDeclineAction,
+    }
+    description = _("Request approving of a draft")
+    receiver_can_be_none = True
+    allowed_topic_ref_types = ModelRefTypes(published=False, draft=True)
+
+REQUESTS_WITH_APPROVE_WORKFLOW = {
+    "publish-draft":
+        {
+            "requesters": [IfInState("approved", [AutoRequest()])],
+            "recipients": user_receiver,
+            "transitions": {
+                "submit": "publishing",
+                "accept": "published",
+                "decline": "approved",
+            }
+        },
+    "approve-draft":
+        {
+            "requesters": [IfInState("draft", [RecordOwners()])],
+            "recipients": user_receiver,
+            "transitions": {
+                "submit": "approving",
+                "accept": "approved",
+                "decline": "draft",
+            }
+        },
+
+    "delete-published-record":
+        {
+            "requesters": [
+            IfInState("published", [RecordOwners()])
+        ],
+            "recipients": user_receiver,
+            "transitions": {
+                "submit": "deleting",
+                "accept": "deleted"
+            }
+        },
+    "edit-published-record":
+        {
+            "requesters": [IfInState("published", [RecordOwners()])],
+            "recipients": user_receiver,
+            "transitions": {
+            }
+        }
+}
+
+"""
+class DefaultWorkflowRequests:
+    publish_draft = WorkflowRequest(
+        requesters=[
+            IfInState("draft", RecordOwners())
+        ],
+        recipients=[user_receiver],
+        transitions=WorkflowTransitions(
+            submitted='publishing',
+            approved='published',
+        ))
+"""
+
+WORKFLOWS = {
+  'default': {
+    'label': _('Default workflow'),
+    'permissions': WorkflowPermissionPolicy,
+    'requests': REQUESTS_DEFAULT_WORKFLOW,
+  },
+  'with_approve': {
+      'label': _('Default workflow'),
+      'permissions': WorkflowPermissionPolicy,
+      'requests': REQUESTS_WITH_APPROVE_WORKFLOW,
+  }
+}
+
+@pytest.fixture
+def change_workflow_function():
+    from oarepo_workflows.proxies import current_oarepo_workflows
+    return current_oarepo_workflows.set_workflow
 
 @pytest.fixture(scope="module")
 def create_app(instance_path, entry_points):
@@ -161,21 +317,10 @@ def app_config(app_config):
     )
     app_config["CACHE_TYPE"] = "SimpleCache"
 
-    def default_receiver(*args, request_type=None, **kwargs):
-        if request_type != "edit-published-record":
-            return {"user": "2"}
-        return None
+    app_config["OAREPO_REQUESTS_DEFAULT_RECEIVER"] = workflow_receiver
 
-    app_config["OAREPO_REQUESTS_DEFAULT_RECEIVER"] = default_receiver
-
-    """
-    app_config.setdefault("ENTITY_REFERENCE_UI_RESOLVERS", {}).update({
-        #"user": user_entity_reference_ui_resolver,
-        #"thesis_draft": draft_record_entity_reference_ui_resolver,
-        "thesis": record_entity_reference_ui_resolver
-    })
-    """
-
+    app_config["RECORD_WORKFLOWS"] = WORKFLOWS
+    app_config["REQUESTS_REGISTERED_TYPES"] = [ApproveRequestType()]
     return app_config
 
 
@@ -210,7 +355,6 @@ def create_request(requests_service):
 
 @pytest.fixture()
 def users(app, db, UserFixture):
-
     user1 = UserFixture(
         email="user1@example.org",
         password="password",

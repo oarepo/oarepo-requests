@@ -8,13 +8,14 @@ from oarepo_requests.resolvers.ui import (
 from oarepo_requests.types import (
     DeletePublishedRecordRequestType,
     EditPublishedRecordRequestType,
-    PublishDraftRequestType,
+    PublishDraftRequestType
 )
 
 REQUESTS_REGISTERED_TYPES = [
     DeletePublishedRecordRequestType(),
     EditPublishedRecordRequestType(),
     PublishDraftRequestType(),
+    # StatusChangingPublishDraftRequestType(),
 ]
 
 REQUESTS_ALLOWED_RECEIVERS = ["user", "group"]
