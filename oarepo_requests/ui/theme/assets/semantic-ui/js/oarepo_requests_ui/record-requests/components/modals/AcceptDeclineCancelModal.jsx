@@ -3,7 +3,7 @@ import React from "react";
 import { i18next } from "@translations/oarepo_requests_ui/i18next";
 import { Button, Icon, Confirm } from "semantic-ui-react";
 
-import { NewRequestModal, RequestModalContent } from "..";
+import { RequestModal, RequestModalContent } from "..";
 import { REQUEST_TYPE } from "../../utils/objects";
 import { useRequestsApi, useConfirmDialog, useRequestModal } from "../../utils/hooks";
 import { useRequestContext } from "../../contexts";
@@ -25,7 +25,7 @@ export const AcceptDeclineCancelModal = ({ request, requestType, triggerElement,
 
   return (
     <>
-      <NewRequestModal
+      <RequestModal
         header={modalHeader}
         isOpen={isModalOpen}
         closeModal={closeModal}

@@ -1,6 +1,6 @@
 import React from "react";
 
-import { NewRequestModal, RequestModalContent } from "..";
+import { RequestModal, RequestModalContent } from "..";
 import { REQUEST_TYPE } from "../../utils/objects";
 import { useRequestModal } from "../../utils/hooks";
 
@@ -12,7 +12,7 @@ export const ViewOnlyModal = ({ request, requestType, triggerElement, modalHeade
   } = useRequestModal();
 
   return (
-    <NewRequestModal
+    <RequestModal
       header={modalHeader}
       isOpen={isModalOpen}
       closeModal={closeModal}

@@ -1,16 +1,10 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useEffect, useRef } from "react";
 import PropTypes from "prop-types";
 
 import { i18next } from "@translations/oarepo_requests_ui/i18next";
-import { Dimmer, Loader, Modal, Button, Icon, Message, Confirm } from "semantic-ui-react";
+import { Dimmer, Loader, Modal, Button, Icon, Message } from "semantic-ui-react";
 import _isEmpty from "lodash/isEmpty";
-import { useFormik, FormikContext } from "formik";
-import axios from "axios";
-
-import { RequestModalContent, CreateRequestModalContent } from ".";
-import { REQUEST_TYPE } from "../utils/objects";
-import { isDeepEmpty, mapPayloadUiToInitialValues } from "../utils";
-import { useConfirmDialog } from "../utils/hooks";
+import { useFormikContext } from "formik";
 
 /** 
  * @typedef {import("../types").Request} Request
@@ -20,17 +14,17 @@ import { useConfirmDialog } from "../utils/hooks";
  * @typedef {import("semantic-ui-react").ConfirmProps} ConfirmProps
  */
 
-/** @param {{ request: Request, requestTypes: RequestType[], requestModalType: RequestTypeEnum, isEventModal: boolean, triggerElement: ReactElement, fetchNewRequests: () => void }} props */
-export const RequestModal = ({ request, requestTypes, requestModalType, isEventModal = false, triggerElement, fetchNewRequests }) => {
-  const [modalOpen, setModalOpen] = useState(false);
-  const [error, setError] = useState(null);
-
+/** @param {{ header: string | ReactElement, requestType: RequestType, trigger: ReactElement, actions: ReactElement, content: ReactElement }} props */
+export const RequestModal = ({ header, isOpen, closeModal, openModal, trigger, actions, content }) => {
   const errorMessageRef = useRef(null);
+  const {
+    isSubmitting,
+    resetForm,
+    setErrors,
+    errors,
+  } = useFormikContext();
 
-  const formik = useFormik({
-    initialValues: !_isEmpty(request?.payload) ? { payload: request.payload } : (request?.payload_ui ? mapPayloadUiToInitialValues(request?.payload_ui) : {}),
-    onSubmit: () => {}
-  });
+  const error = errors?.api;
 
   useEffect(() => {
     if (error) {
@@ -38,197 +32,48 @@ export const RequestModal = ({ request, requestTypes, requestModalType, isEventM
     }
   }, [error]);
 
-  const callApi = async (url, method, data = formik.values, doNotHandleResolve = false) => {
-    if (_isEmpty(url)) {
-      setError(new Error(i18next.t("Cannot send request. Please try again later.")));
-      formik.setSubmitting(false);
-      return;
-    }
-
-    if (doNotHandleResolve) {
-      return axios({
-        method: method,
-        url: url,
-        data: data,
-        headers: { 'Content-Type': 'application/json' }
-      });
-    }
-
-    return axios({
-      method: method,
-      url: url,
-      data: data,
-      headers: { 'Content-Type': 'application/json' }
-    })
-      .then(response => {
-        setModalOpen(false);
-        formik.resetForm();
-        fetchNewRequests();
-      })
-      .catch(error => {
-        setError(error);
-      });
-  }
-
-  const createAndSubmitRequest = async () => {
-    try {
-      const createdRequest = await callApi(request.links.actions?.create, 'post', formik.values, true);
-      await callApi(createdRequest.data?.links?.actions?.submit, 'post', {}, true);
-      setModalOpen(false);
-      formik.resetForm();
-      fetchNewRequests();
-    } catch (error) {
-      setError(error);
-    };
-  }
-
-  const sendRequest = async (requestType, createAndSubmit = false) => {
-    formik.setSubmitting(true);
-    setError(null);
-    if (createAndSubmit) {
-      return createAndSubmitRequest();
-    }
-    if (requestType === REQUEST_TYPE.SAVE) {
-      return callApi(request.links.self, 'put');
-    } else if (requestType === REQUEST_TYPE.ACCEPT) { // Reload page after succesful "Accept" operation
-      await callApi(request.links.actions?.accept, 'post');
-      location.reload();
-      return;
-    }
-    const mappedData = !isDeepEmpty(formik.values) ? {} : formik.values;
-    const actionUrl = !isEventModal ? request.links.actions[requestType] : request.links[requestType];
-    return callApi(actionUrl, 'post', mappedData);
-  }
-
-  const { confirmDialogProps, confirmAction } = useConfirmDialog(formik, sendRequest, isEventModal);
-
   const onClose = () => {
-    setModalOpen(false);
-    setError(null);
-    formik.resetForm();
-  }
-
-  const customSubmitHandler = async (submitButtonName) => {
-    try {
-      await formik.submitForm();
-      if (submitButtonName === "create-and-submit-request") {
-        !_isEmpty(requestType?.payload_ui) ? confirmAction(sendRequest, REQUEST_TYPE.SUBMIT, true) : sendRequest(REQUEST_TYPE.SUBMIT, true);
-        return;
-      }
-      if (requestModalType === REQUEST_TYPE.SUBMIT) {
-        confirmAction(sendRequest, REQUEST_TYPE.SUBMIT);
-      } else if (requestModalType === REQUEST_TYPE.CREATE) {
-        sendRequest(REQUEST_TYPE.CREATE);
-      }
-    } catch (error) {
-      setError(error);
-    } finally {
-      formik.setSubmitting(false);
-    }
-  }
-
-  const requestType = requestTypes?.find(requestType => requestType.type_id === request.type) ?? {};
-  const formWillBeRendered = requestModalType === REQUEST_TYPE.SUBMIT && requestType?.payload_ui;
-  const submitButtonExtraProps = formWillBeRendered ? { type: "submit", form: "request-form" } : { onClick: () => confirmAction(sendRequest, REQUEST_TYPE.SUBMIT) };
-  const requestModalHeader = !_isEmpty(request?.title) ? request.title : (!_isEmpty(request?.name) ? request.name : request.type);
+    closeModal();
+    setErrors({});
+    resetForm();
+  };
 
   return (
-    <>
-      <Modal
-        className="requests-request-modal"
-        as={Dimmer.Dimmable}
-        blurring
-        onClose={onClose}
-        onOpen={() => setModalOpen(true)}
-        open={modalOpen}
-        trigger={triggerElement || <Button content="Open Modal" />}
-        closeIcon
-        closeOnDocumentClick={false}
-        closeOnDimmerClick={false}
-        role="dialog"
-        aria-labelledby="request-modal-header"
-        aria-describedby="request-modal-desc"
-      >
-        <Dimmer active={formik.isSubmitting}>
-          <Loader inverted size="large" />
-        </Dimmer>
-        <Modal.Header as="h1" id="request-modal-header">{requestModalHeader}</Modal.Header>
-        <Modal.Content>
-          {error &&
-            <Message negative>
-              <Message.Header>{i18next.t("Error sending request")}</Message.Header>
-              <p ref={errorMessageRef}>{error?.message}</p>
-            </Message>
-          }
-          <FormikContext.Provider value={formik}>
-            {requestModalType === REQUEST_TYPE.CREATE &&
-              <CreateRequestModalContent requestType={request} customSubmitHandler={customSubmitHandler} /> ||
-              <RequestModalContent request={request} requestType={requestType} requestModalType={requestModalType} customSubmitHandler={customSubmitHandler} />
-            }
-          </FormikContext.Provider>
-        </Modal.Content>
-        <Modal.Actions>
-          {requestModalType === REQUEST_TYPE.SUBMIT &&
-            <>
-              <Button title={i18next.t("Submit request")} color="blue" icon labelPosition="left" floated="right" {...submitButtonExtraProps}>
-                <Icon name="paper plane" />
-                {i18next.t("Submit")}
-              </Button>
-              <Button title={i18next.t("Cancel request")} onClick={() => confirmAction(sendRequest, REQUEST_TYPE.CANCEL)} negative icon labelPosition="left" floated="left">
-                <Icon name="trash alternate" />
-                {i18next.t("Cancel request")}
-              </Button>
-              {formWillBeRendered && 
-                <Button title={i18next.t("Save drafted request")} onClick={() => sendRequest(REQUEST_TYPE.SAVE)} color="grey" icon labelPosition="left" floated="right">
-                  <Icon name="save" />
-                  {i18next.t("Save")}
-                </Button>
-              }
-            </>
-          }
-          {requestModalType === REQUEST_TYPE.CANCEL &&
-            <Button title={i18next.t("Cancel request")} onClick={() => confirmAction(sendRequest, REQUEST_TYPE.CANCEL)} negative icon labelPosition="left" floated="left">
-              <Icon name="trash alternate" />
-              {i18next.t("Cancel request")}
-            </Button>
-          }
-          {requestModalType === REQUEST_TYPE.ACCEPT &&
-            <>
-              <Button title={i18next.t("Accept request")} onClick={() => confirmAction(sendRequest, REQUEST_TYPE.ACCEPT)} positive icon labelPosition="left" floated="right">
-                <Icon name="check" />
-                {i18next.t("Accept")}
-              </Button>
-              <Button title={i18next.t("Decline request")} onClick={() => confirmAction(sendRequest, REQUEST_TYPE.DECLINE)} negative icon labelPosition="left" floated="left">
-                <Icon name="cancel" />
-                {i18next.t("Decline")}
-              </Button>
-            </>
-          }
-          {requestModalType === REQUEST_TYPE.CREATE && (!isEventModal &&
-            <>
-              {requestType?.payload_ui && 
-                <Button type="submit" form="request-form" name="create-request" title={i18next.t("Create request")} color="blue" icon labelPosition="left" floated="right">
-                  <Icon name="plus" />
-                  {i18next.t("Create")}
-                </Button>
-              }
-              <Button type="submit" form="request-form" name="create-and-submit-request" title={i18next.t("Submit request")} color="blue" icon labelPosition="left" floated="right">
-                <Icon name="paper plane" />
-                {i18next.t("Submit")}
-              </Button>
-            </> ||
-            <Button type="submit" form="request-form" name="create-event" title={i18next.t("Submit")} color="blue" icon labelPosition="left" floated="right">
-              <Icon name="plus" />
-              {i18next.t("Submit")}
-            </Button>)
-          }
-          <Button onClick={onClose} icon labelPosition="left">
-            <Icon name="cancel" />
-            {i18next.t("Close")}
-          </Button>
-        </Modal.Actions>
-        <Confirm {...confirmDialogProps} />
-      </Modal>
-    </>
+    <Modal
+      className="requests-request-modal"
+      as={Dimmer.Dimmable}
+      blurring
+      onClose={onClose}
+      onOpen={openModal}
+      open={isOpen}
+      trigger={trigger || <Button content="Open Modal" />}
+      closeIcon
+      closeOnDocumentClick={false}
+      closeOnDimmerClick={false}
+      role="dialog"
+      aria-labelledby="request-modal-header"
+      aria-describedby="request-modal-desc"
+    >
+      <Dimmer active={isSubmitting}>
+        <Loader inverted size="large" />
+      </Dimmer>
+      <Modal.Header as="h1" id="request-modal-header">{header}</Modal.Header>
+      <Modal.Content>
+        {error &&
+          <Message negative>
+            <Message.Header>{i18next.t("Error sending request")}</Message.Header>
+            <p ref={errorMessageRef}>{error?.message}</p>
+          </Message>
+        }
+        {content}
+      </Modal.Content>
+      <Modal.Actions>
+        {actions}
+        <Button onClick={onClose} icon labelPosition="left">
+          <Icon name="cancel" />
+          {i18next.t("Close")}
+        </Button>
+      </Modal.Actions>
+    </Modal>
   );
 };

@@ -5,7 +5,7 @@ import { Button, Icon, Confirm } from "semantic-ui-react";
 import _isEmpty from "lodash/isEmpty";
 import { useFormikContext } from "formik";
 
-import { NewRequestModal, CreateRequestModalContent } from "..";
+import { RequestModal, CreateRequestModalContent } from "..";
 import { REQUEST_TYPE } from "../../utils/objects";
 import { useRequestsApi, useConfirmDialog, useRequestModal } from "../../utils/hooks";
 import { useRequestContext } from "../../contexts";
@@ -45,7 +45,7 @@ export const CreateModal = ({ requestType, triggerElement }) => {
 
   return (
     <>
-      <NewRequestModal
+      <RequestModal
         header={requestModalHeader}
         isOpen={isModalOpen}
         closeModal={closeModal}
