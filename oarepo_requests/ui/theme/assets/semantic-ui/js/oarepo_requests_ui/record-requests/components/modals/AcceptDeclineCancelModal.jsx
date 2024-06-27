@@ -9,7 +9,7 @@ import { NewRequestModal, RequestModalContent } from "..";
 import { REQUEST_TYPE } from "../../utils/objects";
 import { useRequestsApi, useConfirmDialog, useRequestModal } from "../../utils/hooks";
 
-export const AcceptDeclineCancelModal = ({ request, requestType, fetchNewRequests, triggerElement }) => {
+export const AcceptDeclineCancelModal = ({ request, requestType, fetchNewRequests, triggerElement, modalHeader }) => {
   const {
     isOpen: isModalOpen,
     close: closeModal,
@@ -23,12 +23,10 @@ export const AcceptDeclineCancelModal = ({ request, requestType, fetchNewRequest
   const declineActionConfirmationHandler = () => confirmAction(() => onSubmit(() => sendRequest(request.links.actions?.decline, REQUEST_TYPE.DECLINE)), REQUEST_TYPE.DECLINE);
   const cancelActionConfirmationHandler = () => confirmAction(() => onSubmit(() => sendRequest(request.links.actions?.cancel, REQUEST_TYPE.CANCEL)), REQUEST_TYPE.CANCEL);
 
-  const requestModalHeader = !_isEmpty(request?.title) ? request.title : (!_isEmpty(request?.name) ? request.name : request.type);
-
   return (
     <>
       <NewRequestModal
-        header={requestModalHeader}
+        header={modalHeader}
         isOpen={isModalOpen}
         closeModal={closeModal}
         openModal={openModal}

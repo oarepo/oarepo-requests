@@ -7,8 +7,9 @@ import _isEmpty from "lodash/isEmpty";
 import _has from "lodash/has";
 import { Formik } from "formik";
 
-import { RequestModal, SubmitModal, AcceptDeclineCancelModal } from ".";
+import { SubmitModal, AcceptDeclineCancelModal, RequestModalContent, ViewOnlyModal } from ".";
 import { mapPayloadUiToInitialValues } from "../utils";
+import { REQUEST_TYPE } from "../utils/objects";
 
 /**
  * @typedef {import("../types").Request} Request
@@ -25,20 +26,14 @@ export const RequestList = ({ requests, requestTypes, requestModalType, fetchNew
         const requestType = requestTypes?.find(requestType => requestType.type_id === request.type) ?? {};
         const requestModalHeader = !_isEmpty(request?.title) ? request.title : (!_isEmpty(request?.name) ? request.name : request.type);
 
-        let modalType = requestModalType;
-        let ModalComponent = requestModalType === "accept" ? AcceptDeclineCancelModal : RequestModal;
+        let ModalComponent = requestModalType === "accept" ? AcceptDeclineCancelModal : ViewOnlyModal;
         if (_isEmpty(requestModalType) && _has(request, "links.actions")) {
           if ("submit" in request.links.actions) {
-            modalType = "submit";
             ModalComponent = SubmitModal;
           } else if ("cancel" in request.links.actions) {
-            modalType = "cancel";
             ModalComponent = AcceptDeclineCancelModal;
           } else if (_isEmpty(request.links.actions)) {
-            modalType = "view_only";
-          } else {
-            modalType = "submit";
-            ModalComponent = SubmitModal;
+            ModalComponent = ViewOnlyModal;
           }
         }
 
@@ -52,8 +47,6 @@ export const RequestList = ({ requests, requestTypes, requestModalType, fetchNew
               key={request.id}
               request={request}
               requestType={requestType}
-              requestTypes={requestTypes}
-              requestModalType={modalType}
               triggerElement={
                 <List.Item as="a" key={request.id} className="ui request-list-item" role="button">
                   <List.Content style={{ position: 'relative' }}>
@@ -66,6 +59,10 @@ export const RequestList = ({ requests, requestTypes, requestModalType, fetchNew
                 </List.Item>
               }
               fetchNewRequests={fetchNewRequests}
+              modalHeader={requestModalHeader}
+              content={
+                <RequestModalContent request={request} requestType={requestType} requestModalType={REQUEST_TYPE.SUBMIT} />
+              }
             />
           </Formik>
         )

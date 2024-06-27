@@ -9,7 +9,7 @@ import { NewRequestModal, RequestModalContent } from "..";
 import { REQUEST_TYPE } from "../../utils/objects";
 import { useRequestsApi, useConfirmDialog, useRequestModal } from "../../utils/hooks";
 
-export const SubmitModal = ({ request, requestType, fetchNewRequests, triggerElement }) => {
+export const SubmitModal = ({ request, requestType, fetchNewRequests, triggerElement, modalHeader }) => {
   const {
     isOpen: isModalOpen,
     close: closeModal,
@@ -35,12 +35,11 @@ export const SubmitModal = ({ request, requestType, fetchNewRequests, triggerEle
 
   const formWillBeRendered = !_isEmpty(requestType?.payload_ui);
   const submitButtonExtraProps = formWillBeRendered ? { type: "submit", form: "request-form" } : { onClick: submitActionConfirmationHandler };
-  const requestModalHeader = !_isEmpty(request?.title) ? request.title : (!_isEmpty(request?.name) ? request.name : request.type);
 
   return (
     <>
       <NewRequestModal
-        header={requestModalHeader}
+        header={modalHeader}
         isOpen={isModalOpen}
         closeModal={closeModal}
         openModal={openModal}
