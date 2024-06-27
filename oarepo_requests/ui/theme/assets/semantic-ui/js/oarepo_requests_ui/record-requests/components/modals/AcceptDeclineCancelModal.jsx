@@ -4,28 +4,20 @@ import PropTypes from "prop-types";
 import { i18next } from "@translations/oarepo_requests_ui/i18next";
 import { Button, Icon, Confirm } from "semantic-ui-react";
 import _isEmpty from "lodash/isEmpty";
-import { useConfirmationModal } from "@js/oarepo_ui";
 
 import { NewRequestModal, RequestModalContent } from "..";
 import { REQUEST_TYPE } from "../../utils/objects";
-import { useRequestsApi, useConfirmDialog } from "../../utils/hooks";
+import { useRequestsApi, useConfirmDialog, useRequestModal } from "../../utils/hooks";
 
 export const AcceptDeclineCancelModal = ({ request, requestType, fetchNewRequests, triggerElement }) => {
   const {
     isOpen: isModalOpen,
     close: closeModal,
-    open: openModal
-  } = useConfirmationModal();
+    open: openModal,
+    onSubmit
+  } = useRequestModal(fetchNewRequests);
   const { sendRequest } = useRequestsApi();
   const { confirmDialogProps, confirmAction } = useConfirmDialog();
-
-  const onSubmit = async (submitEvent) => {
-    try {
-      await submitEvent();
-      closeModal();
-      fetchNewRequests();
-    } catch (e) { /* empty */ }
-  };
 
   const acceptActionConfirmationHandler = () => confirmAction(() => onSubmit(() => sendRequest(request.links.actions?.accept, REQUEST_TYPE.ACCEPT)), REQUEST_TYPE.ACCEPT);
   const declineActionConfirmationHandler = () => confirmAction(() => onSubmit(() => sendRequest(request.links.actions?.decline, REQUEST_TYPE.DECLINE)), REQUEST_TYPE.DECLINE);

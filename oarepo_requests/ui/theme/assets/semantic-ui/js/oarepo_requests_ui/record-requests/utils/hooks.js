@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useCallback } from "react";
 
 import _isEmpty from "lodash/isEmpty";
 import axios from "axios";
@@ -15,6 +15,25 @@ import { REQUEST_TYPE } from "./objects";
  * @typedef {import("semantic-ui-react").ConfirmProps} ConfirmProps
  */
 
+export const useRequestModal = (postSubmitEvent = () => {}, onError = () => {}) => {
+  const [isOpen, setIsOpen] = useState(false);
+
+  const close = useCallback(() => setIsOpen(false), []);
+  const open = useCallback(() => setIsOpen(true), []);
+
+  const onSubmit = async (submitEvent) => {
+    try {
+      await submitEvent();
+      close();
+      postSubmitEvent();
+    } catch (e) { 
+      onError(e);
+     }
+  };
+
+  return { isOpen, close, open, onSubmit };
+};
+
 export const useConfirmDialog = (formik = null, isEventModal = false) => {
   const { setSubmitting } = useFormikContext() || formik;
 
@@ -28,7 +47,7 @@ export const useConfirmDialog = (formik = null, isEventModal = false) => {
     onConfirm: () => setConfirmDialogProps(props => ({ ...props, open: false }))
   });
 
-  const confirmAction = (onConfirm, requestType, createAndSubmit = false) => {
+  const confirmAction = useCallback((onConfirm, requestType, createAndSubmit = false) => {
     /** @type {ConfirmProps} */
     let newConfirmDialogProps = {
       open: true,
@@ -79,7 +98,7 @@ export const useConfirmDialog = (formik = null, isEventModal = false) => {
     }
 
     setConfirmDialogProps(props => ({ ...props, ...newConfirmDialogProps }));
-  };
+  }, [setSubmitting, isEventModal]);
 
   return { confirmDialogProps, confirmAction };
 }
@@ -134,7 +153,7 @@ export const useRequestsApi = () => {
       setError(error);
       throw error;
     }
-  }
+  };
 
   const sendRequest = async (actionUrl, requestType) => {
     if (requestType === REQUEST_TYPE.SAVE) {

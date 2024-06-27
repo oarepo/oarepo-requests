@@ -1,34 +1,24 @@
-import React, { useState, useEffect, useRef } from "react";
-import PropTypes from "prop-types";
+import React from "react";
 
 import { i18next } from "@translations/oarepo_requests_ui/i18next";
-import { Dimmer, Loader, Modal, Button, Icon, Message, Confirm } from "semantic-ui-react";
+import { Button, Icon, Confirm } from "semantic-ui-react";
 import _isEmpty from "lodash/isEmpty";
 import { useFormikContext } from "formik";
-import axios from "axios";
-import { useConfirmationModal } from "@js/oarepo_ui";
 
 import { NewRequestModal, RequestModalContent } from "..";
 import { REQUEST_TYPE } from "../../utils/objects";
-import { useRequestsApi, useConfirmDialog } from "../../utils/hooks";
+import { useRequestsApi, useConfirmDialog, useRequestModal } from "../../utils/hooks";
 
 export const SubmitModal = ({ request, requestType, fetchNewRequests, triggerElement }) => {
   const {
     isOpen: isModalOpen,
     close: closeModal,
-    open: openModal
-  } = useConfirmationModal();
+    open: openModal,
+    onSubmit
+  } = useRequestModal(fetchNewRequests);
   const { sendRequest } = useRequestsApi();
   const { confirmDialogProps, confirmAction } = useConfirmDialog();
   const { setSubmitting, submitForm, setErrors } = useFormikContext();
-
-  const onSubmit = async (submitEvent) => {
-    try {
-      await submitEvent();
-      closeModal();
-      fetchNewRequests();
-    } catch (e) { /* empty */ }
-  };
 
   const submitActionConfirmationHandler = () => confirmAction(() => onSubmit(() => sendRequest(request.links.actions.submit, REQUEST_TYPE.SUBMIT)), REQUEST_TYPE.SUBMIT);
 
