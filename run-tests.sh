@@ -44,5 +44,5 @@ pip install -e .
 # local override
 # pip install --config-settings editable_mode=compat -e ../oarepo-runtime
 
-#pytest $BUILD_TEST_DIR/test_requests
-#pytest $BUILD_TEST_DIR/test_ui
+pytest $BUILD_TEST_DIR/test_requests
+pytest $BUILD_TEST_DIR/test_ui

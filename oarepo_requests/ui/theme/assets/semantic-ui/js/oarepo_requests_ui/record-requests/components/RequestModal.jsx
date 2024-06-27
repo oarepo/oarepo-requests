@@ -11,7 +11,8 @@ import axios from "axios";
 
 import { RequestModalContent, CreateRequestModalContent } from ".";
 import { REQUEST_TYPE } from "../utils/objects";
-import { isDeepEmpty } from "../utils";
+import { isDeepEmpty, mapPayloadUiToInitialValues } from "../utils";
+import { useConfirmDialog } from "../utils/hooks";
 
 /** 
  * @typedef {import("../types").Request} Request
@@ -21,30 +22,10 @@ import { isDeepEmpty } from "../utils";
  * @typedef {import("semantic-ui-react").ConfirmProps} ConfirmProps
  */
 
-const mapPayloadUiToInitialValues = (payloadUi) => {
-  const initialValues = { payload: {} };
-  payloadUi?.forEach(section => {
-    section.fields.forEach(field => {
-      initialValues.payload[field.field] = "";
-    });
-  });
-  return initialValues;
-};
-
 /** @param {{ request: Request, requestTypes: RequestType[], requestModalType: RequestTypeEnum, isEventModal: boolean, triggerButton: ReactElement, fetchNewRequests: () => void }} props */
 export const RequestModal = ({ request, requestTypes, requestModalType, isEventModal = false, triggerButton, fetchNewRequests }) => {
   const [modalOpen, setModalOpen] = useState(false);
   const [error, setError] = useState(null);
-
-  /** @type {[ConfirmProps, (props: ConfirmProps) => void]} */
-  const [confirmDialogProps, setConfirmDialogProps] = useState({
-    open: false,
-    content: i18next.t("Are you sure?"),
-    cancelButton: i18next.t("Cancel"),
-    confirmButton: i18next.t("OK"),
-    onCancel: () => setConfirmDialogProps(props => ({ ...props, open: false })),
-    onConfirm: () => setConfirmDialogProps(props => ({ ...props, open: false }))
-  });
 
   const errorMessageRef = useRef(null);
 
@@ -52,6 +33,8 @@ export const RequestModal = ({ request, requestTypes, requestModalType, isEventM
     initialValues: !_isEmpty(request?.payload) ? { payload: request.payload } : (request?.payload_ui ? mapPayloadUiToInitialValues(request?.payload_ui) : {}),
     onSubmit: () => {}
   });
+
+  const { confirmDialogProps, confirmAction } = useConfirmDialog(formik, sendRequest, isEventModal);
 
   useEffect(() => {
     if (error) {
@@ -121,59 +104,6 @@ export const RequestModal = ({ request, requestTypes, requestModalType, isEventM
     return callApi(actionUrl, 'post', mappedData);
   }
 
-  const confirmAction = (requestType, createAndSubmit = false) => {
-    /** @type {ConfirmProps} */
-    let newConfirmDialogProps = {
-      open: true,
-      onConfirm: () => {
-        setConfirmDialogProps(props => ({ ...props, open: false }));
-        sendRequest(requestType);
-      },
-      onCancel: () => {
-        setConfirmDialogProps(props => ({ ...props, open: false }));
-        formik.setSubmitting(false);
-      }
-    };
-
-    switch (requestType) {
-      case REQUEST_TYPE.CREATE:
-        newConfirmDialogProps.header = isEventModal ? i18next.t("Submit event") : i18next.t("Create request");
-        break;
-      case REQUEST_TYPE.SUBMIT:
-        newConfirmDialogProps.header = i18next.t("Submit request");
-        newConfirmDialogProps.confirmButton = i18next.t("OK");
-        break;
-      case REQUEST_TYPE.CANCEL:
-        newConfirmDialogProps.header = i18next.t("Cancel request");
-        newConfirmDialogProps.confirmButton = <Button negative>{i18next.t("Cancel request")}</Button>;
-        break;
-      case REQUEST_TYPE.ACCEPT:
-        newConfirmDialogProps.header = i18next.t("Accept request");
-        newConfirmDialogProps.confirmButton = <Button positive>{i18next.t("Accept")}</Button>;
-        break;
-      case REQUEST_TYPE.DECLINE:
-        newConfirmDialogProps.header = i18next.t("Decline request");
-        newConfirmDialogProps.confirmButton = <Button negative>{i18next.t("Decline")}</Button>;
-        break;
-      default:
-        break;
-    }
-
-    if (createAndSubmit) {
-      newConfirmDialogProps = {
-        ...newConfirmDialogProps,
-        header: i18next.t("Create and submit request"),
-        confirmButton: <Button positive>{i18next.t("Create and submit")}</Button>,
-        onConfirm: () => {
-          setConfirmDialogProps(props => ({ ...props, open: false }));
-          sendRequest(REQUEST_TYPE.CREATE, createAndSubmit);
-        }
-      }
-    }
-
-    setConfirmDialogProps(props => ({ ...props, ...newConfirmDialogProps }));
-  }
-
   const onClose = () => {
     setModalOpen(false);
     setError(null);
@@ -184,7 +114,7 @@ export const RequestModal = ({ request, requestTypes, requestModalType, isEventM
     try {
       await formik.submitForm();
       if (submitButtonName === "create-and-submit-request") {
-        confirmAction(REQUEST_TYPE.SUBMIT, true);
+        !_isEmpty(requestType?.payload_ui) ? confirmAction(REQUEST_TYPE.SUBMIT, true) : sendRequest(REQUEST_TYPE.SUBMIT, true);
         return;
       }
       if (requestModalType === REQUEST_TYPE.SUBMIT) {
@@ -250,10 +180,12 @@ export const RequestModal = ({ request, requestTypes, requestModalType, isEventM
                 <Icon name="trash alternate" />
                 {i18next.t("Cancel request")}
               </Button>
-              <Button title={i18next.t("Save drafted request")} onClick={() => sendRequest(REQUEST_TYPE.SAVE)} color="grey" icon labelPosition="left" floated="right">
-                <Icon name="save" />
-                {i18next.t("Save")}
-              </Button>
+              {formWillBeRendered && 
+                <Button title={i18next.t("Save drafted request")} onClick={() => sendRequest(REQUEST_TYPE.SAVE)} color="grey" icon labelPosition="left" floated="right">
+                  <Icon name="save" />
+                  {i18next.t("Save")}
+                </Button>
+              }
             </>
           }
           {requestModalType === REQUEST_TYPE.CANCEL &&
@@ -276,23 +208,25 @@ export const RequestModal = ({ request, requestTypes, requestModalType, isEventM
           }
           {requestModalType === REQUEST_TYPE.CREATE && (!isEventModal &&
             <>
-              <Button type="submit" form="request-form" name="create-request" title={i18next.t("Create request")} color="blue" icon labelPosition="left" floated="right">
-                <Icon name="plus" />
-                {i18next.t("Create")}
-              </Button>
-              <Button type="submit" form="request-form" name="create-and-submit-request" title={i18next.t("Submit request")} color="blue" icon labelPosition="left" floated="left">
+              {requestType?.payload_ui && 
+                <Button type="submit" form="request-form" name="create-request" title={i18next.t("Create request")} color="blue" icon labelPosition="left" floated="right">
+                  <Icon name="plus" />
+                  {i18next.t("Create")}
+                </Button>
+              }
+              <Button type="submit" form="request-form" name="create-and-submit-request" title={i18next.t("Submit request")} color="blue" icon labelPosition="left" floated="right">
                 <Icon name="paper plane" />
                 {i18next.t("Submit")}
               </Button>
             </> ||
-            <Button type="submit" form="request-form" name="create-event" title={i18next.t("Submit")} color="blue" icon labelPosition="left" floated="left">
+            <Button type="submit" form="request-form" name="create-event" title={i18next.t("Submit")} color="blue" icon labelPosition="left" floated="right">
               <Icon name="plus" />
               {i18next.t("Submit")}
             </Button>)
           }
           <Button onClick={onClose} icon labelPosition="left">
             <Icon name="cancel" />
-            {i18next.t("Cancel")}
+            {i18next.t("Close")}
           </Button>
         </Modal.Actions>
         <Confirm {...confirmDialogProps} />
