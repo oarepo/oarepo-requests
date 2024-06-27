@@ -1,11 +1,9 @@
-import React, { useState, useEffect, useRef } from "react";
-import PropTypes from "prop-types";
+import React from "react";
 
 import { i18next } from "@translations/oarepo_requests_ui/i18next";
-import { Dimmer, Loader, Modal, Button, Icon, Message, Confirm } from "semantic-ui-react";
+import { Button, Icon, Confirm } from "semantic-ui-react";
 import _isEmpty from "lodash/isEmpty";
 import { useFormikContext } from "formik";
-import axios from "axios";
 import { useConfirmationModal } from "@js/oarepo_ui";
 
 import { NewRequestModal, CreateRequestModalContent } from "..";

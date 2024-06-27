@@ -1,18 +1,16 @@
-import React, { useState, useEffect, useRef } from "react";
+import React from "react";
 import PropTypes from "prop-types";
 
 import { i18next } from "@translations/oarepo_requests_ui/i18next";
-import { Dimmer, Loader, Modal, Button, Icon, Message, Confirm } from "semantic-ui-react";
+import { Button, Icon, Confirm } from "semantic-ui-react";
 import _isEmpty from "lodash/isEmpty";
-import { useFormikContext } from "formik";
-import axios from "axios";
 import { useConfirmationModal } from "@js/oarepo_ui";
 
 import { NewRequestModal, RequestModalContent } from "..";
 import { REQUEST_TYPE } from "../../utils/objects";
 import { useRequestsApi, useConfirmDialog } from "../../utils/hooks";
 
-export const AcceptDeclineModal = ({ request, requestType, fetchNewRequests, triggerElement }) => {
+export const AcceptDeclineCancelModal = ({ request, requestType, fetchNewRequests, triggerElement }) => {
   const {
     isOpen: isModalOpen,
     close: closeModal,
@@ -29,8 +27,9 @@ export const AcceptDeclineModal = ({ request, requestType, fetchNewRequests, tri
     } catch (e) { /* empty */ }
   };
 
-  const acceptActionConfirmationHandler = () => confirmAction(() => onSubmit(() => sendRequest(request.links.actions.accept, REQUEST_TYPE.ACCEPT)), REQUEST_TYPE.ACCEPT);
-  const declineActionConfirmationHandler = () => confirmAction(() => onSubmit(() => sendRequest(request.links.actions.decline, REQUEST_TYPE.DECLINE)), REQUEST_TYPE.DECLINE);
+  const acceptActionConfirmationHandler = () => confirmAction(() => onSubmit(() => sendRequest(request.links.actions?.accept, REQUEST_TYPE.ACCEPT)), REQUEST_TYPE.ACCEPT);
+  const declineActionConfirmationHandler = () => confirmAction(() => onSubmit(() => sendRequest(request.links.actions?.decline, REQUEST_TYPE.DECLINE)), REQUEST_TYPE.DECLINE);
+  const cancelActionConfirmationHandler = () => confirmAction(() => onSubmit(() => sendRequest(request.links.actions?.cancel, REQUEST_TYPE.CANCEL)), REQUEST_TYPE.CANCEL);
 
   const requestModalHeader = !_isEmpty(request?.title) ? request.title : (!_isEmpty(request?.name) ? request.name : request.type);
 
@@ -44,14 +43,18 @@ export const AcceptDeclineModal = ({ request, requestType, fetchNewRequests, tri
         trigger={triggerElement}
         actions={
           <>
-            <Button title={i18next.t("Accept request")} onClick={acceptActionConfirmationHandler} positive icon labelPosition="left" floated="right">
+            {request.links.actions?.accept && <Button title={i18next.t("Accept request")} onClick={acceptActionConfirmationHandler} positive icon labelPosition="left" floated="right">
               <Icon name="check" />
               {i18next.t("Accept")}
-            </Button>
-            <Button title={i18next.t("Decline request")} onClick={declineActionConfirmationHandler} negative icon labelPosition="left" floated="left">
+            </Button>}
+            {request.links.actions?.decline && <Button title={i18next.t("Decline request")} onClick={declineActionConfirmationHandler} negative icon labelPosition="left" floated="left">
               <Icon name="cancel" />
               {i18next.t("Decline")}
-            </Button>
+            </Button>}
+            {request.links.actions?.cancel && <Button title={i18next.t("Cancel request")} onClick={cancelActionConfirmationHandler} color="grey" icon labelPosition="left" floated="left">
+              <Icon name="trash alternate" />
+              {i18next.t("Cancel request")}
+            </Button>}
           </>
         }
         content={
