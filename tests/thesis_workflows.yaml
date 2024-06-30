@@ -3,12 +3,13 @@ record:
   - invenio
   module:
     qualified: thesis
-  fields:
-    state: "{{oarepo_workflows.records.systemfields.state.RecordStateField}}(initial='published')"
-  draft:
+  record:
     fields:
-      state: "{{oarepo_workflows.records.systemfields.state.RecordStateField}}()"
-  service-config:
+      state: "{{oarepo_workflows.records.systemfields.state.RecordStateField}}(initial='published')"
+  draft:
+    record:
+      fields:
+        state: "{{oarepo_workflows.records.systemfields.state.RecordStateField}}()"
 
   properties:
     metadata:

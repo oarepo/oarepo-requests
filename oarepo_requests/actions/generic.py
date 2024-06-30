@@ -23,7 +23,7 @@ def _try_state_change(identity, action, action_name, request_states, topic, uow,
         if revision_before == updated_topic.revision_id:
         #if revision_before == topic.revision_id:
             uow.register(RecordCommitOp(topic, indexer=service.indexer))
-
+"""
 class TopicStateChangeFromWorkflowMixin:
     def _try_state_change(self, identity, action, request_states, topic, uow, *args, **kwargs):
         if action in request_states:
@@ -50,6 +50,7 @@ class RequestIdentityActionMixin:
     def execute(self, identity, *args, **kwargs):
         identity = RequestIdentity(identity)
         super().execute(identity, *args, **kwargs)
+"""
 
 #----
 class RequestIdentityComponent:
@@ -101,7 +102,7 @@ class OARepoAcceptAction(OARepoGenericActionMixin, actions.AcceptAction):
 #----
 
 
-
+"""
 class TopicStateChangingSubmitAction(TopicStateChangeFromWorkflowMixin, actions.SubmitAction):
     action = "submit"
 
@@ -113,6 +114,7 @@ class StatusChangingAcceptAction(TopicStateChangeFromWorkflowMixin, actions.Acce
 
 class TopicStateChangingDeclineAction(TopicStateChangeFromWorkflowMixin, actions.DeclineAction):
     action = "decline"
+"""
 
 class AutoAcceptSubmitAction(actions.SubmitAction):
     log_event = True

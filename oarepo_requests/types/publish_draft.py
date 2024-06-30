@@ -5,7 +5,7 @@ from oarepo_requests.actions.publish_draft import PublishDraftAcceptAction
 
 from .ref_types import ModelRefTypes
 from .generic import NonDuplicableOARepoRequestType
-from ..actions.generic import TopicStateChangingSubmitAction, TopicStateChangingDeclineAction, OARepoSubmitAction, \
+from ..actions.generic import OARepoSubmitAction, \
     OARepoDeclineAction
 
 

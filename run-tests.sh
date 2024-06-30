@@ -3,7 +3,7 @@ set -e
 
 OAREPO_VERSION=${OAREPO_VERSION:-12}
 
-MODEL="thesis"
+MODEL="thesis_workflows"
 
 BUILDER_VENV=.venv-builder
 BUILD_TEST_DIR="tests"

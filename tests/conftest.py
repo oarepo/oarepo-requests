@@ -10,10 +10,9 @@ from invenio_requests.records.api import RequestEventFormat
 from invenio_users_resources.records import UserAggregate
 from oarepo_workflows.permissions.generators import IfInState
 from oarepo_workflows.permissions.policy import WorkflowPermissionPolicy
-from oarepo_workflows.requests.classes import WorkflowRequest, WorkflowTransitions
 
-from oarepo_requests.actions.generic import TopicStateChangingSubmitAction, TopicStateChangingDeclineAction, \
-    StatusChangingAcceptAction, OARepoAcceptAction, OARepoSubmitAction, OARepoDeclineAction
+from oarepo_requests.actions.generic import  \
+    OARepoAcceptAction, OARepoSubmitAction, OARepoDeclineAction
 from oarepo_requests.permissions.generators import AutoRequest
 from oarepo_requests.permissions.requester import RequestAction
 from oarepo_requests.types import NonDuplicableOARepoRequestType, ModelRefTypes

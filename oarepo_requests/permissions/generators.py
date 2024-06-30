@@ -20,10 +20,10 @@ class CreatorsFromWorkflow(Generator):
         # todo load from community
         workflow_id = self._get_workflow_id(request_type, *args, **kwargs)
         try:
-            creators = get_from_requests_workflow(workflow_id, request_type.type_id, "requesters")
+            creators_generators = get_from_requests_workflow(workflow_id, request_type.type_id, "requesters")
         except KeyError:
             return []
-        needs = needs_from_generators(creators, **kwargs)
+        needs = needs_from_generators(creators_generators, *args, request_type=request_type, **kwargs)
         return needs
 
 class AutoRequest(Generator):

@@ -11,7 +11,7 @@ from .ref_types import ModelRefTypes, ReceiverRefTypes
 class OARepoRequestType(RequestType):
     def can_create(self, identity, data, receiver, topic, creator, *args, **kwargs):
         current_requests_service.require_permission(
-            identity, "create", topic=topic, request_type=self, **kwargs
+            identity, "create", record=topic, request_type=self, **kwargs
         )
 
     @classmethod
@@ -25,7 +25,7 @@ class OARepoRequestType(RequestType):
         """
         try:
             current_requests_service.require_permission(
-                identity, "create", topic=topic, request_type=self, **kwargs
+                identity, "create", record=topic, request_type=self, **kwargs
             )
         except PermissionDeniedError:
             return False

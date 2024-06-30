@@ -1,12 +1,9 @@
 import pytest
 
-from oarepo_requests.actions.generic import TopicStateChangeFromWorkflowMixin, TopicStateChangingSubmitAction, \
-    TopicStateChangingDeclineAction
-from oarepo_requests.actions.publish_draft import PublishDraftAcceptAction
-from oarepo_requests.permissions.generators import CreatorsFromWorkflow
-from invenio_records_permissions.generators import AuthenticatedUser, SystemProcess
 
-from oarepo_requests.types import PublishDraftRequestType
+from oarepo_requests.permissions.generators import CreatorsFromWorkflow
+from invenio_records_permissions.generators import SystemProcess
+
 from tests.test_requests.utils import link_api2testclient
 from thesis.records.api import ThesisRecord, ThesisDraft
 
