@@ -99,7 +99,7 @@ export const ConfirmModal = ({ request, requestModalHeader, handleSubmit, trigge
                 <Icon name="cancel" />
                 {i18next.t("Cancel")}
               </Button>
-              {submitButton ?? React.cloneElement(triggerButton, { type: "submit", form: "submit-request-form" })}
+              {submitButton}
             </Modal.Actions>
           </>
         )}
@@ -112,6 +112,6 @@ ConfirmModal.propTypes = {
   request: PropTypes.object.isRequired,
   requestModalHeader: PropTypes.string,
   handleSubmit: PropTypes.func,
-  triggerButton: PropTypes.element,
+  TriggerButton: PropTypes.func,
   submitButton: PropTypes.element,
 };

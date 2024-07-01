@@ -1,6 +1,6 @@
-import React, { createContext } from "react";
+import React, { createContext, useContext } from "react";
 
-export const RequestContext = createContext();
+const RequestContext = createContext();
 
 export const RequestContextProvider = ({ children, requests }) => {
   return (
@@ -9,3 +9,7 @@ export const RequestContextProvider = ({ children, requests }) => {
     </RequestContext.Provider>
   );
 };
+
+export const useRequestContext = () => {
+  return useContext(RequestContext);
+}

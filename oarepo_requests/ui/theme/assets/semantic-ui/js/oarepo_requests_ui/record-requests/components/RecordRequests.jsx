@@ -84,22 +84,18 @@ export const RecordRequests = ({ record: initialRecord }) => {
   }, [fetchRecord]);
 
   return (
-    <>
+    <RequestContextProvider requests={{ requests, setRequests: requestsSetter, fetchNewRequests }}>
       <CreateRequestButtonGroup
         requestTypes={record?.expanded?.request_types ?? []}
         isLoading={recordLoading}
         loadingError={recordLoadingError}
-        fetchNewRequests={fetchNewRequests}
       />
-      <RequestContextProvider requests={{ requests, setRequests: requestsSetter }}>
-        <RequestListContainer
-          requestTypes={record?.expanded?.request_types ?? []}
-          isLoading={requestsLoading}
-          loadingError={requestsLoadingError}
-          fetchNewRequests={fetchNewRequests}
-        />
-      </RequestContextProvider>
-    </>
+      <RequestListContainer
+        requestTypes={record?.expanded?.request_types ?? []}
+        isLoading={requestsLoading}
+        loadingError={requestsLoadingError}
+      />
+    </RequestContextProvider>
   );
 }
 

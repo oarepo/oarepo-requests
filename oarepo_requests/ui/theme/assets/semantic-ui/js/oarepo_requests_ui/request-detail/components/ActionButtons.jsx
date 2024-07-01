@@ -30,9 +30,12 @@ export const ActionButtons = ({ request }) => {
     <>
       {request.links?.actions?.submit && 
         <ConfirmModal request={request} requestModalHeader={i18next.t("Submit") + " " + i18next.t("request")} 
-          handleSubmit={(values) => callApi(request.links.actions.accept, "POST", values)}
+          handleSubmit={(values) => callApi(request.links.actions.submit, "POST", values)}
           triggerButton={
             <Button compact color="blue" icon="send" content={i18next.t("Submit")} />
+          }
+          submitButton={
+            <Button type="submit" form="submit-request-form" compact color="blue" icon="send" content={i18next.t("Submit")} />
           }
         />
       }
@@ -41,6 +44,9 @@ export const ActionButtons = ({ request }) => {
           handleSubmit={(values) => callApi(request.links.actions.accept, "POST", values)}
           triggerButton={
             <Button positive compact icon="check" content={i18next.t("Accept")} />
+          }
+          submitButton={
+            <Button type="submit" form="submit-request-form" positive compact icon="check" content={i18next.t("Accept")} />
           }
         />
       }
@@ -60,6 +66,9 @@ export const ActionButtons = ({ request }) => {
           handleSubmit={(values) => callApi(request.links.actions.decline, "POST", values)}
           triggerButton={
             <Button negative compact icon="close" content={i18next.t("Decline")} />
+          }
+          submitButton={
+            <Button type="submit" form="submit-request-form" negative compact icon="close" content={i18next.t("Decline")} />
           }
         />
       }
