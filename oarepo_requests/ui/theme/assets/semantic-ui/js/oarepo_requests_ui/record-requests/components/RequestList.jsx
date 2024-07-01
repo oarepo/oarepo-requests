@@ -26,7 +26,7 @@ export const RequestList = ({ requests, requestTypes, requestModalType }) => {
         const requestModalHeader = !_isEmpty(request?.title) ? request.title : (!_isEmpty(request?.name) ? request.name : request.type);
 
         let ModalComponent = requestModalType === "accept" ? AcceptDeclineCancelModal : ViewOnlyModal;
-        if (_isEmpty(requestModalType) && _has(request, "links.actions")) {
+        if (_has(request, "links.actions")) {
           if ("submit" in request.links.actions) {
             ModalComponent = SubmitModal;
           } else if ("cancel" in request.links.actions) {
