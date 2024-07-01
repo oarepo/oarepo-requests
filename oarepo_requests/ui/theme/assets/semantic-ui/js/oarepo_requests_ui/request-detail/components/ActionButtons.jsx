@@ -31,24 +31,24 @@ export const ActionButtons = ({ request }) => {
       {request.links?.actions?.submit && 
         <ConfirmModal request={request} requestModalHeader={i18next.t("Submit") + " " + i18next.t("request")} 
           handleSubmit={(values) => callApi(request.links.actions.accept, "POST", values)}
-          triggerButton={
-            <Button compact color="blue" icon="send" content={i18next.t("Submit")} />
+          TriggerButton={
+            (props) => <Button compact color="blue" icon="send" content={i18next.t("Submit")} {...props} />
           }
         />
       }
       {request.links?.actions?.accept && 
         <ConfirmModal request={request} requestModalHeader={i18next.t("Accept") + " " + i18next.t("request")} 
           handleSubmit={(values) => callApi(request.links.actions.accept, "POST", values)}
-          triggerButton={
-            <Button positive compact icon="check" content={i18next.t("Accept")} />
+          TriggerButton={
+            (props) => <Button positive compact icon="check" content={i18next.t("Accept")} {...props} />
           }
         />
       }
       {request.links?.actions?.cancel && 
         <ConfirmModal request={request} requestModalHeader={i18next.t("Cancel") + " " + i18next.t("request")} 
           handleSubmit={(values) => callApi(request.links.actions.cancel, "POST", values)}
-          triggerButton={
-            <Button compact icon="close" content={i18next.t("Cancel")} />
+          TriggerButton={
+            () => <Button compact icon="close" content={i18next.t("Cancel")} />
           }
           submitButton={
             <Button type="submit" form="submit-request-form" negative compact icon="close" content={i18next.t("Cancel") + " " + i18next.t("request")} />
@@ -58,8 +58,8 @@ export const ActionButtons = ({ request }) => {
       {request.links?.actions?.decline && 
         <ConfirmModal request={request} requestModalHeader={i18next.t("Decline") + " " + i18next.t("request")} 
           handleSubmit={(values) => callApi(request.links.actions.decline, "POST", values)}
-          triggerButton={
-            <Button negative compact icon="close" content={i18next.t("Decline")} />
+          TriggerButton={
+            (props) => <Button negative compact icon="close" content={i18next.t("Decline")} {...props} />
           }
         />
       }
