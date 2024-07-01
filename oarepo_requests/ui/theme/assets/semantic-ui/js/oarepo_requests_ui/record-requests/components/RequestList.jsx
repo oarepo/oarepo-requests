@@ -39,7 +39,11 @@ export const RequestList = ({ requests, requestTypes, requestModalType }) => {
         return (
           <Formik
             key={request.id}
-            initialValues={!_isEmpty(request?.payload) ? { payload: request.payload } : (request?.payload_ui ? mapPayloadUiToInitialValues(request?.payload_ui) : {})}
+            initialValues={
+              !_isEmpty(request?.payload) ? 
+                { payload: request.payload } : 
+                (request?.payload_ui ? mapPayloadUiToInitialValues(request?.payload_ui) : {})
+            }
             onSubmit={() => { }} // We'll redefine with customSubmitHandler
           >
             <ModalComponent
@@ -53,7 +57,9 @@ export const RequestList = ({ requests, requestTypes, requestModalType }) => {
                       {request?.status ?? i18next.t("No status")}
                     </Label>
                     <List.Header className="mb-10">{!_isEmpty(request?.title) ? request.title : (!_isEmpty(request?.name) ? request.name : request.type)}</List.Header>
-                    <List.Description><small className="text-muted">{request.description}</small></List.Description>
+                    <List.Description>
+                      <small className="text-muted">{request.description}</small>
+                    </List.Description>
                   </List.Content>
                 </List.Item>
               }

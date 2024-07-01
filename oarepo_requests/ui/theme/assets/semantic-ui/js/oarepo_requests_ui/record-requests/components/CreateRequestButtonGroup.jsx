@@ -44,7 +44,11 @@ export const CreateRequestButtonGroup = ({ requestTypes, isLoading, loadingError
                 {createRequests.map((requestType) => (
                   <Formik
                     key={requestType.type_id}
-                    initialValues={!_isEmpty(requestType?.payload) ? { payload: requestType.payload } : (requestType?.payload_ui ? mapPayloadUiToInitialValues(requestType?.payload_ui) : {})}
+                    initialValues={
+                      !_isEmpty(requestType?.payload) ? 
+                        { payload: requestType.payload } : 
+                        (requestType?.payload_ui ? mapPayloadUiToInitialValues(requestType?.payload_ui) : {})
+                    }
                     onSubmit={() => { }} // We'll redefine with customSubmitHandler
                   >
                     <CreateModal

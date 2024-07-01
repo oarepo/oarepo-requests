@@ -1,9 +1,7 @@
 import React, { useEffect, useRef } from "react";
-import PropTypes from "prop-types";
 
 import { i18next } from "@translations/oarepo_requests_ui/i18next";
 import { Dimmer, Loader, Modal, Button, Icon, Message } from "semantic-ui-react";
-import _isEmpty from "lodash/isEmpty";
 import { useFormikContext } from "formik";
 
 /** 

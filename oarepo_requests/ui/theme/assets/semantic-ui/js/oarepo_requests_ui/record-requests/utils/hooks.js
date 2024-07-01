@@ -21,9 +21,9 @@ export const useRequestModal = (postSubmitEvent = () => {}, onError = () => {}) 
   const close = useCallback(() => setIsOpen(false), []);
   const open = useCallback(() => setIsOpen(true), []);
 
-  const onSubmit = async (submitEvent) => {
+  const onSubmit = async (asyncSubmitEvent) => {
     try {
-      await submitEvent();
+      await asyncSubmitEvent();
       close();
       postSubmitEvent();
     } catch (e) { 

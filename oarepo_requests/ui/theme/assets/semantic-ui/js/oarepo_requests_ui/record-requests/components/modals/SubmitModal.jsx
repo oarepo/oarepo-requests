@@ -23,6 +23,7 @@ export const SubmitModal = ({ request, requestType, triggerElement, modalHeader 
   const { setSubmitting, submitForm, setErrors } = useFormikContext();
 
   const submitActionConfirmationHandler = () => confirmAction(() => onSubmit(() => sendRequest(request.links.actions.submit, REQUEST_TYPE.SUBMIT)), REQUEST_TYPE.SUBMIT);
+  const cancelActionConfirmationHandler = () => confirmAction(() => onSubmit(() => sendRequest(request.links.actions.cancel, REQUEST_TYPE.CANCEL)), REQUEST_TYPE.CANCEL);
 
   const customSubmitHandler = async () => {
     try {
@@ -54,7 +55,7 @@ export const SubmitModal = ({ request, requestType, triggerElement, modalHeader 
             </Button>
             <Button 
               title={i18next.t("Cancel request")} 
-              onClick={() => confirmAction(() => onSubmit(() => sendRequest(request.links.actions.cancel, REQUEST_TYPE.CANCEL)), REQUEST_TYPE.CANCEL)} 
+              onClick={cancelActionConfirmationHandler} 
               negative icon labelPosition="left" floated="left"
             >
               <Icon name="trash alternate" />
