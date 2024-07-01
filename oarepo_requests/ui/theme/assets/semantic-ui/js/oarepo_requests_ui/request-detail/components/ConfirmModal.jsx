@@ -12,8 +12,8 @@ import { Formik, Form } from "formik";
 
 import { sanitizeInput } from "@js/oarepo_ui";
 
-/** @param {{ request: import("../types").Request, requestModalHeader: string, handleSubmit: (v) => Promise, TriggerButton: () => ReactElement, submitButton: ReactElement }} props */
-export const ConfirmModal = ({ request, requestModalHeader, handleSubmit, TriggerButton, submitButton }) => {
+/** @param {{ request: import("../types").Request, requestModalHeader: string, handleSubmit: (v) => Promise, triggerButton: ReactElement, submitButton: ReactElement }} props */
+export const ConfirmModal = ({ request, requestModalHeader, handleSubmit, triggerButton, submitButton }) => {
   const [modalOpen, setModalOpen] = useState(false);
   const [error, setError] = useState(null);
 
@@ -42,7 +42,7 @@ export const ConfirmModal = ({ request, requestModalHeader, handleSubmit, Trigge
       onClose={onClose}
       onOpen={() => setModalOpen(true)}
       open={modalOpen}
-      trigger={<TriggerButton /> || <Button content="Open Modal" />}
+      trigger={triggerButton || <Button content="Open Modal" />}
       closeOnDocumentClick={false}
       closeOnDimmerClick={false}
       role="dialog"
@@ -99,7 +99,7 @@ export const ConfirmModal = ({ request, requestModalHeader, handleSubmit, Trigge
                 <Icon name="cancel" />
                 {i18next.t("Cancel")}
               </Button>
-              {submitButton ?? <TriggerButton type="submit" form="submit-request-form" />}
+              {submitButton}
             </Modal.Actions>
           </>
         )}
