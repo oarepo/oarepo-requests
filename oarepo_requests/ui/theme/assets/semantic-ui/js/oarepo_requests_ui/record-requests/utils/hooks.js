@@ -114,13 +114,6 @@ export const useRequestsApi = () => {
   const setError = error => { setErrors({ api: error }); };
 
   const callApi = async (url, method, data = formValues, doNotHandleResolve = false) => {
-    if (_isEmpty(url)) {
-      const err = new Error(i18next.t("Cannot send request. Please try again later."));
-      setError(err);
-      setSubmitting(false);
-      throw err;
-    }
-
     const request = axios({
       method: method,
       url: url,
