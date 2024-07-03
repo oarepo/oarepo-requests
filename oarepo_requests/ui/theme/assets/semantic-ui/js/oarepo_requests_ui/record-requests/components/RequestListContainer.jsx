@@ -24,10 +24,12 @@ export const RequestListContainer = ({ requestTypes, isLoading, loadingError }) 
       <Header size="tiny" className="detail-sidebar-header">{i18next.t("Pending")}</Header>
       {isLoading ?
         <Placeholder fluid>
-          <Placeholder.Paragraph>
-            <Placeholder.Line length="full" />
-            <Placeholder.Line length="medium" />
-          </Placeholder.Paragraph>
+          {Array.from({ length: 2 }).map((_, index) => (
+            <Placeholder.Paragraph key={index}>
+              <Placeholder.Line length="full" />
+              <Placeholder.Line length="medium" />
+            </Placeholder.Paragraph>
+          ))} 
         </Placeholder> :
         loadingError ?
           <Message negative>
