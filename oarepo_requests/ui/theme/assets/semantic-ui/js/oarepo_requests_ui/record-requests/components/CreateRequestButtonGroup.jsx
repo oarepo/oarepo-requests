@@ -19,21 +19,22 @@ import { mapPayloadUiToInitialValues } from "../utils";
 export const CreateRequestButtonGroup = ({ requestTypes, isLoading, loadingError }) => {
   const createRequests = requestTypes.filter(requestType => requestType.links.actions?.create);
   return (
-    <Segment>
-      <Header size="small" className="detail-sidebar-header">{i18next.t("Create Request")}</Header>
+    <Segment className="requests-create-request-buttons borderless">
+      <Header size="small" className="detail-sidebar-header">{i18next.t("Requests")}</Header>
       <Dimmer.Dimmable dimmed={isLoading}>
         <Dimmer active={isLoading} inverted>
           <Loader indeterminate>{i18next.t("Loading request types")}...</Loader>
         </Dimmer>
-        {isLoading ? <Placeholder fluid>
-          {Array.from({ length: 3 }).map((_, index) => (
-            <Placeholder.Paragraph key={index}>
-              <Placeholder.Line length="full" />
-              <Placeholder.Line length="medium" />
-              <Placeholder.Line length="short" />
-            </Placeholder.Paragraph>
-          ))}
-        </Placeholder> :
+        {isLoading ? 
+          <Placeholder fluid>
+            {Array.from({ length: 3 }).map((_, index) => (
+              <Placeholder.Paragraph key={index}>
+                <Placeholder.Line length="full" />
+                <Placeholder.Line length="medium" />
+                <Placeholder.Line length="short" />
+              </Placeholder.Paragraph>
+            ))}
+          </Placeholder> :
           loadingError ?
             <Message negative>
               <Message.Header>{i18next.t("Error loading request types")}</Message.Header>

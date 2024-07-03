@@ -16,21 +16,21 @@ import { mapPayloadUiToInitialValues } from "../utils";
  */
 
 /**
- * @param {{ requests: Request[], requestModalType: RequestTypeEnum }} props
+ * @param {{ requests: Request[] }} props
  */
-export const RequestList = ({ requests, requestTypes, requestModalType }) => {
+export const RequestList = ({ requests, requestTypes }) => {
   return (
     <List link divided size="small">
       {requests.map((request) => {
         const requestType = requestTypes?.find(requestType => requestType.type_id === request.type) ?? {};
         const requestModalHeader = !_isEmpty(request?.title) ? request.title : (!_isEmpty(request?.name) ? request.name : request.type);
 
-        let ModalComponent = requestModalType === "accept" ? AcceptDeclineCancelModal : ViewOnlyModal;
+        let ModalComponent = ViewOnlyModal;
         if (_has(request, "links.actions")) {
-          if ("submit" in request.links.actions) {
-            ModalComponent = SubmitModal;
-          } else if ("cancel" in request.links.actions) {
+          if ("accept" in request.links.actions || "cancel" in request.links.actions) {
             ModalComponent = AcceptDeclineCancelModal;
+          } else if ("submit" in request.links.actions) {
+            ModalComponent = SubmitModal;
           } else if (_isEmpty(request.links.actions)) {
             ModalComponent = ViewOnlyModal;
           }
@@ -75,6 +75,4 @@ export const RequestList = ({ requests, requestTypes, requestModalType }) => {
 RequestList.propTypes = {
   requests: PropTypes.array.isRequired,
   requestTypes: PropTypes.array.isRequired,
-  requestModalType: PropTypes.oneOf(["create", "accept", "submit", "cancel"]),
-  fetchNewRequests: PropTypes.func,
 };

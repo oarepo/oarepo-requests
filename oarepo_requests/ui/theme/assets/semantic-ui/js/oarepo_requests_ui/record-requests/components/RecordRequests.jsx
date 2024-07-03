@@ -2,6 +2,7 @@ import React, { useEffect, useState, useCallback } from "react";
 import PropTypes from "prop-types";
 
 import axios from "axios";
+import { SegmentGroup } from "semantic-ui-react";
 
 import { CreateRequestButtonGroup, RequestListContainer } from ".";
 import { RequestContextProvider } from "../contexts";
@@ -85,16 +86,18 @@ export const RecordRequests = ({ record: initialRecord }) => {
 
   return (
     <RequestContextProvider requests={{ requests, setRequests: requestsSetter, fetchNewRequests }}>
-      <CreateRequestButtonGroup
-        requestTypes={record?.expanded?.request_types ?? []}
-        isLoading={recordLoading}
-        loadingError={recordLoadingError}
-      />
-      <RequestListContainer
-        requestTypes={record?.expanded?.request_types ?? []}
-        isLoading={requestsLoading}
-        loadingError={requestsLoadingError}
-      />
+      <SegmentGroup className="requests-container">
+        <CreateRequestButtonGroup
+          requestTypes={record?.expanded?.request_types ?? []}
+          isLoading={recordLoading}
+          loadingError={recordLoadingError}
+        />
+        <RequestListContainer
+          requestTypes={record?.expanded?.request_types ?? []}
+          isLoading={requestsLoading}
+          loadingError={requestsLoadingError}
+        />
+      </SegmentGroup>
     </RequestContextProvider>
   );
 }

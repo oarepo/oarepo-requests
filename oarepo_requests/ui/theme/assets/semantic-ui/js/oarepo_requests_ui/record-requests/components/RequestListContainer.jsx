@@ -1,7 +1,7 @@
 import React from "react";
 
 import { i18next } from "@translations/oarepo_requests_ui/i18next";
-import { Segment, SegmentGroup, Header, Dimmer, Loader, Placeholder, Message } from "semantic-ui-react";
+import { Segment, Header, Dimmer, Loader, Placeholder, Message } from "semantic-ui-react";
 import _isEmpty from "lodash/isEmpty";
 
 import { RequestList } from ".";
@@ -17,54 +17,26 @@ import { useRequestContext } from "../contexts";
 export const RequestListContainer = ({ requestTypes, isLoading, loadingError }) => {
   const { requests } = useRequestContext();
 
-  let requestsToApprove = [];
-  let otherRequests = [];
-  for (const request of requests) {
-    if ("accept" in request.links.actions) {
-      requestsToApprove.push(request);
-    } else {
-      otherRequests.push(request);
-    }
-  }
-
-  const SegmentGroupOrEmpty = requestsToApprove.length > 0 && otherRequests.length > 0 ? SegmentGroup : React.Fragment;
+  let openRequests = requests.filter(request => request.is_open);
 
   return (
-    (isLoading || loadingError) ?
-      <Segment className="requests-my-requests">
-        <Header size="small" className="detail-sidebar-header">{i18next.t("Requests")}</Header>
-        {loadingError ?
+    <Segment className="requests-my-requests borderless">
+      <Header size="tiny" className="detail-sidebar-header">{i18next.t("Pending")}</Header>
+      {isLoading ?
+        <Placeholder fluid>
+          <Placeholder.Paragraph>
+            <Placeholder.Line length="full" />
+            <Placeholder.Line length="medium" />
+          </Placeholder.Paragraph>
+        </Placeholder> :
+        loadingError ?
           <Message negative>
             <Message.Header>{i18next.t("Error loading requests")}</Message.Header>
             <p>{loadingError?.message}</p>
           </Message> :
-          <Dimmer.Dimmable dimmed={isLoading}>
-            <Dimmer active={isLoading} inverted>
-              <Loader indeterminate>{i18next.t("Loading requests")}...</Loader>
-            </Dimmer>
-            <Placeholder fluid>
-              {Array.from({ length: 3 }).map((_, index) => (
-                <Placeholder.Paragraph key={index}>
-                  <Placeholder.Line length="full" />
-                  <Placeholder.Line length="medium" />
-                  <Placeholder.Line length="short" />
-                </Placeholder.Paragraph>
-              ))}
-            </Placeholder>
-          </Dimmer.Dimmable>
-        }
-      </Segment> :
-      <SegmentGroupOrEmpty>
-        <Segment className="requests-my-requests">
-          <Header size="small" className="detail-sidebar-header">{i18next.t("My Requests")}</Header>
-          {!_isEmpty(otherRequests) ? <RequestList requests={otherRequests} requestTypes={requestTypes} /> : <p>{i18next.t("No requests to show")}.</p>}
-        </Segment>
-        {requestsToApprove.length > 0 && (
-          <Segment className="requests-requests-to-approve">
-            <Header size="small" className="detail-sidebar-header">{i18next.t("Requests to Approve")}</Header>
-            <RequestList requests={requestsToApprove} requestTypes={requestTypes} requestModalType="accept" />
-          </Segment>
-        )}
-      </SegmentGroupOrEmpty>
+          !_isEmpty(openRequests) &&
+          <RequestList requests={openRequests} requestTypes={requestTypes} />
+      }
+    </Segment>
   );
 };
