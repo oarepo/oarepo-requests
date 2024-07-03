@@ -7,6 +7,7 @@ import { Formik } from "formik";
 
 import { CreateModal } from "./modals";
 import { mapPayloadUiToInitialValues } from "../utils";
+import { useRecordContext } from "../contexts";
 
 /**
  * @typedef {import("../types").Request} Request
@@ -16,12 +17,15 @@ import { mapPayloadUiToInitialValues } from "../utils";
 /**
  * @param {{ requestTypes: RequestType[], isLoading: boolean, loadingError: Error }} props
  */
-export const CreateRequestButtonGroup = ({ requestTypes, isLoading, loadingError }) => {
+export const CreateRequestButtonGroup = () => {
+  const { record, recordLoading, recordLoadingError } = useRecordContext();
+  const requestTypes = record?.expanded?.request_types ?? [];
   const createRequests = requestTypes.filter(requestType => requestType.links.actions?.create);
+
   return (
     <Segment className="requests-create-request-buttons borderless">
       <Header size="small" className="detail-sidebar-header">{i18next.t("Requests")}</Header>
-      {isLoading ?
+      {recordLoading ?
         <Placeholder>
           {Array.from({ length: 2 }).map((_, index) => (
             <Placeholder.Paragraph key={index}>
@@ -29,10 +33,10 @@ export const CreateRequestButtonGroup = ({ requestTypes, isLoading, loadingError
             </Placeholder.Paragraph>
           ))}
         </Placeholder> :
-        loadingError ?
+        recordLoadingError ?
           <Message negative>
             <Message.Header>{i18next.t("Error loading request types")}</Message.Header>
-            <p>{loadingError?.message}</p>
+            <p>{recordLoadingError?.message}</p>
           </Message> :
           !_isEmpty(createRequests) ?
             <Button.Group vertical compact fluid>

@@ -5,7 +5,7 @@ import axios from "axios";
 import { SegmentGroup } from "semantic-ui-react";
 
 import { CreateRequestButtonGroup, RequestListContainer } from ".";
-import { RequestContextProvider } from "../contexts";
+import { RequestContextProvider, RecordContextProvider } from "../contexts";
 import { sortByStatusCode } from "../utils";
 
 export const RecordRequests = ({ record: initialRecord }) => {
@@ -85,20 +85,18 @@ export const RecordRequests = ({ record: initialRecord }) => {
   }, [fetchRecord]);
 
   return (
-    <RequestContextProvider requests={{ requests, setRequests: requestsSetter, fetchNewRequests }}>
-      <SegmentGroup className="requests-container">
-        <CreateRequestButtonGroup
-          requestTypes={record?.expanded?.request_types ?? []}
-          isLoading={recordLoading}
-          loadingError={recordLoadingError}
-        />
-        <RequestListContainer
-          requestTypes={record?.expanded?.request_types ?? []}
-          isLoading={requestsLoading}
-          loadingError={requestsLoadingError}
-        />
-      </SegmentGroup>
-    </RequestContextProvider>
+    <RecordContextProvider record={{ record, recordLoading, recordLoadingError }}>
+      <RequestContextProvider requests={{ requests, requestsLoading, requestsLoadingError, setRequests: requestsSetter, fetchNewRequests }}>
+        <SegmentGroup className="requests-container">
+          <CreateRequestButtonGroup />
+          <RequestListContainer
+            requestTypes={record?.expanded?.request_types ?? []}
+            isLoading={requestsLoading}
+            loadingError={requestsLoadingError}
+          />
+        </SegmentGroup>
+      </RequestContextProvider>
+    </RecordContextProvider>
   );
 }
 

@@ -9,6 +9,7 @@ import { Formik } from "formik";
 
 import { SubmitModal, AcceptDeclineCancelModal, ViewOnlyModal } from ".";
 import { mapPayloadUiToInitialValues } from "../utils";
+import { useRecordContext } from "../contexts";
 
 /**
  * @typedef {import("../types").Request} Request
@@ -18,7 +19,10 @@ import { mapPayloadUiToInitialValues } from "../utils";
 /**
  * @param {{ requests: Request[] }} props
  */
-export const RequestList = ({ requests, requestTypes }) => {
+export const RequestList = ({ requests }) => {
+  const { record } = useRecordContext();
+  const requestTypes = record?.expanded?.request_types ?? [];
+
   return (
     <List link divided size="small">
       {requests.map((request) => {
@@ -74,5 +78,4 @@ export const RequestList = ({ requests, requestTypes }) => {
 
 RequestList.propTypes = {
   requests: PropTypes.array.isRequired,
-  requestTypes: PropTypes.array.isRequired,
 };

@@ -14,15 +14,15 @@ import { useRequestContext } from "../contexts";
 /**
  * @param {{ requestTypes: RequestType[], isLoading: boolean, loadingError: Error }} props
  */
-export const RequestListContainer = ({ requestTypes, isLoading, loadingError }) => {
-  const { requests } = useRequestContext();
-
+export const RequestListContainer = () => {
+  const { requests, requestsLoading, requestsLoadingError } = useRequestContext();
   let openRequests = requests.filter(request => request.is_open);
 
   return (
+    (requestsLoading || requestsLoadingError || !_isEmpty(openRequests)) &&
     <Segment className="requests-my-requests borderless">
       <Header size="tiny" className="detail-sidebar-header">{i18next.t("Pending")}</Header>
-      {isLoading ?
+      {requestsLoading ?
         <Placeholder fluid>
           {Array.from({ length: 2 }).map((_, index) => (
             <Placeholder.Paragraph key={index}>
@@ -31,13 +31,12 @@ export const RequestListContainer = ({ requestTypes, isLoading, loadingError }) 
             </Placeholder.Paragraph>
           ))} 
         </Placeholder> :
-        loadingError ?
+        requestsLoadingError ?
           <Message negative>
             <Message.Header>{i18next.t("Error loading requests")}</Message.Header>
-            <p>{loadingError?.message}</p>
+            <p>{requestsLoadingError?.message}</p>
           </Message> :
-          !_isEmpty(openRequests) &&
-          <RequestList requests={openRequests} requestTypes={requestTypes} />
+          <RequestList requests={openRequests} />
       }
     </Segment>
   );
