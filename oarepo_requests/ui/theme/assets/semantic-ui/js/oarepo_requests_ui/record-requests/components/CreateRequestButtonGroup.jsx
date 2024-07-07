@@ -5,6 +5,8 @@ import { Segment, Header, Button, Placeholder, Message, Icon } from "semantic-ui
 import _isEmpty from "lodash/isEmpty";
 import { Formik } from "formik";
 
+import { RequestModal, CreateRequestModalContent } from ".";
+import { mapLinksToActions } from "./actions";
 import { CreateModal } from "./modals";
 import { mapPayloadUiToInitialValues } from "../utils";
 import { useRecordContext } from "../contexts";
@@ -40,22 +42,21 @@ export const CreateRequestButtonGroup = () => {
           </Message> :
           !_isEmpty(createRequests) ?
             <Button.Group vertical compact fluid>
-              {createRequests.map((requestType) => (
-                <Formik
-                  key={requestType.type_id}
-                  initialValues={
-                    !_isEmpty(requestType?.payload) ?
-                      { payload: requestType.payload } :
-                      (requestType?.payload_ui ? mapPayloadUiToInitialValues(requestType?.payload_ui) : {})
-                  }
-                  onSubmit={() => { }} // We'll redefine with customSubmitHandler
-                >
-                  <CreateModal
+              {createRequests.map((requestType) => {
+                const modalActions = mapLinksToActions(requestType);
+                return (
+                  <RequestModal
+                    key={requestType.type_id}
                     requestType={requestType}
-                    triggerElement={<Button icon="plus" className="pl-0" title={i18next.t(requestType.name)} basic compact content={requestType.name} />}
+                    trigger={
+                      <Button icon="plus" className="pl-0" title={i18next.t(requestType.name)} basic compact content={requestType.name} />
+                    }
+                    actions={modalActions}
+                    ContentComp={CreateRequestModalContent}
                   />
-                </Formik>
-              ))}
+                )
+              }
+              )}
             </Button.Group> :
             <p>{i18next.t("No new requests to create")}.</p>
       }

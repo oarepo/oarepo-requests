@@ -7,7 +7,7 @@ import { useFormik, FormikProvider } from "formik";
 import _isEmpty from "lodash/isEmpty";
 
 import { mapPayloadUiToInitialValues } from "../utils";
-import { ConfirmModalContextProvider, useRequestContext } from "../contexts";
+import { ConfirmModalContextProvider, useRequestContext, useRecordContext } from "../contexts";
 
 /** 
  * @typedef {import("../types").Request} Request
@@ -17,8 +17,8 @@ import { ConfirmModalContextProvider, useRequestContext } from "../contexts";
  * @typedef {import("semantic-ui-react").ConfirmProps} ConfirmProps
  */
 
-/** @param {{ header: string | ReactElement, requestType: RequestType, trigger: ReactElement, actions: ReactElement, content: ReactElement }} props */
-export const RequestModal = ({ request, header, trigger, actions, content }) => {
+/** @param {{ request: Request?, requestType: RequestType?, trigger: ReactElement, actions: [{ name: string, component: ReactElement }], ContentComp: ReactElement }} props */
+export const RequestModal = ({ request, requestType, trigger, actions, ContentComp }) => {
   const errorMessageRef = useRef(null);
   const { fetchNewRequests } = useRequestContext();
   const {
@@ -26,11 +26,17 @@ export const RequestModal = ({ request, header, trigger, actions, content }) => 
     close: closeModal,
     open: openModal,
   } = useConfirmationModal();
+  const { record: { expanded: { request_types } } } = useRecordContext();
+
+  const requestOrRequestType = request ?? requestType;
+  requestType = request ? request_types?.find(requestType => requestType.type_id === request.type) ?? {} : requestOrRequestType;
+  console.error(requestOrRequestType, request_types, requestType)
+
   const formik = useFormik({
     initialValues: 
-      !_isEmpty(request?.payload) ? 
-        { payload: request.payload } : 
-        (request?.payload_ui ? mapPayloadUiToInitialValues(request?.payload_ui) : {}),
+      !_isEmpty(requestOrRequestType?.payload) ? 
+        { payload: requestOrRequestType.payload } : 
+        (requestOrRequestType?.payload_ui ? mapPayloadUiToInitialValues(requestOrRequestType?.payload_ui) : {}),
     onSubmit: () => { } // We'll redefine with customSubmitHandler
   });
   const {
@@ -64,6 +70,9 @@ export const RequestModal = ({ request, header, trigger, actions, content }) => 
     resetForm();
   };
 
+  const header = !_isEmpty(requestOrRequestType?.title) ? requestOrRequestType.title : (!_isEmpty(requestOrRequestType?.name) ? requestOrRequestType.name : requestOrRequestType.type);
+  const requestModalContentType = actions.some(({ name }) => name === "accept") ? "accept" : "submit";
+
   return (
     <FormikProvider value={formik}>
       <ConfirmModalContextProvider>
@@ -95,12 +104,12 @@ export const RequestModal = ({ request, header, trigger, actions, content }) => 
                     <p ref={errorMessageRef}>{error?.message}</p>
                   </Message>
                 }
-                {content}
+                <ContentComp request={requestOrRequestType} requestType={requestType} requestModalType={requestModalContentType} onCompletedAction={onSubmit} />
               </Modal.Content>
               <Modal.Actions>
-                {actions.map(({ name, component: ActionComponent }) => {
-                  <ActionComponent key={name} request={request} onSubmit={onSubmit} />
-                })}
+                {actions.map(({ name, component: ActionComponent }) => 
+                  <ActionComponent key={name} request={requestOrRequestType} onSubmit={onSubmit} />
+                )}
                 <Button onClick={onClose} icon labelPosition="left">
                   <Icon name="cancel" />
                   {i18next.t("Close")}

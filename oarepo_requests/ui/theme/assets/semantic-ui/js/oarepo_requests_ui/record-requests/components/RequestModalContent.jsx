@@ -11,6 +11,7 @@ import { useFormikContext } from "formik";
 import { CustomFields } from "react-invenio-forms";
 
 import { ModalContentSideInfo, CreateEventModal } from ".";
+import { useRequestsApi } from "../utils/hooks";
 import { useRequestContext } from "../contexts";
 import { fetchUpdated as fetchNewEvents } from "../utils";
 import { REQUEST_TYPE } from "../utils/objects";
@@ -23,11 +24,13 @@ import ReadOnlyCustomFields from "./common/ReadOnlyCustomFields";
  * @typedef {import("../types").Event} Event
  */
 
-/** @param {{ request: Request, requestModalType: RequestTypeEnum, requestType: RequestType, customSubmitHandler: (e) => void }} props */
-export const RequestModalContent = ({ request, requestType, requestModalType, customSubmitHandler }) => {
+/** @param {{ request: Request, requestModalType: RequestTypeEnum, requestType: RequestType, onCompletedAction: (e) => void }} props */
+export const RequestModalContent = ({ request, requestType, requestModalType, onCompletedAction }) => {
   /** @type {{requests: Request[], setRequests: (requests: Request[]) => void}} */
   const { requests, setRequests } = useRequestContext();
-
+  const { doAction } = useRequestsApi(request, onCompletedAction);
+  const { submitForm, setErrors, setSubmitting } = useFormikContext();
+  
   const actualRequest = requests.find(req => req.id === request.id);
 
   useEffect(() => {
@@ -46,15 +49,17 @@ export const RequestModalContent = ({ request, requestType, requestModalType, cu
     }
   }, [setRequests, request.links?.events, request.id]);
 
-  const { handleSubmit } = useFormikContext();
-
-  const onSubmit = (event) => {
-    if (_isFunction(customSubmitHandler)) {
-      customSubmitHandler(event?.nativeEvent?.submitter?.name);
-    } else {
-      handleSubmit(event);
+  // This function can only be triggered if submit form is rendered
+  const onFormSubmit = async () => {
+    try {
+      await submitForm();
+      doAction(REQUEST_TYPE.SUBMIT, true);
+    } catch (error) {
+      setErrors({ api: error });
+    } finally {
+      setSubmitting(false);
     }
-  }
+  };
 
   const payloadUI = requestType?.payload_ui;
   const eventTypes = requestType?.event_types;
@@ -80,11 +85,11 @@ export const RequestModalContent = ({ request, requestType, requestModalType, cu
       {(renderSubmitForm || renderReadOnlyData) &&
         <Grid.Row>
           <Grid.Column width={3} only="mobile">
-            <ModalContentSideInfo request={request} requestType={requestType} isSidebar />
+            <ModalContentSideInfo request={request} isSidebar />
           </Grid.Column>
           <Grid.Column width={13}>
             {renderSubmitForm &&
-              <Form onSubmit={onSubmit} id="request-form">
+              <Form onSubmit={onFormSubmit} id="request-form">
                 <CustomFields
                   className="requests-form-cf"
                   config={payloadUI}
@@ -162,13 +167,13 @@ export const RequestModalContent = ({ request, requestType, requestModalType, cu
             }
           </Grid.Column>
           <Grid.Column width={3} only="tablet computer">
-            <ModalContentSideInfo request={request} requestType={requestType} isSidebar />
+            <ModalContentSideInfo request={request} isSidebar />
           </Grid.Column>
         </Grid.Row> ||
         /* No Submit Form (no PayloadUI for this request type) nor Payload (read only data) available for this Request */
         <Grid.Row>
           <Grid.Column>
-            <ModalContentSideInfo request={request} requestType={requestType} isSidebar={false} />
+            <ModalContentSideInfo request={request} isSidebar={false} />
           </Grid.Column>
         </Grid.Row>
       }
@@ -180,5 +185,5 @@ RequestModalContent.propTypes = {
   request: PropTypes.object.isRequired,
   requestType: PropTypes.object.isRequired,
   requestModalType: PropTypes.string.isRequired,
-  customSubmitHandler: PropTypes.func,
+  onCompletedAction: PropTypes.func,
 };

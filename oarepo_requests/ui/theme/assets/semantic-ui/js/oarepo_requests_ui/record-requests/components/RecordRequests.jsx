@@ -88,7 +88,7 @@ export const RecordRequests = ({ record: initialRecord }) => {
     <RecordContextProvider record={{ record, recordLoading, recordLoadingError }}>
       <RequestContextProvider requests={{ requests, requestsLoading, requestsLoadingError, setRequests: requestsSetter, fetchNewRequests }}>
         <SegmentGroup className="requests-container">
-          {/* <CreateRequestButtonGroup /> */}
+          <CreateRequestButtonGroup />
           <RequestListContainer />
         </SegmentGroup>
       </RequestContextProvider>

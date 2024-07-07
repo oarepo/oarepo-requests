@@ -19,22 +19,14 @@ import { useRecordContext } from "../contexts";
  * @param {{ requests: Request[] }} props
  */
 export const RequestList = ({ requests }) => {
-  const { record } = useRecordContext();
-  const requestTypes = record?.expanded?.request_types ?? [];
-
   return (
     <List link divided size="small">
       {requests.map((request) => {
-        const requestType = requestTypes?.find(requestType => requestType.type_id === request.type) ?? {};
-        const requestModalHeader = !_isEmpty(request?.title) ? request.title : (!_isEmpty(request?.name) ? request.name : request.type);
-
-        const modalActions = mapLinksToActions(request.links?.actions);
-
+        const modalActions = mapLinksToActions(request);
         return (
           <RequestModal
             key={request.id}
             request={request}
-            requestType={requestType}
             trigger={
               <List.Item as="a" key={request.id} className="ui request-list-item" role="button">
                 <List.Content style={{ position: 'relative' }}>
@@ -48,11 +40,8 @@ export const RequestList = ({ requests }) => {
                 </List.Content>
               </List.Item>
             }
-            header={requestModalHeader}
             actions={modalActions}
-            content={
-              <RequestModalContent request={request} requestType={requestType} requestModalType="accept" />
-            }
+            ContentComp={RequestModalContent}
           />
         )
       })}
