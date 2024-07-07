@@ -50,7 +50,8 @@ export const RequestModalContent = ({ request, requestType, requestModalType, on
   }, [setRequests, request.links?.events, request.id]);
 
   // This function can only be triggered if submit form is rendered
-  const onFormSubmit = async () => {
+  const onFormSubmit = async (event) => {
+    event.preventDefault();
     try {
       await submitForm();
       doAction(REQUEST_TYPE.SUBMIT, true);

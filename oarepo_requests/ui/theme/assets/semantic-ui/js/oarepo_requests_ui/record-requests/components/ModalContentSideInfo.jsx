@@ -8,7 +8,7 @@ import { List } from "semantic-ui-react";
  * @typedef {import("../types").RequestType} RequestType
  */
 
-/** @param {{ request: Request, requestType: RequestType, isSidebar: boolean }} props */
+/** @param {{ request: Request, isSidebar: boolean }} props */
 export const ModalContentSideInfo = ({ request, isSidebar = false }) => {
   return (
     <List divided={isSidebar} relaxed={isSidebar}>

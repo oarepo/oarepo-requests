@@ -6,7 +6,7 @@ import { Button, Icon } from "semantic-ui-react";
 import { REQUEST_TYPE } from "../../utils/objects";
 import { useRequestsApi } from "../../utils/hooks";
 
-const Cancel = ({ request, onSubmit, ...props }) => {
+const Cancel = ({ request, requestType, onSubmit, ...props }) => {
   const { doAction } = useRequestsApi(request, onSubmit);
 
   return (

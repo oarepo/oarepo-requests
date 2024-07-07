@@ -52,7 +52,7 @@ export const CreateRequestButtonGroup = () => {
                       <Button icon="plus" className="pl-0" title={i18next.t(requestType.name)} basic compact content={requestType.name} />
                     }
                     actions={modalActions}
-                    ContentComp={CreateRequestModalContent}
+                    ContentComponent={CreateRequestModalContent}
                   />
                 )
               }

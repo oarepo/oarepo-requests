@@ -41,7 +41,7 @@ export const RequestList = ({ requests }) => {
               </List.Item>
             }
             actions={modalActions}
-            ContentComp={RequestModalContent}
+            ContentComponent={RequestModalContent}
           />
         )
       })}

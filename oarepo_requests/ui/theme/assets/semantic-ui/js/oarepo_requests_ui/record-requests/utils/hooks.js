@@ -136,16 +136,22 @@ export const useRequestsApi = (request, onSubmit) => {
       });
   };
 
-  const createAndSubmitRequest = async (createRequestLink) => {
-    setSubmitting(true);
-    setErrors({});
-    onSubmit(async () => {
-      const createdRequest = await callApi(createRequestLink, 'post', formValues, true);
+  const createAndSubmitRequest = () => onSubmit(async () => {
+      const createdRequest = await callApi(request.links?.actions?.create, 'post', formValues, true);
       await callApi(createdRequest.data?.links?.actions?.submit, 'post', {}, true);
       resetForm();
     }, (error) => {
       setError(error);
     });
+
+  const doCreateAndSubmitAction = (waitForConfirmation = false) => {
+    setSubmitting(true);
+    setErrors({});
+    if (waitForConfirmation) {
+      confirmAction(createAndSubmitRequest, REQUEST_TYPE.SUBMIT, true);
+    } else {
+      createAndSubmitRequest();
+    }
   };
 
   const sendRequest = async (actionUrl, requestType) => {
@@ -170,5 +176,5 @@ export const useRequestsApi = (request, onSubmit) => {
     }
   };
 
-  return { sendRequest, doAction, createAndSubmitRequest };
+  return { doAction, doCreateAndSubmitAction };
 }

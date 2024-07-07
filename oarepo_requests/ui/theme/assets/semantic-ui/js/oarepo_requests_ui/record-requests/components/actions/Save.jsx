@@ -6,15 +6,15 @@ import { Button, Icon } from "semantic-ui-react";
 import { REQUEST_TYPE } from "../../utils/objects";
 import { useRequestsApi } from "../../utils/hooks";
 
-const Decline = ({ request, requestType, onSubmit, ...props }) => {
+const Save = ({ request, requestType, onSubmit, ...props }) => {
   const { doAction } = useRequestsApi(request, onSubmit);
 
   return (
-    <Button title={i18next.t("Decline request")} onClick={() => doAction(REQUEST_TYPE.DECLINE, true)} negative icon labelPosition="left" floated="left" {...props}>
-      <Icon name="cancel" />
-      {i18next.t("Decline")}
+    <Button title={i18next.t("Save drafted request")} onClick={() => doAction(REQUEST_TYPE.SAVE)} color="grey" icon labelPosition="left" floated="right" {...props}>
+      <Icon name="save" />
+      {i18next.t("Save")}
     </Button>
   );
 };
 
-export default Decline;
+export default Save;

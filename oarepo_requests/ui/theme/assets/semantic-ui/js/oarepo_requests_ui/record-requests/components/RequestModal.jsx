@@ -17,8 +17,8 @@ import { ConfirmModalContextProvider, useRequestContext, useRecordContext } from
  * @typedef {import("semantic-ui-react").ConfirmProps} ConfirmProps
  */
 
-/** @param {{ request: Request?, requestType: RequestType?, trigger: ReactElement, actions: [{ name: string, component: ReactElement }], ContentComp: ReactElement }} props */
-export const RequestModal = ({ request, requestType, trigger, actions, ContentComp }) => {
+/** @param {{ request: Request?, requestType: RequestType?, trigger: ReactElement, actions: [{ name: string, component: ReactElement }], ContentComponent: ReactElement }} props */
+export const RequestModal = ({ request, requestType, trigger, actions, ContentComponent }) => {
   const errorMessageRef = useRef(null);
   const { fetchNewRequests } = useRequestContext();
   const {
@@ -30,7 +30,6 @@ export const RequestModal = ({ request, requestType, trigger, actions, ContentCo
 
   const requestOrRequestType = request ?? requestType;
   requestType = request ? request_types?.find(requestType => requestType.type_id === request.type) ?? {} : requestOrRequestType;
-  console.error(requestOrRequestType, request_types, requestType)
 
   const formik = useFormik({
     initialValues: 
@@ -104,11 +103,11 @@ export const RequestModal = ({ request, requestType, trigger, actions, ContentCo
                     <p ref={errorMessageRef}>{error?.message}</p>
                   </Message>
                 }
-                <ContentComp request={requestOrRequestType} requestType={requestType} requestModalType={requestModalContentType} onCompletedAction={onSubmit} />
+                <ContentComponent request={requestOrRequestType} requestType={requestType} requestModalType={requestModalContentType} onCompletedAction={onSubmit} />
               </Modal.Content>
               <Modal.Actions>
                 {actions.map(({ name, component: ActionComponent }) => 
-                  <ActionComponent key={name} request={requestOrRequestType} onSubmit={onSubmit} />
+                  <ActionComponent key={name} request={requestOrRequestType} requestType={requestType} onSubmit={onSubmit} />
                 )}
                 <Button onClick={onClose} icon labelPosition="left">
                   <Icon name="cancel" />
