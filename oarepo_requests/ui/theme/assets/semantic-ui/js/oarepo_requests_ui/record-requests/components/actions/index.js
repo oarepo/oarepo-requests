@@ -6,6 +6,7 @@ import Create from "./Create";
 import Submit from "./Submit";
 import Save from "./Save";
 import CreateAndSubmit from "./CreateAndSubmit";
+import SubmitEvent from "./SubmitEvent";
 
 export const mapLinksToActions = (requestOrRequestType) => {
   const actionComponents = [];
@@ -38,4 +39,4 @@ export const mapLinksToActions = (requestOrRequestType) => {
   return actionComponents;
 }
 
-export { Accept, Decline, Cancel, Create, Submit, Save, CreateAndSubmit };
+export { Accept, Decline, Cancel, Create, Submit, Save, CreateAndSubmit, SubmitEvent };

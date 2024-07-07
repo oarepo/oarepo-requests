@@ -5,12 +5,11 @@ import { i18next } from "@translations/oarepo_requests_ui/i18next";
 import { Button, Grid, List, Form, Divider, Comment } from "semantic-ui-react";
 import _isEmpty from "lodash/isEmpty";
 import _sortBy from "lodash/sortBy";
-import _isFunction from "lodash/isFunction";
 import { useFormikContext } from "formik";
-
 import { CustomFields } from "react-invenio-forms";
 
-import { ModalContentSideInfo, CreateEventModal } from ".";
+import { CreateRequestModalContent, ModalContentSideInfo, RequestModal } from ".";
+import { SubmitEvent } from "./actions";
 import { useRequestsApi } from "../utils/hooks";
 import { useRequestContext } from "../contexts";
 import { fetchUpdated as fetchNewEvents } from "../utils";
@@ -158,9 +157,18 @@ export const RequestModalContent = ({ request, requestType, requestModalType, on
                       </Comment.Group>
                     }
                     {eventTypes.map(event => (
-                      <CreateEventModal key={event.id} eventType={event} triggerButton={
-                        <Button compact primary icon="plus" labelPosition="left" content={event.name} />
-                      } />
+                      <RequestModal 
+                        key={event.id} 
+                        request={event} 
+                        requestType={event}
+                        triggerButton={
+                          <Button compact primary icon="plus" labelPosition="left" content={event.name} />
+                        }
+                        actions={[
+                          { name: REQUEST_TYPE.CREATE, component: SubmitEvent }
+                        ]}
+                        ContentComponent={CreateRequestModalContent}
+                      />
                     ))}
                   </>
                 }
