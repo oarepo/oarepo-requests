@@ -3,12 +3,12 @@ import React, { useState, useCallback } from "react";
 import _isEmpty from "lodash/isEmpty";
 import axios from "axios";
 
-import { isDeepEmpty } from "../utils";
-
 import { i18next } from "@translations/oarepo_requests_ui/i18next";
 import { Button } from "semantic-ui-react";
 import { useFormikContext } from "formik";
 
+import { isDeepEmpty } from "../utils";
+import { useConfirmModalContext } from "../contexts";
 import { REQUEST_TYPE } from "./objects";
 
 /** 
@@ -103,13 +103,14 @@ export const useConfirmDialog = (isEventModal = false) => {
   return { confirmDialogProps, confirmAction };
 }
 
-export const useRequestsApi = () => {
+export const useRequestsApi = (request, onSubmit) => {
   const {
     values: formValues,
     resetForm,
     setSubmitting,
     setErrors,
   } = useFormikContext();
+  const { confirmAction } = useConfirmModalContext();
 
   const setError = error => { setErrors({ api: error }); };
 
@@ -138,17 +139,17 @@ export const useRequestsApi = () => {
   const createAndSubmitRequest = async (createRequestLink) => {
     setSubmitting(true);
     setErrors({});
-    try {
+    onSubmit(async () => {
       const createdRequest = await callApi(createRequestLink, 'post', formValues, true);
       await callApi(createdRequest.data?.links?.actions?.submit, 'post', {}, true);
       resetForm();
-    } catch (error) {
+    }, (error) => {
       setError(error);
-      throw error;
-    }
+    });
   };
 
   const sendRequest = async (actionUrl, requestType) => {
+    actionUrl = request.links?.actions[requestType];
     if (requestType === REQUEST_TYPE.SAVE) {
       return callApi(actionUrl, 'put');
     } else if (requestType === REQUEST_TYPE.ACCEPT) { // Reload page after succesful "Accept" operation
@@ -160,5 +161,14 @@ export const useRequestsApi = () => {
     return callApi(actionUrl, 'post', mappedData);
   };
 
-  return { sendRequest, createAndSubmitRequest };
+  const doAction = async (requestType, waitForConfirmation = false) => {
+    const actionUrl = request.links.actions[requestType];
+    if (waitForConfirmation) {
+      confirmAction(() => onSubmit(() => sendRequest(actionUrl, requestType)), requestType);
+    } else {
+      onSubmit(() => sendRequest(actionUrl, requestType));
+    }
+  };
+
+  return { sendRequest, doAction, createAndSubmitRequest };
 }

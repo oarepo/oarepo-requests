@@ -5,10 +5,9 @@ import { i18next } from "@translations/oarepo_requests_ui/i18next";
 import { List, Label } from "semantic-ui-react";
 import _isEmpty from "lodash/isEmpty";
 import _has from "lodash/has";
-import { Formik } from "formik";
 
-import { SubmitModal, AcceptDeclineCancelModal, ViewOnlyModal } from ".";
-import { mapPayloadUiToInitialValues } from "../utils";
+import { RequestModal, RequestModalContent } from ".";
+import { mapLinksToActions } from "./actions";
 import { useRecordContext } from "../contexts";
 
 /**
@@ -29,47 +28,32 @@ export const RequestList = ({ requests }) => {
         const requestType = requestTypes?.find(requestType => requestType.type_id === request.type) ?? {};
         const requestModalHeader = !_isEmpty(request?.title) ? request.title : (!_isEmpty(request?.name) ? request.name : request.type);
 
-        let ModalComponent = ViewOnlyModal;
-        if (_has(request, "links.actions")) {
-          if ("accept" in request.links.actions || "cancel" in request.links.actions) {
-            ModalComponent = AcceptDeclineCancelModal;
-          } else if ("submit" in request.links.actions) {
-            ModalComponent = SubmitModal;
-          } else if (_isEmpty(request.links.actions)) {
-            ModalComponent = ViewOnlyModal;
-          }
-        }
+        const modalActions = mapLinksToActions(request.links?.actions);
 
         return (
-          <Formik
+          <RequestModal
             key={request.id}
-            initialValues={
-              !_isEmpty(request?.payload) ? 
-                { payload: request.payload } : 
-                (request?.payload_ui ? mapPayloadUiToInitialValues(request?.payload_ui) : {})
+            request={request}
+            requestType={requestType}
+            trigger={
+              <List.Item as="a" key={request.id} className="ui request-list-item" role="button">
+                <List.Content style={{ position: 'relative' }}>
+                  <Label size="mini" className="text-muted" attached='top right'>
+                    {request?.status ?? i18next.t("No status")}
+                  </Label>
+                  <List.Header className="mb-10">{!_isEmpty(request?.title) ? request.title : (!_isEmpty(request?.name) ? request.name : request.type)}</List.Header>
+                  <List.Description>
+                    <small className="text-muted">{request.description}</small>
+                  </List.Description>
+                </List.Content>
+              </List.Item>
             }
-            onSubmit={() => { }} // We'll redefine with customSubmitHandler
-          >
-            <ModalComponent
-              key={request.id}
-              request={request}
-              requestType={requestType}
-              triggerElement={
-                <List.Item as="a" key={request.id} className="ui request-list-item" role="button">
-                  <List.Content style={{ position: 'relative' }}>
-                    <Label size="mini" className="text-muted" attached='top right'>
-                      {request?.status ?? i18next.t("No status")}
-                    </Label>
-                    <List.Header className="mb-10">{!_isEmpty(request?.title) ? request.title : (!_isEmpty(request?.name) ? request.name : request.type)}</List.Header>
-                    <List.Description>
-                      <small className="text-muted">{request.description}</small>
-                    </List.Description>
-                  </List.Content>
-                </List.Item>
-              }
-              modalHeader={requestModalHeader}
-            />
-          </Formik>
+            header={requestModalHeader}
+            actions={modalActions}
+            content={
+              <RequestModalContent request={request} requestType={requestType} requestModalType="accept" />
+            }
+          />
         )
       })}
     </List>
