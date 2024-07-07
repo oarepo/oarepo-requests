@@ -15,25 +15,6 @@ import { REQUEST_TYPE } from "./objects";
  * @typedef {import("semantic-ui-react").ConfirmProps} ConfirmProps
  */
 
-export const useRequestModal = (postSubmitEvent = () => {}, onError = () => {}) => {
-  const [isOpen, setIsOpen] = useState(false);
-
-  const close = useCallback(() => setIsOpen(false), []);
-  const open = useCallback(() => setIsOpen(true), []);
-
-  const onSubmit = async (asyncSubmitEvent) => {
-    try {
-      await asyncSubmitEvent();
-      close();
-      postSubmitEvent();
-    } catch (e) { 
-      onError(e);
-     }
-  };
-
-  return { isOpen, close, open, onSubmit };
-};
-
 export const useConfirmDialog = (isEventModal = false) => {
   const { setSubmitting } = useFormikContext();
 
