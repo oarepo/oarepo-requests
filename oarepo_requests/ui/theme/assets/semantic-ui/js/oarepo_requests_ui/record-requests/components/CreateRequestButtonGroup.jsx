@@ -3,12 +3,9 @@ import React from "react";
 import { i18next } from "@translations/oarepo_requests_ui/i18next";
 import { Segment, Header, Button, Placeholder, Message, Icon } from "semantic-ui-react";
 import _isEmpty from "lodash/isEmpty";
-import { Formik } from "formik";
 
 import { RequestModal, CreateRequestModalContent } from ".";
 import { mapLinksToActions } from "./actions";
-import { CreateModal } from "./modals";
-import { mapPayloadUiToInitialValues } from "../utils";
 import { useRecordContext } from "../contexts";
 
 /**
