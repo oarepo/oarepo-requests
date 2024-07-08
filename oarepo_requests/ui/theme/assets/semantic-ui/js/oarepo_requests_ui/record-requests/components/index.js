@@ -7,4 +7,4 @@ export { CreateRequestModalContent } from "./CreateRequestModalContent";
 export { RequestList } from "./RequestList";
 export { ModalContentSideInfo } from "./ModalContentSideInfo";
 export * from "./common";
-export * from "./modals";
+export * from "./actions";
