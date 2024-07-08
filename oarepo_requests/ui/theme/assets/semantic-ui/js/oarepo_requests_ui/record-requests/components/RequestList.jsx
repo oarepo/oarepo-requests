@@ -4,11 +4,9 @@ import PropTypes from "prop-types";
 import { i18next } from "@translations/oarepo_requests_ui/i18next";
 import { List, Label } from "semantic-ui-react";
 import _isEmpty from "lodash/isEmpty";
-import _has from "lodash/has";
 
 import { RequestModal, RequestModalContent } from ".";
 import { mapLinksToActions } from "./actions";
-import { useRecordContext } from "../contexts";
 
 /**
  * @typedef {import("../types").Request} Request

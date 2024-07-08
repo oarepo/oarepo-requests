@@ -2,7 +2,6 @@ import axios from "axios";
 
 import _sortBy from "lodash/sortBy";
 import _concat from "lodash/concat";
-import _has from "lodash/has";
 import _partition from "lodash/partition";
 import _isEmpty from "lodash/isEmpty";
 import _isFunction from "lodash/isFunction";
