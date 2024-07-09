@@ -29,7 +29,7 @@ class OARepoRequestsService(RequestsService):
 
         if receiver is None:
             receiver = current_oarepo_requests.default_request_receiver(
-                identity, request_type, topic, creator, data
+                identity, type_, topic, creator, data
             )
 
         if data is None:
