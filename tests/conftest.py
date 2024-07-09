@@ -1,25 +1,31 @@
 import os
-from invenio_i18n import lazy_gettext as _
+
 import pytest
 from flask_security import login_user
+from invenio_accounts.proxies import current_datastore
 from invenio_accounts.testutils import login_user_via_session
 from invenio_app.factory import create_api
+from invenio_i18n import lazy_gettext as _
+from invenio_records_permissions.generators import Generator
 from invenio_requests.customizations import CommentEventType, LogEventType
 from invenio_requests.proxies import current_requests
 from invenio_requests.records.api import RequestEventFormat
 from invenio_users_resources.records import UserAggregate
+from oarepo_runtime.services.generators import RecordOwners
 from oarepo_workflows.permissions.generators import IfInState
 from oarepo_workflows.permissions.policy import WorkflowPermissionPolicy
-from oarepo_requests.actions.generic import  \
-    OARepoAcceptAction, OARepoSubmitAction, OARepoDeclineAction
-from oarepo_requests.permissions.generators import AutoRequest, AutoApprove
-from oarepo_requests.types import NonDuplicableOARepoRequestType, ModelRefTypes
-from oarepo_requests.utils import get_from_requests_workflow, workflow_receiver_function
 from thesis.proxies import current_service
 from thesis.records.api import ThesisDraft, ThesisRecord
-from oarepo_runtime.services.generators import RecordOwners
-from invenio_records_permissions.generators import Generator
-from invenio_accounts.proxies import current_datastore
+
+from oarepo_requests.actions.generic import (
+    OARepoAcceptAction,
+    OARepoDeclineAction,
+    OARepoSubmitAction,
+)
+from oarepo_requests.permissions.generators import AutoApprove, AutoRequest
+from oarepo_requests.types import ModelRefTypes, NonDuplicableOARepoRequestType
+from oarepo_requests.utils import workflow_receiver_function
+
 
 class TestUserReceiver(Generator):
 
@@ -28,33 +34,28 @@ class TestUserReceiver(Generator):
 
 
 REQUESTS_DEFAULT_WORKFLOW = {
-    "publish-draft":
-        {
-            "requesters": [IfInState("draft", [RecordOwners()])],
-            "recipients": [TestUserReceiver()],
-            "transitions": {
-                "submit": "publishing",
-                "accept": "published",
-                "decline": "draft",
-            }
+    "publish-draft": {
+        "requesters": [IfInState("draft", [RecordOwners()])],
+        "recipients": [TestUserReceiver()],
+        "transitions": {
+            "submit": "publishing",
+            "accept": "published",
+            "decline": "draft",
         },
-    "delete-published-record":
-        {
-            "requesters": [IfInState("published", [RecordOwners()])],
-            "recipients": [TestUserReceiver()],
-            "transitions": {
-                "submit": "deleting",
-                "accept": "deleted"
-            }
-        },
-    "edit-published-record":
-        {
-            "requesters": [IfInState("published", [RecordOwners()])],
-            "recipients": [AutoApprove()],
-            "transitions": {
-            }
-        }
+    },
+    "delete-published-record": {
+        "requesters": [IfInState("published", [RecordOwners()])],
+        "recipients": [TestUserReceiver()],
+        "transitions": {"submit": "deleting", "accept": "deleted"},
+    },
+    "edit-published-record": {
+        "requesters": [IfInState("published", [RecordOwners()])],
+        "recipients": [AutoApprove()],
+        "transitions": {},
+    },
 }
+
+
 class ApproveRequestType(NonDuplicableOARepoRequestType):
     type_id = "approve-draft"
     name = _("Approve draft")
@@ -69,66 +70,59 @@ class ApproveRequestType(NonDuplicableOARepoRequestType):
     receiver_can_be_none = True
     allowed_topic_ref_types = ModelRefTypes(published=False, draft=True)
 
-REQUESTS_WITH_APPROVE_WORKFLOW = {
-    "publish-draft":
-        {
-            "requesters": [IfInState("approved", [AutoRequest()])],
-            "recipients": [TestUserReceiver()],
-            "transitions": {
-                "submit": "publishing",
-                "accept": "published",
-                "decline": "approved",
-            }
-        },
-    "approve-draft":
-        {
-            "requesters": [IfInState("draft", [RecordOwners()])],
-            "recipients": [TestUserReceiver()],
-            "transitions": {
-                "submit": "approving",
-                "accept": "approved",
-                "decline": "draft",
-            }
-        },
 
-    "delete-published-record":
-        {
-            "requesters": [
-            IfInState("published", [RecordOwners()])
-        ],
-            "recipients": [TestUserReceiver()],
-            "transitions": {
-                "submit": "deleting",
-                "accept": "deleted"
-            }
+REQUESTS_WITH_APPROVE_WORKFLOW = {
+    "publish-draft": {
+        "requesters": [IfInState("approved", [AutoRequest()])],
+        "recipients": [TestUserReceiver()],
+        "transitions": {
+            "submit": "publishing",
+            "accept": "published",
+            "decline": "approved",
         },
-    "edit-published-record":
-        {
-            "requesters": [IfInState("published", [RecordOwners()])],
-            "recipients": [TestUserReceiver()],
-            "transitions": {
-            }
-        }
+    },
+    "approve-draft": {
+        "requesters": [IfInState("draft", [RecordOwners()])],
+        "recipients": [TestUserReceiver()],
+        "transitions": {
+            "submit": "approving",
+            "accept": "approved",
+            "decline": "draft",
+        },
+    },
+    "delete-published-record": {
+        "requesters": [IfInState("published", [RecordOwners()])],
+        "recipients": [TestUserReceiver()],
+        "transitions": {"submit": "deleting", "accept": "deleted"},
+    },
+    "edit-published-record": {
+        "requesters": [IfInState("published", [RecordOwners()])],
+        "recipients": [TestUserReceiver()],
+        "transitions": {},
+    },
 }
 
 
 WORKFLOWS = {
-  'default': {
-    'label': _('Default workflow'),
-    'permissions': WorkflowPermissionPolicy,
-    'requests': REQUESTS_DEFAULT_WORKFLOW,
-  },
-  'with_approve': {
-      'label': _('Default workflow'),
-      'permissions': WorkflowPermissionPolicy,
-      'requests': REQUESTS_WITH_APPROVE_WORKFLOW,
-  }
+    "default": {
+        "label": _("Default workflow"),
+        "permissions": WorkflowPermissionPolicy,
+        "requests": REQUESTS_DEFAULT_WORKFLOW,
+    },
+    "with_approve": {
+        "label": _("Default workflow"),
+        "permissions": WorkflowPermissionPolicy,
+        "requests": REQUESTS_WITH_APPROVE_WORKFLOW,
+    },
 }
+
 
 @pytest.fixture
 def change_workflow_function():
     from oarepo_workflows.proxies import current_oarepo_workflows
+
     return current_oarepo_workflows.set_workflow
+
 
 @pytest.fixture(scope="module")
 def create_app(instance_path, entry_points):
@@ -448,6 +442,7 @@ def events_resource_data():
             "format": RequestEventFormat.HTML.value,
         }
     }
+
 
 def _create_role(id, name, description, is_managed, database):
     """Creates a Role/Group."""

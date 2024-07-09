@@ -6,9 +6,8 @@ from oarepo_ui.resources import (
     RecordsUIResourceConfig,
 )
 from oarepo_ui.resources.components import PermissionsComponent
-from werkzeug.exceptions import Forbidden
-
 from thesis.resources.records.ui import ThesisUIJSONSerializer
+from werkzeug.exceptions import Forbidden
 
 
 class ModelUIResourceConfig(RecordsUIResourceConfig):

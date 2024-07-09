@@ -1,9 +1,9 @@
 import copy
 
 from deepdiff import DeepDiff
+from thesis.records.api import ThesisDraft, ThesisRecord
 
 from oarepo_requests.resolvers.ui import FallbackEntityReferenceUIResolver
-from thesis.records.api import ThesisDraft, ThesisRecord
 
 from .utils import is_valid_subdict, link_api2testclient
 

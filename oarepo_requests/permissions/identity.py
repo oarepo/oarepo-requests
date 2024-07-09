@@ -5,6 +5,7 @@ request_active = SystemRoleNeed("request")
 autorequest = SystemRoleNeed("autorequest")
 autoapprove = SystemRoleNeed("autoapprove")
 
+
 class RequestIdentity(Identity):
     def __init__(self, identity):
         super().__init__(identity.id, identity.auth_type)

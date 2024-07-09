@@ -8,7 +8,7 @@ from oarepo_requests.resolvers.ui import (
 from oarepo_requests.types import (
     DeletePublishedRecordRequestType,
     EditPublishedRecordRequestType,
-    PublishDraftRequestType
+    PublishDraftRequestType,
 )
 
 REQUESTS_REGISTERED_TYPES = [

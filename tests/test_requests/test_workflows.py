@@ -1,14 +1,13 @@
 import pytest
-
+from invenio_drafts_resources.services.records.uow import ParentRecordCommitOp
+from invenio_records_permissions.generators import SystemProcess
+from invenio_records_resources.services.uow import RecordCommitOp, unit_of_work
+from thesis.records.api import ThesisDraft, ThesisRecord
 
 from oarepo_requests.permissions.generators import CreatorsFromWorkflow
-from invenio_records_permissions.generators import SystemProcess
-
 from tests.test_requests.utils import link_api2testclient
-from thesis.records.api import ThesisRecord, ThesisDraft
 
-from invenio_records_resources.services.uow import unit_of_work, RecordCommitOp
-from invenio_drafts_resources.services.records.uow import ParentRecordCommitOp
+
 @unit_of_work()
 def change_workflow(identity, service, record, function, uow=None):
     function(identity, record, "with_approve")
@@ -28,11 +27,11 @@ def scenario_permissions():
                 SystemProcess(),
                 CreatorsFromWorkflow(),
             ],
-
         ),
     )
 
     return requests
+
 
 @pytest.fixture()
 def requests_service_config():
@@ -40,12 +39,14 @@ def requests_service_config():
 
     return RequestsServiceConfig
 
+
 @pytest.fixture
 def patch_requests_permissions(
     requests_service_config,
     scenario_permissions,
 ):
     setattr(requests_service_config, "permission_policy_cls", scenario_permissions)
+
 
 @pytest.fixture()
 def status_changing_publish_request_data_function():
@@ -57,7 +58,8 @@ def status_changing_publish_request_data_function():
 
     return ret_data
 
-from oarepo_requests.proxies import current_oarepo_requests
+
+
 
 def test_publish_with_workflows(
     vocab_cf,
@@ -98,21 +100,32 @@ def test_publish_with_workflows(
     assert resp_request_submit.status_code == 200
 
     # test state of the record is changed to published
-    draft_with_submitted_request = record_service.read_draft(creator.identity, draft1.json["id"])._record
+    draft_with_submitted_request = record_service.read_draft(
+        creator.identity, draft1.json["id"]
+    )._record
     assert draft_with_submitted_request["state"] == "publishing"
 
-    record_creator = creator_client.get(f'{urls["BASE_URL"]}{draft1.json["id"]}/draft?expand=true').json
-    record_receiver = receiver_client.get(f'{urls["BASE_URL"]}{draft1.json["id"]}/draft?expand=true').json
+    record_creator = creator_client.get(
+        f'{urls["BASE_URL"]}{draft1.json["id"]}/draft?expand=true'
+    ).json
+    record_receiver = receiver_client.get(
+        f'{urls["BASE_URL"]}{draft1.json["id"]}/draft?expand=true'
+    ).json
 
     assert "accept" not in record_creator["expanded"]["requests"][0]["links"]["actions"]
-    assert {"accept", "decline"} == record_receiver["expanded"]["requests"][0]["links"]["actions"].keys()
+    assert {"accept", "decline"} == record_receiver["expanded"]["requests"][0]["links"][
+        "actions"
+    ].keys()
 
     accept = receiver_client.post(
-        link_api2testclient(record_receiver["expanded"]["requests"][0]["links"]["actions"]["accept"]),
+        link_api2testclient(
+            record_receiver["expanded"]["requests"][0]["links"]["actions"]["accept"]
+        ),
     )
     assert accept.status_code == 200
     published_record = record_service.read(creator.identity, draft1.json["id"])._record
     assert published_record["state"] == "published"
+
 
 def test_autorequest(
     db,
@@ -151,13 +164,16 @@ def test_autorequest(
     approving_record = record_service.read_draft(creator.identity, record_id)._record
     assert resp_request_submit.status_code == 200
     assert approving_record["state"] == "approving"
-    record_receiver = receiver_client.get(f'{urls["BASE_URL"]}{record_id}/draft?expand=true').json
+    record_receiver = receiver_client.get(
+        f'{urls["BASE_URL"]}{record_id}/draft?expand=true'
+    ).json
     accept = receiver_client.post(
-        link_api2testclient(record_receiver["expanded"]["requests"][0]["links"]["actions"]["accept"]),
+        link_api2testclient(
+            record_receiver["expanded"]["requests"][0]["links"]["actions"]["accept"]
+        ),
     )
     assert accept.status_code == 200
 
     # the publish request should be created automatically
     publishing_record = record_service.read_draft(creator.identity, record_id)._record
     assert publishing_record["state"] == "publishing"
-

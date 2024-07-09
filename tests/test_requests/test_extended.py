@@ -1,5 +1,4 @@
 from invenio_requests.records.api import RequestEvent
-
 from thesis.records.api import ThesisDraft
 
 from .utils import is_valid_subdict, link_api2testclient
