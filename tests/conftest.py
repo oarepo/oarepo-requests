@@ -10,51 +10,28 @@ from invenio_requests.records.api import RequestEventFormat
 from invenio_users_resources.records import UserAggregate
 from oarepo_workflows.permissions.generators import IfInState
 from oarepo_workflows.permissions.policy import WorkflowPermissionPolicy
-
 from oarepo_requests.actions.generic import  \
     OARepoAcceptAction, OARepoSubmitAction, OARepoDeclineAction
-from oarepo_requests.permissions.generators import AutoRequest
-from oarepo_requests.permissions.requester import RequestAction
+from oarepo_requests.permissions.generators import AutoRequest, AutoApprove
 from oarepo_requests.types import NonDuplicableOARepoRequestType, ModelRefTypes
-from oarepo_requests.utils import get_from_requests_workflow
+from oarepo_requests.utils import get_from_requests_workflow, workflow_receiver_function
 from thesis.proxies import current_service
 from thesis.records.api import ThesisDraft, ThesisRecord
 from oarepo_runtime.services.generators import RecordOwners
-from invenio_records.dictutils import dict_lookup
-from oarepo_workflows.proxies import current_oarepo_workflows
+from invenio_records_permissions.generators import Generator
+from invenio_accounts.proxies import current_datastore
 
+class TestUserReceiver(Generator):
 
-def default_receiver(*args, request_type=None, **kwargs):
-    if request_type != "edit-published-record":
+    def reference_receiver(self, **kwargs):
         return {"user": "2"}
 
-def workflow_receiver(*args, request_type=None, **kwargs):
-    workflow_id = kwargs["topic"].parent.workflow if "topic" in kwargs else "default"
-    try:
-        receiver_fnc = get_from_requests_workflow(workflow_id, request_type, "recipients")
-    except KeyError: #auto requester also creates innate invenio requests which don't have permission anyway
-        receiver_fnc = default_receiver
-    receiver = receiver_fnc(*args, request_type, **kwargs)
-    return receiver
-
-def user_receiver(*args, **kwargs):
-    return {"user": "2"}
 
 REQUESTS_DEFAULT_WORKFLOW = {
-    "status-changing-publish-draft":
-        {
-            "requesters": [IfInState("draft", [RecordOwners()])],
-            "recipients": user_receiver,
-            "transitions": {
-                "submit": "publishing",
-                "accept": "published",
-                "decline": "draft",
-            }
-        },
     "publish-draft":
         {
             "requesters": [IfInState("draft", [RecordOwners()])],
-            "recipients": user_receiver,
+            "recipients": [TestUserReceiver()],
             "transitions": {
                 "submit": "publishing",
                 "accept": "published",
@@ -64,7 +41,7 @@ REQUESTS_DEFAULT_WORKFLOW = {
     "delete-published-record":
         {
             "requesters": [IfInState("published", [RecordOwners()])],
-            "recipients": user_receiver,
+            "recipients": [TestUserReceiver()],
             "transitions": {
                 "submit": "deleting",
                 "accept": "deleted"
@@ -73,14 +50,11 @@ REQUESTS_DEFAULT_WORKFLOW = {
     "edit-published-record":
         {
             "requesters": [IfInState("published", [RecordOwners()])],
-            #"recipients": auto_approver,
-            "recipients": user_receiver,
+            "recipients": [AutoApprove()],
             "transitions": {
             }
         }
 }
-
-from invenio_access.factory import action_factory
 class ApproveRequestType(NonDuplicableOARepoRequestType):
     type_id = "approve-draft"
     name = _("Approve draft")
@@ -99,7 +73,7 @@ REQUESTS_WITH_APPROVE_WORKFLOW = {
     "publish-draft":
         {
             "requesters": [IfInState("approved", [AutoRequest()])],
-            "recipients": user_receiver,
+            "recipients": [TestUserReceiver()],
             "transitions": {
                 "submit": "publishing",
                 "accept": "published",
@@ -109,7 +83,7 @@ REQUESTS_WITH_APPROVE_WORKFLOW = {
     "approve-draft":
         {
             "requesters": [IfInState("draft", [RecordOwners()])],
-            "recipients": user_receiver,
+            "recipients": [TestUserReceiver()],
             "transitions": {
                 "submit": "approving",
                 "accept": "approved",
@@ -122,7 +96,7 @@ REQUESTS_WITH_APPROVE_WORKFLOW = {
             "requesters": [
             IfInState("published", [RecordOwners()])
         ],
-            "recipients": user_receiver,
+            "recipients": [TestUserReceiver()],
             "transitions": {
                 "submit": "deleting",
                 "accept": "deleted"
@@ -131,24 +105,12 @@ REQUESTS_WITH_APPROVE_WORKFLOW = {
     "edit-published-record":
         {
             "requesters": [IfInState("published", [RecordOwners()])],
-            "recipients": user_receiver,
+            "recipients": [TestUserReceiver()],
             "transitions": {
             }
         }
 }
 
-"""
-class DefaultWorkflowRequests:
-    publish_draft = WorkflowRequest(
-        requesters=[
-            IfInState("draft", RecordOwners())
-        ],
-        recipients=[user_receiver],
-        transitions=WorkflowTransitions(
-            submitted='publishing',
-            approved='published',
-        ))
-"""
 
 WORKFLOWS = {
   'default': {
@@ -316,7 +278,7 @@ def app_config(app_config):
     )
     app_config["CACHE_TYPE"] = "SimpleCache"
 
-    app_config["OAREPO_REQUESTS_DEFAULT_RECEIVER"] = workflow_receiver
+    app_config["OAREPO_REQUESTS_DEFAULT_RECEIVER"] = workflow_receiver_function
 
     app_config["RECORD_WORKFLOWS"] = WORKFLOWS
     app_config["REQUESTS_REGISTERED_TYPES"] = [ApproveRequestType()]
@@ -486,10 +448,6 @@ def events_resource_data():
             "format": RequestEventFormat.HTML.value,
         }
     }
-
-
-from invenio_accounts.proxies import current_datastore
-
 
 def _create_role(id, name, description, is_managed, database):
     """Creates a Role/Group."""

@@ -35,7 +35,7 @@ class OARepoRequests:
     def ui_serialization_referenced_fields(self):
         return self.app.config["REQUESTS_UI_SERIALIZATION_REFERENCED_FIELDS"]
 
-    def default_request_receiver(self, identity, request_type, topic, creator, data):
+    def default_request_receiver(self, identity, request_type, record, creator, data):
         # TODO: if the topic is one of the workflow topics, use the workflow to determine the receiver
         # otherwise use the default receiver
         return obj_or_import_string(
@@ -43,7 +43,7 @@ class OARepoRequests:
         )(
             identity=identity,
             request_type=request_type,
-            topic=topic,
+            record=record,
             creator=creator,
             data=data,
         )
