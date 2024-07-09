@@ -59,8 +59,6 @@ def status_changing_publish_request_data_function():
     return ret_data
 
 
-
-
 def test_publish_with_workflows(
     vocab_cf,
     logged_client,

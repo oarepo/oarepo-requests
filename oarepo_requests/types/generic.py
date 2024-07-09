@@ -13,13 +13,7 @@ from ..actions.generic import (
 from .ref_types import ModelRefTypes, ReceiverRefTypes
 
 
-def community_in_topic_entity_ref(**kwargs):
-    topic = kwargs["topic"]
-    return {"community": str(topic.parent.communities.default.id)}
-
-
 class OARepoRequestType(RequestType):
-    default_receiver_func = community_in_topic_entity_ref
 
     def can_create(self, identity, data, receiver, topic, creator, *args, **kwargs):
         current_requests_service.require_permission(
