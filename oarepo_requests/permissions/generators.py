@@ -1,14 +1,8 @@
-from itertools import chain
-
-from invenio_records.dictutils import dict_lookup
 from invenio_records_permissions.generators import Generator
 from invenio_search.engine import dsl
-from invenio_records_permissions.generators import ConditionalGenerator
 from oarepo_workflows.permissions.generators import needs_from_generators
-from oarepo_workflows.proxies import current_oarepo_workflows
 from oarepo_requests.utils import get_from_requests_workflow
-from .requester import autorequest
-from .identity import request_active
+from .identity import request_active, autorequest, autoapprove
 
 
 class CreatorsFromWorkflow(Generator):
@@ -28,14 +22,15 @@ class CreatorsFromWorkflow(Generator):
 
 class AutoRequest(Generator):
     def needs(self, **kwargs):
-        """Enabling Needs."""
         return [autorequest]
 
+class AutoApprove(Generator):
+    def needs(self, **kwargs):
+        return [autoapprove]
+
 class RequestActive(Generator):
-    """Allows system_process role."""
 
     def needs(self, **kwargs):
-        """Enabling Needs."""
         return [request_active]
 
     def query_filter(self, identity=None, **kwargs):

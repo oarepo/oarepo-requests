@@ -2,7 +2,8 @@ from flask_principal import Identity
 from invenio_access.permissions import SystemRoleNeed
 
 request_active = SystemRoleNeed("request")
-
+autorequest = SystemRoleNeed("autorequest")
+autoapprove = SystemRoleNeed("autoapprove")
 
 class RequestIdentity(Identity):
     def __init__(self, identity):
