@@ -1,7 +1,6 @@
-from invenio_requests.customizations import actions
 
-from .generic import OARepoAcceptAction
 from ..utils import get_matching_service_for_record
+from .generic import OARepoAcceptAction
 
 """
 class DeleteTopicAcceptAction(actions.AcceptAction):
@@ -18,6 +17,7 @@ class DeleteTopicAcceptAction(actions.AcceptAction):
         
 """
 
+
 def delete_topic(action_obj, identity, uow, *args, **kwargs):
     topic = action_obj.request.topic.resolve()
     topic_service = get_matching_service_for_record(topic)
@@ -26,8 +26,10 @@ def delete_topic(action_obj, identity, uow, *args, **kwargs):
     # uow.register(RecordDeleteOp(topic, topic_service.indexer, index_refresh=True))
     topic_service.delete(identity, topic["id"], uow=uow, *args, **kwargs)
 
+
 class DeleteTopicAcceptAction(OARepoAcceptAction):
     action = delete_topic
+
 
 """
 def publish_draft(action_obj, identity, uow, *args, **kwargs):

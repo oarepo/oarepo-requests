@@ -5,10 +5,22 @@ from invenio_requests.proxies import current_requests_service
 from oarepo_requests.errors import OpenRequestAlreadyExists
 from oarepo_requests.utils import open_request_exists
 
+from ..actions.generic import (
+    OARepoAcceptAction,
+    OARepoDeclineAction,
+    OARepoSubmitAction,
+)
 from .ref_types import ModelRefTypes, ReceiverRefTypes
 
 
+def community_in_topic_entity_ref(**kwargs):
+    topic = kwargs["topic"]
+    return {"community": str(topic.parent.communities.default.id)}
+
+
 class OARepoRequestType(RequestType):
+    default_receiver_func = community_in_topic_entity_ref
+
     def can_create(self, identity, data, receiver, topic, creator, *args, **kwargs):
         current_requests_service.require_permission(
             identity, "create", record=topic, request_type=self, **kwargs
@@ -37,8 +49,16 @@ class OARepoRequestType(RequestType):
     @classmethod
     @property
     def needs_context(cls):
+        return {"request_type": cls.type_id}
+
+    @classmethod
+    @property
+    def available_actions(cls):
         return {
-            "request_type": cls.type_id
+            **super().available_actions,
+            "submit": OARepoSubmitAction,
+            "accept": OARepoAcceptAction,
+            "decline": OARepoDeclineAction,
         }
 
 
