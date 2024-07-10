@@ -6,7 +6,7 @@ import _isEmpty from "lodash/isEmpty";
 
 import { RequestModal, CreateRequestModalContent } from ".";
 import { mapLinksToActions } from "./actions";
-import { useRecordContext } from "../contexts";
+import { useRequestContext } from "../contexts";
 
 /**
  * @typedef {import("../types").Request} Request
@@ -16,9 +16,8 @@ import { useRecordContext } from "../contexts";
 /**
  * @param {{ requestTypes: RequestType[], isLoading: boolean, loadingError: Error }} props
  */
-export const CreateRequestButtonGroup = () => {
-  const { record, recordLoading, recordLoadingError } = useRecordContext();
-  const requestTypes = record?.expanded?.request_types ?? [];
+export const CreateRequestButtonGroup = ({ recordLoading, recordLoadingError }) => {
+  const { requestTypes } = useRequestContext();
   const createRequests = requestTypes.filter(requestType => requestType.links.actions?.create);
 
   return (

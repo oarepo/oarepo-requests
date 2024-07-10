@@ -1,7 +1,7 @@
 import React from "react";
 
 import { i18next } from "@translations/oarepo_requests_ui/i18next";
-import { Segment, Header, Dimmer, Loader, Placeholder, Message } from "semantic-ui-react";
+import { Segment, Header, Placeholder, Message } from "semantic-ui-react";
 import _isEmpty from "lodash/isEmpty";
 
 import { RequestList } from ".";
@@ -14,8 +14,8 @@ import { useRequestContext } from "../contexts";
 /**
  * @param {{ requestTypes: RequestType[], isLoading: boolean, loadingError: Error }} props
  */
-export const RequestListContainer = () => {
-  const { requests, requestsLoading, requestsLoadingError } = useRequestContext();
+export const RequestListContainer = ({ requestsLoading, requestsLoadingError }) => {
+  const { requests } = useRequestContext();
   let openRequests = requests.filter(request => request.is_open);
 
   return (

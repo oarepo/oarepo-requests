@@ -7,7 +7,7 @@ import { useFormik, FormikProvider } from "formik";
 import _isEmpty from "lodash/isEmpty";
 
 import { mapPayloadUiToInitialValues } from "../utils";
-import { ConfirmModalContextProvider, useRequestContext, useRecordContext } from "../contexts";
+import { ConfirmModalContextProvider, useRequestContext } from "../contexts";
 
 /** 
  * @typedef {import("../types").Request} Request
@@ -20,16 +20,15 @@ import { ConfirmModalContextProvider, useRequestContext, useRecordContext } from
 /** @param {{ request: Request?, requestType: RequestType?, trigger: ReactElement, actions: [{ name: string, component: ReactElement }], ContentComponent: ReactElement }} props */
 export const RequestModal = ({ request, requestType, trigger, actions, ContentComponent }) => {
   const errorMessageRef = useRef(null);
-  const { fetchNewRequests } = useRequestContext();
+  const { requestTypes, fetchNewRequests } = useRequestContext();
   const {
     isOpen,
     close: closeModal,
     open: openModal,
   } = useConfirmationModal();
-  const { record: { expanded: { request_types } } } = useRecordContext();
 
   const requestOrRequestType = request ?? requestType;
-  requestType = request ? request_types?.find(requestType => requestType.type_id === request.type) ?? {} : requestOrRequestType;
+  requestType = request ? requestTypes.find(requestType => requestType.type_id === request.type) ?? {} : requestOrRequestType;
 
   const formik = useFormik({
     initialValues: 
