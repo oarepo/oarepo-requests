@@ -5,7 +5,7 @@ import axios from "axios";
 import { SegmentGroup } from "semantic-ui-react";
 
 import { CreateRequestButtonGroup, RequestListContainer } from ".";
-import { RequestContextProvider, RecordContextProvider } from "../contexts";
+import { RequestContextProvider } from "../contexts";
 import { sortByStatusCode } from "../utils";
 
 export const RecordRequests = ({ record: initialRecord }) => {

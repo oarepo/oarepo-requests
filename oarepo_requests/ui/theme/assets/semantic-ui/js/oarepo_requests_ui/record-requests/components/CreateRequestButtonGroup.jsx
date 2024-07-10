@@ -39,11 +39,13 @@ export const CreateRequestButtonGroup = ({ recordLoading, recordLoadingError }) 
           !_isEmpty(createRequests) ?
             <Button.Group vertical compact fluid>
               {createRequests.map((requestType) => {
+                const header = !_isEmpty(requestType?.title) ? requestType.title : (!_isEmpty(requestType?.name) ? requestType.name : requestType.type);
                 const modalActions = mapLinksToActions(requestType);
                 return (
                   <RequestModal
                     key={requestType.type_id}
                     requestType={requestType}
+                    header={header}
                     trigger={
                       <Button icon="plus" className="pl-0" title={i18next.t(requestType.name)} basic compact content={requestType.name} />
                     }

@@ -13,7 +13,7 @@ import { SubmitEvent } from "./actions";
 import { useRequestsApi } from "../utils/hooks";
 import { useRequestContext } from "../contexts";
 import { fetchUpdated as fetchNewEvents } from "../utils";
-import { REQUEST_TYPE } from "../utils/objects";
+import { REQUEST_TYPE, REQUEST_MODAL_TYPE } from "../utils/objects";
 import ReadOnlyCustomFields from "./common/ReadOnlyCustomFields";
 
 /** 
@@ -72,8 +72,8 @@ export const RequestModalContent = ({ request, requestType, requestModalType, on
     events = _sortBy(actualRequest.events, ['updated']);
   }
 
-  const renderSubmitForm = requestModalType === REQUEST_TYPE.SUBMIT && payloadUI;
-  const renderReadOnlyData = (requestModalType === REQUEST_TYPE.ACCEPT || requestModalType === REQUEST_TYPE.CANCEL) && request?.payload;
+  const renderSubmitForm = requestModalType === REQUEST_MODAL_TYPE.SUBMIT_FORM && payloadUI;
+  const renderReadOnlyData = requestModalType === REQUEST_MODAL_TYPE.READ_ONLY && request?.payload;
 
   return (
     <Grid doubling stackable>
@@ -161,6 +161,7 @@ export const RequestModalContent = ({ request, requestType, requestModalType, on
                         key={event.id} 
                         request={event} 
                         requestType={event}
+                        header={!_isEmpty(event?.title) ? event.title : (!_isEmpty(event?.name) ? event.name : event.type)}
                         triggerButton={
                           <Button compact primary icon="plus" labelPosition="left" content={event.name} />
                         }
@@ -192,7 +193,7 @@ export const RequestModalContent = ({ request, requestType, requestModalType, on
 
 RequestModalContent.propTypes = {
   request: PropTypes.object.isRequired,
-  requestType: PropTypes.object.isRequired,
+  requestType: PropTypes.object,
   requestModalType: PropTypes.string.isRequired,
   onCompletedAction: PropTypes.func,
 };

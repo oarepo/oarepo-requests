@@ -7,7 +7,7 @@ import { Button, Icon } from "semantic-ui-react";
 import { useRequestsApi } from "../../utils/hooks";
 
 const CreateAndSubmit = ({ request, requestType, onSubmit, ...props }) => {
-  const { doCreateAndSubmitAction } = useRequestsApi(request, onSubmit);
+  const { doCreateAndSubmitAction } = useRequestsApi(requestType, onSubmit);
   
   const formWillBeRendered = !_isEmpty(requestType?.payload_ui);
   let extraProps;

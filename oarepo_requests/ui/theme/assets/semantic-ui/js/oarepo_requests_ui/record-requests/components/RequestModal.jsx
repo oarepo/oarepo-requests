@@ -8,33 +8,29 @@ import _isEmpty from "lodash/isEmpty";
 
 import { mapPayloadUiToInitialValues } from "../utils";
 import { ConfirmModalContextProvider, useRequestContext } from "../contexts";
+import { REQUEST_TYPE, REQUEST_MODAL_TYPE } from "../utils/objects";
 
 /** 
  * @typedef {import("../types").Request} Request
  * @typedef {import("../types").RequestType} RequestType
- * @typedef {import("../types").RequestTypeEnum} RequestTypeEnum
  * @typedef {import("react").ReactElement} ReactElement
- * @typedef {import("semantic-ui-react").ConfirmProps} ConfirmProps
  */
 
-/** @param {{ request: Request?, requestType: RequestType?, trigger: ReactElement, actions: [{ name: string, component: ReactElement }], ContentComponent: ReactElement }} props */
-export const RequestModal = ({ request, requestType, trigger, actions, ContentComponent }) => {
+/** @param {{ request: Request?, requestType: RequestType?, header: string | ReactElement, trigger: ReactElement, actions: [{ name: string, component: ReactElement }], ContentComponent: ReactElement }} props */
+export const RequestModal = ({ request, requestType, header, trigger, actions, ContentComponent }) => {
   const errorMessageRef = useRef(null);
-  const { requestTypes, fetchNewRequests } = useRequestContext();
+  const { fetchNewRequests } = useRequestContext();
   const {
     isOpen,
     close: closeModal,
     open: openModal,
   } = useConfirmationModal();
 
-  const requestOrRequestType = request ?? requestType;
-  requestType = request ? requestTypes.find(requestType => requestType.type_id === request.type) ?? {} : requestOrRequestType;
-
   const formik = useFormik({
     initialValues: 
-      !_isEmpty(requestOrRequestType?.payload) ? 
-        { payload: requestOrRequestType.payload } : 
-        (requestOrRequestType?.payload_ui ? mapPayloadUiToInitialValues(requestOrRequestType?.payload_ui) : {}),
+      (request && !_isEmpty(request?.payload)) ? 
+        { payload: request.payload } : 
+        (requestType?.payload_ui ? mapPayloadUiToInitialValues(requestType?.payload_ui) : {}),
     onSubmit: () => { } // We'll redefine with customSubmitHandler
   });
   const {
@@ -68,8 +64,10 @@ export const RequestModal = ({ request, requestType, trigger, actions, ContentCo
     resetForm();
   };
 
-  const header = !_isEmpty(requestOrRequestType?.title) ? requestOrRequestType.title : (!_isEmpty(requestOrRequestType?.name) ? requestOrRequestType.name : requestOrRequestType.type);
-  const requestModalContentType = actions.some(({ name }) => name === "accept") ? "accept" : "submit";
+  // Only applies to RequestModalContent component:
+  // READ ONLY modal type contains Accept, Decline, and/or Cancel actions OR contains Cancel action only => only ReadOnlyCustomFields are rendered
+  // SUBMIT FORM modal type contains Submit and/or Save, Create, CreateAndSubmit action => Form is rendered
+  const requestModalContentType = actions.some(({ name }) => name === REQUEST_TYPE.ACCEPT || name === REQUEST_TYPE.CANCEL) ? REQUEST_MODAL_TYPE.READ_ONLY : REQUEST_MODAL_TYPE.SUBMIT_FORM;
 
   return (
     <FormikProvider value={formik}>
@@ -102,11 +100,11 @@ export const RequestModal = ({ request, requestType, trigger, actions, ContentCo
                     <p ref={errorMessageRef}>{error?.message}</p>
                   </Message>
                 }
-                <ContentComponent request={requestOrRequestType} requestType={requestType} requestModalType={requestModalContentType} onCompletedAction={onSubmit} />
+                <ContentComponent request={request} requestType={requestType} requestModalType={requestModalContentType} onCompletedAction={onSubmit} />
               </Modal.Content>
               <Modal.Actions>
                 {actions.map(({ name, component: ActionComponent }) => 
-                  <ActionComponent key={name} request={requestOrRequestType} requestType={requestType} onSubmit={onSubmit} />
+                  <ActionComponent key={name} request={request} requestType={requestType} onSubmit={onSubmit} />
                 )}
                 <Button onClick={onClose} icon labelPosition="left">
                   <Icon name="cancel" />
