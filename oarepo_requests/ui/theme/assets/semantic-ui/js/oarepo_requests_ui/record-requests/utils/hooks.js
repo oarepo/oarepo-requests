@@ -96,7 +96,7 @@ export const useRequestsApi = (request, onSubmit) => {
   const setError = error => { setErrors({ api: error }); };
 
   const callApi = async (url, method, data = formValues, doNotHandleResolve = false) => {
-    const request = axios({
+    const promise = axios({
       method: method,
       url: url,
       data: data,
@@ -104,10 +104,10 @@ export const useRequestsApi = (request, onSubmit) => {
     });
 
     if (doNotHandleResolve) {
-      return request;
+      return promise;
     }
 
-    return request
+    return promise
       .then(() => {
         resetForm();
       })
