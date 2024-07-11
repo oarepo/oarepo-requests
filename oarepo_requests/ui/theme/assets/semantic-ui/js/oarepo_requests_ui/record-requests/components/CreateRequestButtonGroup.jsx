@@ -1,11 +1,12 @@
 import React from "react";
 
 import { i18next } from "@translations/oarepo_requests_ui/i18next";
-
-import { Segment, Header, Button, Dimmer, Loader, Placeholder, Message } from "semantic-ui-react";
+import { Segment, Header, Button, Placeholder, Message, Icon } from "semantic-ui-react";
 import _isEmpty from "lodash/isEmpty";
 
-import { RequestModal } from "./RequestModal";
+import { RequestModal, CreateRequestModalContent } from ".";
+import { mapLinksToActions } from "./actions";
+import { useRequestContext } from "../contexts";
 
 /**
  * @typedef {import("../types").Request} Request
@@ -13,47 +14,50 @@ import { RequestModal } from "./RequestModal";
  */
 
 /**
- * @param {{ requestTypes: RequestType[], isLoading: boolean, loadingError: Error, fetchNewRequests: () => void }} props
+ * @param {{ requestTypes: RequestType[], isLoading: boolean, loadingError: Error }} props
  */
-export const CreateRequestButtonGroup = ({ requestTypes, isLoading, loadingError, fetchNewRequests }) => {
+export const CreateRequestButtonGroup = ({ recordLoading, recordLoadingError }) => {
+  const { requestTypes } = useRequestContext();
   const createRequests = requestTypes.filter(requestType => requestType.links.actions?.create);
 
   return (
-    <Segment>
-      <Header size="small" className="detail-sidebar-header">{i18next.t("Create Request")}</Header>
-      <Dimmer.Dimmable dimmed={isLoading}>
-        <Dimmer active={isLoading} inverted>
-          <Loader indeterminate>{i18next.t("Loading request types")}...</Loader>
-        </Dimmer>
-        {isLoading ? <Placeholder fluid>
-          {Array.from({ length: 3 }).map((_, index) => (
+    <Segment className="requests-create-request-buttons borderless">
+      <Header size="small" className="detail-sidebar-header">{i18next.t("Requests")}</Header>
+      {recordLoading ?
+        <Placeholder>
+          {Array.from({ length: 2 }).map((_, index) => (
             <Placeholder.Paragraph key={index}>
-              <Placeholder.Line length="full" />
-              <Placeholder.Line length="medium" />
-              <Placeholder.Line length="short" />
+              <Icon name="plus" disabled />
             </Placeholder.Paragraph>
           ))}
         </Placeholder> :
-          loadingError ?
-            <Message negative>
-              <Message.Header>{i18next.t("Error loading request types")}</Message.Header>
-              <p>{loadingError?.message}</p>
-            </Message> :
-            !_isEmpty(createRequests) ?
-              <Button.Group vertical compact fluid>
-                {createRequests.map((requestType) => (
+        recordLoadingError ?
+          <Message negative>
+            <Message.Header>{i18next.t("Error loading request types")}</Message.Header>
+            <p>{recordLoadingError?.message}</p>
+          </Message> :
+          !_isEmpty(createRequests) ?
+            <Button.Group vertical compact fluid>
+              {createRequests.map((requestType) => {
+                const header = !_isEmpty(requestType?.title) ? requestType.title : (!_isEmpty(requestType?.name) ? requestType.name : requestType.type);
+                const modalActions = mapLinksToActions(requestType);
+                return (
                   <RequestModal
                     key={requestType.type_id}
-                    request={requestType}
-                    requestModalType="create"
-                    triggerButton={<Button icon="plus" className="pl-0" title={i18next.t(requestType.name)} basic compact content={requestType.name} />}
-                    fetchNewRequests={fetchNewRequests}
+                    requestType={requestType}
+                    header={header}
+                    trigger={
+                      <Button icon="plus" className="pl-0" title={i18next.t(requestType.name)} basic compact content={requestType.name} />
+                    }
+                    actions={modalActions}
+                    ContentComponent={CreateRequestModalContent}
                   />
-                ))}
-              </Button.Group> :
-              <p>{i18next.t("No new requests to create")}.</p>
-        }
-      </Dimmer.Dimmable>
+                )
+              }
+              )}
+            </Button.Group> :
+            <p>{i18next.t("No new requests to create")}.</p>
+      }
     </Segment>
   );
 }

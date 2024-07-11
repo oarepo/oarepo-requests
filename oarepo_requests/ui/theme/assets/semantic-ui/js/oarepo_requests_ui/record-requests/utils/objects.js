@@ -6,3 +6,8 @@ export const REQUEST_TYPE = {
   DECLINE: 'decline',
   SAVE: 'save',
 }
+
+export const REQUEST_MODAL_TYPE = {
+  READ_ONLY: 'read-only',
+  SUBMIT_FORM: 'submit-form',
+}

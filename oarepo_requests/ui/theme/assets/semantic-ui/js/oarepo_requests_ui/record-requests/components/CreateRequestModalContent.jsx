@@ -4,9 +4,11 @@ import PropTypes from "prop-types";
 import { Segment, Form, Divider } from "semantic-ui-react";
 import { useFormikContext } from "formik";
 
-import _isFunction from "lodash/isFunction";
-
+import _isEmpty from "lodash/isEmpty";
 import { CustomFields } from "react-invenio-forms";
+
+import { REQUEST_TYPE } from "../utils/objects";
+import { useRequestsApi } from "../utils/hooks";
 
 /** 
  * @typedef {import("../types").RequestType} RequestType
@@ -14,18 +16,28 @@ import { CustomFields } from "react-invenio-forms";
  */
 
 /** @param {{ requestType: RequestType, customSubmitHandler: (e) => void }} props */
-export const CreateRequestModalContent = ({ requestType, customSubmitHandler }) => {
+export const CreateRequestModalContent = ({ requestType, onCompletedAction }) => {  
+  const { doAction, doCreateAndSubmitAction } = useRequestsApi(requestType, onCompletedAction);
+  const { submitForm, setErrors, setSubmitting } = useFormikContext();
+
   const payloadUI = requestType?.payload_ui;
 
-  const { handleSubmit } = useFormikContext();
-
-  const onSubmit = (event) => {
-    if (_isFunction(customSubmitHandler)) {
-      customSubmitHandler(event?.nativeEvent?.submitter?.name);
-    } else {
-      handleSubmit(event);
+  const onFormSubmit = async (event) => {
+    event.preventDefault();
+    const submitButtonName = event?.nativeEvent?.submitter?.name;
+    try {
+      await submitForm();
+      if (submitButtonName === "create-and-submit-request") {
+        doCreateAndSubmitAction(!_isEmpty(payloadUI));
+        return;
+      }
+      doAction(REQUEST_TYPE.CREATE);
+    } catch (error) {
+      setErrors({ api: error });
+    } finally {
+      setSubmitting(false);
     }
-  }
+  };
 
   return (
     <>
@@ -34,8 +46,8 @@ export const CreateRequestModalContent = ({ requestType, customSubmitHandler }) 
           {requestType.description}
         </p>
       }
-      <Form onSubmit={onSubmit} id="request-form">
-        {payloadUI &&
+      {payloadUI &&
+        <Form onSubmit={onFormSubmit} id="request-form">
           <Segment basic>
             <CustomFields
               config={payloadUI}
@@ -47,8 +59,8 @@ export const CreateRequestModalContent = ({ requestType, customSubmitHandler }) 
             />
             <Divider hidden />
           </Segment>
-        }
-      </Form>
+        </Form>
+      }
     </>
   );
 }

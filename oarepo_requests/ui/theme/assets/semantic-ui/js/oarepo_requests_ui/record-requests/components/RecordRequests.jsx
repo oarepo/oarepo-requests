@@ -2,6 +2,7 @@ import React, { useEffect, useState, useCallback } from "react";
 import PropTypes from "prop-types";
 
 import axios from "axios";
+import { SegmentGroup } from "semantic-ui-react";
 
 import { CreateRequestButtonGroup, RequestListContainer } from ".";
 import { RequestContextProvider } from "../contexts";
@@ -19,7 +20,7 @@ export const RecordRequests = ({ record: initialRecord }) => {
 
   const requestsSetter = useCallback(newRequests => setRequests(newRequests), []);
 
-  const fetchRecord = useCallback(async () => {
+  const fetchRecord = useCallback(async (initRequests = false) => {
     setRecordLoading(true);
     setRecordLoadingError(null);
     return axios({
@@ -32,14 +33,15 @@ export const RecordRequests = ({ record: initialRecord }) => {
     })
       .then(response => {
         setRecord(response.data);
-        return response.data;
+        initRequests && setRequests(sortByStatusCode(response.data?.expanded?.requests ?? []));
       })
       .catch(error => {
         setRecordLoadingError(error);
-        throw error;
+        initRequests && setRequestsLoadingError(error);
       })
       .finally(() => {
         setRecordLoading(false);
+        initRequests && setRequestsLoading(false);
       });
   }, [record.links?.self]);
 
@@ -71,35 +73,18 @@ export const RecordRequests = ({ record: initialRecord }) => {
   }, [fetchRecord, fetchRequests]);
 
   useEffect(() => {
-    fetchRecord()
-      .then(record => {
-        setRequests(sortByStatusCode(record?.expanded?.requests ?? []));
-      })
-      .catch(error => {
-        setRequestsLoadingError(error);
-      })
-      .finally(() => {
-        setRequestsLoading(false);
-      });
+    fetchRecord(true);
   }, [fetchRecord]);
 
+  const requestTypes = record?.expanded?.request_types ?? [];
+
   return (
-    <>
-      <CreateRequestButtonGroup
-        requestTypes={record?.expanded?.request_types ?? []}
-        isLoading={recordLoading}
-        loadingError={recordLoadingError}
-        fetchNewRequests={fetchNewRequests}
-      />
-      <RequestContextProvider requests={{ requests, setRequests: requestsSetter }}>
-        <RequestListContainer
-          requestTypes={record?.expanded?.request_types ?? []}
-          isLoading={requestsLoading}
-          loadingError={requestsLoadingError}
-          fetchNewRequests={fetchNewRequests}
-        />
-      </RequestContextProvider>
-    </>
+    <RequestContextProvider requests={{ requests, requestTypes, setRequests: requestsSetter, fetchNewRequests }}>
+      <SegmentGroup className="requests-container">
+        <CreateRequestButtonGroup recordLoading={recordLoading} recordLoadingError={recordLoadingError} />
+        <RequestListContainer requestsLoading={requestsLoading} requestsLoadingError={requestsLoadingError} />
+      </SegmentGroup>
+    </RequestContextProvider>
   );
 }
 
