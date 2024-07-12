@@ -3,7 +3,7 @@ import React, { memo } from "react";
 import { i18next } from "@translations/oarepo_requests_ui/i18next";
 import { Icon, Feed } from "semantic-ui-react";
 import _has from "lodash/has";
-import { sanitizeInput } from "@js/oarepo_ui";
+import { useSanitizeInput } from "@js/oarepo_ui";
 
 import { hasAll, hasAny, getRequestStatusIcon } from "../utils";
 
@@ -11,6 +11,7 @@ const TimelineEvent = ({ event }) => {
   const isRenderable = hasAll(event, 'created', 'payload') && hasAny(event.payload, 'event', 'content');
   const eventLabel = isRenderable ? event.payload?.event ?? i18next.t("commented") : null;
   const eventIcon = getRequestStatusIcon(eventLabel) ?? { name: 'user circle', color: 'grey' };
+  const { sanitizeInput } = useSanitizeInput()
 
   return isRenderable ? (            
     <Feed.Event key={event.id}>

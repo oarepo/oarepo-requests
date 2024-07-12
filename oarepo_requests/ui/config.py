@@ -4,6 +4,7 @@ from flask import current_app
 
 from oarepo_ui.resources.config import UIResourceConfig
 from oarepo_ui.resources.links import UIRecordLink
+from oarepo_ui.resources.components import AllowedHtmlTagsComponent
 from oarepo_runtime.services.custom_fields import CustomFields, InlinedCustomFields
 
 from invenio_base.utils import obj_or_import_string
@@ -31,6 +32,7 @@ class RequestUIResourceConfig(UIResourceConfig):
     ui_links_item = {
         "self": UIRecordLink("{+ui}{+url_prefix}/{id}"),
     }
+    components = [AllowedHtmlTagsComponent]
 
     error_handlers = {
         PIDDeletedError: "tombstone",

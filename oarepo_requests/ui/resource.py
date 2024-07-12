@@ -78,6 +78,21 @@ class RequestUIResource(UIResource):
         make_links_absolute(record["links"], self.config.url_prefix)
 
         extra_context = dict()
+        # TODO: this needs to be reimplemented in:
+        # https://linear.app/ducesnet/issue/BE-346/on-request-detail-page-generate-form-config-for-the-comment-stream
+        form_config = {}
+
+        self.run_components(
+            "form_config",
+            api_record=api_record,
+            record=record,
+            identity=g.identity,
+            form_config=form_config,
+            extra_context=extra_context,
+            args=resource_requestctx.args,
+            view_args=resource_requestctx.view_args,
+            ui_links=ui_links,
+        )
 
         self.run_components(
             "before_ui_detail",
@@ -100,6 +115,7 @@ class RequestUIResource(UIResource):
             "metadata": metadata,
             "ui": dict(record.get("ui", record)),
             "record": record,
+            "form_config": form_config,
             "api_record": api_record,
             "ui_links": ui_links,
             "context": current_oarepo_ui.catalog.jinja_env.globals,

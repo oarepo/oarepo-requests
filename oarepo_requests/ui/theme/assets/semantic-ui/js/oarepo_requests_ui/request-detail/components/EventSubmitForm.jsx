@@ -7,11 +7,12 @@ import axios from "axios";
 import { RichEditor, RichInputField } from "react-invenio-forms";
 import { Formik, Form } from "formik";
 
-import { sanitizeInput } from "@js/oarepo_ui";
+import { useSanitizeInput } from "@js/oarepo_ui";
 import { CommentPayloadSchema } from "../utils";
 
 export const EventSubmitForm = ({ request, setEvents }) => {
   const [error, setError] = useState(null);
+  const { sanitizeInput } = useSanitizeInput()
   
   const editorRef = useRef(null);
 

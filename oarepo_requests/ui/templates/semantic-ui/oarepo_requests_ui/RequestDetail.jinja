@@ -1,4 +1,4 @@
-{#def record, extra_context, ui #}
+{#def record, form_config, extra_context, ui #}
 
 {%- set title = _("Request") ~ ": " ~ record.name ~ " | " ~ _(config.THEME_SITENAME) %}
 
@@ -18,7 +18,7 @@
       </div>
     </div>
     {# Main content #}
-    <div class="ui main container" id="request-detail" data-request='{{ record | tojson }}'></div>
+    <div class="ui main container" id="request-detail" data-form-config='{{form_config | tojson }}' data-request='{{ record | tojson }}'></div>
     {# <pre>{{ record | pprint }}</pre>
     <pre>{{ extra_context | pprint }}</pre>
     <pre>{{ ui | pprint }}</pre> #}
