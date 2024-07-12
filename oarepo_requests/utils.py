@@ -1,30 +1,8 @@
 from invenio_access.permissions import system_identity
-from invenio_records.dictutils import dict_lookup
 from invenio_requests import current_requests_service
 from invenio_requests.proxies import current_request_type_registry
 from invenio_requests.resolvers.registry import ResolverRegistry
 from invenio_search.engine import dsl
-from oarepo_workflows.permissions.generators import reference_receiver_from_generators
-from oarepo_workflows.proxies import current_oarepo_workflows
-
-
-def get_from_requests_workflow(workflow_id, type_id, segment):
-    try:
-        ret = dict_lookup(
-            current_oarepo_workflows.record_workflows,
-            f"{workflow_id}.requests.{type_id}.{segment}",
-        )
-    except KeyError:
-        return []
-    return ret
-
-
-def workflow_from_record(record):
-    record = record.parent if hasattr(record, "parent") else record
-    try:
-        return record.workflow
-    except AttributeError:
-        return None
 
 
 def allowed_request_types_for_record(record):
@@ -168,14 +146,3 @@ def reference_to_tuple(reference):
     return (list(reference.keys())[0], list(reference.values())[0])
 
 
-def workflow_receiver_function(record=None, request_type=None, **kwargs):
-    workflow_id = workflow_from_record(record)
-    try:
-        recipients_generators = get_from_requests_workflow(
-            workflow_id, request_type.type_id, "recipients"
-        )
-    except KeyError:
-        return None
-    return reference_receiver_from_generators(
-        recipients_generators, record=record, request_type=request_type, **kwargs
-    )

@@ -1,41 +1,6 @@
 from invenio_records_permissions.generators import Generator
 from invenio_search.engine import dsl
-from oarepo_workflows.permissions.generators import needs_from_generators
-
-from oarepo_requests.utils import get_from_requests_workflow
-
-from .identity import autoapprove, autorequest, request_active
-
-
-class CreatorsFromWorkflow(Generator):
-    def _get_workflow_id(self, request_type, *args, **kwargs):
-        if "record" in kwargs:
-            return kwargs["record"].parent["workflow"]
-        return "default"
-
-    def needs(self, request_type, *args, **kwargs):
-        # todo load from community
-        workflow_id = self._get_workflow_id(request_type, *args, **kwargs)
-        try:
-            creators_generators = get_from_requests_workflow(
-                workflow_id, request_type.type_id, "requesters"
-            )
-        except KeyError:
-            return []
-        needs = needs_from_generators(
-            creators_generators, *args, request_type=request_type, **kwargs
-        )
-        return needs
-
-
-class AutoRequest(Generator):
-    def needs(self, **kwargs):
-        return [autorequest]
-
-
-class AutoApprove(Generator):
-    def needs(self, **kwargs):
-        return [autoapprove]
+from oarepo_requests.permissions.identity import request_active
 
 
 class RequestActive(Generator):
@@ -49,3 +14,20 @@ class RequestActive(Generator):
             return dsl.Q("match_all")
         else:
             return []
+
+class SubmissionReviewer(Generator):
+    # todo - from rdm, here should be generator for accesing request topic by receivers
+
+    def needs(self, record=None, **kwargs):
+        """Set of Needs granting permission."""
+        if record is None or record.parent.review is None:
+            return []
+
+        # we only expect submission review requests here
+        # and as such, we expect the receiver to be a community
+        # and the topic to be a record
+        request = record.parent.review
+        receiver = request.receiver
+        if receiver is not None:
+            return receiver.get_needs(ctx=request.type.needs_context)
+        return []

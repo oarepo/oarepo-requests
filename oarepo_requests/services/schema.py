@@ -51,5 +51,5 @@ class NoneReceiverGenericRequestSchema(GenericRequestSchema):
 class RequestsSchemaMixin:
     requests = ma.fields.List(
         ma.fields.Nested(NoneReceiverGenericRequestSchema)
-    )  # TODO consider what happens due to different request types having their own schema; should the projection be universal here?
+    )
     request_types = ma.fields.List(ma.fields.Nested(RequestTypeSchema))
