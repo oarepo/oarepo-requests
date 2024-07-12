@@ -106,7 +106,7 @@ def test_role(
     config_restore = app.config["OAREPO_REQUESTS_DEFAULT_RECEIVER"]
 
     def current_receiver(record=None, request_type=None, **kwargs):
-        if request_type.type_id == "publish-draft":
+        if request_type.type_id == "publish_draft":
             return role
         return config_restore(record, request_type, **kwargs)
 

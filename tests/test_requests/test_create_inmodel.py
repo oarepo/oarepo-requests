@@ -29,7 +29,7 @@ def test_record(
 
     link = link_api2testclient(
         pick_request_type(
-            record1.json["expanded"]["request_types"], "delete-published-record"
+            record1.json["expanded"]["request_types"], "delete_published_record"
         )["links"]["actions"]["create"]
     )
 
@@ -65,7 +65,7 @@ def test_draft(
 
     draft1 = creator_client.post(urls["BASE_URL"] + "?expand=true", json={})
     link = link_api2testclient(
-        pick_request_type(draft1.json["expanded"]["request_types"], "publish-draft")[
+        pick_request_type(draft1.json["expanded"]["request_types"], "publish_draft")[
             "links"
         ]["actions"]["create"]
     )

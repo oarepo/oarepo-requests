@@ -14,11 +14,11 @@ def test_draft_publish_request_present(
         assert c.status_code == 200
         data = json.loads(c.text)
         print(data)
-        assert data["creatable_request_types"]["publish-draft"] == {
+        assert data["creatable_request_types"]["publish_draft"] == {
             "description": "Request publishing of a draft",
             "links": {
                 "actions": {
-                    "create": f"https://127.0.0.1:5000/api/thesis/{example_topic_draft['id']}/draft/requests/publish-draft"
+                    "create": f"https://127.0.0.1:5000/api/thesis/{example_topic_draft['id']}/draft/requests/publish_draft"
                 }
             },
             "name": "Publish draft",
@@ -41,20 +41,20 @@ def test_record_delete_request_present(
         assert c.status_code == 200
         data = json.loads(c.text)
         assert len(data["creatable_request_types"]) == 2
-        assert data["creatable_request_types"]["edit-published-record"] == {
+        assert data["creatable_request_types"]["edit_published_record"] == {
             "description": "Request re-opening of published record",
             "links": {
                 "actions": {
-                    "create": f"https://127.0.0.1:5000/api/thesis/{example_topic['id']}/requests/edit-published-record"
+                    "create": f"https://127.0.0.1:5000/api/thesis/{example_topic['id']}/requests/edit_published_record"
                 }
             },
             "name": "Edit record",
         }
-        assert data["creatable_request_types"]["delete-published-record"] == {
+        assert data["creatable_request_types"]["delete_published_record"] == {
             "description": "Request deletion of published record",
             "links": {
                 "actions": {
-                    "create": f"https://127.0.0.1:5000/api/thesis/{example_topic['id']}/requests/delete-published-record"
+                    "create": f"https://127.0.0.1:5000/api/thesis/{example_topic['id']}/requests/delete_published_record"
                 }
             },
             "name": "Delete record",

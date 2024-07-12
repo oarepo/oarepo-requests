@@ -112,14 +112,14 @@ def test_can_possibly_create(
         f"{urls['BASE_URL']}{draft2.json['id']}/draft?expand=true"
     )
     assert find_request_type(
-        record_resp_no_request.json["expanded"]["request_types"], "publish-draft"
+        record_resp_no_request.json["expanded"]["request_types"], "publish_draft"
     )
     assert find_request_type(
-        record_resp_draft2.json["expanded"]["request_types"], "publish-draft"
+        record_resp_draft2.json["expanded"]["request_types"], "publish_draft"
     )
     assert (
         find_request_type(
-            record_resp_with_request.json["expanded"]["request_types"], "publish-draft"
+            record_resp_with_request.json["expanded"]["request_types"], "publish_draft"
         )
         is None
     )

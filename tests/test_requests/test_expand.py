@@ -17,7 +17,7 @@ def test_requests_field(
 
     draft1 = creator_client.post(urls["BASE_URL"] + "?expand=true", json={})
     link = link_api2testclient(
-        pick_request_type(draft1.json["expanded"]["request_types"], "publish-draft")[
+        pick_request_type(draft1.json["expanded"]["request_types"], "publish_draft")[
             "links"
         ]["actions"]["create"]
     )

@@ -12,52 +12,84 @@ from invenio_requests.proxies import current_requests
 from invenio_requests.records.api import RequestEventFormat
 from invenio_users_resources.records import UserAggregate
 from oarepo_runtime.services.generators import RecordOwners
+from oarepo_workflows import (
+    Workflow,
+    WorkflowRequest,
+    WorkflowRequestPolicy,
+    WorkflowTransitions, RecipientGeneratorMixin, AutoRequest, AutoApprove,
+)
 from oarepo_workflows.permissions.generators import IfInState
-from oarepo_workflows.permissions.policy import WorkflowPermissionPolicy
+from oarepo_workflows.permissions.policy import DefaultWorkflowPermissionPolicy
 from thesis.proxies import current_service
 from thesis.records.api import ThesisDraft, ThesisRecord
+from invenio_access.permissions import system_identity
 
 from oarepo_requests.actions.generic import (
     OARepoAcceptAction,
     OARepoDeclineAction,
     OARepoSubmitAction,
 )
-from oarepo_requests.permissions.generators import AutoApprove, AutoRequest
+from oarepo_requests.permissions.presets import DefaultWithRequestsWorkflowPermissionPolicy
 from oarepo_requests.types import ModelRefTypes, NonDuplicableOARepoRequestType
-from oarepo_requests.utils import workflow_receiver_function
+from oarepo_requests.receiver import default_workflow_receiver_function
 
 
-class TestUserReceiver(Generator):
+class TestUserReceiver(RecipientGeneratorMixin, Generator):
+    def reference_receivers(self, **kwargs):
+        return [{"user": "2"}]
 
-    def reference_receiver(self, **kwargs):
-        return {"user": "2"}
+class DefaultRequests(WorkflowRequestPolicy):
+    publish_draft = WorkflowRequest(
+        requesters=[IfInState("draft", [RecordOwners()])],
+        recipients=[TestUserReceiver()],
+        transitions=WorkflowTransitions(
+            submitted="publishing", approved="published", rejected="draft"
+        ),
+    )
+    delete_published_record = WorkflowRequest(
+        requesters=[IfInState("published", [RecordOwners()])],
+        recipients=[TestUserReceiver()],
+        transitions=WorkflowTransitions(
+            submitted="deleting", approved="deleted", rejected="published"
+        ),
+    )
+    edit_published_record = WorkflowRequest(
+        requesters=[IfInState("published", [RecordOwners()])],
+        recipients=[AutoApprove()],
+        transitions=WorkflowTransitions(),
+    )
 
-
-REQUESTS_DEFAULT_WORKFLOW = {
-    "publish-draft": {
-        "requesters": [IfInState("draft", [RecordOwners()])],
-        "recipients": [TestUserReceiver()],
-        "transitions": {
-            "submit": "publishing",
-            "accept": "published",
-            "decline": "draft",
-        },
-    },
-    "delete-published-record": {
-        "requesters": [IfInState("published", [RecordOwners()])],
-        "recipients": [TestUserReceiver()],
-        "transitions": {"submit": "deleting", "accept": "deleted"},
-    },
-    "edit-published-record": {
-        "requesters": [IfInState("published", [RecordOwners()])],
-        "recipients": [AutoApprove()],
-        "transitions": {},
-    },
-}
+class RequestsWithApprove(WorkflowRequestPolicy):
+    publish_draft = WorkflowRequest(
+        requesters=[IfInState("approved", [AutoRequest()])],
+        recipients=[TestUserReceiver()],
+        transitions=WorkflowTransitions(
+            submitted="publishing", approved="published", rejected="approved"
+        ),
+    )
+    approve_draft = WorkflowRequest(
+        requesters=[IfInState("draft", [RecordOwners()])],
+        recipients=[TestUserReceiver()],
+        transitions=WorkflowTransitions(
+            submitted="approving", approved="approved", rejected="draft"
+        ),
+    )
+    delete_published_record = WorkflowRequest(
+        requesters=[IfInState("published", [RecordOwners()])],
+        recipients=[TestUserReceiver()],
+        transitions=WorkflowTransitions(
+            submitted="deleting", approved="deleted", rejected="published"
+        ),
+    )
+    edit_published_record = WorkflowRequest(
+        requesters=[IfInState("published", [RecordOwners()])],
+        recipients=[AutoApprove()],
+        transitions=WorkflowTransitions(),
+    )
 
 
 class ApproveRequestType(NonDuplicableOARepoRequestType):
-    type_id = "approve-draft"
+    type_id = "approve_draft"
     name = _("Approve draft")
 
     available_actions = {
@@ -71,51 +103,19 @@ class ApproveRequestType(NonDuplicableOARepoRequestType):
     allowed_topic_ref_types = ModelRefTypes(published=False, draft=True)
 
 
-REQUESTS_WITH_APPROVE_WORKFLOW = {
-    "publish-draft": {
-        "requesters": [IfInState("approved", [AutoRequest()])],
-        "recipients": [TestUserReceiver()],
-        "transitions": {
-            "submit": "publishing",
-            "accept": "published",
-            "decline": "approved",
-        },
-    },
-    "approve-draft": {
-        "requesters": [IfInState("draft", [RecordOwners()])],
-        "recipients": [TestUserReceiver()],
-        "transitions": {
-            "submit": "approving",
-            "accept": "approved",
-            "decline": "draft",
-        },
-    },
-    "delete-published-record": {
-        "requesters": [IfInState("published", [RecordOwners()])],
-        "recipients": [TestUserReceiver()],
-        "transitions": {"submit": "deleting", "accept": "deleted"},
-    },
-    "edit-published-record": {
-        "requesters": [IfInState("published", [RecordOwners()])],
-        "recipients": [TestUserReceiver()],
-        "transitions": {},
-    },
-}
-
 
 WORKFLOWS = {
-    "default": {
-        "label": _("Default workflow"),
-        "permissions": WorkflowPermissionPolicy,
-        "requests": REQUESTS_DEFAULT_WORKFLOW,
-    },
-    "with_approve": {
-        "label": _("Default workflow"),
-        "permissions": WorkflowPermissionPolicy,
-        "requests": REQUESTS_WITH_APPROVE_WORKFLOW,
-    },
+    "default": Workflow(
+        label=_("Default workflow"),
+        permissions_cls=DefaultWithRequestsWorkflowPermissionPolicy,
+        requests_cls=DefaultRequests,
+    ),
+    "with_approve": Workflow(
+        label=_("Workflow with approval process"),
+        permissions_cls=DefaultWithRequestsWorkflowPermissionPolicy,
+        requests_cls=RequestsWithApprove,
+    ),
 }
-
 
 @pytest.fixture
 def change_workflow_function():
@@ -147,7 +147,7 @@ def urls():
 def publish_request_data_function():
     def ret_data(record_id):
         return {
-            "request_type": "publish-draft",
+            "request_type": "publish_draft",
             "topic": {"thesis_draft": record_id},
         }
 
@@ -158,7 +158,7 @@ def publish_request_data_function():
 def edit_record_data_function():
     def ret_data(record_id):
         return {
-            "request_type": "edit-published-record",
+            "request_type": "edit_published_record",
             "topic": {"thesis": record_id},
         }
 
@@ -169,7 +169,7 @@ def edit_record_data_function():
 def delete_record_data_function():
     def ret_data(record_id):
         return {
-            "request_type": "delete-published-record",
+            "request_type": "delete_published_record",
             "topic": {"thesis": record_id},
         }
 
@@ -191,7 +191,7 @@ def serialization_result():
                 "timeline": f"https://127.0.0.1:5000/api/requests/extended/{request_id}/timeline",
             },
             "revision_id": 3,
-            "type": "publish-draft",
+            "type": "publish_draft",
             "title": "",
             "number": "1",
             "status": "submitted",
@@ -247,7 +247,7 @@ def ui_serialization_result():
                 "reference": {"thesis_draft": topic_id},
                 "type": "thesis_draft",
             },
-            "type": "publish-draft",
+            "type": "publish_draft",
             # 'updated': '2024-01-26T10:06:18.084317'
         }
 
@@ -272,9 +272,9 @@ def app_config(app_config):
     )
     app_config["CACHE_TYPE"] = "SimpleCache"
 
-    app_config["OAREPO_REQUESTS_DEFAULT_RECEIVER"] = workflow_receiver_function
+    app_config["OAREPO_REQUESTS_DEFAULT_RECEIVER"] = default_workflow_receiver_function
 
-    app_config["RECORD_WORKFLOWS"] = WORKFLOWS
+    app_config["WORKFLOWS"] = WORKFLOWS
     app_config["REQUESTS_REGISTERED_TYPES"] = [ApproveRequestType()]
     return app_config
 
@@ -418,7 +418,7 @@ def record_factory(record_service):
                 }
             },
         )
-        record = record_service.publish(identity, draft.id)
+        record = record_service.publish(system_identity, draft.id)
         return record._obj
 
     return record
@@ -427,7 +427,7 @@ def record_factory(record_service):
 @pytest.fixture(scope="function")
 def example_topic(record_service, identity_simple):
     draft = record_service.create(identity_simple, {})
-    record = record_service.publish(identity_simple, draft.id)
+    record = record_service.publish(system_identity, draft.id)
     id_ = record.id
     record = ThesisRecord.pid.resolve(id_)
     return record

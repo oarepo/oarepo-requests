@@ -2,9 +2,10 @@ import pytest
 from invenio_drafts_resources.services.records.uow import ParentRecordCommitOp
 from invenio_records_permissions.generators import SystemProcess
 from invenio_records_resources.services.uow import RecordCommitOp, unit_of_work
+from oarepo_workflows.permissions.generators import CreatorsFromWorkflow
+
 from thesis.records.api import ThesisDraft, ThesisRecord
 
-from oarepo_requests.permissions.generators import CreatorsFromWorkflow
 from tests.test_requests.utils import link_api2testclient
 
 
@@ -52,7 +53,7 @@ def patch_requests_permissions(
 def status_changing_publish_request_data_function():
     def ret_data(record_id):
         return {
-            "request_type": "publish-draft",
+            "request_type": "publish_draft",
             "topic": {"thesis_draft": record_id},
         }
 
@@ -148,7 +149,7 @@ def test_autorequest(
     change_workflow(creator.identity, record_service, draft1, change_workflow_function)
 
     approve_request_data = {
-        "request_type": "approve-draft",
+        "request_type": "approve_draft",
         "topic": {"thesis_draft": str(record_id)},
     }
     resp_request_create = creator_client.post(
