@@ -2,28 +2,29 @@ from invenio_records_resources.services.uow import RecordCommitOp
 from invenio_requests.customizations import actions
 from invenio_requests.customizations.actions import RequestActions
 from invenio_requests.errors import CannotExecuteActionError
-from oarepo_workflows.permissions.generators import needs_from_generators
 from oarepo_workflows.proxies import current_oarepo_workflows
+from oarepo_workflows.requests.policy import auto_approve_need, AutoApprove
+from oarepo_workflows.utils import needs_from_generators, get_from_requests_workflow
 
-from oarepo_requests.permissions.identity import autoapprove, request_active
+from oarepo_requests.permissions.identity import request_active
+from oarepo_requests.resolvers.autoapprove import AutoApprover
 from oarepo_requests.utils import (
-    get_from_requests_workflow,
     get_matching_service_for_record,
 )
 
 
 # todo - is the repeated resolving of topic a perfomance hindrance?
 def _try_state_change(
-    identity, action, action_name, request_states, topic, uow, *args, **kwargs
+    identity, action, transition_state, request_states, topic, uow, *args, **kwargs
 ):
     if topic.model.is_deleted:  # todo should status be changed on deleted topic too?
         return
-    if action_name in request_states:
+    if hasattr(request_states, transition_state):
         revision_before = topic.revision_id
         current_oarepo_workflows.set_state(
             identity,
             topic,
-            request_states[action_name],
+            getattr(request_states, transition_state),
             request=action.request,
             uow=uow,
         )
@@ -99,7 +100,7 @@ class TopicStateChangeFromWorkflowComponent:
         _try_state_change(
             identity,
             action,
-            action.action_type,
+            action.transition_state,
             request_states,
             topic,
             uow,
@@ -113,42 +114,42 @@ class AutoAcceptComponent:
         pass
 
     def after(self, action, identity, uow, *args, **kwargs):
-        if not action.action_type == "submit":
+        if not action.transition_state == "submitted":
             return
-        topic = action.request.topic.resolve()
-        request_type = action.request.type.type_id
-        # if workflows are defined
-        workflow_id = getattr(topic.parent, "workflow", None)
-        if not workflow_id:
+        receiver = action.request.receiver.resolve()
+        if not isinstance(receiver, AutoApprover) or not receiver.value == "true":
             return
-        generators = get_from_requests_workflow(workflow_id, request_type, "recipients")
-        needs = needs_from_generators(generators, **kwargs)
-        if autoapprove in needs:
-            action_obj = RequestActions.get_action(action.request, "accept")
-            if not action_obj.can_execute():
-                raise CannotExecuteActionError("accept")
-            action_obj.execute(identity, uow)
+
+        action_obj = RequestActions.get_action(action.request, "accept")
+        if not action_obj.can_execute():
+            raise CannotExecuteActionError("accept")
+        action_obj.execute(identity, uow)
 
 
 # ----
 class OARepoGenericActionMixin:
     # todo alternatively this can be abstract methods or mixins instead of components
+    # podle me je to delat takhle prehlednejsi a snadneji spravovatelny nez mixiny nebo dekoratory, nemusi se
+    # jmenovat komponenty kvuli konceptualni odlisnosti od invenia
     components = []
-    action = None
+    user_execute = None
+    invenio_execute = None
 
     def execute(self, identity, uow, *args, **kwargs):
 
         for c in self.components:
             c.before(self, identity, uow, *args, **kwargs)
-        if self.action:  # user defined action
-            self.action(identity, uow, *args, **kwargs)
-        super().execute(identity, uow, *args, **kwargs)  # invenio parent
+        if self.user_execute:  # user defined action
+            self.user_execute(identity, uow, *args, **kwargs)
+        self.invenio_execute(identity, uow, *args, **kwargs)
+        #super().execute(identity, uow, *args, **kwargs)  #todo invenio parent; this won't work in case of subclasses - specifically call the invenio part?
         for c in self.components:
             c.after(self, identity, uow, *args, **kwargs)
 
 
 class OARepoSubmitAction(OARepoGenericActionMixin, actions.SubmitAction):
-    action_type = "submit"
+    transition_state = "submitted"
+    invenio_execute = actions.SubmitAction.execute
     components = [
         AutoAcceptComponent(),
         TopicStateChangeFromWorkflowComponent(),
@@ -157,12 +158,14 @@ class OARepoSubmitAction(OARepoGenericActionMixin, actions.SubmitAction):
 
 
 class OARepoDeclineAction(OARepoGenericActionMixin, actions.DeclineAction):
-    action_type = "decline"
+    transition_state = "rejected"
+    invenio_execute = actions.DeclineAction.execute
     components = [TopicStateChangeFromWorkflowComponent(), RequestIdentityComponent()]
 
 
 class OARepoAcceptAction(OARepoGenericActionMixin, actions.AcceptAction):
-    action_type = "accept"
+    transition_state = "approved"
+    invenio_execute = actions.AcceptAction.execute
     components = [TopicStateChangeFromWorkflowComponent(), RequestIdentityComponent()]
 
 

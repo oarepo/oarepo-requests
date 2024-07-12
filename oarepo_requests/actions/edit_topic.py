@@ -12,4 +12,4 @@ def edit_topic(action_obj, identity, uow, *args, **kwargs):
 
 
 class EditTopicAcceptAction(OARepoAcceptAction):
-    action = edit_topic
+    user_execute = edit_topic
