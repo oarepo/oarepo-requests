@@ -2,6 +2,7 @@ import os
 
 import pytest
 from flask_security import login_user
+from invenio_access.permissions import system_identity
 from invenio_accounts.proxies import current_datastore
 from invenio_accounts.testutils import login_user_via_session
 from invenio_app.factory import create_api
@@ -13,30 +14,34 @@ from invenio_requests.records.api import RequestEventFormat
 from invenio_users_resources.records import UserAggregate
 from oarepo_runtime.services.generators import RecordOwners
 from oarepo_workflows import (
+    AutoApprove,
+    AutoRequest,
+    RecipientGeneratorMixin,
     Workflow,
     WorkflowRequest,
     WorkflowRequestPolicy,
-    WorkflowTransitions, RecipientGeneratorMixin, AutoRequest, AutoApprove,
+    WorkflowTransitions,
 )
 from oarepo_workflows.permissions.generators import IfInState
-from oarepo_workflows.permissions.policy import DefaultWorkflowPermissionPolicy
 from thesis.proxies import current_service
 from thesis.records.api import ThesisDraft, ThesisRecord
-from invenio_access.permissions import system_identity
 
 from oarepo_requests.actions.generic import (
     OARepoAcceptAction,
     OARepoDeclineAction,
     OARepoSubmitAction,
 )
-from oarepo_requests.permissions.presets import DefaultWithRequestsWorkflowPermissionPolicy
-from oarepo_requests.types import ModelRefTypes, NonDuplicableOARepoRequestType
+from oarepo_requests.permissions.presets import (
+    DefaultWithRequestsWorkflowPermissionPolicy,
+)
 from oarepo_requests.receiver import default_workflow_receiver_function
+from oarepo_requests.types import ModelRefTypes, NonDuplicableOARepoRequestType
 
 
 class TestUserReceiver(RecipientGeneratorMixin, Generator):
     def reference_receivers(self, **kwargs):
         return [{"user": "2"}]
+
 
 class DefaultRequests(WorkflowRequestPolicy):
     publish_draft = WorkflowRequest(
@@ -58,6 +63,7 @@ class DefaultRequests(WorkflowRequestPolicy):
         recipients=[AutoApprove()],
         transitions=WorkflowTransitions(),
     )
+
 
 class RequestsWithApprove(WorkflowRequestPolicy):
     publish_draft = WorkflowRequest(
@@ -103,7 +109,6 @@ class ApproveRequestType(NonDuplicableOARepoRequestType):
     allowed_topic_ref_types = ModelRefTypes(published=False, draft=True)
 
 
-
 WORKFLOWS = {
     "default": Workflow(
         label=_("Default workflow"),
@@ -116,6 +121,7 @@ WORKFLOWS = {
         requests_cls=RequestsWithApprove,
     ),
 }
+
 
 @pytest.fixture
 def change_workflow_function():

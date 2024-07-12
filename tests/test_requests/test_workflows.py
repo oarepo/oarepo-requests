@@ -3,7 +3,6 @@ from invenio_drafts_resources.services.records.uow import ParentRecordCommitOp
 from invenio_records_permissions.generators import SystemProcess
 from invenio_records_resources.services.uow import RecordCommitOp, unit_of_work
 from oarepo_workflows.permissions.generators import CreatorsFromWorkflow
-
 from thesis.records.api import ThesisDraft, ThesisRecord
 
 from tests.test_requests.utils import link_api2testclient

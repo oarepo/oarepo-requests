@@ -1,5 +1,6 @@
 from invenio_records_permissions.generators import Generator
 from invenio_search.engine import dsl
+
 from oarepo_requests.permissions.identity import request_active
 
 
@@ -14,6 +15,7 @@ class RequestActive(Generator):
             return dsl.Q("match_all")
         else:
             return []
+
 
 class SubmissionReviewer(Generator):
     # todo - from rdm, here should be generator for accesing request topic by receivers

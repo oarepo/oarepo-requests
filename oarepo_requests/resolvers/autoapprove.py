@@ -1,11 +1,11 @@
 from invenio_access.permissions import system_process
-from invenio_records_resources.references.entity_resolvers import (
-    EntityProxy,
-)
+from invenio_records_resources.references.entity_resolvers import EntityProxy
+
 
 class AutoApprover:
     def __init__(self, value):
         self.value = value
+
 
 class AutoApproveProxy(EntityProxy):
     """Resolver proxy for a User entity."""
@@ -23,6 +23,8 @@ class AutoApproveProxy(EntityProxy):
 
 
 from invenio_records_resources.references.entity_resolvers.base import EntityResolver
+
+
 class AutoApproveResolver(EntityResolver):
     """Community entity resolver.
 
@@ -39,7 +41,6 @@ class AutoApproveResolver(EntityResolver):
         super().__init__(
             None,
         )
-
 
     def matches_reference_dict(self, ref_dict):
         """Check if the reference dict references a user."""

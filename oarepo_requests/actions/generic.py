@@ -3,14 +3,11 @@ from invenio_requests.customizations import actions
 from invenio_requests.customizations.actions import RequestActions
 from invenio_requests.errors import CannotExecuteActionError
 from oarepo_workflows.proxies import current_oarepo_workflows
-from oarepo_workflows.requests.policy import auto_approve_need, AutoApprove
-from oarepo_workflows.utils import needs_from_generators, get_from_requests_workflow
+from oarepo_workflows.utils import get_from_requests_workflow
 
 from oarepo_requests.permissions.identity import request_active
 from oarepo_requests.resolvers.autoapprove import AutoApprover
-from oarepo_requests.utils import (
-    get_matching_service_for_record,
-)
+from oarepo_requests.utils import get_matching_service_for_record
 
 
 # todo - is the repeated resolving of topic a perfomance hindrance?
@@ -142,7 +139,7 @@ class OARepoGenericActionMixin:
         if self.user_execute:  # user defined action
             self.user_execute(identity, uow, *args, **kwargs)
         self.invenio_execute(identity, uow, *args, **kwargs)
-        #super().execute(identity, uow, *args, **kwargs)  #todo invenio parent; this won't work in case of subclasses - specifically call the invenio part?
+        # super().execute(identity, uow, *args, **kwargs)  #todo invenio parent; this won't work in case of subclasses - specifically call the invenio part?
         for c in self.components:
             c.after(self, identity, uow, *args, **kwargs)
 

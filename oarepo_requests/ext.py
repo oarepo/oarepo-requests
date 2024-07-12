@@ -91,6 +91,7 @@ class OARepoRequests:
         """Initialize configuration."""
 
         from . import config
+
         # todo extend allows duplicates
         app.config.setdefault("REQUESTS_REGISTERED_TYPES", []).extend(
             config.REQUESTS_REGISTERED_TYPES

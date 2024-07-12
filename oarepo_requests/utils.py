@@ -144,5 +144,3 @@ def stringify_first_val(dct):
 
 def reference_to_tuple(reference):
     return (list(reference.keys())[0], list(reference.values())[0])
-
-

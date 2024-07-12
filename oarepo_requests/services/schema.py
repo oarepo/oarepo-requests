@@ -49,7 +49,5 @@ class NoneReceiverGenericRequestSchema(GenericRequestSchema):
 
 
 class RequestsSchemaMixin:
-    requests = ma.fields.List(
-        ma.fields.Nested(NoneReceiverGenericRequestSchema)
-    )
+    requests = ma.fields.List(ma.fields.Nested(NoneReceiverGenericRequestSchema))
     request_types = ma.fields.List(ma.fields.Nested(RequestTypeSchema))

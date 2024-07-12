@@ -5,7 +5,7 @@ from invenio_requests.customizations.actions import RequestActions
 from invenio_requests.errors import CannotExecuteActionError
 from invenio_requests.resolvers.registry import ResolverRegistry
 from oarepo_workflows.requests.policy import auto_request_need
-from oarepo_workflows.utils import get_workflow_from_record, get_from_requests_workflow
+from oarepo_workflows.utils import get_from_requests_workflow, get_workflow_from_record
 
 from ..proxies import current_oarepo_requests_service
 

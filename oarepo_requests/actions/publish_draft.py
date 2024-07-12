@@ -1,6 +1,7 @@
 from ..utils import get_matching_service_for_record
 from .generic import OARepoAcceptAction
 
+
 def publish_draft(action_obj, identity, uow, *args, **kwargs):
     topic = action_obj.request.topic.resolve()
     topic_service = get_matching_service_for_record(topic)
