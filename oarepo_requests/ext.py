@@ -24,6 +24,7 @@ class OARepoRequests:
         self.init_config(app)
         self.init_services(app)
         self.init_resources(app)
+        self.init_registry(app)
         app.extensions["oarepo-requests"] = self
 
     @property
@@ -90,7 +91,7 @@ class OARepoRequests:
         """Initialize configuration."""
 
         from . import config
-
+        # todo extend allows duplicates
         app.config.setdefault("REQUESTS_REGISTERED_TYPES", []).extend(
             config.REQUESTS_REGISTERED_TYPES
         )
@@ -106,3 +107,14 @@ class OARepoRequests:
         app.config.setdefault("REQUESTS_UI_SERIALIZATION_REFERENCED_FIELDS", []).extend(
             config.REQUESTS_UI_SERIALIZATION_REFERENCED_FIELDS
         )
+
+    def init_registry(self, app):
+        # resolvers aren't registered if they are intiated after invenio-requests
+        # the same problem could happen for all stuff that needs to be registered?
+        # ? perhaps we should have one method somewhere for registering everything after the ext init phase
+        if "invenio-requests" in app.extensions:
+            requests = app.extensions["invenio-requests"]
+            resolvers = app.config.get("REQUESTS_ENTITY_RESOLVERS", [])
+            registry = requests.entity_resolvers_registry
+            for resolver in resolvers:
+                registry.register_type(resolver, force=False)
