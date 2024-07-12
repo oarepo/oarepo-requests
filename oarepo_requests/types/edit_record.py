@@ -7,7 +7,7 @@ from .ref_types import ModelRefTypes
 
 
 class EditPublishedRecordRequestType(NonDuplicableOARepoRequestType):
-    type_id = "edit-published-record"
+    type_id = "edit_published_record"
     name = _("Edit record")
 
     @classmethod

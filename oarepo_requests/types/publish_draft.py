@@ -7,7 +7,7 @@ from .ref_types import ModelRefTypes
 
 
 class PublishDraftRequestType(NonDuplicableOARepoRequestType):
-    type_id = "publish-draft"
+    type_id = "publish_draft"
     name = _("Publish draft")
 
     @classmethod

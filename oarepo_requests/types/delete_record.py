@@ -7,7 +7,7 @@ from .ref_types import ModelRefTypes
 
 
 class DeletePublishedRecordRequestType(NonDuplicableOARepoRequestType):
-    type_id = "delete-published-record"
+    type_id = "delete_published_record"
     name = _("Delete record")
 
     @classmethod
