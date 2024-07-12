@@ -1,5 +1,6 @@
 from invenio_users_resources.entity_resolvers import GroupResolver, UserResolver
 
+from oarepo_requests.resolvers.autoapprove import AutoApproveResolver
 from oarepo_requests.resolvers.ui import (
     FallbackEntityReferenceUIResolver,
     GroupEntityReferenceUIResolver,
@@ -18,11 +19,12 @@ REQUESTS_REGISTERED_TYPES = [
     # StatusChangingPublishDraftRequestType(),
 ]
 
-REQUESTS_ALLOWED_RECEIVERS = ["user", "group"]
+REQUESTS_ALLOWED_RECEIVERS = ["user", "group", "auto_approve"]
 
 REQUESTS_ENTITY_RESOLVERS = [
     UserResolver(),
     GroupResolver(),
+    AutoApproveResolver(),
 ]
 
 ENTITY_REFERENCE_UI_RESOLVERS = {
