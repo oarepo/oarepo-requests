@@ -284,3 +284,7 @@ msgstr ""
 
 msgid "Invalid format."
 msgstr ""
+
+#: /Users/miroslavbauer/Code/github.com/oarepo/oarepo-requests/oarepo_requests/invenio_patches.py:100
+msgid "Request status"
+msgstr "Stav žádosti"

@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2024-07-09 09:13+0200\n"
+"POT-Creation-Date: 2024-07-15 09:46+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -38,7 +38,7 @@ msgid "Cancelled"
 msgstr ""
 
 #: /Users/miroslavbauer/Code/github.com/oarepo/oarepo-requests/oarepo_requests/invenio_patches.py:100
-msgid "Status"
+msgid "Request status"
 msgstr ""
 
 #: /Users/miroslavbauer/Code/github.com/oarepo/oarepo-requests/oarepo_requests/invenio_patches.py:106
@@ -255,6 +255,9 @@ msgid "preview"
 msgstr ""
 
 msgid "to top"
+msgstr ""
+
+msgid "Status"
 msgstr ""
 
 msgid "Loading timeline..."

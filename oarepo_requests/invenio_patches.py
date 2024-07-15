@@ -97,7 +97,7 @@ def override_invenio_requests_config(blueprint, *args, **kwargs):
             "declined": _("Declined"),
             "cancelled": _("Cancelled"),
         }
-        status._label = _("Status")
+        status._label = _("Request status")
 
         # add extra request types dynamically
         type._value_labels = {
