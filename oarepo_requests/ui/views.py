@@ -1,3 +1,7 @@
-from flask import Blueprint
+from oarepo_requests.ui.config import RequestUIResourceConfig
+from oarepo_requests.ui.resource import RequestUIResource
 
-blueprint = Blueprint("oarepo_requests_ui", __name__, template_folder="templates")
+
+def create_blueprint(app):
+    """Register blueprint for this resource."""
+    return RequestUIResource(RequestUIResourceConfig()).as_blueprint()
