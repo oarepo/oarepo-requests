@@ -11,7 +11,9 @@ theme = WebpackThemeBundle(
                 "oarepo_requests_ui_request_detail": "./js/oarepo_requests_ui/request-detail/index.js",
                 "oarepo_requests_ui_components": "./js/oarepo_requests_ui/custom-components.js",
             },
-            dependencies={},
+            dependencies={
+                "bluebird": "^3.7.2",
+            },
             devDependencies={},
             aliases={
                 "@translations/oarepo_requests_ui": "translations/oarepo_requests_ui",
