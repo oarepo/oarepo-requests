@@ -10,35 +10,6 @@ from oarepo_requests.resolvers.autoapprove import AutoApprover
 from oarepo_requests.utils import get_matching_service_for_record
 
 
-# todo - is the repeated resolving of topic a perfomance hindrance?
-def _try_state_change(
-    identity, action, transition_state, request_states, topic, uow, *args, **kwargs
-):
-    if topic.model.is_deleted:  # todo should status be changed on deleted topic too?
-        return
-    if hasattr(request_states, transition_state):
-        revision_before = topic.revision_id
-        current_oarepo_workflows.set_state(
-            identity,
-            topic,
-            getattr(request_states, transition_state),
-            request=action.request,
-            uow=uow,
-        )
-        service = get_matching_service_for_record(topic)
-        record_cls = service.draft_cls if topic.is_draft else service.record_cls
-        updated_topic = (
-            record_cls.pid.resolve(topic["id"], registered_only=False)
-            if topic.is_draft
-            else record_cls.pid.resolve(topic["id"])
-        )
-        # todo discuss this - topic can be updated within set_state - for example due to autocreation of another request
-        # ie. accept action of approve triggers autocreation of publish request, switching the state to publishing
-        if revision_before == updated_topic.revision_id:
-            # if revision_before == topic.revision_id:
-            uow.register(RecordCommitOp(topic, indexer=service.indexer))
-
-
 """
 class TopicStateChangeFromWorkflowMixin:
     def _try_state_change(self, identity, action, request_states, topic, uow, *args, **kwargs):
@@ -72,15 +43,48 @@ class RequestIdentityActionMixin:
 # ----
 class RequestIdentityComponent:
     def before(self, action, identity, uow, *args, **kwargs):
+
         identity.provides.add(request_active)
 
     def after(self, action, identity, uow, *args, **kwargs):
         # todo what if something fails inbetween
+        # todo nested calls could be a problem in future (identity is removed in subcall and supercall finishes without it)
         if request_active in identity.provides:
             identity.provides.remove(request_active)
 
 
 class TopicStateChangeFromWorkflowComponent:
+
+    # todo - is the repeated resolving of topic a perfomance hindrance?
+    def _try_state_change(self,
+            identity, action, transition_state, request_states, topic, uow, *args, **kwargs
+    ):
+        if topic.model.is_deleted:  # todo should status be changed on deleted topic too?
+            return
+        to_state = getattr(request_states, transition_state, None)
+        if to_state:
+            revision_before = topic.revision_id
+            current_oarepo_workflows.set_state(
+                identity,
+                topic,
+                to_state,
+                request=action.request,
+                uow=uow,
+            )
+            service = get_matching_service_for_record(topic)
+            record_cls = service.draft_cls if topic.is_draft else service.record_cls
+            updated_topic = (
+                record_cls.pid.resolve(topic["id"], registered_only=False)
+                if topic.is_draft
+                else record_cls.pid.resolve(topic["id"])
+            )
+            # todo discuss this - topic can be updated within set_state - for example due to autocreation of another request
+            # ie. accept action of approve triggers autocreation of publish request, switching the state to publishing
+            if revision_before == updated_topic.revision_id:
+                # if revision_before == topic.revision_id:
+                uow.register(RecordCommitOp(topic, indexer=service.indexer))
+
+
     def before(self, action, identity, uow, *args, **kwargs):
         pass
 
@@ -94,7 +98,7 @@ class TopicStateChangeFromWorkflowComponent:
         request_states = get_from_requests_workflow(
             workflow_id, request_type, "transitions"
         )
-        _try_state_change(
+        self._try_state_change(
             identity,
             action,
             action.transition_state,
@@ -142,6 +146,10 @@ class OARepoGenericActionMixin:
         # super().execute(identity, uow, *args, **kwargs)  #todo invenio parent; this won't work in case of subclasses - specifically call the invenio part?
         for c in self.components:
             c.after(self, identity, uow, *args, **kwargs)
+        # todo except Exception as e: # to eg. rollback changes from components
+        #   for c in self.components:
+        #       c.on_exception(self, identity, e, uow, *args, **kwargs)
+        #    raise e
 
 
 class OARepoSubmitAction(OARepoGenericActionMixin, actions.SubmitAction):
@@ -155,7 +163,7 @@ class OARepoSubmitAction(OARepoGenericActionMixin, actions.SubmitAction):
 
 
 class OARepoDeclineAction(OARepoGenericActionMixin, actions.DeclineAction):
-    transition_state = "rejected"
+    transition_state = "rejected" # could be replaced by status_to if we keep them same (it's not in documentation)
     invenio_execute = actions.DeclineAction.execute
     components = [TopicStateChangeFromWorkflowComponent(), RequestIdentityComponent()]
 

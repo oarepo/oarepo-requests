@@ -1,8 +1,7 @@
 import pytest
 from invenio_drafts_resources.services.records.uow import ParentRecordCommitOp
-from invenio_records_permissions.generators import SystemProcess
 from invenio_records_resources.services.uow import RecordCommitOp, unit_of_work
-from oarepo_workflows.permissions.generators import CreatorsFromWorkflow
+from oarepo_workflows.permissions.policy import CreatorsFromWorkflowPermissionPolicy
 from thesis.records.api import ThesisDraft, ThesisRecord
 
 from tests.test_requests.utils import link_api2testclient
@@ -17,20 +16,7 @@ def change_workflow(identity, service, record, function, uow=None):
 
 @pytest.fixture()
 def scenario_permissions():
-    from invenio_requests.services.permissions import PermissionPolicy
-
-    requests = type(
-        "RequestsPermissionPolicy",
-        (PermissionPolicy,),
-        dict(
-            can_create=[
-                SystemProcess(),
-                CreatorsFromWorkflow(),
-            ],
-        ),
-    )
-
-    return requests
+    return CreatorsFromWorkflowPermissionPolicy
 
 
 @pytest.fixture()
