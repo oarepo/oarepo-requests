@@ -220,3 +220,71 @@ msgstr "Publikovat"
 
 msgid "Close"
 msgstr "Zavřít"
+
+#: /Users/miroslavbauer/Code/github.com/oarepo/oarepo-requests/oarepo_requests/ui/templates/semantic-ui/oarepo_requests_ui/RequestDetail.jinja:3
+msgid "Request"
+msgstr ""
+
+msgid "Pending"
+msgstr ""
+
+msgid "request"
+msgstr ""
+
+msgid "Error while submitting comment."
+msgstr ""
+
+msgid "Add comment"
+msgstr ""
+
+msgid "optional"
+msgstr ""
+
+msgid "Your comment here..."
+msgstr ""
+
+msgid "Comment was not created successfully."
+msgstr ""
+
+msgid "Comment"
+msgstr ""
+
+msgid "Error while submitting the comment"
+msgstr ""
+
+msgid "Back to requests"
+msgstr ""
+
+msgid "Record"
+msgstr ""
+
+msgid "preview"
+msgstr ""
+
+msgid "to top"
+msgstr ""
+
+msgid "Loading timeline..."
+msgstr ""
+
+msgid "Error while fetching timeline events"
+msgstr ""
+
+msgid "commented"
+msgstr ""
+
+msgid "icon"
+msgstr ""
+
+msgid "this request"
+msgstr ""
+
+msgid "Comment must be at least 1 character long."
+msgstr ""
+
+msgid "Invalid format."
+msgstr ""
+
+#: /Users/miroslavbauer/Code/github.com/oarepo/oarepo-requests/oarepo_requests/invenio_patches.py:100
+msgid "Request status"
+msgstr "Stav žádosti"

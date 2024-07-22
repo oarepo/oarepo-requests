@@ -7,6 +7,7 @@ from invenio_requests.resources.requests.config import (
     RequestSearchRequestArgsSchema,
     RequestsResourceConfig,
 )
+from invenio_requests.resources.events.config import RequestCommentsResourceConfig
 from invenio_requests.services.requests.config import (
     RequestSearchOptions,
     RequestsServiceConfig,
@@ -14,7 +15,7 @@ from invenio_requests.services.requests.config import (
 from marshmallow import fields
 from opensearch_dsl.query import Bool, Term
 
-from oarepo_requests.resources.ui import OARepoRequestsUIJSONSerializer
+from oarepo_requests.resources.ui import OARepoRequestsUIJSONSerializer, OARepoRequestEventsUIJSONSerializer
 
 
 class RequestOwnerFilterParam(FilterParam):
@@ -61,7 +62,7 @@ class ExtendedRequestSearchRequestArgsSchema(RequestSearchRequestArgsSchema):
 
 
 def override_invenio_requests_config(blueprint, *args, **kwargs):
-    with blueprint.app.app_context():
+    with (blueprint.app.app_context()):
         # this monkey patch should be done better (support from invenio)
         RequestsServiceConfig.search = EnhancedRequestSearchOptions
         RequestsResourceConfig.request_search_args = (
@@ -69,9 +70,12 @@ def override_invenio_requests_config(blueprint, *args, **kwargs):
         )
 
         class LazySerializer:
+            def __init__(self, serializer_cls):
+                self.serializer_cls = serializer_cls
+
             @cached_property
             def __instance(self):
-                return OARepoRequestsUIJSONSerializer()
+                return self.serializer_cls()
 
             @property
             def serialize_object_list(self):
@@ -83,7 +87,15 @@ def override_invenio_requests_config(blueprint, *args, **kwargs):
 
         RequestsResourceConfig.response_handlers = {
             "application/json": ResponseHandler(JSONSerializer(), headers=etag_headers),
-            "application/vnd.inveniordm.v1+json": ResponseHandler(LazySerializer()),
+            "application/vnd.inveniordm.v1+json": ResponseHandler(LazySerializer(OARepoRequestsUIJSONSerializer),
+                                                                  headers=etag_headers),
+        }
+
+        RequestCommentsResourceConfig.response_handlers = {
+            "application/vnd.inveniordm.v1+json": ResponseHandler(
+                LazySerializer(OARepoRequestEventsUIJSONSerializer), headers=etag_headers
+            ),
+            **RequestCommentsResourceConfig.response_handlers
         }
 
         from invenio_requests.proxies import current_request_type_registry
@@ -97,7 +109,7 @@ def override_invenio_requests_config(blueprint, *args, **kwargs):
             "declined": _("Declined"),
             "cancelled": _("Cancelled"),
         }
-        status._label = _("Status")
+        status._label = _("Request status")
 
         # add extra request types dynamically
         type._value_labels = {

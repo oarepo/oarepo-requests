@@ -1,1 +1,2 @@
-export { RequestContext, RequestContextProvider } from './RequestContext';
+export { RequestContextProvider, useRequestContext } from './RequestContext';
+export { ConfirmModalContextProvider, useConfirmModalContext } from './ConfirmModalContext';
