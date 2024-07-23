@@ -17,11 +17,11 @@ from oarepo_workflows import (
     AutoApprove,
     AutoRequest,
     RecipientGeneratorMixin,
-    Workflow,
     WorkflowRequest,
     WorkflowRequestPolicy,
     WorkflowTransitions,
 )
+from oarepo_workflows.base import Workflow
 from oarepo_workflows.permissions.generators import IfInState
 from thesis.proxies import current_service
 from thesis.records.api import ThesisDraft, ThesisRecord
