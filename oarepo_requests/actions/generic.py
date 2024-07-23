@@ -115,7 +115,7 @@ class AutoAcceptComponent:
         pass
 
     def after(self, action, identity, uow, *args, **kwargs):
-        if not action.transition_state == "submitted":
+        if not action.transition_state == "submitted" and action.request.status == "submitted":
             return
         receiver = action.request.receiver.resolve()
         if not isinstance(receiver, AutoApprover) or not receiver.value == "true":
@@ -143,7 +143,6 @@ class OARepoGenericActionMixin:
         if self.user_execute:  # user defined action
             self.user_execute(identity, uow, *args, **kwargs)
         self.invenio_execute(identity, uow, *args, **kwargs)
-        # super().execute(identity, uow, *args, **kwargs)  #todo invenio parent; this won't work in case of subclasses - specifically call the invenio part?
         for c in self.components:
             c.after(self, identity, uow, *args, **kwargs)
         # todo except Exception as e: # to eg. rollback changes from components

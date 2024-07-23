@@ -2,6 +2,8 @@ from invenio_records_permissions.generators import Generator
 from invenio_search.engine import dsl
 
 from oarepo_requests.permissions.identity import request_active
+from oarepo_requests.utils import get_requests_service_for_records_service, get_matching_service_for_record
+from invenio_access.permissions import system_identity
 
 
 class RequestActive(Generator):
@@ -17,11 +19,14 @@ class RequestActive(Generator):
             return []
 
 
-class SubmissionReviewer(Generator):
-    # todo - from rdm, here should be generator for accesing request topic by receivers
+
+class RecordRequestsReceivers(Generator):
+    # todo - discussion of how this should actually work
 
     def needs(self, record=None, **kwargs):
-        """Set of Needs granting permission."""
+        """
+        # from rdm
+
         if record is None or record.parent.review is None:
             return []
 
@@ -33,3 +38,25 @@ class SubmissionReviewer(Generator):
         if receiver is not None:
             return receiver.get_needs(ctx=request.type.needs_context)
         return []
+        """
+
+        """
+        the search method checks this in can_read -> infinite recursion; must be done differently
+        service = get_requests_service_for_records_service(
+            get_matching_service_for_record(record)
+        )
+        reader = (
+            service.search_requests_for_draft
+            if getattr(record, "is_draft", False)
+            else service.search_requests_for_record
+        )
+
+        requests = list(reader(system_identity, record["id"]).hits)
+
+        needs = []
+        for request in requests:
+            needs += request.receiver.get_needs(ctx=request.type.needs_context)
+        return needs
+        """
+        return []
+

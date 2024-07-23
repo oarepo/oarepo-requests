@@ -89,6 +89,7 @@ dist/
 
 tests/thesis
 thesis
+thesis_workflows/
 
 todo.md
 node_modules
