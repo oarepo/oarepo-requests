@@ -2,7 +2,10 @@ from invenio_records_permissions.generators import AnyUser, AuthenticatedUser
 from oarepo_runtime.services.generators import RecordOwners
 from oarepo_workflows import DefaultWorkflowPermissionPolicy, IfInState
 
-from oarepo_requests.permissions.generators import RequestActive, RecordRequestsReceivers
+from oarepo_requests.permissions.generators import (
+    RecordRequestsReceivers,
+    RequestActive,
+)
 
 
 class DefaultWithRequestsWorkflowPermissionPolicy(DefaultWorkflowPermissionPolicy):

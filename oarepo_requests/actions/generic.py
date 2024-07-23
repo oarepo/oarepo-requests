@@ -9,7 +9,6 @@ from oarepo_requests.permissions.identity import request_active
 from oarepo_requests.resolvers.autoapprove import AutoApprover
 from oarepo_requests.utils import get_matching_service_for_record
 
-
 """
 class TopicStateChangeFromWorkflowMixin:
     def _try_state_change(self, identity, action, request_states, topic, uow, *args, **kwargs):
@@ -56,10 +55,20 @@ class RequestIdentityComponent:
 class TopicStateChangeFromWorkflowComponent:
 
     # todo - is the repeated resolving of topic a perfomance hindrance?
-    def _try_state_change(self,
-            identity, action, transition_state, request_states, topic, uow, *args, **kwargs
+    def _try_state_change(
+        self,
+        identity,
+        action,
+        transition_state,
+        request_states,
+        topic,
+        uow,
+        *args,
+        **kwargs,
     ):
-        if topic.model.is_deleted:  # todo should status be changed on deleted topic too?
+        if (
+            topic.model.is_deleted
+        ):  # todo should status be changed on deleted topic too?
             return
         to_state = getattr(request_states, transition_state, None)
         if to_state:
@@ -83,7 +92,6 @@ class TopicStateChangeFromWorkflowComponent:
             if revision_before == updated_topic.revision_id:
                 # if revision_before == topic.revision_id:
                 uow.register(RecordCommitOp(topic, indexer=service.indexer))
-
 
     def before(self, action, identity, uow, *args, **kwargs):
         pass
@@ -115,7 +123,10 @@ class AutoAcceptComponent:
         pass
 
     def after(self, action, identity, uow, *args, **kwargs):
-        if not action.transition_state == "submitted" and action.request.status == "submitted":
+        if (
+            not action.transition_state == "submitted"
+            and action.request.status == "submitted"
+        ):
             return
         receiver = action.request.receiver.resolve()
         if not isinstance(receiver, AutoApprover) or not receiver.value == "true":
@@ -162,7 +173,7 @@ class OARepoSubmitAction(OARepoGenericActionMixin, actions.SubmitAction):
 
 
 class OARepoDeclineAction(OARepoGenericActionMixin, actions.DeclineAction):
-    transition_state = "rejected" # could be replaced by status_to if we keep them same (it's not in documentation)
+    transition_state = "rejected"  # could be replaced by status_to if we keep them same (it's not in documentation)
     invenio_execute = actions.DeclineAction.execute
     components = [TopicStateChangeFromWorkflowComponent(), RequestIdentityComponent()]
 

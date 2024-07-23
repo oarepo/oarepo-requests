@@ -1,9 +1,12 @@
+from invenio_access.permissions import system_identity
 from invenio_records_permissions.generators import Generator
 from invenio_search.engine import dsl
 
 from oarepo_requests.permissions.identity import request_active
-from oarepo_requests.utils import get_requests_service_for_records_service, get_matching_service_for_record
-from invenio_access.permissions import system_identity
+from oarepo_requests.utils import (
+    get_matching_service_for_record,
+    get_requests_service_for_records_service,
+)
 
 
 class RequestActive(Generator):
@@ -17,7 +20,6 @@ class RequestActive(Generator):
             return dsl.Q("match_all")
         else:
             return []
-
 
 
 class RecordRequestsReceivers(Generator):
@@ -59,4 +61,3 @@ class RecordRequestsReceivers(Generator):
         return needs
         """
         return []
-
