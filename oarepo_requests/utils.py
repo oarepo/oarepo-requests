@@ -3,6 +3,7 @@ from invenio_requests import current_requests_service
 from invenio_requests.proxies import current_request_type_registry
 from invenio_requests.resolvers.registry import ResolverRegistry
 from invenio_search.engine import dsl
+from oarepo_workflows.proxies import current_oarepo_workflows
 
 
 def allowed_request_types_for_record(record):
@@ -18,6 +19,16 @@ def allowed_request_types_for_record(record):
         if record_ref in allowed_type_keys:
             ret[request_name] = request_type
     return ret
+
+def get_from_requests_workflow(workflow_id, type_id, segment):
+    try:
+        request = getattr(
+            current_oarepo_workflows.record_workflows[workflow_id].requests, type_id
+        )
+        ret = getattr(request, segment)
+        return ret
+    except (KeyError, AttributeError):
+        return []
 
 
 def allowed_request_types_for_record_cls(queryied_record_cls):

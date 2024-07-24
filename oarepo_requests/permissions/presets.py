@@ -1,10 +1,11 @@
-from invenio_records_permissions.generators import AnyUser, AuthenticatedUser
+from invenio_records_permissions.generators import AnyUser, AuthenticatedUser, SystemProcess
 from oarepo_runtime.services.generators import RecordOwners
 from oarepo_workflows import DefaultWorkflowPermissionPolicy, IfInState
+from invenio_requests.services.permissions import PermissionPolicy
 
 from oarepo_requests.permissions.generators import (
     RecordRequestsReceivers,
-    RequestActive,
+    RequestActive, CreatorsFromWorkflow,
 )
 
 
@@ -25,3 +26,9 @@ class DefaultWithRequestsWorkflowPermissionPolicy(DefaultWorkflowPermissionPolic
 
     can_publish = [RequestActive()]
     can_edit = [RequestActive()]
+
+class CreatorsFromWorkflowPermissionPolicy(PermissionPolicy):
+    can_create = [
+        SystemProcess(),
+        CreatorsFromWorkflow(),
+    ]
