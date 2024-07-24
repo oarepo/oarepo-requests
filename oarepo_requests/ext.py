@@ -86,6 +86,13 @@ class OARepoRequests:
             service=current_events_service,
             config=OARepoRequestsCommentsResourceConfig.build(app),
         )
+    from invenio_requests.customizations.actions import RequestAction
+    def action_components(self, action: RequestAction):
+        from . import config
+        components = config.REQUESTS_ACTION_COMPONENTS
+        if callable(components):
+            return components(action)
+        return [obj_or_import_string(component) for component in components]
 
     def init_config(self, app):
         """Initialize configuration."""
