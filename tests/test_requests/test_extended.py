@@ -9,13 +9,14 @@ def test_listing(
     users,
     urls,
     publish_request_data_function,
+    create_draft_via_resource,
     search_clear,
 ):
     creator = users[0]
     creator_client = logged_client(creator)
 
-    draft1 = creator_client.post(urls["BASE_URL"], json={})
-    draft2 = creator_client.post(urls["BASE_URL"], json={})
+    draft1 = create_draft_via_resource(creator_client)
+    draft2 = create_draft_via_resource(creator_client)
 
     creator_client.post(
         urls["BASE_URL_REQUESTS"],
@@ -40,12 +41,13 @@ def test_read_extended(
     publish_request_data_function,
     serialization_result,
     ui_serialization_result,
+    create_draft_via_resource,
     search_clear,
 ):
     creator = users[0]
     creator_client = logged_client(creator)
 
-    draft1 = creator_client.post(urls["BASE_URL"], json={})
+    draft1 = create_draft_via_resource(creator)
     draft_id = draft1.json["id"]
 
     resp_request_create = creator_client.post(
@@ -79,20 +81,22 @@ def test_read_extended(
 
 def test_update_self_link(
     logged_client,
-    example_topic_draft,
     users,
     urls,
     publish_request_data_function,
     serialization_result,
     ui_serialization_result,
+    create_draft_via_resource,
     search_clear,
 ):
     creator = users[0]
     creator_client = logged_client(creator)
 
+    draft1 = create_draft_via_resource(creator_client)
+
     resp_request_create = creator_client.post(
         urls["BASE_URL_REQUESTS"],
-        json=publish_request_data_function(example_topic_draft["id"]),
+        json=publish_request_data_function(draft1.json["id"]),
     )
     resp_request_submit = creator_client.post(
         link_api2testclient(resp_request_create.json["links"]["actions"]["submit"])
@@ -101,7 +105,7 @@ def test_update_self_link(
         link_api2testclient(resp_request_submit.json["links"]["self"]),
     )
     read_from_record = creator_client.get(
-        f"{urls['BASE_URL']}{example_topic_draft['id']}/draft?expand=true",
+        f"{urls['BASE_URL']}{draft1.json['id']}/draft?expand=true",
     )
     link_to_extended = link_api2testclient(
         read_from_record.json["expanded"]["requests"][0]["links"]["self"]
@@ -121,7 +125,6 @@ def test_update_self_link(
 
 
 def test_events_resource(
-    example_topic_draft,
     logged_client,
     users,
     urls,
@@ -129,14 +132,16 @@ def test_events_resource(
     serialization_result,
     ui_serialization_result,
     events_resource_data,
+    create_draft_via_resource,
     search_clear,
 ):
     creator = users[0]
     creator_client = logged_client(creator)
+    draft1 = create_draft_via_resource(creator_client)
 
     resp_request_create = creator_client.post(
         urls["BASE_URL_REQUESTS"],
-        json=publish_request_data_function(example_topic_draft["id"]),
+        json=publish_request_data_function(draft1.json["id"]),
     )
     resp_request_submit = creator_client.post(
         link_api2testclient(resp_request_create.json["links"]["actions"]["submit"])
@@ -146,7 +151,7 @@ def test_events_resource(
         headers={"Accept": "application/vnd.inveniordm.v1+json"},
     )
     read_from_record = creator_client.get(
-        f"{urls['BASE_URL']}{example_topic_draft['id']}/draft?expand=true",
+        f"{urls['BASE_URL']}{draft1.json['id']}/draft?expand=true",
     )
 
     comments_link = link_api2testclient(

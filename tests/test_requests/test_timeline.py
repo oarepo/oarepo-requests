@@ -10,12 +10,13 @@ def test_timeline(
     users,
     urls,
     publish_request_data_function,
+    create_draft_via_resource,
     search_clear,
 ):
     creator = users[0]
     creator_client = logged_client(creator)
 
-    draft1 = creator_client.post(urls["BASE_URL"] + "?expand=true", json={})
+    draft1 = create_draft_via_resource(creator_client)
     link = link_api2testclient(
         pick_request_type(draft1.json["expanded"]["request_types"], "publish_draft")[
             "links"

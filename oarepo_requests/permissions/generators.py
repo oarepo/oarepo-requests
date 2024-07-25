@@ -2,7 +2,7 @@ from invenio_access.permissions import system_identity
 from invenio_records_permissions.generators import Generator
 from invenio_search.engine import dsl
 from oarepo_workflows import WorkflowPermission
-from oarepo_workflows.utils import get_workflow_from_record
+from oarepo_workflows.proxies import current_oarepo_workflows
 
 from oarepo_requests.permissions.identity import request_active
 from oarepo_requests.utils import get_from_requests_workflow
@@ -27,13 +27,10 @@ class CreatorsFromWorkflow(WorkflowPermission):
 
     def _get_generators(self, record, **kwargs):
         request_type = kwargs["request_type"]
-        workflow_id = get_workflow_from_record(record)
+        workflow_id = current_oarepo_workflows.get_workflow_from_record(record)
         return get_from_requests_workflow(
             workflow_id, request_type.type_id, "requesters"
         )
-
-
-
 
 class RecordRequestsReceivers(Generator):
     # todo - discussion of how this should actually work

@@ -13,13 +13,14 @@ def test_publish(
     urls,
     publish_request_data_function,
     ui_serialization_result,
+    create_draft_via_resource,
     logged_client,
     search_clear,
 ):
     creator = users[0]
     creator_client = logged_client(creator)
 
-    draft1 = creator_client.post(urls["BASE_URL"], json={})
+    draft1 = create_draft_via_resource(creator_client)
     draft_id = draft1.json["id"]
     ThesisRecord.index.refresh()
     ThesisDraft.index.refresh()
@@ -51,6 +52,7 @@ def test_resolver_fallback(
     urls,
     publish_request_data_function,
     ui_serialization_result,
+    create_draft_via_resource,
     logged_client,
     search_clear,
 ):
@@ -62,7 +64,7 @@ def test_resolver_fallback(
     creator = users[0]
     creator_client = logged_client(creator)
 
-    draft1 = creator_client.post(urls["BASE_URL"], json={})
+    draft1 = create_draft_via_resource(creator_client)
     draft_id = draft1.json["id"]
     ThesisRecord.index.refresh()
     ThesisDraft.index.refresh()
@@ -100,6 +102,7 @@ def test_role(
     publish_request_data_function,
     logged_client,
     role_ui_serialization,
+    create_draft_via_resource,
     search_clear,
 ):
 
@@ -116,7 +119,7 @@ def test_role(
         creator = users[0]
         creator_client = logged_client(creator)
 
-        draft1 = creator_client.post(urls["BASE_URL"], json={})
+        draft1 = create_draft_via_resource(creator_client)
         draft_id = draft1.json["id"]
         ThesisRecord.index.refresh()
         ThesisDraft.index.refresh()

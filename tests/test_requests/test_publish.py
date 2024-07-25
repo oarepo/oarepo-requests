@@ -6,10 +6,10 @@ from .utils import link_api2testclient
 def test_publish(
     vocab_cf,
     logged_client,
-    identity_simple,
     users,
     urls,
     publish_request_data_function,
+    create_draft_via_resource,
     search_clear,
 ):
     creator = users[0]
@@ -18,9 +18,9 @@ def test_publish(
     creator_client = logged_client(creator)
     receiver_client = logged_client(receiver)
 
-    draft1 = creator_client.post(urls["BASE_URL"], json={})
-    draft2 = creator_client.post(urls["BASE_URL"], json={})
-    draft3 = creator_client.post(urls["BASE_URL"], json={})
+    draft1 = create_draft_via_resource(creator_client)
+    draft2 = create_draft_via_resource(creator_client)
+    draft3 = create_draft_via_resource(creator_client)
     ThesisRecord.index.refresh()
     ThesisDraft.index.refresh()
     draft_lst = creator_client.get(f"/user{urls['BASE_URL']}")

@@ -47,10 +47,10 @@ def status_changing_publish_request_data_function():
 def test_publish_with_workflows(
     vocab_cf,
     logged_client,
-    identity_simple,
     users,
     urls,
     status_changing_publish_request_data_function,
+    create_draft_via_resource,
     patch_requests_permissions,
     record_service,
     search_clear,
@@ -61,7 +61,7 @@ def test_publish_with_workflows(
     creator_client = logged_client(creator)
     receiver_client = logged_client(receiver)
 
-    draft1 = creator_client.post(urls["BASE_URL"], json={})
+    draft1 = create_draft_via_resource(creator_client)
     ThesisRecord.index.refresh()
     ThesisDraft.index.refresh()
 
@@ -114,12 +114,11 @@ def test_autorequest(
     db,
     vocab_cf,
     logged_client,
-    identity_simple,
     users,
     urls,
     patch_requests_permissions,
     record_service,
-    change_workflow_function,
+    create_draft_via_resource,
     search_clear,
 ):
     creator = users[0]
@@ -128,9 +127,8 @@ def test_autorequest(
     creator_client = logged_client(creator)
     receiver_client = logged_client(receiver)
 
-    draft1 = record_service.create(creator.identity, {})._record
-    record_id = draft1["id"]
-    change_workflow(creator.identity, record_service, draft1, change_workflow_function)
+    draft1 = create_draft_via_resource(creator_client, custom_workflow="with_approve")
+    record_id = draft1.json["id"]
 
     approve_request_data = {
         "request_type": "approve_draft",

@@ -4,16 +4,16 @@ from invenio_requests import current_request_type_registry
 from invenio_requests.customizations.actions import RequestActions
 from invenio_requests.errors import CannotExecuteActionError
 from invenio_requests.resolvers.registry import ResolverRegistry
+from oarepo_workflows.proxies import current_oarepo_workflows
 from oarepo_workflows.requests.policy import auto_request_need
-from oarepo_workflows.utils import get_workflow_from_record
 
 from ..proxies import current_oarepo_requests_service
 from ..utils import get_from_requests_workflow
 
-
+# todo - move possibly
 @unit_of_work()
 def auto_requester(identity, record, prev_value, value, *args, uow=None, **kwargs):
-    workflow_id = get_workflow_from_record(record)
+    workflow_id = current_oarepo_workflows.get_workflow_from_record(record)
     for request_type in current_request_type_registry:
         creators = get_from_requests_workflow(
             workflow_id, request_type.type_id, "requesters"

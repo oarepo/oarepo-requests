@@ -26,18 +26,20 @@ def test_draft_publish_request_present(
 
 
 def test_draft_publish_unauthorized(
-    app, record_ui_resource, example_topic, client, fake_manifest
+    app, record_ui_resource, record_factory, users, client, fake_manifest
 ):
-    with client.get(f"/thesis/{example_topic['id']}") as c:
+    topic = record_factory(users[0].identity)
+    with client.get(f"/thesis/{topic['id']}") as c:
         assert c.status_code == 200
         data = json.loads(c.text)
         assert "publish_draft" not in data["creatable_request_types"]
 
 
 def test_record_delete_request_present(
-    app, logged_client, users, record_ui_resource, example_topic, fake_manifest
+    app, record_ui_resource, logged_client, users, record_factory, fake_manifest
 ):
-    with logged_client(users[0]).get(f"/thesis/{example_topic['id']}") as c:
+    topic = record_factory(users[0].identity)
+    with logged_client(users[0]).get(f"/thesis/{topic['id']}") as c:
         assert c.status_code == 200
         data = json.loads(c.text)
         assert len(data["creatable_request_types"]) == 2
@@ -45,7 +47,7 @@ def test_record_delete_request_present(
             "description": "Request re-opening of published record",
             "links": {
                 "actions": {
-                    "create": f"https://127.0.0.1:5000/api/thesis/{example_topic['id']}/requests/edit_published_record"
+                    "create": f"https://127.0.0.1:5000/api/thesis/{topic['id']}/requests/edit_published_record"
                 }
             },
             "name": "Edit record",
@@ -54,7 +56,7 @@ def test_record_delete_request_present(
             "description": "Request deletion of published record",
             "links": {
                 "actions": {
-                    "create": f"https://127.0.0.1:5000/api/thesis/{example_topic['id']}/requests/delete_published_record"
+                    "create": f"https://127.0.0.1:5000/api/thesis/{topic['id']}/requests/delete_published_record"
                 }
             },
             "name": "Delete record",
@@ -62,9 +64,10 @@ def test_record_delete_request_present(
 
 
 def test_record_delete_unauthorized(
-    app, record_ui_resource, example_topic, client, fake_manifest
+    app, record_ui_resource, users, record_factory, client, fake_manifest
 ):
-    with client.get(f"/thesis/{example_topic['id']}") as c:
+    topic = record_factory(users[0].identity)
+    with client.get(f"/thesis/{topic['id']}") as c:
         assert c.status_code == 200
         data = json.loads(c.text)
         assert "delete_record" not in data["creatable_request_types"]
@@ -74,19 +77,20 @@ def test_request_detail_page(
     app,
     logged_client,
     record_ui_resource,
-    example_topic,
+    users,
+    record_factory,
     client,
     fake_manifest,
-    users,
     urls,
 ):
+    topic = record_factory(users[0].identity)
     creator_client = logged_client(users[0])
     creator_identity = users[0].identity
     request = current_requests_service.create(
         creator_identity,
         {},
         EditPublishedRecordRequestType,
-        topic=example_topic,
+        topic=topic,
         receiver=users[1].user,
         creator=users[0].user,
     )

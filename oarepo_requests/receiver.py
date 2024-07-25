@@ -1,10 +1,8 @@
-from oarepo_workflows.utils import get_workflow_from_record
-
+from oarepo_workflows.proxies import current_oarepo_workflows
 
 def default_workflow_receiver_function(record=None, request_type=None, **kwargs):
-    workflow_id = get_workflow_from_record(record)
+    workflow_id = current_oarepo_workflows.get_workflow_from_record(record)
     try:
-        from oarepo_workflows.proxies import current_oarepo_workflows
 
         request = getattr(
             current_oarepo_workflows.record_workflows[workflow_id].requests,

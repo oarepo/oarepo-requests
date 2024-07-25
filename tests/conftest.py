@@ -1,3 +1,4 @@
+import copy
 import os
 
 import pytest
@@ -344,12 +345,6 @@ def users(app, db, UserFixture):
     UserAggregate.index.refresh()
     return [user1, user2, user3]
 
-
-@pytest.fixture()
-def identity_simple(users):
-    return users[0].identity
-
-
 class LoggedClient:
     def __init__(self, client, user_fixture):
         self.client = client
@@ -403,17 +398,19 @@ def record_service():
 
 
 @pytest.fixture()
-def example_topic_draft(record_service, identity_simple):
-    draft = record_service.create(identity_simple, {})
+def example_topic_draft(record_service, users, default_workflow_json): #needed for ui
+    identity = users[0].identity
+    draft = record_service.create(identity, default_workflow_json)
     return draft._obj
 
 
 @pytest.fixture()
-def record_factory(record_service):
-    def record(identity):
-        draft = record_service.create(
-            identity,
-            {
+def record_factory(record_service, default_workflow_json):
+    def record(identity, custom_workflow=None, additional_data=None):
+        json = copy.deepcopy(default_workflow_json)
+        if custom_workflow: #specifying this assumes use of workflows
+            json["parent"]["workflow"] = custom_workflow
+        json = {
                 "metadata": {
                     "title": "Title",
                     "creators": [
@@ -421,22 +418,31 @@ def record_factory(record_service):
                         "Creator 2",
                     ],
                     "contributors": ["Contributor 1"],
-                }
-            },
+                },
+                **json
+            }
+        if additional_data:
+            json |= additional_data
+        draft = record_service.create(
+            identity,
+            json
         )
         record = record_service.publish(system_identity, draft.id)
         return record._obj
 
     return record
 
-
-@pytest.fixture(scope="function")
-def example_topic(record_service, identity_simple):
-    draft = record_service.create(identity_simple, {})
-    record = record_service.publish(system_identity, draft.id)
-    id_ = record.id
-    record = ThesisRecord.pid.resolve(id_)
-    return record
+@pytest.fixture()
+def create_draft_via_resource(default_workflow_json, urls):
+    def _create_draft(client, expand=True, custom_workflow=None, additional_data=None, **kwargs):
+        json = copy.deepcopy(default_workflow_json)
+        if custom_workflow:
+            json["parent"]["workflow_id"] = custom_workflow
+        if additional_data:
+            json |= additional_data
+        url = urls["BASE_URL"] + "?expand=true" if expand else urls["BASE_URL"]
+        return client.post(url, json=json, **kwargs)
+    return _create_draft
 
 
 @pytest.fixture()
@@ -480,3 +486,7 @@ def role_ui_serialization():
         "reference": {"group": "it-dep"},
         "type": "group",
     }
+
+@pytest.fixture()
+def default_workflow_json():
+    return {"parent": {"workflow_id": "default"}}
