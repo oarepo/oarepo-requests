@@ -17,7 +17,7 @@ python3 -m venv $BUILDER_VENV
 . $BUILDER_VENV/bin/activate
 pip install -U setuptools pip wheel
 pip install -U oarepo-model-builder-tests oarepo-model-builder-requests oarepo-model-builder-drafts
-
+curl -L -o forked_install.sh https://github.com/oarepo/nrp-devtools/raw/main/tests/forked_install.sh
 if test -d ./$BUILD_TEST_DIR/$MODEL; then
   rm -rf ./$BUILD_TEST_DIR/$MODEL
 fi
@@ -47,9 +47,8 @@ pip install -e .
 # todo - releases and correct install of forked repositories
 editable_install /home/ron/prace/oarepo-workflows
 editable_install /home/ron/prace/oarepo-ui
-pip uninstall -y invenio-records-resources invenio-requests invenio-drafts-resources
-forked_install invenio-records-resources oarepo-5.10.0
-forked_install invenio-requests oarepo-4.1.0
-forked_install invenio-drafts-resources oarepo-3.1.1
+sh forked_install.sh invenio-records-resources
+sh forked_install.sh invenio-requests
+sh forked_install.sh invenio-drafts-resources
 pytest $BUILD_TEST_DIR/test_requests
 pytest $BUILD_TEST_DIR/test_ui

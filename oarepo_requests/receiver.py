@@ -1,5 +1,6 @@
 from oarepo_workflows.proxies import current_oarepo_workflows
 
+
 def default_workflow_receiver_function(record=None, request_type=None, **kwargs):
     workflow_id = current_oarepo_workflows.get_workflow_from_record(record)
     try:

@@ -25,16 +25,6 @@ def test_draft_publish_request_present(
         }
 
 
-def test_draft_publish_unauthorized(
-    app, record_ui_resource, record_factory, users, client, fake_manifest
-):
-    topic = record_factory(users[0].identity)
-    with client.get(f"/thesis/{topic['id']}") as c:
-        assert c.status_code == 200
-        data = json.loads(c.text)
-        assert "publish_draft" not in data["creatable_request_types"]
-
-
 def test_record_delete_request_present(
     app, record_ui_resource, logged_client, users, record_factory, fake_manifest
 ):

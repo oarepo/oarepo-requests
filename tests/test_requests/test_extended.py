@@ -47,7 +47,7 @@ def test_read_extended(
     creator = users[0]
     creator_client = logged_client(creator)
 
-    draft1 = create_draft_via_resource(creator)
+    draft1 = create_draft_via_resource(creator_client)
     draft_id = draft1.json["id"]
 
     resp_request_create = creator_client.post(

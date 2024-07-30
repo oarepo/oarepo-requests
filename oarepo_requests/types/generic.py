@@ -55,6 +55,7 @@ class OARepoRequestType(RequestType):
             "decline": OARepoDeclineAction,
         }
 
+
 # can be simulated by switching state to a one which does not allow create
 class NonDuplicableOARepoRequestType(OARepoRequestType):
     def can_create(self, identity, data, receiver, topic, creator, *args, **kwargs):

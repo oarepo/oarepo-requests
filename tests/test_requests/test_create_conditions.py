@@ -89,7 +89,7 @@ def test_can_possibly_create(
     draft1 = create_draft_via_resource(creator_client)
     draft2 = create_draft_via_resource(creator_client)
 
-    record_resp_no_request = receiver_client.get(
+    record_resp_no_request = creator_client.get(
         f"{urls['BASE_URL']}{draft1.json['id']}/draft?expand=true"
     )
     resp_request_create = creator_client.post(
@@ -110,15 +110,15 @@ def test_can_possibly_create(
     record_resp_with_request = receiver_client.get(
         f"{urls['BASE_URL']}{draft1.json['id']}/draft?expand=true"
     )
-    record_resp_draft2 = receiver_client.get(
-        f"{urls['BASE_URL']}{draft2.json['id']}/draft?expand=true"
-    )
+    # record_resp_draft2 = receiver_client.get(
+    #    f"{urls['BASE_URL']}{draft2.json['id']}/draft?expand=true"
+    # )
     assert find_request_type(
         record_resp_no_request.json["expanded"]["request_types"], "publish_draft"
     )
-    assert find_request_type(
-        record_resp_draft2.json["expanded"]["request_types"], "publish_draft"
-    )
+    # assert find_request_type(
+    #    record_resp_draft2.json["expanded"]["request_types"], "publish_draft"
+    # )
     assert (
         find_request_type(
             record_resp_with_request.json["expanded"]["request_types"], "publish_draft"

@@ -2,6 +2,7 @@ import pytest
 from invenio_drafts_resources.services.records.uow import ParentRecordCommitOp
 from invenio_records_resources.services.uow import RecordCommitOp, unit_of_work
 from thesis.records.api import ThesisDraft, ThesisRecord
+
 from oarepo_requests.permissions.presets import CreatorsFromWorkflowPermissionPolicy
 from tests.test_requests.utils import link_api2testclient
 

@@ -5,7 +5,7 @@ from oarepo_workflows.proxies import current_oarepo_workflows
 
 from oarepo_requests.permissions.identity import request_active
 from oarepo_requests.resolvers.autoapprove import AutoApprover
-from oarepo_requests.utils import get_matching_service_for_record, get_from_requests_workflow
+from oarepo_requests.utils import get_matching_service_for_record
 
 
 class RequestActionComponent:
@@ -71,14 +71,14 @@ class TopicStateChangeFromWorkflowComponent(RequestActionComponent):
 
     def after(self, action, identity, uow, *args, **kwargs):
         topic = action.request.topic.resolve()
-        request_type = action.request.type.type_id
+        request_type = action.request.type
         # if workflows are defined
         workflow_id = getattr(topic.parent, "workflow", None)
         if not workflow_id:
             return
-        request_states = get_from_requests_workflow(
-            workflow_id, request_type, "transitions"
-        )
+        request_states = current_oarepo_workflows.get_workflow(
+            workflow_id
+        ).request_transitions(request_type)
         self._try_state_change(
             identity,
             action,

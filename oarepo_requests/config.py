@@ -1,7 +1,10 @@
 from invenio_users_resources.entity_resolvers import GroupResolver, UserResolver
 
-from oarepo_requests.actions.components import RequestIdentityComponent, TopicStateChangeFromWorkflowComponent, \
-    AutoAcceptComponent
+from oarepo_requests.actions.components import (
+    AutoAcceptComponent,
+    RequestIdentityComponent,
+    TopicStateChangeFromWorkflowComponent,
+)
 from oarepo_requests.resolvers.autoapprove import AutoApproveResolver
 from oarepo_requests.resolvers.ui import (
     FallbackEntityReferenceUIResolver,
@@ -37,4 +40,8 @@ ENTITY_REFERENCE_UI_RESOLVERS = {
 
 REQUESTS_UI_SERIALIZATION_REFERENCED_FIELDS = ["created_by", "receiver", "topic"]
 
-REQUESTS_ACTION_COMPONENTS = [AutoAcceptComponent, TopicStateChangeFromWorkflowComponent, RequestIdentityComponent] #komponenty; obj_or_import_string; can be callable
+REQUESTS_ACTION_COMPONENTS = [
+    AutoAcceptComponent,
+    TopicStateChangeFromWorkflowComponent,
+    RequestIdentityComponent,
+]  # komponenty; obj_or_import_string; can be callable

@@ -2,7 +2,6 @@ from ..utils import get_matching_service_for_record
 from .generic import OARepoAcceptAction
 
 
-
 class DeleteTopicAcceptAction(OARepoAcceptAction):
 
     def apply(self, identity, uow, *args, **kwargs):

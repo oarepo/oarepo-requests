@@ -2,13 +2,14 @@ import copy
 import os
 
 import pytest
+from flask_principal import UserNeed
 from flask_security import login_user
 from invenio_access.permissions import system_identity
 from invenio_accounts.proxies import current_datastore
 from invenio_accounts.testutils import login_user_via_session
 from invenio_app.factory import create_api
 from invenio_i18n import lazy_gettext as _
-from invenio_records_permissions.generators import Generator
+from invenio_records_permissions.generators import AuthenticatedUser, Generator
 from invenio_requests.customizations import CommentEventType, LogEventType
 from invenio_requests.proxies import current_requests
 from invenio_requests.records.api import RequestEventFormat
@@ -25,13 +26,14 @@ from oarepo_workflows import (
 from oarepo_workflows.base import Workflow
 from oarepo_workflows.permissions.generators import IfInState
 from thesis.proxies import current_service
-from thesis.records.api import ThesisDraft, ThesisRecord
+from thesis.records.api import ThesisDraft
 
 from oarepo_requests.actions.generic import (
     OARepoAcceptAction,
     OARepoDeclineAction,
     OARepoSubmitAction,
 )
+from oarepo_requests.permissions.generators import RecordRequestsReceivers
 from oarepo_requests.permissions.presets import (
     DefaultWithRequestsWorkflowPermissionPolicy,
 )
@@ -40,6 +42,9 @@ from oarepo_requests.types import ModelRefTypes, NonDuplicableOARepoRequestType
 
 
 class TestUserReceiver(RecipientGeneratorMixin, Generator):
+    def needs(self, **kwargs):
+        return [UserNeed(2)]
+
     def reference_receivers(self, **kwargs):
         return [{"user": "2"}]
 
@@ -110,6 +115,16 @@ class ApproveRequestType(NonDuplicableOARepoRequestType):
     allowed_topic_ref_types = ModelRefTypes(published=False, draft=True)
 
 
+class WithApprovalPermissionPolicy(DefaultWithRequestsWorkflowPermissionPolicy):
+    can_read = [
+        IfInState("draft", [RecordOwners()]),
+        IfInState("approving", [RecordOwners(), RecordRequestsReceivers()]),
+        IfInState("approved", [RecordOwners(), RecordRequestsReceivers()]),
+        IfInState("publishing", [RecordOwners(), RecordRequestsReceivers()]),
+        IfInState("deleting", [AuthenticatedUser()]),
+    ]
+
+
 WORKFLOWS = {
     "default": Workflow(
         label=_("Default workflow"),
@@ -118,7 +133,7 @@ WORKFLOWS = {
     ),
     "with_approve": Workflow(
         label=_("Workflow with approval process"),
-        permissions_cls=DefaultWithRequestsWorkflowPermissionPolicy,
+        permissions_cls=WithApprovalPermissionPolicy,
         requests_cls=RequestsWithApprove,
     ),
 }
@@ -345,6 +360,7 @@ def users(app, db, UserFixture):
     UserAggregate.index.refresh()
     return [user1, user2, user3]
 
+
 class LoggedClient:
     def __init__(self, client, user_fixture):
         self.client = client
@@ -398,7 +414,7 @@ def record_service():
 
 
 @pytest.fixture()
-def example_topic_draft(record_service, users, default_workflow_json): #needed for ui
+def example_topic_draft(record_service, users, default_workflow_json):  # needed for ui
     identity = users[0].identity
     draft = record_service.create(identity, default_workflow_json)
     return draft._obj
@@ -408,33 +424,33 @@ def example_topic_draft(record_service, users, default_workflow_json): #needed f
 def record_factory(record_service, default_workflow_json):
     def record(identity, custom_workflow=None, additional_data=None):
         json = copy.deepcopy(default_workflow_json)
-        if custom_workflow: #specifying this assumes use of workflows
+        if custom_workflow:  # specifying this assumes use of workflows
             json["parent"]["workflow"] = custom_workflow
         json = {
-                "metadata": {
-                    "title": "Title",
-                    "creators": [
-                        "Creator 1",
-                        "Creator 2",
-                    ],
-                    "contributors": ["Contributor 1"],
-                },
-                **json
-            }
+            "metadata": {
+                "title": "Title",
+                "creators": [
+                    "Creator 1",
+                    "Creator 2",
+                ],
+                "contributors": ["Contributor 1"],
+            },
+            **json,
+        }
         if additional_data:
             json |= additional_data
-        draft = record_service.create(
-            identity,
-            json
-        )
+        draft = record_service.create(identity, json)
         record = record_service.publish(system_identity, draft.id)
         return record._obj
 
     return record
 
+
 @pytest.fixture()
 def create_draft_via_resource(default_workflow_json, urls):
-    def _create_draft(client, expand=True, custom_workflow=None, additional_data=None, **kwargs):
+    def _create_draft(
+        client, expand=True, custom_workflow=None, additional_data=None, **kwargs
+    ):
         json = copy.deepcopy(default_workflow_json)
         if custom_workflow:
             json["parent"]["workflow_id"] = custom_workflow
@@ -442,6 +458,7 @@ def create_draft_via_resource(default_workflow_json, urls):
             json |= additional_data
         url = urls["BASE_URL"] + "?expand=true" if expand else urls["BASE_URL"]
         return client.post(url, json=json, **kwargs)
+
     return _create_draft
 
 
@@ -486,6 +503,7 @@ def role_ui_serialization():
         "reference": {"group": "it-dep"},
         "type": "group",
     }
+
 
 @pytest.fixture()
 def default_workflow_json():
