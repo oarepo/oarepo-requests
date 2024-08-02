@@ -1,5 +1,3 @@
-from functools import cached_property
-
 from invenio_base.utils import obj_or_import_string
 from invenio_requests.proxies import current_events_service
 
@@ -24,7 +22,6 @@ class OARepoRequests:
         self.init_config(app)
         self.init_services(app)
         self.init_resources(app)
-        self.init_registry(app)
         app.extensions["oarepo-requests"] = self
 
     @property
@@ -47,15 +44,6 @@ class OARepoRequests:
             creator=creator,
             data=data,
         )
-
-    @cached_property
-    def allowed_topic_ref_types(self):
-        entity_resolvers = self.app.config.get("REQUESTS_ENTITY_RESOLVERS", [])
-        return {x.type_key for x in entity_resolvers}
-
-    @cached_property
-    def requests_entity_resolvers(self):
-        return self.app.config.get("REQUESTS_ENTITY_RESOLVERS", [])
 
     @property
     def allowed_receiver_ref_types(self):
@@ -95,22 +83,18 @@ class OARepoRequests:
         components = config.REQUESTS_ACTION_COMPONENTS
         if callable(components):
             return components(action)
-        return [obj_or_import_string(component) for component in components]
+        return [
+            obj_or_import_string(component)
+            for component in components[action.status_to]
+        ]
 
     def init_config(self, app):
         """Initialize configuration."""
 
         from . import config
 
-        # todo extend allows duplicates
-        app.config.setdefault("REQUESTS_REGISTERED_TYPES", []).extend(
-            config.REQUESTS_REGISTERED_TYPES
-        )
         app.config.setdefault("REQUESTS_ALLOWED_RECEIVERS", []).extend(
             config.REQUESTS_ALLOWED_RECEIVERS
-        )
-        app.config.setdefault("REQUESTS_ENTITY_RESOLVERS", []).extend(
-            config.REQUESTS_ENTITY_RESOLVERS
         )
         app.config.setdefault("ENTITY_REFERENCE_UI_RESOLVERS", {}).update(
             config.ENTITY_REFERENCE_UI_RESOLVERS
@@ -118,14 +102,3 @@ class OARepoRequests:
         app.config.setdefault("REQUESTS_UI_SERIALIZATION_REFERENCED_FIELDS", []).extend(
             config.REQUESTS_UI_SERIALIZATION_REFERENCED_FIELDS
         )
-
-    def init_registry(self, app):
-        # resolvers aren't registered if they are intiated after invenio-requests
-        # the same problem could happen for all stuff that needs to be registered?
-        # ? perhaps we should have one method somewhere for registering everything after the ext init phase
-        if "invenio-requests" in app.extensions:
-            requests = app.extensions["invenio-requests"]
-            resolvers = app.config.get("REQUESTS_ENTITY_RESOLVERS", [])
-            registry = requests.entity_resolvers_registry
-            for resolver in resolvers:
-                registry.register_type(resolver, force=False)

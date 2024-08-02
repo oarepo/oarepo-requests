@@ -1,4 +1,5 @@
 from invenio_records_resources.references import RecordResolver
+from invenio_requests.proxies import current_requests
 
 from oarepo_requests.proxies import current_oarepo_requests
 
@@ -16,7 +17,7 @@ class ModelRefTypes:
     def __get__(self, obj, owner):
         """Property getter, returns the list of allowed reference types."""
         ret = []
-        for ref_type in current_oarepo_requests.requests_entity_resolvers:
+        for ref_type in current_requests.entity_resolvers_registry:
             if not isinstance(ref_type, RecordResolver):
                 continue
             is_draft = getattr(ref_type.record_cls, "is_draft", False)
