@@ -6,8 +6,22 @@ from oarepo_requests.proxies import current_oarepo_requests
 
 
 class OARepoGenericActionMixin:
-    def apply(self, identity, uow, *args, **kwargs):
+    def apply(self, identity, request_type, topic, uow, *args, **kwargs):
         pass
+
+    def _execute_with_components(
+        self, components, identity, request_type, topic, uow, *args, **kwargs
+    ):
+        if not components:
+            self.apply(identity, request_type, topic, uow, *args, **kwargs)
+            super().execute(identity, uow, *args, **kwargs)
+        else:
+            with components[0].apply(
+                identity, request_type, self, topic, uow, *args, **kwargs
+            ):
+                self._execute_with_components(
+                    components[1:], identity, request_type, topic, uow, *args, **kwargs
+                )
 
     @cached_property
     def components(self):
@@ -17,25 +31,20 @@ class OARepoGenericActionMixin:
         ]
 
     def execute(self, identity, uow, *args, **kwargs):
-        for c in self.components:
-            c.before(self, identity, uow, *args, **kwargs)
-        self.apply(identity, uow, *args, **kwargs)
-        super().execute(identity, uow, *args, **kwargs)
-        for c in self.components:
-            c.after(self, identity, uow, *args, **kwargs)
-        # todo except Exception as e: # to eg. rollback changes from components
-        #   for c in self.components:
-        #       c.on_exception(self, identity, e, uow, *args, **kwargs)
-        #    raise e
+        request_type = self.request.type
+        topic = self.request.topic.resolve()
+        self._execute_with_components(
+            self.components, identity, request_type, topic, uow, *args, **kwargs
+        )
 
 
 class OARepoSubmitAction(OARepoGenericActionMixin, actions.SubmitAction):
-    transition_state = "submitted"
+    """"""
 
 
 class OARepoDeclineAction(OARepoGenericActionMixin, actions.DeclineAction):
-    transition_state = "rejected"  # could be replaced by status_to if we keep them same (it's not in documentation)
+    """"""
 
 
 class OARepoAcceptAction(OARepoGenericActionMixin, actions.AcceptAction):
-    transition_state = "approved"
+    """"""
