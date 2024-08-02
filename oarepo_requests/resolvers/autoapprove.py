@@ -1,4 +1,3 @@
-from invenio_access.permissions import system_process
 from invenio_records_resources.references.entity_resolvers import EntityProxy
 
 
@@ -14,10 +13,10 @@ class AutoApproveProxy(EntityProxy):
         return AutoApprover(value)
 
     def get_needs(self, ctx=None):
-        return [system_process]
+        return []  # granttokens calls this
 
     def pick_resolved_fields(self, identity, resolved_dict):
-        return {"value": resolved_dict["value"]}
+        return {"auto_approve": resolved_dict["value"]}
 
 
 from invenio_records_resources.references.entity_resolvers.base import EntityResolver
@@ -36,7 +35,7 @@ class AutoApproveResolver(EntityResolver):
         return self._parse_ref_dict_type(ref_dict) == self.type_id
 
     def _reference_entity(self, entity):
-        return {"auto_approve": str(entity.value)}
+        return {self.type_key: str(entity.value)}
 
     def matches_entity(self, entity):
         return isinstance(entity, AutoApprover)
