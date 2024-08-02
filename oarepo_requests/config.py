@@ -1,11 +1,8 @@
-from invenio_users_resources.entity_resolvers import GroupResolver, UserResolver
-
 from oarepo_requests.actions.components import (
     AutoAcceptComponent,
     RequestIdentityComponent,
-    TopicStateChangeFromWorkflowComponent,
+    WorkflowTransitionComponent,
 )
-from oarepo_requests.resolvers.autoapprove import AutoApproveResolver
 from oarepo_requests.resolvers.ui import (
     FallbackEntityReferenceUIResolver,
     GroupEntityReferenceUIResolver,
@@ -26,12 +23,6 @@ REQUESTS_REGISTERED_TYPES = [
 
 REQUESTS_ALLOWED_RECEIVERS = ["user", "group", "auto_approve"]
 
-REQUESTS_ENTITY_RESOLVERS = [
-    UserResolver(),
-    GroupResolver(),
-    AutoApproveResolver(),
-]
-
 ENTITY_REFERENCE_UI_RESOLVERS = {
     "user": UserEntityReferenceUIResolver("user"),
     "fallback": FallbackEntityReferenceUIResolver("fallback"),
@@ -40,8 +31,26 @@ ENTITY_REFERENCE_UI_RESOLVERS = {
 
 REQUESTS_UI_SERIALIZATION_REFERENCED_FIELDS = ["created_by", "receiver", "topic"]
 
-REQUESTS_ACTION_COMPONENTS = [
-    AutoAcceptComponent,
-    TopicStateChangeFromWorkflowComponent,
-    RequestIdentityComponent,
-]  # komponenty; obj_or_import_string; can be callable
+REQUESTS_ACTION_COMPONENTS = {
+    "accepted": [
+        WorkflowTransitionComponent,
+        RequestIdentityComponent,
+    ],
+    "submitted": [
+        AutoAcceptComponent,
+        WorkflowTransitionComponent,
+        RequestIdentityComponent,
+    ],
+    "declined": [
+        WorkflowTransitionComponent,
+        RequestIdentityComponent,
+    ],
+    "cancelled": [
+        WorkflowTransitionComponent,
+        RequestIdentityComponent,
+    ],
+    "expired": [
+        WorkflowTransitionComponent,
+        RequestIdentityComponent,
+    ],
+}
