@@ -6,6 +6,12 @@ from invenio_search.engine import dsl
 
 
 def allowed_request_types_for_record(record):
+    try:
+        from oarepo_workflows.proxies import current_oarepo_workflows
+
+        workflow_requests = current_oarepo_workflows.get_workflow(record).requests()
+    except ImportError:
+        workflow_requests = None
     request_types = current_request_type_registry._registered_types
     ret = {}
     try:
@@ -16,32 +22,8 @@ def allowed_request_types_for_record(record):
     for request_name, request_type in request_types.items():
         allowed_type_keys = set(request_type.allowed_topic_ref_types)
         if record_ref in allowed_type_keys:
-            ret[request_name] = request_type
-    return ret
-
-
-def allowed_request_types_for_record_cls(queryied_record_cls):
-    # works only for record resolvers which have record_cls and type_key
-    # and assumes 1:1 type_key - record_cls mapping; type key is the serialized type name in the ref dict
-
-    request_types = current_request_type_registry._registered_types
-    resolvers = list(ResolverRegistry.get_registered_resolvers())
-    # possibly the mapping doesn't have to be 1:1
-    type_key2record_cls = {
-        resolver.type_key: resolver.record_cls
-        for resolver in resolvers
-        if hasattr(resolver, "type_key") and hasattr(resolver, "record_cls")
-    }
-    ret = {}
-    for request_name, request_type in request_types.items():
-        allowed_type_keys = set(request_type.allowed_topic_ref_types)
-        for allowed_type_key in allowed_type_keys:
-            if allowed_type_key not in type_key2record_cls:
-                continue
-            record_cls = type_key2record_cls[allowed_type_key]
-            if record_cls == queryied_record_cls:
+            if not workflow_requests or hasattr(workflow_requests, request_name):
                 ret[request_name] = request_type
-                break
     return ret
 
 
@@ -110,13 +92,6 @@ def resolve_reference_dict(reference_dict):
 def get_matching_service_for_refdict(reference_dict):
     for resolver in ResolverRegistry.get_registered_resolvers():
         if resolver.matches_reference_dict(reference_dict):
-            return current_service_registry.get(resolver._service_id)
-    return None
-
-
-def get_matching_service_for_record(record):
-    for resolver in ResolverRegistry.get_registered_resolvers():
-        if resolver.matches_entity(record):
             return current_service_registry.get(resolver._service_id)
     return None
 
