@@ -5,10 +5,16 @@ from invenio_requests.proxies import current_requests_service
 from oarepo_requests.errors import OpenRequestAlreadyExists
 from oarepo_requests.utils import open_request_exists
 
+from ..actions.generic import (
+    OARepoAcceptAction,
+    OARepoDeclineAction,
+    OARepoSubmitAction,
+)
 from .ref_types import ModelRefTypes, ReceiverRefTypes
 
 
 class OARepoRequestType(RequestType):
+
     def can_create(self, identity, data, receiver, topic, creator, *args, **kwargs):
         current_requests_service.require_permission(
             identity, "create", record=topic, request_type=self, **kwargs
@@ -34,23 +40,26 @@ class OARepoRequestType(RequestType):
     allowed_topic_ref_types = ModelRefTypes()
     allowed_receiver_ref_types = ReceiverRefTypes()
 
+    @classmethod
+    @property
+    def available_actions(cls):
+        return {
+            **super().available_actions,
+            "submit": OARepoSubmitAction,
+            "accept": OARepoAcceptAction,
+            "decline": OARepoDeclineAction,
+        }
 
+
+# can be simulated by switching state to a one which does not allow create
 class NonDuplicableOARepoRequestType(OARepoRequestType):
     def can_create(self, identity, data, receiver, topic, creator, *args, **kwargs):
         if open_request_exists(topic, self.type_id):
             raise OpenRequestAlreadyExists(self, topic)
-        current_requests_service.require_permission(
-            identity, "create", record=topic, request_type=self, **kwargs
-        )
+        super().can_create(identity, data, receiver, topic, creator, *args, **kwargs)
 
     @classmethod
     def can_possibly_create(self, identity, topic, *args, **kwargs):
         if open_request_exists(topic, self.type_id):
             return False
-        try:
-            current_requests_service.require_permission(
-                identity, "create", record=topic, request_type=self, **kwargs
-            )
-        except PermissionDeniedError:
-            return False
-        return True
+        return super().can_possibly_create(identity, topic, *args, **kwargs)

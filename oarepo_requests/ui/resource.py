@@ -1,8 +1,5 @@
 from flask import g
-from flask_resources import (
-    route,
-    resource_requestctx,
-)
+from flask_resources import resource_requestctx, route
 from invenio_records_resources.proxies import current_service_registry
 from invenio_records_resources.resources.records.resource import (
     request_read_args,
@@ -55,7 +52,9 @@ class RequestUIResource(UIResource):
     @request_view_args
     def detail(self):
         """Returns item detail page."""
-        api_record = self.api_service.read(g.identity, resource_requestctx.view_args["pid_value"])
+        api_record = self.api_service.read(
+            g.identity, resource_requestctx.view_args["pid_value"]
+        )
         render_method = self.get_jinjax_macro(
             "detail",
             identity=g.identity,
@@ -134,12 +133,12 @@ class RequestUIResource(UIResource):
         )
 
     def get_jinjax_macro(
-            self,
-            template_type,
-            identity=None,
-            args=None,
-            view_args=None,
-            default_macro=None,
+        self,
+        template_type,
+        identity=None,
+        args=None,
+        view_args=None,
+        default_macro=None,
     ):
         """
         Returns which jinjax macro (name of the macro, including optional namespace in the form of "namespace.Macro")
@@ -156,7 +155,7 @@ class RequestUIResource(UIResource):
                 identity=g.identity,
                 default_macro="Tombstone",
             ),
-            pid=getattr(error, 'pid_value', None) or getattr(error, "pid", None)
+            pid=getattr(error, "pid_value", None) or getattr(error, "pid", None),
         )
 
     def not_found(self, error, *args, **kwargs):
@@ -166,7 +165,7 @@ class RequestUIResource(UIResource):
                 identity=g.identity,
                 default_macro="NotFound",
             ),
-            pid=getattr(error, 'pid_value', None) or getattr(error, "pid", None)
+            pid=getattr(error, "pid_value", None) or getattr(error, "pid", None),
         )
 
     def permission_denied(self, error, *args, **kwargs):
@@ -176,5 +175,5 @@ class RequestUIResource(UIResource):
                 identity=g.identity,
                 default_macro="PermissionDenied",
             ),
-            pid=getattr(error, 'pid_value', None) or getattr(error, "pid", None)
+            pid=getattr(error, "pid_value", None) or getattr(error, "pid", None),
         )

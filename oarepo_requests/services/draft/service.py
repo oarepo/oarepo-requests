@@ -24,7 +24,7 @@ class DraftRecordRequestsService(RecordRequestsService):
     ):
         """Search for record's requests."""
         record = self.draft_cls.pid.resolve(record_id, registered_only=False)
-        self.record_service.require_permission(identity, "read_draft", record=record)
+        # self.record_service.require_permission(identity, "read_draft", record=record)
 
         search_filter = dsl.query.Bool(
             "must",

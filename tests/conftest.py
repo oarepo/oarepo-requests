@@ -1,16 +1,157 @@
+import copy
 import os
 
 import pytest
+from flask_principal import UserNeed
 from flask_security import login_user
+from invenio_access.permissions import system_identity
+from invenio_accounts.proxies import current_datastore
 from invenio_accounts.testutils import login_user_via_session
 from invenio_app.factory import create_api
+from invenio_i18n import lazy_gettext as _
+from invenio_records_permissions.generators import AnyUser, AuthenticatedUser, Generator
 from invenio_requests.customizations import CommentEventType, LogEventType
 from invenio_requests.proxies import current_requests
 from invenio_requests.records.api import RequestEventFormat
 from invenio_users_resources.records import UserAggregate
-
+from oarepo_runtime.services.permissions import RecordOwners
+from oarepo_workflows import (
+    AutoApprove,
+    AutoRequest,
+    IfInState,
+    WorkflowRequest,
+    WorkflowRequestPolicy,
+    WorkflowTransitions,
+)
+from oarepo_workflows.base import Workflow
+from oarepo_workflows.requests import RecipientGeneratorMixin
 from thesis.proxies import current_service
-from thesis.records.api import ThesisDraft, ThesisRecord
+from thesis.records.api import ThesisDraft
+
+from oarepo_requests.actions.generic import (
+    OARepoAcceptAction,
+    OARepoDeclineAction,
+    OARepoSubmitAction,
+)
+from oarepo_requests.receiver import default_workflow_receiver_function
+from oarepo_requests.services.permissions.workflow_policies import (
+    DefaultWithRequestsWorkflowPermissionPolicy,
+)
+from oarepo_requests.types import ModelRefTypes, NonDuplicableOARepoRequestType
+
+
+class TestUserReceiver(RecipientGeneratorMixin, Generator):
+    def needs(self, **kwargs):
+        return [UserNeed(2)]
+
+    def reference_receivers(self, **kwargs):
+        return [{"user": "2"}]
+
+
+class DefaultRequests(WorkflowRequestPolicy):
+    publish_draft = WorkflowRequest(
+        requesters=[IfInState("draft", [RecordOwners()])],
+        recipients=[TestUserReceiver()],
+        transitions=WorkflowTransitions(
+            submitted="publishing", accepted="published", declined="draft"
+        ),
+    )
+    delete_published_record = WorkflowRequest(
+        requesters=[IfInState("published", [RecordOwners()])],
+        recipients=[TestUserReceiver()],
+        transitions=WorkflowTransitions(
+            submitted="deleting", accepted="deleted", declined="published"
+        ),
+    )
+    edit_published_record = WorkflowRequest(
+        requesters=[IfInState("published", [RecordOwners()])],
+        recipients=[AutoApprove()],
+        transitions=WorkflowTransitions(),
+    )
+
+
+class RequestsWithApprove(WorkflowRequestPolicy):
+    publish_draft = WorkflowRequest(
+        requesters=[IfInState("approved", [AutoRequest()])],
+        recipients=[TestUserReceiver()],
+        transitions=WorkflowTransitions(
+            submitted="publishing", accepted="published", declined="approved"
+        ),
+    )
+    approve_draft = WorkflowRequest(
+        requesters=[IfInState("draft", [RecordOwners()])],
+        recipients=[TestUserReceiver()],
+        transitions=WorkflowTransitions(
+            submitted="approving", accepted="approved", declined="draft"
+        ),
+    )
+    delete_published_record = WorkflowRequest(
+        requesters=[IfInState("published", [RecordOwners()])],
+        recipients=[TestUserReceiver()],
+        transitions=WorkflowTransitions(
+            submitted="deleting", accepted="deleted", declined="published"
+        ),
+    )
+    edit_published_record = WorkflowRequest(
+        requesters=[IfInState("published", [RecordOwners()])],
+        recipients=[AutoApprove()],
+        transitions=WorkflowTransitions(),
+    )
+
+
+class ApproveRequestType(NonDuplicableOARepoRequestType):
+    type_id = "approve_draft"
+    name = _("Approve draft")
+
+    available_actions = {
+        **NonDuplicableOARepoRequestType.available_actions,
+        "accept": OARepoAcceptAction,
+        "submit": OARepoSubmitAction,
+        "decline": OARepoDeclineAction,
+    }
+    description = _("Request approving of a draft")
+    receiver_can_be_none = True
+    allowed_topic_ref_types = ModelRefTypes(published=False, draft=True)
+
+
+class TestWorkflowPolicy(DefaultWithRequestsWorkflowPermissionPolicy):
+    can_read = [
+        IfInState("draft", [RecordOwners()]),
+        IfInState("publishing", [RecordOwners(), TestUserReceiver()]),
+        IfInState("published", [AnyUser()]),
+        IfInState("deleting", [AnyUser()]),
+    ]
+
+
+class WithApprovalPermissionPolicy(DefaultWithRequestsWorkflowPermissionPolicy):
+    can_read = [
+        IfInState("draft", [RecordOwners()]),
+        IfInState("approving", [RecordOwners(), TestUserReceiver()]),
+        IfInState("approved", [RecordOwners(), TestUserReceiver()]),
+        IfInState("publishing", [RecordOwners(), TestUserReceiver()]),
+        IfInState("deleting", [AuthenticatedUser()]),
+    ]
+
+
+WORKFLOWS = {
+    "default": Workflow(
+        label=_("Default workflow"),
+        permission_policy_cls=TestWorkflowPolicy,
+        request_policy_cls=DefaultRequests,
+    ),
+    "with_approve": Workflow(
+        label=_("Workflow with approval process"),
+        permission_policy_cls=WithApprovalPermissionPolicy,
+        request_policy_cls=RequestsWithApprove,
+    ),
+}
+
+
+@pytest.fixture
+def change_workflow_function():
+    from oarepo_workflows.proxies import current_oarepo_workflows
+
+    return current_oarepo_workflows.set_workflow
 
 
 @pytest.fixture(scope="module")
@@ -36,7 +177,7 @@ def urls():
 def publish_request_data_function():
     def ret_data(record_id):
         return {
-            "request_type": "publish-draft",
+            "request_type": "publish_draft",
             "topic": {"thesis_draft": record_id},
         }
 
@@ -47,7 +188,7 @@ def publish_request_data_function():
 def edit_record_data_function():
     def ret_data(record_id):
         return {
-            "request_type": "edit-published-record",
+            "request_type": "edit_published_record",
             "topic": {"thesis": record_id},
         }
 
@@ -58,7 +199,7 @@ def edit_record_data_function():
 def delete_record_data_function():
     def ret_data(record_id):
         return {
-            "request_type": "delete-published-record",
+            "request_type": "delete_published_record",
             "topic": {"thesis": record_id},
         }
 
@@ -80,7 +221,7 @@ def serialization_result():
                 "timeline": f"https://127.0.0.1:5000/api/requests/extended/{request_id}/timeline",
             },
             "revision_id": 3,
-            "type": "publish-draft",
+            "type": "publish_draft",
             "title": "",
             "number": "1",
             "status": "submitted",
@@ -136,7 +277,7 @@ def ui_serialization_result():
                 "reference": {"thesis_draft": topic_id},
                 "type": "thesis_draft",
             },
-            "type": "publish-draft",
+            "type": "publish_draft",
             # 'updated': '2024-01-26T10:06:18.084317'
         }
 
@@ -161,21 +302,10 @@ def app_config(app_config):
     )
     app_config["CACHE_TYPE"] = "SimpleCache"
 
-    def default_receiver(*args, request_type=None, **kwargs):
-        if request_type != "edit-published-record":
-            return {"user": "2"}
-        return None
+    app_config["OAREPO_REQUESTS_DEFAULT_RECEIVER"] = default_workflow_receiver_function
 
-    app_config["OAREPO_REQUESTS_DEFAULT_RECEIVER"] = default_receiver
-
-    """
-    app_config.setdefault("ENTITY_REFERENCE_UI_RESOLVERS", {}).update({
-        #"user": user_entity_reference_ui_resolver,
-        #"thesis_draft": draft_record_entity_reference_ui_resolver,
-        "thesis": record_entity_reference_ui_resolver
-    })
-    """
-
+    app_config["WORKFLOWS"] = WORKFLOWS
+    app_config["REQUESTS_REGISTERED_TYPES"] = [ApproveRequestType()]
     return app_config
 
 
@@ -210,7 +340,6 @@ def create_request(requests_service):
 
 @pytest.fixture()
 def users(app, db, UserFixture):
-
     user1 = UserFixture(
         email="user1@example.org",
         password="password",
@@ -238,11 +367,6 @@ def users(app, db, UserFixture):
     db.session.commit()
     UserAggregate.index.refresh()
     return [user1, user2, user3]
-
-
-@pytest.fixture()
-def identity_simple(users):
-    return users[0].identity
 
 
 class LoggedClient:
@@ -298,40 +422,52 @@ def record_service():
 
 
 @pytest.fixture()
-def example_topic_draft(record_service, identity_simple):
-    draft = record_service.create(identity_simple, {})
+def example_topic_draft(record_service, users, default_workflow_json):  # needed for ui
+    identity = users[0].identity
+    draft = record_service.create(identity, default_workflow_json)
     return draft._obj
 
 
 @pytest.fixture()
-def record_factory(record_service):
-    def record(identity):
-        draft = record_service.create(
-            identity,
-            {
-                "metadata": {
-                    "title": "Title",
-                    "creators": [
-                        "Creator 1",
-                        "Creator 2",
-                    ],
-                    "contributors": ["Contributor 1"],
-                }
+def record_factory(record_service, default_workflow_json):
+    def record(identity, custom_workflow=None, additional_data=None):
+        json = copy.deepcopy(default_workflow_json)
+        if custom_workflow:  # specifying this assumes use of workflows
+            json["parent"]["workflow"] = custom_workflow
+        json = {
+            "metadata": {
+                "title": "Title",
+                "creators": [
+                    "Creator 1",
+                    "Creator 2",
+                ],
+                "contributors": ["Contributor 1"],
             },
-        )
-        record = record_service.publish(identity, draft.id)
+            **json,
+        }
+        if additional_data:
+            json |= additional_data
+        draft = record_service.create(identity, json)
+        record = record_service.publish(system_identity, draft.id)
         return record._obj
 
     return record
 
 
-@pytest.fixture(scope="function")
-def example_topic(record_service, identity_simple):
-    draft = record_service.create(identity_simple, {})
-    record = record_service.publish(identity_simple, draft.id)
-    id_ = record.id
-    record = ThesisRecord.pid.resolve(id_)
-    return record
+@pytest.fixture()
+def create_draft_via_resource(default_workflow_json, urls):
+    def _create_draft(
+        client, expand=True, custom_workflow=None, additional_data=None, **kwargs
+    ):
+        json = copy.deepcopy(default_workflow_json)
+        if custom_workflow:
+            json["parent"]["workflow_id"] = custom_workflow
+        if additional_data:
+            json |= additional_data
+        url = urls["BASE_URL"] + "?expand=true" if expand else urls["BASE_URL"]
+        return client.post(url, json=json, **kwargs)
+
+    return _create_draft
 
 
 @pytest.fixture()
@@ -343,9 +479,6 @@ def events_resource_data():
             "format": RequestEventFormat.HTML.value,
         }
     }
-
-
-from invenio_accounts.proxies import current_datastore
 
 
 def _create_role(id, name, description, is_managed, database):
@@ -378,3 +511,8 @@ def role_ui_serialization():
         "reference": {"group": "it-dep"},
         "type": "group",
     }
+
+
+@pytest.fixture()
+def default_workflow_json():
+    return {"parent": {"workflow_id": "default"}}

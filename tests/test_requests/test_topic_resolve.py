@@ -1,7 +1,6 @@
 import json
 
 from invenio_access.permissions import system_identity
-
 from thesis.records.api import ThesisDraft, ThesisRecord
 
 from .utils import link_api2testclient

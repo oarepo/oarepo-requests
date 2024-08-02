@@ -1,5 +1,6 @@
-from tests.test_requests.utils import link_api2testclient
 from thesis.records.api import ThesisRecord
+
+from tests.test_requests.utils import link_api2testclient
 
 
 def pick_request_type(types_list, queried_type):
@@ -28,7 +29,7 @@ def test_record(
 
     link = link_api2testclient(
         pick_request_type(
-            record1.json["expanded"]["request_types"], "delete-published-record"
+            record1.json["expanded"]["request_types"], "delete_published_record"
         )["links"]["actions"]["create"]
     )
 
@@ -55,6 +56,7 @@ def test_draft(
     users,
     urls,
     publish_request_data_function,
+    create_draft_via_resource,
     search_clear,
 ):
     creator = users[0]
@@ -62,9 +64,9 @@ def test_draft(
     creator_client = logged_client(creator)
     receiver_client = logged_client(receiver)
 
-    draft1 = creator_client.post(urls["BASE_URL"] + "?expand=true", json={})
+    draft1 = create_draft_via_resource(creator_client)
     link = link_api2testclient(
-        pick_request_type(draft1.json["expanded"]["request_types"], "publish-draft")[
+        pick_request_type(draft1.json["expanded"]["request_types"], "publish_draft")[
             "links"
         ]["actions"]["create"]
     )

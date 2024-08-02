@@ -1,9 +1,9 @@
 import copy
 
 from deepdiff import DeepDiff
+from thesis.records.api import ThesisDraft, ThesisRecord
 
 from oarepo_requests.resolvers.ui import FallbackEntityReferenceUIResolver
-from thesis.records.api import ThesisDraft, ThesisRecord
 
 from .utils import is_valid_subdict, link_api2testclient
 
@@ -13,13 +13,14 @@ def test_publish(
     urls,
     publish_request_data_function,
     ui_serialization_result,
+    create_draft_via_resource,
     logged_client,
     search_clear,
 ):
     creator = users[0]
     creator_client = logged_client(creator)
 
-    draft1 = creator_client.post(urls["BASE_URL"], json={})
+    draft1 = create_draft_via_resource(creator_client)
     draft_id = draft1.json["id"]
     ThesisRecord.index.refresh()
     ThesisDraft.index.refresh()
@@ -51,6 +52,7 @@ def test_resolver_fallback(
     urls,
     publish_request_data_function,
     ui_serialization_result,
+    create_draft_via_resource,
     logged_client,
     search_clear,
 ):
@@ -62,7 +64,7 @@ def test_resolver_fallback(
     creator = users[0]
     creator_client = logged_client(creator)
 
-    draft1 = creator_client.post(urls["BASE_URL"], json={})
+    draft1 = create_draft_via_resource(creator_client)
     draft_id = draft1.json["id"]
     ThesisRecord.index.refresh()
     ThesisDraft.index.refresh()
@@ -100,15 +102,16 @@ def test_role(
     publish_request_data_function,
     logged_client,
     role_ui_serialization,
+    create_draft_via_resource,
     search_clear,
 ):
 
     config_restore = app.config["OAREPO_REQUESTS_DEFAULT_RECEIVER"]
 
-    def current_receiver(identity, request_type, topic, creator, data):
-        if request_type == "publish-draft":
+    def current_receiver(record=None, request_type=None, **kwargs):
+        if request_type.type_id == "publish_draft":
             return role
-        return config_restore(identity, request_type, topic, creator, data)
+        return config_restore(record, request_type, **kwargs)
 
     try:
         app.config["OAREPO_REQUESTS_DEFAULT_RECEIVER"] = current_receiver
@@ -116,7 +119,7 @@ def test_role(
         creator = users[0]
         creator_client = logged_client(creator)
 
-        draft1 = creator_client.post(urls["BASE_URL"], json={})
+        draft1 = create_draft_via_resource(creator_client)
         draft_id = draft1.json["id"]
         ThesisRecord.index.refresh()
         ThesisDraft.index.refresh()

@@ -1,5 +1,3 @@
-from functools import cached_property
-
 from invenio_base.utils import obj_or_import_string
 from invenio_requests.proxies import current_events_service
 
@@ -34,7 +32,7 @@ class OARepoRequests:
     def ui_serialization_referenced_fields(self):
         return self.app.config["REQUESTS_UI_SERIALIZATION_REFERENCED_FIELDS"]
 
-    def default_request_receiver(self, identity, request_type, topic, creator, data):
+    def default_request_receiver(self, identity, request_type, record, creator, data):
         # TODO: if the topic is one of the workflow topics, use the workflow to determine the receiver
         # otherwise use the default receiver
         return obj_or_import_string(
@@ -42,19 +40,10 @@ class OARepoRequests:
         )(
             identity=identity,
             request_type=request_type,
-            topic=topic,
+            record=record,
             creator=creator,
             data=data,
         )
-
-    @cached_property
-    def allowed_topic_ref_types(self):
-        entity_resolvers = self.app.config.get("REQUESTS_ENTITY_RESOLVERS", [])
-        return {x.type_key for x in entity_resolvers}
-
-    @cached_property
-    def requests_entity_resolvers(self):
-        return self.app.config.get("REQUESTS_ENTITY_RESOLVERS", [])
 
     @property
     def allowed_receiver_ref_types(self):
@@ -86,19 +75,26 @@ class OARepoRequests:
             config=OARepoRequestsCommentsResourceConfig.build(app),
         )
 
+    from invenio_requests.customizations.actions import RequestAction
+
+    def action_components(self, action: RequestAction):
+        from . import config
+
+        components = config.REQUESTS_ACTION_COMPONENTS
+        if callable(components):
+            return components(action)
+        return [
+            obj_or_import_string(component)
+            for component in components[action.status_to]
+        ]
+
     def init_config(self, app):
         """Initialize configuration."""
 
         from . import config
 
-        app.config.setdefault("REQUESTS_REGISTERED_TYPES", []).extend(
-            config.REQUESTS_REGISTERED_TYPES
-        )
         app.config.setdefault("REQUESTS_ALLOWED_RECEIVERS", []).extend(
             config.REQUESTS_ALLOWED_RECEIVERS
-        )
-        app.config.setdefault("REQUESTS_ENTITY_RESOLVERS", []).extend(
-            config.REQUESTS_ENTITY_RESOLVERS
         )
         app.config.setdefault("ENTITY_REFERENCE_UI_RESOLVERS", {}).update(
             config.ENTITY_REFERENCE_UI_RESOLVERS
