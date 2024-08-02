@@ -22,8 +22,6 @@ def auto_request_state_change_notifier(
         )
         if auto_request_need in needs:
             data = kwargs["data"] if "data" in kwargs else {}
-            if "request" in kwargs and "payload" in kwargs["request"]:
-                data |= {"payload": kwargs["request"]["payload"]}
             creator_ref = ResolverRegistry.reference_identity(identity)
             request_item = current_oarepo_requests_service.create(
                 system_identity,
