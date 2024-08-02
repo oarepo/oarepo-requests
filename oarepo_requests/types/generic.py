@@ -42,11 +42,6 @@ class OARepoRequestType(RequestType):
 
     @classmethod
     @property
-    def needs_context(cls):
-        return {"request_type": cls.type_id}
-
-    @classmethod
-    @property
     def available_actions(cls):
         return {
             **super().available_actions,
@@ -61,18 +56,10 @@ class NonDuplicableOARepoRequestType(OARepoRequestType):
     def can_create(self, identity, data, receiver, topic, creator, *args, **kwargs):
         if open_request_exists(topic, self.type_id):
             raise OpenRequestAlreadyExists(self, topic)
-        current_requests_service.require_permission(
-            identity, "create", record=topic, request_type=self, **kwargs
-        )
+        super().can_create(identity, data, receiver, topic, creator, *args, **kwargs)
 
     @classmethod
     def can_possibly_create(self, identity, topic, *args, **kwargs):
         if open_request_exists(topic, self.type_id):
             return False
-        try:
-            current_requests_service.require_permission(
-                identity, "create", record=topic, request_type=self, **kwargs
-            )
-        except PermissionDeniedError:
-            return False
-        return True
+        return super().can_possibly_create(identity, topic, *args, **kwargs)
