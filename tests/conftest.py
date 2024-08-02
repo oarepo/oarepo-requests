@@ -9,22 +9,22 @@ from invenio_accounts.proxies import current_datastore
 from invenio_accounts.testutils import login_user_via_session
 from invenio_app.factory import create_api
 from invenio_i18n import lazy_gettext as _
-from invenio_records_permissions.generators import AuthenticatedUser, Generator
+from invenio_records_permissions.generators import AnyUser, AuthenticatedUser, Generator
 from invenio_requests.customizations import CommentEventType, LogEventType
 from invenio_requests.proxies import current_requests
 from invenio_requests.records.api import RequestEventFormat
 from invenio_users_resources.records import UserAggregate
-from oarepo_runtime.services.generators import RecordOwners
+from oarepo_runtime.services.permissions import RecordOwners
 from oarepo_workflows import (
     AutoApprove,
     AutoRequest,
-    RecipientGeneratorMixin,
+    IfInState,
     WorkflowRequest,
     WorkflowRequestPolicy,
     WorkflowTransitions,
 )
 from oarepo_workflows.base import Workflow
-from oarepo_workflows.permissions.generators import IfInState
+from oarepo_workflows.requests import RecipientGeneratorMixin
 from thesis.proxies import current_service
 from thesis.records.api import ThesisDraft
 
@@ -33,11 +33,10 @@ from oarepo_requests.actions.generic import (
     OARepoDeclineAction,
     OARepoSubmitAction,
 )
-from oarepo_requests.permissions.generators import RecordRequestsReceivers
-from oarepo_requests.permissions.presets import (
+from oarepo_requests.receiver import default_workflow_receiver_function
+from oarepo_requests.services.permissions.workflow_policies import (
     DefaultWithRequestsWorkflowPermissionPolicy,
 )
-from oarepo_requests.receiver import default_workflow_receiver_function
 from oarepo_requests.types import ModelRefTypes, NonDuplicableOARepoRequestType
 
 
@@ -54,14 +53,14 @@ class DefaultRequests(WorkflowRequestPolicy):
         requesters=[IfInState("draft", [RecordOwners()])],
         recipients=[TestUserReceiver()],
         transitions=WorkflowTransitions(
-            submitted="publishing", approved="published", rejected="draft"
+            submitted="publishing", accepted="published", declined="draft"
         ),
     )
     delete_published_record = WorkflowRequest(
         requesters=[IfInState("published", [RecordOwners()])],
         recipients=[TestUserReceiver()],
         transitions=WorkflowTransitions(
-            submitted="deleting", approved="deleted", rejected="published"
+            submitted="deleting", accepted="deleted", declined="published"
         ),
     )
     edit_published_record = WorkflowRequest(
@@ -76,21 +75,21 @@ class RequestsWithApprove(WorkflowRequestPolicy):
         requesters=[IfInState("approved", [AutoRequest()])],
         recipients=[TestUserReceiver()],
         transitions=WorkflowTransitions(
-            submitted="publishing", approved="published", rejected="approved"
+            submitted="publishing", accepted="published", declined="approved"
         ),
     )
     approve_draft = WorkflowRequest(
         requesters=[IfInState("draft", [RecordOwners()])],
         recipients=[TestUserReceiver()],
         transitions=WorkflowTransitions(
-            submitted="approving", approved="approved", rejected="draft"
+            submitted="approving", accepted="approved", declined="draft"
         ),
     )
     delete_published_record = WorkflowRequest(
         requesters=[IfInState("published", [RecordOwners()])],
         recipients=[TestUserReceiver()],
         transitions=WorkflowTransitions(
-            submitted="deleting", approved="deleted", rejected="published"
+            submitted="deleting", accepted="deleted", declined="published"
         ),
     )
     edit_published_record = WorkflowRequest(
@@ -115,12 +114,21 @@ class ApproveRequestType(NonDuplicableOARepoRequestType):
     allowed_topic_ref_types = ModelRefTypes(published=False, draft=True)
 
 
+class TestWorkflowPolicy(DefaultWithRequestsWorkflowPermissionPolicy):
+    can_read = [
+        IfInState("draft", [RecordOwners()]),
+        IfInState("publishing", [RecordOwners(), TestUserReceiver()]),
+        IfInState("published", [AnyUser()]),
+        IfInState("deleting", [AnyUser()]),
+    ]
+
+
 class WithApprovalPermissionPolicy(DefaultWithRequestsWorkflowPermissionPolicy):
     can_read = [
         IfInState("draft", [RecordOwners()]),
-        IfInState("approving", [RecordOwners(), RecordRequestsReceivers()]),
-        IfInState("approved", [RecordOwners(), RecordRequestsReceivers()]),
-        IfInState("publishing", [RecordOwners(), RecordRequestsReceivers()]),
+        IfInState("approving", [RecordOwners(), TestUserReceiver()]),
+        IfInState("approved", [RecordOwners(), TestUserReceiver()]),
+        IfInState("publishing", [RecordOwners(), TestUserReceiver()]),
         IfInState("deleting", [AuthenticatedUser()]),
     ]
 
@@ -128,13 +136,13 @@ class WithApprovalPermissionPolicy(DefaultWithRequestsWorkflowPermissionPolicy):
 WORKFLOWS = {
     "default": Workflow(
         label=_("Default workflow"),
-        permissions_cls=DefaultWithRequestsWorkflowPermissionPolicy,
-        requests_cls=DefaultRequests,
+        permission_policy_cls=TestWorkflowPolicy,
+        request_policy_cls=DefaultRequests,
     ),
     "with_approve": Workflow(
         label=_("Workflow with approval process"),
-        permissions_cls=WithApprovalPermissionPolicy,
-        requests_cls=RequestsWithApprove,
+        permission_policy_cls=WithApprovalPermissionPolicy,
+        request_policy_cls=RequestsWithApprove,
     ),
 }
 
