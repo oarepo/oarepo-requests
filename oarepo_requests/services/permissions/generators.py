@@ -64,11 +64,11 @@ except ImportError:
 
 class IfRequestedBy(RecipientGeneratorMixin, ConditionalGenerator):
 
-    def __init__(self, if_, then_, else_):
+    def __init__(self, requesters, then_, else_):
         super().__init__(then_, else_)
-        if not isinstance(if_, (list, tuple)):
-            if_ = [if_]
-        self.if_ = if_
+        if not isinstance(requesters, (list, tuple)):
+            requesters = [requesters]
+        self.requesters = requesters
 
     def _condition(self, *, request_type, creator, **kwargs):
         """Condition to choose generators set."""
@@ -81,7 +81,7 @@ class IfRequestedBy(RecipientGeneratorMixin, ConditionalGenerator):
                 creator = current_requests.entity_resolvers_registry.reference_entity(creator)
             needs = creator.get_needs()
 
-        for condition in self.if_:
+        for condition in self.requesters:
             condition_needs = set(condition.needs(request_type=request_type, creator=creator, **kwargs))
             condition_excludes = set(condition.excludes(request_type=request_type, creator=creator, **kwargs))
 
