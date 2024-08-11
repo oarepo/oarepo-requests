@@ -9,6 +9,8 @@ BUILDER_VENV=.venv-builder
 BUILD_TEST_DIR="tests"
 CODE_TEST_DIR="tests"
 
+curl -L -o forked_install.sh https://github.com/oarepo/nrp-devtools/raw/main/tests/forked_install.sh
+
 if test -d $BUILDER_VENV ; then
 	rm -rf $BUILDER_VENV
 fi
@@ -16,8 +18,12 @@ fi
 python3 -m venv $BUILDER_VENV
 . $BUILDER_VENV/bin/activate
 pip install -U setuptools pip wheel
-pip install -U oarepo-model-builder-tests oarepo-model-builder-requests oarepo-model-builder-drafts
-curl -L -o forked_install.sh https://github.com/oarepo/nrp-devtools/raw/main/tests/forked_install.sh
+pip install -U oarepo-model-builder \
+               oarepo-model-builder-tests \
+               oarepo-model-builder-requests \
+               oarepo-model-builder-drafts \
+               oarepo-model-builder-workflows
+
 if test -d ./$BUILD_TEST_DIR/$MODEL; then
   rm -rf ./$BUILD_TEST_DIR/$MODEL
 fi

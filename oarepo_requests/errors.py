@@ -19,3 +19,14 @@ class UnknownRequestType(Exception):
     def description(self):
         """Exception's description."""
         return f"Unknown request type {self.request_type}."
+
+
+class RequestTypeNotInWorkflow(Exception):
+    def __init__(self, request_type, workflow):
+        self.request_type = request_type
+        self.workflow = workflow
+
+    @property
+    def description(self):
+        """Exception's description."""
+        return f"Request type {self.request_type} not in workflow {self.workflow}."

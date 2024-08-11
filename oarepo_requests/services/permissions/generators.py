@@ -1,7 +1,12 @@
-from invenio_records_permissions.generators import Generator
+from invenio_records_permissions.generators import Generator, ConditionalGenerator
 from invenio_search.engine import dsl
 
 from oarepo_requests.services.permissions.identity import request_active
+from oarepo_workflows.requests.policy import RecipientGeneratorMixin
+from flask_principal import Identity
+
+from invenio_requests.proxies import current_requests
+from invenio_records_resources.references.entity_resolvers import EntityProxy
 
 
 class RequestActive(Generator):
@@ -57,33 +62,43 @@ except ImportError:
     pass
 
 
-"""
-#if needed, have to implement filter
-class RecordRequestsReceivers(Generator):
-    def needs(self, record=None, **kwargs):
-        service = get_requests_service_for_records_service(
-            get_record_service_for_record(record)
-        )
-        reader = (
-            service.search_requests_for_draft
-            if getattr(record, "is_draft", False)
-            else service.search_requests_for_record
-        )
-        requests = list(reader(system_identity, record["id"]).hits)
-        needs = set()
-        for request in requests:
-            request_type_id = request["type"]
-            type_ = current_request_type_registry.lookup(request_type_id, quiet=True)
-            if not type_:
-                raise UnknownRequestType(request_type_id)
-            workflow_request = current_oarepo_workflows.get_workflow(record).requests()[
-                request_type_id
-            ]
-            request_needs = {
-                need
-                for generator in workflow_request.recipients
-                for need in generator.needs(**kwargs)
-            }
-            needs |= request_needs
-        return needs
-"""
+class IfRequestedBy(RecipientGeneratorMixin, ConditionalGenerator):
+
+    def __init__(self, conditions, then_, else_):
+        super().__init__(then_, else_)
+        if not isinstance(conditions, (list, tuple)):
+            conditions = [conditions]
+        self._conditions = conditions
+
+    def _condition(self, *, request_type, creator, **kwargs):
+        """Condition to choose generators set."""
+        # get needs
+        if isinstance(creator, Identity):
+            needs = creator.provides
+        else:
+            if not isinstance(creator, EntityProxy):
+                # convert to entityproxy
+                creator = current_requests.entity_resolvers_registry.reference_entity(creator)
+            needs = creator.get_needs()
+
+        for condition in self._conditions:
+            condition_needs = set(condition.needs(request_type=request_type, creator=creator, **kwargs))
+            condition_excludes = set(condition.excludes(request_type=request_type, creator=creator, **kwargs))
+
+            if not condition_needs.intersection(needs):
+                continue
+            if condition_excludes and condition_excludes.intersection(needs):
+                continue
+            return True
+        return False
+
+    def reference_receivers(self, record=None, request_type=None, **kwargs):
+        ret = []
+        for gen in self._generators(record=record, request_type=request_type, **kwargs):
+            if isinstance(gen, RecipientGeneratorMixin):
+                ret.extend(gen.reference_receivers(record=record, request_type=request_type, **kwargs))
+        return ret
+
+    def query_filter(self, **kwargs):
+        """Search filters."""
+        raise NotImplementedError("Please use IfRequestedBy only in recipients, not elsewhere.")

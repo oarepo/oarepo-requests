@@ -8,8 +8,14 @@ from invenio_search.engine import dsl
 def allowed_request_types_for_record(record):
     try:
         from oarepo_workflows.proxies import current_oarepo_workflows
-
-        workflow_requests = current_oarepo_workflows.get_workflow(record).requests()
+        from oarepo_workflows.errors import MissingWorkflowError
+        try:
+            workflow_requests = current_oarepo_workflows.get_workflow(record).requests()
+        except MissingWorkflowError:
+            # workflow not defined on the record, probably not a workflow-enabled record
+            # so returning all matching request types
+            # TODO: is this correct?
+            workflow_requests = None
     except ImportError:
         workflow_requests = None
     request_types = current_request_type_registry._registered_types
