@@ -25,6 +25,8 @@ from oarepo_workflows import (
 )
 from oarepo_workflows.base import Workflow
 from oarepo_workflows.requests import RecipientGeneratorMixin
+
+from oarepo_requests.services.permissions.generators import IfRequestedBy
 from thesis.proxies import current_service
 from thesis.records.api import ThesisDraft
 
@@ -70,6 +72,17 @@ class DefaultRequests(WorkflowRequestPolicy):
     )
 
 
+class UserGenerator(RecipientGeneratorMixin, Generator):
+    def __init__(self, user_id):
+        self.user_id = user_id
+
+    def needs(self, **kwargs):
+        return [UserNeed(self.user_id)]
+
+    def reference_receivers(self, **kwargs):
+        return [{"user": str(self.user_id)}]
+
+
 class RequestsWithApprove(WorkflowRequestPolicy):
     publish_draft = WorkflowRequest(
         requesters=[IfInState("approved", [AutoRequest()])],
@@ -99,6 +112,17 @@ class RequestsWithApprove(WorkflowRequestPolicy):
     )
 
 
+class RequestsWithCT(WorkflowRequestPolicy):
+    conditional_recipient_rt = WorkflowRequest(
+        requesters=[AnyUser()],
+        recipients=[IfRequestedBy(
+            UserGenerator(1),
+            [UserGenerator(2)],
+            [UserGenerator(3)]
+        )],
+    )
+
+
 class ApproveRequestType(NonDuplicableOARepoRequestType):
     type_id = "approve_draft"
     name = _("Approve draft")
@@ -111,6 +135,21 @@ class ApproveRequestType(NonDuplicableOARepoRequestType):
     }
     description = _("Request approving of a draft")
     receiver_can_be_none = True
+    allowed_topic_ref_types = ModelRefTypes(published=False, draft=True)
+
+
+class ConditionalRecipientRequestType(NonDuplicableOARepoRequestType):
+    type_id = "conditional_recipient_rt"
+    name = _("Request type to test conditional recipients")
+
+    available_actions = {
+        **NonDuplicableOARepoRequestType.available_actions,
+        "accept": OARepoAcceptAction,
+        "submit": OARepoSubmitAction,
+        "decline": OARepoDeclineAction,
+    }
+    description = _("A no-op request to check conditional recipients")
+    receiver_can_be_none = False
     allowed_topic_ref_types = ModelRefTypes(published=False, draft=True)
 
 
@@ -143,6 +182,11 @@ WORKFLOWS = {
         label=_("Workflow with approval process"),
         permission_policy_cls=WithApprovalPermissionPolicy,
         request_policy_cls=RequestsWithApprove,
+    ),
+    "with_ct": Workflow(
+        label=_("Workflow with approval process"),
+        permission_policy_cls=WithApprovalPermissionPolicy,
+        request_policy_cls=RequestsWithCT,
     ),
 }
 
@@ -183,6 +227,15 @@ def publish_request_data_function():
 
     return ret_data
 
+@pytest.fixture()
+def conditional_recipient_request_data_function():
+    def ret_data(record_id):
+        return {
+            "request_type": "conditional_recipient_rt",
+            "topic": {"thesis_draft": record_id},
+        }
+
+    return ret_data
 
 @pytest.fixture()
 def edit_record_data_function():
@@ -305,7 +358,7 @@ def app_config(app_config):
     app_config["OAREPO_REQUESTS_DEFAULT_RECEIVER"] = default_workflow_receiver_function
 
     app_config["WORKFLOWS"] = WORKFLOWS
-    app_config["REQUESTS_REGISTERED_TYPES"] = [ApproveRequestType()]
+    app_config["REQUESTS_REGISTERED_TYPES"] = [ApproveRequestType(), ConditionalRecipientRequestType()]
     return app_config
 
 
@@ -461,7 +514,7 @@ def create_draft_via_resource(default_workflow_json, urls):
     ):
         json = copy.deepcopy(default_workflow_json)
         if custom_workflow:
-            json["parent"]["workflow_id"] = custom_workflow
+            json["parent"]["workflow"] = custom_workflow
         if additional_data:
             json |= additional_data
         url = urls["BASE_URL"] + "?expand=true" if expand else urls["BASE_URL"]
@@ -515,4 +568,4 @@ def role_ui_serialization():
 
 @pytest.fixture()
 def default_workflow_json():
-    return {"parent": {"workflow_id": "default"}}
+    return {"parent": {"workflow": "default"}}
