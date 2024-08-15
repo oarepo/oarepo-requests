@@ -30,3 +30,12 @@ class RequestTypeNotInWorkflow(Exception):
     def description(self):
         """Exception's description."""
         return f"Request type {self.request_type} not in workflow {self.workflow}."
+
+class ReceiverUnreferencable(Exception):
+    def __init__(self, request_type):
+        self.request_type = request_type
+
+    @property
+    def description(self):
+        """Exception's description."""
+        return f"Receiver for request type {self.request_type} is required but wasn't successfully referenced."
