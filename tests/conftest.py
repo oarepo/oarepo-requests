@@ -25,8 +25,6 @@ from oarepo_workflows import (
 )
 from oarepo_workflows.base import Workflow
 from oarepo_workflows.requests import RecipientGeneratorMixin
-
-from oarepo_requests.services.permissions.generators import IfRequestedBy
 from thesis.proxies import current_service
 from thesis.records.api import ThesisDraft
 
@@ -36,6 +34,7 @@ from oarepo_requests.actions.generic import (
     OARepoSubmitAction,
 )
 from oarepo_requests.receiver import default_workflow_receiver_function
+from oarepo_requests.services.permissions.generators import IfRequestedBy
 from oarepo_requests.services.permissions.workflow_policies import (
     DefaultWithRequestsWorkflowPermissionPolicy,
 )
@@ -115,11 +114,9 @@ class RequestsWithApprove(WorkflowRequestPolicy):
 class RequestsWithCT(WorkflowRequestPolicy):
     conditional_recipient_rt = WorkflowRequest(
         requesters=[AnyUser()],
-        recipients=[IfRequestedBy(
-            UserGenerator(1),
-            [UserGenerator(2)],
-            [UserGenerator(3)]
-        )],
+        recipients=[
+            IfRequestedBy(UserGenerator(1), [UserGenerator(2)], [UserGenerator(3)])
+        ],
     )
 
 
@@ -227,6 +224,7 @@ def publish_request_data_function():
 
     return ret_data
 
+
 @pytest.fixture()
 def conditional_recipient_request_data_function():
     def ret_data(record_id):
@@ -236,6 +234,7 @@ def conditional_recipient_request_data_function():
         }
 
     return ret_data
+
 
 @pytest.fixture()
 def edit_record_data_function():
@@ -358,7 +357,10 @@ def app_config(app_config):
     app_config["OAREPO_REQUESTS_DEFAULT_RECEIVER"] = default_workflow_receiver_function
 
     app_config["WORKFLOWS"] = WORKFLOWS
-    app_config["REQUESTS_REGISTERED_TYPES"] = [ApproveRequestType(), ConditionalRecipientRequestType()]
+    app_config["REQUESTS_REGISTERED_TYPES"] = [
+        ApproveRequestType(),
+        ConditionalRecipientRequestType(),
+    ]
     return app_config
 
 

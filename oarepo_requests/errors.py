@@ -31,6 +31,7 @@ class RequestTypeNotInWorkflow(Exception):
         """Exception's description."""
         return f"Request type {self.request_type} not in workflow {self.workflow}."
 
+
 class ReceiverUnreferencable(Exception):
     def __init__(self, request_type):
         self.request_type = request_type

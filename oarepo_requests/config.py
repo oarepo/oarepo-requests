@@ -2,9 +2,12 @@ from oarepo_requests.actions.components import (
     AutoAcceptComponent,
     RequestIdentityComponent,
 )
+
 try:
-    import oarepo_workflows # noqa
+    import oarepo_workflows  # noqa
+
     from oarepo_requests.actions.components import WorkflowTransitionComponent
+
     workflow_action_components = [WorkflowTransitionComponent]
 except ImportError:
     workflow_action_components = []

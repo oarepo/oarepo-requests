@@ -1,4 +1,4 @@
-from oarepo_requests.errors import RequestTypeNotInWorkflow, ReceiverUnreferencable
+from oarepo_requests.errors import ReceiverUnreferencable, RequestTypeNotInWorkflow
 
 
 def default_workflow_receiver_function(record=None, request_type=None, **kwargs):
@@ -6,7 +6,7 @@ def default_workflow_receiver_function(record=None, request_type=None, **kwargs)
 
     workflow_id = current_oarepo_workflows.get_workflow_from_record(record)
     if not workflow_id:
-        return None #exception?
+        return None  # exception?
 
     try:
 

@@ -7,8 +7,9 @@ from invenio_search.engine import dsl
 
 def allowed_request_types_for_record(record):
     try:
-        from oarepo_workflows.proxies import current_oarepo_workflows
         from oarepo_workflows.errors import MissingWorkflowError
+        from oarepo_workflows.proxies import current_oarepo_workflows
+
         try:
             workflow_requests = current_oarepo_workflows.get_workflow(record).requests()
         except MissingWorkflowError:
@@ -26,7 +27,9 @@ def allowed_request_types_for_record(record):
         # log?
         return ret
     for request_name, request_type in request_types.items():
-        allowed_type_keys = set(request_type.allowed_topic_ref_types) # allowed topic types does not work correctly - delete published allows community and documents_file_draft
+        allowed_type_keys = set(
+            request_type.allowed_topic_ref_types
+        )  # allowed topic types does not work correctly - delete published allows community and documents_file_draft
         if record_ref in allowed_type_keys:
             if not workflow_requests or hasattr(workflow_requests, request_name):
                 ret[request_name] = request_type
