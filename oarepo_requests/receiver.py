@@ -21,5 +21,5 @@ def default_workflow_receiver_function(record=None, request_type=None, **kwargs)
         record=record, request_type=request_type, **kwargs
     )
     if not request_type.receiver_can_be_none and not receiver:
-        raise ReceiverUnreferencable(request_type=request_type)
+        raise ReceiverUnreferencable(request_type=request_type, record=record, **kwargs)
     return receiver
