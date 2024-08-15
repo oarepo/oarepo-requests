@@ -17,10 +17,21 @@ class RequestActive(Generator):
     def query_filter(self, identity=None, **kwargs):
         return dsl.Q("match_none")
 
+class IfRequestType(ConditionalGenerator):
+    def __init__(self, request_types, then_):
+        super().__init__(then_, else_=[])
+        if not isinstance(request_types, (list, tuple)):
+            request_types = [request_types]
+        self.request_types = request_types
+
+    def _condition(self, request_type, **kwargs):
+        return request_type.type_id in self.request_types
+
 
 try:
     from oarepo_workflows import WorkflowPermission
     from oarepo_workflows.proxies import current_oarepo_workflows
+    from oarepo_workflows.errors import MissingWorkflowError, InvalidWorkflowError
 
     class CreatorsFromWorkflow(WorkflowPermission):
 
@@ -29,22 +40,21 @@ try:
                 workflow_request = current_oarepo_workflows.get_workflow(
                     record
                 ).requests()[request_type.type_id]
-            except KeyError:
+                return workflow_request.needs(
+                    request_type=request_type, record=record, **kwargs
+                )
+            except (MissingWorkflowError, InvalidWorkflowError):
                 return []
-            return workflow_request.needs(
-                request_type=request_type, record=record, **kwargs
-            )
-
         def excludes(self, record=None, request_type=None, **kwargs):
             try:
                 workflow_request = current_oarepo_workflows.get_workflow(
                     record
                 ).requests()[request_type.type_id]
-            except KeyError:
+                return workflow_request.excludes(
+                    request_type=request_type, record=record, **kwargs
+                )
+            except (MissingWorkflowError, InvalidWorkflowError):
                 return []
-            return workflow_request.excludes(
-                request_type=request_type, record=record, **kwargs
-            )
 
         # not tested
         def query_filter(self, record=None, request_type=None, **kwargs):
@@ -52,11 +62,11 @@ try:
                 workflow_request = current_oarepo_workflows.get_workflow(
                     record
                 ).requests()[request_type.type_id]
-            except KeyError:
+                return workflow_request.query_filters(
+                    request_type=request_type, record=record, **kwargs
+                )
+            except (MissingWorkflowError, InvalidWorkflowError):
                 return dsl.Q("match_none")
-            return workflow_request.query_filters(
-                request_type=request_type, record=record, **kwargs
-            )
 
 except ImportError:
     pass

@@ -26,7 +26,7 @@ def allowed_request_types_for_record(record):
         # log?
         return ret
     for request_name, request_type in request_types.items():
-        allowed_type_keys = set(request_type.allowed_topic_ref_types)
+        allowed_type_keys = set(request_type.allowed_topic_ref_types) # allowed topic types does not work correctly - delete published allows community and documents_file_draft
         if record_ref in allowed_type_keys:
             if not workflow_requests or hasattr(workflow_requests, request_name):
                 ret[request_name] = request_type
