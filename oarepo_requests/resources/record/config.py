@@ -8,8 +8,9 @@ from oarepo_requests.resources.ui import OARepoRequestsUIJSONSerializer
 
 class RecordRequestsResourceConfig:
     routes = {
-        "list": "/<pid_value>/requests",
-        "type": "/<pid_value>/requests/<request_type>",
+        "list-requests": "/<pid_value>/requests",
+        "list-applicable-requests": "/<pid_value>/requests/applicable",
+        "request-type": "/<pid_value>/requests/<request_type>",
     }
     request_view_args = RecordResourceConfig.request_view_args | {
         "request_type": ma.fields.Str()

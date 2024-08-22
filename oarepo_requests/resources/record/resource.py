@@ -33,8 +33,9 @@ class RecordRequestsResource(RecordResource):
         routes = self.config.routes
 
         url_rules = [
-            route("GET", routes["list"], self.search_requests_for_record),
-            route("POST", routes["type"], self.create),
+            route("GET", routes["list-requests"], self.search_requests_for_record),
+            route("GET", routes["list-applicable-requests"], self.get_applicable_request_types),
+            route("POST", routes["request-type"], self.create),
         ]
         return url_rules
 
@@ -50,6 +51,16 @@ class RecordRequestsResource(RecordResource):
             params=resource_requestctx.args,
             search_preference=search_preference(),
             expand=resource_requestctx.args.get("expand", False),
+        )
+        return hits.to_dict(), 200
+
+    @request_view_args
+    @response_handler(many=True)
+    def get_applicable_request_types(self):
+        """List request types."""
+        hits = self.service.get_applicable_request_types(
+            identity=g.identity,
+            record_id=resource_requestctx.view_args["pid_value"],
         )
         return hits.to_dict(), 200
 
