@@ -1,5 +1,6 @@
 from flask import current_app
 
+from tests.test_requests.utils import link_api2testclient
 from thesis.ext import ThesisExt
 
 
@@ -15,7 +16,6 @@ def test_allowed_request_types_on_service(
     creator = users[0]
     receiver = users[1]
     creator_client = logged_client(creator)
-    receiver_client = logged_client(receiver)
 
     draft1 = create_draft_via_resource(creator_client)
 
@@ -56,12 +56,12 @@ def test_allowed_request_types_on_resource(
     creator = users[0]
     receiver = users[1]
     creator_client = logged_client(creator)
-    receiver_client = logged_client(receiver)
 
     draft1 = create_draft_via_resource(creator_client)
 
     applicable_requests_link = draft1.json["links"]["applicable-requests"]
-    allowed_request_types = creator_client.get(applicable_requests_link)
+    assert applicable_requests_link == f'https://127.0.0.1:5000/api/thesis/{draft1.json["id"]}/draft/requests/applicable'
+    allowed_request_types = creator_client.get(link_api2testclient(applicable_requests_link))
     assert allowed_request_types.json == {
         'hits': {
             'hits': [

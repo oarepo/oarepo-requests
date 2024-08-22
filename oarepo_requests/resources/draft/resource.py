@@ -19,9 +19,9 @@ class DraftRecordRequestsResource(RecordRequestsResource):
         routes = self.config.routes
 
         url_rules = [
-            route("GET", routes["list-requests"], self.search_requests_for_draft),
-            route("POST", routes["request-type"], self.create_for_draft),
-            route("GET", routes["list-applicable-requests"], self.get_applicable_request_types_for_draft),
+            route("GET", routes["list-requests-draft"], self.search_requests_for_draft),
+            route("GET", routes["list-applicable-requests-draft"], self.get_applicable_request_types_for_draft),
+            route("POST", routes["request-type-draft"], self.create_for_draft),
         ]
         return url_rules + old_rules
 
