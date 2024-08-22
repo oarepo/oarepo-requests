@@ -75,8 +75,10 @@ class RecordRequestsService:
 
     def get_applicable_request_types(self, identity, record_id):
         record = self.record_cls.pid.resolve(record_id)
-        self.record_service.require_permission(identity, "read", record=record)
+        return self._get_applicable_request_types(identity, record)
 
+    def _get_applicable_request_types(self, identity, record):
+        self.record_service.require_permission(identity, "read", record=record)
         allowed_request_types = allowed_user_request_types(identity, record)
         return RequestTypesList(
             service=self.record_service,
@@ -90,7 +92,6 @@ class RecordRequestsService:
             schema=RequestTypeSchema,
             record=record,
         )
-
 
     @unit_of_work()
     def create(

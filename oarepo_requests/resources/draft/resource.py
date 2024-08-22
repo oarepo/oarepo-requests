@@ -44,7 +44,7 @@ class DraftRecordRequestsResource(RecordRequestsResource):
     @response_handler(many=True)
     def get_applicable_request_types_for_draft(self):
         """List request types."""
-        hits = self.service.get_applicable_request_types(
+        hits = self.service.get_applicable_request_types_for_draft(
             identity=g.identity,
             record_id=resource_requestctx.view_args["pid_value"],
         )

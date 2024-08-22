@@ -75,19 +75,6 @@ class DraftRecordRequestsService(RecordRequestsService):
         )
 
 
-    def get_applicable_request_types(self, identity, record_id):
+    def get_applicable_request_types_for_draft(self, identity, record_id):
         record = self.draft_cls.pid.resolve(record_id, registered_only=False)
-        self.record_service.require_permission(identity, "read", record=record)
-        allowed_request_types = allowed_user_request_types(identity, record)
-        return RequestTypesList(
-            service=self.record_service,
-            identity=identity,
-            results=list(allowed_request_types.values()),
-            links_tpl=LinksTemplate(
-                {
-                    'self': Link("{+record_link_requests}/applicable")
-                }
-            ),
-            schema=RequestTypeSchema,
-            record=record
-        )
+        return self._get_applicable_request_types(identity, record)
