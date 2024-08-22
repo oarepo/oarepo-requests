@@ -2,7 +2,11 @@ from invenio_records_resources.services.uow import unit_of_work
 from invenio_search.engine import dsl
 
 from oarepo_requests.services.record.service import RecordRequestsService
+from oarepo_requests.services.results import allowed_user_request_types, RequestTypesList
+from oarepo_requests.services.schema import RequestTypeSchema
 from oarepo_requests.utils import get_type_id_for_record_cls
+from invenio_records_resources.services import LinksTemplate
+from invenio_records_resources.services.base.links import Link
 
 
 class DraftRecordRequestsService(RecordRequestsService):
@@ -24,7 +28,7 @@ class DraftRecordRequestsService(RecordRequestsService):
     ):
         """Search for record's requests."""
         record = self.draft_cls.pid.resolve(record_id, registered_only=False)
-        # self.record_service.require_permission(identity, "read_draft", record=record)
+        self.record_service.require_permission(identity, "read_draft", record=record)
 
         search_filter = dsl.query.Bool(
             "must",
@@ -68,4 +72,22 @@ class DraftRecordRequestsService(RecordRequestsService):
             topic=record,
             expand=expand,
             uow=uow,
+        )
+
+
+    def get_applicable_request_types(self, identity, record_id):
+        record = self.draft_cls.pid.resolve(record_id, registered_only=False)
+        self.record_service.require_permission(identity, "read", record=record)
+        allowed_request_types = allowed_user_request_types(identity, record)
+        return RequestTypesList(
+            service=self.record_service,
+            identity=identity,
+            results=list(allowed_request_types.values()),
+            links_tpl=LinksTemplate(
+                {
+                    'self': Link("{+record_link_requests}/applicable")
+                }
+            ),
+            schema=RequestTypeSchema,
+            record=record
         )

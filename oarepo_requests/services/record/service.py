@@ -4,7 +4,11 @@ from invenio_records_resources.services.uow import unit_of_work
 from invenio_search.engine import dsl
 
 from oarepo_requests.proxies import current_oarepo_requests
+from oarepo_requests.services.results import allowed_user_request_types, RequestTypesList
+from oarepo_requests.services.schema import RequestTypeSchema
 from oarepo_requests.utils import get_type_id_for_record_cls
+from invenio_records_resources.services import LinksTemplate
+from invenio_records_resources.services.base.links import Link
 
 
 class RecordRequestsService:
@@ -68,6 +72,25 @@ class RecordRequestsService:
             extra_filter=search_filter,
             **kwargs,
         )
+
+    def get_applicable_request_types(self, identity, record_id):
+        record = self.record_cls.pid.resolve(record_id)
+        self.record_service.require_permission(identity, "read", record=record)
+
+        allowed_request_types = allowed_user_request_types(identity, record)
+        return RequestTypesList(
+            service=self.record_service,
+            identity=identity,
+            results=list(allowed_request_types.values()),
+            links_tpl=LinksTemplate(
+                {
+                    'self': Link("{+record_link_requests}/applicable")
+                }
+            ),
+            schema=RequestTypeSchema,
+            record=record,
+        )
+
 
     @unit_of_work()
     def create(
