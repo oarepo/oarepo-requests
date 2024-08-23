@@ -2,11 +2,7 @@ from invenio_records_resources.services.uow import unit_of_work
 from invenio_search.engine import dsl
 
 from oarepo_requests.services.record.service import RecordRequestsService
-from oarepo_requests.services.results import allowed_user_request_types, RequestTypesList
-from oarepo_requests.services.schema import RequestTypeSchema
 from oarepo_requests.utils import get_type_id_for_record_cls
-from invenio_records_resources.services import LinksTemplate
-from invenio_records_resources.services.base.links import Link
 
 
 class DraftRecordRequestsService(RecordRequestsService):
@@ -73,7 +69,6 @@ class DraftRecordRequestsService(RecordRequestsService):
             expand=expand,
             uow=uow,
         )
-
 
     def get_applicable_request_types_for_draft(self, identity, record_id):
         record = self.draft_cls.pid.resolve(record_id, registered_only=False)

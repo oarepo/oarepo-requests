@@ -1,7 +1,3 @@
-
-
-
-
 def test_conditional_receiver_creator_matches(
     logged_client,
     users,

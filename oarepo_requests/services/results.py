@@ -1,14 +1,13 @@
+from invenio_records_resources.services import LinksTemplate
 from invenio_records_resources.services.errors import PermissionDeniedError
 from oarepo_runtime.datastreams.utils import get_record_service_for_record
-from oarepo_runtime.services.results import ResultsComponent, RecordList
+from oarepo_runtime.services.results import RecordList, ResultsComponent
 
 from oarepo_requests.services.schema import RequestTypeSchema
 from oarepo_requests.utils import (
     allowed_request_types_for_record,
     get_requests_service_for_records_service,
 )
-from invenio_records_resources.services import LinksTemplate
-
 
 
 class RequestTypesComponent(ResultsComponent):
@@ -16,17 +15,19 @@ class RequestTypesComponent(ResultsComponent):
         if not expand:
             return
         allowed_request_types = allowed_user_request_types(identity, record)
-        request_types_list = serialize_request_types(allowed_request_types, identity, record)
+        request_types_list = serialize_request_types(
+            allowed_request_types, identity, record
+        )
         projection["expanded"]["request_types"] = request_types_list
+
 
 def allowed_user_request_types(identity, record):
     allowed_request_types = allowed_request_types_for_record(record)
     allowed_request_types = {
         request_type_name: request_type
         for request_type_name, request_type in allowed_request_types.items()
-        if hasattr(
-            request_type, "can_possibly_create"
-        ) and request_type.can_possibly_create(identity, record)
+        if hasattr(request_type, "can_possibly_create")
+        and request_type.can_possibly_create(identity, record)
     }
     return allowed_request_types
 
@@ -34,7 +35,9 @@ def allowed_user_request_types(identity, record):
 def serialize_request_types(request_types, identity, record):
     request_types_list = []
     for request_type in request_types.values():
-        request_types_list.append(serialize_request_type(request_type, identity, record))
+        request_types_list.append(
+            serialize_request_type(request_type, identity, record)
+        )
     return request_types_list
 
 
@@ -74,13 +77,15 @@ class RequestTypesList(RecordList):
         hits = list(self.hits)
 
         record_links = self._service.config.links_item
-        rendered_record_links = LinksTemplate(record_links, context={}).expand(self._identity, self._record)
+        rendered_record_links = LinksTemplate(record_links, context={}).expand(
+            self._identity, self._record
+        )
         links_tpl = LinksTemplate(
-            self._links_tpl._links, context={
-            **{
-                f'record_link_{k}': v for k, v in rendered_record_links.items()
-            }
-        })
+            self._links_tpl._links,
+            context={
+                **{f"record_link_{k}": v for k, v in rendered_record_links.items()}
+            },
+        )
         res = {
             "hits": {
                 "hits": hits,
@@ -106,9 +111,7 @@ class RequestTypesList(RecordList):
                 hit,
             )
             if self._links_item_tpl:
-                projection["links"] = self._links_item_tpl.expand(
-                    self._identity, hit
-                )
+                projection["links"] = self._links_item_tpl.expand(self._identity, hit)
             yield projection
 
     @property
