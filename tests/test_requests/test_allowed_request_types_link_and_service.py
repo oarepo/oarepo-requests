@@ -171,4 +171,12 @@ def test_allowed_request_types_on_published_resource(
             },
             "type_id": "edit_published_record",
         },
+        {
+            "links": {
+                "actions": {
+                    "create": f'https://127.0.0.1:5000/api/thesis/{published1["id"]}/requests/new_version'
+                }
+            },
+            "type_id": "new_version",
+        },
     ]

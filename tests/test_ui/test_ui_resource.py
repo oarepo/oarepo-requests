@@ -32,7 +32,7 @@ def test_record_delete_request_present(
     with logged_client(users[0]).get(f"/thesis/{topic['id']}") as c:
         assert c.status_code == 200
         data = json.loads(c.text)
-        assert len(data["creatable_request_types"]) == 2
+        assert len(data["creatable_request_types"]) == 3
         assert data["creatable_request_types"]["edit_published_record"] == {
             "description": "Request re-opening of published record",
             "links": {

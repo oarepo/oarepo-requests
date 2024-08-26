@@ -69,6 +69,11 @@ class DefaultRequests(WorkflowRequestPolicy):
         recipients=[AutoApprove()],
         transitions=WorkflowTransitions(),
     )
+    new_version = WorkflowRequest(
+        requesters=[IfInState("published", [RecordOwners()])],
+        recipients=[AutoApprove()],
+        transitions=WorkflowTransitions(),
+    )
 
 
 class UserGenerator(RecipientGeneratorMixin, Generator):
@@ -241,6 +246,17 @@ def edit_record_data_function():
     def ret_data(record_id):
         return {
             "request_type": "edit_published_record",
+            "topic": {"thesis": record_id},
+        }
+
+    return ret_data
+
+
+@pytest.fixture()
+def new_version_data_function():
+    def ret_data(record_id):
+        return {
+            "request_type": "new_version",
             "topic": {"thesis": record_id},
         }
 
