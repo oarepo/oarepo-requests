@@ -3,12 +3,12 @@ from thesis.records.api import ThesisDraft, ThesisRecord
 from tests.test_requests.utils import link_api2testclient
 
 
-def test_edit_autoaccept(
+def test_new_version_autoaccept(
     vocab_cf,
     logged_client,
     users,
     urls,
-    edit_record_data_function,
+    new_version_data_function,
     record_factory,
     search_clear,
 ):
@@ -16,11 +16,10 @@ def test_edit_autoaccept(
     creator_client = logged_client(creator)
 
     record1 = record_factory(creator.identity)
-    id_ = record1["id"]
 
     resp_request_create = creator_client.post(
         urls["BASE_URL_REQUESTS"],
-        json=edit_record_data_function(record1["id"]),
+        json=new_version_data_function(record1["id"]),
     )
     resp_request_submit = creator_client.post(
         link_api2testclient(resp_request_create.json["links"]["actions"]["submit"]),
@@ -39,12 +38,12 @@ def test_edit_autoaccept(
 
     ThesisRecord.index.refresh()
     ThesisDraft.index.refresh()
-    # edit action worked?
+    # new_version action worked?
     search = creator_client.get(
         f'user{urls["BASE_URL"]}',
     ).json[
         "hits"
     ]["hits"]
-    assert len(search) == 1
-    assert search[0]["links"]["self"].endswith("/draft")
-    assert search[0]["id"] == id_
+    assert len(search) == 2
+    assert search[0]["id"] != search[1]["id"]
+    assert search[0]["parent"]["id"] == search[1]["parent"]["id"]

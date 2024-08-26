@@ -1,15 +1,16 @@
 import marshmallow as ma
 from oarepo_runtime.i18n import lazy_gettext as _
 
-from oarepo_requests.actions.edit_topic import EditTopicAcceptAction
-
+from ..actions.new_version import NewVersionAcceptAction
 from .generic import NonDuplicableOARepoRequestType
 from .ref_types import ModelRefTypes
 
 
-class EditPublishedRecordRequestType(NonDuplicableOARepoRequestType):
-    type_id = "edit_published_record"
-    name = _("Edit record")
+class NewVersionRequestType(
+    NonDuplicableOARepoRequestType
+):  # NewVersionFromPublishedRecord? or just new_version
+    type_id = "new_version"
+    name = _("New Version")
     payload_schema = {
         "draft_record.links.self": ma.fields.Str(
             attribute="draft_record:links:self",
@@ -26,9 +27,8 @@ class EditPublishedRecordRequestType(NonDuplicableOARepoRequestType):
     def available_actions(cls):
         return {
             **super().available_actions,
-            "accept": EditTopicAcceptAction,
+            "accept": NewVersionAcceptAction,
         }
 
-    description = _("Request re-opening of published record")
-    receiver_can_be_none = True
+    description = _("Request requesting creation of new version of a published record.")
     allowed_topic_ref_types = ModelRefTypes(published=True, draft=False)
