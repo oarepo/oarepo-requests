@@ -1,11 +1,10 @@
+import marshmallow as ma
 from oarepo_runtime.i18n import lazy_gettext as _
 
 from oarepo_requests.actions.edit_topic import EditTopicAcceptAction
 
 from .generic import NonDuplicableOARepoRequestType
 from .ref_types import ModelRefTypes
-
-import marshmallow as ma
 
 
 class EditPublishedRecordRequestType(NonDuplicableOARepoRequestType):
