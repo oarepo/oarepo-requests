@@ -15,6 +15,7 @@ class DefaultWithRequestsWorkflowPermissionPolicy(DefaultWorkflowPermissionPolic
     can_delete = DefaultWorkflowPermissionPolicy.can_delete + [RequestActive()]
     can_publish = [RequestActive()]
     can_edit = [RequestActive()]
+    can_new_version = [RequestActive()]
 
 
 class CreatorsFromWorkflowPermissionPolicy(InvenioRequestsPermissionPolicy):

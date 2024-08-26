@@ -1,5 +1,5 @@
 from thesis.records.api import ThesisDraft, ThesisRecord
-
+import pytest
 from tests.test_requests.utils import link_api2testclient
 
 
@@ -17,6 +17,12 @@ def test_edit_autoaccept(
 
     record1 = record_factory(creator.identity)
     id_ = record1["id"]
+
+    # test direct edit is forbidden
+    direct_edit = creator_client.post(
+        f"{urls['BASE_URL']}{id_}/draft",
+    )
+    assert direct_edit.status_code == 403
 
     resp_request_create = creator_client.post(
         urls["BASE_URL_REQUESTS"],
