@@ -5,10 +5,22 @@ from oarepo_requests.actions.edit_topic import EditTopicAcceptAction
 from .generic import NonDuplicableOARepoRequestType
 from .ref_types import ModelRefTypes
 
+import marshmallow as ma
+
 
 class EditPublishedRecordRequestType(NonDuplicableOARepoRequestType):
     type_id = "edit_published_record"
     name = _("Edit record")
+    payload_schema = {
+        "draft_record.links.self": ma.fields.Str(
+            attribute="draft_record:links:self",
+            data_key="draft_record:links:self",
+        ),
+        "draft_record.links.self_html": ma.fields.Str(
+            attribute="draft_record:links:self_html",
+            data_key="draft_record:links:self_html",
+        ),
+    }
 
     @classmethod
     @property

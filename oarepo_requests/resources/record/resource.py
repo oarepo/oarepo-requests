@@ -34,7 +34,11 @@ class RecordRequestsResource(RecordResource):
 
         url_rules = [
             route("GET", routes["list-requests"], self.search_requests_for_record),
-            route("GET", routes["list-applicable-requests"], self.get_applicable_request_types),
+            route(
+                "GET",
+                routes["list-applicable-requests"],
+                self.get_applicable_request_types,
+            ),
             route("POST", routes["request-type"], self.create),
         ]
         return url_rules

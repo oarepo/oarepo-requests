@@ -54,6 +54,9 @@ def test_publish(
     # record = receiver_client.get(f"{urls['BASE_URL']}{draft2.json['id']}/draft")
     # assert "publish_draft" not in record.json["parent"]
 
+    assert "published_record:links:self" in publish.json["payload"]
+    assert "published_record:links:self_html" in publish.json["payload"]
+
     ThesisRecord.index.refresh()
     ThesisDraft.index.refresh()
     draft_lst = creator_client.get(f"/user{urls['BASE_URL']}")
