@@ -16,6 +16,7 @@ def test_edit_autoaccept(
     creator_client = logged_client(creator)
 
     record1 = record_factory(creator.identity)
+    id_ = record1["id"]
 
     resp_request_create = creator_client.post(
         urls["BASE_URL_REQUESTS"],
@@ -33,6 +34,9 @@ def test_edit_autoaccept(
     assert not request["is_open"]
     assert request["is_closed"]
 
+    assert "draft_record:links:self" in request["payload"]
+    assert "draft_record:links:self_html" in request["payload"]
+
     ThesisRecord.index.refresh()
     ThesisDraft.index.refresh()
     # edit action worked?
@@ -43,3 +47,4 @@ def test_edit_autoaccept(
     ]["hits"]
     assert len(search) == 1
     assert search[0]["links"]["self"].endswith("/draft")
+    assert search[0]["id"] == id_
