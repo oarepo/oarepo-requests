@@ -36,7 +36,7 @@ from oarepo_requests.actions.generic import (
 from oarepo_requests.receiver import default_workflow_receiver_function
 from oarepo_requests.services.permissions.generators import IfRequestedBy
 from oarepo_requests.services.permissions.workflow_policies import (
-    DefaultWithRequestsWorkflowPermissionPolicy,
+    RequestBasedWorkflowPermissions,
 )
 from oarepo_requests.types import ModelRefTypes, NonDuplicableOARepoRequestType
 
@@ -155,7 +155,7 @@ class ConditionalRecipientRequestType(NonDuplicableOARepoRequestType):
     allowed_topic_ref_types = ModelRefTypes(published=False, draft=True)
 
 
-class TestWorkflowPolicy(DefaultWithRequestsWorkflowPermissionPolicy):
+class TestWorkflowPermissions(RequestBasedWorkflowPermissions):
     can_read = [
         IfInState("draft", [RecordOwners()]),
         IfInState("publishing", [RecordOwners(), TestUserReceiver()]),
@@ -164,7 +164,7 @@ class TestWorkflowPolicy(DefaultWithRequestsWorkflowPermissionPolicy):
     ]
 
 
-class WithApprovalPermissionPolicy(DefaultWithRequestsWorkflowPermissionPolicy):
+class WithApprovalPermissions(RequestBasedWorkflowPermissions):
     can_read = [
         IfInState("draft", [RecordOwners()]),
         IfInState("approving", [RecordOwners(), TestUserReceiver()]),
@@ -177,17 +177,17 @@ class WithApprovalPermissionPolicy(DefaultWithRequestsWorkflowPermissionPolicy):
 WORKFLOWS = {
     "default": Workflow(
         label=_("Default workflow"),
-        permission_policy_cls=TestWorkflowPolicy,
+        permission_policy_cls=TestWorkflowPermissions,
         request_policy_cls=DefaultRequests,
     ),
     "with_approve": Workflow(
         label=_("Workflow with approval process"),
-        permission_policy_cls=WithApprovalPermissionPolicy,
+        permission_policy_cls=WithApprovalPermissions,
         request_policy_cls=RequestsWithApprove,
     ),
     "with_ct": Workflow(
         label=_("Workflow with approval process"),
-        permission_policy_cls=WithApprovalPermissionPolicy,
+        permission_policy_cls=WithApprovalPermissions,
         request_policy_cls=RequestsWithCT,
     ),
 }
