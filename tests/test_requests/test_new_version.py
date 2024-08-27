@@ -17,6 +17,11 @@ def test_new_version_autoaccept(
 
     record1 = record_factory(creator.identity)
 
+    new_version_direct = creator_client.post(
+        f"{urls['BASE_URL']}{record1['id']}/versions",
+    )
+    assert new_version_direct.status_code == 403
+
     resp_request_create = creator_client.post(
         urls["BASE_URL_REQUESTS"],
         json=new_version_data_function(record1["id"]),
