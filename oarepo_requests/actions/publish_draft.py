@@ -9,14 +9,14 @@ class PublishDraftSubmitAction(OARepoSubmitAction):
     def can_execute(self):
         if not super().can_execute():
             return False
-        topic = self.request.topic.resolve()
-        topic_service = get_record_service_for_record(topic)
-        id_ = topic["id"]
+
+        topic_service = get_record_service_for_record(self.request.topic.resolve())
         try:
-            topic_service.validate_draft(system_identity, id_)
+            topic_service.validate_draft(system_identity, self.request.topic["id"])
+            return True
         except ValidationError:
             return False
-        return True
+
 
 
 class PublishDraftAcceptAction(AddTopicLinksOnPayloadMixin, OARepoAcceptAction):
