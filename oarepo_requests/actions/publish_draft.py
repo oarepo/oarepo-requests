@@ -9,10 +9,10 @@ class PublishDraftSubmitAction(OARepoSubmitAction):
     def can_execute(self):
         if not super().can_execute():
             return False
-
-        topic_service = get_record_service_for_record(self.request.topic.resolve())
+        topic = self.request.topic.resolve()
+        topic_service = get_record_service_for_record(topic)
         try:
-            topic_service.validate_draft(system_identity, self.request.topic["id"])
+            topic_service.validate_draft(system_identity, topic["id"])
             return True
         except ValidationError:
             return False
