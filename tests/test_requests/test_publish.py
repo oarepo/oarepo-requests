@@ -1,6 +1,36 @@
+import copy
+
 from thesis.records.api import ThesisDraft, ThesisRecord
 
 from .utils import link_api2testclient
+
+
+def test_publish_service(users, record_service, default_workflow_json, search_clear):
+    from invenio_requests.proxies import (
+        current_requests_service as current_invenio_requests_service,
+    )
+
+    from oarepo_requests.proxies import current_oarepo_requests_service
+
+    creator = users[0]
+    receiver = users[1]
+    draft = record_service.create(creator.identity, default_workflow_json)
+    request = current_oarepo_requests_service.create(
+        identity=creator.identity,
+        data=None,
+        request_type="publish_draft",
+        topic=draft._record,
+    )
+    submit_result = current_invenio_requests_service.execute_action(
+        creator.identity, request.id, "submit"
+    )
+    accept_result = current_invenio_requests_service.execute_action(
+        receiver.identity, request.id, "accept"
+    )
+
+    record_service.read(
+        creator.identity, draft["id"]
+    )  # will throw exception if record isn't published
 
 
 def test_publish(
@@ -107,3 +137,37 @@ def test_publish(
         f"{urls['BASE_URL_REQUESTS']}{resp_request_create.json['id']}"
     )
     assert canceled_request.json["status"] == "cancelled"
+
+
+def test_submit_fails_if_draft_not_validated(
+    vocab_cf,
+    logged_client,
+    users,
+    urls,
+    publish_request_data_function,
+    create_draft_via_resource,
+    default_workflow_json,
+    search_clear,
+):
+    creator = users[0]
+    receiver = users[1]
+
+    creator_client = logged_client(creator)
+
+    json = copy.deepcopy(default_workflow_json)
+    del json["metadata"]["title"]
+
+    draft = creator_client.post(f"{urls['BASE_URL']}?expand=true", json=json)
+    assert draft.status_code == 201
+
+    resp_request_create = creator_client.post(
+        urls["BASE_URL_REQUESTS"],
+        json=publish_request_data_function(draft.json["id"]),
+    )
+    assert resp_request_create.status_code == 201
+    assert "submit" not in resp_request_create.json["links"]["actions"]
+
+    resp_request_submit = creator_client.post(
+        f"/requests/{resp_request_create.json['id']}/actions/submit"
+    )
+    assert resp_request_submit.status_code == 400

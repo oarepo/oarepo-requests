@@ -45,7 +45,7 @@ def test_resolve_topic(
         "metadata": {
             "contributors": ["Contributor 1"],
             "creators": ["Creator 1", "Creator 2"],
-            "title": "Title",
+            "title": "blabla",
         },
     }
 
@@ -108,7 +108,7 @@ def test_ui_resolve_topic(
     assert resp.json["topic"] == {
         "reference": {"thesis": record1["id"]},
         "type": "thesis",
-        "label": "Title",
+        "label": "blabla",
         "links": {
             "self": f"https://127.0.0.1:5000/api/thesis/{record1['id']}",
             "self_html": f"https://127.0.0.1:5000/thesis/{record1['id']}",

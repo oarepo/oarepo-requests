@@ -1,5 +1,6 @@
-from thesis.records.api import ThesisDraft, ThesisRecord
 import pytest
+from thesis.records.api import ThesisDraft, ThesisRecord
+
 from tests.test_requests.utils import link_api2testclient
 
 
