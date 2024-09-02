@@ -3,18 +3,19 @@ record:
   - invenio
   module:
     qualified: thesis
-  permissions:
-    presets: [ 'everyone' ]
-  draft: {}
+
   properties:
     metadata:
       properties:
         title:
           type: fulltext
+          required: true
         creators[]:
           type: keyword
         contributors[]:
           type: keyword
+
+  draft: {}
 
 settings:
   schema-server: 'local://'

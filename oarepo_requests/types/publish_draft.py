@@ -1,7 +1,10 @@
 import marshmallow as ma
 from oarepo_runtime.i18n import lazy_gettext as _
 
-from oarepo_requests.actions.publish_draft import PublishDraftAcceptAction
+from oarepo_requests.actions.publish_draft import (
+    PublishDraftAcceptAction,
+    PublishDraftSubmitAction,
+)
 
 from .generic import NonDuplicableOARepoRequestType
 from .ref_types import ModelRefTypes
@@ -26,6 +29,7 @@ class PublishDraftRequestType(NonDuplicableOARepoRequestType):
     def available_actions(cls):
         return {
             **super().available_actions,
+            "submit": PublishDraftSubmitAction,
             "accept": PublishDraftAcceptAction,
         }
 

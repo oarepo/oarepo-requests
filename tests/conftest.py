@@ -2,6 +2,7 @@ import copy
 import os
 
 import pytest
+from deepmerge import always_merger
 from flask_principal import UserNeed
 from flask_security import login_user
 from invenio_access.permissions import system_identity
@@ -337,7 +338,8 @@ def ui_serialization_result():
             "status": "Submitted",
             "title": "",
             "topic": {
-                "label": f"id: {topic_id}",
+                # "label": f"id: {topic_id}",
+                "label": "blabla",
                 "links": {
                     "self": f"https://127.0.0.1:5000/api/thesis/{topic_id}/draft",
                     "self_html": f"https://127.0.0.1:5000/thesis/{topic_id}/preview",
@@ -507,17 +509,16 @@ def record_factory(record_service, default_workflow_json):
             json["parent"]["workflow"] = custom_workflow
         json = {
             "metadata": {
-                "title": "Title",
                 "creators": [
                     "Creator 1",
                     "Creator 2",
                 ],
                 "contributors": ["Contributor 1"],
-            },
-            **json,
+            }
         }
+        json = always_merger.merge(json, default_workflow_json)
         if additional_data:
-            json |= additional_data
+            always_merger.merge(json, additional_data)
         draft = record_service.create(identity, json)
         record = record_service.publish(system_identity, draft.id)
         return record._obj
@@ -534,7 +535,7 @@ def create_draft_via_resource(default_workflow_json, urls):
         if custom_workflow:
             json["parent"]["workflow"] = custom_workflow
         if additional_data:
-            json |= additional_data
+            json = always_merger.merge(json, additional_data)
         url = urls["BASE_URL"] + "?expand=true" if expand else urls["BASE_URL"]
         return client.post(url, json=json, **kwargs)
 
@@ -586,4 +587,4 @@ def role_ui_serialization():
 
 @pytest.fixture()
 def default_workflow_json():
-    return {"parent": {"workflow": "default"}}
+    return {"parent": {"workflow": "default"}, "metadata": {"title": "blabla"}}
