@@ -16,7 +16,7 @@ import { useRequestContext } from "../contexts";
  */
 export const RequestListContainer = ({ requestsLoading, requestsLoadingError }) => {
   const { requests } = useRequestContext();
-  let openRequests = requests.filter(request => request.is_open);
+  let openRequests = requests.filter(request => request.is_open || request?.status_code.toLowerCase() === "created");
 
   return (
     (requestsLoading || requestsLoadingError || !_isEmpty(openRequests)) &&
