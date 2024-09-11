@@ -125,3 +125,11 @@ class IfRequestedBy(RecipientGeneratorMixin, ConditionalGenerator):
         raise NotImplementedError(
             "Please use IfRequestedBy only in recipients, not elsewhere."
         )
+
+class IfNoNewVersionDraft(ConditionalGenerator):
+    def __init__(self,  then_, else_=None):
+        else_ = [] if else_ is None else else_
+        super().__init__(then_, else_=else_)
+
+    def _condition(self, record, **kwargs):
+        return not record.is_draft and not record.versions.next_draft_id
