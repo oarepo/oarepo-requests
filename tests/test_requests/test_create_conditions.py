@@ -27,12 +27,18 @@ def test_can_create(
         json=publish_request_data_function(draft1.json["id"]),
     )
 
+    with pytest.raises(OpenRequestAlreadyExists):
+        creator_client.post( # create request after create
+            urls["BASE_URL_REQUESTS"],
+            json=publish_request_data_function(draft1.json["id"]),
+        )
+
     resp_request_submit = creator_client.post(
         link_api2testclient(resp_request_create.json["links"]["actions"]["submit"]),
     )
 
     with pytest.raises(OpenRequestAlreadyExists):
-        resp_request_create_duplicated = creator_client.post(
+        creator_client.post( # create request after submit
             urls["BASE_URL_REQUESTS"],
             json=publish_request_data_function(draft1.json["id"]),
         )
@@ -97,6 +103,10 @@ def test_can_possibly_create(
         json=publish_request_data_function(draft1.json["id"]),
     )
 
+    record_resp_after_create = creator_client.get(
+        f"{urls['BASE_URL']}{draft1.json['id']}/draft?expand=true"
+    )
+
     resp_request_submit = creator_client.post(
         link_api2testclient(resp_request_create.json["links"]["actions"]["submit"]),
     )
@@ -110,18 +120,21 @@ def test_can_possibly_create(
     record_resp_with_request = receiver_client.get(
         f"{urls['BASE_URL']}{draft1.json['id']}/draft?expand=true"
     )
-    # record_resp_draft2 = receiver_client.get(
-    #    f"{urls['BASE_URL']}{draft2.json['id']}/draft?expand=true"
-    # )
+
     assert find_request_type(
         record_resp_no_request.json["expanded"]["request_types"], "publish_draft"
     )
-    # assert find_request_type(
-    #    record_resp_draft2.json["expanded"]["request_types"], "publish_draft"
-    # )
+
     assert (
         find_request_type(
             record_resp_with_request.json["expanded"]["request_types"], "publish_draft"
+        )
+        is None
+    )
+
+    assert (
+        find_request_type(
+            record_resp_after_create.json["expanded"]["request_types"], "publish_draft"
         )
         is None
     )

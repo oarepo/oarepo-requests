@@ -3,7 +3,7 @@ from invenio_requests.customizations import RequestType
 from invenio_requests.proxies import current_requests_service
 
 from oarepo_requests.errors import OpenRequestAlreadyExists
-from oarepo_requests.utils import open_request_exists
+from oarepo_requests.utils import open_or_created_request_exists
 
 from ..actions.generic import (
     OARepoAcceptAction,
@@ -54,12 +54,12 @@ class OARepoRequestType(RequestType):
 # can be simulated by switching state to a one which does not allow create
 class NonDuplicableOARepoRequestType(OARepoRequestType):
     def can_create(self, identity, data, receiver, topic, creator, *args, **kwargs):
-        if open_request_exists(topic, self.type_id):
+        if open_or_created_request_exists(topic, self.type_id):
             raise OpenRequestAlreadyExists(self, topic)
         super().can_create(identity, data, receiver, topic, creator, *args, **kwargs)
 
     @classmethod
     def can_possibly_create(self, identity, topic, *args, **kwargs):
-        if open_request_exists(topic, self.type_id):
+        if open_or_created_request_exists(topic, self.type_id):
             return False
         return super().can_possibly_create(identity, topic, *args, **kwargs)

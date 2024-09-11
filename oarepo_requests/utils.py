@@ -42,16 +42,14 @@ def _reference_query_term(term, reference):
     )
 
 
-def search_requests(
-    identity,
+def search_requests_filter(
     type_id,
     topic_reference=None,
     receiver_reference=None,
     creator_reference=None,
     is_open=False,
-    add_args=None,
-):
-    """Return the request id if an open request already exists, else None."""
+    add_filter=None,
+    or_filter=None):
 
     must = [
         dsl.Q("term", **{"type": type_id}),
@@ -63,24 +61,31 @@ def search_requests(
         must.append(_reference_query_term("creator", creator_reference))
     if topic_reference:
         must.append(_reference_query_term("topic", topic_reference))
-    if add_args:
-        must += add_args
-    results = current_requests_service.search(
-        identity,
-        extra_filter=dsl.query.Bool(
-            "must",
-            must=must,
-        ),
+
+    extra_filter = dsl.query.Bool(
+        "must",
+        must=must,
     )
-    return results.hits
+    if add_filter:
+        extra_filter &= add_filter
+    if or_filter:
+        extra_filter |= or_filter
 
+    return extra_filter
 
-def open_request_exists(topic_or_reference, type_id):
+def open_or_created_request_exists(topic_or_reference, type_id):
     topic_reference = ResolverRegistry.reference_entity(topic_or_reference, raise_=True)
-    existing_requests = search_requests(
-        system_identity, type_id, topic_reference=topic_reference, is_open=True
+    base_filter = search_requests_filter(
+        type_id=type_id, topic_reference=topic_reference, is_open=True
     )
-    return bool(list(existing_requests))
+    created_filter = search_requests_filter(type_id=type_id, topic_reference=topic_reference, is_open=False,
+        add_filter=dsl.Q("term", **{"status": "created"})
+    )
+    results = current_requests_service.search(
+        system_identity,
+        extra_filter=base_filter | created_filter
+    ).hits
+    return bool(list(results))
 
 
 # TODO these things are related and possibly could be approached in a less convoluted manner? For example, global model->services map would help
