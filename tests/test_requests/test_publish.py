@@ -17,7 +17,9 @@ def test_publish_service(users, record_service, default_workflow_json, search_cl
     draft = record_service.create(creator.identity, default_workflow_json)
     request = current_oarepo_requests_service.create(
         identity=creator.identity,
-        data=None,
+        data={
+            "payload": {"version": "1.0"}
+        },
         request_type="publish_draft",
         topic=draft._record,
     )
@@ -81,11 +83,15 @@ def test_publish(
             record.json["expanded"]["requests"][0]["links"]["actions"]["accept"]
         ),
     )
-    # record = receiver_client.get(f"{urls['BASE_URL']}{draft2.json['id']}/draft")
-    # assert "publish_draft" not in record.json["parent"]
 
     assert "published_record:links:self" in publish.json["payload"]
     assert "published_record:links:self_html" in publish.json["payload"]
+
+    published_record = receiver_client.get(
+        f"{urls['BASE_URL']}{draft1.json['id']}?expand=true"
+    )
+
+    assert "version" in published_record.json["metadata"]
 
     ThesisRecord.index.refresh()
     ThesisDraft.index.refresh()
