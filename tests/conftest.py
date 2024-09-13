@@ -35,7 +35,7 @@ from oarepo_requests.actions.generic import (
     OARepoSubmitAction,
 )
 from oarepo_requests.receiver import default_workflow_receiver_function
-from oarepo_requests.services.permissions.generators import IfRequestedBy
+from oarepo_requests.services.permissions.generators import IfRequestedBy, IfNoNewVersionDraft, IfNoEditDraft
 from oarepo_requests.services.permissions.workflow_policies import (
     RequestBasedWorkflowPermissions,
 )
@@ -66,12 +66,12 @@ class DefaultRequests(WorkflowRequestPolicy):
         ),
     )
     edit_published_record = WorkflowRequest(
-        requesters=[IfInState("published", [RecordOwners()])],
+        requesters=[IfNoEditDraft([IfInState("published", [RecordOwners()])])],
         recipients=[AutoApprove()],
         transitions=WorkflowTransitions(),
     )
     new_version = WorkflowRequest(
-        requesters=[IfInState("published", [RecordOwners()])],
+        requesters=[IfNoNewVersionDraft([IfInState("published", [RecordOwners()])])],
         recipients=[AutoApprove()],
         transitions=WorkflowTransitions(),
     )

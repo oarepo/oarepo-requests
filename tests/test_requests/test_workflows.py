@@ -161,3 +161,137 @@ def test_autorequest(
     # the publish request should be created automatically
     publishing_record = record_service.read_draft(creator.identity, record_id)._record
     assert publishing_record["state"] == "publishing"
+
+
+
+def test_if_no_new_version_draft(
+    vocab_cf,
+    patch_requests_permissions,
+    logged_client,
+    users,
+    urls,
+    new_version_data_function,
+    edit_record_data_function,
+    record_factory,
+    search_clear,
+):
+    creator = users[0]
+    creator_client = logged_client(creator)
+
+    record = record_factory(creator.identity)
+    record2 = record_factory(creator.identity)
+    id_ = record["id"]
+    id2_ = record2["id"]
+
+    record = creator_client.get(
+        f"{urls['BASE_URL']}{id_}?expand=true",
+    )
+    requests = record.json["expanded"]["request_types"]
+    assert "new_version" in {r["type_id"] for r in requests}
+
+    resp_request_create = creator_client.post(
+        urls["BASE_URL_REQUESTS"],
+        json=new_version_data_function(id_),
+    )
+    resp_request_submit = creator_client.post(
+        link_api2testclient(resp_request_create.json["links"]["actions"]["submit"]),
+    )
+    request = creator_client.get(
+        f'{urls["BASE_URL_REQUESTS"]}{resp_request_create.json["id"]}',
+    ).json #request is autoaccepted
+    assert request["status"] == "accepted"
+    record = creator_client.get(
+        f"{urls['BASE_URL']}{id_}?expand=true",
+    )
+    requests = record.json["expanded"]["request_types"]
+    assert "new_version" not in {r["type_id"] for r in requests} # new version created, requests should not be available again
+
+
+    record = creator_client.get(       # try if edit is still allowed?; does it make sense edit request while also creating new version?
+        f"{urls['BASE_URL']}{id2_}?expand=true",
+    )
+    requests = record.json["expanded"]["request_types"]
+    resp_request_create = creator_client.post(
+        urls["BASE_URL_REQUESTS"],
+        json=edit_record_data_function(id2_),
+    )
+    resp_request_submit = creator_client.post(
+        link_api2testclient(resp_request_create.json["links"]["actions"]["submit"]),
+    )
+    request = creator_client.get(
+        f'{urls["BASE_URL_REQUESTS"]}{resp_request_create.json["id"]}',
+    ).json #request is autoaccepted
+    assert request["status"] == "accepted"
+    record = creator_client.get(
+        f"{urls['BASE_URL']}{id2_}?expand=true",
+    )
+    requests = record.json["expanded"]["request_types"]
+    assert ("new_version" in {r["type_id"] for r in requests}) # new version created, requests should not be available again
+
+
+def test_if_no_edit_draft(
+    vocab_cf,
+    patch_requests_permissions,
+    logged_client,
+    users,
+    urls,
+    new_version_data_function,
+    edit_record_data_function,
+    record_factory,
+    search_clear,
+):
+    creator = users[0]
+    creator_client = logged_client(creator)
+
+    record = record_factory(creator.identity)
+    record2 = record_factory(creator.identity)
+    id_ = record["id"]
+    id2_ = record2["id"]
+
+    record = creator_client.get(
+        f"{urls['BASE_URL']}{id_}?expand=true",
+    )
+    requests = record.json["expanded"]["request_types"]
+    assert "edit_published_record" in {r["type_id"] for r in requests}
+
+    resp_request_create = creator_client.post(
+        urls["BASE_URL_REQUESTS"],
+        json=edit_record_data_function(id_),
+    )
+    resp_request_submit = creator_client.post(
+        link_api2testclient(resp_request_create.json["links"]["actions"]["submit"]),
+    )
+    request = creator_client.get(
+        f'{urls["BASE_URL_REQUESTS"]}{resp_request_create.json["id"]}',
+    ).json #request is autoaccepted
+    assert request["status"] == "accepted"
+    record = creator_client.get(
+        f"{urls['BASE_URL']}{id_}?expand=true",
+    )
+    requests = record.json["expanded"]["request_types"]
+    assert "edit_published_record" not in {r["type_id"] for r in requests} # new version created, requests should not be available again
+
+
+    record = creator_client.get(       # try if edit_published_record is still allowed?; does it make sense edit request while also creating new version?
+        f"{urls['BASE_URL']}{id2_}?expand=true",
+    )
+    requests = record.json["expanded"]["request_types"]
+    resp_request_create = creator_client.post(
+        urls["BASE_URL_REQUESTS"],
+        json=new_version_data_function(id2_),
+    )
+    resp_request_submit = creator_client.post(
+        link_api2testclient(resp_request_create.json["links"]["actions"]["submit"]),
+    )
+    request = creator_client.get(
+        f'{urls["BASE_URL_REQUESTS"]}{resp_request_create.json["id"]}',
+    ).json #request is autoaccepted
+    assert request["status"] == "accepted"
+    record = creator_client.get(
+        f"{urls['BASE_URL']}{id2_}?expand=true",
+    )
+    requests = record.json["expanded"]["request_types"]
+    assert ("edit_published_record" in {r["type_id"] for r in requests}) # new version created, should edit be allowed with new version?
+
+
+
