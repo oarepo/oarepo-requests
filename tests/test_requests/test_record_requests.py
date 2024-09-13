@@ -12,7 +12,9 @@ def test_read_requests_on_draft(
     search_clear,
 ):
     creator = users[0]
+    receiver = users[1]
     creator_client = logged_client(creator)
+    receiver_client = logged_client(receiver)
 
     draft1 = create_draft_via_resource(creator_client)
     draft2 = create_draft_via_resource(creator_client)
@@ -24,6 +26,18 @@ def test_read_requests_on_draft(
         urls["BASE_URL_REQUESTS"],
         json=publish_request_data_function(draft1.json["id"]),
     )
+    resp_request_submit = creator_client.post(
+        link_api2testclient(r1.json["links"]["actions"]["submit"]),
+    )
+    record = receiver_client.get(
+        f"{urls['BASE_URL']}{draft1.json['id']}/draft?expand=true"
+    )
+    decline = receiver_client.post(
+        link_api2testclient(
+            record.json["expanded"]["requests"][0]["links"]["actions"]["decline"]
+        ),
+    )
+
     r2 = creator_client.post(
         urls["BASE_URL_REQUESTS"],
         json=publish_request_data_function(draft1.json["id"]),
@@ -61,7 +75,9 @@ def test_read_requests_on_record(
     search_clear,
 ):
     creator = users[0]
+    receiver = users[1]
     creator_client = logged_client(creator)
+    receiver_client = logged_client(receiver)
 
     record1 = record_factory(creator.identity)
     record2 = record_factory(creator.identity)
@@ -72,6 +88,18 @@ def test_read_requests_on_record(
         urls["BASE_URL_REQUESTS"],
         json=delete_record_data_function(record1["id"]),
     )
+    resp_request_submit = creator_client.post(
+        link_api2testclient(r1.json["links"]["actions"]["submit"]),
+    )
+    record = receiver_client.get(
+        f"{urls['BASE_URL']}{record1['id']}?expand=true"
+    )
+    decline = receiver_client.post(
+        link_api2testclient(
+            record.json["expanded"]["requests"][0]["links"]["actions"]["decline"]
+        ),
+    )
+
     r2 = creator_client.post(
         urls["BASE_URL_REQUESTS"],
         json=delete_record_data_function(record1["id"]),
