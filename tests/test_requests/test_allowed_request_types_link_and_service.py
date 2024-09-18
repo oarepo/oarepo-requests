@@ -180,3 +180,74 @@ def test_allowed_request_types_on_published_resource(
             "type_id": "new_version",
         },
     ]
+
+def test_ui_serialization(
+    vocab_cf,
+    logged_client,
+    users,
+    urls,
+    publish_request_data_function,
+    create_draft_via_resource,
+    record_factory,
+    search_clear,
+):
+    creator = users[0]
+    receiver = users[1]
+    creator_client = logged_client(creator)
+    receiver_client = logged_client(receiver)
+
+    draft1 = create_draft_via_resource(creator_client)
+
+    draft_to_publish = create_draft_via_resource(creator_client)
+    published1 = publish_record(
+        creator_client,
+        urls,
+        publish_request_data_function,
+        draft_to_publish,
+        receiver_client,
+    )
+
+    applicable_requests_link_draft = draft1.json["links"]["applicable-requests"]
+    applicable_requests_link_published = published1["links"]["applicable-requests"]
+
+    allowed_request_types_draft = creator_client.get(
+        link_api2testclient(applicable_requests_link_draft),
+        headers={"Accept": "application/vnd.inveniordm.v1+json"},
+    )
+    allowed_request_types_published = creator_client.get(
+        link_api2testclient(applicable_requests_link_published),
+        headers={"Accept": "application/vnd.inveniordm.v1+json"},
+    )
+    print()
+
+    """
+    assert sorted(
+        allowed_request_types.json["hits"]["hits"], key=lambda x: x["type_id"]
+    ) == [
+        {
+            "links": {
+                "actions": {
+                    "create": f'https://127.0.0.1:5000/api/thesis/{published1["id"]}/requests/delete_published_record'
+                }
+            },
+            "type_id": "delete_published_record",
+        },
+        {
+            "links": {
+                "actions": {
+                    "create": f'https://127.0.0.1:5000/api/thesis/{published1["id"]}/requests/edit_published_record'
+                }
+            },
+            "type_id": "edit_published_record",
+        },
+        {
+            "links": {
+                "actions"
+                : {
+                    "create": f'https://127.0.0.1:5000/api/thesis/{published1["id"]}/requests/new_version'
+                }
+            },
+            "type_id": "new_version",
+        },
+    ]
+    """
