@@ -4,11 +4,16 @@ from invenio_requests.services.permissions import (
 )
 from oarepo_workflows.requests.events import WorkflowEvent
 
+from oarepo_requests.types.events import TopicUpdateEventType
+
 default_events = {
     CommentEventType.type_id: WorkflowEvent(
         submitters=InvenioRequestsPermissionPolicy.can_create_comment
     ),
     LogEventType.type_id: WorkflowEvent(
+        submitters=InvenioRequestsPermissionPolicy.can_create_comment
+    ),
+    TopicUpdateEventType.type_id: WorkflowEvent(
         submitters=InvenioRequestsPermissionPolicy.can_create_comment
     ),
 }

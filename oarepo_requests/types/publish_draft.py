@@ -1,4 +1,12 @@
+from typing import Dict
+
 import marshmallow as ma
+from invenio_access.permissions import system_identity
+from invenio_records_resources.services.uow import RecordCommitOp
+from invenio_requests.proxies import current_requests_service
+from invenio_requests.records.api import Request
+from marshmallow import ValidationError
+from oarepo_runtime.datastreams.utils import get_record_service_for_record
 from oarepo_runtime.i18n import lazy_gettext as _
 
 from oarepo_requests.actions.publish_draft import (
@@ -48,4 +56,31 @@ class PublishDraftRequestType(NonDuplicableOARepoRequestType):
 
     description = _("Request publishing of a draft")
     receiver_can_be_none = True
-    allowed_topic_ref_types = ModelRefTypes(published=False, draft=True)
+    allowed_topic_ref_types = ModelRefTypes(published=True, draft=True)
+
+    def can_create(self, identity, data, receiver, topic, creator, *args, **kwargs):
+        if not topic.is_draft:
+            raise ValueError(
+                "Trying to create publish request on published record"
+            )  # todo - if we want the active topic thing, we have to allow published as allowed topic and have to check this somewhere else
+        super().can_create(identity, data, receiver, topic, creator, *args, **kwargs)
+        topic_service = get_record_service_for_record(topic)
+        topic_service.validate_draft(system_identity, topic["id"])
+
+    @classmethod
+    def can_possibly_create(self, identity, topic, *args, **kwargs):
+        if not topic.is_draft:
+            return False
+        super_ = super().can_possibly_create(identity, topic, *args, **kwargs)
+        if not super_:
+            return False
+        topic_service = get_record_service_for_record(topic)
+        try:
+            topic_service.validate_draft(system_identity, topic["id"])
+            return True
+        except ValidationError:
+            return False
+
+    def topic_change(self, request: Request, new_topic: Dict, uow):
+        setattr(request, "topic", new_topic)
+        uow.register(RecordCommitOp(request, indexer=current_requests_service.indexer))
