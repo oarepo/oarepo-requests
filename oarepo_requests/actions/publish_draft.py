@@ -1,9 +1,10 @@
 from invenio_access.permissions import system_identity
+from invenio_records_resources.services.uow import RecordCommitOp
 from marshmallow import ValidationError
 from oarepo_runtime.datastreams.utils import get_record_service_for_record
 
 from .generic import AddTopicLinksOnPayloadMixin, OARepoAcceptAction, OARepoSubmitAction
-from invenio_records_resources.services.uow import RecordCommitOp
+
 
 class PublishDraftSubmitAction(OARepoSubmitAction):
     def can_execute(self):
@@ -16,7 +17,6 @@ class PublishDraftSubmitAction(OARepoSubmitAction):
             return True
         except ValidationError:
             return False
-
 
 
 class PublishDraftAcceptAction(AddTopicLinksOnPayloadMixin, OARepoAcceptAction):

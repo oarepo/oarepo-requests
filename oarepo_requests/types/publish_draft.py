@@ -22,8 +22,7 @@ class PublishDraftRequestType(NonDuplicableOARepoRequestType):
             attribute="published_record:links:self_html",
             data_key="published_record:links:self_html",
         ),
-        "version": ma.fields.Str(
-        ),
+        "version": ma.fields.Str(),
     }
 
     form = [

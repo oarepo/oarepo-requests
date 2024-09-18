@@ -3,11 +3,13 @@ from invenio_records_permissions.generators import ConditionalGenerator, Generat
 from invenio_records_resources.references.entity_resolvers import EntityProxy
 from invenio_requests.proxies import current_requests
 from invenio_search.engine import dsl
-from oarepo_workflows.requests.policy import RecipientGeneratorMixin
-
-from oarepo_requests.services.permissions.identity import request_active
-from sqlalchemy.exc import NoResultFound
 from oarepo_runtime.datastreams.utils import get_record_service_for_record
+from oarepo_workflows.requests.policy import RecipientGeneratorMixin
+from sqlalchemy.exc import NoResultFound
+
+from oarepo_requests.errors import MissingTopicError
+from oarepo_requests.services.permissions.identity import request_active
+
 
 class RequestActive(Generator):
 
@@ -29,37 +31,53 @@ class IfRequestType(ConditionalGenerator):
         return request_type.type_id in self.request_types
 
 
+class IfEventType(ConditionalGenerator):
+    def __init__(self, event_types, then_, else_=None):
+        else_ = [] if else_ is None else else_
+        super().__init__(then_, else_=else_)
+        if not isinstance(event_types, (list, tuple)):
+            event_types = [event_types]
+        self.event_types = event_types
+
+    def _condition(self, event_type, **kwargs):
+        return event_type.type_id in self.event_types
+
+
 try:
     from oarepo_workflows import WorkflowPermission
     from oarepo_workflows.errors import InvalidWorkflowError, MissingWorkflowError
     from oarepo_workflows.proxies import current_oarepo_workflows
 
-    class CreatorsFromWorkflow(WorkflowPermission):
+    class RequestPolicyWorkflowCreators(WorkflowPermission):
+        #
 
-        def needs(self, record=None, request_type=None, **kwargs):
+        def _getter(self, **kwargs):
+            raise NotImplemented()
+
+        def _kwargs_parser(self, **kwargs):
+            return kwargs
+
+        # return empty needs on MissingTopicError
+        # match None in query filter
+        # excludes empty needs
+        def needs(self, **kwargs):
             try:
-                workflow_request = current_oarepo_workflows.get_workflow(
-                    record
-                ).requests()[request_type.type_id]
-                return workflow_request.needs(
-                    request_type=request_type, record=record, **kwargs
-                )
-            except (MissingWorkflowError, InvalidWorkflowError):
+                kwargs = self._kwargs_parser(**kwargs)
+                workflow_request = self._getter(**kwargs)
+                return workflow_request.needs(**kwargs)
+            except (MissingWorkflowError, InvalidWorkflowError, MissingTopicError):
                 return []
 
-        def excludes(self, record=None, request_type=None, **kwargs):
+        def excludes(self, **kwargs):
             try:
-                workflow_request = current_oarepo_workflows.get_workflow(
-                    record
-                ).requests()[request_type.type_id]
-                return workflow_request.excludes(
-                    request_type=request_type, record=record, **kwargs
-                )
-            except (MissingWorkflowError, InvalidWorkflowError):
+                kwargs = self._kwargs_parser(**kwargs)
+                workflow_request = self._getter(**kwargs)
+                return workflow_request.excludes(**kwargs)
+            except (MissingWorkflowError, InvalidWorkflowError, MissingTopicError):
                 return []
 
         # not tested
-        def query_filter(self, record=None, request_type=None, **kwargs):
+        def query_filter(self, **kwargs):
             try:
                 workflow_request = current_oarepo_workflows.get_workflow(
                     record
@@ -67,8 +85,45 @@ try:
                 return workflow_request.query_filters(
                     request_type=request_type, record=record, **kwargs
                 )
-            except (MissingWorkflowError, InvalidWorkflowError):
+            except (MissingWorkflowError, InvalidWorkflowError, MissingTopicError):
                 return dsl.Q("match_none")
+
+    class RequestCreatorsFromWorkflow(RequestPolicyWorkflowCreators):
+        def _getter(self, **kwargs):
+            request_type = kwargs["request_type"]
+            if "record" not in kwargs:
+                raise MissingTopicError(
+                    "Topic not found in request permissions generator arguments, can't get workflow."
+                )
+            record = kwargs["record"]
+            return current_oarepo_workflows.get_workflow(record).requests()[
+                request_type.type_id
+            ]
+
+    class EventCreatorsFromWorkflow(RequestPolicyWorkflowCreators):
+        def _kwargs_parser(self, **kwargs):
+            try:
+                record = kwargs[
+                    "request"
+                ].topic.resolve()  # publish tries to resolve deleted draft
+            except:
+                raise MissingTopicError(
+                    "Topic not found in request event permissions generator arguments, can't get workflow."
+                )
+            kwargs["record"] = record
+            return kwargs
+
+        def _getter(self, **kwargs):
+            if "record" not in kwargs:
+                return None
+            event_type = kwargs["event_type"]
+            request = kwargs["request"]
+            record = kwargs["record"]
+            return (
+                current_oarepo_workflows.get_workflow(record)
+                .requests()[request.type.type_id]
+                .events[event_type.type_id]
+            )
 
 except ImportError:
     pass
@@ -127,16 +182,18 @@ class IfRequestedBy(RecipientGeneratorMixin, ConditionalGenerator):
             "Please use IfRequestedBy only in recipients, not elsewhere."
         )
 
+
 class IfNoNewVersionDraft(ConditionalGenerator):
-    def __init__(self,  then_, else_=None):
+    def __init__(self, then_, else_=None):
         else_ = [] if else_ is None else else_
         super().__init__(then_, else_=else_)
 
     def _condition(self, record, **kwargs):
         return not record.is_draft and not record.versions.next_draft_id
 
+
 class IfNoEditDraft(ConditionalGenerator):
-    def __init__(self,  then_, else_=None):
+    def __init__(self, then_, else_=None):
         else_ = [] if else_ is None else else_
         super().__init__(then_, else_=else_)
 
@@ -145,7 +202,9 @@ class IfNoEditDraft(ConditionalGenerator):
             return False
         records_service = get_record_service_for_record(record)
         try:
-            draft = records_service.config.draft_cls.pid.resolve(record["id"]) # by edit - has the same id as parent record
+            draft = records_service.config.draft_cls.pid.resolve(
+                record["id"]
+            )  # by edit - has the same id as parent record
             # i'm not sure what open unpublished means
             return False
         except NoResultFound:

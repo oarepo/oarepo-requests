@@ -17,9 +17,7 @@ def test_publish_service(users, record_service, default_workflow_json, search_cl
     draft = record_service.create(creator.identity, default_workflow_json)
     request = current_oarepo_requests_service.create(
         identity=creator.identity,
-        data={
-            "payload": {"version": "1.0"}
-        },
+        data={"payload": {"version": "1.0"}},
         request_type="publish_draft",
         topic=draft._record,
     )

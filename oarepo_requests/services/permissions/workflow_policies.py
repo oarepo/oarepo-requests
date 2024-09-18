@@ -5,9 +5,10 @@ from invenio_requests.services.permissions import (
 from oarepo_workflows import DefaultWorkflowPermissions
 
 from oarepo_requests.services.permissions.generators import (
-    CreatorsFromWorkflow,
+    EventCreatorsFromWorkflow,
     IfRequestType,
     RequestActive,
+    RequestCreatorsFromWorkflow,
 )
 
 
@@ -34,8 +35,13 @@ class RequestBasedWorkflowPermissions(DefaultWorkflowPermissions):
 class CreatorsFromWorkflowRequestsPermissionPolicy(InvenioRequestsPermissionPolicy):
     can_create = [
         SystemProcess(),
-        CreatorsFromWorkflow(),
+        RequestCreatorsFromWorkflow(),
         IfRequestType(
             ["community-invitation"], InvenioRequestsPermissionPolicy.can_create
         ),
+    ]
+
+    can_create_comment = [
+        SystemProcess(),
+        EventCreatorsFromWorkflow(),
     ]

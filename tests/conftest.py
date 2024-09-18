@@ -10,11 +10,21 @@ from invenio_accounts.proxies import current_datastore
 from invenio_accounts.testutils import login_user_via_session
 from invenio_app.factory import create_api
 from invenio_i18n import lazy_gettext as _
-from invenio_records_permissions.generators import AnyUser, AuthenticatedUser, Generator
+from invenio_records_permissions.generators import (
+    AnyUser,
+    AuthenticatedUser,
+    Generator,
+    SystemProcess,
+)
 from invenio_requests.customizations import CommentEventType, LogEventType
 from invenio_requests.proxies import current_requests
 from invenio_requests.records.api import RequestEventFormat
+from invenio_requests.services.generators import Receiver
+from invenio_requests.services.permissions import (
+    PermissionPolicy as InvenioRequestsPermissionPolicy,
+)
 from invenio_users_resources.records import UserAggregate
+from oarepo_runtime.i18n import lazy_gettext as _
 from oarepo_runtime.services.permissions import RecordOwners
 from oarepo_workflows import (
     AutoApprove,
@@ -26,6 +36,7 @@ from oarepo_workflows import (
 )
 from oarepo_workflows.base import Workflow
 from oarepo_workflows.requests import RecipientGeneratorMixin
+from oarepo_workflows.requests.events import WorkflowEvent
 from thesis.proxies import current_service
 from thesis.records.api import ThesisDraft
 
@@ -35,12 +46,28 @@ from oarepo_requests.actions.generic import (
     OARepoSubmitAction,
 )
 from oarepo_requests.receiver import default_workflow_receiver_function
-from oarepo_requests.services.permissions.generators import IfRequestedBy, IfNoNewVersionDraft, IfNoEditDraft
+from oarepo_requests.services.permissions.events import default_events
+from oarepo_requests.services.permissions.generators import (
+    IfNoEditDraft,
+    IfNoNewVersionDraft,
+    IfRequestedBy,
+)
 from oarepo_requests.services.permissions.workflow_policies import (
     RequestBasedWorkflowPermissions,
 )
 from oarepo_requests.types import ModelRefTypes, NonDuplicableOARepoRequestType
 
+can_comment_only_receiver = [
+    Receiver(),
+    SystemProcess(),
+]
+
+events_only_receiver_can_comment = {
+    CommentEventType.type_id: WorkflowEvent(submitters=can_comment_only_receiver),
+    LogEventType.type_id: WorkflowEvent(
+        submitters=InvenioRequestsPermissionPolicy.can_create_comment
+    ),
+}
 
 
 class UserGenerator(RecipientGeneratorMixin, Generator):
@@ -61,6 +88,7 @@ class DefaultRequests(WorkflowRequestPolicy):
         transitions=WorkflowTransitions(
             submitted="publishing", accepted="published", declined="draft"
         ),
+        events=default_events,
     )
     delete_published_record = WorkflowRequest(
         requesters=[IfInState("published", [RecordOwners()])],
@@ -68,16 +96,19 @@ class DefaultRequests(WorkflowRequestPolicy):
         transitions=WorkflowTransitions(
             submitted="deleting", accepted="deleted", declined="published"
         ),
+        events=default_events,
     )
     edit_published_record = WorkflowRequest(
         requesters=[IfNoEditDraft([IfInState("published", [RecordOwners()])])],
         recipients=[AutoApprove()],
         transitions=WorkflowTransitions(),
+        events=default_events,
     )
     new_version = WorkflowRequest(
         requesters=[IfNoNewVersionDraft([IfInState("published", [RecordOwners()])])],
         recipients=[AutoApprove()],
         transitions=WorkflowTransitions(),
+        events=default_events,
     )
 
 
@@ -88,6 +119,7 @@ class RequestsWithApprove(WorkflowRequestPolicy):
         transitions=WorkflowTransitions(
             submitted="publishing", accepted="published", declined="approved"
         ),
+        events=default_events,
     )
     approve_draft = WorkflowRequest(
         requesters=[IfInState("draft", [RecordOwners()])],
@@ -95,6 +127,7 @@ class RequestsWithApprove(WorkflowRequestPolicy):
         transitions=WorkflowTransitions(
             submitted="approving", accepted="approved", declined="draft"
         ),
+        events=default_events,
     )
     delete_published_record = WorkflowRequest(
         requesters=[IfInState("published", [RecordOwners()])],
@@ -102,11 +135,13 @@ class RequestsWithApprove(WorkflowRequestPolicy):
         transitions=WorkflowTransitions(
             submitted="deleting", accepted="deleted", declined="published"
         ),
+        events=default_events,
     )
     edit_published_record = WorkflowRequest(
         requesters=[IfInState("published", [RecordOwners()])],
         recipients=[AutoApprove()],
         transitions=WorkflowTransitions(),
+        events=default_events,
     )
 
 
@@ -116,6 +151,7 @@ class RequestsWithCT(WorkflowRequestPolicy):
         recipients=[
             IfRequestedBy(UserGenerator(1), [UserGenerator(2)], [UserGenerator(3)])
         ],
+        events=default_events,
     )
 
 
@@ -219,7 +255,7 @@ def publish_request_data_function():
         return {
             "request_type": "publish_draft",
             "topic": {"thesis_draft": record_id},
-            "payload": {"version": "1.0"}
+            "payload": {"version": "1.0"},
         }
 
     return ret_data
