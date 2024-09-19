@@ -17,7 +17,7 @@ from oarepo_ui.resources.components import AllowedHtmlTagsComponent
 from oarepo_ui.resources.config import FormConfigResourceConfig, UIResourceConfig
 from oarepo_ui.resources.links import UIRecordLink
 
-from oarepo_requests.ui.components.custom_fields import FormConfigCustomFieldsComponent
+from oarepo_requests.ui.components import FormConfigCustomFieldsComponent
 
 
 def _get_custom_fields_ui_config(key, **kwargs):
