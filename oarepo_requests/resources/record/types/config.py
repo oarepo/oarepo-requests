@@ -1,9 +1,7 @@
-import marshmallow as ma
 from flask_resources import JSONSerializer, ResponseHandler
-from invenio_records_resources.resources import RecordResourceConfig
 from invenio_records_resources.resources.records.headers import etag_headers
 
-from oarepo_requests.resources.ui import OARepoRequestsUIJSONSerializer, OARepoRequestTypesUIJSONSerializer
+from oarepo_requests.resources.ui import OARepoRequestTypesUIJSONSerializer
 
 
 class ApplicableRecordRequestsResourceConfig:

@@ -2,15 +2,9 @@ import copy
 
 from flask import g
 from flask_resources import resource_requestctx, response_handler, route
-from invenio_records_resources.resources import RecordResource
-from invenio_records_resources.resources.records.resource import (
-    request_data,
-    request_extra_args,
-    request_search_args,
-    request_view_args,
-)
-from invenio_records_resources.resources.records.utils import search_preference
 from flask_resources.resources import Resource
+from invenio_records_resources.resources.records.resource import request_view_args
+
 
 class ApplicableRecordRequestsResource(Resource):
     def __init__(self, record_requests_config, config, service):
@@ -20,7 +14,7 @@ class ApplicableRecordRequestsResource(Resource):
         :param record_requests_config: config specific for the record request serivce
         """
         actual_config = copy.deepcopy(record_requests_config)
-        actual_config.blueprint_name = f"{config.blueprint_name}_requests"
+        actual_config.blueprint_name = f"{config.blueprint_name}_applicable_requests"
         vars_to_overwrite = [x for x in dir(config) if not x.startswith("_")]
         actual_keys = dir(actual_config)
         for var in vars_to_overwrite:
@@ -51,4 +45,3 @@ class ApplicableRecordRequestsResource(Resource):
             record_id=resource_requestctx.view_args["pid_value"],
         )
         return hits.to_dict(), 200
-

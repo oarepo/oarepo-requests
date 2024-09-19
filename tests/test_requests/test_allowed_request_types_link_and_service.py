@@ -181,6 +181,7 @@ def test_allowed_request_types_on_published_resource(
         },
     ]
 
+
 def test_ui_serialization(
     vocab_cf,
     logged_client,
@@ -206,6 +207,8 @@ def test_ui_serialization(
         draft_to_publish,
         receiver_client,
     )
+    draft_id = draft1.json["id"]
+    published_id = published1["id"]
 
     applicable_requests_link_draft = draft1.json["links"]["applicable-requests"]
     applicable_requests_link_published = published1["links"]["applicable-requests"]
@@ -214,40 +217,55 @@ def test_ui_serialization(
         link_api2testclient(applicable_requests_link_draft),
         headers={"Accept": "application/vnd.inveniordm.v1+json"},
     )
+
     allowed_request_types_published = creator_client.get(
         link_api2testclient(applicable_requests_link_published),
         headers={"Accept": "application/vnd.inveniordm.v1+json"},
     )
-    print()
 
-    """
-    assert sorted(
-        allowed_request_types.json["hits"]["hits"], key=lambda x: x["type_id"]
-    ) == [
+    assert allowed_request_types_draft.json["hits"]["hits"] == [
         {
+            "description": "Request publishing of a draft",
             "links": {
                 "actions": {
-                    "create": f'https://127.0.0.1:5000/api/thesis/{published1["id"]}/requests/delete_published_record'
+                    "create": f"https://127.0.0.1:5000/api/thesis/{draft_id}/draft/requests/publish_draft"
                 }
             },
+            "name": "Publish draft",
+            "type_id": "publish_draft",
+        }
+    ]
+    sorted_published_list = allowed_request_types_published.json["hits"]["hits"]
+    sorted_published_list.sort(key=lambda serialized_rt: serialized_rt["type_id"])
+    assert sorted_published_list == [
+        {
             "type_id": "delete_published_record",
-        },
-        {
             "links": {
                 "actions": {
-                    "create": f'https://127.0.0.1:5000/api/thesis/{published1["id"]}/requests/edit_published_record'
+                    "create": f"https://127.0.0.1:5000/api/thesis/{published_id}/requests/delete_published_record"
                 }
             },
-            "type_id": "edit_published_record",
+            "description": "Request deletion of published record",
+            "name": "Delete record",
         },
         {
+            "type_id": "edit_published_record",
             "links": {
-                "actions"
-                : {
-                    "create": f'https://127.0.0.1:5000/api/thesis/{published1["id"]}/requests/new_version'
+                "actions": {
+                    "create": f"https://127.0.0.1:5000/api/thesis/{published_id}/requests/edit_published_record"
                 }
             },
+            "description": "Request re-opening of published record",
+            "name": "Edit record",
+        },
+        {
             "type_id": "new_version",
+            "links": {
+                "actions": {
+                    "create": f"https://127.0.0.1:5000/api/thesis/{published_id}/requests/new_version"
+                }
+            },
+            "description": "Request requesting creation of new version of a published record.",
+            "name": "New Version",
         },
     ]
-    """
