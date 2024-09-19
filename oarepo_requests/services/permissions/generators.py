@@ -122,7 +122,7 @@ try:
             return (
                 current_oarepo_workflows.get_workflow(record)
                 .requests()[request.type.type_id]
-                .events[event_type.type_id]
+                .allowed_events[event_type.type_id]
             )
 
 except ImportError:

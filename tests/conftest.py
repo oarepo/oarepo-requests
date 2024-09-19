@@ -46,7 +46,6 @@ from oarepo_requests.actions.generic import (
     OARepoSubmitAction,
 )
 from oarepo_requests.receiver import default_workflow_receiver_function
-from oarepo_requests.services.permissions.events import default_events
 from oarepo_requests.services.permissions.generators import (
     IfNoEditDraft,
     IfNoNewVersionDraft,
@@ -88,7 +87,6 @@ class DefaultRequests(WorkflowRequestPolicy):
         transitions=WorkflowTransitions(
             submitted="publishing", accepted="published", declined="draft"
         ),
-        events=default_events,
     )
     delete_published_record = WorkflowRequest(
         requesters=[IfInState("published", [RecordOwners()])],
@@ -96,30 +94,27 @@ class DefaultRequests(WorkflowRequestPolicy):
         transitions=WorkflowTransitions(
             submitted="deleting", accepted="deleted", declined="published"
         ),
-        events=default_events,
     )
     edit_published_record = WorkflowRequest(
         requesters=[IfNoEditDraft([IfInState("published", [RecordOwners()])])],
         recipients=[AutoApprove()],
         transitions=WorkflowTransitions(),
-        events=default_events,
     )
     new_version = WorkflowRequest(
         requesters=[IfNoNewVersionDraft([IfInState("published", [RecordOwners()])])],
         recipients=[AutoApprove()],
         transitions=WorkflowTransitions(),
-        events=default_events,
     )
 
 
 class RequestsWithApprove(WorkflowRequestPolicy):
     publish_draft = WorkflowRequest(
         requesters=[IfInState("approved", [AutoRequest()])],
-        recipients=[UserGenerator(2)],
+        recipients=[UserGenerator(1)],
         transitions=WorkflowTransitions(
             submitted="publishing", accepted="published", declined="approved"
         ),
-        events=default_events,
+        events=events_only_receiver_can_comment,
     )
     approve_draft = WorkflowRequest(
         requesters=[IfInState("draft", [RecordOwners()])],
@@ -127,7 +122,7 @@ class RequestsWithApprove(WorkflowRequestPolicy):
         transitions=WorkflowTransitions(
             submitted="approving", accepted="approved", declined="draft"
         ),
-        events=default_events,
+        events=events_only_receiver_can_comment,
     )
     delete_published_record = WorkflowRequest(
         requesters=[IfInState("published", [RecordOwners()])],
@@ -135,13 +130,13 @@ class RequestsWithApprove(WorkflowRequestPolicy):
         transitions=WorkflowTransitions(
             submitted="deleting", accepted="deleted", declined="published"
         ),
-        events=default_events,
+        events=events_only_receiver_can_comment,
     )
     edit_published_record = WorkflowRequest(
         requesters=[IfInState("published", [RecordOwners()])],
         recipients=[AutoApprove()],
         transitions=WorkflowTransitions(),
-        events=default_events,
+        events=events_only_receiver_can_comment,
     )
 
 
@@ -151,7 +146,6 @@ class RequestsWithCT(WorkflowRequestPolicy):
         recipients=[
             IfRequestedBy(UserGenerator(1), [UserGenerator(2)], [UserGenerator(3)])
         ],
-        events=default_events,
     )
 
 
