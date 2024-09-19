@@ -357,7 +357,7 @@ def test_workflow_events(
         json=events_resource_data,
     )
 
-    assert comment_from1.status_code == 201
+    assert comment_from1.status_code == 403
     assert comment_from2.status_code == 201
 
     record_receiver = user2_client.get(

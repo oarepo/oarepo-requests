@@ -102,6 +102,9 @@ class OARepoRequests:
         app.config.setdefault("REQUESTS_UI_SERIALIZATION_REFERENCED_FIELDS", []).extend(
             config.REQUESTS_UI_SERIALIZATION_REFERENCED_FIELDS
         )
+        app.config.setdefault("DEFAULT_WORKFLOW_EVENT_SUBMITTERS", {}).update(
+            config.DEFAULT_WORKFLOW_EVENT_SUBMITTERS
+        )
 
 
 def api_finalize_app(app):
