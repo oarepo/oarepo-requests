@@ -1,4 +1,5 @@
 import inspect
+import typing
 
 import marshmallow as ma
 from flask import current_app
@@ -10,6 +11,7 @@ from invenio_pidstore.errors import (
 )
 from invenio_records_resources.proxies import current_service_registry
 from invenio_records_resources.services.errors import PermissionDeniedError
+from invenio_requests import current_request_type_registry
 from oarepo_runtime.services.custom_fields import CustomFields, InlinedCustomFields
 from oarepo_ui.resources.components import AllowedHtmlTagsComponent
 from oarepo_ui.resources.config import FormConfigResourceConfig, UIResourceConfig
@@ -22,11 +24,23 @@ def _get_custom_fields_ui_config(key, **kwargs):
     return current_app.config.get(f"{key}_UI", [])
 
 
+class RequestTypeSchema(ma.fields.Str):
+    def _deserialize(
+        self,
+        value: typing.Any,
+        attr: str | None,
+        data: typing.Mapping[str, typing.Any] | None,
+        **kwargs,
+    ):
+        ret = super()._deserialize(value, attr, data, **kwargs)
+        return current_request_type_registry.lookup(ret, quiet=True)
+
+
 class RequestsFormConfigResourceConfig(FormConfigResourceConfig):
     url_prefix = "/requests"
     blueprint_name = "oarepo_requests_form_config"
     components = [AllowedHtmlTagsComponent, FormConfigCustomFieldsComponent]
-    request_view_args = {"request_type": ma.fields.Str()}
+    request_view_args = {"request_type": RequestTypeSchema()}
     routes = {
         "form_config": "/configs/<request_type>",
     }

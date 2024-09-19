@@ -92,3 +92,63 @@ def test_request_detail_page(
     with creator_client.get(f"/requests/{request_id}") as c:
         assert c.status_code == 200
         print(c.text)
+
+
+def test_form_config(app, client, record_ui_resource, fake_manifest):
+    with client.get(f"/requests/configs/publish_draft") as c:
+        assert c.json == {
+            "allowedHtmlAttrs": {
+                "*": ["class"],
+                "a": ["href", "title", "name", "class", "rel"],
+                "abbr": ["title"],
+                "acronym": ["title"],
+            },
+            "allowedHtmlTags": [
+                "a",
+                "abbr",
+                "acronym",
+                "b",
+                "blockquote",
+                "br",
+                "code",
+                "div",
+                "table",
+                "tbody",
+                "td",
+                "th",
+                "tr",
+                "em",
+                "h1",
+                "h2",
+                "h3",
+                "h4",
+                "h5",
+                "i",
+                "li",
+                "ol",
+                "p",
+                "pre",
+                "span",
+                "strike",
+                "strong",
+                "sub",
+                "sup",
+                "u",
+                "ul",
+            ],
+            "custom_fields": {
+                "ui": {
+                    "fields": [
+                        {
+                            "field": "version",
+                            "props": {
+                                "label": "Resource version",
+                                "placeholder": "Write down the version (first, second…).",
+                                "required": False,
+                            },
+                            "ui_widget": "Input",
+                        }
+                    ]
+                }
+            },
+        }
