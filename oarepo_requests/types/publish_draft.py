@@ -24,6 +24,18 @@ class PublishDraftRequestType(NonDuplicableOARepoRequestType):
         ),
     }
 
+    form = [
+        {
+            "field": "version",
+            "ui_widget": "Input",
+            "props": {
+                "label": _("Resource version"),
+                "placeholder": _("Write down the version (first, second…)."),
+                "required": False,
+            },
+        }
+    ]
+
     @classmethod
     @property
     def available_actions(cls):
