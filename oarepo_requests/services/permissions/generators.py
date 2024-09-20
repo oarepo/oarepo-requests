@@ -3,11 +3,12 @@ from invenio_records_permissions.generators import ConditionalGenerator, Generat
 from invenio_records_resources.references.entity_resolvers import EntityProxy
 from invenio_requests.proxies import current_requests
 from invenio_search.engine import dsl
+from oarepo_runtime.datastreams.utils import get_record_service_for_record
 from oarepo_workflows.requests.policy import RecipientGeneratorMixin
+from sqlalchemy.exc import NoResultFound
 
 from oarepo_requests.services.permissions.identity import request_active
-from sqlalchemy.exc import NoResultFound
-from oarepo_runtime.datastreams.utils import get_record_service_for_record
+
 
 class RequestActive(Generator):
 
@@ -127,16 +128,18 @@ class IfRequestedBy(RecipientGeneratorMixin, ConditionalGenerator):
             "Please use IfRequestedBy only in recipients, not elsewhere."
         )
 
+
 class IfNoNewVersionDraft(ConditionalGenerator):
-    def __init__(self,  then_, else_=None):
+    def __init__(self, then_, else_=None):
         else_ = [] if else_ is None else else_
         super().__init__(then_, else_=else_)
 
     def _condition(self, record, **kwargs):
         return not record.is_draft and not record.versions.next_draft_id
 
+
 class IfNoEditDraft(ConditionalGenerator):
-    def __init__(self,  then_, else_=None):
+    def __init__(self, then_, else_=None):
         else_ = [] if else_ is None else else_
         super().__init__(then_, else_=else_)
 
@@ -145,7 +148,9 @@ class IfNoEditDraft(ConditionalGenerator):
             return False
         records_service = get_record_service_for_record(record)
         try:
-            draft = records_service.config.draft_cls.pid.resolve(record["id"]) # by edit - has the same id as parent record
+            draft = records_service.config.draft_cls.pid.resolve(
+                record["id"]
+            )  # by edit - has the same id as parent record
             # i'm not sure what open unpublished means
             return False
         except NoResultFound:

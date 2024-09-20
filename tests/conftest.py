@@ -35,7 +35,11 @@ from oarepo_requests.actions.generic import (
     OARepoSubmitAction,
 )
 from oarepo_requests.receiver import default_workflow_receiver_function
-from oarepo_requests.services.permissions.generators import IfRequestedBy, IfNoNewVersionDraft, IfNoEditDraft
+from oarepo_requests.services.permissions.generators import (
+    IfNoEditDraft,
+    IfNoNewVersionDraft,
+    IfRequestedBy,
+)
 from oarepo_requests.services.permissions.workflow_policies import (
     RequestBasedWorkflowPermissions,
 )

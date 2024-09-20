@@ -18,7 +18,6 @@ class PublishDraftSubmitAction(OARepoSubmitAction):
             return False
 
 
-
 class PublishDraftAcceptAction(AddTopicLinksOnPayloadMixin, OARepoAcceptAction):
     self_link = "published_record:links:self"
     self_html_link = "published_record:links:self_html"

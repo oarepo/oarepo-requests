@@ -163,7 +163,6 @@ def test_autorequest(
     assert publishing_record["state"] == "publishing"
 
 
-
 def test_if_no_new_version_draft(
     vocab_cf,
     patch_requests_permissions,
@@ -198,16 +197,17 @@ def test_if_no_new_version_draft(
     )
     request = creator_client.get(
         f'{urls["BASE_URL_REQUESTS"]}{resp_request_create.json["id"]}',
-    ).json #request is autoaccepted
+    ).json  # request is autoaccepted
     assert request["status"] == "accepted"
     record = creator_client.get(
         f"{urls['BASE_URL']}{id_}?expand=true",
     )
     requests = record.json["expanded"]["request_types"]
-    assert "new_version" not in {r["type_id"] for r in requests} # new version created, requests should not be available again
+    assert "new_version" not in {
+        r["type_id"] for r in requests
+    }  # new version created, requests should not be available again
 
-
-    record = creator_client.get(       # try if edit is still allowed?; does it make sense edit request while also creating new version?
+    record = creator_client.get(  # try if edit is still allowed?; does it make sense edit request while also creating new version?
         f"{urls['BASE_URL']}{id2_}?expand=true",
     )
     requests = record.json["expanded"]["request_types"]
@@ -220,13 +220,15 @@ def test_if_no_new_version_draft(
     )
     request = creator_client.get(
         f'{urls["BASE_URL_REQUESTS"]}{resp_request_create.json["id"]}',
-    ).json #request is autoaccepted
+    ).json  # request is autoaccepted
     assert request["status"] == "accepted"
     record = creator_client.get(
         f"{urls['BASE_URL']}{id2_}?expand=true",
     )
     requests = record.json["expanded"]["request_types"]
-    assert ("new_version" in {r["type_id"] for r in requests}) # new version created, requests should not be available again
+    assert "new_version" in {
+        r["type_id"] for r in requests
+    }  # new version created, requests should not be available again
 
 
 def test_if_no_edit_draft(
@@ -263,16 +265,17 @@ def test_if_no_edit_draft(
     )
     request = creator_client.get(
         f'{urls["BASE_URL_REQUESTS"]}{resp_request_create.json["id"]}',
-    ).json #request is autoaccepted
+    ).json  # request is autoaccepted
     assert request["status"] == "accepted"
     record = creator_client.get(
         f"{urls['BASE_URL']}{id_}?expand=true",
     )
     requests = record.json["expanded"]["request_types"]
-    assert "edit_published_record" not in {r["type_id"] for r in requests} # new version created, requests should not be available again
+    assert "edit_published_record" not in {
+        r["type_id"] for r in requests
+    }  # new version created, requests should not be available again
 
-
-    record = creator_client.get(       # try if edit_published_record is still allowed?; does it make sense edit request while also creating new version?
+    record = creator_client.get(  # try if edit_published_record is still allowed?; does it make sense edit request while also creating new version?
         f"{urls['BASE_URL']}{id2_}?expand=true",
     )
     requests = record.json["expanded"]["request_types"]
@@ -285,13 +288,12 @@ def test_if_no_edit_draft(
     )
     request = creator_client.get(
         f'{urls["BASE_URL_REQUESTS"]}{resp_request_create.json["id"]}',
-    ).json #request is autoaccepted
+    ).json  # request is autoaccepted
     assert request["status"] == "accepted"
     record = creator_client.get(
         f"{urls['BASE_URL']}{id2_}?expand=true",
     )
     requests = record.json["expanded"]["request_types"]
-    assert ("edit_published_record" in {r["type_id"] for r in requests}) # new version created, should edit be allowed with new version?
-
-
-
+    assert "edit_published_record" in {
+        r["type_id"] for r in requests
+    }  # new version created, should edit be allowed with new version?

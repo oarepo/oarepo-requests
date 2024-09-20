@@ -28,7 +28,7 @@ def test_can_create(
     )
 
     with pytest.raises(OpenRequestAlreadyExists):
-        creator_client.post( # create request after create
+        creator_client.post(  # create request after create
             urls["BASE_URL_REQUESTS"],
             json=publish_request_data_function(draft1.json["id"]),
         )
@@ -38,7 +38,7 @@ def test_can_create(
     )
 
     with pytest.raises(OpenRequestAlreadyExists):
-        creator_client.post( # create request after submit
+        creator_client.post(  # create request after submit
             urls["BASE_URL_REQUESTS"],
             json=publish_request_data_function(draft1.json["id"]),
         )

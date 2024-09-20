@@ -49,7 +49,8 @@ def search_requests_filter(
     creator_reference=None,
     is_open=False,
     add_filter=None,
-    or_filter=None):
+    or_filter=None,
+):
 
     must = [
         dsl.Q("term", **{"type": type_id}),
@@ -73,17 +74,20 @@ def search_requests_filter(
 
     return extra_filter
 
+
 def open_or_created_request_exists(topic_or_reference, type_id):
     topic_reference = ResolverRegistry.reference_entity(topic_or_reference, raise_=True)
     base_filter = search_requests_filter(
         type_id=type_id, topic_reference=topic_reference, is_open=True
     )
-    created_filter = search_requests_filter(type_id=type_id, topic_reference=topic_reference, is_open=False,
-        add_filter=dsl.Q("term", **{"status": "created"})
+    created_filter = search_requests_filter(
+        type_id=type_id,
+        topic_reference=topic_reference,
+        is_open=False,
+        add_filter=dsl.Q("term", **{"status": "created"}),
     )
     results = current_requests_service.search(
-        system_identity,
-        extra_filter=base_filter | created_filter
+        system_identity, extra_filter=base_filter | created_filter
     ).hits
     return bool(list(results))
 
