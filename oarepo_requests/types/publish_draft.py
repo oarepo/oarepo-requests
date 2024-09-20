@@ -26,8 +26,7 @@ class PublishDraftRequestType(NonDuplicableOARepoRequestType):
         ),
     }
 
-    form = [
-        {
+    form = {
             "field": "version",
             "ui_widget": "Input",
             "props": {
@@ -36,7 +35,6 @@ class PublishDraftRequestType(NonDuplicableOARepoRequestType):
                 "required": False,
             },
         }
-    ]
 
     @classmethod
     @property

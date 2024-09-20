@@ -7,4 +7,22 @@ class FormConfigCustomFieldsComponent(UIResourceComponent):
         type_ = view_args.get("request_type")
         if hasattr(type_, "form"):
             form = type_.form
-            form_config["custom_fields"] = {"ui": {"fields": form}}
+            if not form:
+                return
+            if isinstance(form, dict):
+                # it is just a single field
+                form = [{
+                    "section": "",
+                    "fields": [form]
+                }]
+            elif isinstance(form, list):
+                for it in form:
+                    if not isinstance(it, dict):
+                        raise ValueError(f"Form section must be a dictionary: {it}")
+                    assert "section" in it, f"Form section must contain 'section' key: {it}"
+                    assert "fields" in it, f"Form section must contain 'fields' key: {it}"
+                    assert isinstance(it["fields"], list), f"Form section fields must be a list: {it}"
+            else:
+                raise ValueError("form must be either dict containing a single field or a list of sections.")
+
+            form_config["custom_fields"] = {"ui": form}

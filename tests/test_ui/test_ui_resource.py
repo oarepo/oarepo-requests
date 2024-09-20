@@ -137,7 +137,8 @@ def test_form_config(app, client, record_ui_resource, fake_manifest):
                 "ul",
             ],
             "custom_fields": {
-                "ui": {
+                "ui": [{
+                    "section": "",
                     "fields": [
                         {
                             "field": "version",
@@ -149,6 +150,6 @@ def test_form_config(app, client, record_ui_resource, fake_manifest):
                             "ui_widget": "Input",
                         }
                     ]
-                }
+                }]
             },
         }
