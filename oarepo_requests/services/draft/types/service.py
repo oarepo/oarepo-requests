@@ -1,9 +1,5 @@
-from invenio_records_resources.services.uow import unit_of_work
-from invenio_search.engine import dsl
 
-from oarepo_requests.services.record.service import RecordRequestsService
 from oarepo_requests.services.record.types.service import RecordRequestTypesService
-from oarepo_requests.utils import get_type_id_for_record_cls
 
 
 class DraftRecordRequestTypesService(RecordRequestTypesService):

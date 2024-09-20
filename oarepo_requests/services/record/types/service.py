@@ -2,16 +2,12 @@ from types import SimpleNamespace
 
 from invenio_records_resources.services import LinksTemplate
 from invenio_records_resources.services.base.links import Link
-from invenio_records_resources.services.uow import unit_of_work
-from invenio_search.engine import dsl
 
-from oarepo_requests.proxies import current_oarepo_requests
 from oarepo_requests.services.results import (
     RequestTypesList,
     allowed_user_request_types,
 )
 from oarepo_requests.services.schema import RequestTypeSchema
-from oarepo_requests.utils import get_type_id_for_record_cls
 
 
 class RecordRequestTypesService:
@@ -32,6 +28,7 @@ class RecordRequestTypesService:
     def record_cls(self):
         """Factory for creating a record class."""
         return self.record_service.config.record_cls
+
     """
     @property
     def requests_service(self):
@@ -55,4 +52,3 @@ class RecordRequestTypesService:
             schema=RequestTypeSchema,
             record=record,
         )
-

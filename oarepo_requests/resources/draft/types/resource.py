@@ -2,9 +2,7 @@ from flask import g
 from flask_resources import resource_requestctx, response_handler, route
 from invenio_records_resources.resources.records.resource import request_view_args
 
-from oarepo_requests.resources.record.types.resource import (
-    RecordRequestTypesResource,
-)
+from oarepo_requests.resources.record.types.resource import RecordRequestTypesResource
 
 
 class DraftRequestTypesResource(RecordRequestTypesResource):
