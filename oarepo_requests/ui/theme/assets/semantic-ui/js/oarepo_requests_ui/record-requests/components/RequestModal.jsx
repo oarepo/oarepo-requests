@@ -41,7 +41,6 @@ export const RequestModal = ({
     requestCreationModal ? requestType : request,
     customFields
   );
-  console.log(record);
   const formik = useFormik({
     initialValues:
       request && !_isEmpty(request?.payload)
@@ -110,6 +109,7 @@ export const RequestModal = ({
             );
             setTimeout(() => {
               window.location.href = record.links.edit_html;
+              closeModal();
             }, 2000);
           } else {
             setFieldError(

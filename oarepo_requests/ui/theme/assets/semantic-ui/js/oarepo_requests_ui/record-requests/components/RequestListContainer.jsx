@@ -1,7 +1,7 @@
 import React from "react";
 
 import { i18next } from "@translations/oarepo_requests_ui/i18next";
-import { Segment, Header, Placeholder, Message } from "semantic-ui-react";
+import { Placeholder, Message } from "semantic-ui-react";
 import _isEmpty from "lodash/isEmpty";
 
 import { RequestList } from ".";
@@ -26,7 +26,7 @@ export const RequestListContainer = ({
 
   return (
     (requestsLoading || requestsLoadingError || !_isEmpty(openRequests)) && (
-      <Segment className="requests-my-requests borderless">
+      <div className="requests-my-requests borderless">
         {requestsLoading ? (
           <Placeholder fluid>
             {Array.from({ length: openRequests.length }).map((_, index) => (
@@ -46,7 +46,7 @@ export const RequestListContainer = ({
         ) : (
           <RequestList requests={openRequests} />
         )}
-      </Segment>
+      </div>
     )
   );
 };

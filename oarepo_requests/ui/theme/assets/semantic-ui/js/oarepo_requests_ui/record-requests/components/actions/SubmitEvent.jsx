@@ -1,18 +1,12 @@
 import React from "react";
 
-import _isEmpty from "lodash/isEmpty";
 import { i18next } from "@translations/oarepo_requests_ui/i18next";
 import { Button, Icon } from "semantic-ui-react";
 
 import { REQUEST_TYPE } from "../../utils/objects";
 import { useRequestsApi } from "../../utils/hooks";
 
-const SubmitEvent = ({
-  request: eventType,
-  requestType,
-  onSubmit,
-  ...props
-}) => {
+const SubmitEvent = ({ request: eventType, onSubmit, ...props }) => {
   const { doAction } = useRequestsApi(eventType, onSubmit);
 
   return (

@@ -5,7 +5,7 @@ import { Button, Icon } from "semantic-ui-react";
 import { useRequestsApi } from "../../utils/hooks";
 import { REQUEST_TYPE } from "../../utils/objects";
 
-const Create = ({ request, requestType, onSubmit, ...props }) => {
+const Create = ({ requestType, onSubmit, ...props }) => {
   const { doAction } = useRequestsApi(requestType, onSubmit);
 
   return (
