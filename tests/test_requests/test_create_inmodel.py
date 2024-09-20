@@ -71,7 +71,9 @@ def test_draft(
         ]["actions"]["create"]
     )
 
-    resp_request_create = creator_client.post(link)
+    resp_request_create = creator_client.post(link, json={
+            "payload": {"version": "1.0"}
+        })
     assert resp_request_create.status_code == 201
     resp_request_submit = creator_client.post(
         link_api2testclient(resp_request_create.json["links"]["actions"]["submit"]),
