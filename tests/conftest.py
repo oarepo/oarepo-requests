@@ -42,25 +42,29 @@ from oarepo_requests.services.permissions.workflow_policies import (
 from oarepo_requests.types import ModelRefTypes, NonDuplicableOARepoRequestType
 
 
-class TestUserReceiver(RecipientGeneratorMixin, Generator):
+
+class UserGenerator(RecipientGeneratorMixin, Generator):
+    def __init__(self, user_id):
+        self.user_id = user_id
+
     def needs(self, **kwargs):
-        return [UserNeed(2)]
+        return [UserNeed(self.user_id)]
 
     def reference_receivers(self, **kwargs):
-        return [{"user": "2"}]
+        return [{"user": str(self.user_id)}]
 
 
 class DefaultRequests(WorkflowRequestPolicy):
     publish_draft = WorkflowRequest(
         requesters=[IfInState("draft", [RecordOwners()])],
-        recipients=[TestUserReceiver()],
+        recipients=[UserGenerator(2)],
         transitions=WorkflowTransitions(
             submitted="publishing", accepted="published", declined="draft"
         ),
     )
     delete_published_record = WorkflowRequest(
         requesters=[IfInState("published", [RecordOwners()])],
-        recipients=[TestUserReceiver()],
+        recipients=[UserGenerator(2)],
         transitions=WorkflowTransitions(
             submitted="deleting", accepted="deleted", declined="published"
         ),
@@ -77,35 +81,24 @@ class DefaultRequests(WorkflowRequestPolicy):
     )
 
 
-class UserGenerator(RecipientGeneratorMixin, Generator):
-    def __init__(self, user_id):
-        self.user_id = user_id
-
-    def needs(self, **kwargs):
-        return [UserNeed(self.user_id)]
-
-    def reference_receivers(self, **kwargs):
-        return [{"user": str(self.user_id)}]
-
-
 class RequestsWithApprove(WorkflowRequestPolicy):
     publish_draft = WorkflowRequest(
         requesters=[IfInState("approved", [AutoRequest()])],
-        recipients=[TestUserReceiver()],
+        recipients=[UserGenerator(2)],
         transitions=WorkflowTransitions(
             submitted="publishing", accepted="published", declined="approved"
         ),
     )
     approve_draft = WorkflowRequest(
         requesters=[IfInState("draft", [RecordOwners()])],
-        recipients=[TestUserReceiver()],
+        recipients=[UserGenerator(2)],
         transitions=WorkflowTransitions(
             submitted="approving", accepted="approved", declined="draft"
         ),
     )
     delete_published_record = WorkflowRequest(
         requesters=[IfInState("published", [RecordOwners()])],
-        recipients=[TestUserReceiver()],
+        recipients=[UserGenerator(2)],
         transitions=WorkflowTransitions(
             submitted="deleting", accepted="deleted", declined="published"
         ),
@@ -159,7 +152,7 @@ class ConditionalRecipientRequestType(NonDuplicableOARepoRequestType):
 class TestWorkflowPermissions(RequestBasedWorkflowPermissions):
     can_read = [
         IfInState("draft", [RecordOwners()]),
-        IfInState("publishing", [RecordOwners(), TestUserReceiver()]),
+        IfInState("publishing", [RecordOwners(), UserGenerator(2)]),
         IfInState("published", [AnyUser()]),
         IfInState("deleting", [AnyUser()]),
     ]
@@ -168,9 +161,9 @@ class TestWorkflowPermissions(RequestBasedWorkflowPermissions):
 class WithApprovalPermissions(RequestBasedWorkflowPermissions):
     can_read = [
         IfInState("draft", [RecordOwners()]),
-        IfInState("approving", [RecordOwners(), TestUserReceiver()]),
-        IfInState("approved", [RecordOwners(), TestUserReceiver()]),
-        IfInState("publishing", [RecordOwners(), TestUserReceiver()]),
+        IfInState("approving", [RecordOwners(), UserGenerator(2)]),
+        IfInState("approved", [RecordOwners(), UserGenerator(2)]),
+        IfInState("publishing", [RecordOwners(), UserGenerator(2)]),
         IfInState("deleting", [AuthenticatedUser()]),
     ]
 
@@ -226,6 +219,7 @@ def publish_request_data_function():
         return {
             "request_type": "publish_draft",
             "topic": {"thesis_draft": record_id},
+            "payload": {"version": "1.0"}
         }
 
     return ret_data
