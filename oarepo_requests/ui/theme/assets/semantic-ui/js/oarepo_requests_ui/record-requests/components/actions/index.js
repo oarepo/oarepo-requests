@@ -8,27 +8,36 @@ import Save from "./Save";
 import CreateAndSubmit from "./CreateAndSubmit";
 import SubmitEvent from "./SubmitEvent";
 
-export const mapLinksToActions = (requestOrRequestType) => {
+export const mapLinksToActions = (requestOrRequestType, customFields) => {
   const actionComponents = [];
   for (const actionKey of Object.keys(requestOrRequestType.links?.actions)) {
     switch (actionKey) {
       case REQUEST_TYPE.ACCEPT:
         actionComponents.push({ name: REQUEST_TYPE.ACCEPT, component: Accept });
-        actionComponents.push({ name: REQUEST_TYPE.DECLINE, component: Decline });
+        actionComponents.push({
+          name: REQUEST_TYPE.DECLINE,
+          component: Decline,
+        });
         break;
       case REQUEST_TYPE.CANCEL:
         actionComponents.push({ name: REQUEST_TYPE.CANCEL, component: Cancel });
         break;
       case REQUEST_TYPE.CREATE:
         // requestOrRequestType is requestType here
-        if (requestOrRequestType?.payload_ui) {
-          actionComponents.push({ name: REQUEST_TYPE.CREATE, component: Create });
+        if (customFields?.ui) {
+          actionComponents.push({
+            name: REQUEST_TYPE.CREATE,
+            component: Create,
+          });
         }
-        actionComponents.push({ name: REQUEST_TYPE.SUBMIT, component: CreateAndSubmit });
+        actionComponents.push({
+          name: REQUEST_TYPE.SUBMIT,
+          component: CreateAndSubmit,
+        });
         break;
       case REQUEST_TYPE.SUBMIT:
         actionComponents.push({ name: REQUEST_TYPE.SUBMIT, component: Submit });
-        if (requestOrRequestType?.payload_ui) {
+        if (customFields?.ui) {
           actionComponents.push({ name: REQUEST_TYPE.SAVE, component: Save });
         }
         break;
@@ -37,6 +46,15 @@ export const mapLinksToActions = (requestOrRequestType) => {
     }
   }
   return actionComponents;
-}
+};
 
-export { Accept, Decline, Cancel, Create, Submit, Save, CreateAndSubmit, SubmitEvent };
+export {
+  Accept,
+  Decline,
+  Cancel,
+  Create,
+  Submit,
+  Save,
+  CreateAndSubmit,
+  SubmitEvent,
+};

@@ -10,62 +10,50 @@ import { CustomFields } from "react-invenio-forms";
 import { REQUEST_TYPE } from "../utils/objects";
 import { useRequestsApi } from "../utils/hooks";
 
-/** 
+/**
  * @typedef {import("../types").RequestType} RequestType
  * @typedef {import("formik").FormikConfig} FormikConfig
  */
-
+const FormikStateLogger = ({ values, errors }) => (
+  <>
+    <pre>{JSON.stringify(values, null, 2)}</pre>
+    <pre>{JSON.stringify(errors, null, 2)}</pre>
+  </>
+);
 /** @param {{ requestType: RequestType, customSubmitHandler: (e) => void }} props */
-export const CreateRequestModalContent = ({ requestType, onCompletedAction }) => {  
-  const { doAction, doCreateAndSubmitAction } = useRequestsApi(requestType, onCompletedAction);
-  const { submitForm, setErrors, setSubmitting } = useFormikContext();
-
-  const payloadUI = requestType?.payload_ui;
-
-  const onFormSubmit = async (event) => {
-    event.preventDefault();
-    const submitButtonName = event?.nativeEvent?.submitter?.name;
-    try {
-      await submitForm();
-      if (submitButtonName === "create-and-submit-request") {
-        doCreateAndSubmitAction(!_isEmpty(payloadUI));
-        return;
-      }
-      doAction(REQUEST_TYPE.CREATE);
-    } catch (error) {
-      setErrors({ api: error });
-    } finally {
-      setSubmitting(false);
-    }
-  };
+export const CreateRequestModalContent = ({
+  requestType,
+  onCompletedAction,
+  customFields,
+}) => {
+  const { values, errors } = useFormikContext();
 
   return (
     <>
-      {requestType?.description &&
-        <p id="request-modal-desc">
-          {requestType.description}
-        </p>
-      }
-      {payloadUI &&
-        <Form onSubmit={onFormSubmit} id="request-form">
+      {requestType?.description && (
+        <p id="request-modal-desc">{requestType.description}</p>
+      )}
+      {customFields?.ui && (
+        <Form id="request-form">
           <Segment basic>
             <CustomFields
-              config={payloadUI}
+              config={customFields?.ui}
               templateLoaders={[
                 (widget) => import(`@templates/custom_fields/${widget}.js`),
-                (widget) => import(`react-invenio-forms`)
+                (widget) => import(`react-invenio-forms`),
               ]}
               fieldPathPrefix="payload"
             />
+            <FormikStateLogger values={values} errors={errors} />
             <Divider hidden />
           </Segment>
         </Form>
-      }
+      )}
     </>
   );
-}
+};
 
 CreateRequestModalContent.propTypes = {
   requestType: PropTypes.object.isRequired,
-  extraPreSubmitEvent: PropTypes.func
+  extraPreSubmitEvent: PropTypes.func,
 };

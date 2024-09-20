@@ -14,30 +14,39 @@ import { useRequestContext } from "../contexts";
 /**
  * @param {{ requestTypes: RequestType[], isLoading: boolean, loadingError: Error }} props
  */
-export const RequestListContainer = ({ requestsLoading, requestsLoadingError }) => {
+export const RequestListContainer = ({
+  requestsLoading,
+  requestsLoadingError,
+}) => {
   const { requests } = useRequestContext();
-  let openRequests = requests.filter(request => request.is_open || request?.status_code.toLowerCase() === "created");
+  let openRequests = requests.filter(
+    (request) =>
+      request.is_open || request?.status_code.toLowerCase() === "created"
+  );
 
   return (
-    (requestsLoading || requestsLoadingError || !_isEmpty(openRequests)) &&
-    <Segment className="requests-my-requests borderless">
-      <Header size="tiny" className="detail-sidebar-header">{i18next.t("Pending")}</Header>
-      {requestsLoading ?
-        <Placeholder fluid>
-          {Array.from({ length: 2 }).map((_, index) => (
-            <Placeholder.Paragraph key={index}>
-              <Placeholder.Line length="full" />
-              <Placeholder.Line length="medium" />
-            </Placeholder.Paragraph>
-          ))} 
-        </Placeholder> :
-        requestsLoadingError ?
+    (requestsLoading || requestsLoadingError || !_isEmpty(openRequests)) && (
+      <Segment className="requests-my-requests borderless">
+        {requestsLoading ? (
+          <Placeholder fluid>
+            {Array.from({ length: openRequests.length }).map((_, index) => (
+              <Placeholder.Paragraph key={index}>
+                <Placeholder.Line length="full" />
+                <Placeholder.Line length="medium" />
+              </Placeholder.Paragraph>
+            ))}
+          </Placeholder>
+        ) : requestsLoadingError ? (
           <Message negative>
-            <Message.Header>{i18next.t("Error loading requests")}</Message.Header>
+            <Message.Header>
+              {i18next.t("Error loading requests")}
+            </Message.Header>
             <p>{requestsLoadingError?.message}</p>
-          </Message> :
+          </Message>
+        ) : (
           <RequestList requests={openRequests} />
-      }
-    </Segment>
+        )}
+      </Segment>
+    )
   );
 };
