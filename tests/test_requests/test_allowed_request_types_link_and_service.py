@@ -21,7 +21,7 @@ def test_allowed_request_types_on_draft_service(
     draft1 = create_draft_via_resource(creator_client)
 
     thesis_ext: ThesisExt = current_app.extensions["thesis"]
-    thesis_requests_service = thesis_ext.service_requests
+    thesis_requests_service = thesis_ext.service_record_request_types
 
     allowed_request_types = (
         thesis_requests_service.get_applicable_request_types_for_draft(

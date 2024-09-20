@@ -6,7 +6,7 @@ from flask_resources.resources import Resource
 from invenio_records_resources.resources.records.resource import request_view_args
 
 
-class ApplicableRecordRequestsResource(Resource):
+class RecordRequestTypesResource(Resource):
     def __init__(self, record_requests_config, config, service):
         """
         :param config: main record resource config

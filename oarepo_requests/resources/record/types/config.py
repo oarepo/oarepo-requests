@@ -4,7 +4,7 @@ from invenio_records_resources.resources.records.headers import etag_headers
 from oarepo_requests.resources.ui import OARepoRequestTypesUIJSONSerializer
 
 
-class ApplicableRecordRequestsResourceConfig:
+class RecordRequestTypesResourceConfig:
     routes = {
         "list-applicable-requests": "/<pid_value>/requests/applicable",
     }
