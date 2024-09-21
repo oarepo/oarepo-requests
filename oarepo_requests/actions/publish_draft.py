@@ -1,8 +1,14 @@
 from invenio_access.permissions import system_identity
+from invenio_records_resources.services.uow import RecordCommitOp
 from marshmallow import ValidationError
 from oarepo_runtime.datastreams.utils import get_record_service_for_record
 
-from .generic import AddTopicLinksOnPayloadMixin, OARepoAcceptAction, OARepoSubmitAction
+from .generic import (
+    AddTopicLinksOnPayloadMixin,
+    OARepoAcceptAction,
+    OARepoSubmitAction,
+    update_topic,
+)
 
 
 class PublishDraftSubmitAction(OARepoSubmitAction):
@@ -28,10 +34,14 @@ class PublishDraftAcceptAction(AddTopicLinksOnPayloadMixin, OARepoAcceptAction):
             raise KeyError(f"topic {topic} service not found")
         id_ = topic["id"]
 
+        if "payload" in self.request and "version" in self.request["payload"]:
+            topic.metadata["version"] = self.request["payload"]["version"]
+            uow.register(RecordCommitOp(topic, indexer=topic_service.indexer))
+
         published_topic = topic_service.publish(
             identity, id_, uow=uow, expand=False, *args, **kwargs
         )
-
+        update_topic(self.request, topic, published_topic._record, uow)
         return super().apply(
             identity, request_type, published_topic, uow, *args, **kwargs
         )

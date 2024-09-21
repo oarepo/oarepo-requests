@@ -28,12 +28,21 @@ def requests_service_config():
     return RequestsServiceConfig
 
 
+@pytest.fixture()
+def events_service_config():
+    from invenio_requests.services.events.config import RequestEventsServiceConfig
+
+    return RequestEventsServiceConfig
+
+
 @pytest.fixture
 def patch_requests_permissions(
     requests_service_config,
+    events_service_config,
     scenario_permissions,
 ):
     setattr(requests_service_config, "permission_policy_cls", scenario_permissions)
+    setattr(events_service_config, "permission_policy_cls", scenario_permissions)
 
 
 @pytest.fixture()
@@ -297,3 +306,89 @@ def test_if_no_edit_draft(
     assert "edit_published_record" in {
         r["type_id"] for r in requests
     }  # new version created, should edit be allowed with new version?
+
+
+def test_workflow_events(
+    logged_client,
+    users,
+    urls,
+    patch_requests_permissions,
+    record_service,
+    publish_request_data_function,
+    serialization_result,
+    ui_serialization_result,
+    events_resource_data,
+    create_draft_via_resource,
+    search_clear,
+):
+    user1 = users[0]
+    user2 = users[1]
+
+    user1_client = logged_client(user1)
+    user2_client = logged_client(user2)
+
+    draft1 = create_draft_via_resource(user1_client, custom_workflow="with_approve")
+    record_id = draft1.json["id"]
+
+    approve_request_data = {
+        "request_type": "approve_draft",
+        "topic": {"thesis_draft": str(record_id)},
+    }
+    resp_request_create = user1_client.post(
+        urls["BASE_URL_REQUESTS"],
+        json=approve_request_data,
+    )
+    resp_request_submit = user1_client.post(
+        link_api2testclient(resp_request_create.json["links"]["actions"]["submit"]),
+    )
+
+    read_from_record = user1_client.get(
+        f"{urls['BASE_URL']}{draft1.json['id']}/draft?expand=true",
+    )
+    comments_link = link_api2testclient(
+        read_from_record.json["expanded"]["requests"][0]["links"]["comments"]
+    )
+    comment_from1 = user1_client.post(
+        comments_link,
+        json=events_resource_data,
+    )
+    comment_from2 = user2_client.post(
+        comments_link,
+        json=events_resource_data,
+    )
+
+    assert comment_from1.status_code == 403
+    assert comment_from2.status_code == 201
+
+    record_receiver = user2_client.get(
+        f'{urls["BASE_URL"]}{record_id}/draft?expand=true'
+    ).json
+    accept = user2_client.post(
+        link_api2testclient(
+            record_receiver["expanded"]["requests"][0]["links"]["actions"]["accept"]
+        ),
+    )
+    assert accept.status_code == 200
+    publishing_record = record_service.read_draft(user1.identity, record_id)._record
+    assert publishing_record["state"] == "publishing"
+
+    read_from_record = user2_client.get(
+        f"{urls['BASE_URL']}{draft1.json['id']}/draft?expand=true",
+    )
+    publish_request = [
+        request
+        for request in read_from_record.json["expanded"]["requests"]
+        if request["type"] == "publish_draft"
+    ][0]
+    comments_link = link_api2testclient(publish_request["links"]["comments"])
+
+    comment_from1 = user1_client.post(
+        comments_link,
+        json=events_resource_data,
+    )
+    comment_from2 = user2_client.post(
+        comments_link,
+        json=events_resource_data,
+    )
+    assert comment_from1.status_code == 201  # 1 is receiver for the publish request
+    assert comment_from2.status_code == 403
