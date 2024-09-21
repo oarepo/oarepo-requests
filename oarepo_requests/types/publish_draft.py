@@ -33,8 +33,7 @@ class PublishDraftRequestType(NonDuplicableOARepoRequestType):
         "version": ma.fields.Str(),
     }
 
-    form = [
-        {
+    form = {
             "field": "version",
             "ui_widget": "Input",
             "props": {
@@ -43,7 +42,6 @@ class PublishDraftRequestType(NonDuplicableOARepoRequestType):
                 "required": False,
             },
         }
-    ]
 
     @classmethod
     @property
