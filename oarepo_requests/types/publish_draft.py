@@ -34,14 +34,14 @@ class PublishDraftRequestType(NonDuplicableOARepoRequestType):
     }
 
     form = {
-            "field": "version",
-            "ui_widget": "Input",
-            "props": {
-                "label": _("Resource version"),
-                "placeholder": _("Write down the version (first, second…)."),
-                "required": False,
-            },
-        }
+        "field": "version",
+        "ui_widget": "Input",
+        "props": {
+            "label": _("Resource version"),
+            "placeholder": _("Write down the version (first, second…)."),
+            "required": False,
+        },
+    }
 
     @classmethod
     @property
@@ -58,9 +58,7 @@ class PublishDraftRequestType(NonDuplicableOARepoRequestType):
 
     def can_create(self, identity, data, receiver, topic, creator, *args, **kwargs):
         if not topic.is_draft:
-            raise ValueError(
-                "Trying to create publish request on published record"
-            )
+            raise ValueError("Trying to create publish request on published record")
         super().can_create(identity, data, receiver, topic, creator, *args, **kwargs)
         topic_service = get_record_service_for_record(topic)
         topic_service.validate_draft(system_identity, topic["id"])

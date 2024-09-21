@@ -120,8 +120,6 @@ def finalize_app(app):
     """Finalize app."""
     from invenio_requests.proxies import current_event_type_registry
 
-    from . import config
-
     # Register services - cannot be done in extension because
     # Invenio-Records-Resources might not have been initialized.
     rr_ext = app.extensions["invenio-records-resources"]
