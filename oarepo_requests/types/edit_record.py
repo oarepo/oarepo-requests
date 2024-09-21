@@ -38,7 +38,7 @@ class EditPublishedRecordRequestType(NonDuplicableOARepoRequestType):
     receiver_can_be_none = True
     allowed_topic_ref_types = ModelRefTypes(
         published=True, draft=True
-    )  # todo correct create conditions so it can't be created on draft
+    )
 
     @classmethod
     def can_possibly_create(self, identity, topic, *args, **kwargs):

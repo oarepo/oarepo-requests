@@ -60,7 +60,7 @@ class PublishDraftRequestType(NonDuplicableOARepoRequestType):
         if not topic.is_draft:
             raise ValueError(
                 "Trying to create publish request on published record"
-            )  # todo - if we want the active topic thing, we have to allow published as allowed topic and have to check this somewhere else
+            )
         super().can_create(identity, data, receiver, topic, creator, *args, **kwargs)
         topic_service = get_record_service_for_record(topic)
         topic_service.validate_draft(system_identity, topic["id"])
