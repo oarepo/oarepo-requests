@@ -106,6 +106,10 @@ class OARepoRequests:
             config.DEFAULT_WORKFLOW_EVENT_SUBMITTERS
         )
 
+        app.config.setdefault("REQUESTS_REGISTERED_EVENT_TYPES", []).extend(
+            config.REQUESTS_REGISTERED_EVENT_TYPES
+        )
+
 
 def api_finalize_app(app):
     """Finalize app."""
@@ -115,8 +119,6 @@ def api_finalize_app(app):
 def finalize_app(app):
     """Finalize app."""
     from invenio_requests.proxies import current_event_type_registry
-
-    from . import config
 
     # Register services - cannot be done in extension because
     # Invenio-Records-Resources might not have been initialized.
@@ -132,10 +134,5 @@ def finalize_app(app):
 
     # todo i have to do this cause there is bug in invenio-requests for events
     # but imo this is better than entrypoints
-
-    app.config.setdefault("REQUESTS_REGISTERED_EVENT_TYPES", []).extend(
-        config.REQUESTS_REGISTERED_EVENT_TYPES
-    )
-
     for type in app.config["REQUESTS_REGISTERED_EVENT_TYPES"]:
         current_event_type_registry.register_type(type)

@@ -1,5 +1,6 @@
 import copy
 import os
+from typing import Dict
 
 import pytest
 from deepmerge import always_merger
@@ -9,16 +10,16 @@ from invenio_access.permissions import system_identity
 from invenio_accounts.proxies import current_datastore
 from invenio_accounts.testutils import login_user_via_session
 from invenio_app.factory import create_api
-from invenio_i18n import lazy_gettext as _
 from invenio_records_permissions.generators import (
     AnyUser,
     AuthenticatedUser,
     Generator,
     SystemProcess,
 )
+from invenio_records_resources.services.uow import RecordCommitOp
 from invenio_requests.customizations import CommentEventType, LogEventType
-from invenio_requests.proxies import current_requests
-from invenio_requests.records.api import RequestEventFormat
+from invenio_requests.proxies import current_requests, current_requests_service
+from invenio_requests.records.api import Request, RequestEventFormat
 from invenio_requests.services.generators import Receiver
 from invenio_requests.services.permissions import (
     PermissionPolicy as InvenioRequestsPermissionPolicy,
@@ -55,6 +56,7 @@ from oarepo_requests.services.permissions.workflow_policies import (
     RequestBasedWorkflowPermissions,
 )
 from oarepo_requests.types import ModelRefTypes, NonDuplicableOARepoRequestType
+from oarepo_requests.types.events.topic_update import TopicUpdateEventType
 
 can_comment_only_receiver = [
     Receiver(),
@@ -64,6 +66,9 @@ can_comment_only_receiver = [
 events_only_receiver_can_comment = {
     CommentEventType.type_id: WorkflowEvent(submitters=can_comment_only_receiver),
     LogEventType.type_id: WorkflowEvent(
+        submitters=InvenioRequestsPermissionPolicy.can_create_comment
+    ),
+    TopicUpdateEventType.type_id: WorkflowEvent(
         submitters=InvenioRequestsPermissionPolicy.can_create_comment
     ),
 }
@@ -149,6 +154,13 @@ class RequestsWithCT(WorkflowRequestPolicy):
     )
 
 
+class RequestsWithAnotherTopicUpdatingRequestType(DefaultRequests):
+    another_topic_updating = WorkflowRequest(
+        requesters=[AnyUser()],
+        recipients=[UserGenerator(2)],
+    )
+
+
 class ApproveRequestType(NonDuplicableOARepoRequestType):
     type_id = "approve_draft"
     name = _("Approve draft")
@@ -162,6 +174,25 @@ class ApproveRequestType(NonDuplicableOARepoRequestType):
     description = _("Request approving of a draft")
     receiver_can_be_none = True
     allowed_topic_ref_types = ModelRefTypes(published=False, draft=True)
+
+
+class AnotherTopicUpdatingRequestType(NonDuplicableOARepoRequestType):
+    type_id = "another_topic_updating"
+    name = _("Another topic updating")
+
+    available_actions = {
+        **NonDuplicableOARepoRequestType.available_actions,
+        "accept": OARepoAcceptAction,
+        "submit": OARepoSubmitAction,
+        "decline": OARepoDeclineAction,
+    }
+    description = _("Request to test cascade update of live topic")
+    receiver_can_be_none = True
+    allowed_topic_ref_types = ModelRefTypes(published=True, draft=True)
+
+    def topic_change(self, request: Request, new_topic: Dict, uow):
+        setattr(request, "topic", new_topic)
+        uow.register(RecordCommitOp(request, indexer=current_requests_service.indexer))
 
 
 class ConditionalRecipientRequestType(NonDuplicableOARepoRequestType):
@@ -214,6 +245,11 @@ WORKFLOWS = {
         permission_policy_cls=WithApprovalPermissions,
         request_policy_cls=RequestsWithCT,
     ),
+    "cascade_update": Workflow(
+        label=_("Workflow to test update of live topic"),
+        permission_policy_cls=WithApprovalPermissions,
+        request_policy_cls=RequestsWithAnotherTopicUpdatingRequestType,
+    ),
 }
 
 
@@ -260,6 +296,17 @@ def conditional_recipient_request_data_function():
     def ret_data(record_id):
         return {
             "request_type": "conditional_recipient_rt",
+            "topic": {"thesis_draft": record_id},
+        }
+
+    return ret_data
+
+
+@pytest.fixture()
+def another_topic_updating_request_function():
+    def ret_data(record_id):
+        return {
+            "request_type": "another_topic_updating",
             "topic": {"thesis_draft": record_id},
         }
 
@@ -402,6 +449,7 @@ def app_config(app_config):
     app_config["REQUESTS_REGISTERED_TYPES"] = [
         ApproveRequestType(),
         ConditionalRecipientRequestType(),
+        AnotherTopicUpdatingRequestType(),
     ]
     return app_config
 

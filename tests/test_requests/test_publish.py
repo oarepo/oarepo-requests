@@ -143,7 +143,7 @@ def test_publish(
     assert canceled_request.json["status"] == "cancelled"
 
 
-def test_submit_fails_if_draft_not_validated(
+def test_create_fails_if_draft_not_validated(
     vocab_cf,
     logged_client,
     users,
@@ -162,16 +162,14 @@ def test_submit_fails_if_draft_not_validated(
     del json["metadata"]["title"]
 
     draft = creator_client.post(f"{urls['BASE_URL']}?expand=true", json=json)
-    assert draft.status_code == 201
 
+    assert "publish_draft" not in draft.json["expanded"]["request_types"]
     resp_request_create = creator_client.post(
         urls["BASE_URL_REQUESTS"],
         json=publish_request_data_function(draft.json["id"]),
     )
-    assert resp_request_create.status_code == 201
-    assert "submit" not in resp_request_create.json["links"]["actions"]
-
-    resp_request_submit = creator_client.post(
-        f"/requests/{resp_request_create.json['id']}/actions/submit"
-    )
-    assert resp_request_submit.status_code == 400
+    assert resp_request_create.status_code == 400
+    assert resp_request_create.json["message"] == "A validation error occurred."
+    assert resp_request_create.json["errors"] == [
+        {"field": "metadata.title", "messages": ["Missing data for required field."]}
+    ]

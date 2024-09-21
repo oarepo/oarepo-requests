@@ -2,6 +2,7 @@ from oarepo_requests.actions.components import (
     AutoAcceptComponent,
     RequestIdentityComponent,
 )
+from oarepo_requests.types.events.topic_update import TopicUpdateEventType
 
 try:
     import oarepo_workflows  # noqa
@@ -28,6 +29,10 @@ REQUESTS_REGISTERED_TYPES = [
     PublishDraftRequestType(),
 ]
 
+REQUESTS_REGISTERED_EVENT_TYPES = [
+    TopicUpdateEventType(),
+]
+
 REQUESTS_ALLOWED_RECEIVERS = ["user", "group", "auto_approve"]
 
 from invenio_requests.customizations import CommentEventType, LogEventType
@@ -41,6 +46,9 @@ DEFAULT_WORKFLOW_EVENT_SUBMITTERS = {
         submitters=InvenioRequestsPermissionPolicy.can_create_comment
     ),
     LogEventType.type_id: WorkflowEvent(
+        submitters=InvenioRequestsPermissionPolicy.can_create_comment
+    ),
+    TopicUpdateEventType.type_id: WorkflowEvent(
         submitters=InvenioRequestsPermissionPolicy.can_create_comment
     ),
 }
