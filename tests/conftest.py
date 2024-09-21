@@ -1,5 +1,6 @@
 import copy
 import os
+from typing import Dict
 
 import pytest
 from deepmerge import always_merger
@@ -9,12 +10,22 @@ from invenio_access.permissions import system_identity
 from invenio_accounts.proxies import current_datastore
 from invenio_accounts.testutils import login_user_via_session
 from invenio_app.factory import create_api
-from invenio_i18n import lazy_gettext as _
-from invenio_records_permissions.generators import AnyUser, AuthenticatedUser, Generator
+from invenio_records_permissions.generators import (
+    AnyUser,
+    AuthenticatedUser,
+    Generator,
+    SystemProcess,
+)
+from invenio_records_resources.services.uow import RecordCommitOp
 from invenio_requests.customizations import CommentEventType, LogEventType
-from invenio_requests.proxies import current_requests
-from invenio_requests.records.api import RequestEventFormat
+from invenio_requests.proxies import current_requests, current_requests_service
+from invenio_requests.records.api import Request, RequestEventFormat
+from invenio_requests.services.generators import Receiver
+from invenio_requests.services.permissions import (
+    PermissionPolicy as InvenioRequestsPermissionPolicy,
+)
 from invenio_users_resources.records import UserAggregate
+from oarepo_runtime.i18n import lazy_gettext as _
 from oarepo_runtime.services.permissions import RecordOwners
 from oarepo_workflows import (
     AutoApprove,
@@ -26,6 +37,7 @@ from oarepo_workflows import (
 )
 from oarepo_workflows.base import Workflow
 from oarepo_workflows.requests import RecipientGeneratorMixin
+from oarepo_workflows.requests.events import WorkflowEvent
 from thesis.proxies import current_service
 from thesis.records.api import ThesisDraft
 
@@ -35,12 +47,31 @@ from oarepo_requests.actions.generic import (
     OARepoSubmitAction,
 )
 from oarepo_requests.receiver import default_workflow_receiver_function
-from oarepo_requests.services.permissions.generators import IfRequestedBy, IfNoNewVersionDraft, IfNoEditDraft
+from oarepo_requests.services.permissions.generators import (
+    IfNoEditDraft,
+    IfNoNewVersionDraft,
+    IfRequestedBy,
+)
 from oarepo_requests.services.permissions.workflow_policies import (
     RequestBasedWorkflowPermissions,
 )
 from oarepo_requests.types import ModelRefTypes, NonDuplicableOARepoRequestType
+from oarepo_requests.types.events.topic_update import TopicUpdateEventType
 
+can_comment_only_receiver = [
+    Receiver(),
+    SystemProcess(),
+]
+
+events_only_receiver_can_comment = {
+    CommentEventType.type_id: WorkflowEvent(submitters=can_comment_only_receiver),
+    LogEventType.type_id: WorkflowEvent(
+        submitters=InvenioRequestsPermissionPolicy.can_create_comment
+    ),
+    TopicUpdateEventType.type_id: WorkflowEvent(
+        submitters=InvenioRequestsPermissionPolicy.can_create_comment
+    ),
+}
 
 
 class UserGenerator(RecipientGeneratorMixin, Generator):
@@ -84,10 +115,11 @@ class DefaultRequests(WorkflowRequestPolicy):
 class RequestsWithApprove(WorkflowRequestPolicy):
     publish_draft = WorkflowRequest(
         requesters=[IfInState("approved", [AutoRequest()])],
-        recipients=[UserGenerator(2)],
+        recipients=[UserGenerator(1)],
         transitions=WorkflowTransitions(
             submitted="publishing", accepted="published", declined="approved"
         ),
+        events=events_only_receiver_can_comment,
     )
     approve_draft = WorkflowRequest(
         requesters=[IfInState("draft", [RecordOwners()])],
@@ -95,6 +127,7 @@ class RequestsWithApprove(WorkflowRequestPolicy):
         transitions=WorkflowTransitions(
             submitted="approving", accepted="approved", declined="draft"
         ),
+        events=events_only_receiver_can_comment,
     )
     delete_published_record = WorkflowRequest(
         requesters=[IfInState("published", [RecordOwners()])],
@@ -102,11 +135,13 @@ class RequestsWithApprove(WorkflowRequestPolicy):
         transitions=WorkflowTransitions(
             submitted="deleting", accepted="deleted", declined="published"
         ),
+        events=events_only_receiver_can_comment,
     )
     edit_published_record = WorkflowRequest(
         requesters=[IfInState("published", [RecordOwners()])],
         recipients=[AutoApprove()],
         transitions=WorkflowTransitions(),
+        events=events_only_receiver_can_comment,
     )
 
 
@@ -116,6 +151,13 @@ class RequestsWithCT(WorkflowRequestPolicy):
         recipients=[
             IfRequestedBy(UserGenerator(1), [UserGenerator(2)], [UserGenerator(3)])
         ],
+    )
+
+
+class RequestsWithAnotherTopicUpdatingRequestType(DefaultRequests):
+    another_topic_updating = WorkflowRequest(
+        requesters=[AnyUser()],
+        recipients=[UserGenerator(2)],
     )
 
 
@@ -132,6 +174,25 @@ class ApproveRequestType(NonDuplicableOARepoRequestType):
     description = _("Request approving of a draft")
     receiver_can_be_none = True
     allowed_topic_ref_types = ModelRefTypes(published=False, draft=True)
+
+
+class AnotherTopicUpdatingRequestType(NonDuplicableOARepoRequestType):
+    type_id = "another_topic_updating"
+    name = _("Another topic updating")
+
+    available_actions = {
+        **NonDuplicableOARepoRequestType.available_actions,
+        "accept": OARepoAcceptAction,
+        "submit": OARepoSubmitAction,
+        "decline": OARepoDeclineAction,
+    }
+    description = _("Request to test cascade update of live topic")
+    receiver_can_be_none = True
+    allowed_topic_ref_types = ModelRefTypes(published=True, draft=True)
+
+    def topic_change(self, request: Request, new_topic: Dict, uow):
+        setattr(request, "topic", new_topic)
+        uow.register(RecordCommitOp(request, indexer=current_requests_service.indexer))
 
 
 class ConditionalRecipientRequestType(NonDuplicableOARepoRequestType):
@@ -184,6 +245,11 @@ WORKFLOWS = {
         permission_policy_cls=WithApprovalPermissions,
         request_policy_cls=RequestsWithCT,
     ),
+    "cascade_update": Workflow(
+        label=_("Workflow to test update of live topic"),
+        permission_policy_cls=WithApprovalPermissions,
+        request_policy_cls=RequestsWithAnotherTopicUpdatingRequestType,
+    ),
 }
 
 
@@ -219,7 +285,7 @@ def publish_request_data_function():
         return {
             "request_type": "publish_draft",
             "topic": {"thesis_draft": record_id},
-            "payload": {"version": "1.0"}
+            "payload": {"version": "1.0"},
         }
 
     return ret_data
@@ -230,6 +296,17 @@ def conditional_recipient_request_data_function():
     def ret_data(record_id):
         return {
             "request_type": "conditional_recipient_rt",
+            "topic": {"thesis_draft": record_id},
+        }
+
+    return ret_data
+
+
+@pytest.fixture()
+def another_topic_updating_request_function():
+    def ret_data(record_id):
+        return {
+            "request_type": "another_topic_updating",
             "topic": {"thesis_draft": record_id},
         }
 
@@ -372,6 +449,7 @@ def app_config(app_config):
     app_config["REQUESTS_REGISTERED_TYPES"] = [
         ApproveRequestType(),
         ConditionalRecipientRequestType(),
+        AnotherTopicUpdatingRequestType(),
     ]
     return app_config
 

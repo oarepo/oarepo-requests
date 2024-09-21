@@ -1,3 +1,6 @@
+from marshmallow import ValidationError
+
+
 class OpenRequestAlreadyExists(Exception):
     """An open request already exists."""
 
@@ -46,3 +49,7 @@ class ReceiverUnreferencable(Exception):
             message += "\n Additional keyword arguments:"
             message += f"\n{', '.join(self.kwargs)}"
         return message
+
+
+class MissingTopicError(ValidationError):
+    """"""
