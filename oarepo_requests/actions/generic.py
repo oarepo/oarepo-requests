@@ -78,9 +78,9 @@ class OARepoAcceptAction(OARepoGenericActionMixin, actions.AcceptAction):
     """"""
 
 
-def _str_from_ref(ref):  # todo look on grants
-    # grants are based on needs; idk whether that makes sense here
-    return f"{list(ref.keys())[0]}:{list(ref.values())[0]}"
+def _str_from_ref(ref):
+    k, v = list(ref.items())[0]
+    return f"{k}.{v}"
 
 
 def update_topic(request, old_topic, new_topic, uow):

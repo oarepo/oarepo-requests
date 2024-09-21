@@ -26,9 +26,9 @@ def _check_publish_topic_update(creator_client, urls, record, before_update_resp
     ]
     assert len(topic_updated_events) == 1
     assert (
-        topic_updated_events[0]["payload"]["old_topic"] == f"thesis_draft:{record_id}"
+        topic_updated_events[0]["payload"]["old_topic"] == f"thesis_draft.{record_id}"
     )
-    assert topic_updated_events[0]["payload"]["new_topic"] == f"thesis:{record_id}"
+    assert topic_updated_events[0]["payload"]["new_topic"] == f"thesis.{record_id}"
 
 
 def test_publish(
