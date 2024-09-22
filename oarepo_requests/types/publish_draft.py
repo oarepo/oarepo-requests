@@ -68,6 +68,7 @@ class PublishDraftRequestType(NonDuplicableOARepoRequestType):
         if not topic.is_draft:
             return False
         super_ = super().can_possibly_create(identity, topic, *args, **kwargs)
+        print(super_, "can_possibly_create", flush=True)
         if not super_:
             return False
         topic_service = get_record_service_for_record(topic)

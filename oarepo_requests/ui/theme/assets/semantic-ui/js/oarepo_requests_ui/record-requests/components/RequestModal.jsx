@@ -68,9 +68,12 @@ export const RequestModal = ({
   }, [error]);
 
   useEffect(() => {
-    fetch("http://localhost:3001/form/config")
+    fetch(`/requests/configs/${requestType?.type_id || request?.type}`)
       .then((response) => response.json())
-      .then((data) => setCustomFields(data.custom_fields));
+      .then((data) => {
+        console.log(data);
+        setCustomFields(data?.custom_fields);
+      });
   }, []);
 
   const onSubmit = async (asyncSubmitEvent, onError, requestActionType) => {

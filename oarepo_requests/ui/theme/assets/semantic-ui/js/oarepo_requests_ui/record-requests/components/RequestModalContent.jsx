@@ -8,7 +8,11 @@ import _sortBy from "lodash/sortBy";
 import { useFormikContext } from "formik";
 import { CustomFields } from "react-invenio-forms";
 
-import { CreateRequestModalContent, ModalContentSideInfo, RequestModal } from ".";
+import {
+  CreateRequestModalContent,
+  ModalContentSideInfo,
+  RequestModal,
+} from ".";
 import { SubmitEvent } from "./actions";
 import { useRequestsApi } from "../utils/hooks";
 import { useRequestContext } from "../contexts";
@@ -16,7 +20,7 @@ import { fetchUpdated as fetchNewEvents } from "../utils";
 import { REQUEST_TYPE, REQUEST_MODAL_TYPE } from "../utils/objects";
 import ReadOnlyCustomFields from "./common/ReadOnlyCustomFields";
 
-/** 
+/**
  * @typedef {import("../types").Request} Request
  * @typedef {import("../types").RequestType} RequestType
  * @typedef {import("../types").RequestTypeEnum} RequestTypeEnum
@@ -24,27 +28,38 @@ import ReadOnlyCustomFields from "./common/ReadOnlyCustomFields";
  */
 
 /** @param {{ request: Request, requestModalType: RequestTypeEnum, requestType: RequestType, onCompletedAction: (e) => void }} props */
-export const RequestModalContent = ({ request, requestType, requestModalType, onCompletedAction }) => {
+export const RequestModalContent = ({
+  request,
+  requestType,
+  requestModalType,
+  onCompletedAction,
+  customFields,
+}) => {
   /** @type {{requests: Request[], setRequests: (requests: Request[]) => void}} */
   const { requests, setRequests } = useRequestContext();
   const { doAction } = useRequestsApi(request, onCompletedAction);
   const { submitForm, setErrors, setSubmitting } = useFormikContext();
-  
-  const actualRequest = requests.find(req => req.id === request.id);
+
+  const actualRequest = requests.find((req) => req.id === request.id);
 
   useEffect(() => {
     if (!_isEmpty(request.links?.events)) {
-      fetchNewEvents(request.links.events,
+      fetchNewEvents(
+        request.links.events,
         (responseData) => {
-          setRequests(requests => requests.map(req => {
-            if (req.id === request.id) {
-              req.events = responseData?.hits?.hits ?? [];
-            }
-            return req;
-          }));
-        }, (error) => {
+          setRequests((requests) =>
+            requests.map((req) => {
+              if (req.id === request.id) {
+                req.events = responseData?.hits?.hits ?? [];
+              }
+              return req;
+            })
+          );
+        },
+        (error) => {
           console.error(error);
-        });
+        }
+      );
     }
   }, [setRequests, request.links?.events, request.id]);
 
@@ -61,19 +76,20 @@ export const RequestModalContent = ({ request, requestType, requestModalType, on
     }
   };
 
-  const payloadUI = requestType?.payload_ui;
   const eventTypes = requestType?.event_types;
 
   /** @type {Event[]} */
   let events = [];
   if (!_isEmpty(request?.events)) {
-    events = _sortBy(request.events, ['updated']);
+    events = _sortBy(request.events, ["updated"]);
   } else if (!_isEmpty(actualRequest?.events)) {
-    events = _sortBy(actualRequest.events, ['updated']);
+    events = _sortBy(actualRequest.events, ["updated"]);
   }
 
-  const renderSubmitForm = requestModalType === REQUEST_MODAL_TYPE.SUBMIT_FORM && payloadUI;
-  const renderReadOnlyData = requestModalType === REQUEST_MODAL_TYPE.READ_ONLY && request?.payload;
+  const renderSubmitForm =
+    requestModalType === REQUEST_MODAL_TYPE.SUBMIT_FORM && customFields?.ui;
+  const renderReadOnlyData =
+    requestModalType === REQUEST_MODAL_TYPE.READ_ONLY && request?.payload;
 
   return (
     <Grid doubling stackable>
@@ -82,41 +98,42 @@ export const RequestModalContent = ({ request, requestType, requestModalType, on
           {request.description}
         </Grid.Column>
       </Grid.Row>
-      {(renderSubmitForm || renderReadOnlyData) &&
+      {((renderSubmitForm || renderReadOnlyData) && (
         <Grid.Row>
           <Grid.Column width={3} only="mobile">
             <ModalContentSideInfo request={request} isSidebar />
           </Grid.Column>
           <Grid.Column width={13}>
-            {renderSubmitForm &&
+            {renderSubmitForm && (
               <Form onSubmit={onFormSubmit} id="request-form">
                 <CustomFields
                   className="requests-form-cf"
-                  config={payloadUI}
+                  config={customFields?.ui}
                   templateLoaders={[
                     (widget) => import(`@templates/custom_fields/${widget}.js`),
-                    (widget) => import(`react-invenio-forms`)
+                    (widget) => import(`react-invenio-forms`),
                   ]}
                   fieldPathPrefix="payload"
                 />
                 <Divider hidden />
               </Form>
-            }
+            )}
             {/* Render read only data for Accept and Cancel modals */}
-            {renderReadOnlyData &&
+            {renderReadOnlyData && (
               <>
                 <List relaxed>
-                  {Object.keys(request.payload).map(key => (
+                  {Object.keys(request.payload).map((key) => (
                     <List.Item key={key}>
                       <List.Content>
                         <List.Header>{key}</List.Header>
                         <ReadOnlyCustomFields
                           className="requests-form-cf"
-                          config={payloadUI}
+                          config={customFields?.ui}
                           data={{ [key]: request.payload[key] }}
                           templateLoaders={[
-                            (widget) => import(`../components/common/${widget}.jsx`),
-                            (widget) => import(`react-invenio-forms`)
+                            (widget) =>
+                              import(`../components/common/${widget}.jsx`),
+                            (widget) => import(`react-invenio-forms`),
                           ]}
                         />
                       </List.Content>
@@ -124,17 +141,24 @@ export const RequestModalContent = ({ request, requestType, requestModalType, on
                   ))}
                 </List>
                 {/* If events are enabled for this request type, you can see the timeline of events and create new events. */}
-                {!_isEmpty(eventTypes) &&
+                {!_isEmpty(eventTypes) && (
                   <>
                     <Divider horizontal>{i18next.t("Timeline")}</Divider>
-                    {!_isEmpty(events) &&
+                    {!_isEmpty(events) && (
                       <Comment.Group>
-                        {events.map(event => {
-                          const eventPayloadUI = eventTypes.filter(eventType => eventType.id === event.type_code)[0]?.payload_ui;
+                        {events.map((event) => {
+                          const eventPayloadUI = eventTypes.filter(
+                            (eventType) => eventType.id === event.type_code
+                          )[0]?.payload_ui;
                           return (
                             <Comment key={event.id}>
                               <Comment.Content>
-                                <Comment.Author as="a" href={event.created_by?.link}>{event.created_by.label}</Comment.Author>
+                                <Comment.Author
+                                  as="a"
+                                  href={event.created_by?.link}
+                                >
+                                  {event.created_by.label}
+                                </Comment.Author>
                                 <Comment.Metadata>
                                   <div>{event?.created}</div>
                                 </Comment.Metadata>
@@ -145,51 +169,64 @@ export const RequestModalContent = ({ request, requestType, requestModalType, on
                                     data={event.payload}
                                     templateLoaders={[
                                       (widget) => import(`./${widget}.jsx`),
-                                      (widget) => import(`react-invenio-forms`)
+                                      (widget) => import(`react-invenio-forms`),
                                     ]}
-                                  // fieldPathPrefix="payload"
+                                    // fieldPathPrefix="payload"
                                   />
                                 </Comment.Text>
                               </Comment.Content>
                             </Comment>
-                          )
+                          );
                         })}
                       </Comment.Group>
-                    }
-                    {eventTypes.map(event => (
-                      <RequestModal 
-                        key={event.id} 
-                        request={event} 
+                    )}
+                    {eventTypes.map((event) => (
+                      <RequestModal
+                        key={event.id}
+                        request={event}
                         requestType={event}
-                        header={!_isEmpty(event?.title) ? event.title : (!_isEmpty(event?.name) ? event.name : event.type)}
+                        header={
+                          !_isEmpty(event?.title)
+                            ? event.title
+                            : !_isEmpty(event?.name)
+                            ? event.name
+                            : event.type
+                        }
                         triggerButton={
-                          <Button compact primary icon="plus" labelPosition="left" content={event.name} />
+                          <Button
+                            compact
+                            primary
+                            icon="plus"
+                            labelPosition="left"
+                            content={event.name}
+                          />
                         }
                         actions={[
-                          { name: REQUEST_TYPE.CREATE, component: SubmitEvent }
+                          { name: REQUEST_TYPE.CREATE, component: SubmitEvent },
                         ]}
                         ContentComponent={CreateRequestModalContent}
                       />
                     ))}
                   </>
-                }
+                )}
               </>
-            }
+            )}
           </Grid.Column>
           <Grid.Column width={3} only="tablet computer">
             <ModalContentSideInfo request={request} isSidebar />
           </Grid.Column>
-        </Grid.Row> ||
+        </Grid.Row>
+      )) || (
         /* No Submit Form (no PayloadUI for this request type) nor Payload (read only data) available for this Request */
         <Grid.Row>
           <Grid.Column>
             <ModalContentSideInfo request={request} isSidebar={false} />
           </Grid.Column>
         </Grid.Row>
-      }
+      )}
     </Grid>
   );
-}
+};
 
 RequestModalContent.propTypes = {
   request: PropTypes.object.isRequired,

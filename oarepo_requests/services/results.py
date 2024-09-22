@@ -26,8 +26,8 @@ def allowed_user_request_types(identity, record):
     allowed_request_types = {
         request_type_name: request_type
         for request_type_name, request_type in allowed_request_types.items()
-        if hasattr(request_type, "can_possibly_create")
-        and request_type.can_possibly_create(identity, record)
+        # if hasattr(request_type, "can_possibly_create")
+        # and request_type.can_possibly_create(identity, record)
     }
     return allowed_request_types
 
