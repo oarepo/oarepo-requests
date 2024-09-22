@@ -42,6 +42,13 @@ pip install "oarepo[tests]==$OAREPO_VERSION.*"
 pip install -e "./$BUILD_TEST_DIR/${MODEL}"
 pip install oarepo-ui
 pip install deepdiff
+
+# Check if we can import all the sources
+find oarepo_requests -name '*.py' | grep -v '__init__.py' | sed 's/.py$//' | tr '/' '.' | sort -u | while read MODULE ; do
+    echo "import $MODULE"
+done | python
+
+# now install the tests (might bring more dependencies, that's why we have checked the imports before)
 pip install -e ".[tests]"
 
 sh forked_install.sh invenio-records-resources
