@@ -91,9 +91,7 @@ def test_read_requests_on_record(
     resp_request_submit = creator_client.post(
         link_api2testclient(r1.json["links"]["actions"]["submit"]),
     )
-    record = receiver_client.get(
-        f"{urls['BASE_URL']}{record1['id']}?expand=true"
-    )
+    record = receiver_client.get(f"{urls['BASE_URL']}{record1['id']}?expand=true")
     decline = receiver_client.post(
         link_api2testclient(
             record.json["expanded"]["requests"][0]["links"]["actions"]["decline"]

@@ -1,9 +1,15 @@
 from invenio_access.permissions import system_identity
+from invenio_records_resources.services.uow import RecordCommitOp
 from marshmallow import ValidationError
 from oarepo_runtime.datastreams.utils import get_record_service_for_record
 
-from .generic import AddTopicLinksOnPayloadMixin, OARepoAcceptAction, OARepoSubmitAction
-from invenio_records_resources.services.uow import RecordCommitOp
+from .generic import (
+    AddTopicLinksOnPayloadMixin,
+    OARepoAcceptAction,
+    OARepoSubmitAction,
+    update_topic,
+)
+
 
 class PublishDraftSubmitAction(OARepoSubmitAction):
     def can_execute(self):
@@ -16,7 +22,6 @@ class PublishDraftSubmitAction(OARepoSubmitAction):
             return True
         except ValidationError:
             return False
-
 
 
 class PublishDraftAcceptAction(AddTopicLinksOnPayloadMixin, OARepoAcceptAction):
@@ -36,7 +41,7 @@ class PublishDraftAcceptAction(AddTopicLinksOnPayloadMixin, OARepoAcceptAction):
         published_topic = topic_service.publish(
             identity, id_, uow=uow, expand=False, *args, **kwargs
         )
-
+        update_topic(self.request, topic, published_topic._record, uow)
         return super().apply(
             identity, request_type, published_topic, uow, *args, **kwargs
         )

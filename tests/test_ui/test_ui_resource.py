@@ -137,19 +137,21 @@ def test_form_config(app, client, record_ui_resource, fake_manifest):
                 "ul",
             ],
             "custom_fields": {
-                "ui": [{
-                    "section": "",
-                    "fields": [
-                        {
-                            "field": "version",
-                            "props": {
-                                "label": "Resource version",
-                                "placeholder": "Write down the version (first, second…).",
-                                "required": False,
-                            },
-                            "ui_widget": "Input",
-                        }
-                    ]
-                }]
+                "ui": [
+                    {
+                        "section": "",
+                        "fields": [
+                            {
+                                "field": "version",
+                                "props": {
+                                    "label": "Resource version",
+                                    "placeholder": "Write down the version (first, second…).",
+                                    "required": False,
+                                },
+                                "ui_widget": "Input",
+                            }
+                        ],
+                    }
+                ]
             },
         }
