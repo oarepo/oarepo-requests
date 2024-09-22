@@ -55,6 +55,9 @@ if WorkflowEvent:
             submitters=InvenioRequestsPermissionPolicy.can_create_comment
         ),
     }
+else:
+    DEFAULT_WORKFLOW_EVENT_SUBMITTERS = {}
+
 
 ENTITY_REFERENCE_UI_RESOLVERS = {
     "user": UserEntityReferenceUIResolver("user"),
