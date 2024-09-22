@@ -1,4 +1,3 @@
-
 from oarepo_requests.services.record.types.service import RecordRequestTypesService
 
 

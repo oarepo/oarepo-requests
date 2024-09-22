@@ -6,7 +6,6 @@ from oarepo_requests.resources.record.types.resource import RecordRequestTypesRe
 
 
 class DraftRequestTypesResource(RecordRequestTypesResource):
-
     def create_url_rules(self):
         old_rules = super().create_url_rules()
         """Create the URL rules for the record resource."""

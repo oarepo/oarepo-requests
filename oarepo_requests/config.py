@@ -22,6 +22,12 @@ from oarepo_requests.types import (
     EditPublishedRecordRequestType,
     PublishDraftRequestType,
 )
+from invenio_requests.customizations import CommentEventType, LogEventType
+from invenio_requests.services.permissions import (
+    PermissionPolicy as InvenioRequestsPermissionPolicy,
+)
+from oarepo_workflows.requests.events import WorkflowEvent
+
 
 REQUESTS_REGISTERED_TYPES = [
     DeletePublishedRecordRequestType(),
@@ -34,12 +40,6 @@ REQUESTS_REGISTERED_EVENT_TYPES = [
 ]
 
 REQUESTS_ALLOWED_RECEIVERS = ["user", "group", "auto_approve"]
-
-from invenio_requests.customizations import CommentEventType, LogEventType
-from invenio_requests.services.permissions import (
-    PermissionPolicy as InvenioRequestsPermissionPolicy,
-)
-from oarepo_workflows.requests.events import WorkflowEvent
 
 DEFAULT_WORKFLOW_EVENT_SUBMITTERS = {
     CommentEventType.type_id: WorkflowEvent(
