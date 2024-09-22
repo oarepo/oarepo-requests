@@ -90,7 +90,8 @@ export const RequestModalContent = ({
     requestModalType === REQUEST_MODAL_TYPE.SUBMIT_FORM && customFields?.ui;
   const renderReadOnlyData =
     requestModalType === REQUEST_MODAL_TYPE.READ_ONLY && request?.payload;
-
+  console.log(renderSubmitForm);
+  console.log(renderReadOnlyData);
   return (
     <Grid doubling stackable>
       <Grid.Row>

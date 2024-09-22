@@ -1,4 +1,5 @@
 from invenio_records_resources.references.entity_resolvers import EntityProxy
+from invenio_records_resources.references.entity_resolvers.base import EntityResolver
 
 
 class AutoApprover:
@@ -7,7 +8,6 @@ class AutoApprover:
 
 
 class AutoApproveProxy(EntityProxy):
-
     def _resolve(self):
         value = self._parse_ref_dict_id()
         return AutoApprover(value)
@@ -17,9 +17,6 @@ class AutoApproveProxy(EntityProxy):
 
     def pick_resolved_fields(self, identity, resolved_dict):
         return {"auto_approve": resolved_dict["value"]}
-
-
-from invenio_records_resources.references.entity_resolvers.base import EntityResolver
 
 
 class AutoApproveResolver(EntityResolver):

@@ -34,7 +34,8 @@ export const RequestModal = ({
   requestCreationModal,
 }) => {
   const errorMessageRef = useRef(null);
-  const { fetchNewRequests, onErrorCallback, record } = useRequestContext();
+  const { fetchNewRequests, onErrorCallback, record, saveDraft } =
+    useRequestContext();
   const { isOpen, close: closeModal, open: openModal } = useConfirmationModal();
   const [customFields, setCustomFields] = useState(null);
   const modalActions = mapLinksToActions(
@@ -80,9 +81,13 @@ export const RequestModal = ({
     setSubmitting(true);
     setErrors({});
     try {
+      // const save = await saveDraft();
+      // if (!save) {
+      //   closeModal();
+      //   return;
+      // }
       await asyncSubmitEvent();
       closeModal();
-      fetchNewRequests();
     } catch (e) {
       // for use to communicate to outside react app
       console.log("catch start");
@@ -136,6 +141,7 @@ export const RequestModal = ({
       }
     } finally {
       setSubmitting(false);
+      fetchNewRequests();
     }
   };
 

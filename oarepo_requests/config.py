@@ -8,10 +8,13 @@ try:
     import oarepo_workflows  # noqa
 
     from oarepo_requests.actions.components import WorkflowTransitionComponent
+    from oarepo_workflows.requests.events import WorkflowEvent
 
     workflow_action_components = [WorkflowTransitionComponent]
 except ImportError:
     workflow_action_components = []
+    WorkflowEvent = None
+
 from oarepo_requests.resolvers.ui import (
     FallbackEntityReferenceUIResolver,
     GroupEntityReferenceUIResolver,
@@ -22,6 +25,12 @@ from oarepo_requests.types import (
     EditPublishedRecordRequestType,
     PublishDraftRequestType,
 )
+from invenio_requests.customizations import CommentEventType, LogEventType
+import invenio_requests.config
+from invenio_requests.services.permissions import (
+    PermissionPolicy as InvenioRequestsPermissionPolicy,
+)
+
 
 REQUESTS_REGISTERED_TYPES = [
     DeletePublishedRecordRequestType(),
@@ -31,27 +40,25 @@ REQUESTS_REGISTERED_TYPES = [
 
 REQUESTS_REGISTERED_EVENT_TYPES = [
     TopicUpdateEventType(),
-]
+] + invenio_requests.config.REQUESTS_REGISTERED_EVENT_TYPES
 
 REQUESTS_ALLOWED_RECEIVERS = ["user", "group", "auto_approve"]
 
-from invenio_requests.customizations import CommentEventType, LogEventType
-from invenio_requests.services.permissions import (
-    PermissionPolicy as InvenioRequestsPermissionPolicy,
-)
-from oarepo_workflows.requests.events import WorkflowEvent
+if WorkflowEvent:
+    DEFAULT_WORKFLOW_EVENT_SUBMITTERS = {
+        CommentEventType.type_id: WorkflowEvent(
+            submitters=InvenioRequestsPermissionPolicy.can_create_comment
+        ),
+        LogEventType.type_id: WorkflowEvent(
+            submitters=InvenioRequestsPermissionPolicy.can_create_comment
+        ),
+        TopicUpdateEventType.type_id: WorkflowEvent(
+            submitters=InvenioRequestsPermissionPolicy.can_create_comment
+        ),
+    }
+else:
+    DEFAULT_WORKFLOW_EVENT_SUBMITTERS = {}
 
-DEFAULT_WORKFLOW_EVENT_SUBMITTERS = {
-    CommentEventType.type_id: WorkflowEvent(
-        submitters=InvenioRequestsPermissionPolicy.can_create_comment
-    ),
-    LogEventType.type_id: WorkflowEvent(
-        submitters=InvenioRequestsPermissionPolicy.can_create_comment
-    ),
-    TopicUpdateEventType.type_id: WorkflowEvent(
-        submitters=InvenioRequestsPermissionPolicy.can_create_comment
-    ),
-}
 
 ENTITY_REFERENCE_UI_RESOLVERS = {
     "user": UserEntityReferenceUIResolver("user"),

@@ -14,7 +14,6 @@ from .ref_types import ModelRefTypes, ReceiverRefTypes
 
 
 class OARepoRequestType(RequestType):
-
     def can_create(self, identity, data, receiver, topic, creator, *args, **kwargs):
         current_requests_service.require_permission(
             identity, "create", record=topic, request_type=self, **kwargs

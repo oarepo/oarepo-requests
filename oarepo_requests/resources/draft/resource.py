@@ -20,11 +20,6 @@ class DraftRecordRequestsResource(RecordRequestsResource):
 
         url_rules = [
             route("GET", routes["list-requests-draft"], self.search_requests_for_draft),
-            route(
-                "GET",
-                routes["list-applicable-requests-draft"],
-                self.get_applicable_request_types_for_draft,
-            ),
             route("POST", routes["request-type-draft"], self.create_for_draft),
         ]
         return url_rules + old_rules
@@ -41,16 +36,6 @@ class DraftRecordRequestsResource(RecordRequestsResource):
             params=resource_requestctx.args,
             search_preference=search_preference(),
             expand=resource_requestctx.args.get("expand", False),
-        )
-        return hits.to_dict(), 200
-
-    @request_view_args
-    @response_handler(many=True)
-    def get_applicable_request_types_for_draft(self):
-        """List request types."""
-        hits = self.service.get_applicable_request_types_for_draft(
-            identity=g.identity,
-            record_id=resource_requestctx.view_args["pid_value"],
         )
         return hits.to_dict(), 200
 

@@ -5,7 +5,6 @@ from invenio_access.permissions import system_identity
 from invenio_records_resources.services.uow import RecordCommitOp
 from invenio_requests.proxies import current_requests_service
 from invenio_requests.records.api import Request
-from marshmallow import ValidationError
 from oarepo_runtime.datastreams.utils import get_record_service_for_record
 from oarepo_runtime.i18n import lazy_gettext as _
 
@@ -68,15 +67,7 @@ class PublishDraftRequestType(NonDuplicableOARepoRequestType):
         if not topic.is_draft:
             return False
         super_ = super().can_possibly_create(identity, topic, *args, **kwargs)
-        print(super_, "can_possibly_create", flush=True)
-        if not super_:
-            return False
-        topic_service = get_record_service_for_record(topic)
-        try:
-            topic_service.validate_draft(system_identity, topic["id"])
-            return True
-        except ValidationError:
-            return False
+        return super_
 
     def topic_change(self, request: Request, new_topic: Dict, uow):
         setattr(request, "topic", new_topic)

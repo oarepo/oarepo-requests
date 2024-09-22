@@ -12,6 +12,7 @@ export const RecordRequests = ({
   record: initialRecord,
   ContainerComponent,
   onErrorCallback,
+  saveDraft,
 }) => {
   const [recordLoading, setRecordLoading] = useState(true);
   const [requestsLoading, setRequestsLoading] = useState(true);
@@ -57,7 +58,7 @@ export const RecordRequests = ({
           initRequests && setRequestsLoading(false);
         });
     },
-    [record.links?.self]
+    [record.links?.self, initialRecord.revision_id]
   );
 
   const fetchRequests = useCallback(async () => {
@@ -101,6 +102,7 @@ export const RecordRequests = ({
         fetchNewRequests,
         onErrorCallback,
         record: record,
+        saveDraft,
       }}
     >
       <ContainerComponent>

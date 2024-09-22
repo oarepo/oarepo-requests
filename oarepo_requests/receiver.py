@@ -9,7 +9,6 @@ def default_workflow_receiver_function(record=None, request_type=None, **kwargs)
         return None  # exception?
 
     try:
-
         request = getattr(
             current_oarepo_workflows.record_workflows[workflow_id].requests(),
             request_type.type_id,

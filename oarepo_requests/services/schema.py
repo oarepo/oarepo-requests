@@ -1,7 +1,6 @@
 import marshmallow as ma
 from invenio_records_resources.services import ConditionalLink
 from invenio_records_resources.services.base.links import Link, LinksTemplate
-from invenio_requests.proxies import current_request_type_registry
 from invenio_requests.services.schemas import GenericRequestSchema
 from marshmallow import fields
 from oarepo_runtime.datastreams.utils import get_record_service_for_record
@@ -28,7 +27,7 @@ class RequestTypeSchema(ma.Schema):
                 "record not in context for request types serialization"
             )
         type_id = data["type_id"]
-        type = current_request_type_registry.lookup(type_id, quiet=True)
+        # current_request_type_registry.lookup(type_id, quiet=True)
         record = self.context["record"]
         service = get_record_service_for_record(record)
         link = ConditionalLink(
