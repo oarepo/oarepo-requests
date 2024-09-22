@@ -96,7 +96,6 @@ class UIRequestTypeSchema(RequestTypeSchema):
 
 
 class UIRequestsSerializationMixin(ma.Schema):
-
     @ma.post_dump()
     def add_request_types(self, data, **kwargs):
         expanded = data.get("expanded", {})

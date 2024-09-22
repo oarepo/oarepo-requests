@@ -69,7 +69,3 @@ class DraftRecordRequestsService(RecordRequestsService):
             expand=expand,
             uow=uow,
         )
-
-    def get_applicable_request_types_for_draft(self, identity, record_id):
-        record = self.draft_cls.pid.resolve(record_id, registered_only=False)
-        return self._get_applicable_request_types(identity, record)

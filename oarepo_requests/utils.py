@@ -3,6 +3,7 @@ from invenio_requests import current_requests_service
 from invenio_requests.proxies import current_request_type_registry
 from invenio_requests.resolvers.registry import ResolverRegistry
 from invenio_search.engine import dsl
+from invenio_records_resources.proxies import current_service_registry
 
 
 def allowed_request_types_for_record(record):
@@ -51,7 +52,6 @@ def search_requests_filter(
     add_filter=None,
     or_filter=None,
 ):
-
     must = [
         dsl.Q("term", **{"type": type_id}),
         dsl.Q("term", **{"is_open": is_open}),
@@ -119,9 +119,6 @@ def get_type_id_for_record_cls(record_cls):
         if hasattr(resolver, "record_cls") and resolver.record_cls == record_cls:
             return resolver.type_id
     return None
-
-
-from invenio_records_resources.proxies import current_service_registry
 
 
 def get_requests_service_for_records_service(records_service):

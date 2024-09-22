@@ -21,7 +21,7 @@ def test_allowed_request_types_on_draft_service(
     draft1 = create_draft_via_resource(creator_client)
 
     thesis_ext: ThesisExt = current_app.extensions["thesis"]
-    thesis_requests_service = thesis_ext.service_requests
+    thesis_requests_service = thesis_ext.service_record_request_types
 
     allowed_request_types = (
         thesis_requests_service.get_applicable_request_types_for_draft(
@@ -178,5 +178,94 @@ def test_allowed_request_types_on_published_resource(
                 }
             },
             "type_id": "new_version",
+        },
+    ]
+
+
+def test_ui_serialization(
+    vocab_cf,
+    logged_client,
+    users,
+    urls,
+    publish_request_data_function,
+    create_draft_via_resource,
+    record_factory,
+    search_clear,
+):
+    creator = users[0]
+    receiver = users[1]
+    creator_client = logged_client(creator)
+    receiver_client = logged_client(receiver)
+
+    draft1 = create_draft_via_resource(creator_client)
+
+    draft_to_publish = create_draft_via_resource(creator_client)
+    published1 = publish_record(
+        creator_client,
+        urls,
+        publish_request_data_function,
+        draft_to_publish,
+        receiver_client,
+    )
+    draft_id = draft1.json["id"]
+    published_id = published1["id"]
+
+    applicable_requests_link_draft = draft1.json["links"]["applicable-requests"]
+    applicable_requests_link_published = published1["links"]["applicable-requests"]
+
+    allowed_request_types_draft = creator_client.get(
+        link_api2testclient(applicable_requests_link_draft),
+        headers={"Accept": "application/vnd.inveniordm.v1+json"},
+    )
+
+    allowed_request_types_published = creator_client.get(
+        link_api2testclient(applicable_requests_link_published),
+        headers={"Accept": "application/vnd.inveniordm.v1+json"},
+    )
+
+    assert allowed_request_types_draft.json["hits"]["hits"] == [
+        {
+            "description": "Request publishing of a draft",
+            "links": {
+                "actions": {
+                    "create": f"https://127.0.0.1:5000/api/thesis/{draft_id}/draft/requests/publish_draft"
+                }
+            },
+            "name": "Publish draft",
+            "type_id": "publish_draft",
+        }
+    ]
+    sorted_published_list = allowed_request_types_published.json["hits"]["hits"]
+    sorted_published_list.sort(key=lambda serialized_rt: serialized_rt["type_id"])
+    assert sorted_published_list == [
+        {
+            "type_id": "delete_published_record",
+            "links": {
+                "actions": {
+                    "create": f"https://127.0.0.1:5000/api/thesis/{published_id}/requests/delete_published_record"
+                }
+            },
+            "description": "Request deletion of published record",
+            "name": "Delete record",
+        },
+        {
+            "type_id": "edit_published_record",
+            "links": {
+                "actions": {
+                    "create": f"https://127.0.0.1:5000/api/thesis/{published_id}/requests/edit_published_record"
+                }
+            },
+            "description": "Request re-opening of published record",
+            "name": "Edit record",
+        },
+        {
+            "type_id": "new_version",
+            "links": {
+                "actions": {
+                    "create": f"https://127.0.0.1:5000/api/thesis/{published_id}/requests/new_version"
+                }
+            },
+            "description": "Request requesting creation of new version of a published record.",
+            "name": "New Version",
         },
     ]

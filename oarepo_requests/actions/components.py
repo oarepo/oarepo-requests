@@ -27,7 +27,6 @@ class RequestActionComponent:
 class RequestIdentityComponent(RequestActionComponent):
     @contextlib.contextmanager
     def apply(self, identity, request_type, action, topic, uow, *args, **kwargs):
-
         identity.provides.add(request_active)
         try:
             yield
@@ -37,7 +36,6 @@ class RequestIdentityComponent(RequestActionComponent):
 
 
 class WorkflowTransitionComponent(RequestActionComponent):
-
     @contextlib.contextmanager
     def apply(self, identity, request_type, action, topic, uow, *args, **kwargs):
         from oarepo_workflows.proxies import current_oarepo_workflows

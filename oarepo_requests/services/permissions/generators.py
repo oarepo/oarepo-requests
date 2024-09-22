@@ -12,7 +12,6 @@ from oarepo_requests.services.permissions.identity import request_active
 
 
 class RequestActive(Generator):
-
     def needs(self, **kwargs):
         return [request_active]
 
@@ -52,7 +51,7 @@ try:
         #
 
         def _getter(self, **kwargs):
-            raise NotImplemented()
+            raise NotImplementedError()
 
         def _kwargs_parser(self, **kwargs):
             return kwargs
@@ -77,7 +76,7 @@ try:
                 return []
 
         # not tested
-        def query_filter(self, **kwargs):
+        def query_filter(self, record=None, request_type=None, **kwargs):
             try:
                 workflow_request = current_oarepo_workflows.get_workflow(
                     record
@@ -130,7 +129,6 @@ except ImportError:
 
 
 class IfRequestedBy(RecipientGeneratorMixin, ConditionalGenerator):
-
     def __init__(self, requesters, then_, else_):
         super().__init__(then_, else_)
         if not isinstance(requesters, (list, tuple)):
@@ -202,7 +200,7 @@ class IfNoEditDraft(ConditionalGenerator):
             return False
         records_service = get_record_service_for_record(record)
         try:
-            draft = records_service.config.draft_cls.pid.resolve(
+            records_service.config.draft_cls.pid.resolve(
                 record["id"]
             )  # by edit - has the same id as parent record
             # i'm not sure what open unpublished means
