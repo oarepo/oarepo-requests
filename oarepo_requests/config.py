@@ -26,6 +26,7 @@ from oarepo_requests.types import (
     PublishDraftRequestType,
 )
 from invenio_requests.customizations import CommentEventType, LogEventType
+import invenio_requests.config
 from invenio_requests.services.permissions import (
     PermissionPolicy as InvenioRequestsPermissionPolicy,
 )
@@ -39,7 +40,7 @@ REQUESTS_REGISTERED_TYPES = [
 
 REQUESTS_REGISTERED_EVENT_TYPES = [
     TopicUpdateEventType(),
-]
+] + invenio_requests.config.REQUESTS_REGISTERED_EVENT_TYPES
 
 REQUESTS_ALLOWED_RECEIVERS = ["user", "group", "auto_approve"]
 
