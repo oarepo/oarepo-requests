@@ -41,7 +41,6 @@ export const RequestModalContent = ({
   const { submitForm, setErrors, setSubmitting } = useFormikContext();
 
   const actualRequest = requests.find((req) => req.id === request.id);
-
   useEffect(() => {
     if (!_isEmpty(request.links?.events)) {
       fetchNewEvents(
@@ -77,7 +76,6 @@ export const RequestModalContent = ({
   };
 
   const eventTypes = requestType?.event_types;
-
   /** @type {Event[]} */
   let events = [];
   if (!_isEmpty(request?.events)) {
@@ -90,8 +88,6 @@ export const RequestModalContent = ({
     requestModalType === REQUEST_MODAL_TYPE.SUBMIT_FORM && customFields?.ui;
   const renderReadOnlyData =
     requestModalType === REQUEST_MODAL_TYPE.READ_ONLY && request?.payload;
-  console.log(renderSubmitForm);
-  console.log(renderReadOnlyData);
   return (
     <Grid doubling stackable>
       <Grid.Row>
@@ -234,4 +230,5 @@ RequestModalContent.propTypes = {
   requestType: PropTypes.object,
   requestModalType: PropTypes.string.isRequired,
   onCompletedAction: PropTypes.func,
+  customFields: PropTypes.object,
 };

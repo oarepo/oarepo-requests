@@ -13,6 +13,7 @@ export const RecordRequests = ({
   ContainerComponent,
   onErrorCallback,
   saveDraft,
+  shouldRedirectToEdit = true,
 }) => {
   const [recordLoading, setRecordLoading] = useState(true);
   const [requestsLoading, setRequestsLoading] = useState(true);
@@ -58,7 +59,7 @@ export const RecordRequests = ({
           initRequests && setRequestsLoading(false);
         });
     },
-    [record.links?.self, initialRecord.revision_id]
+    [record.links?.self]
   );
 
   const fetchRequests = useCallback(async () => {
@@ -103,6 +104,7 @@ export const RecordRequests = ({
         onErrorCallback,
         record: record,
         saveDraft,
+        shouldRedirectToEdit,
       }}
     >
       <ContainerComponent>

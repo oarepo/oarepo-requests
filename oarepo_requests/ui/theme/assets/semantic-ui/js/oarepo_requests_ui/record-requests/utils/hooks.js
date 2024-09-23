@@ -9,6 +9,15 @@ import { useConfirmModalContext } from "../contexts";
 import { REQUEST_TYPE } from "./objects";
 import { http } from "react-invenio-forms";
 
+export const getRedirectionUrlFromResponsePayload = (response) => {
+  const redirectionLinkKey = Object.keys(response?.data?.payload || []).find(
+    (key) => key.toLowerCase().includes("self_html")
+  );
+  return redirectionLinkKey
+    ? response?.data?.payload[redirectionLinkKey]
+    : null;
+};
+
 /**
  * @typedef {import("semantic-ui-react").ConfirmProps} ConfirmProps
  */
@@ -111,7 +120,15 @@ export const useRequestsApi = (request, onSubmit) => {
           request.links?.actions?.create,
           formValues
         );
-        await http.post(createdRequest.data?.links?.actions?.submit, {});
+        const submittedRequest = await http.post(
+          createdRequest.data?.links?.actions?.submit,
+          formValues
+        );
+        const redirectionURL =
+          getRedirectionUrlFromResponsePayload(submittedRequest);
+        if (redirectionURL && window.location.href !== redirectionURL) {
+          window.location.href = redirectionURL;
+        }
         resetForm();
       },
       undefined,
@@ -129,20 +146,20 @@ export const useRequestsApi = (request, onSubmit) => {
 
   const sendRequest = async (actionUrl, requestActionType) => {
     let response;
+    console.log("start send request");
     if (requestActionType === REQUEST_TYPE.SAVE) {
       response = await http.put(actionUrl);
     } else if (requestActionType === REQUEST_TYPE.ACCEPT) {
-      // Reload page after succesful "Accept" operation
       response = await http.post(actionUrl);
-      // window.location.reload();
     } else {
       const mappedData = isDeepEmpty(formValues) ? {} : formValues;
       response = await http.post(actionUrl, mappedData);
     }
-    if (response?.payload?.redirectUrl) {
-      window.location.href = response.payload.redirectUrl;
+    const redirectionURL = getRedirectionUrlFromResponsePayload(response);
+    if (redirectionURL && window.location.href !== redirectionURL) {
+      window.location.href = redirectionURL;
     }
-    return response;
+    return response.data;
   };
 
   const doAction = async (requestActionType, waitForConfirmation = false) => {

@@ -34,14 +34,20 @@ export const RequestModal = ({
   requestCreationModal,
 }) => {
   const errorMessageRef = useRef(null);
-  const { fetchNewRequests, onErrorCallback, record, saveDraft } =
-    useRequestContext();
+  const {
+    fetchNewRequests,
+    onErrorCallback,
+    record,
+    saveDraft,
+    shouldRedirectToEdit,
+  } = useRequestContext();
   const { isOpen, close: closeModal, open: openModal } = useConfirmationModal();
   const [customFields, setCustomFields] = useState(null);
   const modalActions = mapLinksToActions(
     requestCreationModal ? requestType : request,
     customFields
   );
+  console.log(request);
   const formik = useFormik({
     initialValues:
       request && !_isEmpty(request?.payload)
@@ -80,6 +86,7 @@ export const RequestModal = ({
   const onSubmit = async (asyncSubmitEvent, onError, requestActionType) => {
     setSubmitting(true);
     setErrors({});
+    let response;
     try {
       // const save = await saveDraft();
       // if (!save) {
@@ -87,7 +94,8 @@ export const RequestModal = ({
       //   return;
       // }
       await asyncSubmitEvent();
-      closeModal();
+      fetchNewRequests();
+      onClose();
     } catch (e) {
       // for use to communicate to outside react app
       console.log("catch start");
@@ -99,6 +107,9 @@ export const RequestModal = ({
         onError(e);
       } else {
         if (requestActionType === REQUEST_TYPE.CREATE) {
+          console.log(e);
+          console.log(e.response);
+
           if (e.response?.data?.errors?.length > 0) {
             const now = new Date();
             const validationErrors = {
@@ -109,16 +120,29 @@ export const RequestModal = ({
               `validationErrors.${record.id}`,
               JSON.stringify(validationErrors)
             );
-            setFieldError(
-              "api",
-              i18next.t(
-                "The request could not be created, due to draft validation errors. Redirecting to edit page..."
-              )
-            );
-            setTimeout(() => {
-              window.location.href = record.links.edit_html;
-              closeModal();
-            }, 2000);
+
+            if (shouldRedirectToEdit) {
+              setFieldError(
+                "api",
+                i18next.t(
+                  "The request could not be created, due to draft validation errors. Please fix your errors in the form (redirecting...)"
+                )
+              );
+              setTimeout(() => {
+                window.location.href = record.links.edit_html;
+                onClose();
+              }, 3000);
+            } else {
+              setFieldError(
+                "api",
+                i18next.t(
+                  "The request could not be created, due to draft validation errors.  Please fix your errors in the form (closing modal...)"
+                )
+              );
+              setTimeout(() => {
+                onClose();
+              }, 3000);
+            }
           } else {
             setFieldError(
               "api",
@@ -141,7 +165,6 @@ export const RequestModal = ({
       }
     } finally {
       setSubmitting(false);
-      fetchNewRequests();
     }
   };
 

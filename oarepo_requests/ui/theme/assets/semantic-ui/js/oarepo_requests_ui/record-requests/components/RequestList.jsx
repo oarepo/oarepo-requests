@@ -5,7 +5,6 @@ import { Button } from "semantic-ui-react";
 import _isEmpty from "lodash/isEmpty";
 
 import { RequestModal, RequestModalContent } from ".";
-import { mapLinksToActions } from "./actions";
 
 /**
  * @typedef {import("../types").Request} Request
@@ -21,7 +20,6 @@ export const RequestList = ({ requests }) => {
       : !_isEmpty(request?.name)
       ? request.name
       : request.type;
-    const modalActions = mapLinksToActions(request);
     return (
       <RequestModal
         key={request.id}
@@ -31,15 +29,14 @@ export const RequestList = ({ requests }) => {
         requestCreationModal={false}
         trigger={
           <Button
-            className="block request-reply-button mb-10"
+            className={`block request-reply-button ${request.type} mb-10`}
             fluid
             title={header}
             content={header}
-            icon="clock"
+            icon={request?.status_code === "created" ? "paper plane" : "clock"}
             labelPosition="left"
           />
         }
-        actions={modalActions}
         ContentComponent={RequestModalContent}
       />
     );

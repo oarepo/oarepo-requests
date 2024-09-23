@@ -8,10 +8,5 @@ const recordRequestsAppDiv = document.getElementById("record-requests");
 if (recordRequestsAppDiv) {
   const record = JSON.parse(recordRequestsAppDiv.dataset.record);
 
-  ReactDOM.render(
-    <RecordRequests
-      record={record}
-    />,
-    recordRequestsAppDiv
-  );
+  ReactDOM.render(<RecordRequests record={record} />, recordRequestsAppDiv);
 }

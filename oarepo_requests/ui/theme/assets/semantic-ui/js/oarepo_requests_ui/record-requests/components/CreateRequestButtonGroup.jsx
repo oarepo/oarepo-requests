@@ -44,7 +44,7 @@ export const CreateRequestButtonGroup = ({
               requestCreationModal
               trigger={
                 <Button
-                  className="block request-create-button mb-10"
+                  className={`block request-create-button ${requestType?.type_id} mb-10`}
                   fluid
                   title={i18next.t(requestType.name)}
                   content={requestType.name}
