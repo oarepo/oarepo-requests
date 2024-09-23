@@ -47,7 +47,6 @@ export const RequestModal = ({
     requestCreationModal ? requestType : request,
     customFields
   );
-  console.log(request);
   const formik = useFormik({
     initialValues:
       request && !_isEmpty(request?.payload)
@@ -78,7 +77,6 @@ export const RequestModal = ({
     fetch(`/requests/configs/${requestType?.type_id || request?.type}`)
       .then((response) => response.json())
       .then((data) => {
-        console.log(data);
         setCustomFields(data?.custom_fields);
       });
   }, []);
@@ -98,7 +96,6 @@ export const RequestModal = ({
       onClose();
     } catch (e) {
       // for use to communicate to outside react app
-      console.log("catch start");
       if (onErrorCallback) {
         onErrorCallback(e);
       }
@@ -107,9 +104,6 @@ export const RequestModal = ({
         onError(e);
       } else {
         if (requestActionType === REQUEST_TYPE.CREATE) {
-          console.log(e);
-          console.log(e.response);
-
           if (e.response?.data?.errors?.length > 0) {
             const now = new Date();
             const validationErrors = {

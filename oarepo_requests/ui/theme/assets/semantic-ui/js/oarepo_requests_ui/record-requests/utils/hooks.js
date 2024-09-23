@@ -146,7 +146,6 @@ export const useRequestsApi = (request, onSubmit) => {
 
   const sendRequest = async (actionUrl, requestActionType) => {
     let response;
-    console.log("start send request");
     if (requestActionType === REQUEST_TYPE.SAVE) {
       response = await http.put(actionUrl);
     } else if (requestActionType === REQUEST_TYPE.ACCEPT) {
