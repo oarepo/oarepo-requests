@@ -1,115 +1,71 @@
-import React, { useEffect, useState, useCallback } from "react";
+import React, { useCallback } from "react";
 import PropTypes from "prop-types";
-
-import axios from "axios";
 import { SegmentGroup } from "semantic-ui-react";
-
 import { CreateRequestButtonGroup, RequestListContainer } from ".";
 import { RequestContextProvider } from "../contexts";
-import { sortByStatusCode } from "../utils";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { http } from "@js/oarepo_ui";
 
 export const RecordRequests = ({
   record: initialRecord,
   ContainerComponent,
-  onErrorCallback,
-  saveDraft,
-  shouldRedirectToEdit = true,
+  onBeforeAction,
+  onAfterAction,
+  onActionError,
 }) => {
-  const [applicableRequestTypesLoading, setApplicableRequestTypesLoading] =
-    useState(true);
-  const [requestsLoading, setRequestsLoading] = useState(true);
+  const queryClient = useQueryClient();
 
-  const [applicableRequestsLoadingError, setApplicableRequestsLoadingError] =
-    useState(null);
-  const [requestsLoadingError, setRequestsLoadingError] = useState(null);
-
-  const [applicableRequestTypes, setApplicableRequestTypes] = useState([]);
-  const [requests, setRequests] = useState([]);
-  console.log(applicableRequestTypes);
-  const requestsSetter = useCallback(
-    (newRequests) => setRequests(newRequests),
-    []
+  const {
+    data: requestTypes,
+    error: applicableRequestsLoadingError,
+    isLoading: applicableRequestTypesLoading,
+  } = useQuery(
+    ["applicableRequestTypes", initialRecord.links["applicable-requests"]],
+    () => http.get(initialRecord.links["applicable-requests"]),
+    {
+      enabled: !!initialRecord.links?.["applicable-requests"],
+    }
   );
-
-  const fetchApplicableRequestTypes = useCallback(async () => {
-    console.log(initialRecord.links["applicable-requests"]);
-
-    setApplicableRequestTypesLoading(true);
-    setApplicableRequestsLoadingError(null);
-    return axios({
-      method: "get",
-      url: initialRecord.links["applicable-requests"],
-      headers: {
-        "Content-Type": "application/json",
-        Accept: "application/vnd.inveniordm.v1+json",
-      },
-    })
-      .then((response) => {
-        setApplicableRequestTypes(response.data.hits.hits);
-      })
-      .catch((error) => {
-        setApplicableRequestsLoadingError(error);
-        setRequestsLoadingError(error);
-      })
-      .finally(() => {
-        setApplicableRequestTypesLoading(false);
-        setApplicableRequestTypesLoading(false);
-      });
-  }, [initialRecord.links?.self]);
-
-  const fetchRequests = useCallback(async () => {
-    setRequestsLoading(true);
-    setRequestsLoadingError(null);
-    return axios({
-      method: "get",
-      url: initialRecord.links?.requests,
-      headers: {
-        "Content-Type": "application/json",
-        Accept: "application/vnd.inveniordm.v1+json",
-      },
-    })
-      .then((response) => {
-        setRequests(sortByStatusCode(response.data?.hits?.hits));
-      })
-      .catch((error) => {
-        setRequestsLoadingError(error);
-      })
-      .finally(() => {
-        setRequestsLoading(false);
-      });
-  }, [initialRecord.links?.requests]);
-
+  console.log(applicableRequestTypesLoading);
+  const {
+    data: recordRequests,
+    error: requestsLoadingError,
+    isLoading: requestsLoading,
+  } = useQuery(
+    ["requests", initialRecord.links?.requests],
+    () => http.get(initialRecord.links?.requests),
+    {
+      enabled: !!initialRecord.links?.requests,
+    }
+  );
+  const applicableRequestTypes = requestTypes?.data?.hits?.hits;
+  const requests = recordRequests?.data?.hits?.hits;
   const fetchNewRequests = useCallback(() => {
-    fetchApplicableRequestTypes();
-    fetchRequests();
-  }, [fetchApplicableRequestTypes, fetchRequests]);
-
-  useEffect(() => {
-    fetchApplicableRequestTypes();
-    fetchRequests();
-  }, [fetchApplicableRequestTypes, fetchRequests]);
-
+    queryClient.invalidateQueries(["applicableRequestTypes"]);
+    queryClient.invalidateQueries(["requests"]);
+  }, [queryClient]);
   return (
     <RequestContextProvider
       requests={{
         requests,
         requestTypes: applicableRequestTypes,
-        setRequests: requestsSetter,
+        // TODO: check this
+        setRequests: () => {},
         fetchNewRequests,
-        onErrorCallback,
         record: initialRecord,
-        saveDraft,
-        shouldRedirectToEdit,
+        onBeforeAction,
+        onAfterAction,
+        onActionError,
       }}
     >
       <ContainerComponent>
-        {applicableRequestTypes.length > 0 && (
+        {applicableRequestTypes?.length > 0 && (
           <CreateRequestButtonGroup
             recordLoading={applicableRequestTypesLoading}
             recordLoadingError={applicableRequestsLoadingError}
           />
         )}
-        {requests.length > 0 && (
+        {requests?.length > 0 && (
           <RequestListContainer
             requestsLoading={requestsLoading}
             requestsLoadingError={requestsLoadingError}
@@ -123,7 +79,9 @@ export const RecordRequests = ({
 RecordRequests.propTypes = {
   record: PropTypes.object.isRequired,
   ContainerComponent: PropTypes.func,
-  onErrorCallback: PropTypes.func,
+  onBeforeAction: PropTypes.func,
+  onAfterAction: PropTypes.func,
+  onActionError: PropTypes.func,
 };
 
 RecordRequests.defaultProps = {
@@ -132,5 +90,7 @@ RecordRequests.defaultProps = {
       {children}
     </SegmentGroup>
   ),
-  onErrorCallback: undefined,
+  onBeforeAction: undefined,
+  onAfterAction: undefined,
+  onActionError: undefined,
 };

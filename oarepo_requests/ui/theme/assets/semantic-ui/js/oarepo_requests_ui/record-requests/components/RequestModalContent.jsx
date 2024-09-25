@@ -7,6 +7,7 @@ import _isEmpty from "lodash/isEmpty";
 import _sortBy from "lodash/sortBy";
 import { useFormikContext } from "formik";
 import { CustomFields } from "react-invenio-forms";
+import { SideRequestInfo } from "@js/oarepo_requests_detail/components/SideRequestInfo";
 
 import {
   CreateRequestModalContent,
@@ -86,6 +87,8 @@ export const RequestModalContent = ({
 
   const renderSubmitForm =
     requestModalType === REQUEST_MODAL_TYPE.SUBMIT_FORM && customFields?.ui;
+  console.log(requestModalType);
+  console.log(renderSubmitForm);
   const renderReadOnlyData =
     requestModalType === REQUEST_MODAL_TYPE.READ_ONLY && request?.payload;
   return (
@@ -95,12 +98,14 @@ export const RequestModalContent = ({
           {request.description}
         </Grid.Column>
       </Grid.Row>
-      {((renderSubmitForm || renderReadOnlyData) && (
+      <Grid.Row>
+        <Grid.Column>
+          <SideRequestInfo request={request} />
+        </Grid.Column>
+      </Grid.Row>
+      {(renderSubmitForm || renderReadOnlyData) && (
         <Grid.Row>
-          <Grid.Column width={3} only="mobile">
-            <ModalContentSideInfo request={request} isSidebar />
-          </Grid.Column>
-          <Grid.Column width={13}>
+          <Grid.Column width={16}>
             {renderSubmitForm && (
               <Form onSubmit={onFormSubmit} id="request-form">
                 <CustomFields
@@ -115,7 +120,7 @@ export const RequestModalContent = ({
                 <Divider hidden />
               </Form>
             )}
-            {/* Render read only data for Accept and Cancel modals */}
+
             {renderReadOnlyData && (
               <>
                 <List relaxed>
@@ -137,10 +142,11 @@ export const RequestModalContent = ({
                     </List.Item>
                   ))}
                 </List>
-                {/* If events are enabled for this request type, you can see the timeline of events and create new events. */}
+
                 {!_isEmpty(eventTypes) && (
                   <>
                     <Divider horizontal>{i18next.t("Timeline")}</Divider>
+
                     {!_isEmpty(events) && (
                       <Comment.Group>
                         {events.map((event) => {
@@ -168,7 +174,6 @@ export const RequestModalContent = ({
                                       (widget) => import(`./${widget}.jsx`),
                                       (widget) => import(`react-invenio-forms`),
                                     ]}
-                                    // fieldPathPrefix="payload"
                                   />
                                 </Comment.Text>
                               </Comment.Content>
@@ -177,6 +182,7 @@ export const RequestModalContent = ({
                         })}
                       </Comment.Group>
                     )}
+
                     {eventTypes.map((event) => (
                       <RequestModal
                         key={event.id}
@@ -199,7 +205,10 @@ export const RequestModalContent = ({
                           />
                         }
                         actions={[
-                          { name: REQUEST_TYPE.CREATE, component: SubmitEvent },
+                          {
+                            name: REQUEST_TYPE.CREATE,
+                            component: SubmitEvent,
+                          },
                         ]}
                         ContentComponent={CreateRequestModalContent}
                       />
@@ -208,16 +217,6 @@ export const RequestModalContent = ({
                 )}
               </>
             )}
-          </Grid.Column>
-          <Grid.Column width={3} only="tablet computer">
-            <ModalContentSideInfo request={request} isSidebar />
-          </Grid.Column>
-        </Grid.Row>
-      )) || (
-        /* No Submit Form (no PayloadUI for this request type) nor Payload (read only data) available for this Request */
-        <Grid.Row>
-          <Grid.Column>
-            <ModalContentSideInfo request={request} isSidebar={false} />
           </Grid.Column>
         </Grid.Row>
       )}

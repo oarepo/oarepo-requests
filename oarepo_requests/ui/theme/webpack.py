@@ -18,6 +18,7 @@ theme = WebpackThemeBundle(
             aliases={
                 "@translations/oarepo_requests_ui": "translations/oarepo_requests_ui",
                 "@js/oarepo_requests": "js/oarepo_requests_ui/record-requests",
+                "@js/oarepo_requests_detail": "js/oarepo_requests_ui/request-detail",
             },
         )
     },

@@ -1,5 +1,5 @@
-import React, { useEffect, useRef, useState } from "react";
-import { useConfirmationModal, serializeErrors } from "@js/oarepo_ui";
+import React from "react";
+import { useConfirmationModal } from "@js/oarepo_ui";
 import { i18next } from "@translations/oarepo_requests_ui/i18next";
 import {
   Dimmer,
@@ -10,12 +10,19 @@ import {
   Message,
   Confirm,
 } from "semantic-ui-react";
-import { useFormik, FormikProvider } from "formik";
+import { useFormik, FormikProvider, useFormikContext } from "formik";
 import _isEmpty from "lodash/isEmpty";
 import { mapPayloadUiToInitialValues } from "../utils";
-import { ConfirmModalContextProvider, useRequestContext } from "../contexts";
+import {
+  ConfirmModalContextProvider,
+  ModalControlContextProvider,
+} from "../contexts";
 import { REQUEST_TYPE, REQUEST_MODAL_TYPE } from "../utils/objects";
 import { mapLinksToActions } from "./actions";
+import PropTypes from "prop-types";
+import { useQuery } from "@tanstack/react-query";
+// TODO: remove when /configs starts using vnd zenodo accept header
+import { http } from "react-invenio-forms";
 
 /**
  * @typedef {import("../types").Request} Request
@@ -33,20 +40,8 @@ export const RequestModal = ({
   ContentComponent,
   requestCreationModal,
 }) => {
-  const errorMessageRef = useRef(null);
-  const {
-    fetchNewRequests,
-    onErrorCallback,
-    record,
-    saveDraft,
-    shouldRedirectToEdit,
-  } = useRequestContext();
   const { isOpen, close: closeModal, open: openModal } = useConfirmationModal();
-  const [customFields, setCustomFields] = useState(null);
-  const modalActions = mapLinksToActions(
-    requestCreationModal ? requestType : request,
-    customFields
-  );
+
   const formik = useFormik({
     initialValues:
       request && !_isEmpty(request?.payload)
@@ -56,117 +51,101 @@ export const RequestModal = ({
         : {},
     onSubmit: () => {}, // We'll redefine with customSubmitHandler
   });
-  const {
-    isSubmitting,
-    resetForm,
-    setErrors,
-    errors,
-    setFieldError,
-    setSubmitting,
-  } = formik;
-
-  const error = errors?.api;
-
-  useEffect(() => {
-    if (error) {
-      errorMessageRef.current?.scrollIntoView({ behavior: "smooth" });
-    }
-  }, [error]);
-
-  useEffect(() => {
-    fetch(`/requests/configs/${requestType?.type_id || request?.type}`)
-      .then((response) => response.json())
-      .then((data) => {
-        setCustomFields(data?.custom_fields);
-      });
-  }, []);
-
-  const onSubmit = async (asyncSubmitEvent, onError, requestActionType) => {
-    setSubmitting(true);
-    setErrors({});
-    let response;
-    try {
-      // const save = await saveDraft();
-      // if (!save) {
-      //   closeModal();
-      //   return;
-      // }
-      await asyncSubmitEvent();
-      fetchNewRequests();
-      onClose();
-    } catch (e) {
-      // for use to communicate to outside react app
-      if (onErrorCallback) {
-        onErrorCallback(e);
-      }
-      // callback to be used specifically for some calls inside of the component
-      if (onError) {
-        onError(e);
-      } else {
-        if (requestActionType === REQUEST_TYPE.CREATE) {
-          if (e.response?.data?.errors?.length > 0) {
-            const now = new Date();
-            const validationErrors = {
-              value: serializeErrors(e.response?.data?.errors),
-              expiry: now.getTime() + 10000,
-            };
-            localStorage.setItem(
-              `validationErrors.${record.id}`,
-              JSON.stringify(validationErrors)
-            );
-
-            if (shouldRedirectToEdit) {
-              setFieldError(
-                "api",
-                i18next.t(
-                  "The request could not be created, due to draft validation errors. Please fix your errors in the form (redirecting...)"
-                )
-              );
-              setTimeout(() => {
-                window.location.href = record.links.edit_html;
-                onClose();
-              }, 3000);
-            } else {
-              setFieldError(
-                "api",
-                i18next.t(
-                  "The request could not be created, due to draft validation errors.  Please fix your errors in the form (closing modal...)"
-                )
-              );
-              setTimeout(() => {
-                onClose();
-              }, 3000);
-            }
-          } else {
-            setFieldError(
-              "api",
-              i18next.t("The request could not be created.")
-            );
-          }
-        } else if (requestActionType === REQUEST_TYPE.SUBMIT) {
-          setFieldError(
-            "api",
-            i18next.t("The request could not be submitted.")
-          );
-        } else {
-          setFieldError(
-            "api",
-            i18next.t(
-              "The action was not executed successfully. Please try again."
-            )
-          );
-        }
-      }
-    } finally {
-      setSubmitting(false);
-    }
-  };
+  const { isSubmitting, resetForm, setErrors, setSubmitting } = formik;
 
   const onClose = () => {
     closeModal();
     setErrors({});
     resetForm();
   };
+
+  return (
+    <FormikProvider value={formik}>
+      <ModalControlContextProvider
+        value={{
+          isOpen,
+          closeModal: onClose,
+          openModal,
+        }}
+      >
+        <ConfirmModalContextProvider>
+          {({ confirmDialogProps }) => (
+            <>
+              <Modal
+                className="requests-request-modal"
+                as={Dimmer.Dimmable}
+                blurringerror
+                onClose={onClose}
+                onOpen={openModal}
+                open={isOpen}
+                trigger={trigger || <Button content="Open Modal" />}
+                closeIcon
+                closeOnDocumentClick={false}
+                closeOnDimmerClick={false}
+                role="dialog"
+                aria-labelledby="request-modal-header"
+                aria-describedby="request-modal-desc"
+              >
+                <Dimmer active={isSubmitting}>
+                  <Loader inverted size="large" />
+                </Dimmer>
+                <Modal.Header as="h1" id="request-modal-header">
+                  {header}
+                </Modal.Header>
+                <RequestModalContentAndActions
+                  request={request}
+                  requestType={requestType}
+                  ContentComponent={ContentComponent}
+                  requestCreationModal={requestCreationModal}
+                  onClose={onClose}
+                />
+              </Modal>
+              <Confirm {...confirmDialogProps} />
+            </>
+          )}
+        </ConfirmModalContextProvider>
+      </ModalControlContextProvider>
+    </FormikProvider>
+  );
+};
+
+RequestModal.propTypes = {
+  request: PropTypes.object,
+  requestType: PropTypes.object,
+  header: PropTypes.oneOfType([PropTypes.string, PropTypes.element]),
+  trigger: PropTypes.element,
+  ContentComponent: PropTypes.func,
+  requestCreationModal: PropTypes.bool,
+};
+
+const RequestModalContentAndActions = ({
+  request,
+  requestType,
+  onSubmit,
+  ContentComponent,
+  requestCreationModal,
+  onClose,
+}) => {
+  const { errors } = useFormikContext();
+  const error = errors?.api;
+
+  const {
+    data,
+    error: customFieldsLoadingError,
+    isLoading,
+  } = useQuery(
+    ["applicableCustomFields", requestType?.type_id || request?.type],
+    () =>
+      http.get(`/requests/configs/${requestType?.type_id || request?.type}`),
+    {
+      enabled: !!(requestType?.type_id || request?.type),
+    }
+  );
+  const customFields = data?.data?.custom_fields;
+  const modalActions = mapLinksToActions(
+    requestCreationModal ? requestType : request,
+    customFields
+  );
 
   // Only applies to RequestModalContent component:
   // READ ONLY modal type contains Accept, Decline, and/or Cancel actions OR contains Cancel action only => only ReadOnlyCustomFields are rendered
@@ -176,66 +155,57 @@ export const RequestModal = ({
   )
     ? REQUEST_MODAL_TYPE.READ_ONLY
     : REQUEST_MODAL_TYPE.SUBMIT_FORM;
-
+  console.log(data);
+  console.log(customFields);
   return (
-    <FormikProvider value={formik}>
-      <ConfirmModalContextProvider>
-        {({ confirmDialogProps }) => (
-          <>
-            <Modal
-              className="requests-request-modal"
-              as={Dimmer.Dimmable}
-              blurring
-              onClose={onClose}
-              onOpen={openModal}
-              open={isOpen}
-              trigger={trigger || <Button content="Open Modal" />}
-              closeIcon
-              closeOnDocumentClick={false}
-              closeOnDimmerClick={false}
-              role="dialog"
-              aria-labelledby="request-modal-header"
-              aria-describedby="request-modal-desc"
-            >
-              <Dimmer active={isSubmitting}>
-                <Loader inverted size="large" />
-              </Dimmer>
-              <Modal.Header as="h1" id="request-modal-header">
-                {header}
-              </Modal.Header>
-              <Modal.Content>
-                {error && (
-                  <Message negative>
-                    <Message.Header>{error}</Message.Header>
-                  </Message>
-                )}
-                <ContentComponent
-                  request={request}
-                  requestType={requestType}
-                  requestModalType={requestModalContentType}
-                  onCompletedAction={onSubmit}
-                  customFields={customFields}
-                />
-              </Modal.Content>
-              <Modal.Actions>
-                {modalActions.map(({ name, component: ActionComponent }) => (
-                  <ActionComponent
-                    key={name}
-                    request={request}
-                    requestType={requestType}
-                    onSubmit={onSubmit}
-                  />
-                ))}
-                <Button onClick={onClose} icon labelPosition="left">
-                  <Icon name="cancel" />
-                  {i18next.t("Close")}
-                </Button>
-              </Modal.Actions>
-            </Modal>
-            <Confirm {...confirmDialogProps} />
-          </>
+    <React.Fragment>
+      <Dimmer active={isLoading}>
+        <Loader inverted />
+      </Dimmer>
+      <Modal.Content>
+        {error && (
+          <Message negative>
+            <Message.Header>{error}</Message.Header>
+          </Message>
         )}
-      </ConfirmModalContextProvider>
-    </FormikProvider>
+        {customFieldsLoadingError && (
+          <Message negative>
+            <Message.Header>
+              {i18next.t("Custom fields could not be fetched.")}
+            </Message.Header>
+          </Message>
+        )}
+        <ContentComponent
+          request={request}
+          requestType={requestType}
+          requestModalType={requestModalContentType}
+          onCompletedAction={onSubmit}
+          customFields={customFields}
+        />
+      </Modal.Content>
+      <Modal.Actions>
+        {modalActions.map(({ name, component: ActionComponent }) => (
+          <ActionComponent
+            key={name}
+            request={request}
+            requestType={requestType}
+            onSubmit={onSubmit}
+          />
+        ))}
+        <Button onClick={onClose} icon labelPosition="left">
+          <Icon name="cancel" />
+          {i18next.t("Close")}
+        </Button>
+      </Modal.Actions>
+    </React.Fragment>
   );
+};
+
+RequestModalContentAndActions.propTypes = {
+  request: PropTypes.object,
+  requestType: PropTypes.object,
+  ContentComponent: PropTypes.func,
+  requestCreationModal: PropTypes.bool,
+  onSubmit: PropTypes.func,
+  onClose: PropTypes.func,
 };

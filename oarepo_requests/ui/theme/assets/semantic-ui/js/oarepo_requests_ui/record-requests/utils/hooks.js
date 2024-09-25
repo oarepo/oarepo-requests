@@ -3,11 +3,15 @@ import React, { useState, useCallback } from "react";
 import { i18next } from "@translations/oarepo_requests_ui/i18next";
 import { Button } from "semantic-ui-react";
 import { useFormikContext } from "formik";
-
+import { useMutation } from "@tanstack/react-query";
 import { isDeepEmpty } from "../utils";
-import { useConfirmModalContext } from "../contexts";
+import {
+  useConfirmModalContext,
+  useRequestContext,
+  useModalControlContext,
+} from "../contexts";
 import { REQUEST_TYPE } from "./objects";
-import { http } from "react-invenio-forms";
+import { http } from "@js/oarepo_ui";
 
 export const getRedirectionUrlFromResponsePayload = (response) => {
   const redirectionLinkKey = Object.keys(response?.data?.payload || []).find(
@@ -109,78 +113,97 @@ export const useConfirmDialog = (isEventModal = false) => {
   return { confirmDialogProps, confirmAction };
 };
 
-export const useRequestsApi = (request, onSubmit) => {
+export const useRequestsApi = (request) => {
   const { values: formValues, resetForm } = useFormikContext();
   const { confirmAction } = useConfirmModalContext();
-
-  const createAndSubmitRequest = () => {
-    onSubmit(
-      async () => {
-        const createdRequest = await http.post(
-          request.links?.actions?.create,
-          formValues
-        );
-        const submittedRequest = await http.post(
-          createdRequest.data?.links?.actions?.submit,
-          formValues
-        );
-        const redirectionURL =
-          getRedirectionUrlFromResponsePayload(submittedRequest);
-        if (redirectionURL && window.location.href !== redirectionURL) {
-          window.location.href = redirectionURL;
-        }
-        resetForm();
-      },
-      undefined,
-      REQUEST_TYPE.CREATE
+  const createAndSubmitRequest = useAction(async () => {
+    const createdRequest = await http.post(
+      request.links?.actions?.create,
+      formValues
     );
-  };
+    const submittedRequest = await http.post(
+      createdRequest.data?.links?.actions?.submit,
+      formValues
+    );
+    const redirectionURL =
+      getRedirectionUrlFromResponsePayload(submittedRequest);
+    if (redirectionURL && window.location.href !== redirectionURL) {
+      window.location.href = redirectionURL;
+    }
+    resetForm();
+  });
 
   const doCreateAndSubmitAction = (waitForConfirmation = false) => {
     if (waitForConfirmation) {
-      confirmAction(createAndSubmitRequest, REQUEST_TYPE.SUBMIT, true);
+      confirmAction(createAndSubmitRequest.mutate(), REQUEST_TYPE.SUBMIT, true);
     } else {
-      createAndSubmitRequest();
+      createAndSubmitRequest.mutate();
     }
   };
 
-  const sendRequest = async (actionUrl, requestActionType) => {
+  const sendRequest = useAction(async (requestActionType) => {
     let response;
+    const actionUrl = request.links?.actions[requestActionType];
+    const mappedData = isDeepEmpty(formValues) ? {} : formValues;
+
     if (requestActionType === REQUEST_TYPE.SAVE) {
-      response = await http.put(actionUrl);
+      response = await http.put(request.links?.self, mappedData);
     } else if (requestActionType === REQUEST_TYPE.ACCEPT) {
       response = await http.post(actionUrl);
     } else {
-      const mappedData = isDeepEmpty(formValues) ? {} : formValues;
       response = await http.post(actionUrl, mappedData);
     }
+
     const redirectionURL = getRedirectionUrlFromResponsePayload(response);
     if (redirectionURL && window.location.href !== redirectionURL) {
       window.location.href = redirectionURL;
     }
     return response.data;
-  };
-
+  });
   const doAction = async (requestActionType, waitForConfirmation = false) => {
-    const actionUrl = request.links.actions[requestActionType];
     if (waitForConfirmation) {
       confirmAction(
-        () =>
-          onSubmit(
-            async () => sendRequest(actionUrl, requestActionType),
-            undefined,
-            requestActionType
-          ),
+        () => sendRequest.mutate(requestActionType),
         requestActionType
       );
     } else {
-      onSubmit(
-        async () => sendRequest(actionUrl, requestActionType),
-        undefined,
-        requestActionType
-      );
+      sendRequest.mutate(requestActionType);
     }
   };
 
   return { doAction, doCreateAndSubmitAction };
+};
+
+const useAction = (action) => {
+  const { onBeforeAction, onAfterAction, onActionError, fetchNewRequests } =
+    useRequestContext();
+  const { closeModal } = useModalControlContext();
+
+  return useMutation(
+    async (requestActionType) => {
+      if (onBeforeAction) {
+        const shouldProceed = await onBeforeAction();
+
+        if (!shouldProceed) {
+          return;
+        }
+      }
+
+      return action(requestActionType);
+    },
+    {
+      onError: (e) => {
+        if (onActionError) {
+          onActionError(e);
+        }
+      },
+      onSuccess: (data) => {
+        if (onAfterAction) {
+          onAfterAction(data);
+        }
+        closeModal();
+        fetchNewRequests();
+      },
+    }
+  );
 };

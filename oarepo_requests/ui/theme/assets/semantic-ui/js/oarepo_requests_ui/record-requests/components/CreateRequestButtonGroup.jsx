@@ -31,7 +31,6 @@ export const CreateRequestButtonGroup = ({
           <Message.Header>
             {i18next.t("Error loading request types")}
           </Message.Header>
-          <p>{recordLoadingError?.message}</p>
         </Message>
       ) : !_isEmpty(createRequests) ? (
         createRequests.map((requestType) => {
