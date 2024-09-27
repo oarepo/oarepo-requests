@@ -19,6 +19,7 @@ from oarepo_requests.resources.ui import (
     OARepoRequestEventsUIJSONSerializer,
     OARepoRequestsUIJSONSerializer,
 )
+from oarepo_requests.services.oarepo.config import OARepoRequestsServiceConfig
 
 
 class RequestOwnerFilterParam(FilterParam):
@@ -71,6 +72,10 @@ def override_invenio_requests_config(blueprint, *args, **kwargs):
         RequestsResourceConfig.request_search_args = (
             ExtendedRequestSearchRequestArgsSchema
         )
+        # add extra links to the requests
+        for k, v in OARepoRequestsServiceConfig.links_item.items():
+            if k not in RequestsServiceConfig.links_item:
+                RequestsServiceConfig.links_item[k] = v
 
         class LazySerializer:
             def __init__(self, serializer_cls):
