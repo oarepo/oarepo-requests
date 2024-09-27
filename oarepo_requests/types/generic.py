@@ -20,7 +20,7 @@ class OARepoRequestType(RequestType):
         )
 
     @classmethod
-    def can_possibly_create(self, identity, topic, *args, **kwargs):
+    def is_applicable_to(cls, identity, topic, *args, **kwargs):
         """
         used for checking whether there is any situation where the client can create a request of this type
         it's different to just using can create with no receiver and data because that checks specifically
@@ -30,7 +30,7 @@ class OARepoRequestType(RequestType):
         """
         try:
             current_requests_service.require_permission(
-                identity, "create", record=topic, request_type=self, **kwargs
+                identity, "create", record=topic, request_type=cls, **kwargs
             )
         except PermissionDeniedError:
             return False
@@ -58,7 +58,7 @@ class NonDuplicableOARepoRequestType(OARepoRequestType):
         super().can_create(identity, data, receiver, topic, creator, *args, **kwargs)
 
     @classmethod
-    def can_possibly_create(self, identity, topic, *args, **kwargs):
-        if open_or_created_request_exists(topic, self.type_id):
+    def is_applicable_to(cls, identity, topic, *args, **kwargs):
+        if open_or_created_request_exists(topic, cls.type_id):
             return False
-        return super().can_possibly_create(identity, topic, *args, **kwargs)
+        return super().is_applicable_to(identity, topic, *args, **kwargs)

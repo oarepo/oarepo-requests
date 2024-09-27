@@ -39,10 +39,10 @@ class NewVersionRequestType(
     allowed_topic_ref_types = ModelRefTypes(published=True, draft=True)
 
     @classmethod
-    def can_possibly_create(self, identity, topic, *args, **kwargs):
+    def is_applicable_to(cls, identity, topic, *args, **kwargs):
         if topic.is_draft:
             return False
-        return super().can_possibly_create(identity, topic, *args, **kwargs)
+        return super().is_applicable_to(identity, topic, *args, **kwargs)
 
     def can_create(self, identity, data, receiver, topic, creator, *args, **kwargs):
         if topic.is_draft:
