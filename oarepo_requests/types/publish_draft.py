@@ -63,10 +63,10 @@ class PublishDraftRequestType(NonDuplicableOARepoRequestType):
         topic_service.validate_draft(system_identity, topic["id"])
 
     @classmethod
-    def can_possibly_create(self, identity, topic, *args, **kwargs):
+    def is_applicable_to(cls, identity, topic, *args, **kwargs):
         if not topic.is_draft:
             return False
-        super_ = super().can_possibly_create(identity, topic, *args, **kwargs)
+        super_ = super().is_applicable_to(identity, topic, *args, **kwargs)
         return super_
 
     def topic_change(self, request: Request, new_topic: Dict, uow):
