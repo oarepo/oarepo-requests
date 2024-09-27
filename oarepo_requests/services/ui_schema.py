@@ -1,3 +1,5 @@
+from types import SimpleNamespace
+
 import marshmallow as ma
 from invenio_pidstore.errors import PIDDeletedError
 from invenio_requests.proxies import current_request_type_registry, current_requests
@@ -16,7 +18,7 @@ from oarepo_requests.services.schema import (
     RequestTypeSchema,
     get_links_schema,
 )
-
+from invenio_requests.resolvers.registry import ResolverRegistry
 
 class UIReferenceSchema(ma.Schema):
     reference = ma.fields.Dict(validate=validate.Length(equal=1))
@@ -48,6 +50,9 @@ class UIRequestSchemaMixin:
     name = ma.fields.String()
     description = ma.fields.String()
 
+    stateful_name = ma.fields.String(dump_only=True)
+    stateful_description = ma.fields.String(dump_only=True)
+
     created_by = ma.fields.Nested(UIReferenceSchema)
     receiver = ma.fields.Nested(UIReferenceSchema)
     topic = ma.fields.Nested(UIReferenceSchema)
@@ -66,7 +71,35 @@ class UIRequestSchemaMixin:
             data["description"] = type_obj.description
         if hasattr(type_obj, "name"):
             data["name"] = type_obj.name
+
+        stateful_name, stateful_description = self._get_stateful_labels(type_obj, data)
+        data["stateful_name"] = stateful_name or data["name"]
+        data["stateful_description"] = stateful_description or data["description"]
+
         return data
+
+    def _get_stateful_labels(self, type_obj, data):
+        stateful_name = None
+        stateful_description = None
+        try:
+            topic = ResolverRegistry.resolve_entity(data["topic"], False)
+            if topic:
+                if hasattr(type_obj, "stateful_name"):
+                    stateful_name = type_obj.stateful_name(
+                        identity=self.context["identity"], topic=topic,
+                        # not very nice, but we need to pass the request object to the stateful_name function
+                        request=SimpleNamespace(**data)
+                    )
+                if hasattr(type_obj, "stateful_description"):
+                    stateful_description = type_obj.stateful_description(
+                        identity=self.context["identity"], topic=topic,
+                        # not very nice, but we need to pass the request object to the stateful_description function
+                        request=SimpleNamespace(**data)
+                    )
+        except PIDDeletedError:
+            pass
+
+        return stateful_name, stateful_description
 
     @ma.pre_dump
     def process_status(self, data, **kwargs):
@@ -84,6 +117,9 @@ class UIRequestTypeSchema(RequestTypeSchema):
     description = ma.fields.String()
     fast_approve = ma.fields.Boolean()
 
+    stateful_name = ma.fields.String(dump_only=True)
+    stateful_description = ma.fields.String(dump_only=True)
+
     @ma.post_dump
     def add_type_details(self, data, **kwargs):
         type = data["type_id"]
@@ -92,6 +128,14 @@ class UIRequestTypeSchema(RequestTypeSchema):
             data["description"] = type_obj.description
         if hasattr(type_obj, "name"):
             data["name"] = type_obj.name
+
+        if hasattr(type_obj, "stateful_name"):
+            data["stateful_name"] = type_obj.stateful_name(
+                identity=self.context["identity"], topic=self.context["topic"])
+        if hasattr(type_obj, "stateful_description"):
+            data["stateful_description"] = type_obj.stateful_description(
+                identity=self.context["identity"], topic=self.context["topic"]
+            )
         return data
 
 

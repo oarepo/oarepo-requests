@@ -1,4 +1,5 @@
 from typing import Dict
+from typing_extensions import override
 
 import marshmallow as ma
 from invenio_access.permissions import system_identity
@@ -15,6 +16,7 @@ from oarepo_requests.actions.publish_draft import (
 
 from .generic import NonDuplicableOARepoRequestType
 from .ref_types import ModelRefTypes
+from ..utils import is_auto_approved, request_identity_matches
 
 
 class PublishDraftRequestType(NonDuplicableOARepoRequestType):
@@ -72,3 +74,42 @@ class PublishDraftRequestType(NonDuplicableOARepoRequestType):
     def topic_change(self, request: Request, new_topic: Dict, uow):
         setattr(request, "topic", new_topic)
         uow.register(RecordCommitOp(request, indexer=current_requests_service.indexer))
+
+    @override
+    def stateful_name(self, identity, *, topic=None, request=None):
+        if is_auto_approved(self, identity=identity, topic=topic):
+            return _("Publish draft")
+        if not request:
+            return _("Submit for review")
+        match request.status:
+            case "submitted":
+                return _("Submitted for review")
+            case _:
+                return _("Submit for review")
+
+    @override
+    def stateful_description(self, identity, *, topic=None, request=None):
+        if is_auto_approved(self, identity=identity, topic=topic):
+            return _("Click to immediately publish the draft. "
+                     "The draft will be a subject to embargo as requested in the side panel. "
+                     "Note: The action is irreversible.")
+
+        if not request:
+            return _("By submitting the draft for review you are requesting the publication of the draft. "
+                     "The draft will become locked and no further changes will be possible until the request "
+                     "is accepted or declined. You will be notified about the decision by email.")
+        match request.status:
+            case "submitted":
+                if request_identity_matches(request.created_by, identity):
+                    return _("The draft has been submitted for review. "
+                         "It is now locked and no further changes are possible. "
+                         "You will be notified about the decision by email.")
+                if request_identity_matches(request.receiver, identity):
+                    return _("The draft has been submitted for review. "
+                             "You can now accept or decline the request.")
+                return _("The draft has been submitted for review.")
+            case _:
+                if request_identity_matches(request.created_by, identity):
+                    return _("Submit for review. After submitting the draft for review, "
+                             "it will be locked and no further modifications will be possible.")
+                return _("Request not yet submitted.")

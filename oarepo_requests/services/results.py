@@ -66,6 +66,9 @@ class RequestsComponent(ResultsComponent):
             requests = []
         projection["expanded"]["requests"] = requests
 
+class RequestTypesListDict(dict):
+    topic = None
+
 
 class RequestTypesList(RecordList):
     def __init__(self, *args, record=None, **kwargs):
@@ -86,15 +89,14 @@ class RequestTypesList(RecordList):
                 **{f"record_link_{k}": v for k, v in rendered_record_links.items()}
             },
         )
-        res = {
-            "hits": {
+        res = RequestTypesListDict(hits = {
                 "hits": hits,
                 "total": self.total,
             }
-        }
+        )
         if self._links_tpl:
             res["links"] = links_tpl.expand(self._identity, None)
-
+        res.topic = self._record
         return res
 
     @property

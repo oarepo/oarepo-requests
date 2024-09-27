@@ -6,13 +6,13 @@ from tests.test_requests.utils import link_api2testclient
 
 
 def test_allowed_request_types_on_draft_service(
-    vocab_cf,
-    logged_client,
-    users,
-    urls,
-    publish_request_data_function,
-    create_draft_via_resource,
-    search_clear,
+        vocab_cf,
+        logged_client,
+        users,
+        urls,
+        publish_request_data_function,
+        create_draft_via_resource,
+        search_clear,
 ):
     creator = users[0]
     receiver = users[1]
@@ -49,13 +49,13 @@ def test_allowed_request_types_on_draft_service(
 
 
 def test_allowed_request_types_on_draft_resource(
-    vocab_cf,
-    logged_client,
-    users,
-    urls,
-    publish_request_data_function,
-    create_draft_via_resource,
-    search_clear,
+        vocab_cf,
+        logged_client,
+        users,
+        urls,
+        publish_request_data_function,
+        create_draft_via_resource,
+        search_clear,
 ):
     creator = users[0]
     receiver = users[1]
@@ -66,8 +66,8 @@ def test_allowed_request_types_on_draft_resource(
 
     applicable_requests_link = draft1.json["links"]["applicable-requests"]
     assert (
-        applicable_requests_link
-        == f'https://127.0.0.1:5000/api/thesis/{draft1.json["id"]}/draft/requests/applicable'
+            applicable_requests_link
+            == f'https://127.0.0.1:5000/api/thesis/{draft1.json["id"]}/draft/requests/applicable'
     )
     allowed_request_types = creator_client.get(
         link_api2testclient(applicable_requests_link)
@@ -93,7 +93,7 @@ def test_allowed_request_types_on_draft_resource(
 
 
 def publish_record(
-    creator_client, urls, publish_request_data_function, draft1, receiver_client
+        creator_client, urls, publish_request_data_function, draft1, receiver_client
 ):
     resp_request_create = creator_client.post(
         urls["BASE_URL_REQUESTS"],
@@ -126,13 +126,13 @@ def publish_record(
 
 
 def test_allowed_request_types_on_published_resource(
-    vocab_cf,
-    logged_client,
-    users,
-    urls,
-    publish_request_data_function,
-    create_draft_via_resource,
-    search_clear,
+        vocab_cf,
+        logged_client,
+        users,
+        urls,
+        publish_request_data_function,
+        create_draft_via_resource,
+        search_clear,
 ):
     creator = users[0]
     receiver = users[1]
@@ -146,8 +146,8 @@ def test_allowed_request_types_on_published_resource(
 
     applicable_requests_link = published1["links"]["applicable-requests"]
     assert (
-        applicable_requests_link
-        == f'https://127.0.0.1:5000/api/thesis/{published1["id"]}/requests/applicable'
+            applicable_requests_link
+            == f'https://127.0.0.1:5000/api/thesis/{published1["id"]}/requests/applicable'
     )
     allowed_request_types = creator_client.get(
         link_api2testclient(applicable_requests_link)
@@ -155,42 +155,42 @@ def test_allowed_request_types_on_published_resource(
     assert sorted(
         allowed_request_types.json["hits"]["hits"], key=lambda x: x["type_id"]
     ) == [
-        {
-            "links": {
-                "actions": {
-                    "create": f'https://127.0.0.1:5000/api/thesis/{published1["id"]}/requests/delete_published_record'
-                }
-            },
-            "type_id": "delete_published_record",
-        },
-        {
-            "links": {
-                "actions": {
-                    "create": f'https://127.0.0.1:5000/api/thesis/{published1["id"]}/requests/edit_published_record'
-                }
-            },
-            "type_id": "edit_published_record",
-        },
-        {
-            "links": {
-                "actions": {
-                    "create": f'https://127.0.0.1:5000/api/thesis/{published1["id"]}/requests/new_version'
-                }
-            },
-            "type_id": "new_version",
-        },
-    ]
+               {
+                   "links": {
+                       "actions": {
+                           "create": f'https://127.0.0.1:5000/api/thesis/{published1["id"]}/requests/delete_published_record'
+                       }
+                   },
+                   "type_id": "delete_published_record",
+               },
+               {
+                   "links": {
+                       "actions": {
+                           "create": f'https://127.0.0.1:5000/api/thesis/{published1["id"]}/requests/edit_published_record'
+                       }
+                   },
+                   "type_id": "edit_published_record",
+               },
+               {
+                   "links": {
+                       "actions": {
+                           "create": f'https://127.0.0.1:5000/api/thesis/{published1["id"]}/requests/new_version'
+                       }
+                   },
+                   "type_id": "new_version",
+               },
+           ]
 
 
 def test_ui_serialization(
-    vocab_cf,
-    logged_client,
-    users,
-    urls,
-    publish_request_data_function,
-    create_draft_via_resource,
-    record_factory,
-    search_clear,
+        vocab_cf,
+        logged_client,
+        users,
+        urls,
+        publish_request_data_function,
+        create_draft_via_resource,
+        record_factory,
+        search_clear,
 ):
     creator = users[0]
     receiver = users[1]
@@ -233,6 +233,12 @@ def test_ui_serialization(
             },
             "name": "Publish draft",
             "type_id": "publish_draft",
+            'stateful_description': 'By submitting the draft for review you are '
+                                    'requesting the publication of the draft. The draft '
+                                    'will become locked and no further changes will be '
+                                    'possible until the request is accepted or declined. '
+                                    'You will be notified about the decision by email.',
+            'stateful_name': 'Submit for review',
         }
     ]
     sorted_published_list = allowed_request_types_published.json["hits"]["hits"]
@@ -247,6 +253,8 @@ def test_ui_serialization(
             },
             "description": "Request deletion of published record",
             "name": "Delete record",
+            'stateful_description': 'Request permission to delete the record.',
+            'stateful_name': 'Request record deletion',
         },
         {
             "type_id": "edit_published_record",
@@ -257,6 +265,8 @@ def test_ui_serialization(
             },
             "description": "Request re-opening of published record",
             "name": "Edit record",
+            'stateful_description': 'Click to start editing the metadata of the record.',
+            'stateful_name': 'Edit record',
         },
         {
             "type_id": "new_version",
@@ -267,5 +277,8 @@ def test_ui_serialization(
             },
             "description": "Request requesting creation of new version of a published record.",
             "name": "New Version",
+            'stateful_description': 'Click to start creating a new version of the '
+            'record.',
+            'stateful_name': 'New Version',
         },
     ]

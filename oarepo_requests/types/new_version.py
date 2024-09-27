@@ -1,4 +1,5 @@
 from typing import Dict
+from typing_extensions import override
 
 import marshmallow as ma
 from invenio_records_resources.services.uow import RecordCommitOp
@@ -9,6 +10,7 @@ from oarepo_runtime.i18n import lazy_gettext as _
 from ..actions.new_version import NewVersionAcceptAction
 from .generic import NonDuplicableOARepoRequestType
 from .ref_types import ModelRefTypes
+from ..utils import is_auto_approved, request_identity_matches
 
 
 class NewVersionRequestType(
@@ -54,3 +56,36 @@ class NewVersionRequestType(
     def topic_change(self, request: Request, new_topic: Dict, uow):
         setattr(request, "topic", new_topic)
         uow.register(RecordCommitOp(request, indexer=current_requests_service.indexer))
+
+    @override
+    def stateful_name(self, identity, *, topic=None, request=None):
+        if is_auto_approved(self, identity=identity, topic=topic):
+            return self.name
+        if not request:
+            return _("Request new version access")
+        match request.status:
+            case "submitted":
+                return _("New version access requested")
+            case _:
+                return _("Request new version access")
+
+    @override
+    def stateful_description(self, identity, *, topic=None, request=None):
+        if is_auto_approved(self, identity=identity, topic=topic):
+            return _("Click to start creating a new version of the record.")
+
+        if not request:
+            return _("Request permission to update record (including files). "
+                     "You will be notified about the decision by email.")
+        match request.status:
+            case "submitted":
+                if request_identity_matches(request.created_by, identity):
+                    return _("Permission to update record (including files) requested. "
+                             "You will be notified about the decision by email.")
+                if request_identity_matches(request.receiver, identity):
+                    return _("You have been asked to approve the request to update the record. "
+                             "You can approve or reject the request.")
+                return _("Permission to update record (including files) requested. ")
+            case _:
+                if request_identity_matches(request.created_by, identity):
+                    return _("Submit request to get edit access to the record.")

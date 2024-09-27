@@ -112,3 +112,17 @@ class OARepoRequestTypesUIJSONSerializer(LocalizedUIJSONSerializer):
             list_schema_cls=BaseListSchema,
             schema_context={"object_key": "ui", "identity": g.identity},
         )
+
+    def dump_obj(self, obj, *args, **kwargs):
+        if hasattr(obj, 'topic'):
+            extra_context = {
+                "topic": obj.topic
+            }
+        else:
+            extra_context = {}
+        return super().dump_obj(obj, *args, extra_context=extra_context, **kwargs)
+
+    def dump_list(self, obj_list, *args, **kwargs):
+        return super().dump_list(obj_list, *args, extra_context={
+            'topic': getattr(obj_list, 'topic', None)
+        }, **kwargs)

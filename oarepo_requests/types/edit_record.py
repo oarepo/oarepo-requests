@@ -11,6 +11,10 @@ from oarepo_requests.actions.edit_topic import EditTopicAcceptAction
 from .generic import NonDuplicableOARepoRequestType
 from .ref_types import ModelRefTypes
 
+from typing_extensions import override
+
+from ..utils import is_auto_approved, request_identity_matches
+
 
 class EditPublishedRecordRequestType(NonDuplicableOARepoRequestType):
     type_id = "edit_published_record"
@@ -54,3 +58,35 @@ class EditPublishedRecordRequestType(NonDuplicableOARepoRequestType):
     def topic_change(self, request: Request, new_topic: Dict, uow):
         setattr(request, "topic", new_topic)
         uow.register(RecordCommitOp(request, indexer=current_requests_service.indexer))
+
+    @override
+    def stateful_name(self, identity, *, topic=None, request=None):
+        if is_auto_approved(self, identity=identity, topic=topic):
+            return self.name
+        if not request:
+            return _("Request edit access")
+        match request.status:
+            case "submitted":
+                return _("Edit access requested")
+            case _:
+                return _("Request edit access")
+
+    @override
+    def stateful_description(self, identity, *, topic=None, request=None):
+        if is_auto_approved(self, identity=identity, topic=topic):
+            return _("Click to start editing the metadata of the record.")
+
+        if not request:
+            return _("Request edit access to the record. "
+                     "You will be notified about the decision by email.")
+        match request.status:
+            case "submitted":
+                if request_identity_matches(request.created_by, identity):
+                    return _("Edit access requested. You will be notified about "
+                             "the decision by email.")
+                if request_identity_matches(request.receiver, identity):
+                    return _("You have been requested to grant edit access to the record.")
+                return _("Edit access requested.")
+            case _:
+                return _("Request edit access to the record. "
+                         "You will be notified about the decision by email.")

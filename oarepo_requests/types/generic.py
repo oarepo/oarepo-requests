@@ -14,6 +14,8 @@ from .ref_types import ModelRefTypes, ReceiverRefTypes
 
 
 class OARepoRequestType(RequestType):
+    description = None
+
     def can_create(self, identity, data, receiver, topic, creator, *args, **kwargs):
         current_requests_service.require_permission(
             identity, "create", record=topic, request_type=self, **kwargs
@@ -48,6 +50,24 @@ class OARepoRequestType(RequestType):
             "accept": OARepoAcceptAction,
             "decline": OARepoDeclineAction,
         }
+
+    def stateful_name(self, identity, request):
+        """
+        Returns the name of the request that reflects its current state.
+
+        :param identity:        identity of the caller
+        :param request:         the request
+        """
+        return self.name
+
+    def stateful_description(self, identity, request):
+        """
+        Returns the description of the request that reflects its current state.
+
+        :param identity:        identity of the caller
+        :param request:         the request
+        """
+        return self.description
 
 
 # can be simulated by switching state to a one which does not allow create
