@@ -1,4 +1,5 @@
 import copy
+from pprint import pprint
 
 from deepdiff import DeepDiff
 from thesis.records.api import ThesisDraft, ThesisRecord
@@ -30,6 +31,7 @@ def test_publish(
         json=publish_request_data_function(draft1.json["id"]),
         headers={"Accept": "application/vnd.inveniordm.v1+json"},
     )
+    pprint(resp_request_create.json)
     assert resp_request_create.json["stateful_name"] == "Submit for review"
     assert resp_request_create.json["stateful_description"] == (
         "Submit for review. After submitting the draft for review, "
@@ -40,6 +42,7 @@ def test_publish(
         link_api2testclient(resp_request_create.json["links"]["actions"]["submit"]),
         headers={"Accept": "application/vnd.inveniordm.v1+json"},
     )
+    pprint(resp_request_submit.json)
     assert resp_request_submit.json["stateful_name"] == "Submitted for review"
     assert (
         resp_request_submit.json["stateful_description"]
