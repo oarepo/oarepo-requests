@@ -1,10 +1,9 @@
 import React, { useState, useCallback } from "react";
-
 import { i18next } from "@translations/oarepo_requests_ui/i18next";
 import { Button } from "semantic-ui-react";
 import { useFormikContext } from "formik";
 import { useMutation } from "@tanstack/react-query";
-import { isDeepEmpty } from "../utils";
+import { serializeCustomFields } from "../utils";
 import {
   useConfirmModalContext,
   useRequestContext,
@@ -116,14 +115,16 @@ export const useConfirmDialog = (isEventModal = false) => {
 export const useRequestsApi = (request) => {
   const { values: formValues, resetForm } = useFormikContext();
   const { confirmAction } = useConfirmModalContext();
+  const mappedData = serializeCustomFields(formValues);
+
   const createAndSubmitRequest = useAction(async () => {
     const createdRequest = await http.post(
       request.links?.actions?.create,
-      formValues
+      mappedData
     );
     const submittedRequest = await http.post(
       createdRequest.data?.links?.actions?.submit,
-      formValues
+      mappedData
     );
     const redirectionURL =
       getRedirectionUrlFromResponsePayload(submittedRequest);
@@ -144,8 +145,8 @@ export const useRequestsApi = (request) => {
   const sendRequest = useAction(async (requestActionType) => {
     let response;
     const actionUrl = request.links?.actions[requestActionType];
-    const mappedData = isDeepEmpty(formValues) ? {} : formValues;
-
+    const mappedData = serializeCustomFields(formValues);
+    console.log(mappedData);
     if (requestActionType === REQUEST_TYPE.SAVE) {
       response = await http.put(request.links?.self, mappedData);
     } else if (requestActionType === REQUEST_TYPE.ACCEPT) {
@@ -177,32 +178,60 @@ export const useRequestsApi = (request) => {
 const useAction = (action) => {
   const { onBeforeAction, onAfterAction, onActionError, fetchNewRequests } =
     useRequestContext();
-  const { closeModal } = useModalControlContext();
-
+  const modalControl = useModalControlContext();
+  const { closeModal } = modalControl;
+  const formik = useFormikContext();
+  const { setFieldError, setSubmitting } = formik;
   return useMutation(
     async (requestActionType) => {
       if (onBeforeAction) {
-        const shouldProceed = await onBeforeAction();
-
+        const shouldProceed = await onBeforeAction(formik, modalControl);
         if (!shouldProceed) {
+          closeModal();
           return;
         }
       }
-
       return action(requestActionType);
     },
     {
-      onError: (e) => {
+      onError: (e, variables) => {
         if (onActionError) {
-          onActionError(e);
+          onActionError(e, variables, formik, modalControl);
+        } else {
+          if (e?.response?.data?.errors) {
+            setFieldError(
+              "api",
+              i18next.t(
+                "The request could not be created due to validation errors. Please correct the errors and try again."
+              )
+            );
+            setTimeout(() => {
+              closeModal();
+            }, 2500);
+          } else {
+            setFieldError(
+              "api",
+              i18next.t(
+                "The action could not be executed. Please try again in a moment."
+              )
+            );
+            setTimeout(() => {
+              closeModal();
+            }, 2500);
+          }
         }
+        setSubmitting(false);
       },
-      onSuccess: (data) => {
+      onSuccess: (data, variables) => {
         if (onAfterAction) {
-          onAfterAction(data);
+          onAfterAction(data, variables, formik, modalControl);
         }
         closeModal();
         fetchNewRequests();
+        setSubmitting(false);
+      },
+      onMutate: () => {
+        setSubmitting(true);
       },
     }
   );

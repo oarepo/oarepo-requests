@@ -2,18 +2,27 @@ import React, { useState } from "react";
 import PropTypes from "prop-types";
 
 import { i18next } from "@translations/oarepo_requests_ui/i18next";
-import { Dimmer, Loader, Modal, Button, Icon, Message, FormField } from "semantic-ui-react";
 import {
-  RichEditor,
-  FieldLabel,
-  RichInputField,
-} from "react-invenio-forms";
+  Dimmer,
+  Loader,
+  Modal,
+  Button,
+  Icon,
+  Message,
+  FormField,
+} from "semantic-ui-react";
+import { RichEditor, FieldLabel, RichInputField } from "react-invenio-forms";
 import { Formik, Form } from "formik";
-
-import { sanitizeInput } from "@js/oarepo_ui";
-
+// TODO: until we figure out a way to globally use sanitization with our hook
+import sanitizeHtml from "sanitize-html";
 /** @param {{ request: import("../types").Request, requestModalHeader: string, handleSubmit: (v) => Promise, triggerButton: ReactElement, submitButton: ReactElement }} props */
-export const ConfirmModal = ({ request, requestModalHeader, handleSubmit, triggerButton, submitButton }) => {
+export const ConfirmModal = ({
+  request,
+  requestModalHeader,
+  handleSubmit,
+  triggerButton,
+  submitButton,
+}) => {
   const [modalOpen, setModalOpen] = useState(false);
   const [error, setError] = useState(null);
 
@@ -48,12 +57,12 @@ export const ConfirmModal = ({ request, requestModalHeader, handleSubmit, trigge
       role="dialog"
       aria-labelledby="request-modal-header"
     >
-      <Formik 
-        initialValues={{ 
-          payload: { 
+      <Formik
+        initialValues={{
+          payload: {
             content: "",
-            format: "html"
-          }
+            format: "html",
+          },
         }}
         onSubmit={onSubmit}
       >
@@ -62,11 +71,15 @@ export const ConfirmModal = ({ request, requestModalHeader, handleSubmit, trigge
             <Dimmer active={isSubmitting}>
               <Loader inverted size="large" />
             </Dimmer>
-            <Modal.Header as="h2" id="request-modal-header">{requestModalHeader ?? request?.type}</Modal.Header>
+            <Modal.Header as="h2" id="request-modal-header">
+              {requestModalHeader ?? request?.type}
+            </Modal.Header>
             <Modal.Content>
               {error && (
                 <Message error>
-                  <Message.Header>{i18next.t("Error while submitting comment.")}</Message.Header>
+                  <Message.Header>
+                    {i18next.t("Error while submitting comment.")}
+                  </Message.Header>
                   <p>{error?.message}</p>
                 </Message>
               )}
@@ -75,16 +88,24 @@ export const ConfirmModal = ({ request, requestModalHeader, handleSubmit, trigge
                   <RichInputField
                     fieldPath="payload.content"
                     label={
-                      <FieldLabel htmlFor="payload.content" label={`${i18next.t("Add comment")} (${i18next.t("optional")})`} className="rel-mb-25" />
+                      <FieldLabel
+                        htmlFor="payload.content"
+                        label={`${i18next.t("Add comment")} (${i18next.t(
+                          "optional"
+                        )})`}
+                        className="rel-mb-25"
+                      />
                     }
                     optimized="true"
-                    placeholder={i18next.t('Your comment here...')}
+                    placeholder={i18next.t("Your comment here...")}
                     editor={
                       <RichEditor
                         value={values.payload.content}
                         optimized
                         onBlur={(event, editor) => {
-                          const cleanedContent = sanitizeInput(editor.getContent());
+                          const cleanedContent = sanitizeHtml(
+                            editor.getContent()
+                          );
                           setFieldValue("payload.content", cleanedContent);
                           setFieldTouched("payload.content", true);
                         }}
@@ -95,7 +116,13 @@ export const ConfirmModal = ({ request, requestModalHeader, handleSubmit, trigge
               </Form>
             </Modal.Content>
             <Modal.Actions>
-              <Button onClick={onClose} icon compact labelPosition="left" floated="left">
+              <Button
+                onClick={onClose}
+                icon
+                compact
+                labelPosition="left"
+                floated="left"
+              >
                 <Icon name="cancel" />
                 {i18next.t("Cancel")}
               </Button>

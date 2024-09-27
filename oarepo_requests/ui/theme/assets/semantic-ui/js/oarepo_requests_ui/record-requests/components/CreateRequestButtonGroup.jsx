@@ -1,59 +1,84 @@
 import React from "react";
 import { i18next } from "@translations/oarepo_requests_ui/i18next";
-import { Button, Placeholder, Message, Icon } from "semantic-ui-react";
+import { Button, Placeholder, Message } from "semantic-ui-react";
 import _isEmpty from "lodash/isEmpty";
 import { RequestModal, CreateRequestModalContent } from ".";
 import { useRequestContext } from "../contexts";
+import PropTypes from "prop-types";
 
 /**
- * @param {{  recordLoading: boolean, recordLoadingError: Error }} props
+ * @param {{  applicableRequestsLoading: boolean, applicableRequestsLoadingError: Error }} props
  */
 export const CreateRequestButtonGroup = ({
-  recordLoading,
-  recordLoadingError,
+  applicableRequestsLoading,
+  applicableRequestsLoadingError,
 }) => {
-  const { requestTypes } = useRequestContext();
-  const createRequests = requestTypes.filter(
+  const { requestTypes, requestButtonsIconsConfig } = useRequestContext();
+  const createRequests = requestTypes?.filter(
     (requestType) => requestType.links.actions?.create
   );
-  return (
-    <div className="requests-create-request-buttons borderless">
-      {recordLoading ? (
+
+  if (applicableRequestsLoading) {
+    return (
+      <div className="requests-create-request-buttons borderless">
         <Placeholder>
-          {Array.from({ length: createRequests.length }).map((_, index) => (
+          {Array.from({ length: 2 }).map((_, index) => (
             <Placeholder.Paragraph key={index}>
-              <Icon name="plus" disabled />
+              <Placeholder.Line length="full" />
+              <Placeholder.Line length="medium" />
             </Placeholder.Paragraph>
           ))}
         </Placeholder>
-      ) : recordLoadingError ? (
+      </div>
+    );
+  }
+
+  if (applicableRequestsLoadingError) {
+    return (
+      <div className="requests-create-request-buttons borderless">
         <Message negative>
           <Message.Header>
             {i18next.t("Error loading request types")}
           </Message.Header>
         </Message>
-      ) : !_isEmpty(createRequests) ? (
-        createRequests.map((requestType) => {
-          const header = requestType?.name || requestType?.type_id;
-          return (
-            <RequestModal
-              key={requestType.type_id}
-              requestType={requestType}
-              header={header}
-              requestCreationModal
-              trigger={
-                <Button
-                  className={`block request-create-button ${requestType?.type_id} mb-10`}
-                  fluid
-                  title={i18next.t(requestType.name)}
-                  content={requestType.name}
-                />
-              }
-              ContentComponent={CreateRequestModalContent}
-            />
-          );
-        })
-      ) : null}
+      </div>
+    );
+  }
+
+  if (_isEmpty(createRequests)) {
+    return null;
+  }
+
+  return (
+    <div className="requests-create-request-buttons borderless">
+      {createRequests.map((requestType) => {
+        const header = requestType?.name || requestType?.type_id;
+        const buttonIconProps = requestButtonsIconsConfig[requestType.type_id];
+        return (
+          <RequestModal
+            key={requestType.type_id}
+            requestType={requestType}
+            header={header}
+            requestCreationModal
+            trigger={
+              <Button
+                // applicable requests don't have a status
+                className={`request-create-button ${requestType?.type_id}`}
+                fluid
+                title={i18next.t(requestType.name)}
+                content={i18next.t(requestType.name)}
+                {...buttonIconProps}
+              />
+            }
+            ContentComponent={CreateRequestModalContent}
+          />
+        );
+      })}
     </div>
   );
+};
+
+CreateRequestButtonGroup.propTypes = {
+  applicableRequestsLoading: PropTypes.bool,
+  applicableRequestsLoadingError: PropTypes.object,
 };

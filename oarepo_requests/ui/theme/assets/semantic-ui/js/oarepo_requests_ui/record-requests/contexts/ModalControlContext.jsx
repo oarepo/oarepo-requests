@@ -17,5 +17,11 @@ ModalControlContextProvider.propTypes = {
 };
 
 export const useModalControlContext = () => {
-  return useContext(ModalControlContext);
+  const context = useContext(ModalControlContext);
+  if (!context) {
+    throw new Error(
+      "useModalControlContext must be used inside ModalControlContext.Provider"
+    );
+  }
+  return context;
 };

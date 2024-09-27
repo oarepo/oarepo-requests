@@ -12,7 +12,6 @@ import {
 } from "semantic-ui-react";
 import { useFormik, FormikProvider, useFormikContext } from "formik";
 import _isEmpty from "lodash/isEmpty";
-import { mapPayloadUiToInitialValues } from "../utils";
 import {
   ConfirmModalContextProvider,
   ModalControlContextProvider,
@@ -43,15 +42,11 @@ export const RequestModal = ({
   const { isOpen, close: closeModal, open: openModal } = useConfirmationModal();
 
   const formik = useFormik({
-    initialValues:
-      request && !_isEmpty(request?.payload)
-        ? { payload: request.payload }
-        : requestType?.payload_ui
-        ? mapPayloadUiToInitialValues(customFields)
-        : {},
-    onSubmit: () => {}, // We'll redefine with customSubmitHandler
+    initialValues: !_isEmpty(request?.payload)
+      ? { payload: request.payload }
+      : { payload: {} },
   });
-  const { isSubmitting, resetForm, setErrors, setSubmitting } = formik;
+  const { isSubmitting, resetForm, setErrors } = formik;
 
   const onClose = () => {
     closeModal();
@@ -74,7 +69,7 @@ export const RequestModal = ({
               <Modal
                 className="requests-request-modal"
                 as={Dimmer.Dimmable}
-                blurringerror
+                blurring
                 onClose={onClose}
                 onOpen={openModal}
                 open={isOpen}
@@ -139,6 +134,8 @@ const RequestModalContentAndActions = ({
       http.get(`/requests/configs/${requestType?.type_id || request?.type}`),
     {
       enabled: !!(requestType?.type_id || request?.type),
+      refetchOnWindowFocus: false,
+      staleTime: Infinity,
     }
   );
   const customFields = data?.data?.custom_fields;
@@ -155,8 +152,6 @@ const RequestModalContentAndActions = ({
   )
     ? REQUEST_MODAL_TYPE.READ_ONLY
     : REQUEST_MODAL_TYPE.SUBMIT_FORM;
-  console.log(data);
-  console.log(customFields);
   return (
     <React.Fragment>
       <Dimmer active={isLoading}>
@@ -171,7 +166,7 @@ const RequestModalContentAndActions = ({
         {customFieldsLoadingError && (
           <Message negative>
             <Message.Header>
-              {i18next.t("Custom fields could not be fetched.")}
+              {i18next.t("Form fields could not be fetched.")}
             </Message.Header>
           </Message>
         )}

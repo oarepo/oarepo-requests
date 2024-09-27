@@ -1,15 +1,25 @@
 import React, { createContext, useContext } from "react";
+import PropTypes from "prop-types";
 
 const RequestContext = createContext();
 
-export const RequestContextProvider = ({ children, requests }) => {
+export const RequestContextProvider = ({ children, value }) => {
   return (
-    <RequestContext.Provider value={requests}>
-      {children}
-    </RequestContext.Provider>
+    <RequestContext.Provider value={value}>{children}</RequestContext.Provider>
   );
 };
 
+RequestContextProvider.propTypes = {
+  value: PropTypes.object,
+  children: PropTypes.node,
+};
+
 export const useRequestContext = () => {
-  return useContext(RequestContext);
-}
+  const context = useContext(RequestContext);
+  if (!context) {
+    throw new Error(
+      "useModalControlContext must be used inside RequestContext.Provider"
+    );
+  }
+  return context;
+};

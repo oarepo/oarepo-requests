@@ -5,17 +5,14 @@ import { i18next } from "@translations/oarepo_requests_ui/i18next";
 import { Button, Grid, List, Form, Divider, Comment } from "semantic-ui-react";
 import _isEmpty from "lodash/isEmpty";
 import _sortBy from "lodash/sortBy";
-import { useFormikContext } from "formik";
 import { CustomFields } from "react-invenio-forms";
-import { SideRequestInfo } from "@js/oarepo_requests_detail/components/SideRequestInfo";
-
 import {
-  CreateRequestModalContent,
-  ModalContentSideInfo,
-  RequestModal,
-} from ".";
+  SideRequestInfo,
+  Timeline,
+} from "@js/oarepo_requests_detail/components";
+
+import { CreateRequestModalContent, RequestModal } from ".";
 import { SubmitEvent } from "./actions";
-import { useRequestsApi } from "../utils/hooks";
 import { useRequestContext } from "../contexts";
 import { fetchUpdated as fetchNewEvents } from "../utils";
 import { REQUEST_TYPE, REQUEST_MODAL_TYPE } from "../utils/objects";
@@ -23,24 +20,18 @@ import ReadOnlyCustomFields from "./common/ReadOnlyCustomFields";
 
 /**
  * @typedef {import("../types").Request} Request
- * @typedef {import("../types").RequestType} RequestType
  * @typedef {import("../types").RequestTypeEnum} RequestTypeEnum
  * @typedef {import("../types").Event} Event
  */
 
-/** @param {{ request: Request, requestModalType: RequestTypeEnum, requestType: RequestType, onCompletedAction: (e) => void }} props */
+/** @param {{ request: Request, requestModalType: RequestTypeEnum, }} props */
 export const RequestModalContent = ({
   request,
-  requestType,
   requestModalType,
-  onCompletedAction,
   customFields,
 }) => {
   /** @type {{requests: Request[], setRequests: (requests: Request[]) => void}} */
   const { requests, setRequests } = useRequestContext();
-  const { doAction } = useRequestsApi(request, onCompletedAction);
-  const { submitForm, setErrors, setSubmitting } = useFormikContext();
-
   const actualRequest = requests.find((req) => req.id === request.id);
   useEffect(() => {
     if (!_isEmpty(request.links?.events)) {
@@ -64,19 +55,8 @@ export const RequestModalContent = ({
   }, [setRequests, request.links?.events, request.id]);
 
   // This function can only be triggered if submit form is rendered
-  const onFormSubmit = async (event) => {
-    event.preventDefault();
-    try {
-      await submitForm();
-      doAction(REQUEST_TYPE.SUBMIT, true);
-    } catch (error) {
-      setErrors({ api: error });
-    } finally {
-      setSubmitting(false);
-    }
-  };
 
-  const eventTypes = requestType?.event_types;
+  const eventTypes = request?.event_types;
   /** @type {Event[]} */
   let events = [];
   if (!_isEmpty(request?.events)) {
@@ -87,8 +67,6 @@ export const RequestModalContent = ({
 
   const renderSubmitForm =
     requestModalType === REQUEST_MODAL_TYPE.SUBMIT_FORM && customFields?.ui;
-  console.log(requestModalType);
-  console.log(renderSubmitForm);
   const renderReadOnlyData =
     requestModalType === REQUEST_MODAL_TYPE.READ_ONLY && request?.payload;
   return (
@@ -107,7 +85,7 @@ export const RequestModalContent = ({
         <Grid.Row>
           <Grid.Column width={16}>
             {renderSubmitForm && (
-              <Form onSubmit={onFormSubmit} id="request-form">
+              <Form>
                 <CustomFields
                   className="requests-form-cf"
                   config={customFields?.ui}
@@ -142,7 +120,6 @@ export const RequestModalContent = ({
                     </List.Item>
                   ))}
                 </List>
-
                 {!_isEmpty(eventTypes) && (
                   <>
                     <Divider horizontal>{i18next.t("Timeline")}</Divider>
@@ -217,6 +194,7 @@ export const RequestModalContent = ({
                 )}
               </>
             )}
+            <Timeline request={request} />
           </Grid.Column>
         </Grid.Row>
       )}
@@ -226,8 +204,6 @@ export const RequestModalContent = ({
 
 RequestModalContent.propTypes = {
   request: PropTypes.object.isRequired,
-  requestType: PropTypes.object,
   requestModalType: PropTypes.string.isRequired,
-  onCompletedAction: PropTypes.func,
   customFields: PropTypes.object,
 };
