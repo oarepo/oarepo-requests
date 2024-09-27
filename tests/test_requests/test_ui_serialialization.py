@@ -30,17 +30,21 @@ def test_publish(
         json=publish_request_data_function(draft1.json["id"]),
         headers={"Accept": "application/vnd.inveniordm.v1+json"},
     )
-    assert resp_request_create.json["stateful_name"] == 'Submit for review'
+    assert resp_request_create.json["stateful_name"] == "Submit for review"
     assert resp_request_create.json["stateful_description"] == (
-        'Submit for review. After submitting the draft for review, '
-        'it will be locked and no further modifications will be possible.')
+        "Submit for review. After submitting the draft for review, "
+        "it will be locked and no further modifications will be possible."
+    )
 
     resp_request_submit = creator_client.post(
         link_api2testclient(resp_request_create.json["links"]["actions"]["submit"]),
         headers={"Accept": "application/vnd.inveniordm.v1+json"},
     )
     assert resp_request_submit.json["stateful_name"] == "Submitted for review"
-    assert resp_request_submit.json["stateful_description"] == "The draft has been submitted for review. It is now locked and no further changes are possible. You will be notified about the decision by email."
+    assert (
+        resp_request_submit.json["stateful_description"]
+        == "The draft has been submitted for review. It is now locked and no further changes are possible. You will be notified about the decision by email."
+    )
 
     record = creator_client.get(f"{urls['BASE_URL']}{draft_id}/draft").json
     ui_record = creator_client.get(
@@ -84,14 +88,20 @@ def test_resolver_fallback(
         headers={"Accept": "application/vnd.inveniordm.v1+json"},
     )
     assert resp_request_create.json["stateful_name"] == "Submit for review"
-    assert resp_request_create.json["stateful_description"] == "Submit for review. After submitting the draft for review, it will be locked and no further modifications will be possible."
+    assert (
+        resp_request_create.json["stateful_description"]
+        == "Submit for review. After submitting the draft for review, it will be locked and no further modifications will be possible."
+    )
 
     resp_request_submit = creator_client.post(
         link_api2testclient(resp_request_create.json["links"]["actions"]["submit"]),
         headers={"Accept": "application/vnd.inveniordm.v1+json"},
     )
     assert resp_request_submit.json["stateful_name"] == "Submitted for review"
-    assert resp_request_submit.json["stateful_description"] == "The draft has been submitted for review. It is now locked and no further changes are possible. You will be notified about the decision by email."
+    assert (
+        resp_request_submit.json["stateful_description"]
+        == "The draft has been submitted for review. It is now locked and no further changes are possible. You will be notified about the decision by email."
+    )
 
     ui_record = creator_client.get(
         f"{urls['BASE_URL']}{draft_id}/draft?expand=true",
@@ -146,7 +156,10 @@ def test_role(
             headers={"Accept": "application/vnd.inveniordm.v1+json"},
         )
         assert resp_request_create.json["stateful_name"] == "Submit for review"
-        assert resp_request_create.json["stateful_description"] == "Submit for review. After submitting the draft for review, it will be locked and no further modifications will be possible."
+        assert (
+            resp_request_create.json["stateful_description"]
+            == "Submit for review. After submitting the draft for review, it will be locked and no further modifications will be possible."
+        )
 
         ui_record = creator_client.get(
             f"{urls['BASE_URL']}{draft_id}/draft?expand=true",

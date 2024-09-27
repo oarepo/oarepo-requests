@@ -6,14 +6,20 @@ from oarepo_requests.types.events.topic_update import TopicUpdateEventType
 
 try:
     import oarepo_workflows  # noqa
+    from oarepo_workflows.requests.events import WorkflowEvent
 
     from oarepo_requests.actions.components import WorkflowTransitionComponent
-    from oarepo_workflows.requests.events import WorkflowEvent
 
     workflow_action_components = [WorkflowTransitionComponent]
 except ImportError:
     workflow_action_components = []
     WorkflowEvent = None
+
+import invenio_requests.config
+from invenio_requests.customizations import CommentEventType, LogEventType
+from invenio_requests.services.permissions import (
+    PermissionPolicy as InvenioRequestsPermissionPolicy,
+)
 
 from oarepo_requests.resolvers.ui import (
     FallbackEntityReferenceUIResolver,
@@ -25,12 +31,6 @@ from oarepo_requests.types import (
     EditPublishedRecordRequestType,
     PublishDraftRequestType,
 )
-from invenio_requests.customizations import CommentEventType, LogEventType
-import invenio_requests.config
-from invenio_requests.services.permissions import (
-    PermissionPolicy as InvenioRequestsPermissionPolicy,
-)
-
 
 REQUESTS_REGISTERED_TYPES = [
     DeletePublishedRecordRequestType(),

@@ -1,11 +1,14 @@
 from invenio_access.permissions import system_identity
-from invenio_requests.proxies import current_request_type_registry, current_requests_service
+from invenio_records_resources.proxies import current_service_registry
+from invenio_requests.proxies import (
+    current_request_type_registry,
+    current_requests_service,
+)
 from invenio_requests.resolvers.registry import ResolverRegistry
 from invenio_search.engine import dsl
-from invenio_records_resources.proxies import current_service_registry
 
 try:
-    from oarepo_workflows import Workflow, WorkflowRequest, AutoApprove
+    from oarepo_workflows import AutoApprove, Workflow, WorkflowRequest
     from oarepo_workflows.errors import MissingWorkflowError
     from oarepo_workflows.proxies import current_oarepo_workflows
 except ImportError:
@@ -158,7 +161,9 @@ def get_receiver_for_request_type(request_type, identity, topic):
     except KeyError:
         return None
 
-    receivers = workflow_request.reference_receivers(identity=identity, topic=topic, request_type=request_type)
+    receivers = workflow_request.reference_receivers(
+        identity=identity, topic=topic, request_type=request_type
+    )
     if not receivers:
         return None
 
@@ -170,11 +175,14 @@ def is_auto_approved(request_type, *, identity=None, topic=None, receiver=None):
         return False
 
     if not receiver:
-        receiver = get_receiver_for_request_type(request_type=request_type, identity=identity, topic=topic)
+        receiver = get_receiver_for_request_type(
+            request_type=request_type, identity=identity, topic=topic
+        )
 
     return receiver and (
         isinstance(receiver, AutoApprove)
-        or isinstance(receiver, dict) and receiver.get("auto_approve")
+        or isinstance(receiver, dict)
+        and receiver.get("auto_approve")
     )
 
 

@@ -5,15 +5,13 @@ from invenio_records_resources.services.uow import RecordCommitOp
 from invenio_requests.proxies import current_requests_service
 from invenio_requests.records.api import Request
 from oarepo_runtime.i18n import lazy_gettext as _
+from typing_extensions import override
 
 from oarepo_requests.actions.edit_topic import EditTopicAcceptAction
 
+from ..utils import is_auto_approved, request_identity_matches
 from .generic import NonDuplicableOARepoRequestType
 from .ref_types import ModelRefTypes
-
-from typing_extensions import override
-
-from ..utils import is_auto_approved, request_identity_matches
 
 
 class EditPublishedRecordRequestType(NonDuplicableOARepoRequestType):
@@ -77,16 +75,24 @@ class EditPublishedRecordRequestType(NonDuplicableOARepoRequestType):
             return _("Click to start editing the metadata of the record.")
 
         if not request:
-            return _("Request edit access to the record. "
-                     "You will be notified about the decision by email.")
+            return _(
+                "Request edit access to the record. "
+                "You will be notified about the decision by email."
+            )
         match request.status:
             case "submitted":
                 if request_identity_matches(request.created_by, identity):
-                    return _("Edit access requested. You will be notified about "
-                             "the decision by email.")
+                    return _(
+                        "Edit access requested. You will be notified about "
+                        "the decision by email."
+                    )
                 if request_identity_matches(request.receiver, identity):
-                    return _("You have been requested to grant edit access to the record.")
+                    return _(
+                        "You have been requested to grant edit access to the record."
+                    )
                 return _("Edit access requested.")
             case _:
-                return _("Request edit access to the record. "
-                         "You will be notified about the decision by email.")
+                return _(
+                    "Request edit access to the record. "
+                    "You will be notified about the decision by email."
+                )

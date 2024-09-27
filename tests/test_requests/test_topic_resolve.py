@@ -115,8 +115,10 @@ def test_ui_resolve_topic(
         },
     }
     assert resp.json["stateful_name"] == "Record deletion requested"
-    assert resp.json["stateful_description"] == ("Permission to delete record requested. "
-                                                 "You will be notified about the decision by email.")
+    assert resp.json["stateful_description"] == (
+        "Permission to delete record requested. "
+        "You will be notified about the decision by email."
+    )
 
     record_service.delete(system_identity, record1["id"])
     ThesisRecord.index.refresh()
@@ -135,4 +137,3 @@ def test_ui_resolve_topic(
     }
     assert resp.json["stateful_name"] == "Delete record"
     assert resp.json["stateful_description"] == "Request deletion of published record"
-

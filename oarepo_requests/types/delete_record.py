@@ -1,12 +1,11 @@
 from oarepo_runtime.i18n import lazy_gettext as _
+from typing_extensions import override
 
 from oarepo_requests.actions.delete_topic import DeleteTopicAcceptAction
 
+from ..utils import is_auto_approved, request_identity_matches
 from .generic import NonDuplicableOARepoRequestType
 from .ref_types import ModelRefTypes
-from typing_extensions import override
-
-from ..utils import is_auto_approved, request_identity_matches
 
 
 class DeletePublishedRecordRequestType(NonDuplicableOARepoRequestType):
@@ -47,11 +46,15 @@ class DeletePublishedRecordRequestType(NonDuplicableOARepoRequestType):
         match request.status:
             case "submitted":
                 if request_identity_matches(request.created_by, identity):
-                    return _("Permission to delete record requested. "
-                             "You will be notified about the decision by email.")
+                    return _(
+                        "Permission to delete record requested. "
+                        "You will be notified about the decision by email."
+                    )
                 if request_identity_matches(request.receiver, identity):
-                    return _("You have been asked to approve the request to permanently delete the record. "
-                             "You can approve or reject the request.")
+                    return _(
+                        "You have been asked to approve the request to permanently delete the record. "
+                        "You can approve or reject the request."
+                    )
                 return _("Permission to delete record (including files) requested. ")
             case _:
                 if request_identity_matches(request.created_by, identity):

@@ -66,6 +66,7 @@ class RequestsComponent(ResultsComponent):
             requests = []
         projection["expanded"]["requests"] = requests
 
+
 class RequestTypesListDict(dict):
     topic = None
 
@@ -89,7 +90,8 @@ class RequestTypesList(RecordList):
                 **{f"record_link_{k}": v for k, v in rendered_record_links.items()}
             },
         )
-        res = RequestTypesListDict(hits = {
+        res = RequestTypesListDict(
+            hits={
                 "hits": hits,
                 "total": self.total,
             }

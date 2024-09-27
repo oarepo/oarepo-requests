@@ -3,6 +3,7 @@ from types import SimpleNamespace
 import marshmallow as ma
 from invenio_pidstore.errors import PIDDeletedError
 from invenio_requests.proxies import current_request_type_registry, current_requests
+from invenio_requests.resolvers.registry import ResolverRegistry
 from invenio_requests.services.schemas import (
     CommentEventType,
     EventTypeMarshmallowField,
@@ -18,7 +19,7 @@ from oarepo_requests.services.schema import (
     RequestTypeSchema,
     get_links_schema,
 )
-from invenio_requests.resolvers.registry import ResolverRegistry
+
 
 class UIReferenceSchema(ma.Schema):
     reference = ma.fields.Dict(validate=validate.Length(equal=1))
@@ -86,15 +87,17 @@ class UIRequestSchemaMixin:
             if topic:
                 if hasattr(type_obj, "stateful_name"):
                     stateful_name = type_obj.stateful_name(
-                        identity=self.context["identity"], topic=topic,
+                        identity=self.context["identity"],
+                        topic=topic,
                         # not very nice, but we need to pass the request object to the stateful_name function
-                        request=SimpleNamespace(**data)
+                        request=SimpleNamespace(**data),
                     )
                 if hasattr(type_obj, "stateful_description"):
                     stateful_description = type_obj.stateful_description(
-                        identity=self.context["identity"], topic=topic,
+                        identity=self.context["identity"],
+                        topic=topic,
                         # not very nice, but we need to pass the request object to the stateful_description function
-                        request=SimpleNamespace(**data)
+                        request=SimpleNamespace(**data),
                     )
         except PIDDeletedError:
             pass
@@ -131,7 +134,8 @@ class UIRequestTypeSchema(RequestTypeSchema):
 
         if hasattr(type_obj, "stateful_name"):
             data["stateful_name"] = type_obj.stateful_name(
-                identity=self.context["identity"], topic=self.context["topic"])
+                identity=self.context["identity"], topic=self.context["topic"]
+            )
         if hasattr(type_obj, "stateful_description"):
             data["stateful_description"] = type_obj.stateful_description(
                 identity=self.context["identity"], topic=self.context["topic"]
