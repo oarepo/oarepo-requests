@@ -149,12 +149,16 @@ class UIRequestsSerializationMixin(ma.Schema):
         expanded = data.get("expanded", {})
         if not expanded:
             return data
+        context = {
+            **self.context,
+            'topic': data
+        }
         if "request_types" in expanded:
-            expanded["request_types"] = UIRequestTypeSchema(context=self.context).dump(
+            expanded["request_types"] = UIRequestTypeSchema(context=context).dump(
                 expanded["request_types"], many=True
             )
         if "requests" in expanded:
-            expanded["requests"] = UIBaseRequestSchema(context=self.context).dump(
+            expanded["requests"] = UIBaseRequestSchema(context=context).dump(
                 expanded["requests"], many=True
             )
         return data
