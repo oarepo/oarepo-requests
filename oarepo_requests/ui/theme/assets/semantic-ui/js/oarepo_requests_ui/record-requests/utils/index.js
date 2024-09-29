@@ -21,23 +21,3 @@ export const serializeCustomFields = (formData) => {
     }
   }
 };
-
-export const fetchUpdated = async (url, setter, onError) => {
-  return axios({
-    method: "get",
-    url: url,
-    headers: {
-      "Content-Type": "application/json",
-      Accept: "application/vnd.inveniordm.v1+json",
-    },
-  })
-    .then((response) => {
-      setter(response.data);
-    })
-    .catch((error) => {
-      if (!_isFunction(onError)) {
-        throw error;
-      }
-      onError(error);
-    });
-};

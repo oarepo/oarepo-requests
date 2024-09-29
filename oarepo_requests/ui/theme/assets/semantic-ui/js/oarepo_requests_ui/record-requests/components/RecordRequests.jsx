@@ -59,15 +59,11 @@ const RecordRequests = ({
     queryClient.invalidateQueries(["applicableRequestTypes"]);
     queryClient.invalidateQueries(["requests"]);
   }, [queryClient]);
-  console.log(applicableRequestTypesLoading);
-  console.log(applicableRequestsLoadingError);
   return (
     <RequestContextProvider
       value={{
         requests,
         requestTypes: applicableRequestTypes,
-        // TODO: check this
-        setRequests: () => {},
         fetchNewRequests,
         record: initialRecord,
         onBeforeAction,

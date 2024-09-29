@@ -184,7 +184,6 @@ const RequestModalContentAndActions = ({
             key={name}
             request={request}
             requestType={requestType}
-            onSubmit={onSubmit}
           />
         ))}
         <Button onClick={onClose} icon labelPosition="left">

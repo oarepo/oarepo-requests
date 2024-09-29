@@ -63,7 +63,7 @@ export const CreateRequestButtonGroup = ({
             trigger={
               <Button
                 // applicable requests don't have a status
-                className={`request-create-button ${requestType?.type_id}`}
+                className={`requests request-create-button ${requestType?.type_id}`}
                 fluid
                 title={i18next.t(requestType.name)}
                 content={i18next.t(requestType.name)}

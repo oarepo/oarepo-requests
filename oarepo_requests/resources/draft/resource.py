@@ -60,9 +60,5 @@ class DraftRecordRequestsResource(RecordRequestsResource):
                 else None
             ),
         )
-        bla = items.to_dict()
-        bla = {}
-        bla["errors"] = [
-            {"field": "metadata.title", "messages": ["This field is required."]}
-        ]
+
         return items.to_dict(), 201

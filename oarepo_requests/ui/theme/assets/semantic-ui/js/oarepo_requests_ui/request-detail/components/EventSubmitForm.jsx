@@ -6,14 +6,14 @@ import _isEmpty from "lodash/isEmpty";
 import axios from "axios";
 import { RichEditor, RichInputField } from "react-invenio-forms";
 import { Formik, Form } from "formik";
+// TODO: until we figure out a way to globally use sanitization with our hook
+import sanitizeHtml from "sanitize-html";
 
-import { useSanitizeInput } from "@js/oarepo_ui";
 import { CommentPayloadSchema } from "../utils";
 
 export const EventSubmitForm = ({ request, setEvents }) => {
   const [error, setError] = useState(null);
-  const { sanitizeInput } = useSanitizeInput()
-  
+
   const editorRef = useRef(null);
 
   const callApi = async (url, method = "POST", data = null) => {
@@ -24,11 +24,12 @@ export const EventSubmitForm = ({ request, setEvents }) => {
       url: url,
       method: method,
       headers: {
-        'Content-Type': 'application/json',
-        'Accept': 'application/vnd.inveniordm.v1+json'
+        "Content-Type": "application/json",
+        Accept: "application/vnd.inveniordm.v1+json",
       },
-      data: data
-  })};
+      data: data,
+    });
+  };
 
   const onSubmit = async (values, { setSubmitting, resetForm }) => {
     setSubmitting(true);
@@ -50,11 +51,11 @@ export const EventSubmitForm = ({ request, setEvents }) => {
 
   return (
     <Formik
-      initialValues={{ 
-        payload: { 
+      initialValues={{
+        payload: {
           content: "",
-          format: "html"
-        }
+          format: "html",
+        },
       }}
       validationSchema={CommentPayloadSchema}
       onSubmit={onSubmit}
@@ -65,17 +66,19 @@ export const EventSubmitForm = ({ request, setEvents }) => {
             <RichInputField
               fieldPath="payload.content"
               label={
-                <label htmlFor="payload.content" hidden>{i18next.t("Comment")}</label>
+                <label htmlFor="payload.content" hidden>
+                  {i18next.t("Comment")}
+                </label>
               }
               optimized="true"
-              placeholder={i18next.t('Your comment here...')}
+              placeholder={i18next.t("Your comment here...")}
               editor={
                 <RichEditor
                   value={values.payload.content}
                   optimized
-                  onFocus={(event, editor) => editorRef.current = editor}
+                  onFocus={(event, editor) => (editorRef.current = editor)}
                   onBlur={(event, editor) => {
-                    const cleanedContent = sanitizeInput(editor.getContent());
+                    const cleanedContent = sanitizeHtml(editor.getContent());
                     setFieldValue("payload.content", cleanedContent);
                     setFieldTouched("payload.content", true);
                   }}
@@ -85,7 +88,9 @@ export const EventSubmitForm = ({ request, setEvents }) => {
           </FormField>
           {error && (
             <Message error>
-              <Message.Header>{i18next.t("Error while submitting the comment")}</Message.Header>
+              <Message.Header>
+                {i18next.t("Error while submitting the comment")}
+              </Message.Header>
               <p>{error?.message}</p>
             </Message>
           )}
@@ -102,4 +107,4 @@ export const EventSubmitForm = ({ request, setEvents }) => {
       )}
     </Formik>
   );
-}
+};

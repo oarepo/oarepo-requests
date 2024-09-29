@@ -12,15 +12,6 @@ import {
 import { REQUEST_TYPE } from "./objects";
 import { http } from "@js/oarepo_ui";
 
-export const getRedirectionUrlFromResponsePayload = (response) => {
-  const redirectionLinkKey = Object.keys(response?.data?.payload || []).find(
-    (key) => key.toLowerCase().includes("self_html")
-  );
-  return redirectionLinkKey
-    ? response?.data?.payload[redirectionLinkKey]
-    : null;
-};
-
 /**
  * @typedef {import("semantic-ui-react").ConfirmProps} ConfirmProps
  */
@@ -126,8 +117,7 @@ export const useRequestsApi = (request) => {
       createdRequest.data?.links?.actions?.submit,
       mappedData
     );
-    const redirectionURL =
-      getRedirectionUrlFromResponsePayload(submittedRequest);
+    const redirectionURL = submittedRequest?.data?.links?.topic_html;
     if (redirectionURL && window.location.href !== redirectionURL) {
       window.location.href = redirectionURL;
     }
@@ -145,8 +135,6 @@ export const useRequestsApi = (request) => {
   const sendRequest = useAction(async (requestActionType) => {
     let response;
     const actionUrl = request.links?.actions[requestActionType];
-    const mappedData = serializeCustomFields(formValues);
-    console.log(mappedData);
     if (requestActionType === REQUEST_TYPE.SAVE) {
       response = await http.put(request.links?.self, mappedData);
     } else if (requestActionType === REQUEST_TYPE.ACCEPT) {
@@ -155,7 +143,7 @@ export const useRequestsApi = (request) => {
       response = await http.post(actionUrl, mappedData);
     }
 
-    const redirectionURL = getRedirectionUrlFromResponsePayload(response);
+    const redirectionURL = response?.data?.links?.topic_html;
     if (redirectionURL && window.location.href !== redirectionURL) {
       window.location.href = redirectionURL;
     }

@@ -31,7 +31,7 @@ export const RequestList = ({ requests }) => {
         requestCreationModal={false}
         trigger={
           <Button
-            className={`request-reply-button ${request.type} ${request.type}-${request.status_code}`}
+            className={`requests request-reply-button ${request.type} ${request.type}-${request.status_code}`}
             fluid
             title={header}
             content={header}
