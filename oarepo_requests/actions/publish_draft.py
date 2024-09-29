@@ -15,7 +15,10 @@ class PublishDraftSubmitAction(OARepoSubmitAction):
     def can_execute(self):
         if not super().can_execute():
             return False
-        topic = self.request.topic.resolve()
+        try:
+            topic = self.request.topic.resolve()
+        except:         # noqa: used for links, so ignore errors here
+            return False
         topic_service = get_record_service_for_record(topic)
         try:
             topic_service.validate_draft(system_identity, topic["id"])
