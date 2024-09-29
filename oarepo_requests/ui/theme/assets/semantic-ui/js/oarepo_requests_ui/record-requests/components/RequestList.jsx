@@ -16,7 +16,7 @@ export const RequestList = ({ requests }) => {
 
   return requests.map((request) => {
     const buttonIconProps = requestButtonsIconsConfig[request.status_code];
-    const header = request.title ?? request?.name;
+    const header = request.title || request?.name;
     return (
       <RequestModal
         key={request.id}

@@ -55,56 +55,44 @@ export const Timeline = ({ request }) => {
     };
   }, [fetchEvents]);
 
-  const renderLoader = () => (
-    <Dimmer active={isLoading} inverted>
-      <Loader indeterminate size="big">
-        {i18next.t("Loading timeline...")}
-      </Loader>
-    </Dimmer>
-  );
-
-  const renderError = () => (
-    <Message negative>
-      <Message.Header>
-        {i18next.t("Error while fetching timeline events")}
-      </Message.Header>
-      <p>{error?.message}</p>
-    </Message>
-  );
-
-  const renderPlaceholder = () => (
-    <Segment basic>
-      <Placeholder fluid>
-        {Array.from({
-          length: events.length < 5 ? 5 : events.length,
-        }).map((_, index) => (
-          <Placeholder.Header image key={index}>
-            <Placeholder.Line />
-            <Placeholder.Line />
-          </Placeholder.Header>
-        ))}
-      </Placeholder>
-    </Segment>
-  );
-
-  const renderEvents = () => (
-    <Feed>
-      {events.map((event) => (
-        <TimelineEvent key={event.id} event={event} />
-      ))}
-    </Feed>
-  );
-
   return (
-    <React.Fragment>
+    <>
       <Dimmer.Dimmable blurring dimmed={isLoading}>
-        {isLoading && renderLoader()}
-        {!isLoading && error && renderError()}
-        {!isLoading && !_isEmpty(events) && renderEvents()}
-        {!isLoading && _isEmpty(events) && renderPlaceholder()}
+        <Dimmer active={isLoading} inverted>
+          <Loader indeterminate size="big">
+            {i18next.t("Loading timeline...")}
+          </Loader>
+        </Dimmer>
+        {error ? (
+          <Message negative>
+            <Message.Header>
+              {i18next.t("Error while fetching timeline events")}
+            </Message.Header>
+            <p>{error?.message}</p>
+          </Message>
+        ) : isLoading ? (
+          <Segment basic>
+            <Placeholder fluid>
+              {Array.from({
+                length: events.length < 5 ? 5 : events.length,
+              }).map((_, index) => (
+                <Placeholder.Header image key={index}>
+                  <Placeholder.Line />
+                  <Placeholder.Line />
+                </Placeholder.Header>
+              ))}
+            </Placeholder>
+          </Segment>
+        ) : !_isEmpty(events) ? (
+          <Feed>
+            {events.map((event) => (
+              <TimelineEvent key={event.id} event={event} />
+            ))}
+          </Feed>
+        ) : null}
       </Dimmer.Dimmable>
       <EventSubmitForm request={request} setEvents={setEvents} />
-    </React.Fragment>
+    </>
   );
 };
 
