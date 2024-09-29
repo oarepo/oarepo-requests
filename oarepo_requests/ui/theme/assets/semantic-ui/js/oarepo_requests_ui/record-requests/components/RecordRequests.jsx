@@ -98,17 +98,6 @@ RecordRequests.propTypes = {
   requestButtonsIconsConfig: PropTypes.object,
 };
 
-RecordRequests.defaultProps = {
-  ContainerComponent: ({ children }) => (
-    <SegmentGroup className="requests-container borderless">
-      {children}
-    </SegmentGroup>
-  ),
-  onBeforeAction: undefined,
-  onAfterAction: undefined,
-  onActionError: undefined,
-};
-
 const RecordRequestsWithQueryClient = ({
   record: initialRecord,
   ContainerComponent,
@@ -140,12 +129,18 @@ RecordRequestsWithQueryClient.propTypes = {
   requestButtonsIconsConfig: PropTypes.object,
 };
 
+const ContainerComponent = ({ children }) => (
+  <SegmentGroup className="requests-container borderless">
+    {children}
+  </SegmentGroup>
+);
+
+ContainerComponent.propTypes = {
+  children: PropTypes.node,
+};
+
 RecordRequestsWithQueryClient.defaultProps = {
-  ContainerComponent: ({ children }) => (
-    <SegmentGroup className="requests-container borderless">
-      {children}
-    </SegmentGroup>
-  ),
+  ContainerComponent: ContainerComponent,
   onBeforeAction: undefined,
   onAfterAction: undefined,
   onActionError: undefined,

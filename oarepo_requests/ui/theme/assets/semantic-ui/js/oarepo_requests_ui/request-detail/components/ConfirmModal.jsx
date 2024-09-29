@@ -139,6 +139,6 @@ ConfirmModal.propTypes = {
   request: PropTypes.object.isRequired,
   requestModalHeader: PropTypes.string,
   handleSubmit: PropTypes.func,
-  TriggerButton: PropTypes.func,
+  triggerButton: PropTypes.node,
   submitButton: PropTypes.element,
 };

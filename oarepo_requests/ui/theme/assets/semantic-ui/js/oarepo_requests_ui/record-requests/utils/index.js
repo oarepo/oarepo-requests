@@ -1,6 +1,4 @@
-import axios from "axios";
 import _isEmpty from "lodash/isEmpty";
-import _isFunction from "lodash/isFunction";
 
 export const serializeCustomFields = (formData) => {
   if (
