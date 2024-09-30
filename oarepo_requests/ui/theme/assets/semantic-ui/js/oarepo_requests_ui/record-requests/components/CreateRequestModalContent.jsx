@@ -10,11 +10,10 @@ import { CustomFields } from "react-invenio-forms";
 
 /** @param {{ requestType: RequestType, customSubmitHandler: (e) => void }} props */
 export const CreateRequestModalContent = ({ requestType, customFields }) => {
+  const description = requestType?.stateful_description || description;
   return (
     <>
-      {requestType?.description && (
-        <p id="request-modal-desc">{requestType.description}</p>
-      )}
+      {description && <p id="request-modal-desc">{description}</p>}
       {customFields?.ui && (
         <Form id="request-form">
           <CustomFields

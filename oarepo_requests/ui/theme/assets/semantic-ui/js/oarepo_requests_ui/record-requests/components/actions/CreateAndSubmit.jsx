@@ -6,7 +6,6 @@ import PropTypes from "prop-types";
 
 const CreateAndSubmit = ({ requestType }) => {
   const { doCreateAndSubmitAction } = useRequestsApi(requestType);
-
   return (
     <Button
       title={i18next.t("Submit request")}

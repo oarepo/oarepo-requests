@@ -52,7 +52,10 @@ export const CreateRequestButtonGroup = ({
   return (
     <div className="requests-create-request-buttons borderless">
       {createRequests.map((requestType) => {
-        const header = requestType?.name || requestType?.type_id;
+        const header =
+          requestType?.stateful_name ||
+          requestType?.name ||
+          requestType?.type_id;
         const buttonIconProps = requestButtonsIconsConfig[requestType.type_id];
         return (
           <RequestModal

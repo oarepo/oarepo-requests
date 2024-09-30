@@ -2,7 +2,15 @@ import React, { useState, useEffect } from "react";
 
 import { i18next } from "@translations/oarepo_requests_ui/i18next";
 import { scrollTop } from "@js/oarepo_ui";
-import { Button, Grid, List, Header, TransitionablePortal, Icon, Menu } from "semantic-ui-react";
+import {
+  Button,
+  Grid,
+  List,
+  Header,
+  TransitionablePortal,
+  Icon,
+  Menu,
+} from "semantic-ui-react";
 import _isEmpty from "lodash/isEmpty";
 
 import { ActionButtons, Timeline, TopicPreview, SideRequestInfo } from ".";
@@ -13,7 +21,9 @@ export const RequestDetail = ({ request }) => {
 
   useEffect(() => {
     const handleScrollButtonVisibility = () => {
-      window.scrollY > 300 ? setScrollToTopVisible(true) : setScrollToTopVisible(false);
+      window.scrollY > 300
+        ? setScrollToTopVisible(true)
+        : setScrollToTopVisible(false);
     };
     window.addEventListener("scroll", handleScrollButtonVisibility);
     return () => {
@@ -22,14 +32,20 @@ export const RequestDetail = ({ request }) => {
   }, []);
 
   // const renderReadOnlyData = !_isEmpty(request?.payload);
-  const requestHeader = !_isEmpty(request?.title) ? request.title : (!_isEmpty(request?.name) ? request.name : request.type);
-
+  const requestHeader = request?.stateful_name || request?.name;
+  const description = request?.stateful_description || request?.description;
   return (
     <>
       <Grid relaxed>
         <Grid.Row columns={2}>
           <Grid.Column>
-            <Button as="a" compact href="/me/requests/" icon labelPosition="left">
+            <Button
+              as="a"
+              compact
+              href="/me/requests/"
+              icon
+              labelPosition="left"
+            >
               <Icon name="arrow left" />
               {i18next.t("Back to requests")}
             </Button>
@@ -41,11 +57,7 @@ export const RequestDetail = ({ request }) => {
         <Grid.Row>
           <Grid.Column>
             <Header as="h1">{requestHeader}</Header>
-            {request?.description &&
-              <Grid.Row as="p">
-                {request.description}
-              </Grid.Row>
-            }
+            {description && <Grid.Row as="p">{description}</Grid.Row>}
             {/* {renderReadOnlyData ?
               <List relaxed>
                 {Object.keys(request.payload).map(key => (
@@ -73,24 +85,24 @@ export const RequestDetail = ({ request }) => {
           <Grid.Column>
             <Menu tabular attached>
               <Menu.Item
-                name='timeline'
+                name="timeline"
                 content={i18next.t("Timeline")}
-                active={activeTab === 'timeline'}
-                onClick={() => setActiveTab('timeline')}
+                active={activeTab === "timeline"}
+                onClick={() => setActiveTab("timeline")}
               />
               <Menu.Item
-                name='topic'
+                name="topic"
                 content={`${i18next.t("Record")} ${i18next.t("preview")}`}
-                active={activeTab === 'topic'}
-                onClick={() => setActiveTab('topic')}
+                active={activeTab === "topic"}
+                onClick={() => setActiveTab("topic")}
               />
             </Menu>
           </Grid.Column>
         </Grid.Row>
         <Grid.Row>
           <Grid.Column>
-            {activeTab === 'timeline' && <Timeline request={request} />}
-            {activeTab === 'topic' && <TopicPreview request={request} />}
+            {activeTab === "timeline" && <Timeline request={request} />}
+            {activeTab === "topic" && <TopicPreview request={request} />}
           </Grid.Column>
         </Grid.Row>
       </Grid>
@@ -115,4 +127,4 @@ export const RequestDetail = ({ request }) => {
       </TransitionablePortal>
     </>
   );
-}
+};

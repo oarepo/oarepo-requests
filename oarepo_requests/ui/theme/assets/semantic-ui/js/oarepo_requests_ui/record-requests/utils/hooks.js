@@ -172,6 +172,7 @@ const useAction = (action) => {
   const { setFieldError, setSubmitting } = formik;
   return useMutation(
     async (requestActionType) => {
+      setSubmitting(true);
       if (onBeforeAction) {
         const shouldProceed = await onBeforeAction(formik, modalControl);
         if (!shouldProceed) {

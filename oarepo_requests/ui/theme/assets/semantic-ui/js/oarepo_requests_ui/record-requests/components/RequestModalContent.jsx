@@ -28,12 +28,15 @@ export const RequestModalContent = ({
     requestModalType === REQUEST_MODAL_TYPE.SUBMIT_FORM && customFields?.ui;
   const renderReadOnlyData =
     requestModalType === REQUEST_MODAL_TYPE.READ_ONLY && request?.payload;
+  const description = request?.stateful_description || request?.description;
   return (
     <Grid doubling stackable>
       <Grid.Row>
-        <Grid.Column as="p" id="request-modal-desc">
-          {request.description}
-        </Grid.Column>
+        {description && (
+          <Grid.Column as="p" id="request-modal-desc">
+            {description}
+          </Grid.Column>
+        )}
       </Grid.Row>
       <Grid.Row>
         <Grid.Column>
