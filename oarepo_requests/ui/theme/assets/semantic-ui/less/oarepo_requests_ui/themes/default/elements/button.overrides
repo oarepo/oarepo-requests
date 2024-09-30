@@ -26,5 +26,9 @@
       color: white;
       background-color: @green;
     }
+    &.delete_published_record {
+      background-color: @red;
+      color: @white;
+    }
   }
 }

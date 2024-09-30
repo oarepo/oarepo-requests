@@ -118,7 +118,7 @@ export const useRequestsApi = (request) => {
       mappedData
     );
     const redirectionURL = submittedRequest?.data?.links?.topic_html;
-    if (redirectionURL && window.location.href !== redirectionURL) {
+    if (redirectionURL) {
       window.location.href = redirectionURL;
     }
     resetForm();
@@ -144,7 +144,7 @@ export const useRequestsApi = (request) => {
     }
 
     const redirectionURL = response?.data?.links?.topic_html;
-    if (redirectionURL && window.location.href !== redirectionURL) {
+    if (redirectionURL) {
       window.location.href = redirectionURL;
     }
     return response.data;
@@ -205,21 +205,18 @@ const useAction = (action) => {
             );
             setTimeout(() => {
               closeModal();
+              setSubmitting(false);
             }, 2500);
           }
         }
-        setSubmitting(false);
       },
       onSuccess: (data, variables) => {
         if (onAfterAction) {
           onAfterAction(data, variables, formik, modalControl);
         }
+        setSubmitting(false);
         closeModal();
         fetchNewRequests();
-        setSubmitting(false);
-      },
-      onMutate: () => {
-        setSubmitting(true);
       },
     }
   );
