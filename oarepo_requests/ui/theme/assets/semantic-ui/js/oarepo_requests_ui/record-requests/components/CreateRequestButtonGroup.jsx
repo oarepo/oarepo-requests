@@ -68,8 +68,8 @@ export const CreateRequestButtonGroup = ({
                 // applicable requests don't have a status
                 className={`requests request-create-button ${requestType?.type_id}`}
                 fluid
-                title={i18next.t(requestType.name)}
-                content={i18next.t(requestType.name)}
+                title={header}
+                content={header}
                 {...buttonIconProps}
               />
             }

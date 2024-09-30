@@ -5,15 +5,13 @@ import { scrollTop } from "@js/oarepo_ui";
 import {
   Button,
   Grid,
-  List,
   Header,
   TransitionablePortal,
   Icon,
   Menu,
 } from "semantic-ui-react";
-import _isEmpty from "lodash/isEmpty";
-
 import { ActionButtons, Timeline, TopicPreview, SideRequestInfo } from ".";
+import PropTypes from "prop-types";
 
 export const RequestDetail = ({ request }) => {
   const [activeTab, setActiveTab] = useState("timeline");
@@ -127,4 +125,8 @@ export const RequestDetail = ({ request }) => {
       </TransitionablePortal>
     </>
   );
+};
+
+RequestDetail.propTypes = {
+  request: PropTypes.object,
 };

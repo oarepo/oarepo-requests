@@ -3,9 +3,19 @@ import { i18next } from "@translations/oarepo_requests_ui/i18next";
 import { Button, Icon } from "semantic-ui-react";
 import { useRequestsApi } from "../../utils/hooks";
 import PropTypes from "prop-types";
+import { useFormikContext } from "formik";
+import { useConfirmModalContext, useModalControlContext } from "../../contexts";
 
 const CreateAndSubmit = ({ requestType }) => {
-  const { doCreateAndSubmitAction } = useRequestsApi(requestType);
+  const formik = useFormikContext();
+  const { confirmAction } = useConfirmModalContext();
+  const modalControl = useModalControlContext();
+  const { doCreateAndSubmitAction } = useRequestsApi(
+    requestType,
+    formik,
+    confirmAction,
+    modalControl
+  );
   return (
     <Button
       title={i18next.t("Submit request")}

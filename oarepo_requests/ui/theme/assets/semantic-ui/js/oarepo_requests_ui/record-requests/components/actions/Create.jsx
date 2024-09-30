@@ -4,9 +4,19 @@ import { Button, Icon } from "semantic-ui-react";
 import { useRequestsApi } from "../../utils/hooks";
 import { REQUEST_TYPE } from "../../utils/objects";
 import PropTypes from "prop-types";
-
+import { useFormikContext } from "formik";
+import { useConfirmModalContext, useModalControlContext } from "../../contexts";
 const Create = ({ requestType }) => {
-  const { doAction } = useRequestsApi(requestType);
+  const formik = useFormikContext();
+  const { confirmAction } = useConfirmModalContext();
+  const modalControl = useModalControlContext();
+
+  const { doAction } = useRequestsApi(
+    requestType,
+    formik,
+    confirmAction,
+    modalControl
+  );
 
   return (
     <Button

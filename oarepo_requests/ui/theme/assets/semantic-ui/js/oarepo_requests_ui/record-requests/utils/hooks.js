@@ -4,13 +4,10 @@ import { Button } from "semantic-ui-react";
 import { useFormikContext } from "formik";
 import { useMutation } from "@tanstack/react-query";
 import { serializeCustomFields } from "../utils";
-import {
-  useConfirmModalContext,
-  useRequestContext,
-  useModalControlContext,
-} from "../contexts";
+import { useRequestContext } from "../contexts";
 import { REQUEST_TYPE } from "./objects";
 import { http } from "@js/oarepo_ui";
+import _isEmpty from "lodash/isEmpty";
 
 /**
  * @typedef {import("semantic-ui-react").ConfirmProps} ConfirmProps
@@ -103,26 +100,35 @@ export const useConfirmDialog = (isEventModal = false) => {
   return { confirmDialogProps, confirmAction };
 };
 
-export const useRequestsApi = (request) => {
-  const { values: formValues, resetForm } = useFormikContext();
-  const { confirmAction } = useConfirmModalContext();
-  const mappedData = serializeCustomFields(formValues);
+export const useRequestsApi = (
+  request,
+  formik,
+  confirmAction,
+  modalControl
+) => {
+  let customFieldsData = {};
+  if (!_isEmpty(formik?.values)) {
+    customFieldsData = serializeCustomFields(formik.values);
+  }
 
-  const createAndSubmitRequest = useAction(async () => {
-    const createdRequest = await http.post(
-      request.links?.actions?.create,
-      mappedData
-    );
-    const submittedRequest = await http.post(
-      createdRequest.data?.links?.actions?.submit,
-      mappedData
-    );
-    const redirectionURL = submittedRequest?.data?.links?.topic_html;
-    if (redirectionURL) {
-      window.location.href = redirectionURL;
-    }
-    resetForm();
-  });
+  const createAndSubmitRequest = useAction(
+    async () => {
+      const createdRequest = await http.post(
+        request.links?.actions?.create,
+        customFieldsData
+      );
+      const submittedRequest = await http.post(
+        createdRequest.data?.links?.actions?.submit,
+        customFieldsData
+      );
+      const redirectionURL = submittedRequest?.data?.links?.topic_html;
+      if (redirectionURL) {
+        window.location.href = redirectionURL;
+      }
+    },
+    formik,
+    modalControl
+  );
 
   const doCreateAndSubmitAction = (waitForConfirmation = false) => {
     if (waitForConfirmation) {
@@ -132,23 +138,27 @@ export const useRequestsApi = (request) => {
     }
   };
 
-  const sendRequest = useAction(async (requestActionType) => {
-    let response;
-    const actionUrl = request.links?.actions[requestActionType];
-    if (requestActionType === REQUEST_TYPE.SAVE) {
-      response = await http.put(request.links?.self, mappedData);
-    } else if (requestActionType === REQUEST_TYPE.ACCEPT) {
-      response = await http.post(actionUrl);
-    } else {
-      response = await http.post(actionUrl, mappedData);
-    }
+  const sendRequest = useAction(
+    async (requestActionType) => {
+      let response;
+      const actionUrl = request.links?.actions[requestActionType];
+      if (requestActionType === REQUEST_TYPE.SAVE) {
+        response = await http.put(request.links?.self, customFieldsData);
+      } else if (requestActionType === REQUEST_TYPE.ACCEPT) {
+        response = await http.post(actionUrl);
+      } else {
+        response = await http.post(actionUrl, customFieldsData);
+      }
 
-    const redirectionURL = response?.data?.links?.topic_html;
-    if (redirectionURL) {
-      window.location.href = redirectionURL;
-    }
-    return response.data;
-  });
+      const redirectionURL = response?.data?.links?.topic_html;
+      if (redirectionURL) {
+        window.location.href = redirectionURL;
+      }
+      return response.data;
+    },
+    formik,
+    modalControl
+  );
   const doAction = async (requestActionType, waitForConfirmation = false) => {
     if (waitForConfirmation) {
       confirmAction(
@@ -160,23 +170,24 @@ export const useRequestsApi = (request) => {
     }
   };
 
-  return { doAction, doCreateAndSubmitAction };
+  return {
+    doAction,
+    doCreateAndSubmitAction,
+    createAndSubmitRequest,
+    sendRequest,
+  };
 };
 
-const useAction = (action) => {
+const useAction = (action, formik, modalControl) => {
   const { onBeforeAction, onAfterAction, onActionError, fetchNewRequests } =
     useRequestContext();
-  const modalControl = useModalControlContext();
-  const { closeModal } = modalControl;
-  const formik = useFormikContext();
-  const { setFieldError, setSubmitting } = formik;
   return useMutation(
     async (requestActionType) => {
-      setSubmitting(true);
+      formik?.setSubmitting(true);
       if (onBeforeAction) {
         const shouldProceed = await onBeforeAction(formik, modalControl);
         if (!shouldProceed) {
-          closeModal();
+          modalControl?.closeModal();
           return;
         }
       }
@@ -188,25 +199,25 @@ const useAction = (action) => {
           onActionError(e, variables, formik, modalControl);
         } else {
           if (e?.response?.data?.errors) {
-            setFieldError(
+            formik?.setFieldError(
               "api",
               i18next.t(
                 "The request could not be created due to validation errors. Please correct the errors and try again."
               )
             );
             setTimeout(() => {
-              closeModal();
+              modalControl?.closeModal();
             }, 2500);
           } else {
-            setFieldError(
+            formik?.setFieldError(
               "api",
               i18next.t(
                 "The action could not be executed. Please try again in a moment."
               )
             );
             setTimeout(() => {
-              closeModal();
-              setSubmitting(false);
+              modalControl?.closeModal();
+              formik?.setSubmitting(false);
             }, 2500);
           }
         }
@@ -215,8 +226,8 @@ const useAction = (action) => {
         if (onAfterAction) {
           onAfterAction(data, variables, formik, modalControl);
         }
-        setSubmitting(false);
-        closeModal();
+        formik?.setSubmitting(false);
+        modalControl?.closeModal();
         fetchNewRequests();
       },
     }

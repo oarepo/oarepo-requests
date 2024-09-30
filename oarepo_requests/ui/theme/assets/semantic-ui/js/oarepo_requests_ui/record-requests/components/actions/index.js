@@ -6,6 +6,7 @@ import Create from "./Create";
 import Submit from "./Submit";
 import Save from "./Save";
 import CreateAndSubmit from "./CreateAndSubmit";
+import CreateSubmitAction from "./CreateSubmitAction";
 
 export const mapLinksToActions = (requestOrRequestType, customFields) => {
   const actionComponents = [];
@@ -47,4 +48,13 @@ export const mapLinksToActions = (requestOrRequestType, customFields) => {
   return actionComponents;
 };
 
-export { Accept, Decline, Cancel, Create, Submit, Save, CreateAndSubmit };
+export {
+  Accept,
+  Decline,
+  Cancel,
+  Create,
+  Submit,
+  Save,
+  CreateAndSubmit,
+  CreateSubmitAction,
+};
