@@ -7,12 +7,14 @@ from invenio_requests.proxies import current_requests_service
 from invenio_requests.records.api import Request
 from oarepo_runtime.datastreams.utils import get_record_service_for_record
 from oarepo_runtime.i18n import lazy_gettext as _
+from typing_extensions import override
 
 from oarepo_requests.actions.publish_draft import (
     PublishDraftAcceptAction,
     PublishDraftSubmitAction,
 )
 
+from ..utils import is_auto_approved, request_identity_matches
 from .generic import NonDuplicableOARepoRequestType
 from .ref_types import ModelRefTypes
 
@@ -63,12 +65,61 @@ class PublishDraftRequestType(NonDuplicableOARepoRequestType):
         topic_service.validate_draft(system_identity, topic["id"])
 
     @classmethod
-    def can_possibly_create(self, identity, topic, *args, **kwargs):
+    def is_applicable_to(cls, identity, topic, *args, **kwargs):
         if not topic.is_draft:
             return False
-        super_ = super().can_possibly_create(identity, topic, *args, **kwargs)
+        super_ = super().is_applicable_to(identity, topic, *args, **kwargs)
         return super_
 
     def topic_change(self, request: Request, new_topic: Dict, uow):
         setattr(request, "topic", new_topic)
         uow.register(RecordCommitOp(request, indexer=current_requests_service.indexer))
+
+    @override
+    def stateful_name(self, identity, *, topic=None, request=None):
+        if is_auto_approved(self, identity=identity, topic=topic):
+            return _("Publish draft")
+        if not request:
+            return _("Submit for review")
+        match request.status:
+            case "submitted":
+                return _("Submitted for review")
+            case _:
+                return _("Submit for review")
+
+    @override
+    def stateful_description(self, identity, *, topic=None, request=None):
+        if is_auto_approved(self, identity=identity, topic=topic):
+            return _(
+                "Click to immediately publish the draft. "
+                "The draft will be a subject to embargo as requested in the side panel. "
+                "Note: The action is irreversible."
+            )
+
+        if not request:
+            return _(
+                "By submitting the draft for review you are requesting the publication of the draft. "
+                "The draft will become locked and no further changes will be possible until the request "
+                "is accepted or declined. You will be notified about the decision by email."
+            )
+        match request.status:
+            case "submitted":
+                if request_identity_matches(request.created_by, identity):
+                    return _(
+                        "The draft has been submitted for review. "
+                        "It is now locked and no further changes are possible. "
+                        "You will be notified about the decision by email."
+                    )
+                if request_identity_matches(request.receiver, identity):
+                    return _(
+                        "The draft has been submitted for review. "
+                        "You can now accept or decline the request."
+                    )
+                return _("The draft has been submitted for review.")
+            case _:
+                if request_identity_matches(request.created_by, identity):
+                    return _(
+                        "Submit for review. After submitting the draft for review, "
+                        "it will be locked and no further modifications will be possible."
+                    )
+                return _("Request not yet submitted.")

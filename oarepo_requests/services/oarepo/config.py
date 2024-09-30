@@ -24,18 +24,20 @@ class RequestEntityLink(RequestLink):
 
     def _resolve(self, obj, ctx):
         reference_dict = getattr(obj, self.entity).reference_dict
-        key = "entity:" + ":".join(f"{x[0]}:{x[1]}" for x in sorted(reference_dict.items()))
+        key = "entity:" + ":".join(
+            f"{x[0]}:{x[1]}" for x in sorted(reference_dict.items())
+        )
         if key in ctx:
             return ctx[key]
         try:
             entity = resolve(ctx["identity"], reference_dict)
-        except Exception:       # noqa
+        except Exception:  # noqa
             entity = {}
         ctx[key] = entity
         return entity
 
     def _expand_entity(self, entity, vars):
-        vars.update({f"entity_{k}" : v for k, v in entity.get("links", {}).items()})
+        vars.update({f"entity_{k}": v for k, v in entity.get("links", {}).items()})
 
 
 class OARepoRequestsServiceConfig(RequestsServiceConfig):
@@ -48,7 +50,9 @@ class OARepoRequestsServiceConfig(RequestsServiceConfig):
         "topic": RequestEntityLink("{+entity_self}"),
         "topic_html": RequestEntityLink("{+entity_self_html}"),
         "created_by": RequestEntityLink("{+entity_self}", entity="created_by"),
-        "created_by_html": RequestEntityLink("{+entity_self_html}", entity="created_by"),
+        "created_by_html": RequestEntityLink(
+            "{+entity_self_html}", entity="created_by"
+        ),
         "receiver": RequestEntityLink("{+entity_self}", entity="receiver"),
         "receiver_html": RequestEntityLink("{+entity_self_html}", entity="receiver"),
     }

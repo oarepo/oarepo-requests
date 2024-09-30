@@ -233,6 +233,12 @@ def test_ui_serialization(
             },
             "name": "Publish draft",
             "type_id": "publish_draft",
+            "stateful_description": "By submitting the draft for review you are "
+            "requesting the publication of the draft. The draft "
+            "will become locked and no further changes will be "
+            "possible until the request is accepted or declined. "
+            "You will be notified about the decision by email.",
+            "stateful_name": "Submit for review",
         }
     ]
     sorted_published_list = allowed_request_types_published.json["hits"]["hits"]
@@ -247,6 +253,8 @@ def test_ui_serialization(
             },
             "description": "Request deletion of published record",
             "name": "Delete record",
+            "stateful_description": "Request permission to delete the record.",
+            "stateful_name": "Request record deletion",
         },
         {
             "type_id": "edit_published_record",
@@ -257,6 +265,8 @@ def test_ui_serialization(
             },
             "description": "Request re-opening of published record",
             "name": "Edit record",
+            "stateful_description": "Click to start editing the metadata of the record.",
+            "stateful_name": "Edit record",
         },
         {
             "type_id": "new_version",
@@ -267,5 +277,8 @@ def test_ui_serialization(
             },
             "description": "Request requesting creation of new version of a published record.",
             "name": "New Version",
+            "stateful_description": "Click to start creating a new version of the "
+            "record.",
+            "stateful_name": "New Version",
         },
     ]

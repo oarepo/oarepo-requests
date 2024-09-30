@@ -26,8 +26,8 @@ def allowed_user_request_types(identity, record):
     allowed_request_types = {
         request_type_name: request_type
         for request_type_name, request_type in allowed_request_types.items()
-        if hasattr(request_type, "can_possibly_create")
-        and request_type.can_possibly_create(identity, record)
+        if hasattr(request_type, "is_applicable_to")
+        and request_type.is_applicable_to(identity, record)
     }
     return allowed_request_types
 
@@ -67,6 +67,10 @@ class RequestsComponent(ResultsComponent):
         projection["expanded"]["requests"] = requests
 
 
+class RequestTypesListDict(dict):
+    topic = None
+
+
 class RequestTypesList(RecordList):
     def __init__(self, *args, record=None, **kwargs):
         self._record = record
@@ -86,15 +90,15 @@ class RequestTypesList(RecordList):
                 **{f"record_link_{k}": v for k, v in rendered_record_links.items()}
             },
         )
-        res = {
-            "hits": {
+        res = RequestTypesListDict(
+            hits={
                 "hits": hits,
                 "total": self.total,
             }
-        }
+        )
         if self._links_tpl:
             res["links"] = links_tpl.expand(self._identity, None)
-
+        res.topic = self._record
         return res
 
     @property
