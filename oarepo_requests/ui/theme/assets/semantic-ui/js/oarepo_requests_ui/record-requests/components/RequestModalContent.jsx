@@ -6,9 +6,9 @@ import {
   SideRequestInfo,
   Timeline,
 } from "@js/oarepo_requests_detail/components";
-
 import { REQUEST_MODAL_TYPE } from "../utils/objects";
 import ReadOnlyCustomFields from "./common/ReadOnlyCustomFields";
+import { i18next } from "@translations/oarepo_requests_ui/i18next";
 
 /**
  * @typedef {import("../types").Request} Request
@@ -34,7 +34,14 @@ export const RequestModalContent = ({
       <Grid.Row>
         {description && (
           <Grid.Column as="p" id="request-modal-desc">
-            {description}
+            {description}{" "}
+            <a
+              href={request?.links?.self_html}
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              ({i18next.t("Request details")})
+            </a>
           </Grid.Column>
         )}
       </Grid.Row>

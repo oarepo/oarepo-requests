@@ -2,8 +2,6 @@
   &.request-create-button {
     display: block;
     margin-bottom: 10px;
-    background-color: @blue;
-    color: @white;
 
     &.delete_published_record {
       background-color: @red;
@@ -11,12 +9,6 @@
     &.publish_draft {
       color: white;
       background-color: @green;
-    }
-    &.new_version {
-    }
-    &.edit_published_record {
-    }
-    &.assign_doi {
     }
   }
   &.request-reply-button {
