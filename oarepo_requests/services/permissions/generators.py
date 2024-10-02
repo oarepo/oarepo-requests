@@ -1,7 +1,6 @@
 from flask_principal import Identity
 from invenio_records_permissions.generators import ConditionalGenerator, Generator
 from invenio_records_resources.references.entity_resolvers import EntityProxy
-from invenio_requests.proxies import current_requests
 from invenio_search.engine import dsl
 from oarepo_runtime.datastreams.utils import get_record_service_for_record
 from oarepo_workflows.requests.policy import RecipientGeneratorMixin
@@ -28,6 +27,7 @@ class IfRequestType(ConditionalGenerator):
 
     def _condition(self, request_type, **kwargs):
         return request_type.type_id in self.request_types
+
 
 class IfEventOnRequestType(IfRequestType):
 
@@ -114,16 +114,16 @@ try:
                 try:
                     # temporary, see invenio_pidstore.resolver.Resolver; with_deleted is hardcoded in get record
                     from invenio_pidstore.models import PersistentIdentifier
+
                     proxy = kwargs["request"].topic
-                    
+
                     pid_type = proxy.record_cls.pid.field._pid_type
                     pid_value = proxy._parse_ref_dict_id()
                     object_type = proxy.record_cls.pid.field._object_type
 
                     pid = PersistentIdentifier.get(pid_type, pid_value)
                     obj_id = pid.get_assigned_object(object_type=object_type)
-                    
-            
+
                     record = proxy.record_cls.get_record(obj_id, with_deleted=True)
                 except:
                     raise MissingTopicError(
@@ -165,9 +165,7 @@ class IfRequestedBy(RecipientGeneratorMixin, ConditionalGenerator):
                 # convert to entityproxy
                 from invenio_requests.resolvers.registry import ResolverRegistry
 
-                creator = ResolverRegistry.reference_entity(
-                    creator
-                )
+                creator = ResolverRegistry.reference_entity(creator)
             needs = creator.get_needs()
 
         for condition in self.requesters:

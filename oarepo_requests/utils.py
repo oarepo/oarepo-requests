@@ -161,8 +161,8 @@ def get_receiver_for_request_type(request_type, identity, topic):
     except KeyError:
         return None
 
-    from invenio_requests.resolvers.registry import ResolverRegistry
-    #creator = ResolverRegistry.reference_identity(identity)
+
+    # creator = ResolverRegistry.reference_identity(identity)
     # todo - the problem here is that we don't know who the creator is - it can be any of the users community roles at least?
     receivers = workflow_request.reference_receivers(
         identity=identity, record=topic, request_type=request_type, creator=identity
@@ -171,6 +171,7 @@ def get_receiver_for_request_type(request_type, identity, topic):
         return None
 
     return receivers
+
 
 def is_auto_approved(request_type, *, identity=None, topic=None, receiver=None):
     if not current_oarepo_workflows:
