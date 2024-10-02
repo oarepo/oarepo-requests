@@ -112,7 +112,7 @@ try:
                 ].topic.resolve()  # publish tries to resolve deleted draft
             except:
                 try:
-                    # see invenio_pidstore.resolver.Resolver
+                    # temporary, see invenio_pidstore.resolver.Resolver; with_deleted is hardcoded in get record
                     from invenio_pidstore.models import PersistentIdentifier
                     proxy = kwargs["request"].topic
                     

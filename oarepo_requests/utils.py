@@ -172,7 +172,7 @@ def get_receiver_for_request_type(request_type, identity, topic):
 
     return receivers
 
-def is_auto_approved(request_type, *, identity=None, topic=None, receiver=None, request=None):
+def is_auto_approved(request_type, *, identity=None, topic=None, receiver=None):
     if not current_oarepo_workflows:
         return False
 

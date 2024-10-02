@@ -77,7 +77,7 @@ class PublishDraftRequestType(NonDuplicableOARepoRequestType):
 
     @override
     def stateful_name(self, identity, *, topic=None, request=None):
-        if is_auto_approved(self, identity=identity, topic=topic, request=request):
+        if is_auto_approved(self, identity=identity, topic=topic):
             return _("Publish draft")
         if not request:
             return _("Submit for review")
