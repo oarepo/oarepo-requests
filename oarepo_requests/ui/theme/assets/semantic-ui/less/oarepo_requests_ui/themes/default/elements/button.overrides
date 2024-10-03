@@ -5,6 +5,7 @@
 
     &.delete_published_record {
       background-color: @red;
+      color: @white;
     }
     &.publish_draft {
       color: white;
