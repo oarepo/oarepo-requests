@@ -4,8 +4,7 @@ import { Button } from "semantic-ui-react";
 import { useFormikContext } from "formik";
 import { useMutation } from "@tanstack/react-query";
 import { serializeCustomFields } from "../utils";
-import { useRequestContext } from "../contexts";
-import { REQUEST_TYPE } from "./objects";
+import { useRequestContext, REQUEST_TYPE } from "@js/oarepo_requests_common";
 import { http } from "@js/oarepo_ui";
 import _isEmpty from "lodash/isEmpty";
 

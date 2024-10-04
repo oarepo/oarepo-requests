@@ -1,30 +1,36 @@
 import React from "react";
 import { i18next } from "@translations/oarepo_requests_ui/i18next";
 import { Button, Icon } from "semantic-ui-react";
-import { useRequestsApi } from "../../utils/hooks";
 import PropTypes from "prop-types";
 import { useFormikContext } from "formik";
-import { useConfirmModalContext, useModalControlContext } from "../../contexts";
+import {
+  useConfirmModalContext,
+  useModalControlContext,
+  REQUEST_TYPE,
+  useRequestsApi,
+} from "@js/oarepo_requests_common";
 
-const CreateAndSubmit = ({ requestType }) => {
+const Submit = ({ request }) => {
   const formik = useFormikContext();
   const { confirmAction } = useConfirmModalContext();
   const modalControl = useModalControlContext();
-  const { doCreateAndSubmitAction } = useRequestsApi(
-    requestType,
+
+  const { doAction } = useRequestsApi(
+    request,
     formik,
     confirmAction,
     modalControl
   );
+
   return (
     <Button
       title={i18next.t("Submit request")}
-      className="requests request-create-and-submit-button"
       color="blue"
+      className="requests request-submit-button"
       icon
       labelPosition="left"
       floated="right"
-      onClick={() => doCreateAndSubmitAction()}
+      onClick={() => doAction(REQUEST_TYPE.SUBMIT)}
     >
       <Icon name="paper plane" />
       {i18next.t("Submit")}
@@ -32,8 +38,8 @@ const CreateAndSubmit = ({ requestType }) => {
   );
 };
 
-CreateAndSubmit.propTypes = {
-  requestType: PropTypes.object,
+Submit.propTypes = {
+  request: PropTypes.object,
 };
 
-export default CreateAndSubmit;
+export default Submit;

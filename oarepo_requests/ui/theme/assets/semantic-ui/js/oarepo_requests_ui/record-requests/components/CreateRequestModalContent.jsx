@@ -4,13 +4,14 @@ import { Form, Divider } from "semantic-ui-react";
 import { CustomFields } from "react-invenio-forms";
 
 /**
- * @typedef {import("../types").RequestType} RequestType
+ * @typedef {import("../../record-requests/types").RequestType} RequestType
  * @typedef {import("formik").FormikConfig} FormikConfig
  */
 
 /** @param {{ requestType: RequestType, customSubmitHandler: (e) => void }} props */
 export const CreateRequestModalContent = ({ requestType, customFields }) => {
-  const description = requestType?.stateful_description || description;
+  const description =
+    requestType?.stateful_description || requestType?.description;
   return (
     <>
       {description && <p id="request-modal-desc">{description}</p>}

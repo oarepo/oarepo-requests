@@ -1,33 +1,42 @@
 import React, { useEffect, useState } from "react";
 import PropTypes from "prop-types";
-import { loadWidgetsFromConfig } from "../../utils/loader";
+import { loadWidgetsFromConfig } from "@js/oarepo_requests_common";
 import _has from "lodash/has";
 import _zip from "lodash/zip";
 
-const ReadOnlyCustomFields = ({
+export const ReadOnlyCustomFields = ({
   config,
   data,
   fieldPathPrefix,
   templateLoaders,
-  includesPaths = (fields) => fields.map((field) => field.key)
+  includesPaths = (fields) => fields.map((field) => field.key),
 }) => {
   const [sections, setSections] = useState([]);
 
   const loadCustomFieldsWidgets = async () => {
     const sections = [];
     for (const sectionCfg of config) {
-      const usedFields = sectionCfg.fields.filter((field) => _has(data, field.field));
+      const usedFields = sectionCfg.fields.filter((field) =>
+        _has(data, field.field)
+      );
       const Widgets = await loadWidgetsFromConfig({
         templateLoaders: templateLoaders,
         fieldPathPrefix: fieldPathPrefix,
         fields: usedFields,
       });
       const widgetsWithConfig = _zip(Widgets, usedFields);
-      const filteredFieldsWithData = widgetsWithConfig
-        .map(([Widget, fieldConfig]) => {
+      const filteredFieldsWithData = widgetsWithConfig.map(
+        ([Widget, fieldConfig]) => {
           const value = data[fieldConfig.field];
-          return <Widget key={fieldConfig.field} props={fieldConfig.view_widget_props} value={value} />;
-        });
+          return (
+            <Widget
+              key={fieldConfig.field}
+              props={fieldConfig.view_widget_props}
+              value={value}
+            />
+          );
+        }
+      );
       sections.push({ ...sectionCfg, fields: filteredFieldsWithData });
     }
     return sections;
@@ -78,5 +87,3 @@ ReadOnlyCustomFields.propTypes = {
 ReadOnlyCustomFields.defaultProps = {
   includesPaths: (fields) => fields.map((field) => field.key),
 };
-
-export default ReadOnlyCustomFields;

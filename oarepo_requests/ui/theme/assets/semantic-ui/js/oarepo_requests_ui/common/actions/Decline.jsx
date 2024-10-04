@@ -1,11 +1,14 @@
 import React from "react";
 import { i18next } from "@translations/oarepo_requests_ui/i18next";
 import { Button, Icon } from "semantic-ui-react";
-import { REQUEST_TYPE } from "../../utils/objects";
-import { useRequestsApi } from "../../utils/hooks";
 import PropTypes from "prop-types";
 import { useFormikContext } from "formik";
-import { useConfirmModalContext, useModalControlContext } from "../../contexts";
+import {
+  useConfirmModalContext,
+  useModalControlContext,
+  REQUEST_TYPE,
+  useRequestsApi,
+} from "@js/oarepo_requests_common";
 
 const Decline = ({ request }) => {
   const formik = useFormikContext();

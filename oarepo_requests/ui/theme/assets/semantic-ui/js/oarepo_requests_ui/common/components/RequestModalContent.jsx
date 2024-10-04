@@ -6,14 +6,16 @@ import {
   SideRequestInfo,
   Timeline,
 } from "@js/oarepo_requests_detail/components";
-import { REQUEST_MODAL_TYPE } from "../utils/objects";
-import ReadOnlyCustomFields from "./common/ReadOnlyCustomFields";
+import {
+  REQUEST_MODAL_TYPE,
+  ReadOnlyCustomFields,
+} from "@js/oarepo_requests_common";
 import { i18next } from "@translations/oarepo_requests_ui/i18next";
 
 /**
- * @typedef {import("../types").Request} Request
- * @typedef {import("../types").RequestTypeEnum} RequestTypeEnum
- * @typedef {import("../types").Event} Event
+ * @typedef {import("../../record-requests/types").Request} Request
+ * @typedef {import("../../record-requests/types").RequestTypeEnum} RequestTypeEnum
+ * @typedef {import("../../record-requests/types").Event} Event
  */
 
 /** @param {{ request: Request, requestModalType: RequestTypeEnum, }} props */
@@ -80,7 +82,9 @@ export const RequestModalContent = ({
                         data={{ [key]: request.payload[key] }}
                         templateLoaders={[
                           (widget) =>
-                            import(`../components/common/${widget}.jsx`),
+                            import(
+                              `@js/oarepo_requests_common/widgets/${widget}.jsx`
+                            ),
                           (widget) => import(`react-invenio-forms`),
                         ]}
                       />

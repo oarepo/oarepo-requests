@@ -1,5 +1,5 @@
 import React, { createContext, useContext } from "react";
-import { useConfirmDialog } from "../utils/hooks";
+import { useConfirmDialog } from "@js/oarepo_requests_common";
 import PropTypes from "prop-types";
 
 const ConfirmModalContext = createContext();

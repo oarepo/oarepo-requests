@@ -1,13 +1,16 @@
 import React from "react";
 import { i18next } from "@translations/oarepo_requests_ui/i18next";
 import { Button, Icon } from "semantic-ui-react";
-import { REQUEST_TYPE } from "../../utils/objects";
-import { useRequestsApi } from "../../utils/hooks";
 import PropTypes from "prop-types";
 import { useFormikContext } from "formik";
-import { useConfirmModalContext, useModalControlContext } from "../../contexts";
+import {
+  useConfirmModalContext,
+  useModalControlContext,
+  REQUEST_TYPE,
+  useRequestsApi,
+} from "@js/oarepo_requests_common";
 
-const Submit = ({ request }) => {
+const Cancel = ({ request }) => {
   const formik = useFormikContext();
   const { confirmAction } = useConfirmModalContext();
   const modalControl = useModalControlContext();
@@ -21,22 +24,22 @@ const Submit = ({ request }) => {
 
   return (
     <Button
-      title={i18next.t("Submit request")}
-      color="blue"
-      className="requests request-submit-button"
+      title={i18next.t("Cancel request")}
+      onClick={() => doAction(REQUEST_TYPE.CANCEL, true)}
+      className="requests request-cancel-button"
+      color="grey"
       icon
       labelPosition="left"
-      floated="right"
-      onClick={() => doAction(REQUEST_TYPE.SUBMIT)}
+      floated="left"
     >
-      <Icon name="paper plane" />
-      {i18next.t("Submit")}
+      <Icon name="trash alternate" />
+      {i18next.t("Cancel request")}
     </Button>
   );
 };
 
-Submit.propTypes = {
+Cancel.propTypes = {
   request: PropTypes.object,
 };
 
-export default Submit;
+export default Cancel;

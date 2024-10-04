@@ -1,5 +1,4 @@
-import React from "react";
-import DefaultView from "../components/common/DefaultView";
+import { DefaultView } from "@js/oarepo_requests_common";
 
 /** Import function to load widget either from a specific path or local widgets
  *
@@ -8,11 +7,8 @@ import DefaultView from "../components/common/DefaultView";
  * user of this function that has to ensure that. The value is hardcoded here as the
  * dynamic import cannot rely on purely a dynamic path i.e a variable.
  */
-export async function importWidget(
-  templateLoaders,
-  { view_widget: UIWidget, fieldPath, view_widget_props: props }
-) {
-  let component = undefined;
+export async function importWidget(templateLoaders, { view_widget: UIWidget }) {
+  let component;
 
   // Try import widget from user's defined templateLoaders
   for (const loader of templateLoaders) {
@@ -64,7 +60,11 @@ export async function loadWidgetsFromConfig({
   fieldPathPrefix,
   fields,
 }) {
-  const importWidgetsFromFolder = (templateFolder, fieldPathPrefix, fieldsConfig) => {
+  const importWidgetsFromFolder = (
+    templateFolder,
+    fieldPathPrefix,
+    fieldsConfig
+  ) => {
     const tplPromises = [];
     fieldsConfig.forEach((fieldCfg) => {
       tplPromises.push(

@@ -1,8 +1,7 @@
 import React from "react";
 import { Button } from "semantic-ui-react";
-import { useRequestsApi } from "../../utils/hooks";
 import PropTypes from "prop-types";
-import { useRequestContext } from "../../contexts";
+import { useRequestContext, useRequestsApi } from "@js/oarepo_requests_common";
 
 // Directly create and submit request without modal
 const CreateSubmitAction = ({ requestType }) => {

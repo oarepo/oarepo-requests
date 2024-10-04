@@ -3,7 +3,7 @@ import { i18next } from "@translations/oarepo_requests_ui/i18next";
 import { Button, Placeholder, Message } from "semantic-ui-react";
 import _isEmpty from "lodash/isEmpty";
 import { RequestModal, CreateRequestModalContent } from ".";
-import { useRequestContext } from "../contexts";
+import { useRequestContext } from "@js/oarepo_requests_common";
 import PropTypes from "prop-types";
 
 /**

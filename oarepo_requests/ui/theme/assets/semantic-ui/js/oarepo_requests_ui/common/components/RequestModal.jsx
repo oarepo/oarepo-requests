@@ -15,17 +15,18 @@ import _isEmpty from "lodash/isEmpty";
 import {
   ConfirmModalContextProvider,
   ModalControlContextProvider,
-} from "../contexts";
-import { REQUEST_TYPE, REQUEST_MODAL_TYPE } from "../utils/objects";
-import { mapLinksToActions } from "./actions";
+  mapLinksToActions,
+  REQUEST_TYPE,
+  REQUEST_MODAL_TYPE,
+} from "@js/oarepo_requests_common";
 import PropTypes from "prop-types";
 import { useQuery } from "@tanstack/react-query";
 // TODO: remove when /configs starts using vnd zenodo accept header
 import { http } from "react-invenio-forms";
 
 /**
- * @typedef {import("../types").Request} Request
- * @typedef {import("../types").RequestType} RequestType
+ * @typedef {import("../../record-requests/types").Request} Request
+ * @typedef {import("../../record-requests/types").RequestType} RequestType
  * @typedef {import("react").ReactElement} ReactElement
  */
 

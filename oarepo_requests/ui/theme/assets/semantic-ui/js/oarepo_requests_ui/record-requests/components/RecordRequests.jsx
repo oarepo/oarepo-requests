@@ -2,7 +2,7 @@ import React, { useCallback } from "react";
 import PropTypes from "prop-types";
 import { SegmentGroup } from "semantic-ui-react";
 import { CreateRequestButtonGroup, RequestListContainer } from ".";
-import { RequestContextProvider } from "../contexts";
+import { RequestContextProvider } from "@js/oarepo_requests_common";
 import {
   useQuery,
   useQueryClient,

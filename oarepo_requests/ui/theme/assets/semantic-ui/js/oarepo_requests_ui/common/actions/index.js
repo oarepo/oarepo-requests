@@ -1,4 +1,4 @@
-import { REQUEST_TYPE } from "../../utils/objects";
+import { REQUEST_TYPE } from "@js/oarepo_requests_common";
 import Accept from "./Accept";
 import Decline from "./Decline";
 import Cancel from "./Cancel";

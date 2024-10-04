@@ -2,7 +2,7 @@ import React from "react";
 import PropTypes from "prop-types";
 import { Button } from "semantic-ui-react";
 import { RequestModal, RequestModalContent } from ".";
-import { useRequestContext } from "../contexts";
+import { useRequestContext } from "@js/oarepo_requests_common";
 
 /**
  * @typedef {import("../types").Request} Request
