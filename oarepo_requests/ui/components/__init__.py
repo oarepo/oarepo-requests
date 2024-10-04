@@ -1,3 +1,9 @@
-from oarepo_requests.ui.components.custom_fields import FormConfigCustomFieldsComponent
+from oarepo_requests.ui.components.custom_fields import (
+    FormConfigCustomFieldsComponent,
+    FormConfigRequestTypePropertiesComponent,
+)
 
-__all__ = ("FormConfigCustomFieldsComponent",)
+__all__ = (
+    "FormConfigCustomFieldsComponent",
+    "FormConfigRequestTypePropertiesComponent",
+)
