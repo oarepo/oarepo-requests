@@ -12,6 +12,7 @@ class DeletePublishedRecordRequestType(NonDuplicableOARepoRequestType):
     type_id = "delete_published_record"
     name = _("Delete record")
 
+    dangerous = True
     @classmethod
     @property
     def available_actions(cls):

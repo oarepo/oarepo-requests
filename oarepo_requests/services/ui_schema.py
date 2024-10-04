@@ -123,6 +123,10 @@ class UIRequestTypeSchema(RequestTypeSchema):
     stateful_name = ma.fields.String(dump_only=True)
     stateful_description = ma.fields.String(dump_only=True)
 
+    dangerous = ma.fields.Boolean(dump_only=True)
+    editable = ma.fields.Boolean(dump_only=True)
+    has_form = ma.fields.Boolean(dump_only=True)
+
     @ma.post_dump
     def add_type_details(self, data, **kwargs):
         type = data["type_id"]
@@ -131,6 +135,12 @@ class UIRequestTypeSchema(RequestTypeSchema):
             data["description"] = type_obj.description
         if hasattr(type_obj, "name"):
             data["name"] = type_obj.name
+        if hasattr(type_obj, "dangerous"):
+            data["dangerous"] = type_obj.dangerous
+        if hasattr(type_obj, "editable"):
+            data["editable"] = type_obj.editable
+        if hasattr(type_obj, "has_form"):
+            data["has_form"] = type_obj.has_form
 
         if hasattr(type_obj, "stateful_name"):
             data["stateful_name"] = type_obj.stateful_name(
