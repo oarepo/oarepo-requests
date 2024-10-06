@@ -16,8 +16,6 @@ import {
   ConfirmModalContextProvider,
   ModalControlContextProvider,
   mapLinksToActions,
-  REQUEST_TYPE,
-  REQUEST_MODAL_TYPE,
 } from "@js/oarepo_requests_common";
 import PropTypes from "prop-types";
 import { useQuery } from "@tanstack/react-query";
@@ -140,19 +138,14 @@ const RequestModalContentAndActions = ({
     }
   );
   const customFields = data?.data?.custom_fields;
+  const extra_data = data?.data?.extra_data;
+
   const modalActions = mapLinksToActions(
     requestCreationModal ? requestType : request,
-    customFields
+    customFields,
+    extra_data
   );
 
-  // Only applies to RequestModalContent component:
-  // READ ONLY modal type contains Accept, Decline, and/or Cancel actions OR contains Cancel action only => only ReadOnlyCustomFields are rendered
-  // SUBMIT FORM modal type contains Submit and/or Save, Create, CreateAndSubmit action => Form is rendered
-  const requestModalContentType = modalActions.some(
-    ({ name }) => name === REQUEST_TYPE.ACCEPT || name === REQUEST_TYPE.CANCEL
-  )
-    ? REQUEST_MODAL_TYPE.READ_ONLY
-    : REQUEST_MODAL_TYPE.SUBMIT_FORM;
   return (
     <React.Fragment>
       <Dimmer active={isLoading}>
@@ -174,9 +167,9 @@ const RequestModalContentAndActions = ({
         <ContentComponent
           request={request}
           requestType={requestType}
-          requestModalType={requestModalContentType}
           onCompletedAction={onSubmit}
           customFields={customFields}
+          modalActions={modalActions}
         />
       </Modal.Content>
       <Modal.Actions>

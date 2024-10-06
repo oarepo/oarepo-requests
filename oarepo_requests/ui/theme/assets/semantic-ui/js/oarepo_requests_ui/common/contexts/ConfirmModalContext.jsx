@@ -26,7 +26,7 @@ ConfirmModalContextProvider.propTypes = {
 export const useConfirmModalContext = () => {
   const context = useContext(ConfirmModalContext);
   if (!context) {
-    throw new Error(
+    console.error(
       "useModalControlContext must be used inside ConfirmModalContext.Provider"
     );
   }

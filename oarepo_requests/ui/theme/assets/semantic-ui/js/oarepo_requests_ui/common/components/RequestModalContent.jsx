@@ -1,14 +1,14 @@
 import React from "react";
 import PropTypes from "prop-types";
-import { Grid, List, Form, Divider } from "semantic-ui-react";
-import { CustomFields } from "react-invenio-forms";
+import { Grid } from "semantic-ui-react";
+import {} from "react-invenio-forms";
 import {
   SideRequestInfo,
   Timeline,
 } from "@js/oarepo_requests_detail/components";
 import {
   REQUEST_MODAL_TYPE,
-  ReadOnlyCustomFields,
+  RequestCustomFields,
 } from "@js/oarepo_requests_common";
 import { i18next } from "@translations/oarepo_requests_ui/i18next";
 
@@ -21,15 +21,11 @@ import { i18next } from "@translations/oarepo_requests_ui/i18next";
 /** @param {{ request: Request, requestModalType: RequestTypeEnum, }} props */
 export const RequestModalContent = ({
   request,
-  requestModalType,
   customFields,
+  modalActions,
 }) => {
   /** @type {{requests: Request[], setRequests: (requests: Request[]) => void}} */
 
-  const renderSubmitForm =
-    requestModalType === REQUEST_MODAL_TYPE.SUBMIT_FORM && customFields?.ui;
-  const renderReadOnlyData =
-    requestModalType === REQUEST_MODAL_TYPE.READ_ONLY && request?.payload;
   const description = request?.stateful_description || request?.description;
   return (
     <Grid doubling stackable>
@@ -52,57 +48,22 @@ export const RequestModalContent = ({
           <SideRequestInfo request={request} />
         </Grid.Column>
       </Grid.Row>
-      {(renderSubmitForm || renderReadOnlyData) && (
-        <Grid.Row>
-          <Grid.Column width={16}>
-            {renderSubmitForm && (
-              <Form>
-                <CustomFields
-                  className="requests-form-cf"
-                  config={customFields?.ui}
-                  templateLoaders={[
-                    (widget) => import(`@templates/custom_fields/${widget}.js`),
-                    (widget) => import(`react-invenio-forms`),
-                  ]}
-                  fieldPathPrefix="payload"
-                />
-                <Divider hidden />
-              </Form>
-            )}
-
-            {renderReadOnlyData && (
-              <List relaxed>
-                {Object.keys(request.payload).map((key) => (
-                  <List.Item key={key}>
-                    <List.Content>
-                      <List.Header>{key}</List.Header>
-                      <ReadOnlyCustomFields
-                        className="requests-form-cf"
-                        config={customFields?.ui}
-                        data={{ [key]: request.payload[key] }}
-                        templateLoaders={[
-                          (widget) =>
-                            import(
-                              `@js/oarepo_requests_common/widgets/${widget}.jsx`
-                            ),
-                          (widget) => import(`react-invenio-forms`),
-                        ]}
-                      />
-                    </List.Content>
-                  </List.Item>
-                ))}
-              </List>
-            )}
-            <Timeline request={request} />
-          </Grid.Column>
-        </Grid.Row>
-      )}
+      <RequestCustomFields
+        request={request}
+        customFields={customFields}
+        actions={modalActions}
+      />
+      <Grid.Row>
+        <Grid.Column>
+          <Timeline request={request} />
+        </Grid.Column>
+      </Grid.Row>
     </Grid>
   );
 };
 
 RequestModalContent.propTypes = {
   request: PropTypes.object.isRequired,
-  requestModalType: PropTypes.string.isRequired,
   customFields: PropTypes.object,
+  modalActions: PropTypes.array,
 };

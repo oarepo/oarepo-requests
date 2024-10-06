@@ -6,7 +6,7 @@ import { useRequestContext, useRequestsApi } from "@js/oarepo_requests_common";
 // Directly create and submit request without modal
 const CreateSubmitAction = ({ requestType }) => {
   const { createAndSubmitRequest } = useRequestsApi(requestType);
-  const { isLoading, mutate } = createAndSubmitRequest;
+  const { isLoading, mutate: createAndSubmit } = createAndSubmitRequest;
   const { requestButtonsIconsConfig } = useRequestContext();
   const buttonIconProps = requestButtonsIconsConfig[requestType.type_id];
   const buttonContent =
@@ -19,7 +19,7 @@ const CreateSubmitAction = ({ requestType }) => {
       title={buttonContent}
       content={buttonContent}
       loading={isLoading}
-      onClick={() => mutate()}
+      onClick={() => createAndSubmit()}
       {...buttonIconProps}
     />
   );

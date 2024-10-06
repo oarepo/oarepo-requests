@@ -21,6 +21,34 @@ export const requestButtonsDefaultIconConfig = {
   submitted: { icon: "clock", labelPosition: "left" },
 };
 
+export const requestExtraConfig = {
+  delete_published_record: {
+    dangerous: true,
+    hasForm: false,
+    editable: true,
+  },
+  publish_draft: {
+    dangerous: false,
+    hasForm: true,
+    editable: true,
+  },
+  new_version: {
+    dangerous: false,
+    hasForm: false,
+    editable: false,
+  },
+  edit_published_record: {
+    dangerous: false,
+    hasForm: false,
+    editable: false,
+  },
+  assign_doi: {
+    dangerous: false,
+    hasForm: false,
+    editable: false,
+  },
+};
+
 const queryClient = new QueryClient();
 
 const RecordRequests = ({
@@ -53,7 +81,13 @@ const RecordRequests = ({
     enabled: !!initialRecord.links?.requests,
     refetchOnWindowFocus: false,
   });
-  const applicableRequestTypes = requestTypes?.data?.hits?.hits;
+  let applicableRequestTypes = requestTypes?.data?.hits?.hits;
+  applicableRequestTypes = applicableRequestTypes?.map((requestType) => {
+    return {
+      ...requestType,
+      ...requestExtraConfig[requestType.type_id],
+    };
+  });
   const requests = recordRequests?.data?.hits?.hits;
   const fetchNewRequests = useCallback(() => {
     queryClient.invalidateQueries(["applicableRequestTypes"]);

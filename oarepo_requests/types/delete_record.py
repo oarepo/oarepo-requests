@@ -10,6 +10,13 @@ class DeletePublishedRecordRequestType(NonDuplicableOARepoRequestType):
     type_id = "delete_published_record"
     name = _("Delete record")
 
+    # Adding the extra_data attribute
+    extra_data = {
+        "dangerous": True,
+        "hasForm": False,
+        "editable": True,
+    }
+
     @classmethod
     @property
     def available_actions(cls):

@@ -3,7 +3,10 @@ import { i18next } from "@translations/oarepo_requests_ui/i18next";
 import { Button, Placeholder, Message } from "semantic-ui-react";
 import _isEmpty from "lodash/isEmpty";
 import { RequestModal, CreateRequestModalContent } from ".";
-import { useRequestContext } from "@js/oarepo_requests_common";
+import {
+  useRequestContext,
+  CreateSubmitAction,
+} from "@js/oarepo_requests_common";
 import PropTypes from "prop-types";
 
 /**
@@ -52,12 +55,14 @@ export const CreateRequestButtonGroup = ({
   return (
     <div className="requests-create-request-buttons borderless">
       {createRequests.map((requestType) => {
+        const { dangerous, hasForm } = requestType;
+        const needsDialog = dangerous || hasForm;
         const header =
           requestType?.stateful_name ||
           requestType?.name ||
           requestType?.type_id;
         const buttonIconProps = requestButtonsIconsConfig[requestType.type_id];
-        return (
+        return needsDialog ? (
           <RequestModal
             key={requestType.type_id}
             requestType={requestType}
@@ -74,6 +79,11 @@ export const CreateRequestButtonGroup = ({
               />
             }
             ContentComponent={CreateRequestModalContent}
+          />
+        ) : (
+          <CreateSubmitAction
+            key={requestType?.type_id}
+            requestType={requestType}
           />
         );
       })}

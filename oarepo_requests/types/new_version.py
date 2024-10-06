@@ -26,6 +26,11 @@ class NewVersionRequestType(
             data_key="draft_record:links:self_html",
         ),
     }
+    extra_data = {
+        "dangerous": False,
+        "hasForm": False,
+        "editable": False,
+    }
 
     @classmethod
     @property

@@ -110,16 +110,22 @@ export const useRequestsApi = (
     customFieldsData = serializeCustomFields(formik.values);
   }
 
+  const saveAndSubmit = async (request) => {
+    await http.put(request.links?.self, customFieldsData);
+    const submittedRequest = await http.post(
+      request?.links?.actions?.submit,
+      {}
+    );
+    return submittedRequest;
+  };
+
   const createAndSubmitRequest = useAction(
     async () => {
       const createdRequest = await http.post(
         request.links?.actions?.create,
         customFieldsData
       );
-      const submittedRequest = await http.post(
-        createdRequest.data?.links?.actions?.submit,
-        customFieldsData
-      );
+      const submittedRequest = await saveAndSubmit(createdRequest.data);
       const redirectionURL = submittedRequest?.data?.links?.topic_html;
       if (redirectionURL) {
         window.location.href = redirectionURL;
@@ -145,6 +151,8 @@ export const useRequestsApi = (
         response = await http.put(request.links?.self, customFieldsData);
       } else if (requestActionType === REQUEST_TYPE.ACCEPT) {
         response = await http.post(actionUrl);
+      } else if (requestActionType === REQUEST_TYPE.SUBMIT) {
+        response = await saveAndSubmit(request);
       } else {
         response = await http.post(actionUrl, customFieldsData);
       }
@@ -178,8 +186,12 @@ export const useRequestsApi = (
 };
 
 const useAction = (action, formik, modalControl) => {
-  const { onBeforeAction, onAfterAction, onActionError, fetchNewRequests } =
-    useRequestContext();
+  const {
+    onBeforeAction = undefined,
+    onAfterAction = undefined,
+    onActionError = undefined,
+    fetchNewRequests = undefined,
+  } = useRequestContext() || {};
   return useMutation(
     async (requestActionType) => {
       formik?.setSubmitting(true);

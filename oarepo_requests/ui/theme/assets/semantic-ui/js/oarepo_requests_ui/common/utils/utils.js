@@ -19,3 +19,9 @@ export const serializeCustomFields = (formData) => {
     }
   }
 };
+
+export const saveAndSubmit = async (request) => {
+  await http.put(request.links?.self, customFieldsData);
+  const submittedRequest = await http.post(request?.links?.actions?.submit, {});
+  return submittedRequest;
+};

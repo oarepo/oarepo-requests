@@ -17,8 +17,8 @@ RequestContextProvider.propTypes = {
 export const useRequestContext = () => {
   const context = useContext(RequestContext);
   if (!context) {
-    throw new Error(
-      "useModalControlContext must be used inside RequestContext.Provider"
+    console.error(
+      "useRequestContext must be used inside RequestContext.Provider"
     );
   }
   return context;
