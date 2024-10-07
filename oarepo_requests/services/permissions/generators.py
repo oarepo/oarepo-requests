@@ -30,6 +30,12 @@ class IfRequestType(ConditionalGenerator):
         return request_type.type_id in self.request_types
 
 
+class IfEventOnRequestType(IfRequestType):
+
+    def _condition(self, request, **kwargs):
+        return request.type.type_id in self.request_types
+
+
 class IfEventType(ConditionalGenerator):
     def __init__(self, event_types, then_, else_=None):
         else_ = [] if else_ is None else else_
@@ -143,9 +149,9 @@ class IfRequestedBy(RecipientGeneratorMixin, ConditionalGenerator):
         else:
             if not isinstance(creator, EntityProxy):
                 # convert to entityproxy
-                creator = current_requests.entity_resolvers_registry.reference_entity(
-                    creator
-                )
+                from invenio_requests.resolvers.registry import ResolverRegistry
+
+                creator = ResolverRegistry.reference_entity(creator)
             needs = creator.get_needs()
 
         for condition in self.requesters:

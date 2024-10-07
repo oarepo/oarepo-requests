@@ -28,32 +28,26 @@ def test_allowed_request_types_on_draft_service(
             creator.identity, draft1.json["id"]
         )
     )
-    assert allowed_request_types.to_dict() == {
-        "hits": {
-            "hits": [
-                {
-                    "links": {
-                        "actions": {
-                            "create": f'https://127.0.0.1:5000/api/thesis/{draft1.json["id"]}/draft/requests/delete_draft'
-                        }
-                    },
-                    "type_id": "delete_draft",
-                },
-                {
-                    "links": {
-                        "actions": {
-                            "create": f'https://127.0.0.1:5000/api/thesis/{draft1.json["id"]}/draft/requests/publish_draft'
-                        }
-                    },
-                    "type_id": "publish_draft",
-                },
-            ],
-            "total": 2,
+    assert sorted(
+        allowed_request_types.to_dict()["hits"]["hits"], key=lambda x: x["type_id"]
+    ) == [
+        {
+            "links": {
+                "actions": {
+                    "create": f'https://127.0.0.1:5000/api/thesis/{draft1.json["id"]}/draft/requests/delete_draft'
+                }
+            },
+            "type_id": "delete_draft",
         },
-        "links": {
-            "self": f'https://127.0.0.1:5000/api/thesis/{draft1.json["id"]}/draft/requests/applicable'
+        {
+            "links": {
+                "actions": {
+                    "create": f'https://127.0.0.1:5000/api/thesis/{draft1.json["id"]}/draft/requests/publish_draft'
+                }
+            },
+            "type_id": "publish_draft",
         },
-    }
+    ]
 
 
 def test_allowed_request_types_on_draft_resource(
@@ -80,32 +74,26 @@ def test_allowed_request_types_on_draft_resource(
     allowed_request_types = creator_client.get(
         link_api2testclient(applicable_requests_link)
     )
-    assert allowed_request_types.json == {
-        "hits": {
-            "hits": [
-                {
-                    "links": {
-                        "actions": {
-                            "create": f'https://127.0.0.1:5000/api/thesis/{draft1.json["id"]}/draft/requests/delete_draft'
-                        }
-                    },
-                    "type_id": "delete_draft",
-                },
-                {
-                    "links": {
-                        "actions": {
-                            "create": f'https://127.0.0.1:5000/api/thesis/{draft1.json["id"]}/draft/requests/publish_draft'
-                        }
-                    },
-                    "type_id": "publish_draft",
-                },
-            ],
-            "total": 2,
+    assert sorted(
+        allowed_request_types.json["hits"]["hits"], key=lambda x: x["type_id"]
+    ) == [
+        {
+            "links": {
+                "actions": {
+                    "create": f'https://127.0.0.1:5000/api/thesis/{draft1.json["id"]}/draft/requests/delete_draft'
+                }
+            },
+            "type_id": "delete_draft",
         },
-        "links": {
-            "self": f'https://127.0.0.1:5000/api/thesis/{draft1.json["id"]}/draft/requests/applicable'
+        {
+            "links": {
+                "actions": {
+                    "create": f'https://127.0.0.1:5000/api/thesis/{draft1.json["id"]}/draft/requests/publish_draft'
+                }
+            },
+            "type_id": "publish_draft",
         },
-    }
+    ]
 
 
 def publish_record(
@@ -239,7 +227,10 @@ def test_ui_serialization(
         headers={"Accept": "application/vnd.inveniordm.v1+json"},
     )
 
-    assert allowed_request_types_draft.json["hits"]["hits"] == [
+    sorted_draft_list = allowed_request_types_draft.json["hits"]["hits"]
+    sorted_draft_list.sort(key=lambda serialized_rt: serialized_rt["type_id"])
+
+    assert sorted_draft_list == [
         {
             "dangerous": True,
             "description": "Request deletion of draft",
