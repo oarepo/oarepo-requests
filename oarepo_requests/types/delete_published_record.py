@@ -1,7 +1,9 @@
 from oarepo_runtime.i18n import lazy_gettext as _
 from typing_extensions import override
 
-from oarepo_requests.actions.delete_published_record import DeletePublishedRecordAcceptAction
+from oarepo_requests.actions.delete_published_record import (
+    DeletePublishedRecordAcceptAction,
+)
 
 from ..utils import is_auto_approved, request_identity_matches
 from .generic import NonDuplicableOARepoRequestType
