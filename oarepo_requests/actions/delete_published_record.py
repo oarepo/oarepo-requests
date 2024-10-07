@@ -3,7 +3,7 @@ from oarepo_runtime.datastreams.utils import get_record_service_for_record
 from .generic import OARepoAcceptAction
 
 
-class DeleteTopicAcceptAction(OARepoAcceptAction):
+class DeletePublishedRecordAcceptAction(OARepoAcceptAction):
     def apply(self, identity, request_type, topic, uow, *args, **kwargs):
         topic_service = get_record_service_for_record(topic)
         if not topic_service:
