@@ -1,22 +1,21 @@
 import React, { useState, useCallback } from "react";
 import { i18next } from "@translations/oarepo_requests_ui/i18next";
 import { Button } from "semantic-ui-react";
-import { useFormikContext } from "formik";
 import { useMutation } from "@tanstack/react-query";
-import { serializeCustomFields } from "../utils";
-import { useRequestContext, REQUEST_TYPE } from "@js/oarepo_requests_common";
-import { http } from "@js/oarepo_ui";
-import _isEmpty from "lodash/isEmpty";
+import {
+  useRequestContext,
+  REQUEST_TYPE,
+  WarningMessage,
+} from "@js/oarepo_requests_common";
 
 /**
  * @typedef {import("semantic-ui-react").ConfirmProps} ConfirmProps
  */
 
 export const useConfirmDialog = (isEventModal = false) => {
-  const { setSubmitting } = useFormikContext();
-
   /** @type {[ConfirmProps, (props: ConfirmProps) => void]} */
-  const [confirmDialogProps, setConfirmDialogProps] = useState({
+
+  const initialState = {
     open: false,
     content: i18next.t("Are you sure?"),
     cancelButton: i18next.t("Close"),
@@ -25,24 +24,25 @@ export const useConfirmDialog = (isEventModal = false) => {
       setConfirmDialogProps((props) => ({ ...props, open: false })),
     onConfirm: () =>
       setConfirmDialogProps((props) => ({ ...props, open: false })),
-  });
+  };
+  const [confirmDialogProps, setConfirmDialogProps] = useState(initialState);
 
   const confirmAction = useCallback(
-    (onConfirm, requestType, createAndSubmit = false) => {
+    (onConfirm, requestActionType, { dangerous, hasForm, editable } = {}) => {
       /** @type {ConfirmProps} */
       let newConfirmDialogProps = {
         open: true,
+        content: dangerous ? <WarningMessage /> : i18next.t("Are you sure?"),
         onConfirm: () => {
           setConfirmDialogProps((props) => ({ ...props, open: false }));
           onConfirm();
         },
         onCancel: () => {
-          setConfirmDialogProps((props) => ({ ...props, open: false }));
-          setSubmitting(false);
+          setConfirmDialogProps(initialState);
         },
       };
 
-      switch (requestType) {
+      switch (requestActionType) {
         case REQUEST_TYPE.CREATE:
           newConfirmDialogProps.header = isEventModal
             ? i18next.t("Submit event")
@@ -74,118 +74,37 @@ export const useConfirmDialog = (isEventModal = false) => {
           break;
       }
 
-      if (createAndSubmit) {
-        newConfirmDialogProps = {
-          ...newConfirmDialogProps,
-          header: i18next.t("Create and submit request"),
-          confirmButton: (
-            <Button positive>{i18next.t("Create and submit")}</Button>
-          ),
-          onConfirm: () => {
-            setConfirmDialogProps((props) => ({ ...props, open: false }));
-            onConfirm();
-          },
-        };
-      }
+      // if (createAndSubmit) {
+      //   newConfirmDialogProps = {
+      //     ...newConfirmDialogProps,
+      //     header: i18next.t("Create and submit request"),
+      //     confirmButton: (
+      //       <Button positive>{i18next.t("Create and submit")}</Button>
+      //     ),
+      //     onConfirm: () => {
+      //       setConfirmDialogProps((props) => ({ ...props, open: false }));
+      //       onConfirm();
+      //     },
+      //   };
+      // }
 
       setConfirmDialogProps((props) => ({
         ...props,
         ...newConfirmDialogProps,
       }));
     },
-    [setSubmitting, isEventModal]
+    [isEventModal]
   );
 
   return { confirmDialogProps, confirmAction };
 };
 
-export const useRequestsApi = (
-  request,
+export const useAction = ({
+  action,
+  requestOrRequestType,
   formik,
-  confirmAction,
-  modalControl
-) => {
-  let customFieldsData = {};
-  if (!_isEmpty(formik?.values)) {
-    customFieldsData = serializeCustomFields(formik.values);
-  }
-
-  const saveAndSubmit = async (request) => {
-    await http.put(request.links?.self, customFieldsData);
-    const submittedRequest = await http.post(
-      request?.links?.actions?.submit,
-      {}
-    );
-    return submittedRequest;
-  };
-
-  const createAndSubmitRequest = useAction(
-    async () => {
-      const createdRequest = await http.post(
-        request.links?.actions?.create,
-        customFieldsData
-      );
-      const submittedRequest = await saveAndSubmit(createdRequest.data);
-      const redirectionURL = submittedRequest?.data?.links?.topic_html;
-      if (redirectionURL) {
-        window.location.href = redirectionURL;
-      }
-    },
-    formik,
-    modalControl
-  );
-
-  const doCreateAndSubmitAction = (waitForConfirmation = false) => {
-    if (waitForConfirmation) {
-      confirmAction(createAndSubmitRequest.mutate(), REQUEST_TYPE.SUBMIT, true);
-    } else {
-      createAndSubmitRequest.mutate();
-    }
-  };
-
-  const sendRequest = useAction(
-    async (requestActionType) => {
-      let response;
-      const actionUrl = request.links?.actions[requestActionType];
-      if (requestActionType === REQUEST_TYPE.SAVE) {
-        response = await http.put(request.links?.self, customFieldsData);
-      } else if (requestActionType === REQUEST_TYPE.ACCEPT) {
-        response = await http.post(actionUrl);
-      } else if (requestActionType === REQUEST_TYPE.SUBMIT) {
-        response = await saveAndSubmit(request);
-      } else {
-        response = await http.post(actionUrl, customFieldsData);
-      }
-
-      const redirectionURL = response?.data?.links?.topic_html;
-      if (redirectionURL) {
-        window.location.href = redirectionURL;
-      }
-      return response.data;
-    },
-    formik,
-    modalControl
-  );
-  const doAction = async (requestActionType, waitForConfirmation = false) => {
-    if (waitForConfirmation) {
-      confirmAction(
-        () => sendRequest.mutate(requestActionType),
-        requestActionType
-      );
-    } else {
-      sendRequest.mutate(requestActionType);
-    }
-  };
-
-  return {
-    doAction,
-    doCreateAndSubmitAction,
-    createAndSubmitRequest,
-    sendRequest,
-  };
-};
-
-const useAction = (action, formik, modalControl) => {
+  modalControl,
+} = {}) => {
   const {
     onBeforeAction = undefined,
     onAfterAction = undefined,
@@ -193,7 +112,7 @@ const useAction = (action, formik, modalControl) => {
     fetchNewRequests = undefined,
   } = useRequestContext() || {};
   return useMutation(
-    async (requestActionType) => {
+    async () => {
       formik?.setSubmitting(true);
       if (onBeforeAction) {
         const shouldProceed = await onBeforeAction(formik, modalControl);
@@ -202,7 +121,8 @@ const useAction = (action, formik, modalControl) => {
           return;
         }
       }
-      return action(requestActionType);
+
+      return action(requestOrRequestType, formik?.values);
     },
     {
       onError: (e, variables) => {
@@ -239,7 +159,13 @@ const useAction = (action, formik, modalControl) => {
         }
         formik?.setSubmitting(false);
         modalControl?.closeModal();
-        fetchNewRequests();
+        fetchNewRequests?.();
+
+        const redirectionURL = data?.data?.links?.topic_html;
+        console.log(redirectionURL);
+        if (redirectionURL) {
+          window.location.href = redirectionURL;
+        }
       },
     }
   );

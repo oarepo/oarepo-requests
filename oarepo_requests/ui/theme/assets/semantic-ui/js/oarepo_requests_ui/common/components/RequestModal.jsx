@@ -13,7 +13,7 @@ import {
 import { useFormik, FormikProvider, useFormikContext } from "formik";
 import _isEmpty from "lodash/isEmpty";
 import {
-  ConfirmModalContextProvider,
+  useConfirmModalContext,
   ModalControlContextProvider,
   mapLinksToActions,
 } from "@js/oarepo_requests_common";
@@ -52,7 +52,6 @@ export const RequestModal = ({
     setErrors({});
     resetForm();
   };
-
   return (
     <FormikProvider value={formik}>
       <ModalControlContextProvider
@@ -62,42 +61,35 @@ export const RequestModal = ({
           openModal,
         }}
       >
-        <ConfirmModalContextProvider>
-          {({ confirmDialogProps }) => (
-            <>
-              <Modal
-                className="requests-request-modal"
-                as={Dimmer.Dimmable}
-                blurring
-                onClose={onClose}
-                onOpen={openModal}
-                open={isOpen}
-                trigger={trigger || <Button content="Open Modal" />}
-                closeIcon
-                closeOnDocumentClick={false}
-                closeOnDimmerClick={false}
-                role="dialog"
-                aria-labelledby="request-modal-header"
-                aria-describedby="request-modal-desc"
-              >
-                <Dimmer active={isSubmitting}>
-                  <Loader inverted size="large" />
-                </Dimmer>
-                <Modal.Header as="h1" id="request-modal-header">
-                  {header}
-                </Modal.Header>
-                <RequestModalContentAndActions
-                  request={request}
-                  requestType={requestType}
-                  ContentComponent={ContentComponent}
-                  requestCreationModal={requestCreationModal}
-                  onClose={onClose}
-                />
-              </Modal>
-              <Confirm {...confirmDialogProps} />
-            </>
-          )}
-        </ConfirmModalContextProvider>
+        <Modal
+          className="requests-request-modal"
+          as={Dimmer.Dimmable}
+          blurring
+          onClose={onClose}
+          onOpen={openModal}
+          open={isOpen}
+          trigger={trigger || <Button content="Open Modal" />}
+          closeIcon
+          closeOnDocumentClick={false}
+          closeOnDimmerClick={false}
+          // role="dialog"
+          aria-labelledby="request-modal-header"
+          aria-describedby="request-modal-desc"
+        >
+          <Dimmer active={isSubmitting}>
+            <Loader inverted size="large" />
+          </Dimmer>
+          <Modal.Header as="h1" id="request-modal-header">
+            {header}
+          </Modal.Header>
+          <RequestModalContentAndActions
+            request={request}
+            requestType={requestType}
+            ContentComponent={ContentComponent}
+            requestCreationModal={requestCreationModal}
+            onClose={onClose}
+          />
+        </Modal>
       </ModalControlContextProvider>
     </FormikProvider>
   );
@@ -139,6 +131,7 @@ const RequestModalContentAndActions = ({
   );
   const customFields = data?.data?.custom_fields;
   const extra_data = data?.data?.extra_data;
+  console.log(extra_data);
 
   const modalActions = mapLinksToActions(
     requestCreationModal ? requestType : request,
@@ -178,6 +171,7 @@ const RequestModalContentAndActions = ({
             key={name}
             request={request}
             requestType={requestType}
+            extraData={extra_data}
           />
         ))}
         <Button onClick={onClose} icon labelPosition="left">

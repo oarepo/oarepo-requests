@@ -6,31 +6,44 @@ import { useFormikContext } from "formik";
 import {
   useConfirmModalContext,
   useModalControlContext,
+  useAction,
+  cancel,
   REQUEST_TYPE,
-  useRequestsApi,
 } from "@js/oarepo_requests_common";
 
-const Cancel = ({ request }) => {
+const Cancel = ({ request, extraData }) => {
   const formik = useFormikContext();
   const { confirmAction } = useConfirmModalContext();
   const modalControl = useModalControlContext();
+  const requireConfirmation = extraData?.hasForm || extraData?.dangerous;
 
-  const { doAction } = useRequestsApi(
-    request,
+  const { isLoading, mutate: cancelRequest } = useAction({
+    action: cancel,
+    requestOrRequestType: request,
     formik,
     confirmAction,
-    modalControl
-  );
+    modalControl,
+  });
+
+  const handleClick = () => {
+    if (requireConfirmation) {
+      confirmAction(() => cancelRequest(), REQUEST_TYPE.CANCEL, extraData);
+    } else {
+      cancelRequest();
+    }
+  };
 
   return (
     <Button
       title={i18next.t("Cancel request")}
-      onClick={() => doAction(REQUEST_TYPE.CANCEL, true)}
+      onClick={() => handleClick()}
       className="requests request-cancel-button"
       color="grey"
       icon
       labelPosition="left"
       floated="left"
+      loading={isLoading}
+      disabled={isLoading}
     >
       <Icon name="trash alternate" />
       {i18next.t("Cancel request")}
@@ -40,6 +53,7 @@ const Cancel = ({ request }) => {
 
 Cancel.propTypes = {
   request: PropTypes.object,
+  extraData: PropTypes.object,
 };
 
 export default Cancel;

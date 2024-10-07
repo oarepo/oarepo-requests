@@ -6,21 +6,36 @@ import { useFormikContext } from "formik";
 import {
   useConfirmModalContext,
   useModalControlContext,
-  useRequestsApi,
+  useAction,
+  createOrSave,
   REQUEST_TYPE,
 } from "@js/oarepo_requests_common";
-const Create = ({ requestType }) => {
+
+const Create = ({ requestType, extraData }) => {
   const formik = useFormikContext();
   const { confirmAction } = useConfirmModalContext();
   const modalControl = useModalControlContext();
+  const requireConfirmation = extraData?.hasForm || extraData?.dangerous;
 
-  const { doAction } = useRequestsApi(
-    requestType,
+  const { isLoading, mutate: createOrSaveRequest } = useAction({
+    action: createOrSave,
+    requestOrRequestType: requestType,
     formik,
     confirmAction,
-    modalControl
-  );
+    modalControl,
+  });
 
+  const handleClick = () => {
+    if (requireConfirmation) {
+      confirmAction(
+        () => createOrSaveRequest(),
+        REQUEST_TYPE.CREATE,
+        extraData
+      );
+    } else {
+      createOrSaveRequest();
+    }
+  };
   return (
     <Button
       type="submit"
@@ -32,7 +47,9 @@ const Create = ({ requestType }) => {
       icon
       labelPosition="left"
       floated="right"
-      onClick={() => doAction(REQUEST_TYPE.CREATE)}
+      onClick={() => handleClick()}
+      loading={isLoading}
+      disabled={isLoading}
     >
       <Icon name="plus" />
       {i18next.t("Create")}
@@ -42,6 +59,7 @@ const Create = ({ requestType }) => {
 
 Create.propTypes = {
   requestType: PropTypes.object,
+  requireConfirmation: PropTypes.bool,
 };
 
 export default Create;

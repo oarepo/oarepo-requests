@@ -27,7 +27,7 @@ export const useConfirmModalContext = () => {
   const context = useContext(ConfirmModalContext);
   if (!context) {
     console.error(
-      "useModalControlContext must be used inside ConfirmModalContext.Provider"
+      "useConfirmModalContext must be used inside ConfirmModalContext.Provider"
     );
   }
   return context;

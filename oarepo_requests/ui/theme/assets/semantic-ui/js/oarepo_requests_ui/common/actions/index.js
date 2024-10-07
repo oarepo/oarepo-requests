@@ -30,7 +30,6 @@ export const mapLinksToActions = (
         actionComponents.push({
           name: REQUEST_TYPE.ACCEPT,
           component: Accept,
-          extraData: extra_data,
         });
         actionComponents.push({
           name: REQUEST_TYPE.DECLINE,
@@ -41,7 +40,6 @@ export const mapLinksToActions = (
         actionComponents.push({
           name: REQUEST_TYPE.CANCEL,
           component: Cancel,
-          extraData: extra_data,
         });
         break;
       case REQUEST_TYPE.CREATE:
@@ -50,7 +48,6 @@ export const mapLinksToActions = (
           actionComponents.push({
             name: REQUEST_TYPE.SAVE,
             component: Save,
-            extraData: extra_data,
           });
         }
         actionComponents.push({
@@ -62,13 +59,11 @@ export const mapLinksToActions = (
         actionComponents.push({
           name: REQUEST_TYPE.SUBMIT,
           component: Submit,
-          extraData: extra_data,
         });
         if (customFields?.ui) {
           actionComponents.push({
             name: REQUEST_TYPE.SAVE,
             component: Save,
-            extraData: extra_data,
           });
         }
         break;

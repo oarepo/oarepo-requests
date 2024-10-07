@@ -6,22 +6,36 @@ import { useFormikContext } from "formik";
 import {
   useConfirmModalContext,
   useModalControlContext,
+  useAction,
+  saveAndSubmit,
   REQUEST_TYPE,
-  useRequestsApi,
 } from "@js/oarepo_requests_common";
 
-const Submit = ({ request }) => {
+const Submit = ({ request, extraData }) => {
   const formik = useFormikContext();
   const { confirmAction } = useConfirmModalContext();
   const modalControl = useModalControlContext();
 
-  const { doAction } = useRequestsApi(
-    request,
+  const { isLoading, mutate: saveAndSubmitRequest } = useAction({
+    action: saveAndSubmit,
+    requestOrRequestType: request,
     formik,
     confirmAction,
-    modalControl
-  );
+    modalControl,
+  });
+  const requireConfirmation = extraData?.hasForm || extraData?.dangerous;
 
+  const handleClick = () => {
+    if (requireConfirmation) {
+      confirmAction(
+        () => saveAndSubmitRequest(),
+        REQUEST_TYPE.SUBMIT,
+        extraData
+      );
+    } else {
+      saveAndSubmitRequest();
+    }
+  };
   return (
     <Button
       title={i18next.t("Submit request")}
@@ -30,7 +44,9 @@ const Submit = ({ request }) => {
       icon
       labelPosition="left"
       floated="right"
-      onClick={() => doAction(REQUEST_TYPE.SUBMIT)}
+      onClick={() => handleClick()}
+      loading={isLoading}
+      disabled={isLoading}
     >
       <Icon name="paper plane" />
       {i18next.t("Submit")}
@@ -40,6 +56,7 @@ const Submit = ({ request }) => {
 
 Submit.propTypes = {
   request: PropTypes.object,
+  requireConfirmation: PropTypes.bool,
 };
 
 export default Submit;

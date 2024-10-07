@@ -1,11 +1,12 @@
 import React from "react";
 import { i18next } from "@translations/oarepo_requests_ui/i18next";
-import { Button, Placeholder, Message } from "semantic-ui-react";
+import { Button, Placeholder, Message, Confirm } from "semantic-ui-react";
 import _isEmpty from "lodash/isEmpty";
 import { RequestModal, CreateRequestModalContent } from ".";
 import {
   useRequestContext,
   CreateSubmitAction,
+  useConfirmModalContext,
 } from "@js/oarepo_requests_common";
 import PropTypes from "prop-types";
 
@@ -20,6 +21,7 @@ export const CreateRequestButtonGroup = ({
   const createRequests = requestTypes?.filter(
     (requestType) => requestType.links.actions?.create
   );
+  const { confirmDialogProps } = useConfirmModalContext();
 
   if (applicableRequestsLoading) {
     return (
@@ -62,31 +64,51 @@ export const CreateRequestButtonGroup = ({
           requestType?.name ||
           requestType?.type_id;
         const buttonIconProps = requestButtonsIconsConfig[requestType.type_id];
-        return needsDialog ? (
-          <RequestModal
-            key={requestType.type_id}
-            requestType={requestType}
-            header={header}
-            requestCreationModal
-            trigger={
-              <Button
-                // applicable requests don't have a status
-                className={`requests request-create-button ${requestType?.type_id}`}
-                fluid
-                title={header}
-                content={header}
-                {...buttonIconProps}
-              />
-            }
-            ContentComponent={CreateRequestModalContent}
-          />
-        ) : (
-          <CreateSubmitAction
-            key={requestType?.type_id}
-            requestType={requestType}
-          />
-        );
+
+        if (!hasForm && dangerous) {
+          return (
+            <CreateSubmitAction
+              key={requestType?.type_id}
+              requestType={requestType}
+              requireConfirmation={dangerous}
+            />
+          );
+        }
+
+        if (!hasForm && !dangerous) {
+          return (
+            <CreateSubmitAction
+              key={requestType?.type_id}
+              requestType={requestType}
+              requireConfirmation={false}
+            />
+          );
+        }
+
+        if (needsDialog) {
+          return (
+            <RequestModal
+              key={requestType.type_id}
+              requestType={requestType}
+              header={header}
+              requestCreationModal
+              trigger={
+                <Button
+                  className={`requests request-create-button ${requestType?.type_id}`}
+                  fluid
+                  title={header}
+                  content={header}
+                  {...buttonIconProps}
+                />
+              }
+              ContentComponent={CreateRequestModalContent}
+            />
+          );
+        }
+
+        return null;
       })}
+      <Confirm {...confirmDialogProps} />
     </div>
   );
 };

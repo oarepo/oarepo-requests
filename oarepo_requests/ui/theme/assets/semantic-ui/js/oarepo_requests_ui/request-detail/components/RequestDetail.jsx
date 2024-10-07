@@ -21,6 +21,7 @@ import {
   RequestCustomFields,
 } from "@js/oarepo_requests_common";
 import { Formik } from "formik";
+import { ActionButtons } from "./ActionButtons";
 
 export const RequestDetail = ({ request }) => {
   const [activeTab, setActiveTab] = useState("timeline");
@@ -78,12 +79,13 @@ export const RequestDetail = ({ request }) => {
               </Grid.Column>
               <Grid.Column floated="right" textAlign="right">
                 {/* Action Buttons */}
-                {actions.map(({ name, component: ActionComponent }) => (
+                <ActionButtons request={request} />
+                {/* {actions.map(({ name, component: ActionComponent }) => (
                   <React.Fragment key={name}>
-                    <ActionComponent request={request} />
+                    <ActionComponent request={request} extraData={extra_data} />
                     <Confirm {...confirmDialogProps} />
                   </React.Fragment>
-                ))}
+                ))} */}
               </Grid.Column>
             </Grid.Row>
 

@@ -1,16 +1,39 @@
 import React from "react";
 import { Button } from "semantic-ui-react";
 import PropTypes from "prop-types";
-import { useRequestContext, useRequestsApi } from "@js/oarepo_requests_common";
+import {
+  useAction,
+  useRequestContext,
+  saveAndSubmit,
+  useConfirmModalContext,
+  REQUEST_TYPE,
+} from "@js/oarepo_requests_common";
 
 // Directly create and submit request without modal
-const CreateSubmitAction = ({ requestType }) => {
-  const { createAndSubmitRequest } = useRequestsApi(requestType);
-  const { isLoading, mutate: createAndSubmit } = createAndSubmitRequest;
+const CreateSubmitAction = ({ requestType, requireConfirmation }) => {
+  const { confirmAction } = useConfirmModalContext();
+  const { hasForm, dangerous, editable } = requestType;
+  const { isLoading, mutate: createAndSubmit } = useAction({
+    action: saveAndSubmit,
+    requestOrRequestType: requestType,
+    confirmAction,
+  });
   const { requestButtonsIconsConfig } = useRequestContext();
   const buttonIconProps = requestButtonsIconsConfig[requestType.type_id];
   const buttonContent =
     requestType?.stateful_name || requestType?.name || requestType?.type_id;
+
+  const handleClick = () => {
+    if (requireConfirmation) {
+      confirmAction(() => createAndSubmit(), REQUEST_TYPE.CREATE, {
+        hasForm,
+        dangerous,
+        editable,
+      });
+    } else {
+      createAndSubmit();
+    }
+  };
   return (
     <Button
       // applicable requests don't have a status
@@ -19,7 +42,7 @@ const CreateSubmitAction = ({ requestType }) => {
       title={buttonContent}
       content={buttonContent}
       loading={isLoading}
-      onClick={() => createAndSubmit()}
+      onClick={() => handleClick()}
       {...buttonIconProps}
     />
   );
@@ -27,6 +50,7 @@ const CreateSubmitAction = ({ requestType }) => {
 
 CreateSubmitAction.propTypes = {
   requestType: PropTypes.object,
+  requireConfirmation: PropTypes.bool,
 };
 
 export default CreateSubmitAction;

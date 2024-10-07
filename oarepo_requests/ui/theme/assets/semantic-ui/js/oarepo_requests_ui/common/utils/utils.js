@@ -1,6 +1,8 @@
 import _isEmpty from "lodash/isEmpty";
+import { http } from "@js/oarepo_ui";
 
 export const serializeCustomFields = (formData) => {
+  if (!formData) return {};
   if (
     _isEmpty(formData.payload) ||
     Object.values(formData.payload).every((value) => !value)
@@ -20,8 +22,35 @@ export const serializeCustomFields = (formData) => {
   }
 };
 
-export const saveAndSubmit = async (request) => {
-  await http.put(request.links?.self, customFieldsData);
-  const submittedRequest = await http.post(request?.links?.actions?.submit, {});
+export const saveAndSubmit = async (request, formValues) => {
+  const response = await createOrSave(request, formValues);
+  const submittedRequest = await http.post(
+    response?.data?.links?.actions?.submit,
+    {}
+  );
   return submittedRequest;
+};
+
+export const createOrSave = async (requestOrRequestType, formValues) => {
+  const customFieldsData = serializeCustomFields(formValues);
+  if (requestOrRequestType?.links?.actions?.create) {
+    return await http.post(
+      requestOrRequestType.links.actions.create,
+      customFieldsData
+    );
+  } else {
+    return await http.put(requestOrRequestType?.links?.self, customFieldsData);
+  }
+};
+
+export const accept = async (request) => {
+  return await http.post(request.links?.actions?.accept);
+};
+
+export const decline = async (request) => {
+  return await http.post(request.links?.actions?.decline);
+};
+
+export const cancel = async (request) => {
+  return await http.post(request.links?.actions?.cancel);
 };

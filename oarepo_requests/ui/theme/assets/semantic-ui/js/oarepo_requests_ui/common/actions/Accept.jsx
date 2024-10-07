@@ -6,31 +6,44 @@ import { useFormikContext } from "formik";
 import {
   useConfirmModalContext,
   useModalControlContext,
+  useAction,
+  accept,
   REQUEST_TYPE,
-  useRequestsApi,
 } from "@js/oarepo_requests_common";
 
-const Accept = ({ request }) => {
+const Accept = ({ request, extraData }) => {
   const formik = useFormikContext();
   const { confirmAction } = useConfirmModalContext();
   const modalControl = useModalControlContext();
+  const requireConfirmation = extraData?.hasForm || extraData?.dangerous;
 
-  const { doAction } = useRequestsApi(
-    request,
+  const { isLoading, mutate: acceptRequest } = useAction({
+    action: accept,
+    requestOrRequestType: request,
     formik,
     confirmAction,
-    modalControl
-  );
+    modalControl,
+  });
+
+  const handleClick = () => {
+    if (requireConfirmation) {
+      confirmAction(() => acceptRequest(), REQUEST_TYPE.ACCEPT, extraData);
+    } else {
+      acceptRequest();
+    }
+  };
 
   return (
     <Button
       title={i18next.t("Accept request")}
-      onClick={() => doAction(REQUEST_TYPE.ACCEPT, true)}
+      onClick={() => handleClick()}
       className="requests request-accept-button"
       positive
       icon
       labelPosition="left"
       floated="right"
+      loading={isLoading}
+      disabled={isLoading}
     >
       <Icon name="check" />
       {i18next.t("Accept")}
@@ -40,6 +53,7 @@ const Accept = ({ request }) => {
 
 Accept.propTypes = {
   request: PropTypes.object,
+  extraData: PropTypes.object,
 };
 
 export default Accept;

@@ -6,19 +6,35 @@ import { useFormikContext } from "formik";
 import {
   useConfirmModalContext,
   useModalControlContext,
-  useRequestsApi,
+  useAction,
+  saveAndSubmit,
+  REQUEST_TYPE,
 } from "@js/oarepo_requests_common";
 
-const CreateAndSubmit = ({ requestType }) => {
+const CreateAndSubmit = ({ requestType, extraData }) => {
   const formik = useFormikContext();
   const { confirmAction } = useConfirmModalContext();
   const modalControl = useModalControlContext();
-  const { doCreateAndSubmitAction } = useRequestsApi(
-    requestType,
+  const requireConfirmation = extraData?.hasForm || extraData?.dangerous;
+
+  const { isLoading, mutate: saveAndSubmitRequest } = useAction({
+    action: saveAndSubmit,
+    requestOrRequestType: requestType,
     formik,
     confirmAction,
-    modalControl
-  );
+    modalControl,
+  });
+  const handleClick = () => {
+    if (requireConfirmation) {
+      confirmAction(
+        () => saveAndSubmitRequest(),
+        REQUEST_TYPE.CREATE,
+        extraData
+      );
+    } else {
+      saveAndSubmitRequest();
+    }
+  };
   return (
     <Button
       title={i18next.t("Submit request")}
@@ -27,7 +43,9 @@ const CreateAndSubmit = ({ requestType }) => {
       icon
       labelPosition="left"
       floated="right"
-      onClick={() => doCreateAndSubmitAction()}
+      onClick={() => handleClick()}
+      loading={isLoading}
+      disabled={isLoading}
     >
       <Icon name="paper plane" />
       {i18next.t("Submit")}
@@ -37,6 +55,7 @@ const CreateAndSubmit = ({ requestType }) => {
 
 CreateAndSubmit.propTypes = {
   requestType: PropTypes.object,
+  requireConfirmation: PropTypes.bool,
 };
 
 export default CreateAndSubmit;

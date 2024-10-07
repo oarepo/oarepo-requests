@@ -6,31 +6,44 @@ import { useFormikContext } from "formik";
 import {
   useConfirmModalContext,
   useModalControlContext,
+  useAction,
+  decline,
   REQUEST_TYPE,
-  useRequestsApi,
 } from "@js/oarepo_requests_common";
 
-const Decline = ({ request }) => {
+const Decline = ({ request, extraData }) => {
   const formik = useFormikContext();
   const { confirmAction } = useConfirmModalContext();
   const modalControl = useModalControlContext();
+  const requireConfirmation = extraData?.hasForm || extraData?.dangerous;
 
-  const { doAction } = useRequestsApi(
-    request,
+  const { isLoading, mutate: declineRequest } = useAction({
+    action: decline,
+    requestOrRequestType: request,
     formik,
     confirmAction,
-    modalControl
-  );
+    modalControl,
+  });
+
+  const handleClick = () => {
+    if (requireConfirmation) {
+      confirmAction(() => declineRequest(), REQUEST_TYPE.DECLINE, extraData);
+    } else {
+      declineRequest();
+    }
+  };
 
   return (
     <Button
       title={i18next.t("Decline request")}
-      onClick={() => doAction(REQUEST_TYPE.DECLINE, true)}
+      onClick={() => handleClick()}
       negative
       className="requests request-decline-button"
       icon
       labelPosition="left"
       floated="left"
+      loading={isLoading}
+      disabled={isLoading}
     >
       <Icon name="cancel" />
       {i18next.t("Decline")}
@@ -40,6 +53,7 @@ const Decline = ({ request }) => {
 
 Decline.propTypes = {
   request: PropTypes.object,
+  requireConfirmation: PropTypes.bool,
 };
 
 export default Decline;

@@ -2,7 +2,10 @@ import React, { useCallback } from "react";
 import PropTypes from "prop-types";
 import { SegmentGroup } from "semantic-ui-react";
 import { CreateRequestButtonGroup, RequestListContainer } from ".";
-import { RequestContextProvider } from "@js/oarepo_requests_common";
+import {
+  RequestContextProvider,
+  ConfirmModalContextProvider,
+} from "@js/oarepo_requests_common";
 import {
   useQuery,
   useQueryClient,
@@ -19,34 +22,6 @@ export const requestButtonsDefaultIconConfig = {
   assign_doi: { icon: "address card", labelPosition: "left" },
   created: { icon: "paper plane", labelPosition: "left" },
   submitted: { icon: "clock", labelPosition: "left" },
-};
-
-export const requestExtraConfig = {
-  delete_published_record: {
-    dangerous: true,
-    hasForm: false,
-    editable: true,
-  },
-  publish_draft: {
-    dangerous: false,
-    hasForm: true,
-    editable: true,
-  },
-  new_version: {
-    dangerous: false,
-    hasForm: false,
-    editable: false,
-  },
-  edit_published_record: {
-    dangerous: false,
-    hasForm: false,
-    editable: false,
-  },
-  assign_doi: {
-    dangerous: false,
-    hasForm: false,
-    editable: false,
-  },
 };
 
 const queryClient = new QueryClient();
@@ -81,13 +56,8 @@ const RecordRequests = ({
     enabled: !!initialRecord.links?.requests,
     refetchOnWindowFocus: false,
   });
-  let applicableRequestTypes = requestTypes?.data?.hits?.hits;
-  applicableRequestTypes = applicableRequestTypes?.map((requestType) => {
-    return {
-      ...requestType,
-      ...requestExtraConfig[requestType.type_id],
-    };
-  });
+  const applicableRequestTypes = requestTypes?.data?.hits?.hits;
+
   const requests = recordRequests?.data?.hits?.hits;
   const fetchNewRequests = useCallback(() => {
     queryClient.invalidateQueries(["applicableRequestTypes"]);
@@ -109,16 +79,18 @@ const RecordRequests = ({
         },
       }}
     >
-      <ContainerComponent>
-        <CreateRequestButtonGroup
-          applicableRequestsLoading={applicableRequestTypesLoading}
-          applicableRequestsLoadingError={applicableRequestsLoadingError}
-        />
-        <RequestListContainer
-          requestsLoading={requestsLoading}
-          requestsLoadingError={requestsLoadingError}
-        />
-      </ContainerComponent>
+      <ConfirmModalContextProvider>
+        <ContainerComponent>
+          <CreateRequestButtonGroup
+            applicableRequestsLoading={applicableRequestTypesLoading}
+            applicableRequestsLoadingError={applicableRequestsLoadingError}
+          />
+          <RequestListContainer
+            requestsLoading={requestsLoading}
+            requestsLoadingError={requestsLoadingError}
+          />
+        </ContainerComponent>
+      </ConfirmModalContextProvider>
     </RequestContextProvider>
   );
 };
