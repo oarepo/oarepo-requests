@@ -17,7 +17,7 @@ class PublishDraftSubmitAction(OARepoSubmitAction):
             return False
         try:
             topic = self.request.topic.resolve()
-        except:         # noqa: used for links, so ignore errors here
+        except:  # noqa: used for links, so ignore errors here
             return False
         topic_service = get_record_service_for_record(topic)
         try:

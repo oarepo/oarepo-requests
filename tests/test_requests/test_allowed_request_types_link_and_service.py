@@ -31,6 +31,9 @@ def test_allowed_request_types_on_draft_service(
     assert allowed_request_types.to_dict() == {
         "hits": {
             "hits": [
+                {'links': {
+                    'actions': {'create': f'https://127.0.0.1:5000/api/thesis/{draft1.json["id"]}/draft/requests/delete_draft'}},
+                 'type_id': 'delete_draft'},
                 {
                     "links": {
                         "actions": {
@@ -40,7 +43,7 @@ def test_allowed_request_types_on_draft_service(
                     "type_id": "publish_draft",
                 }
             ],
-            "total": 1,
+            "total": 2,
         },
         "links": {
             "self": f'https://127.0.0.1:5000/api/thesis/{draft1.json["id"]}/draft/requests/applicable'
@@ -75,6 +78,10 @@ def test_allowed_request_types_on_draft_resource(
     assert allowed_request_types.json == {
         "hits": {
             "hits": [
+                {'links': {
+                    'actions': {
+                        'create': f'https://127.0.0.1:5000/api/thesis/{draft1.json["id"]}/draft/requests/delete_draft'}},
+                    'type_id': 'delete_draft'},
                 {
                     "links": {
                         "actions": {
@@ -84,7 +91,7 @@ def test_allowed_request_types_on_draft_resource(
                     "type_id": "publish_draft",
                 }
             ],
-            "total": 1,
+            "total": 2,
         },
         "links": {
             "self": f'https://127.0.0.1:5000/api/thesis/{draft1.json["id"]}/draft/requests/applicable'
@@ -224,6 +231,15 @@ def test_ui_serialization(
     )
 
     assert allowed_request_types_draft.json["hits"]["hits"] == [
+        {'dangerous': True,
+         'description': 'Request deletion of draft',
+         'editable': True,
+         'has_form': False,
+         'links': {'actions': {'create': f'https://127.0.0.1:5000/api/thesis/{draft_id}/draft/requests/delete_draft'}},
+         'name': 'Delete draft',
+         'stateful_description': 'Click to permanently delete the draft.',
+         'stateful_name': 'Delete draft',
+         'type_id': 'delete_draft'},
         {
             "description": "Request publishing of a draft",
             "links": {

@@ -88,3 +88,34 @@ def test_delete(
         f"{urls['BASE_URL_REQUESTS']}{resp_request_create.json['id']}"
     )
     assert canceled_request.json["status"] == "cancelled"
+
+def test_delete_draft(
+    vocab_cf,
+    logged_client,
+    create_draft_via_resource,
+    users,
+    urls,
+    delete_draft_function,
+    get_request_link,
+    search_clear,
+):
+    creator_client = logged_client(users[0])
+
+    draft1 = create_draft_via_resource(creator_client)
+    draft_id = draft1.json["id"]
+
+    read = creator_client.get(f"{urls['BASE_URL']}{draft_id}/draft?expand=true")
+    assert read.status_code == 200
+
+    resp_request_create = creator_client.post(
+        link_api2testclient(get_request_link(read.json["expanded"]["request_types"], "delete_draft"))
+    )
+    resp_request_submit = creator_client.post(
+        link_api2testclient(resp_request_create.json["links"]["actions"]["submit"]),
+    )
+
+    read_deleted = creator_client.get(f"{urls['BASE_URL']}{draft_id}/draft?expand=true")
+    request_after = creator_client.get(f"{urls['BASE_URL_REQUESTS']}{resp_request_create.json['id']}") #autoapprove suggested here
+    assert request_after.json["status"] == "accepted"
+    assert request_after.json["is_closed"]
+    assert read_deleted.status_code == 404
