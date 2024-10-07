@@ -350,6 +350,7 @@ def delete_record_data_function():
 
     return ret_data
 
+
 @pytest.fixture()
 def delete_draft_function():
     def ret_data(record_id):
@@ -682,8 +683,11 @@ def get_request_type():
     """
     gets request create link from serialized request types
     """
+
     def _get_request_type(request_types_json, request_type):
-        selected_entry = [entry for entry in request_types_json if entry["type_id"] == request_type][0]
+        selected_entry = [
+            entry for entry in request_types_json if entry["type_id"] == request_type
+        ][0]
         return selected_entry
 
     return _get_request_type
@@ -694,8 +698,9 @@ def get_request_link(get_request_type):
     """
     gets request create link from serialized request types
     """
+
     def _create_request_from_link(request_types_json, request_type):
         selected_entry = get_request_type(request_types_json, request_type)
-        return selected_entry['links']['actions']['create']
+        return selected_entry["links"]["actions"]["create"]
 
     return _create_request_from_link

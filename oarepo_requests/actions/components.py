@@ -48,7 +48,9 @@ class WorkflowTransitionComponent(RequestActionComponent):
                 .requests()[request_type.type_id]
                 .transitions
             )
-        except NoResultFound: # todo HOTFIX!! for error during getting workflow from deleted drafts
+        except (
+            NoResultFound
+        ):  # todo HOTFIX!! for error during getting workflow from deleted drafts
             return
         target_state = transitions[action.status_to]
         if (
