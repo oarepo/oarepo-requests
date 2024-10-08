@@ -2,7 +2,7 @@ import React from "react";
 import { i18next } from "@translations/oarepo_requests_ui/i18next";
 import { Icon, List } from "semantic-ui-react";
 import _has from "lodash/has";
-import { getRequestStatusIcon } from "../utils";
+import { getRequestStatusIcon } from "../../request-detail/utils";
 import PropTypes from "prop-types";
 
 export const SideRequestInfo = ({ request }) => {

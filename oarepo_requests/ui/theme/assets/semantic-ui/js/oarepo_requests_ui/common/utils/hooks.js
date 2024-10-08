@@ -6,6 +6,7 @@ import {
   useRequestContext,
   REQUEST_TYPE,
   WarningMessage,
+  RequestCommentInput,
 } from "@js/oarepo_requests_common";
 
 /**
@@ -57,17 +58,32 @@ export const useConfirmDialog = (isEventModal = false) => {
           newConfirmDialogProps.confirmButton = (
             <Button negative>{i18next.t("Cancel request")}</Button>
           );
+          newConfirmDialogProps.content = (
+            <div className="content">
+              <RequestCommentInput />
+            </div>
+          );
           break;
         case REQUEST_TYPE.ACCEPT:
           newConfirmDialogProps.header = i18next.t("Accept request");
           newConfirmDialogProps.confirmButton = (
             <Button positive>{i18next.t("Accept")}</Button>
           );
+          newConfirmDialogProps.content = (
+            <div className="content">
+              <RequestCommentInput />
+            </div>
+          );
           break;
         case REQUEST_TYPE.DECLINE:
           newConfirmDialogProps.header = i18next.t("Decline request");
           newConfirmDialogProps.confirmButton = (
             <Button negative>{i18next.t("Decline")}</Button>
+          );
+          newConfirmDialogProps.content = (
+            <div className="content">
+              <RequestCommentInput />
+            </div>
           );
           break;
         default:
@@ -157,12 +173,12 @@ export const useAction = ({
         if (onAfterAction) {
           onAfterAction(data, variables, formik, modalControl);
         }
+        const redirectionURL = data?.data?.links?.topic_html;
+
         formik?.setSubmitting(false);
         modalControl?.closeModal();
         fetchNewRequests?.();
 
-        const redirectionURL = data?.data?.links?.topic_html;
-        console.log(redirectionURL);
         if (redirectionURL) {
           window.location.href = redirectionURL;
         }

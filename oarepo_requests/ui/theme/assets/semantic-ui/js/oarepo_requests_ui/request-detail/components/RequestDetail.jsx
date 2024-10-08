@@ -11,7 +11,7 @@ import {
   Menu,
   Confirm,
 } from "semantic-ui-react";
-import { Timeline, TopicPreview, SideRequestInfo } from ".";
+import { TopicPreview } from ".";
 import PropTypes from "prop-types";
 import { useQuery } from "@tanstack/react-query";
 import { http } from "react-invenio-forms";
@@ -19,9 +19,10 @@ import {
   mapLinksToActions,
   ConfirmModalContextProvider,
   RequestCustomFields,
+  SideRequestInfo,
+  Timeline,
 } from "@js/oarepo_requests_common";
 import { Formik } from "formik";
-import { ActionButtons } from "./ActionButtons";
 
 export const RequestDetail = ({ request }) => {
   const [activeTab, setActiveTab] = useState("timeline");
@@ -79,15 +80,14 @@ export const RequestDetail = ({ request }) => {
               </Grid.Column>
               <Grid.Column floated="right" textAlign="right">
                 {/* Action Buttons */}
-                <ActionButtons request={request} />
-                {/* {actions.map(({ name, component: ActionComponent }) => (
+                {actions.map(({ name, component: ActionComponent }) => (
                   <React.Fragment key={name}>
                     <ActionComponent request={request} extraData={extra_data} />
-                    <Confirm {...confirmDialogProps} />
                   </React.Fragment>
-                ))} */}
+                ))}
               </Grid.Column>
             </Grid.Row>
+            <Confirm {...confirmDialogProps} />
 
             <Grid.Row>
               <Grid.Column>

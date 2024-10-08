@@ -43,14 +43,14 @@ export const createOrSave = async (requestOrRequestType, formValues) => {
   }
 };
 
-export const accept = async (request) => {
-  return await http.post(request.links?.actions?.accept);
+export const accept = async (request, formData) => {
+  return await http.post(request.links?.actions?.accept, formData);
 };
 
-export const decline = async (request) => {
-  return await http.post(request.links?.actions?.decline);
+export const decline = async (request, formData) => {
+  return await http.post(request.links?.actions?.decline, formData);
 };
 
-export const cancel = async (request) => {
-  return await http.post(request.links?.actions?.cancel);
+export const cancel = async (request, formData) => {
+  return await http.post(request.links?.actions?.cancel, formData);
 };

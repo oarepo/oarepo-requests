@@ -21,7 +21,7 @@ export const CreateRequestModalContent = ({ requestType, customFields }) => {
             config={customFields?.ui}
             templateLoaders={[
               (widget) => import(`@templates/custom_fields/${widget}.js`),
-              (widget) => import(`react-invenio-forms`),
+              () => import(`react-invenio-forms`),
             ]}
             fieldPathPrefix="payload"
           />

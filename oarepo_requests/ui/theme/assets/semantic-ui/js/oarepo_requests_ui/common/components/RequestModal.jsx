@@ -13,9 +13,9 @@ import {
 import { useFormik, FormikProvider, useFormikContext } from "formik";
 import _isEmpty from "lodash/isEmpty";
 import {
-  useConfirmModalContext,
   ModalControlContextProvider,
   mapLinksToActions,
+  ConfirmModalContextProvider,
 } from "@js/oarepo_requests_common";
 import PropTypes from "prop-types";
 import { useQuery } from "@tanstack/react-query";
@@ -61,35 +61,42 @@ export const RequestModal = ({
           openModal,
         }}
       >
-        <Modal
-          className="requests-request-modal"
-          as={Dimmer.Dimmable}
-          blurring
-          onClose={onClose}
-          onOpen={openModal}
-          open={isOpen}
-          trigger={trigger || <Button content="Open Modal" />}
-          closeIcon
-          closeOnDocumentClick={false}
-          closeOnDimmerClick={false}
-          // role="dialog"
-          aria-labelledby="request-modal-header"
-          aria-describedby="request-modal-desc"
-        >
-          <Dimmer active={isSubmitting}>
-            <Loader inverted size="large" />
-          </Dimmer>
-          <Modal.Header as="h1" id="request-modal-header">
-            {header}
-          </Modal.Header>
-          <RequestModalContentAndActions
-            request={request}
-            requestType={requestType}
-            ContentComponent={ContentComponent}
-            requestCreationModal={requestCreationModal}
-            onClose={onClose}
-          />
-        </Modal>
+        <ConfirmModalContextProvider>
+          {({ confirmDialogProps }) => (
+            <React.Fragment>
+              <Modal
+                className="requests-request-modal"
+                as={Dimmer.Dimmable}
+                blurring
+                onClose={onClose}
+                onOpen={openModal}
+                open={isOpen}
+                trigger={trigger || <Button content="Open Modal" />}
+                closeIcon
+                closeOnDocumentClick={false}
+                closeOnDimmerClick={false}
+                // role="dialog"
+                aria-labelledby="request-modal-header"
+                aria-describedby="request-modal-desc"
+              >
+                <Dimmer active={isSubmitting}>
+                  <Loader inverted size="large" />
+                </Dimmer>
+                <Modal.Header as="h1" id="request-modal-header">
+                  {header}
+                </Modal.Header>
+                <RequestModalContentAndActions
+                  request={request}
+                  requestType={requestType}
+                  ContentComponent={ContentComponent}
+                  requestCreationModal={requestCreationModal}
+                  onClose={onClose}
+                />
+              </Modal>
+              <Confirm {...confirmDialogProps} />
+            </React.Fragment>
+          )}
+        </ConfirmModalContextProvider>
       </ModalControlContextProvider>
     </FormikProvider>
   );

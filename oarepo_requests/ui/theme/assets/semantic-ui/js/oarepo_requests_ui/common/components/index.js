@@ -4,3 +4,6 @@ export * from "./RequestModalContent";
 export * from "./RequestModal";
 export * from "./WarningMessage";
 export * from "./RequestCustomFields";
+export * from "./RequestCommentInput";
+export * from "./SideRequestInfo";
+export * from "./Timeline";

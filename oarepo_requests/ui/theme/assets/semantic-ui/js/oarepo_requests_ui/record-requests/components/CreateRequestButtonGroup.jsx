@@ -6,7 +6,7 @@ import { RequestModal, CreateRequestModalContent } from ".";
 import {
   useRequestContext,
   CreateSubmitAction,
-  useConfirmModalContext,
+  ConfirmModalContextProvider,
 } from "@js/oarepo_requests_common";
 import PropTypes from "prop-types";
 
@@ -21,7 +21,6 @@ export const CreateRequestButtonGroup = ({
   const createRequests = requestTypes?.filter(
     (requestType) => requestType.links.actions?.create
   );
-  const { confirmDialogProps } = useConfirmModalContext();
 
   if (applicableRequestsLoading) {
     return (
@@ -67,21 +66,33 @@ export const CreateRequestButtonGroup = ({
 
         if (!hasForm && dangerous) {
           return (
-            <CreateSubmitAction
-              key={requestType?.type_id}
-              requestType={requestType}
-              requireConfirmation={dangerous}
-            />
+            <ConfirmModalContextProvider key={requestType?.type_id}>
+              {({ confirmDialogProps }) => (
+                <React.Fragment>
+                  <CreateSubmitAction
+                    requestType={requestType}
+                    requireConfirmation={dangerous}
+                  />
+                  <Confirm {...confirmDialogProps} />
+                </React.Fragment>
+              )}
+            </ConfirmModalContextProvider>
           );
         }
-
         if (!hasForm && !dangerous) {
           return (
-            <CreateSubmitAction
-              key={requestType?.type_id}
-              requestType={requestType}
-              requireConfirmation={false}
-            />
+            <ConfirmModalContextProvider key={requestType?.type_id}>
+              {({ confirmDialogProps }) => (
+                <React.Fragment>
+                  <CreateSubmitAction
+                    key={requestType?.type_id}
+                    requestType={requestType}
+                    requireConfirmation={false}
+                  />
+                  <Confirm {...confirmDialogProps} />
+                </React.Fragment>
+              )}
+            </ConfirmModalContextProvider>
           );
         }
 
@@ -108,7 +119,6 @@ export const CreateRequestButtonGroup = ({
 
         return null;
       })}
-      <Confirm {...confirmDialogProps} />
     </div>
   );
 };

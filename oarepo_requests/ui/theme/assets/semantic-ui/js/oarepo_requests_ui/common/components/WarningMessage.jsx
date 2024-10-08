@@ -6,7 +6,7 @@ import { i18next } from "@translations/oarepo_requests_ui/i18next";
 export const WarningMessage = ({ message, ...uiProps }) => {
   return (
     <Message negative {...uiProps} className="rel-mr-1 rel-ml-1">
-      <Message.Header className="rel-mb-1">
+      <Message.Header>
         <Icon name="warning sign" className="rel-mr-1" />
         {message}
       </Message.Header>

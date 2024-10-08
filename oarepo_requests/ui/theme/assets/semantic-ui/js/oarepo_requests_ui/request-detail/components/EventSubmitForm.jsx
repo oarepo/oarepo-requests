@@ -1,5 +1,5 @@
 import React, { useState, useRef } from "react";
-
+import PropTypes from "prop-types";
 import { i18next } from "@translations/oarepo_requests_ui/i18next";
 import { Button, Message, FormField } from "semantic-ui-react";
 import _isEmpty from "lodash/isEmpty";
@@ -8,8 +8,8 @@ import { RichEditor, RichInputField } from "react-invenio-forms";
 import { Formik, Form } from "formik";
 // TODO: until we figure out a way to globally use sanitization with our hook
 import sanitizeHtml from "sanitize-html";
-
 import { CommentPayloadSchema } from "../utils";
+import { useMutation } from "@tanstack/react-query";
 
 export const EventSubmitForm = ({ request, setEvents }) => {
   const [error, setError] = useState(null);
@@ -107,4 +107,9 @@ export const EventSubmitForm = ({ request, setEvents }) => {
       )}
     </Formik>
   );
+};
+
+EventSubmitForm.propTypes = {
+  request: PropTypes.object,
+  setEvents: PropTypes.func,
 };

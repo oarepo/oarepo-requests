@@ -4,11 +4,8 @@ import { Grid } from "semantic-ui-react";
 import {} from "react-invenio-forms";
 import {
   SideRequestInfo,
-  Timeline,
-} from "@js/oarepo_requests_detail/components";
-import {
-  REQUEST_MODAL_TYPE,
   RequestCustomFields,
+  Timeline,
 } from "@js/oarepo_requests_common";
 import { i18next } from "@translations/oarepo_requests_ui/i18next";
 
