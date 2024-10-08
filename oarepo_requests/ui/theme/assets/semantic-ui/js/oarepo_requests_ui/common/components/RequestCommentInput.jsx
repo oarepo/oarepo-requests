@@ -26,7 +26,8 @@ export const RequestCommentInput = () => {
         placeholder={i18next.t("Your comment here...")}
         editor={
           <RichEditor
-            value={values?.payload?.content}
+            initialValue={values?.payload?.content}
+            inputValue={() => values?.payload?.content}
             optimized
             onBlur={(event, editor) => {
               const cleanedContent = sanitizeHtml(editor.getContent());

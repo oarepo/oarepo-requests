@@ -45,7 +45,7 @@ export const RequestCustomFields = ({
   return renderSubmitForm || renderReadOnlyData ? (
     <Grid.Row>
       <Grid.Column width={columnWidth}>
-        {renderSubmitForm && (
+        {renderSubmitForm && !request.is_closed && (
           <Form className="requests-form-cf">
             <CustomFields
               config={customFields?.ui}

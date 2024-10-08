@@ -44,13 +44,22 @@ export const createOrSave = async (requestOrRequestType, formValues) => {
 };
 
 export const accept = async (request, formData) => {
-  return await http.post(request.links?.actions?.accept, formData);
+  return await http.post(
+    request.links?.actions?.accept,
+    serializeCustomFields(formData)
+  );
 };
 
 export const decline = async (request, formData) => {
-  return await http.post(request.links?.actions?.decline, formData);
+  return await http.post(
+    request.links?.actions?.decline,
+    serializeCustomFields(formData)
+  );
 };
 
 export const cancel = async (request, formData) => {
-  return await http.post(request.links?.actions?.cancel, formData);
+  return await http.post(
+    request.links?.actions?.cancel,
+    serializeCustomFields(formData)
+  );
 };
