@@ -64,6 +64,12 @@ can_comment_only_receiver = [
     SystemProcess(),
 ]
 
+
+class TestEventType(CommentEventType):
+    type_id = "test"
+    """"""  # to test permissions
+
+
 events_only_receiver_can_comment = {
     CommentEventType.type_id: WorkflowEvent(submitters=can_comment_only_receiver),
     LogEventType.type_id: WorkflowEvent(
@@ -72,6 +78,7 @@ events_only_receiver_can_comment = {
     TopicUpdateEventType.type_id: WorkflowEvent(
         submitters=InvenioRequestsPermissionPolicy.can_create_comment
     ),
+    TestEventType.type_id: WorkflowEvent(submitters=can_comment_only_receiver),
 }
 
 
@@ -482,6 +489,7 @@ def app_config(app_config):
         ConditionalRecipientRequestType(),
         AnotherTopicUpdatingRequestType(),
     ]
+    app_config["REQUESTS_REGISTERED_EVENT_TYPES"] = [TestEventType()]
     return app_config
 
 
