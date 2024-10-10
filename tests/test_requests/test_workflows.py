@@ -1,11 +1,13 @@
 import pytest
 from invenio_drafts_resources.services.records.uow import ParentRecordCommitOp
+from invenio_records_resources.services.errors import PermissionDeniedError
 from invenio_records_resources.services.uow import RecordCommitOp, unit_of_work
 from thesis.records.api import ThesisDraft, ThesisRecord
 
 from oarepo_requests.services.permissions.workflow_policies import (
     CreatorsFromWorkflowRequestsPermissionPolicy,
 )
+from tests.conftest import TestEventType
 from tests.test_requests.utils import link_api2testclient
 
 
@@ -43,6 +45,13 @@ def patch_requests_permissions(
 ):
     setattr(requests_service_config, "permission_policy_cls", scenario_permissions)
     setattr(events_service_config, "permission_policy_cls", scenario_permissions)
+
+
+@pytest.fixture
+def events_service():
+    from invenio_requests.proxies import current_events_service
+
+    return current_events_service
 
 
 @pytest.fixture()
@@ -319,6 +328,7 @@ def test_workflow_events(
     ui_serialization_result,
     events_resource_data,
     create_draft_via_resource,
+    events_service,
     search_clear,
 ):
     user1 = users[0]
@@ -345,20 +355,22 @@ def test_workflow_events(
     read_from_record = user1_client.get(
         f"{urls['BASE_URL']}{draft1.json['id']}/draft?expand=true",
     )
-    comments_link = link_api2testclient(
-        read_from_record.json["expanded"]["requests"][0]["links"]["comments"]
-    )
-    comment_from1 = user1_client.post(
-        comments_link,
-        json=events_resource_data,
-    )
-    comment_from2 = user2_client.post(
-        comments_link,
-        json=events_resource_data,
-    )
 
-    assert comment_from1.status_code == 403
-    assert comment_from2.status_code == 201
+    request_id = read_from_record.json["expanded"]["requests"][0]["id"]
+    with pytest.raises(PermissionDeniedError):
+        create_event_u1 = events_service.create(
+            identity=user1.identity,
+            request_id=request_id,
+            data=events_resource_data,
+            event_type=TestEventType,
+        )
+    create_event_u2 = events_service.create(
+        identity=user2.identity,
+        request_id=request_id,
+        data=events_resource_data,
+        event_type=TestEventType,
+    )
+    assert create_event_u2
 
     record_receiver = user2_client.get(
         f'{urls["BASE_URL"]}{record_id}/draft?expand=true'
@@ -380,15 +392,19 @@ def test_workflow_events(
         for request in read_from_record.json["expanded"]["requests"]
         if request["type"] == "publish_draft"
     ][0]
-    comments_link = link_api2testclient(publish_request["links"]["comments"])
+    request_id = publish_request["id"]
 
-    comment_from1 = user1_client.post(
-        comments_link,
-        json=events_resource_data,
+    create_event_u1 = events_service.create(
+        identity=user1.identity,
+        request_id=request_id,
+        data=events_resource_data,
+        event_type=TestEventType,
     )
-    comment_from2 = user2_client.post(
-        comments_link,
-        json=events_resource_data,
-    )
-    assert comment_from1.status_code == 201  # 1 is receiver for the publish request
-    assert comment_from2.status_code == 403
+    with pytest.raises(PermissionDeniedError):
+        create_event_u2 = events_service.create(
+            identity=user2.identity,
+            request_id=request_id,
+            data=events_resource_data,
+            event_type=TestEventType,
+        )
+    assert create_event_u1

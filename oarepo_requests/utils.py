@@ -91,14 +91,8 @@ def open_or_created_request_exists(topic_or_reference, type_id):
     base_filter = search_requests_filter(
         type_id=type_id, topic_reference=topic_reference, is_open=True
     )
-    created_filter = search_requests_filter(
-        type_id=type_id,
-        topic_reference=topic_reference,
-        is_open=False,
-        add_filter=dsl.Q("term", **{"status": "created"}),
-    )
     results = current_requests_service.search(
-        system_identity, extra_filter=base_filter | created_filter
+        system_identity, extra_filter=base_filter
     ).hits
     return bool(list(results))
 
@@ -161,8 +155,10 @@ def get_receiver_for_request_type(request_type, identity, topic):
     except KeyError:
         return None
 
+    # creator = ResolverRegistry.reference_identity(identity)
+    # todo - the problem here is that we don't know who the creator is - it can be any of the users community roles at least?
     receivers = workflow_request.reference_receivers(
-        identity=identity, topic=topic, request_type=request_type
+        identity=identity, record=topic, request_type=request_type, creator=identity
     )
     if not receivers:
         return None

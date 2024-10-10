@@ -12,14 +12,17 @@ from invenio_requests.services.requests.config import (
     RequestSearchOptions,
     RequestsServiceConfig,
 )
+from invenio_requests.services.requests.params import IsOpenParam
 from marshmallow import fields
-from opensearch_dsl.query import Bool, Term
+from opensearch_dsl.query import Bool
 
+from oarepo_requests.proxies import current_oarepo_requests
 from oarepo_requests.resources.ui import (
     OARepoRequestEventsUIJSONSerializer,
     OARepoRequestsUIJSONSerializer,
 )
 from oarepo_requests.services.oarepo.config import OARepoRequestsServiceConfig
+from oarepo_requests.utils import _reference_query_term
 
 
 class RequestOwnerFilterParam(FilterParam):
@@ -30,26 +33,30 @@ class RequestOwnerFilterParam(FilterParam):
         return search
 
 
+from invenio_search.engine import dsl
+
+
 class RequestReceiverFilterParam(FilterParam):
     def apply(self, identity, search, params):
         value = params.pop(self.param_name, None)
-        my_roles = [n.value for n in identity.provides if n.method == "role"]
+        terms = dsl.Q("match_none")
         if value is not None:
-            search = search.filter(
-                Bool(
-                    should=[
-                        # explicitly myself
-                        Term(**{f"{self.field_name}.user": identity.id}),
-                        # my roles
-                        *[
-                            Term(**{f"{self.field_name}.group": role_id})
-                            for role_id in my_roles
-                        ],
-                        # TODO: add my communities where I have a role to accept requests
-                    ],
-                    minimum_should_match=1,
-                )
-            )
+            references = current_oarepo_requests.identity_to_entity_references(identity)
+            for reference in references:
+                query_term = _reference_query_term(self.field_name, reference)
+                terms |= query_term
+            search = search.filter(Bool(filter=terms))
+        return search
+
+
+class IsClosedParam(IsOpenParam):
+
+    def apply(self, identity, search, params):
+        """Evaluate the is_closed parameter on the search."""
+        if params.get("is_closed") is True:
+            search = search.filter("term", **{self.field_name: True})
+        elif params.get("is_closed") is False:
+            search = search.filter("term", **{self.field_name: False})
         return search
 
 
@@ -57,12 +64,14 @@ class EnhancedRequestSearchOptions(RequestSearchOptions):
     params_interpreters_cls = RequestSearchOptions.params_interpreters_cls + [
         RequestOwnerFilterParam.factory("mine", "created_by.user"),
         RequestReceiverFilterParam.factory("assigned", "receiver"),
+        IsClosedParam.factory("is_closed"),
     ]
 
 
 class ExtendedRequestSearchRequestArgsSchema(RequestSearchRequestArgsSchema):
     mine = fields.Boolean()
     assigned = fields.Boolean()
+    is_closed = fields.Boolean()
 
 
 def override_invenio_requests_config(blueprint, *args, **kwargs):

@@ -1,5 +1,6 @@
 from invenio_records_resources.services.errors import PermissionDeniedError
 from invenio_requests.customizations import RequestType
+from invenio_requests.customizations.states import RequestState
 from invenio_requests.proxies import current_requests_service
 
 from oarepo_requests.errors import OpenRequestAlreadyExists
@@ -15,6 +16,19 @@ from .ref_types import ModelRefTypes, ReceiverRefTypes
 
 class OARepoRequestType(RequestType):
     description = None
+
+    dangerous = False
+    editable = True
+
+    @classmethod
+    @property
+    def available_statuses(cls):
+        return {**super().available_statuses, "created": RequestState.OPEN}
+
+    @classmethod
+    @property
+    def has_form(cls):
+        return hasattr(cls, "form")
 
     def can_create(self, identity, data, receiver, topic, creator, *args, **kwargs):
         current_requests_service.require_permission(

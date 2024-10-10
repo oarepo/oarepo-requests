@@ -1,4 +1,6 @@
 from invenio_records_permissions.generators import SystemProcess
+from invenio_requests.customizations.event_types import CommentEventType, LogEventType
+from invenio_requests.services.generators import Creator, Receiver
 from invenio_requests.services.permissions import (
     PermissionPolicy as InvenioRequestsPermissionPolicy,
 )
@@ -6,6 +8,7 @@ from oarepo_workflows import DefaultWorkflowPermissions
 
 from oarepo_requests.services.permissions.generators import (
     EventCreatorsFromWorkflow,
+    IfEventType,
     IfRequestType,
     RequestActive,
     RequestCreatorsFromWorkflow,
@@ -43,5 +46,8 @@ class CreatorsFromWorkflowRequestsPermissionPolicy(InvenioRequestsPermissionPoli
 
     can_create_comment = [
         SystemProcess(),
+        IfEventType(
+            [LogEventType.type_id, CommentEventType.type_id], [Creator(), Receiver()]
+        ),
         EventCreatorsFromWorkflow(),
     ]
