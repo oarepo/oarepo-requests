@@ -1,4 +1,5 @@
 from functools import cached_property
+
 import importlib_metadata
 from invenio_base.utils import obj_or_import_string
 from invenio_requests.proxies import current_events_service
@@ -61,7 +62,9 @@ class OARepoRequests:
 
     def identity_to_entity_references(self, identity):
         mappings = current_oarepo_requests.identity_to_entity_references_fncs
-        ret = [mapping_fnc(identity) for mapping_fnc in mappings if mapping_fnc(identity)]
+        ret = [
+            mapping_fnc(identity) for mapping_fnc in mappings if mapping_fnc(identity)
+        ]
         flattened_ret = []
         for mapping_result in ret:
             flattened_ret += mapping_result
