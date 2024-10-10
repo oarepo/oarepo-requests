@@ -1,6 +1,9 @@
+from functools import cached_property
+import importlib_metadata
 from invenio_base.utils import obj_or_import_string
 from invenio_requests.proxies import current_events_service
 
+from oarepo_requests.proxies import current_oarepo_requests
 from oarepo_requests.resources.events.config import OARepoRequestsCommentsResourceConfig
 from oarepo_requests.resources.events.resource import OARepoRequestsCommentsResource
 from oarepo_requests.resources.oarepo.config import OARepoRequestsResourceConfig
@@ -48,6 +51,21 @@ class OARepoRequests:
     @property
     def allowed_receiver_ref_types(self):
         return self.app.config.get("REQUESTS_ALLOWED_RECEIVERS", [])
+
+    @cached_property
+    def identity_to_entity_references_fncs(self):
+        group_name = "oarepo_requests.identity_to_entity_references"
+        return [
+            x.load() for x in importlib_metadata.entry_points().select(group=group_name)
+        ]
+
+    def identity_to_entity_references(self, identity):
+        mappings = current_oarepo_requests.identity_to_entity_references_fncs
+        ret = [mapping_fnc(identity) for mapping_fnc in mappings if mapping_fnc(identity)]
+        flattened_ret = []
+        for mapping_result in ret:
+            flattened_ret += mapping_result
+        return flattened_ret
 
     # copied from invenio_requests for now
     def service_configs(self, app):
