@@ -1,5 +1,6 @@
 from invenio_records_resources.services.errors import PermissionDeniedError
 from invenio_requests.customizations import RequestType
+from invenio_requests.customizations.states import RequestState
 from invenio_requests.proxies import current_requests_service
 
 from oarepo_requests.errors import OpenRequestAlreadyExists
@@ -11,7 +12,7 @@ from ..actions.generic import (
     OARepoSubmitAction,
 )
 from .ref_types import ModelRefTypes, ReceiverRefTypes
-from invenio_requests.customizations.states import RequestState
+
 
 class OARepoRequestType(RequestType):
     description = None
@@ -22,10 +23,7 @@ class OARepoRequestType(RequestType):
     @classmethod
     @property
     def available_statuses(cls):
-        return {
-            **super().available_statuses,
-            "created": RequestState.OPEN
-        }
+        return {**super().available_statuses, "created": RequestState.OPEN}
 
     @classmethod
     @property

@@ -155,7 +155,6 @@ def get_receiver_for_request_type(request_type, identity, topic):
     except KeyError:
         return None
 
-
     receivers = workflow_request.reference_receivers(
         identity=identity, record=topic, request_type=request_type, creator=identity
     )

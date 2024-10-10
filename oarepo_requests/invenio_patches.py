@@ -3,7 +3,6 @@ from functools import cached_property
 from flask_resources import JSONSerializer, ResponseHandler
 from invenio_records_resources.resources.records.headers import etag_headers
 from invenio_records_resources.services.records.params import FilterParam
-from invenio_requests.services.requests.params import IsOpenParam
 from invenio_requests.resources.events.config import RequestCommentsResourceConfig
 from invenio_requests.resources.requests.config import (
     RequestSearchRequestArgsSchema,
@@ -13,6 +12,7 @@ from invenio_requests.services.requests.config import (
     RequestSearchOptions,
     RequestsServiceConfig,
 )
+from invenio_requests.services.requests.params import IsOpenParam
 from marshmallow import fields
 from opensearch_dsl.query import Bool
 
@@ -32,7 +32,9 @@ class RequestOwnerFilterParam(FilterParam):
             search = search.filter("term", **{self.field_name: identity.id})
         return search
 
+
 from invenio_search.engine import dsl
+
 
 class RequestReceiverFilterParam(FilterParam):
     def apply(self, identity, search, params):
@@ -45,6 +47,7 @@ class RequestReceiverFilterParam(FilterParam):
                 terms |= query_term
             search = search.filter(Bool(filter=terms))
         return search
+
 
 class IsClosedParam(IsOpenParam):
 
