@@ -34,13 +34,21 @@ def test_allowed_request_types_on_draft_service(
                 {
                     "links": {
                         "actions": {
+                            "create": f'https://127.0.0.1:5000/api/thesis/{draft1.json["id"]}/draft/requests/delete_draft'
+                        }
+                    },
+                    "type_id": "delete_draft",
+                },
+                {
+                    "links": {
+                        "actions": {
                             "create": f'https://127.0.0.1:5000/api/thesis/{draft1.json["id"]}/draft/requests/publish_draft'
                         }
                     },
                     "type_id": "publish_draft",
-                }
+                },
             ],
-            "total": 1,
+            "total": 2,
         },
         "links": {
             "self": f'https://127.0.0.1:5000/api/thesis/{draft1.json["id"]}/draft/requests/applicable'
@@ -78,13 +86,21 @@ def test_allowed_request_types_on_draft_resource(
                 {
                     "links": {
                         "actions": {
+                            "create": f'https://127.0.0.1:5000/api/thesis/{draft1.json["id"]}/draft/requests/delete_draft'
+                        }
+                    },
+                    "type_id": "delete_draft",
+                },
+                {
+                    "links": {
+                        "actions": {
                             "create": f'https://127.0.0.1:5000/api/thesis/{draft1.json["id"]}/draft/requests/publish_draft'
                         }
                     },
                     "type_id": "publish_draft",
-                }
+                },
             ],
-            "total": 1,
+            "total": 2,
         },
         "links": {
             "self": f'https://127.0.0.1:5000/api/thesis/{draft1.json["id"]}/draft/requests/applicable'
@@ -225,6 +241,21 @@ def test_ui_serialization(
 
     assert allowed_request_types_draft.json["hits"]["hits"] == [
         {
+            "dangerous": True,
+            "description": "Request deletion of draft",
+            "editable": True,
+            "has_form": False,
+            "links": {
+                "actions": {
+                    "create": f"https://127.0.0.1:5000/api/thesis/{draft_id}/draft/requests/delete_draft"
+                }
+            },
+            "name": "Delete draft",
+            "stateful_description": "Click to permanently delete the draft.",
+            "stateful_name": "Delete draft",
+            "type_id": "delete_draft",
+        },
+        {
             "description": "Request publishing of a draft",
             "links": {
                 "actions": {
@@ -233,13 +264,16 @@ def test_ui_serialization(
             },
             "name": "Publish draft",
             "type_id": "publish_draft",
+            "dangerous": False,
+            "editable": True,
+            "has_form": True,
             "stateful_description": "By submitting the draft for review you are "
             "requesting the publication of the draft. The draft "
             "will become locked and no further changes will be "
             "possible until the request is accepted or declined. "
             "You will be notified about the decision by email.",
             "stateful_name": "Submit for review",
-        }
+        },
     ]
     sorted_published_list = allowed_request_types_published.json["hits"]["hits"]
     sorted_published_list.sort(key=lambda serialized_rt: serialized_rt["type_id"])
@@ -253,6 +287,9 @@ def test_ui_serialization(
             },
             "description": "Request deletion of published record",
             "name": "Delete record",
+            "dangerous": True,
+            "editable": True,
+            "has_form": False,
             "stateful_description": "Request permission to delete the record.",
             "stateful_name": "Request record deletion",
         },
@@ -265,6 +302,9 @@ def test_ui_serialization(
             },
             "description": "Request re-opening of published record",
             "name": "Edit record",
+            "dangerous": False,
+            "editable": True,
+            "has_form": False,
             "stateful_description": "Click to start editing the metadata of the record.",
             "stateful_name": "Edit record",
         },
@@ -277,6 +317,9 @@ def test_ui_serialization(
             },
             "description": "Request requesting creation of new version of a published record.",
             "name": "New Version",
+            "dangerous": False,
+            "editable": True,
+            "has_form": False,
             "stateful_description": "Click to start creating a new version of the "
             "record.",
             "stateful_name": "New Version",

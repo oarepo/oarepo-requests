@@ -1,4 +1,4 @@
-from .delete_record import DeletePublishedRecordRequestType
+from .delete_published_record import DeletePublishedRecordRequestType
 from .edit_record import EditPublishedRecordRequestType
 from .generic import NonDuplicableOARepoRequestType
 from .publish_draft import PublishDraftRequestType
