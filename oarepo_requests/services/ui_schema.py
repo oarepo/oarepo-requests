@@ -92,6 +92,10 @@ class UIRequestTypeSchema(RequestTypeSchema):
             data["description"] = type_obj.description
         if hasattr(type_obj, "name"):
             data["name"] = type_obj.name
+
+        if hasattr(type_obj, "extra_data"):
+            for key, item in type_obj.extra_data.items():
+                data[key] = item
         return data
 
 

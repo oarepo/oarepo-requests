@@ -31,6 +31,11 @@ class PublishDraftRequestType(NonDuplicableOARepoRequestType):
         ),
         "version": ma.fields.Str(),
     }
+    extra_data = {
+        "dangerous": False,
+        "hasForm": True,
+        "editable": True,
+    }
 
     form = {
         "field": "version",

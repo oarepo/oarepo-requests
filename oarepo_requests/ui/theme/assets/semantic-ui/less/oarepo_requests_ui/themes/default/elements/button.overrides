@@ -1,0 +1,27 @@
+.ui.button {
+  &.request-create-button {
+    display: block;
+    margin-bottom: 10px;
+
+    &.delete_published_record {
+      background-color: @red;
+      color: @white;
+    }
+    &.publish_draft {
+      color: white;
+      background-color: @green;
+    }
+  }
+  &.request-reply-button {
+    display: block;
+    margin-bottom: 10px;
+    &.publish_draft {
+      color: white;
+      background-color: @green;
+    }
+    &.delete_published_record {
+      background-color: @red;
+      color: @white;
+    }
+  }
+}
