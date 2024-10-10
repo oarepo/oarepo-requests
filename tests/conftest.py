@@ -57,6 +57,7 @@ from oarepo_requests.services.permissions.workflow_policies import (
 )
 from oarepo_requests.types import ModelRefTypes, NonDuplicableOARepoRequestType
 from oarepo_requests.types.events.topic_update import TopicUpdateEventType
+from tests.test_requests.utils import link_api2testclient
 
 can_comment_only_receiver = [
     Receiver(),
@@ -114,6 +115,12 @@ class DefaultRequests(WorkflowRequestPolicy):
         requesters=[IfNoNewVersionDraft([IfInState("published", [RecordOwners()])])],
         recipients=[AutoApprove()],
         transitions=WorkflowTransitions(),
+    )
+
+class RequestsWithDifferentRecipients(DefaultRequests):
+    another_topic_updating = WorkflowRequest(
+        requesters=[AnyUser()],
+        recipients=[UserGenerator(1)],
     )
 
 
@@ -179,6 +186,8 @@ class ApproveRequestType(NonDuplicableOARepoRequestType):
     description = _("Request approving of a draft")
     receiver_can_be_none = True
     allowed_topic_ref_types = ModelRefTypes(published=False, draft=True)
+
+
 
 
 class AnotherTopicUpdatingRequestType(NonDuplicableOARepoRequestType):
@@ -255,6 +264,11 @@ WORKFLOWS = {
         permission_policy_cls=WithApprovalPermissions,
         request_policy_cls=RequestsWithAnotherTopicUpdatingRequestType,
     ),
+    "different_recipients": Workflow(
+        label=_("Workflow with draft requests with different recipients to test param interpreters"),
+        permission_policy_cls=TestWorkflowPermissions,
+        request_policy_cls=RequestsWithDifferentRecipients
+    )
 }
 
 
@@ -485,21 +499,6 @@ def request_events_service(app):
 
 
 @pytest.fixture()
-def create_request(requests_service):
-    """Request Factory fixture."""
-
-    def _create_request(identity, input_data, receiver, request_type, **kwargs):
-        """Create a request."""
-        # Need to use the service to get the id
-        item = requests_service.create(
-            identity, input_data, request_type=request_type, receiver=receiver, **kwargs
-        )
-        return item._request
-
-    return _create_request
-
-
-@pytest.fixture()
 def users(app, db, UserFixture):
     user1 = UserFixture(
         email="user1@example.org",
@@ -704,3 +703,21 @@ def get_request_link(get_request_type):
         return selected_entry["links"]["actions"]["create"]
 
     return _create_request_from_link
+
+@pytest.fixture
+def create_request_by_link(get_request_link):
+    def _create_request(client, record, request_type):
+        applicable_requests = client.get(link_api2testclient(record.json["links"]["applicable-requests"])).json["hits"]["hits"]
+        create_link = link_api2testclient(get_request_link(applicable_requests, request_type))
+        create_response = client.post(create_link)
+        return create_response
+    return _create_request
+
+@pytest.fixture
+def submit_request_by_link(create_request_by_link):
+    def _submit_request(client, record, request_type):
+        create_response = create_request_by_link(client, record, request_type)
+        submit_response = client.post(
+            link_api2testclient(create_response.json["links"]["actions"]["submit"]))
+        return submit_response
+    return _submit_request
