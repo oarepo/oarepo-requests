@@ -17,7 +17,10 @@ from oarepo_ui.resources.components import AllowedHtmlTagsComponent
 from oarepo_ui.resources.config import FormConfigResourceConfig, UIResourceConfig
 from oarepo_ui.resources.links import UIRecordLink
 
-from oarepo_requests.ui.components import FormConfigCustomFieldsComponent
+from oarepo_requests.ui.components import (
+    FormConfigCustomFieldsComponent,
+    FormConfigRequestTypePropertiesComponent,
+)
 
 
 def _get_custom_fields_ui_config(key, **kwargs):
@@ -39,7 +42,11 @@ class RequestTypeSchema(ma.fields.Str):
 class RequestsFormConfigResourceConfig(FormConfigResourceConfig):
     url_prefix = "/requests"
     blueprint_name = "oarepo_requests_form_config"
-    components = [AllowedHtmlTagsComponent, FormConfigCustomFieldsComponent]
+    components = [
+        AllowedHtmlTagsComponent,
+        FormConfigCustomFieldsComponent,
+        FormConfigRequestTypePropertiesComponent,
+    ]
     request_view_args = {"request_type": RequestTypeSchema()}
     routes = {
         "form_config": "/configs/<request_type>",
