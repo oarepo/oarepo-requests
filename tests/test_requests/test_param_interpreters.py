@@ -98,7 +98,7 @@ def test_open_param_interpreter(
     )
     create_response = create_request_by_link(user2_client, draft3, "publish_draft")
 
-    read = user2_client.get(f'{urls["BASE_URL"]}{draft1.json['id']}/draft?expand=true')
+    read = user2_client.get(f'{urls["BASE_URL"]}{draft1.json["id"]}/draft?expand=true')
     publish = user2_client.post(
         link_api2testclient(
             read.json["expanded"]["requests"][0]["links"]["actions"]["accept"]
