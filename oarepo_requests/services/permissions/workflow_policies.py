@@ -8,10 +8,10 @@ from oarepo_workflows import DefaultWorkflowPermissions
 
 from oarepo_requests.services.permissions.generators import (
     EventCreatorsFromWorkflow,
-    IfEventOnRequestType,
+    IfEventType,
     IfRequestType,
     RequestActive,
-    RequestCreatorsFromWorkflow, IfEventType,
+    RequestCreatorsFromWorkflow,
 )
 
 

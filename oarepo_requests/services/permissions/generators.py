@@ -1,7 +1,6 @@
 from flask_principal import Identity
 from invenio_records_permissions.generators import ConditionalGenerator, Generator
 from invenio_records_resources.references.entity_resolvers import EntityProxy
-from invenio_requests.proxies import current_requests
 from invenio_search.engine import dsl
 from oarepo_runtime.datastreams.utils import get_record_service_for_record
 from oarepo_workflows.requests.policy import RecipientGeneratorMixin
