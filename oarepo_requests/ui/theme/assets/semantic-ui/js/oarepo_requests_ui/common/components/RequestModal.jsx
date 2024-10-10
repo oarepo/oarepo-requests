@@ -7,7 +7,6 @@ import {
   Modal,
   Button,
   Icon,
-  Message,
   Confirm,
 } from "semantic-ui-react";
 import { useFormik, FormikProvider, useFormikContext } from "formik";
@@ -16,6 +15,7 @@ import {
   ModalControlContextProvider,
   mapLinksToActions,
   ConfirmModalContextProvider,
+  WarningMessage,
 } from "@js/oarepo_requests_common";
 import PropTypes from "prop-types";
 import { useQuery } from "@tanstack/react-query";
@@ -61,7 +61,9 @@ export const RequestModal = ({
           openModal,
         }}
       >
-        <ConfirmModalContextProvider>
+        <ConfirmModalContextProvider
+          requestOrRequestType={requestCreationModal ? requestType : request}
+        >
           {({ confirmDialogProps }) => (
             <React.Fragment>
               <Modal
@@ -138,12 +140,10 @@ const RequestModalContentAndActions = ({
   );
   const customFields = data?.data?.custom_fields;
   const extra_data = data?.data?.extra_data;
-  console.log(extra_data);
 
   const modalActions = mapLinksToActions(
     requestCreationModal ? requestType : request,
-    customFields,
-    extra_data
+    customFields
   );
 
   return (
@@ -152,17 +152,11 @@ const RequestModalContentAndActions = ({
         <Loader inverted />
       </Dimmer>
       <Modal.Content>
-        {error && (
-          <Message negative>
-            <Message.Header>{error}</Message.Header>
-          </Message>
-        )}
+        {error && <WarningMessage message={error} />}
         {customFieldsLoadingError && (
-          <Message negative>
-            <Message.Header>
-              {i18next.t("Form fields could not be fetched.")}
-            </Message.Header>
-          </Message>
+          <WarningMessage
+            message={i18next.t("Form fields could not be fetched.")}
+          />
         )}
         <ContentComponent
           request={request}

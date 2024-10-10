@@ -17,7 +17,7 @@ RequestContextProvider.propTypes = {
 export const useRequestContext = () => {
   const context = useContext(RequestContext);
   if (!context) {
-    console.error(
+    console.warn(
       "useRequestContext must be used inside RequestContext.Provider"
     );
   }

@@ -2,7 +2,10 @@ import React, { useCallback } from "react";
 import PropTypes from "prop-types";
 import { SegmentGroup } from "semantic-ui-react";
 import { CreateRequestButtonGroup, RequestListContainer } from ".";
-import { RequestContextProvider } from "@js/oarepo_requests_common";
+import {
+  RequestContextProvider,
+  CallbackContextProvider,
+} from "@js/oarepo_requests_common";
 import {
   useQuery,
   useQueryClient,
@@ -65,27 +68,32 @@ const RecordRequests = ({
       value={{
         requests,
         requestTypes: applicableRequestTypes,
-        fetchNewRequests,
         record: initialRecord,
-        onBeforeAction,
-        onAfterAction,
-        onActionError,
         requestButtonsIconsConfig: {
           ...requestButtonsDefaultIconConfig,
           ...requestButtonsIconsConfig,
         },
       }}
     >
-      <ContainerComponent>
-        <CreateRequestButtonGroup
-          applicableRequestsLoading={applicableRequestTypesLoading}
-          applicableRequestsLoadingError={applicableRequestsLoadingError}
-        />
-        <RequestListContainer
-          requestsLoading={requestsLoading}
-          requestsLoadingError={requestsLoadingError}
-        />
-      </ContainerComponent>
+      <CallbackContextProvider
+        value={{
+          onBeforeAction,
+          onAfterAction,
+          onActionError,
+          fetchNewRequests,
+        }}
+      >
+        <ContainerComponent>
+          <CreateRequestButtonGroup
+            applicableRequestsLoading={applicableRequestTypesLoading}
+            applicableRequestsLoadingError={applicableRequestsLoadingError}
+          />
+          <RequestListContainer
+            requestsLoading={requestsLoading}
+            requestsLoadingError={requestsLoadingError}
+          />
+        </ContainerComponent>
+      </CallbackContextProvider>
     </RequestContextProvider>
   );
 };

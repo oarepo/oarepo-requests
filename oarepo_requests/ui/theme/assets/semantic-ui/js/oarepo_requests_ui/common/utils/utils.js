@@ -1,5 +1,6 @@
 import _isEmpty from "lodash/isEmpty";
 import { http } from "@js/oarepo_ui";
+import _set from "lodash/set";
 
 export const serializeCustomFields = (formData) => {
   if (!formData) return {};
@@ -46,20 +47,29 @@ export const createOrSave = async (requestOrRequestType, formValues) => {
 export const accept = async (request, formData) => {
   return await http.post(
     request.links?.actions?.accept,
-    serializeCustomFields(formData)
+    serializeDataForInvenioApi(formData)
   );
 };
 
 export const decline = async (request, formData) => {
   return await http.post(
     request.links?.actions?.decline,
-    serializeCustomFields(formData)
+    serializeDataForInvenioApi(formData)
   );
 };
 
 export const cancel = async (request, formData) => {
   return await http.post(
     request.links?.actions?.cancel,
-    serializeCustomFields(formData)
+    serializeDataForInvenioApi(formData)
   );
+};
+
+// this is not nice, but unfortunately, as our API vs invenio API are not consistent, I don't see a better way (Invenio api accepts only payload.content and nothing else)
+const serializeDataForInvenioApi = (formData) => {
+  const serializedData = {};
+  if (formData.payload?.content) {
+    _set(serializedData, "payload.content", formData.payload.content);
+  }
+  return serializedData;
 };

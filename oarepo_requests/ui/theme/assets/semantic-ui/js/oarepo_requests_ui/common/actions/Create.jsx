@@ -59,7 +59,7 @@ const Create = ({ requestType, extraData }) => {
 
 Create.propTypes = {
   requestType: PropTypes.object,
-  requireConfirmation: PropTypes.bool,
+  extraData: PropTypes.object,
 };
 
 export default Create;

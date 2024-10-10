@@ -53,7 +53,7 @@ const Decline = ({ request, extraData }) => {
 
 Decline.propTypes = {
   request: PropTypes.object,
-  requireConfirmation: PropTypes.bool,
+  extraData: PropTypes.object,
 };
 
 export default Decline;

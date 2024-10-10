@@ -58,7 +58,7 @@ export const ReadOnlyCustomFields = ({
 
   return (
     <>
-      {sections.map(({ section, fields, paths }) => (
+      {sections.map(({ section, fields }) => (
         <React.Fragment key={section}>{fields}</React.Fragment>
       ))}
     </>

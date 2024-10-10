@@ -3,20 +3,21 @@ import { i18next } from "@translations/oarepo_requests_ui/i18next";
 import { Button } from "semantic-ui-react";
 import { useMutation } from "@tanstack/react-query";
 import {
-  useRequestContext,
+  useCallbackContext,
   REQUEST_TYPE,
   WarningMessage,
   RequestCommentInput,
 } from "@js/oarepo_requests_common";
+import { useFormikContext } from "formik";
 
 /**
  * @typedef {import("semantic-ui-react").ConfirmProps} ConfirmProps
  */
 
-export const useConfirmDialog = (isEventModal = false) => {
+export const useConfirmDialog = (requestOrRequestType) => {
   /** @type {[ConfirmProps, (props: ConfirmProps) => void]} */
-
-  const initialState = {
+  const formik = useFormikContext();
+  const [confirmDialogProps, setConfirmDialogProps] = useState({
     open: false,
     content: i18next.t("Are you sure?"),
     cancelButton: i18next.t("Close"),
@@ -25,36 +26,69 @@ export const useConfirmDialog = (isEventModal = false) => {
       setConfirmDialogProps((props) => ({ ...props, open: false })),
     onConfirm: () =>
       setConfirmDialogProps((props) => ({ ...props, open: false })),
-  };
-  const [confirmDialogProps, setConfirmDialogProps] = useState(initialState);
+  });
 
   const confirmAction = useCallback(
-    (onConfirm, requestActionType, { dangerous, hasForm, editable } = {}) => {
+    (onConfirm, requestActionType, extraData) => {
+      const dangerous = extraData?.dangerous;
       /** @type {ConfirmProps} */
       let newConfirmDialogProps = {
         open: true,
+        header: `${i18next.t("Are you sure you wish to")} ${
+          requestOrRequestType.name
+        }`,
         content: dangerous ? <WarningMessage /> : i18next.t("Are you sure?"),
         onConfirm: () => {
           setConfirmDialogProps((props) => ({ ...props, open: false }));
           onConfirm();
         },
         onCancel: () => {
-          setConfirmDialogProps(initialState);
+          setConfirmDialogProps((props) => ({ ...props, open: false }));
+          formik?.resetForm();
         },
       };
-
       switch (requestActionType) {
         case REQUEST_TYPE.CREATE:
-          newConfirmDialogProps.header = isEventModal
-            ? i18next.t("Submit event")
-            : i18next.t("Create request");
+          newConfirmDialogProps.header = `${i18next.t("Create request")} (${
+            requestOrRequestType.name
+          })`;
+
+          if (dangerous) {
+            newConfirmDialogProps.confirmButton = (
+              <Button negative content={i18next.t("Proceed")} />
+            );
+            newConfirmDialogProps.content = (
+              <WarningMessage
+                message={i18next.t(
+                  "Are you sure you wish to proceed? After this request is accepted, it will not be possible to reverse the action."
+                )}
+              />
+            );
+          }
+
           break;
         case REQUEST_TYPE.SUBMIT:
-          newConfirmDialogProps.header = i18next.t("Submit request");
-          newConfirmDialogProps.confirmButton = i18next.t("OK");
+          newConfirmDialogProps.header = `${i18next.t("Submit request")} (${
+            requestOrRequestType.name
+          })`;
+
+          if (dangerous) {
+            newConfirmDialogProps.confirmButton = (
+              <Button negative content={i18next.t("Proceed")} />
+            );
+            newConfirmDialogProps.content = (
+              <WarningMessage
+                message={i18next.t(
+                  "Are you sure you wish to proceed? After this request is accepted, it will not be possible to reverse the action."
+                )}
+              />
+            );
+          }
           break;
         case REQUEST_TYPE.CANCEL:
-          newConfirmDialogProps.header = i18next.t("Cancel request");
+          newConfirmDialogProps.header = `${i18next.t("Cancel request")} (${
+            requestOrRequestType.name
+          })`;
           newConfirmDialogProps.confirmButton = (
             <Button negative>{i18next.t("Cancel request")}</Button>
           );
@@ -65,18 +99,27 @@ export const useConfirmDialog = (isEventModal = false) => {
           );
           break;
         case REQUEST_TYPE.ACCEPT:
-          newConfirmDialogProps.header = i18next.t("Accept request");
+          newConfirmDialogProps.header = `${i18next.t("Accept request")} (${
+            requestOrRequestType.name
+          })`;
           newConfirmDialogProps.confirmButton = (
-            <Button positive>{i18next.t("Accept")}</Button>
+            <Button positive={!dangerous} negative={dangerous}>
+              {i18next.t("Accept")}
+            </Button>
           );
           newConfirmDialogProps.content = (
-            <div className="content">
-              <RequestCommentInput />
-            </div>
+            <React.Fragment>
+              <div className="content">
+                <RequestCommentInput />
+              </div>
+              {dangerous && <WarningMessage />}
+            </React.Fragment>
           );
           break;
         case REQUEST_TYPE.DECLINE:
-          newConfirmDialogProps.header = i18next.t("Decline request");
+          newConfirmDialogProps.header = `${i18next.t("Decline request")} (${
+            requestOrRequestType.name
+          })`;
           newConfirmDialogProps.confirmButton = (
             <Button negative>{i18next.t("Decline")}</Button>
           );
@@ -89,27 +132,12 @@ export const useConfirmDialog = (isEventModal = false) => {
         default:
           break;
       }
-
-      // if (createAndSubmit) {
-      //   newConfirmDialogProps = {
-      //     ...newConfirmDialogProps,
-      //     header: i18next.t("Create and submit request"),
-      //     confirmButton: (
-      //       <Button positive>{i18next.t("Create and submit")}</Button>
-      //     ),
-      //     onConfirm: () => {
-      //       setConfirmDialogProps((props) => ({ ...props, open: false }));
-      //       onConfirm();
-      //     },
-      //   };
-      // }
-
       setConfirmDialogProps((props) => ({
         ...props,
         ...newConfirmDialogProps,
       }));
     },
-    [isEventModal]
+    []
   );
 
   return { confirmDialogProps, confirmAction };
@@ -121,12 +149,8 @@ export const useAction = ({
   formik,
   modalControl,
 } = {}) => {
-  const {
-    onBeforeAction = undefined,
-    onAfterAction = undefined,
-    onActionError = undefined,
-    fetchNewRequests = undefined,
-  } = useRequestContext() || {};
+  const { onBeforeAction, onAfterAction, onActionError, fetchNewRequests } =
+    useCallbackContext();
   return useMutation(
     async () => {
       formik?.setSubmitting(true);
@@ -142,6 +166,8 @@ export const useAction = ({
     },
     {
       onError: (e, variables) => {
+        formik?.setSubmitting(false);
+
         if (onActionError) {
           onActionError(e, variables, formik, modalControl);
         } else {
@@ -164,18 +190,16 @@ export const useAction = ({
             );
             setTimeout(() => {
               modalControl?.closeModal();
-              formik?.setSubmitting(false);
             }, 2500);
           }
         }
       },
       onSuccess: (data, variables) => {
+        formik?.setSubmitting(false);
         if (onAfterAction) {
           onAfterAction(data, variables, formik, modalControl);
         }
         const redirectionURL = data?.data?.links?.topic_html;
-
-        formik?.setSubmitting(false);
         modalControl?.closeModal();
         fetchNewRequests?.();
 

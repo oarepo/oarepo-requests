@@ -8,35 +8,25 @@ import {
   useModalControlContext,
   useAction,
   createOrSave,
-  REQUEST_TYPE,
 } from "@js/oarepo_requests_common";
 
-const Save = ({ request, extraData }) => {
+const Save = ({ request, requestType }) => {
   const formik = useFormikContext();
   const { confirmAction } = useConfirmModalContext();
   const modalControl = useModalControlContext();
 
   const { isLoading, mutate: createOrSaveRequest } = useAction({
     action: createOrSave,
-    requestOrRequestType: request,
+    requestOrRequestType: request || requestType,
     formik,
     confirmAction,
     modalControl,
   });
-  const requireConfirmation = extraData?.hasForm || extraData?.dangerous;
-
-  const handleClick = () => {
-    if (requireConfirmation) {
-      confirmAction(() => createOrSaveRequest(), REQUEST_TYPE.SAVE, extraData);
-    } else {
-      createOrSaveRequest();
-    }
-  };
 
   return (
     <Button
       title={i18next.t("Save drafted request")}
-      onClick={() => handleClick()}
+      onClick={() => createOrSaveRequest()}
       className="requests request-save-button"
       color="grey"
       icon
@@ -53,7 +43,7 @@ const Save = ({ request, extraData }) => {
 
 Save.propTypes = {
   request: PropTypes.object,
-  requireConfirmation: PropTypes.bool,
+  requestType: PropTypes.object,
 };
 
 export default Save;

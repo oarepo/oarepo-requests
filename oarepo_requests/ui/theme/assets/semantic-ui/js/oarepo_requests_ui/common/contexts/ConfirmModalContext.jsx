@@ -6,9 +6,9 @@ const ConfirmModalContext = createContext();
 
 export const ConfirmModalContextProvider = ({
   children,
-  isEventModal = false,
+  requestOrRequestType,
 }) => {
-  const confirmDialogStateAndHelpers = useConfirmDialog(isEventModal);
+  const confirmDialogStateAndHelpers = useConfirmDialog(requestOrRequestType);
   return (
     <ConfirmModalContext.Provider value={confirmDialogStateAndHelpers}>
       {typeof children === "function"
@@ -20,13 +20,13 @@ export const ConfirmModalContextProvider = ({
 
 ConfirmModalContextProvider.propTypes = {
   children: PropTypes.oneOfType([PropTypes.node, PropTypes.func]),
-  isEventModal: PropTypes.bool,
+  requestOrRequestType: PropTypes.object,
 };
 
 export const useConfirmModalContext = () => {
   const context = useContext(ConfirmModalContext);
   if (!context) {
-    console.error(
+    console.warn(
       "useConfirmModalContext must be used inside ConfirmModalContext.Provider"
     );
   }

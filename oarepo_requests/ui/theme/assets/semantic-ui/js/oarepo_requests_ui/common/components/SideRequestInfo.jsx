@@ -29,7 +29,6 @@ export const SideRequestInfo = ({ request }) => {
           </span>
         </List.Content>
       </List.Item>
-
       <List.Item>
         <List.Header as="h3">{i18next.t("Receiver")}</List.Header>
         <List.Content>
@@ -49,14 +48,6 @@ export const SideRequestInfo = ({ request }) => {
           </span>
         </List.Content>
       </List.Item>
-
-      {/* <Header as="h3"  size="tiny">
-        {i18next.t("Request type")}
-      </Header>
-      <Label size="small">{request?.type}</Label>
-
-      <Divider /> */}
-
       <List.Item>
         <List.Header as="h3">{i18next.t("Status")}</List.Header>
         <List.Content>
@@ -66,7 +57,6 @@ export const SideRequestInfo = ({ request }) => {
           <span>{request.status}</span>
         </List.Content>
       </List.Item>
-
       <List.Item>
         <List.Header as="h3">{i18next.t("Created")}</List.Header>
         <List.Content>{request.created}</List.Content>

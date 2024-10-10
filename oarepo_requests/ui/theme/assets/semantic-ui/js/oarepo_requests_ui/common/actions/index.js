@@ -8,11 +8,7 @@ import Save from "./Save";
 import CreateAndSubmit from "./CreateAndSubmit";
 import CreateSubmitAction from "./CreateSubmitAction";
 
-export const mapLinksToActions = (
-  requestOrRequestType,
-  customFields,
-  extra_data
-) => {
+export const mapLinksToActions = (requestOrRequestType, customFields) => {
   const customFieldsPaths = customFields?.ui
     ?.map(({ fields }) => {
       let paths = [];

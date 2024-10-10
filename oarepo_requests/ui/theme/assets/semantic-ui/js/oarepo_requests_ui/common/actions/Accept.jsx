@@ -38,7 +38,8 @@ const Accept = ({ request, extraData }) => {
       title={i18next.t("Accept request")}
       onClick={() => handleClick()}
       className="requests request-accept-button"
-      positive
+      positive={!extraData?.dangerous}
+      negative={extraData?.dangerous}
       icon
       labelPosition="left"
       floated="right"
@@ -46,7 +47,7 @@ const Accept = ({ request, extraData }) => {
       disabled={isLoading}
     >
       <Icon name="check" />
-      {i18next.t("Accept")}
+      {request?.name || i18next.t("Accept")}
     </Button>
   );
 };

@@ -19,7 +19,7 @@ ModalControlContextProvider.propTypes = {
 export const useModalControlContext = () => {
   const context = useContext(ModalControlContext);
   if (!context) {
-    console.error(
+    console.warn(
       "useModalControlContext must be used inside ModalControlContext.Provider"
     );
   }

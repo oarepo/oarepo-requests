@@ -1,4 +1,4 @@
-import React, { useRef } from "react";
+import React, { useRef, useEffect } from "react";
 import PropTypes from "prop-types";
 import { i18next } from "@translations/oarepo_requests_ui/i18next";
 import { Button, Message, FormField, Form } from "semantic-ui-react";
@@ -9,7 +9,6 @@ import sanitizeHtml from "sanitize-html";
 import { CommentPayloadSchema } from "../utils";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { http } from "@js/oarepo_ui";
-import { CodeGen } from "ajv";
 
 export const EventSubmitForm = ({ request }) => {
   const formik = useFormik({
@@ -28,13 +27,14 @@ export const EventSubmitForm = ({ request }) => {
   const editorRef = useRef(null);
   const queryClient = useQueryClient();
 
-  const { mutate, error, isLoading } = useMutation(
+  const { mutate, isError, isLoading, reset } = useMutation(
     () => http.post(request.links?.comments, values),
     {
       onSuccess: (response) => {
         if (response.status === 201) {
           queryClient.setQueryData(["requestEvents"], (oldData) => {
             if (!oldData) return;
+            // a bit ugly, but it is a limitation of react query when data you recieve is nested
             return {
               ...oldData,
               data: {
@@ -47,22 +47,29 @@ export const EventSubmitForm = ({ request }) => {
             };
           });
         }
+        editorRef.current.setContent("");
+        resetForm();
       },
       onError: (error) => {
-        console.log(error.response);
         if (error.response?.data?.errors?.length > 0) {
           error.response.data.errors.forEach((error) => {
-            console.log(error);
             setFieldError(error.field, error.messages[0]);
           });
         }
       },
-      onSettled: () => {
-        editorRef.current.setContent("");
-        resetForm();
-      },
     }
   );
+
+  useEffect(() => {
+    if (isError) {
+      setTimeout(() => {
+        reset();
+        resetForm();
+      }, 2500);
+    }
+    return () => isError && reset();
+  }, [isError, reset, resetForm]);
+
   return (
     <FormikProvider value={formik}>
       <Form className="ui form">
@@ -91,10 +98,10 @@ export const EventSubmitForm = ({ request }) => {
             }
           />
         </FormField>
-        {error && (
+        {isError && (
           <Message negative>
             <Message.Header>
-              {i18next.t("Error while submitting the comment")}
+              {i18next.t("Comment was not submitted successfully.")}
             </Message.Header>
           </Message>
         )}
@@ -115,5 +122,4 @@ export const EventSubmitForm = ({ request }) => {
 
 EventSubmitForm.propTypes = {
   request: PropTypes.object,
-  setEvents: PropTypes.func,
 };

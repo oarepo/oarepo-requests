@@ -56,7 +56,7 @@ const Submit = ({ request, extraData }) => {
 
 Submit.propTypes = {
   request: PropTypes.object,
-  requireConfirmation: PropTypes.bool,
+  extraData: PropTypes.object,
 };
 
 export default Submit;

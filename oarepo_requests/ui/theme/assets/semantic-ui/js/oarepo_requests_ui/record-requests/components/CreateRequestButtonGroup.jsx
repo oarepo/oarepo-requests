@@ -66,7 +66,10 @@ export const CreateRequestButtonGroup = ({
 
         if (!hasForm && dangerous) {
           return (
-            <ConfirmModalContextProvider key={requestType?.type_id}>
+            <ConfirmModalContextProvider
+              key={requestType?.type_id}
+              requestOrRequestType={requestType}
+            >
               {({ confirmDialogProps }) => (
                 <React.Fragment>
                   <CreateSubmitAction
@@ -81,7 +84,10 @@ export const CreateRequestButtonGroup = ({
         }
         if (!hasForm && !dangerous) {
           return (
-            <ConfirmModalContextProvider key={requestType?.type_id}>
+            <ConfirmModalContextProvider
+              key={requestType?.type_id}
+              requestOrRequestType={requestType}
+            >
               {({ confirmDialogProps }) => (
                 <React.Fragment>
                   <CreateSubmitAction
