@@ -3,22 +3,16 @@ import { i18next } from "@translations/oarepo_requests_ui/i18next";
 import { Icon, Feed } from "semantic-ui-react";
 import _has from "lodash/has";
 import sanitizeHtml from "sanitize-html";
-import { hasAll, hasAny, getRequestStatusIcon } from "../utils";
+import { getRequestStatusIcon } from "@js/oarepo_requests_common";
 import PropTypes from "prop-types";
 
 const TimelineEvent = ({ event }) => {
-  const isRenderable =
-    hasAll(event, "created", "payload") &&
-    hasAny(event.payload, "event", "content");
-  const eventLabel = isRenderable
-    ? event.payload?.event ?? i18next.t("commented")
-    : null;
+  const eventLabel = event.payload?.event ?? i18next.t("commented");
   const eventIcon = getRequestStatusIcon(eventLabel) ?? {
     name: "user circle",
     color: "grey",
   };
-
-  return isRenderable ? (
+  return (
     <Feed.Event key={event.id}>
       <Feed.Label>
         <Icon
@@ -31,14 +25,7 @@ const TimelineEvent = ({ event }) => {
         <Feed.Summary>
           {_has(event, "created_by.label") ? (
             <>
-              <Feed.User
-                href={event.created_by?.links?.self}
-                target="_blank"
-                rel="noreferrer"
-              >
-                {event.created_by.label}
-              </Feed.User>{" "}
-              {eventLabel} {i18next.t("this request")}
+              {event.created_by.label} {eventLabel} {i18next.t("this request")}
               <Feed.Date>{event.created}</Feed.Date>
             </>
           ) : (
@@ -59,7 +46,7 @@ const TimelineEvent = ({ event }) => {
         )}
       </Feed.Content>
     </Feed.Event>
-  ) : null;
+  );
 };
 
 TimelineEvent.propTypes = {

@@ -8,17 +8,13 @@ import Save from "./Save";
 import CreateAndSubmit from "./CreateAndSubmit";
 import CreateSubmitAction from "./CreateSubmitAction";
 
-export const mapLinksToActions = (requestOrRequestType, customFields) => {
-  const customFieldsPaths = customFields?.ui
-    ?.map(({ fields }) => {
-      let paths = [];
-      for (const field of fields) {
-        paths.push(field.field);
-      }
-      return paths;
-    })
-    .flat();
-  const longForm = customFieldsPaths?.length > 3;
+export const mapLinksToActions = (
+  requestOrRequestType,
+  customFields,
+  extraData
+) => {
+  const hasLongForm = extraData?.editable;
+
   const actionComponents = [];
   for (const actionKey of Object.keys(requestOrRequestType.links?.actions)) {
     switch (actionKey) {
@@ -40,7 +36,7 @@ export const mapLinksToActions = (requestOrRequestType, customFields) => {
         break;
       case REQUEST_TYPE.CREATE:
         // requestOrRequestType is requestType here
-        if (customFields?.ui && longForm) {
+        if (customFields?.ui && hasLongForm) {
           actionComponents.push({
             name: REQUEST_TYPE.SAVE,
             component: Save,

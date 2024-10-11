@@ -15,7 +15,6 @@ const Decline = ({ request, extraData }) => {
   const formik = useFormikContext();
   const { confirmAction } = useConfirmModalContext();
   const modalControl = useModalControlContext();
-  const requireConfirmation = extraData?.hasForm || extraData?.dangerous;
 
   const { isLoading, mutate: declineRequest } = useAction({
     action: decline,
@@ -26,11 +25,7 @@ const Decline = ({ request, extraData }) => {
   });
 
   const handleClick = () => {
-    if (requireConfirmation) {
-      confirmAction(() => declineRequest(), REQUEST_TYPE.DECLINE, extraData);
-    } else {
-      declineRequest();
-    }
+    confirmAction(() => declineRequest(), REQUEST_TYPE.DECLINE, extraData);
   };
 
   return (

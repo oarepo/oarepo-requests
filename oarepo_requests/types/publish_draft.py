@@ -34,7 +34,7 @@ class PublishDraftRequestType(NonDuplicableOARepoRequestType):
     extra_data = {
         "dangerous": False,
         "hasForm": True,
-        "editable": True,
+        "editable": False,
     }
 
     form = {

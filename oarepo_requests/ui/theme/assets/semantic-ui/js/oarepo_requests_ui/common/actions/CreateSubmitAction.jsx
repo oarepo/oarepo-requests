@@ -49,6 +49,7 @@ const CreateSubmitAction = ({ requestType, requireConfirmation }) => {
     }
     return () => isError && reset();
   }, [isError, reset]);
+
   return (
     <React.Fragment>
       <Button

@@ -2,12 +2,11 @@ import React from "react";
 import { i18next } from "@translations/oarepo_requests_ui/i18next";
 import { Icon, List } from "semantic-ui-react";
 import _has from "lodash/has";
-import { getRequestStatusIcon } from "../../request-detail/utils";
+import { getRequestStatusIcon } from "@js/oarepo_requests_common";
 import PropTypes from "prop-types";
 
 export const SideRequestInfo = ({ request }) => {
   const statusIcon = getRequestStatusIcon(request?.status_code);
-
   return (
     <List horizontal relaxed divided size="small">
       <List.Item>
@@ -61,6 +60,20 @@ export const SideRequestInfo = ({ request }) => {
         <List.Header as="h3">{i18next.t("Created")}</List.Header>
         <List.Content>{request.created}</List.Content>
       </List.Item>
+      {request?.links?.topic_html && (
+        <List.Item>
+          <List.Header as="h3">{i18next.t("Topic")}</List.Header>
+          <List.Content>
+            <a
+              href={request?.links?.topic_html}
+              target="_blank"
+              rel="noreferrer"
+            >
+              {i18next.t("Request topic")}
+            </a>
+          </List.Content>
+        </List.Item>
+      )}
     </List>
   );
 };

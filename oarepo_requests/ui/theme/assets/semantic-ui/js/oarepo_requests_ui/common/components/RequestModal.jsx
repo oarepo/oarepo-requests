@@ -143,7 +143,8 @@ const RequestModalContentAndActions = ({
 
   const modalActions = mapLinksToActions(
     requestCreationModal ? requestType : request,
-    customFields
+    customFields,
+    extra_data
   );
 
   return (

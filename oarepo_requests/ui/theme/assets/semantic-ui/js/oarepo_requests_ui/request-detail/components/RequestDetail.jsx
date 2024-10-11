@@ -10,6 +10,7 @@ import {
   Menu,
   Confirm,
   Loader,
+  Message,
 } from "semantic-ui-react";
 import { TopicPreview } from ".";
 import PropTypes from "prop-types";
@@ -27,6 +28,7 @@ import { Formik } from "formik";
 
 export const RequestDetail = ({
   request,
+  timelinePageSize,
   onBeforeAction,
   onAfterAction,
   onActionError,
@@ -45,7 +47,7 @@ export const RequestDetail = ({
 
   const customFields = data?.data?.custom_fields;
   const extra_data = data?.data?.extra_data;
-  const actions = mapLinksToActions(request, customFields);
+  const actions = mapLinksToActions(request, customFields, extra_data);
 
   useEffect(() => {
     const handleScrollButtonVisibility = () => {
@@ -66,96 +68,115 @@ export const RequestDetail = ({
       value={{ onBeforeAction, onAfterAction, onActionError }}
     >
       <Formik initialValues={{}}>
-        <ConfirmModalContextProvider requestOrRequestType={request}>
-          {({ confirmDialogProps }) => (
-            <Grid relaxed>
-              <Grid.Row columns={2}>
-                <Grid.Column>
-                  <Button
-                    as="a"
-                    compact
-                    href="/me/requests/"
-                    icon
-                    labelPosition="left"
-                  >
-                    <Icon name="arrow left" />
-                    {i18next.t("Back to requests")}
-                  </Button>
-                </Grid.Column>
-                <Grid.Column floated="right" textAlign="right">
-                  {actions.map(({ name, component: ActionComponent }) => (
-                    <React.Fragment key={name}>
-                      <ActionComponent
-                        request={request}
-                        extraData={extra_data}
+        {({ errors }) => (
+          <ConfirmModalContextProvider requestOrRequestType={request}>
+            {({ confirmDialogProps }) => (
+              <Grid relaxed>
+                <Grid.Row columns={2}>
+                  <Grid.Column>
+                    <Button
+                      as="a"
+                      compact
+                      href="/me/requests/"
+                      icon
+                      labelPosition="left"
+                    >
+                      <Icon name="arrow left" />
+                      {i18next.t("Back to requests")}
+                    </Button>
+                  </Grid.Column>
+                  <Grid.Column floated="right" textAlign="right">
+                    {actions.map(({ name, component: ActionComponent }) => (
+                      <React.Fragment key={name}>
+                        <ActionComponent
+                          request={request}
+                          extraData={extra_data}
+                        />
+                      </React.Fragment>
+                    ))}
+                  </Grid.Column>
+                </Grid.Row>
+                <Confirm {...confirmDialogProps} />
+                {errors?.api && (
+                  <Grid.Row>
+                    <Grid.Column>
+                      <Message negative>
+                        <Message.Header>
+                          {i18next.t("Action was not successful.")}
+                        </Message.Header>
+                      </Message>
+                    </Grid.Column>
+                  </Grid.Row>
+                )}
+                <Grid.Row>
+                  <Grid.Column>
+                    <Header as="h1">{requestHeader}</Header>
+                    {description && <p>{description}</p>}
+                    <SideRequestInfo request={request} />
+                  </Grid.Column>
+                </Grid.Row>
+                <React.Fragment>
+                  <RequestCustomFields
+                    request={request}
+                    customFields={customFields}
+                    actions={actions}
+                  />
+                  <Loader active={isLoading} />
+                </React.Fragment>
+                <Grid.Row>
+                  <Grid.Column>
+                    <Menu tabular attached>
+                      <Menu.Item
+                        name="timeline"
+                        content={i18next.t("Timeline")}
+                        active={activeTab === "timeline"}
+                        onClick={() => setActiveTab("timeline")}
                       />
-                    </React.Fragment>
-                  ))}
-                </Grid.Column>
-              </Grid.Row>
-              <Confirm {...confirmDialogProps} />
-
-              <Grid.Row>
-                <Grid.Column>
-                  <Header as="h1">{requestHeader}</Header>
-                  {description && <p>{description}</p>}
-                  <SideRequestInfo request={request} />
-                </Grid.Column>
-              </Grid.Row>
-              <React.Fragment>
-                <RequestCustomFields
-                  request={request}
-                  customFields={customFields}
-                  actions={actions}
-                />
-                <Loader active={isLoading} />
-              </React.Fragment>
-              <Grid.Row>
-                <Grid.Column>
-                  <Menu tabular attached>
-                    <Menu.Item
-                      name="timeline"
-                      content={i18next.t("Timeline")}
-                      active={activeTab === "timeline"}
-                      onClick={() => setActiveTab("timeline")}
-                    />
-                    <Menu.Item
-                      name="topic"
-                      content={`${i18next.t("Record")} ${i18next.t("preview")}`}
-                      active={activeTab === "topic"}
-                      onClick={() => setActiveTab("topic")}
-                    />
-                  </Menu>
-                </Grid.Column>
-              </Grid.Row>
-
-              <Grid.Row>
-                <Grid.Column>
-                  {activeTab === "timeline" && <Timeline request={request} />}
-                  {activeTab === "topic" && <TopicPreview request={request} />}
-                </Grid.Column>
-              </Grid.Row>
-
-              <TransitionablePortal
-                open={scrollToTopVisible}
-                transition={{ animation: "fade up", duration: 300 }}
-              >
-                <Button
-                  onClick={scrollTop}
-                  id="scroll-top-button"
-                  secondary
-                  circular
-                  basic
+                      <Menu.Item
+                        name="topic"
+                        content={`${i18next.t("Record")} ${i18next.t(
+                          "preview"
+                        )}`}
+                        active={activeTab === "topic"}
+                        onClick={() => setActiveTab("topic")}
+                      />
+                    </Menu>
+                  </Grid.Column>
+                </Grid.Row>
+                <Grid.Row>
+                  <Grid.Column>
+                    {activeTab === "timeline" && (
+                      <Timeline
+                        request={request}
+                        timelinePageSize={timelinePageSize}
+                      />
+                    )}
+                    {activeTab === "topic" && (
+                      <TopicPreview request={request} />
+                    )}
+                  </Grid.Column>
+                </Grid.Row>
+                <TransitionablePortal
+                  open={scrollToTopVisible}
+                  transition={{ animation: "fade up", duration: 300 }}
                 >
-                  <Icon size="large" name="chevron up" />
-                  <div className="scroll-top-text">
-                    {i18next.t("to top").toUpperCase()}
-                  </div>
-                </Button>
-              </TransitionablePortal>
-            </Grid>
-          )}
-        </ConfirmModalContextProvider>
+                  <Button
+                    onClick={scrollTop}
+                    id="scroll-top-button"
+                    secondary
+                    circular
+                    basic
+                  >
+                    <Icon size="large" name="chevron up" />
+                    <div className="scroll-top-text">
+                      {i18next.t("to top").toUpperCase()}
+                    </div>
+                  </Button>
+                </TransitionablePortal>
+              </Grid>
+            )}
+          </ConfirmModalContextProvider>
+        )}
       </Formik>
     </CallbackContextProvider>
   );
@@ -166,10 +187,12 @@ RequestDetail.propTypes = {
   onBeforeAction: PropTypes.func,
   onAfterAction: PropTypes.func,
   onActionError: PropTypes.func,
+  timelinePageSize: PropTypes.number,
 };
 
 RequestDetail.defaultProps = {
   onBeforeAction: undefined,
   onAfterAction: undefined,
   onActionError: undefined,
+  timelinePageSize: 10,
 };

@@ -92,11 +92,6 @@ export const useConfirmDialog = (requestOrRequestType) => {
           newConfirmDialogProps.confirmButton = (
             <Button negative>{i18next.t("Cancel request")}</Button>
           );
-          newConfirmDialogProps.content = (
-            <div className="content">
-              <RequestCommentInput />
-            </div>
-          );
           break;
         case REQUEST_TYPE.ACCEPT:
           newConfirmDialogProps.header = `${i18next.t("Accept request")} (${
@@ -109,10 +104,13 @@ export const useConfirmDialog = (requestOrRequestType) => {
           );
           newConfirmDialogProps.content = (
             <React.Fragment>
-              <div className="content">
-                <RequestCommentInput />
-              </div>
-              {dangerous && <WarningMessage />}
+              {dangerous && (
+                <WarningMessage
+                  message={
+                    "This action is irreversible. Are you sure you wish to accept this request?"
+                  }
+                />
+              )}
             </React.Fragment>
           );
           break;

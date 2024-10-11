@@ -15,8 +15,6 @@ const Accept = ({ request, extraData }) => {
   const formik = useFormikContext();
   const { confirmAction } = useConfirmModalContext();
   const modalControl = useModalControlContext();
-  const requireConfirmation = extraData?.hasForm || extraData?.dangerous;
-
   const { isLoading, mutate: acceptRequest } = useAction({
     action: accept,
     requestOrRequestType: request,
@@ -26,7 +24,7 @@ const Accept = ({ request, extraData }) => {
   });
 
   const handleClick = () => {
-    if (requireConfirmation) {
+    if (extraData?.dangerous) {
       confirmAction(() => acceptRequest(), REQUEST_TYPE.ACCEPT, extraData);
     } else {
       acceptRequest();

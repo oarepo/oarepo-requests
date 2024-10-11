@@ -1,7 +1,7 @@
 import React, { useRef, useEffect } from "react";
 import PropTypes from "prop-types";
 import { i18next } from "@translations/oarepo_requests_ui/i18next";
-import { Button, Message, FormField, Form } from "semantic-ui-react";
+import { Button, Message, Form } from "semantic-ui-react";
 import { RichEditor, RichInputField } from "react-invenio-forms";
 import { useFormik, FormikProvider } from "formik";
 // TODO: until we figure out a way to globally use sanitization with our hook
@@ -10,7 +10,12 @@ import { CommentPayloadSchema } from "../utils";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { http } from "@js/oarepo_ui";
 
-export const EventSubmitForm = ({ request }) => {
+export const EventSubmitForm = ({
+  request,
+  refetch,
+  page,
+  timelinePageSize,
+}) => {
   const formik = useFormik({
     initialValues: {
       payload: {
@@ -20,6 +25,8 @@ export const EventSubmitForm = ({ request }) => {
     },
     onSubmit: () => {},
     validationSchema: CommentPayloadSchema,
+    validateOnBlur: false,
+    validateOnChange: false,
   });
 
   const { resetForm, setFieldValue, setFieldTouched, values, setFieldError } =
@@ -32,21 +39,30 @@ export const EventSubmitForm = ({ request }) => {
     {
       onSuccess: (response) => {
         if (response.status === 201) {
-          queryClient.setQueryData(["requestEvents"], (oldData) => {
-            if (!oldData) return;
-            // a bit ugly, but it is a limitation of react query when data you recieve is nested
-            return {
-              ...oldData,
-              data: {
-                ...oldData.data,
-                hits: {
-                  ...oldData.data.hits,
-                  hits: [...oldData.data.hits.hits, response.data],
+          queryClient.setQueryData(
+            ["requestEvents", request.id, page],
+            (oldData) => {
+              if (!oldData) return;
+              // a bit ugly, but it is a limitation of react query when data you recieve is nested
+              const newData = [...oldData.data.hits.hits];
+              if (oldData.data.hits.total + 1 > timelinePageSize) {
+                newData.pop();
+              }
+              return {
+                ...oldData,
+                data: {
+                  ...oldData.data,
+                  hits: {
+                    ...oldData.data.hits,
+                    total: oldData.data.hits.total + 1,
+                    hits: [response.data, ...newData],
+                  },
                 },
-              },
-            };
-          });
+              };
+            }
+          );
         }
+        setTimeout(() => refetch(), 1000);
         editorRef.current.setContent("");
         resetForm();
       },
@@ -73,31 +89,30 @@ export const EventSubmitForm = ({ request }) => {
   return (
     <FormikProvider value={formik}>
       <Form className="ui form">
-        <FormField>
-          <RichInputField
-            fieldPath="payload.content"
-            label={
-              <label htmlFor="payload.content" hidden>
-                {i18next.t("Comment")}
-              </label>
-            }
-            optimized="true"
-            placeholder={i18next.t("Your comment here...")}
-            editor={
-              <RichEditor
-                initialValue={values.payload.content}
-                inputValue={() => values.payload.content}
-                optimized
-                onFocus={(event, editor) => (editorRef.current = editor)}
-                onBlur={(event, editor) => {
-                  const cleanedContent = sanitizeHtml(editor.getContent());
-                  setFieldValue("payload.content", cleanedContent);
-                  setFieldTouched("payload.content", true);
-                }}
-              />
-            }
-          />
-        </FormField>
+        <RichInputField
+          fieldPath="payload.content"
+          label={
+            <label htmlFor="payload.content" hidden>
+              {i18next.t("Comment")}
+            </label>
+          }
+          optimized="true"
+          placeholder={i18next.t("Your comment here...")}
+          editor={
+            <RichEditor
+              initialValue={values.payload.content}
+              inputValue={() => values.payload.content}
+              optimized
+              editorConfig={{ auto_focus: true, min_height: 130 }}
+              onFocus={(event, editor) => (editorRef.current = editor)}
+              onBlur={(event, editor) => {
+                const cleanedContent = sanitizeHtml(editor.getContent());
+                setFieldValue("payload.content", cleanedContent);
+                setFieldTouched("payload.content", true);
+              }}
+            />
+          }
+        />
         {isError && (
           <Message negative>
             <Message.Header>
@@ -106,6 +121,7 @@ export const EventSubmitForm = ({ request }) => {
           </Message>
         )}
         <Button
+          size="tiny"
           floated="right"
           color="blue"
           icon="send"
@@ -122,4 +138,7 @@ export const EventSubmitForm = ({ request }) => {
 
 EventSubmitForm.propTypes = {
   request: PropTypes.object,
+  refetch: PropTypes.func,
+  page: PropTypes.number,
+  timelinePageSize: PropTypes.number,
 };

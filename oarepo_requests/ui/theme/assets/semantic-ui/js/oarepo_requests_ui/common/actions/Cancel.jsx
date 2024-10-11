@@ -8,14 +8,12 @@ import {
   useModalControlContext,
   useAction,
   cancel,
-  REQUEST_TYPE,
 } from "@js/oarepo_requests_common";
 
-const Cancel = ({ request, extraData }) => {
+const Cancel = ({ request }) => {
   const formik = useFormikContext();
   const { confirmAction } = useConfirmModalContext();
   const modalControl = useModalControlContext();
-  const requireConfirmation = extraData?.hasForm || extraData?.dangerous;
 
   const { isLoading, mutate: cancelRequest } = useAction({
     action: cancel,
@@ -25,18 +23,10 @@ const Cancel = ({ request, extraData }) => {
     modalControl,
   });
 
-  const handleClick = () => {
-    if (requireConfirmation) {
-      confirmAction(() => cancelRequest(), REQUEST_TYPE.CANCEL, extraData);
-    } else {
-      cancelRequest();
-    }
-  };
-
   return (
     <Button
       title={i18next.t("Cancel request")}
-      onClick={() => handleClick()}
+      onClick={() => cancelRequest()}
       className="requests request-cancel-button"
       color="grey"
       icon
@@ -53,7 +43,6 @@ const Cancel = ({ request, extraData }) => {
 
 Cancel.propTypes = {
   request: PropTypes.object,
-  extraData: PropTypes.object,
 };
 
 export default Cancel;
