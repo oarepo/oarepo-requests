@@ -6,7 +6,7 @@ import { RichEditor, RichInputField } from "react-invenio-forms";
 import { useFormik, FormikProvider } from "formik";
 // TODO: until we figure out a way to globally use sanitization with our hook
 import sanitizeHtml from "sanitize-html";
-import { CommentPayloadSchema } from "../utils";
+import { CommentPayloadSchema } from "@js/oarepo_requests_common";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { http } from "@js/oarepo_ui";
 

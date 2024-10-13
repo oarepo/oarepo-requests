@@ -25,3 +25,15 @@
     }
   }
 }
+
+#request-detail {
+  .ui.button {
+    &.requests.request-accept-button,
+    &.requests.requests-cancel-button,
+    &.requests.request-decline-button,
+    &.requests.request-cancel-button {
+      float: right;
+      margin-bottom: 0.5rem;
+    }
+  }
+}

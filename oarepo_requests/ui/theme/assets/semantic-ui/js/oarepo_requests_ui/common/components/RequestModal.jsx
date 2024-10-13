@@ -18,7 +18,7 @@ import {
   WarningMessage,
 } from "@js/oarepo_requests_common";
 import PropTypes from "prop-types";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useIsMutating } from "@tanstack/react-query";
 // TODO: remove when /configs starts using vnd zenodo accept header
 import { http } from "react-invenio-forms";
 
@@ -45,7 +45,9 @@ export const RequestModal = ({
       ? { payload: request.payload }
       : { payload: {} },
   });
-  const { isSubmitting, resetForm, setErrors } = formik;
+  const { resetForm, setErrors } = formik;
+
+  const isMutating = useIsMutating();
 
   const onClose = () => {
     closeModal();
@@ -81,7 +83,7 @@ export const RequestModal = ({
                 aria-labelledby="request-modal-header"
                 aria-describedby="request-modal-desc"
               >
-                <Dimmer active={isSubmitting}>
+                <Dimmer active={isMutating > 0}>
                   <Loader inverted size="large" />
                 </Dimmer>
                 <Modal.Header as="h1" id="request-modal-header">

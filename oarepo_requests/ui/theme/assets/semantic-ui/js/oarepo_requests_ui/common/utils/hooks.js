@@ -14,14 +14,29 @@ import { useFormikContext } from "formik";
  * @typedef {import("semantic-ui-react").ConfirmProps} ConfirmProps
  */
 
+const ConfirmationModalConfirmButton = (uiProps) => (
+  <Button
+    className="requests confirmation-modal-confirm-button"
+    content={i18next.t("OK")}
+    {...uiProps}
+  />
+);
+
+const ConfirmationModalCancelButton = (uiProps) => (
+  <Button
+    content={i18next.t("Cancel")}
+    className="requests confirmation-modal-cancel-button"
+    {...uiProps}
+  />
+);
 export const useConfirmDialog = (requestOrRequestType) => {
   /** @type {[ConfirmProps, (props: ConfirmProps) => void]} */
   const formik = useFormikContext();
   const [confirmDialogProps, setConfirmDialogProps] = useState({
     open: false,
     content: i18next.t("Are you sure?"),
-    cancelButton: i18next.t("Close"),
-    confirmButton: i18next.t("OK"),
+    cancelButton: <ConfirmationModalCancelButton />,
+    confirmButton: <ConfirmationModalConfirmButton />,
     onCancel: () =>
       setConfirmDialogProps((props) => ({ ...props, open: false })),
     onConfirm: () =>
@@ -55,7 +70,10 @@ export const useConfirmDialog = (requestOrRequestType) => {
 
           if (dangerous) {
             newConfirmDialogProps.confirmButton = (
-              <Button negative content={i18next.t("Proceed")} />
+              <ConfirmationModalConfirmButton
+                negative
+                content={i18next.t("Proceed")}
+              />
             );
             newConfirmDialogProps.content = (
               <WarningMessage
@@ -74,7 +92,10 @@ export const useConfirmDialog = (requestOrRequestType) => {
 
           if (dangerous) {
             newConfirmDialogProps.confirmButton = (
-              <Button negative content={i18next.t("Proceed")} />
+              <ConfirmationModalConfirmButton
+                negative
+                content={i18next.t("Proceed")}
+              />
             );
             newConfirmDialogProps.content = (
               <WarningMessage
@@ -90,7 +111,10 @@ export const useConfirmDialog = (requestOrRequestType) => {
             requestOrRequestType.name
           })`;
           newConfirmDialogProps.confirmButton = (
-            <Button negative>{i18next.t("Cancel request")}</Button>
+            <ConfirmationModalConfirmButton
+              content={i18next.t("Cancel request")}
+              negative
+            />
           );
           break;
         case REQUEST_TYPE.ACCEPT:
@@ -98,9 +122,11 @@ export const useConfirmDialog = (requestOrRequestType) => {
             requestOrRequestType.name
           })`;
           newConfirmDialogProps.confirmButton = (
-            <Button positive={!dangerous} negative={dangerous}>
-              {i18next.t("Accept")}
-            </Button>
+            <ConfirmationModalConfirmButton
+              positive={!dangerous}
+              negative={dangerous}
+              content={i18next.t("Accept")}
+            />
           );
           newConfirmDialogProps.content = (
             <React.Fragment>
@@ -119,7 +145,10 @@ export const useConfirmDialog = (requestOrRequestType) => {
             requestOrRequestType.name
           })`;
           newConfirmDialogProps.confirmButton = (
-            <Button negative>{i18next.t("Decline")}</Button>
+            <ConfirmationModalConfirmButton
+              content={i18next.t("Decline")}
+              negative
+            />
           );
           newConfirmDialogProps.content = (
             <div className="content">
@@ -151,7 +180,6 @@ export const useAction = ({
     useCallbackContext();
   return useMutation(
     async () => {
-      formik?.setSubmitting(true);
       if (onBeforeAction) {
         const shouldProceed = await onBeforeAction(formik, modalControl);
         if (!shouldProceed) {
@@ -164,8 +192,6 @@ export const useAction = ({
     },
     {
       onError: (e, variables) => {
-        formik?.setSubmitting(false);
-
         if (onActionError) {
           onActionError(e, variables, formik, modalControl);
         } else {
@@ -193,18 +219,20 @@ export const useAction = ({
         }
       },
       onSuccess: (data, variables) => {
-        formik?.setSubmitting(false);
         if (onAfterAction) {
           onAfterAction(data, variables, formik, modalControl);
         }
         const redirectionURL = data?.data?.links?.topic_html;
         modalControl?.closeModal();
-        fetchNewRequests?.();
 
         if (redirectionURL) {
           window.location.href = redirectionURL;
+        } else {
+          fetchNewRequests?.();
         }
       },
     }
   );
 };
+
+
