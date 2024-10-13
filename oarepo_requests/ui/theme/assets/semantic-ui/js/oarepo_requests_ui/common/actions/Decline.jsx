@@ -10,6 +10,7 @@ import {
   decline,
   REQUEST_TYPE,
 } from "@js/oarepo_requests_common";
+import { useIsMutating } from "@tanstack/react-query";
 
 const Decline = ({ request, extraData }) => {
   const formik = useFormikContext();
@@ -27,7 +28,7 @@ const Decline = ({ request, extraData }) => {
   const handleClick = () => {
     confirmAction(() => declineRequest(), REQUEST_TYPE.DECLINE, extraData);
   };
-
+  const isMutating = useIsMutating();
   return (
     <Button
       title={i18next.t("Decline request")}
@@ -38,7 +39,7 @@ const Decline = ({ request, extraData }) => {
       labelPosition="left"
       floated="left"
       loading={isLoading}
-      disabled={isLoading}
+      disabled={isMutating > 0}
     >
       <Icon name="cancel" />
       {i18next.t("Decline")}

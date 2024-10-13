@@ -10,6 +10,7 @@ import {
   createOrSave,
   REQUEST_TYPE,
 } from "@js/oarepo_requests_common";
+import { useIsMutating } from "@tanstack/react-query";
 
 const Create = ({ requestType, extraData }) => {
   const formik = useFormikContext();
@@ -24,7 +25,7 @@ const Create = ({ requestType, extraData }) => {
     confirmAction,
     modalControl,
   });
-
+  const isMutating = useIsMutating();
   const handleClick = () => {
     if (requireConfirmation) {
       confirmAction(
@@ -49,7 +50,7 @@ const Create = ({ requestType, extraData }) => {
       floated="right"
       onClick={() => handleClick()}
       loading={isLoading}
-      disabled={isLoading}
+      disabled={isMutating > 0}
     >
       <Icon name="plus" />
       {i18next.t("Create")}

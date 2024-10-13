@@ -10,6 +10,7 @@ import {
   saveAndSubmit,
   REQUEST_TYPE,
 } from "@js/oarepo_requests_common";
+import { useIsMutating } from "@tanstack/react-query";
 
 const Submit = ({ request, extraData }) => {
   const formik = useFormikContext();
@@ -36,6 +37,8 @@ const Submit = ({ request, extraData }) => {
       saveAndSubmitRequest();
     }
   };
+
+  const isMutating = useIsMutating();
   return (
     <Button
       title={i18next.t("Submit request")}
@@ -46,7 +49,7 @@ const Submit = ({ request, extraData }) => {
       floated="right"
       onClick={() => handleClick()}
       loading={isLoading}
-      disabled={isLoading}
+      disabled={isMutating > 0}
     >
       <Icon name="paper plane" />
       {i18next.t("Submit")}

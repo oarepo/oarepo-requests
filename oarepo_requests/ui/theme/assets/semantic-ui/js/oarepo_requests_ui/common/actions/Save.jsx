@@ -9,11 +9,14 @@ import {
   useAction,
   createOrSave,
 } from "@js/oarepo_requests_common";
+import { useIsMutating } from "@tanstack/react-query";
 
 const Save = ({ request, requestType }) => {
   const formik = useFormikContext();
   const { confirmAction } = useConfirmModalContext();
   const modalControl = useModalControlContext();
+
+  const isMutating = useIsMutating();
 
   const { isLoading, mutate: createOrSaveRequest } = useAction({
     action: createOrSave,
@@ -33,7 +36,7 @@ const Save = ({ request, requestType }) => {
       labelPosition="left"
       floated="right"
       loading={isLoading}
-      disabled={isLoading}
+      disabled={isMutating > 0}
     >
       <Icon name="save" />
       {i18next.t("Save")}

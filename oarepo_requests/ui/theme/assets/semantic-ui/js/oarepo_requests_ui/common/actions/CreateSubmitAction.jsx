@@ -10,6 +10,7 @@ import {
   WarningMessage,
 } from "@js/oarepo_requests_common";
 import { i18next } from "@translations/oarepo_requests_ui/i18next";
+import { useIsMutating } from "@tanstack/react-query";
 
 // Directly create and submit request without modal
 const CreateSubmitAction = ({ requestType, requireConfirmation }) => {
@@ -25,6 +26,7 @@ const CreateSubmitAction = ({ requestType, requireConfirmation }) => {
     requestOrRequestType: requestType,
     confirmAction,
   });
+  const isMutating = useIsMutating();
   const { requestButtonsIconsConfig } = useRequestContext();
   const buttonIconProps = requestButtonsIconsConfig[requestType.type_id];
   const buttonContent =
@@ -59,6 +61,7 @@ const CreateSubmitAction = ({ requestType, requireConfirmation }) => {
         title={buttonContent}
         content={buttonContent}
         loading={isLoading}
+        disabled={isMutating > 0}
         onClick={() => handleClick()}
         {...buttonIconProps}
       />

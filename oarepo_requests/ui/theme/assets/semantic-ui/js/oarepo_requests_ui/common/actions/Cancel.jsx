@@ -9,6 +9,7 @@ import {
   useAction,
   cancel,
 } from "@js/oarepo_requests_common";
+import { useIsMutating } from "@tanstack/react-query";
 
 const Cancel = ({ request }) => {
   const formik = useFormikContext();
@@ -22,7 +23,7 @@ const Cancel = ({ request }) => {
     confirmAction,
     modalControl,
   });
-
+  const isMutating = useIsMutating();
   return (
     <Button
       title={i18next.t("Cancel request")}
@@ -33,7 +34,7 @@ const Cancel = ({ request }) => {
       labelPosition="left"
       floated="left"
       loading={isLoading}
-      disabled={isLoading}
+      disabled={isMutating > 0}
     >
       <Icon name="trash alternate" />
       {i18next.t("Cancel request")}

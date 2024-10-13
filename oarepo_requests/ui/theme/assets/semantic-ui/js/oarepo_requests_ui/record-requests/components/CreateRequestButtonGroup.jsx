@@ -9,6 +9,7 @@ import {
   ConfirmModalContextProvider,
 } from "@js/oarepo_requests_common";
 import PropTypes from "prop-types";
+import { useIsMutating } from "@tanstack/react-query";
 
 /**
  * @param {{  applicableRequestsLoading: boolean, applicableRequestsLoadingError: Error }} props
@@ -21,7 +22,7 @@ export const CreateRequestButtonGroup = ({
   const createRequests = requestTypes?.filter(
     (requestType) => requestType.links.actions?.create
   );
-
+  const isMutating = useIsMutating();
   if (applicableRequestsLoading) {
     return (
       <div className="requests-create-request-buttons borderless">
@@ -115,6 +116,7 @@ export const CreateRequestButtonGroup = ({
                   fluid
                   title={header}
                   content={header}
+                  disabled={isMutating > 0}
                   {...buttonIconProps}
                 />
               }
