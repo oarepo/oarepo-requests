@@ -6,11 +6,12 @@ import { useFormikContext } from "formik";
 import sanitizeHtml from "sanitize-html";
 
 export const RequestCommentInput = () => {
-  const {
-    values = undefined,
-    setFieldValue = undefined,
-    setFieldTouched = undefined,
-  } = useFormikContext() || {};
+  // const {
+  //   values = undefined,
+  //   setFieldValue = undefined,
+  //   setFieldTouched = undefined,
+  // } = useFormikContext() || {};
+  const { values, setFieldValue, setFieldTouched } = useFormikContext();
   return (
     <FormField>
       <RichInputField
@@ -29,6 +30,7 @@ export const RequestCommentInput = () => {
             initialValue={values?.payload?.content}
             inputValue={() => values?.payload?.content}
             optimized
+            editorConfig={{ auto_focus: true, min_height: 130 }}
             onBlur={(event, editor) => {
               const cleanedContent = sanitizeHtml(editor.getContent());
               setFieldValue("payload.content", cleanedContent);
