@@ -10,9 +10,8 @@ import {
   accept,
   REQUEST_TYPE,
 } from "@js/oarepo_requests_common";
-import { useIsMutating } from "@tanstack/react-query";
 
-const Accept = ({ request, extraData }) => {
+const Accept = ({ request, extraData, isMutating }) => {
   const formik = useFormikContext();
   const { confirmAction } = useConfirmModalContext();
   const modalControl = useModalControlContext();
@@ -23,7 +22,6 @@ const Accept = ({ request, extraData }) => {
     confirmAction,
     modalControl,
   });
-  const isMutating = useIsMutating();
   const handleClick = () => {
     if (extraData?.dangerous) {
       confirmAction(() => acceptRequest(), REQUEST_TYPE.ACCEPT, extraData);
@@ -54,6 +52,7 @@ const Accept = ({ request, extraData }) => {
 Accept.propTypes = {
   request: PropTypes.object,
   extraData: PropTypes.object,
+  isMutating: PropTypes.number,
 };
 
 export default Accept;

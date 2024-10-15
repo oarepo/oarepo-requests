@@ -16,3 +16,9 @@
 .ui.modal .actions > .button {
   margin-bottom: 0.5rem;
 }
+
+// weird issue when opening modal inside of the modal, if the main modal is long enough, the other modal (confirmation)
+// opens on top of the page instead of the center
+.scrolling.dimmable > .dimmer {
+  justify-content: center;
+}

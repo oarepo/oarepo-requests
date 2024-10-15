@@ -79,7 +79,6 @@ export const RequestModal = ({
                 closeIcon
                 closeOnDocumentClick={false}
                 closeOnDimmerClick={false}
-                // role="dialog"
                 aria-labelledby="request-modal-header"
                 aria-describedby="request-modal-desc"
               >
@@ -94,7 +93,7 @@ export const RequestModal = ({
                   requestType={requestType}
                   ContentComponent={ContentComponent}
                   requestCreationModal={requestCreationModal}
-                  onClose={onClose}
+                  isMutating={isMutating}
                 />
               </Modal>
               <Confirm {...confirmDialogProps} />
@@ -142,7 +141,7 @@ const RequestModalContentAndActions = ({
   );
   const customFields = data?.data?.custom_fields;
   const extra_data = data?.data?.extra_data;
-
+  const isMutating = useIsMutating();
   const modalActions = mapLinksToActions(
     requestCreationModal ? requestType : request,
     customFields,
@@ -182,6 +181,7 @@ const RequestModalContentAndActions = ({
             request={request}
             requestType={requestType}
             extraData={extra_data}
+            isMutating={isMutating}
           />
         ))}
         <Button onClick={onClose} icon labelPosition="left">

@@ -9,14 +9,11 @@ import {
   useAction,
   createOrSave,
 } from "@js/oarepo_requests_common";
-import { useIsMutating } from "@tanstack/react-query";
 
-const Save = ({ request, requestType }) => {
+const Save = ({ request, requestType, isMutating }) => {
   const formik = useFormikContext();
   const { confirmAction } = useConfirmModalContext();
   const modalControl = useModalControlContext();
-
-  const isMutating = useIsMutating();
 
   const { isLoading, mutate: createOrSaveRequest } = useAction({
     action: createOrSave,
@@ -47,6 +44,7 @@ const Save = ({ request, requestType }) => {
 Save.propTypes = {
   request: PropTypes.object,
   requestType: PropTypes.object,
+  isMutating: PropTypes.number,
 };
 
 export default Save;

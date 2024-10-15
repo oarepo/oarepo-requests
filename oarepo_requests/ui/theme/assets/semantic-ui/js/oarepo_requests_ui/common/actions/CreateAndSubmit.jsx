@@ -10,9 +10,8 @@ import {
   saveAndSubmit,
   REQUEST_TYPE,
 } from "@js/oarepo_requests_common";
-import { useIsMutating } from "@tanstack/react-query";
 
-const CreateAndSubmit = ({ requestType, extraData }) => {
+const CreateAndSubmit = ({ requestType, extraData, isMutating }) => {
   const formik = useFormikContext();
   const { confirmAction } = useConfirmModalContext();
   const modalControl = useModalControlContext();
@@ -24,7 +23,6 @@ const CreateAndSubmit = ({ requestType, extraData }) => {
     confirmAction,
     modalControl,
   });
-  const isMutating = useIsMutating();
   const handleClick = () => {
     if (requireConfirmation) {
       confirmAction(
@@ -57,6 +55,7 @@ const CreateAndSubmit = ({ requestType, extraData }) => {
 CreateAndSubmit.propTypes = {
   requestType: PropTypes.object,
   extraData: PropTypes.object,
+  isMutating: PropTypes.number,
 };
 
 export default CreateAndSubmit;

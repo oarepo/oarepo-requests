@@ -9,9 +9,8 @@ import {
   useAction,
   cancel,
 } from "@js/oarepo_requests_common";
-import { useIsMutating } from "@tanstack/react-query";
 
-const Cancel = ({ request }) => {
+const Cancel = ({ request, isMutating }) => {
   const formik = useFormikContext();
   const { confirmAction } = useConfirmModalContext();
   const modalControl = useModalControlContext();
@@ -23,7 +22,6 @@ const Cancel = ({ request }) => {
     confirmAction,
     modalControl,
   });
-  const isMutating = useIsMutating();
   return (
     <Button
       title={i18next.t("Cancel request")}
@@ -44,6 +42,7 @@ const Cancel = ({ request }) => {
 
 Cancel.propTypes = {
   request: PropTypes.object,
+  isMutating: PropTypes.number,
 };
 
 export default Cancel;

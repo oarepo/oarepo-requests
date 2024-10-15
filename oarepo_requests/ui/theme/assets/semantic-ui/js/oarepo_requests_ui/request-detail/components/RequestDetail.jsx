@@ -14,7 +14,7 @@ import {
 } from "semantic-ui-react";
 import { TopicPreview } from ".";
 import PropTypes from "prop-types";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useIsMutating } from "@tanstack/react-query";
 import { http } from "react-invenio-forms";
 import {
   mapLinksToActions,
@@ -48,7 +48,7 @@ export const RequestDetail = ({
   const customFields = data?.data?.custom_fields;
   const extra_data = data?.data?.extra_data;
   const actions = mapLinksToActions(request, customFields, extra_data);
-
+  const isMutating = useIsMutating();
   useEffect(() => {
     const handleScrollButtonVisibility = () => {
       window.scrollY > 300
@@ -91,6 +91,7 @@ export const RequestDetail = ({
                         <ActionComponent
                           request={request}
                           extraData={extra_data}
+                          isMutating={isMutating}
                         />
                       </React.Fragment>
                     ))}
