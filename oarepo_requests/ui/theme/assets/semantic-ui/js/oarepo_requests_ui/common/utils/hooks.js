@@ -152,7 +152,9 @@ export const useConfirmDialog = (requestOrRequestType) => {
           );
           newConfirmDialogProps.content = (
             <div className="content">
-              <RequestCommentInput />
+              <RequestCommentInput
+                label={`${i18next.t("Add comment")} (${i18next.t("optional")})`}
+              />
             </div>
           );
           break;
@@ -234,5 +236,3 @@ export const useAction = ({
     }
   );
 };
-
-

@@ -11,7 +11,6 @@ import { useQuery } from "@tanstack/react-query";
 
 export const Timeline = ({ request, timelinePageSize }) => {
   const [page, setPage] = useState(1);
-  console.log(timelinePageSize);
   const { data, error, isLoading, refetch } = useQuery(
     ["requestEvents", request.id, page],
     () =>

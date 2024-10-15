@@ -1,5 +1,5 @@
 import React, { useEffect } from "react";
-import { Button } from "semantic-ui-react";
+import { Button, Message } from "semantic-ui-react";
 import PropTypes from "prop-types";
 import {
   useAction,
@@ -7,7 +7,6 @@ import {
   saveAndSubmit,
   useConfirmModalContext,
   REQUEST_TYPE,
-  WarningMessage,
 } from "@js/oarepo_requests_common";
 import { i18next } from "@translations/oarepo_requests_ui/i18next";
 import { useIsMutating } from "@tanstack/react-query";
@@ -66,11 +65,13 @@ const CreateSubmitAction = ({ requestType, requireConfirmation }) => {
         {...buttonIconProps}
       />
       {isError && (
-        <WarningMessage
-          message={i18next.t(
-            "Request not created successfully. Please try again in a moment."
-          )}
-        />
+        <Message negative>
+          <Message.Header>
+            {i18next.t(
+              "Request not created successfully. Please try again in a moment."
+            )}
+          </Message.Header>
+        </Message>
       )}
     </React.Fragment>
   );

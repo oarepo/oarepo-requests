@@ -4,24 +4,16 @@ import { FormField } from "semantic-ui-react";
 import { RichInputField, FieldLabel, RichEditor } from "react-invenio-forms";
 import { useFormikContext } from "formik";
 import sanitizeHtml from "sanitize-html";
+import PropTypes from "prop-types";
 
-export const RequestCommentInput = () => {
-  // const {
-  //   values = undefined,
-  //   setFieldValue = undefined,
-  //   setFieldTouched = undefined,
-  // } = useFormikContext() || {};
+export const RequestCommentInput = ({ fieldPath, label, editorRef }) => {
   const { values, setFieldValue, setFieldTouched } = useFormikContext();
   return (
     <FormField>
       <RichInputField
-        fieldPath="payload.content"
+        fieldPath={fieldPath}
         label={
-          <FieldLabel
-            htmlFor="payload.content"
-            label={`${i18next.t("Add comment")} (${i18next.t("optional")})`}
-            className="rel-mb-25"
-          />
+          <FieldLabel htmlFor={fieldPath} label={label} className="rel-mb-25" />
         }
         optimized="true"
         placeholder={i18next.t("Your comment here...")}
@@ -31,14 +23,27 @@ export const RequestCommentInput = () => {
             inputValue={() => values?.payload?.content}
             optimized
             editorConfig={{ auto_focus: true, min_height: 130 }}
+            onFocus={(event, editor) => (editorRef.current = editor)}
             onBlur={(event, editor) => {
               const cleanedContent = sanitizeHtml(editor.getContent());
-              setFieldValue("payload.content", cleanedContent);
-              setFieldTouched("payload.content", true);
+              setFieldValue(fieldPath, cleanedContent);
+              setFieldTouched(fieldPath, true);
             }}
           />
         }
       />
     </FormField>
   );
+};
+
+// label={`${i18next.t("Add comment")} (${i18next.t("optional")})`}
+RequestCommentInput.propTypes = {
+  fieldPath: PropTypes.string,
+  label: PropTypes.string,
+  editorRef: PropTypes.object,
+};
+
+RequestCommentInput.defaultProps = {
+  fieldPath: "payload.content",
+  label: i18next.t("Comment"),
 };

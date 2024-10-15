@@ -8,6 +8,7 @@ import {
   Button,
   Icon,
   Confirm,
+  Message,
 } from "semantic-ui-react";
 import { useFormik, FormikProvider, useFormikContext } from "formik";
 import _isEmpty from "lodash/isEmpty";
@@ -15,7 +16,6 @@ import {
   ModalControlContextProvider,
   mapLinksToActions,
   ConfirmModalContextProvider,
-  WarningMessage,
 } from "@js/oarepo_requests_common";
 import PropTypes from "prop-types";
 import { useQuery, useIsMutating } from "@tanstack/react-query";
@@ -155,11 +155,17 @@ const RequestModalContentAndActions = ({
         <Loader inverted />
       </Dimmer>
       <Modal.Content>
-        {error && <WarningMessage message={error} />}
+        {error && (
+          <Message negative>
+            <Message.Header>{error}</Message.Header>
+          </Message>
+        )}
         {customFieldsLoadingError && (
-          <WarningMessage
-            message={i18next.t("Form fields could not be fetched.")}
-          />
+          <Message negative>
+            <Message.Header>
+              {i18next.t("Form fields could not be fetched.")}
+            </Message.Header>
+          </Message>
         )}
         <ContentComponent
           request={request}
