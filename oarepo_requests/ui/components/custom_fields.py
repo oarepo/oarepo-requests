@@ -30,3 +30,18 @@ class FormConfigCustomFieldsComponent(UIResourceComponent):
             )
 
         form_config["custom_fields"] = {"ui": form}
+
+
+class FormConfigRequestTypePropertiesComponent(UIResourceComponent):
+    def form_config(self, *, view_args, form_config, **kwargs):
+        type_ = view_args.get("request_type")
+
+        request_type_properties = {}
+        if hasattr(type_, "dangerous"):
+            request_type_properties["dangerous"] = type_.dangerous
+        if hasattr(type_, "editable"):
+            request_type_properties["editable"] = type_.editable
+        if hasattr(type_, "has_form"):
+            request_type_properties["has_form"] = type_.has_form
+
+        form_config["request_type_properties"] = request_type_properties

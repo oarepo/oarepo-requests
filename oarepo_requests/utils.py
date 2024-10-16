@@ -1,16 +1,26 @@
 from invenio_access.permissions import system_identity
-from invenio_requests import current_requests_service
-from invenio_requests.proxies import current_request_type_registry
+from invenio_records_resources.proxies import current_service_registry
+from invenio_requests.proxies import (
+    current_request_type_registry,
+    current_requests_service,
+)
 from invenio_requests.resolvers.registry import ResolverRegistry
 from invenio_search.engine import dsl
-from invenio_records_resources.proxies import current_service_registry
+
+try:
+    from oarepo_workflows import AutoApprove, Workflow, WorkflowRequest
+    from oarepo_workflows.errors import MissingWorkflowError
+    from oarepo_workflows.proxies import current_oarepo_workflows
+except ImportError:
+    current_oarepo_workflows = None
+    Workflow = None
+    WorkflowRequest = None
+    AutoApprove = None
+    MissingWorkflowError = None
 
 
 def allowed_request_types_for_record(record):
-    try:
-        from oarepo_workflows.errors import MissingWorkflowError
-        from oarepo_workflows.proxies import current_oarepo_workflows
-
+    if current_oarepo_workflows:
         try:
             workflow_requests = current_oarepo_workflows.get_workflow(record).requests()
         except MissingWorkflowError:
@@ -18,8 +28,9 @@ def allowed_request_types_for_record(record):
             # so returning all matching request types
             # TODO: is this correct?
             workflow_requests = None
-    except ImportError:
+    else:
         workflow_requests = None
+
     request_types = current_request_type_registry._registered_types
     ret = {}
     try:
@@ -134,3 +145,52 @@ def stringify_first_val(dct):
 
 def reference_to_tuple(reference):
     return (list(reference.keys())[0], list(reference.values())[0])
+
+
+def get_receiver_for_request_type(request_type, identity, topic):
+    if not topic:
+        return None
+
+    try:
+        workflow: Workflow = current_oarepo_workflows.get_workflow(topic)
+    except MissingWorkflowError:
+        return None
+
+    try:
+        workflow_request: WorkflowRequest = workflow.requests()[request_type.type_id]
+    except KeyError:
+        return None
+
+    receivers = workflow_request.reference_receivers(
+        identity=identity, topic=topic, request_type=request_type
+    )
+    if not receivers:
+        return None
+
+    return receivers
+
+
+def is_auto_approved(request_type, *, identity=None, topic=None, receiver=None):
+    if not current_oarepo_workflows:
+        return False
+
+    if not receiver:
+        receiver = get_receiver_for_request_type(
+            request_type=request_type, identity=identity, topic=topic
+        )
+
+    return receiver and (
+        isinstance(receiver, AutoApprove)
+        or isinstance(receiver, dict)
+        and receiver.get("auto_approve")
+    )
+
+
+def request_identity_matches(entity_reference, identity):
+    if not entity_reference:
+        return False
+
+    entity = ResolverRegistry.resolve_entity_proxy(entity_reference)
+    if entity:
+        needs = entity.get_needs()
+        return bool(identity.provides.intersection(needs))

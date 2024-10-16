@@ -106,7 +106,9 @@ class OARepoRequests:
             config.DEFAULT_WORKFLOW_EVENT_SUBMITTERS
         )
 
-        app_registered_event_types = app.config.setdefault("REQUESTS_REGISTERED_EVENT_TYPES", [])
+        app_registered_event_types = app.config.setdefault(
+            "REQUESTS_REGISTERED_EVENT_TYPES", []
+        )
         for event_type in config.REQUESTS_REGISTERED_EVENT_TYPES:
             if event_type not in app_registered_event_types:
                 app_registered_event_types.append(event_type)
