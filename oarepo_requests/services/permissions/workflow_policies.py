@@ -6,6 +6,7 @@ from oarepo_workflows import DefaultWorkflowPermissions
 
 from oarepo_requests.services.permissions.generators import (
     EventCreatorsFromWorkflow,
+    IfEventOnRequestType,
     IfRequestType,
     RequestActive,
     RequestCreatorsFromWorkflow,
@@ -44,4 +45,7 @@ class CreatorsFromWorkflowRequestsPermissionPolicy(InvenioRequestsPermissionPoli
     can_create_comment = [
         SystemProcess(),
         EventCreatorsFromWorkflow(),
+        IfEventOnRequestType(
+            ["community-invitation"], InvenioRequestsPermissionPolicy.can_create_comment
+        ),
     ]

@@ -1,7 +1,6 @@
 from flask_principal import Identity
 from invenio_records_permissions.generators import ConditionalGenerator, Generator
 from invenio_records_resources.references.entity_resolvers import EntityProxy
-from invenio_requests.proxies import current_requests
 from invenio_search.engine import dsl
 from oarepo_runtime.datastreams.utils import get_record_service_for_record
 from oarepo_workflows.requests.policy import RecipientGeneratorMixin
@@ -28,6 +27,12 @@ class IfRequestType(ConditionalGenerator):
 
     def _condition(self, request_type, **kwargs):
         return request_type.type_id in self.request_types
+
+
+class IfEventOnRequestType(IfRequestType):
+
+    def _condition(self, request, **kwargs):
+        return request.type.type_id in self.request_types
 
 
 class IfEventType(ConditionalGenerator):
@@ -106,9 +111,24 @@ try:
                     "request"
                 ].topic.resolve()  # publish tries to resolve deleted draft
             except:
-                raise MissingTopicError(
-                    "Topic not found in request event permissions generator arguments, can't get workflow."
-                )
+                try:
+                    # temporary, see invenio_pidstore.resolver.Resolver; with_deleted is hardcoded in get record
+                    from invenio_pidstore.models import PersistentIdentifier
+
+                    proxy = kwargs["request"].topic
+
+                    pid_type = proxy.record_cls.pid.field._pid_type
+                    pid_value = proxy._parse_ref_dict_id()
+                    object_type = proxy.record_cls.pid.field._object_type
+
+                    pid = PersistentIdentifier.get(pid_type, pid_value)
+                    obj_id = pid.get_assigned_object(object_type=object_type)
+
+                    record = proxy.record_cls.get_record(obj_id, with_deleted=True)
+                except:
+                    raise MissingTopicError(
+                        "Topic not found in request event permissions generator arguments, can't get workflow."
+                    )
             kwargs["record"] = record
             return kwargs
 
@@ -143,9 +163,9 @@ class IfRequestedBy(RecipientGeneratorMixin, ConditionalGenerator):
         else:
             if not isinstance(creator, EntityProxy):
                 # convert to entityproxy
-                creator = current_requests.entity_resolvers_registry.reference_entity(
-                    creator
-                )
+                from invenio_requests.resolvers.registry import ResolverRegistry
+
+                creator = ResolverRegistry.reference_entity(creator)
             needs = creator.get_needs()
 
         for condition in self.requesters:
