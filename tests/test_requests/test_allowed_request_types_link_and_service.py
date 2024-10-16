@@ -28,24 +28,26 @@ def test_allowed_request_types_on_draft_service(
             creator.identity, draft1.json["id"]
         )
     )
-    assert allowed_request_types.to_dict() == {
-        "hits": {
-            "hits": [
-                {
-                    "links": {
-                        "actions": {
-                            "create": f'https://127.0.0.1:5000/api/thesis/{draft1.json["id"]}/draft/requests/publish_draft'
-                        }
-                    },
-                    "type_id": "publish_draft",
+    assert sorted(
+        allowed_request_types.to_dict()["hits"]["hits"], key=lambda x: x["type_id"]
+    ) == [
+        {
+            "links": {
+                "actions": {
+                    "create": f'https://127.0.0.1:5000/api/thesis/{draft1.json["id"]}/draft/requests/delete_draft'
                 }
-            ],
-            "total": 1,
+            },
+            "type_id": "delete_draft",
         },
-        "links": {
-            "self": f'https://127.0.0.1:5000/api/thesis/{draft1.json["id"]}/draft/requests/applicable'
+        {
+            "links": {
+                "actions": {
+                    "create": f'https://127.0.0.1:5000/api/thesis/{draft1.json["id"]}/draft/requests/publish_draft'
+                }
+            },
+            "type_id": "publish_draft",
         },
-    }
+    ]
 
 
 def test_allowed_request_types_on_draft_resource(
@@ -72,24 +74,26 @@ def test_allowed_request_types_on_draft_resource(
     allowed_request_types = creator_client.get(
         link_api2testclient(applicable_requests_link)
     )
-    assert allowed_request_types.json == {
-        "hits": {
-            "hits": [
-                {
-                    "links": {
-                        "actions": {
-                            "create": f'https://127.0.0.1:5000/api/thesis/{draft1.json["id"]}/draft/requests/publish_draft'
-                        }
-                    },
-                    "type_id": "publish_draft",
+    assert sorted(
+        allowed_request_types.json["hits"]["hits"], key=lambda x: x["type_id"]
+    ) == [
+        {
+            "links": {
+                "actions": {
+                    "create": f'https://127.0.0.1:5000/api/thesis/{draft1.json["id"]}/draft/requests/delete_draft'
                 }
-            ],
-            "total": 1,
+            },
+            "type_id": "delete_draft",
         },
-        "links": {
-            "self": f'https://127.0.0.1:5000/api/thesis/{draft1.json["id"]}/draft/requests/applicable'
+        {
+            "links": {
+                "actions": {
+                    "create": f'https://127.0.0.1:5000/api/thesis/{draft1.json["id"]}/draft/requests/publish_draft'
+                }
+            },
+            "type_id": "publish_draft",
         },
-    }
+    ]
 
 
 def publish_record(
@@ -223,7 +227,25 @@ def test_ui_serialization(
         headers={"Accept": "application/vnd.inveniordm.v1+json"},
     )
 
-    assert allowed_request_types_draft.json["hits"]["hits"] == [
+    sorted_draft_list = allowed_request_types_draft.json["hits"]["hits"]
+    sorted_draft_list.sort(key=lambda serialized_rt: serialized_rt["type_id"])
+
+    assert sorted_draft_list == [
+        {
+            "dangerous": True,
+            "description": "Request deletion of draft",
+            "editable": True,
+            "has_form": False,
+            "links": {
+                "actions": {
+                    "create": f"https://127.0.0.1:5000/api/thesis/{draft_id}/draft/requests/delete_draft"
+                }
+            },
+            "name": "Delete draft",
+            "stateful_description": "Click to permanently delete the draft.",
+            "stateful_name": "Delete draft",
+            "type_id": "delete_draft",
+        },
         {
             "description": "Request publishing of a draft",
             "links": {
@@ -242,7 +264,7 @@ def test_ui_serialization(
             "possible until the request is accepted or declined. "
             "You will be notified about the decision by email.",
             "stateful_name": "Submit for review",
-        }
+        },
     ]
     sorted_published_list = allowed_request_types_published.json["hits"]["hits"]
     sorted_published_list.sort(key=lambda serialized_rt: serialized_rt["type_id"])

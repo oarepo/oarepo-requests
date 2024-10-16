@@ -39,13 +39,19 @@ class WorkflowTransitionComponent(RequestActionComponent):
     @contextlib.contextmanager
     def apply(self, identity, request_type, action, topic, uow, *args, **kwargs):
         from oarepo_workflows.proxies import current_oarepo_workflows
+        from sqlalchemy.exc import NoResultFound
 
         yield
-        transitions = (
-            current_oarepo_workflows.get_workflow(topic)
-            .requests()[request_type.type_id]
-            .transitions
-        )
+        try:
+            transitions = (
+                current_oarepo_workflows.get_workflow(topic)
+                .requests()[request_type.type_id]
+                .transitions
+            )
+        except (
+            NoResultFound
+        ):  # parent might be deleted - this is the case for delete_draft request type
+            return
         target_state = transitions[action.status_to]
         if (
             target_state and not topic.model.is_deleted

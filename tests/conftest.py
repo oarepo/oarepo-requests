@@ -57,11 +57,18 @@ from oarepo_requests.services.permissions.workflow_policies import (
 )
 from oarepo_requests.types import ModelRefTypes, NonDuplicableOARepoRequestType
 from oarepo_requests.types.events.topic_update import TopicUpdateEventType
+from tests.test_requests.utils import link_api2testclient
 
 can_comment_only_receiver = [
     Receiver(),
     SystemProcess(),
 ]
+
+
+class TestEventType(CommentEventType):
+    type_id = "test"
+    """"""  # to test permissions
+
 
 events_only_receiver_can_comment = {
     CommentEventType.type_id: WorkflowEvent(submitters=can_comment_only_receiver),
@@ -71,6 +78,7 @@ events_only_receiver_can_comment = {
     TopicUpdateEventType.type_id: WorkflowEvent(
         submitters=InvenioRequestsPermissionPolicy.can_create_comment
     ),
+    TestEventType.type_id: WorkflowEvent(submitters=can_comment_only_receiver),
 }
 
 
@@ -100,6 +108,11 @@ class DefaultRequests(WorkflowRequestPolicy):
             submitted="deleting", accepted="deleted", declined="published"
         ),
     )
+    delete_draft = WorkflowRequest(
+        requesters=[IfInState("draft", [RecordOwners()])],
+        recipients=[AutoApprove()],
+        transitions=WorkflowTransitions(),
+    )
     edit_published_record = WorkflowRequest(
         requesters=[IfNoEditDraft([IfInState("published", [RecordOwners()])])],
         recipients=[AutoApprove()],
@@ -109,6 +122,13 @@ class DefaultRequests(WorkflowRequestPolicy):
         requesters=[IfNoNewVersionDraft([IfInState("published", [RecordOwners()])])],
         recipients=[AutoApprove()],
         transitions=WorkflowTransitions(),
+    )
+
+
+class RequestsWithDifferentRecipients(DefaultRequests):
+    another_topic_updating = WorkflowRequest(
+        requesters=[AnyUser()],
+        recipients=[UserGenerator(1)],
     )
 
 
@@ -250,6 +270,13 @@ WORKFLOWS = {
         permission_policy_cls=WithApprovalPermissions,
         request_policy_cls=RequestsWithAnotherTopicUpdatingRequestType,
     ),
+    "different_recipients": Workflow(
+        label=_(
+            "Workflow with draft requests with different recipients to test param interpreters"
+        ),
+        permission_policy_cls=TestWorkflowPermissions,
+        request_policy_cls=RequestsWithDifferentRecipients,
+    ),
 }
 
 
@@ -347,6 +374,17 @@ def delete_record_data_function():
 
 
 @pytest.fixture()
+def delete_draft_function():
+    def ret_data(record_id):
+        return {
+            "request_type": "delete_draft",
+            "topic": {"thesis_draft": record_id},
+        }
+
+    return ret_data
+
+
+@pytest.fixture()
 def serialization_result():
     def _result(topic_id, request_id):
         return {
@@ -427,7 +465,7 @@ def ui_serialization_result():
 
 @pytest.fixture(scope="module")
 def app_config(app_config):
-    app_config["REQUESTS_REGISTERED_EVENT_TYPES"] = [LogEventType(), CommentEventType()]
+    app_config["REQUESTS_REGISTERED_EVENT_TYPES"] = [TestEventType(), LogEventType(), CommentEventType()]
     app_config["SEARCH_HOSTS"] = [
         {
             "host": os.environ.get("OPENSEARCH_HOST", "localhost"),
@@ -466,21 +504,6 @@ def request_events_service(app):
     """Request Factory fixture."""
     service = current_requests.request_events_service
     return service
-
-
-@pytest.fixture()
-def create_request(requests_service):
-    """Request Factory fixture."""
-
-    def _create_request(identity, input_data, receiver, request_type, **kwargs):
-        """Create a request."""
-        # Need to use the service to get the id
-        item = requests_service.create(
-            identity, input_data, request_type=request_type, receiver=receiver, **kwargs
-        )
-        return item._request
-
-    return _create_request
 
 
 @pytest.fixture()
@@ -660,3 +683,58 @@ def role_ui_serialization():
 @pytest.fixture()
 def default_workflow_json():
     return {"parent": {"workflow": "default"}, "metadata": {"title": "blabla"}}
+
+
+@pytest.fixture()
+def get_request_type():
+    """
+    gets request create link from serialized request types
+    """
+
+    def _get_request_type(request_types_json, request_type):
+        selected_entry = [
+            entry for entry in request_types_json if entry["type_id"] == request_type
+        ][0]
+        return selected_entry
+
+    return _get_request_type
+
+
+@pytest.fixture()
+def get_request_link(get_request_type):
+    """
+    gets request create link from serialized request types
+    """
+
+    def _create_request_from_link(request_types_json, request_type):
+        selected_entry = get_request_type(request_types_json, request_type)
+        return selected_entry["links"]["actions"]["create"]
+
+    return _create_request_from_link
+
+
+@pytest.fixture
+def create_request_by_link(get_request_link):
+    def _create_request(client, record, request_type):
+        applicable_requests = client.get(
+            link_api2testclient(record.json["links"]["applicable-requests"])
+        ).json["hits"]["hits"]
+        create_link = link_api2testclient(
+            get_request_link(applicable_requests, request_type)
+        )
+        create_response = client.post(create_link)
+        return create_response
+
+    return _create_request
+
+
+@pytest.fixture
+def submit_request_by_link(create_request_by_link):
+    def _submit_request(client, record, request_type):
+        create_response = create_request_by_link(client, record, request_type)
+        submit_response = client.post(
+            link_api2testclient(create_response.json["links"]["actions"]["submit"])
+        )
+        return submit_response
+
+    return _submit_request

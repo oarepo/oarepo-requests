@@ -1,9 +1,10 @@
 from invenio_records_resources.services.errors import PermissionDeniedError
 from invenio_requests.customizations import RequestType
+from invenio_requests.customizations.states import RequestState
 from invenio_requests.proxies import current_requests_service
 
 from oarepo_requests.errors import OpenRequestAlreadyExists
-from oarepo_requests.utils import open_or_created_request_exists
+from oarepo_requests.utils import open_request_exists
 
 from ..actions.generic import (
     OARepoAcceptAction,
@@ -18,6 +19,11 @@ class OARepoRequestType(RequestType):
 
     dangerous = False
     editable = True
+
+    @classmethod
+    @property
+    def available_statuses(cls):
+        return {**super().available_statuses, "created": RequestState.OPEN}
 
     @classmethod
     @property
@@ -81,12 +87,12 @@ class OARepoRequestType(RequestType):
 # can be simulated by switching state to a one which does not allow create
 class NonDuplicableOARepoRequestType(OARepoRequestType):
     def can_create(self, identity, data, receiver, topic, creator, *args, **kwargs):
-        if open_or_created_request_exists(topic, self.type_id):
+        if open_request_exists(topic, self.type_id):
             raise OpenRequestAlreadyExists(self, topic)
         super().can_create(identity, data, receiver, topic, creator, *args, **kwargs)
 
     @classmethod
     def is_applicable_to(cls, identity, topic, *args, **kwargs):
-        if open_or_created_request_exists(topic, cls.type_id):
+        if open_request_exists(topic, cls.type_id):
             return False
         return super().is_applicable_to(identity, topic, *args, **kwargs)
