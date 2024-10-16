@@ -86,7 +86,7 @@ def search_requests_filter(
     return extra_filter
 
 
-def open_or_created_request_exists(topic_or_reference, type_id):
+def open_request_exists(topic_or_reference, type_id):
     topic_reference = ResolverRegistry.reference_entity(topic_or_reference, raise_=True)
     base_filter = search_requests_filter(
         type_id=type_id, topic_reference=topic_reference, is_open=True
