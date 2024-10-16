@@ -31,6 +31,7 @@ def test_record_delete_request_present(
     topic = record_factory(users[0].identity)
     with logged_client(users[0]).get(f"/thesis/{topic['id']}") as c:
         assert c.status_code == 200
+        print(c.text)
         data = json.loads(c.text)
         assert len(data["creatable_request_types"]) == 3
         assert data["creatable_request_types"]["edit_published_record"] == {
@@ -95,7 +96,7 @@ def test_request_detail_page(
 
 
 def test_form_config(app, client, record_ui_resource, fake_manifest):
-    with client.get(f"/requests/configs/publish_draft") as c:
+    with client.get("/requests/configs/publish_draft") as c:
         assert c.json == {
             "allowedHtmlAttrs": {
                 "*": ["class"],

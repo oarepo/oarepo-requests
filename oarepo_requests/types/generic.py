@@ -14,13 +14,23 @@ from .ref_types import ModelRefTypes, ReceiverRefTypes
 
 
 class OARepoRequestType(RequestType):
+    description = None
+
+    dangerous = False
+    editable = True
+
+    @classmethod
+    @property
+    def has_form(cls):
+        return hasattr(cls, "form")
+
     def can_create(self, identity, data, receiver, topic, creator, *args, **kwargs):
         current_requests_service.require_permission(
             identity, "create", record=topic, request_type=self, **kwargs
         )
 
     @classmethod
-    def can_possibly_create(self, identity, topic, *args, **kwargs):
+    def is_applicable_to(cls, identity, topic, *args, **kwargs):
         """
         used for checking whether there is any situation where the client can create a request of this type
         it's different to just using can create with no receiver and data because that checks specifically
@@ -30,7 +40,7 @@ class OARepoRequestType(RequestType):
         """
         try:
             current_requests_service.require_permission(
-                identity, "create", record=topic, request_type=self, **kwargs
+                identity, "create", record=topic, request_type=cls, **kwargs
             )
         except PermissionDeniedError:
             return False
@@ -49,6 +59,24 @@ class OARepoRequestType(RequestType):
             "decline": OARepoDeclineAction,
         }
 
+    def stateful_name(self, identity, request):
+        """
+        Returns the name of the request that reflects its current state.
+
+        :param identity:        identity of the caller
+        :param request:         the request
+        """
+        return self.name
+
+    def stateful_description(self, identity, request):
+        """
+        Returns the description of the request that reflects its current state.
+
+        :param identity:        identity of the caller
+        :param request:         the request
+        """
+        return self.description
+
 
 # can be simulated by switching state to a one which does not allow create
 class NonDuplicableOARepoRequestType(OARepoRequestType):
@@ -58,7 +86,7 @@ class NonDuplicableOARepoRequestType(OARepoRequestType):
         super().can_create(identity, data, receiver, topic, creator, *args, **kwargs)
 
     @classmethod
-    def can_possibly_create(self, identity, topic, *args, **kwargs):
-        if open_or_created_request_exists(topic, self.type_id):
+    def is_applicable_to(cls, identity, topic, *args, **kwargs):
+        if open_or_created_request_exists(topic, cls.type_id):
             return False
-        return super().can_possibly_create(identity, topic, *args, **kwargs)
+        return super().is_applicable_to(identity, topic, *args, **kwargs)

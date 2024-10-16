@@ -223,68 +223,262 @@ msgstr "Zavřít"
 
 #: /Users/miroslavbauer/Code/github.com/oarepo/oarepo-requests/oarepo_requests/ui/templates/semantic-ui/oarepo_requests_ui/RequestDetail.jinja:3
 msgid "Request"
-msgstr ""
+msgstr "Žádost"
 
 msgid "Pending"
-msgstr ""
+msgstr "Schvalována"
 
 msgid "request"
-msgstr ""
+msgstr "žádost"
 
 msgid "Error while submitting comment."
-msgstr ""
+msgstr "Chyba při odesílání komentáře."
 
 msgid "Add comment"
-msgstr ""
+msgstr "Přidat komentář"
 
 msgid "optional"
-msgstr ""
+msgstr "nepovinné"
 
 msgid "Your comment here..."
-msgstr ""
+msgstr "Váš komentář..."
 
 msgid "Comment was not created successfully."
-msgstr ""
+msgstr "Komnetář nebyl úspěšně vytvořen."
 
 msgid "Comment"
-msgstr ""
+msgstr "Komnetář"
 
 msgid "Error while submitting the comment"
-msgstr ""
+msgstr "Chyba při odesílání komentáře"
 
 msgid "Back to requests"
-msgstr ""
+msgstr "Zpět na žádosti"
 
 msgid "Record"
-msgstr ""
+msgstr "Záznam"
 
 msgid "preview"
-msgstr ""
+msgstr "náhled"
 
 msgid "to top"
-msgstr ""
+msgstr "na začátek stránky"
 
 msgid "Loading timeline..."
-msgstr ""
+msgstr "Načítám časovou osu..."
 
 msgid "Error while fetching timeline events"
-msgstr ""
+msgstr "Chyba při načítání událostí časové osy"
 
 msgid "commented"
-msgstr ""
+msgstr "komnetoval"
 
 msgid "icon"
-msgstr ""
+msgstr "ikona"
 
 msgid "this request"
-msgstr ""
+msgstr "tato žádost"
 
 msgid "Comment must be at least 1 character long."
-msgstr ""
+msgstr "Komentář musí být alespoň 1 znak dlouhý."
 
 msgid "Invalid format."
-msgstr ""
+msgstr "Neplatný formát."
 
 #: /Users/miroslavbauer/Code/github.com/oarepo/oarepo-requests/oarepo_requests/invenio_patches.py:100
 msgid "Request status"
 msgstr "Stav žádosti"
+
+#: /Users/m/w/cesnet/oarepo-requests/oarepo_requests/types/delete_record.py:32
+#: /Users/m/w/cesnet/oarepo-requests/oarepo_requests/types/delete_record.py:37
+msgid "Request record deletion"
+msgstr "Zažádat smazání záznamu"
+
+#: /Users/m/w/cesnet/oarepo-requests/oarepo_requests/types/delete_record.py:35
+msgid "Record deletion requested"
+msgstr "Zažádáno smazání záznamu"
+
+#: /Users/m/w/cesnet/oarepo-requests/oarepo_requests/types/delete_record.py:42
+msgid "Click to permanently delete the record."
+msgstr "Klikněte pro trvalé smazání záznamu."
+
+#: /Users/m/w/cesnet/oarepo-requests/oarepo_requests/types/delete_record.py:45
+msgid "Request permission to delete the record."
+msgstr "Zažádat o povolení smazat záznam."
+
+#: /Users/m/w/cesnet/oarepo-requests/oarepo_requests/types/delete_record.py:49
+msgid ""
+"Permission to delete record requested. You will be notified about the "
+"decision by email."
+msgstr ""
+"Zažádáno o povolení k smazání záznamu. O rozhodnutí budete informováni "
+"e-mailem."
+
+#: /Users/m/w/cesnet/oarepo-requests/oarepo_requests/types/delete_record.py:54
+msgid ""
+"You have been asked to approve the request to permanently delete the record."
+" You can approve or reject the request."
+msgstr ""
+"Byl jste požádán o schválení žádosti o trvalé smazání záznamu. Můžete žádost"
+" schválit nebo zamítnout."
+
+#: /Users/m/w/cesnet/oarepo-requests/oarepo_requests/types/delete_record.py:58
+msgid "Permission to delete record (including files) requested. "
+msgstr "Zažádáno o povolení ke smazání záznamu (včetně souborů)."
+
+#: /Users/m/w/cesnet/oarepo-requests/oarepo_requests/types/delete_record.py:61
+msgid "Submit request to get permission to delete the record."
+msgstr "Odeslat žádost o povolení ke smazání záznamu."
+
+#: /Users/m/w/cesnet/oarepo-requests/oarepo_requests/types/edit_record.py:65
+#: /Users/m/w/cesnet/oarepo-requests/oarepo_requests/types/edit_record.py:70
+msgid "Request edit access"
+msgstr "Žádost o úpravu záznamu"
+
+#: /Users/m/w/cesnet/oarepo-requests/oarepo_requests/types/edit_record.py:68
+msgid "Edit access requested"
+msgstr "Zažádáno o úpravu záznamu"
+
+#: /Users/m/w/cesnet/oarepo-requests/oarepo_requests/types/edit_record.py:75
+msgid "Click to start editing the metadata of the record."
+msgstr "Klikněte pro začátek úprav metadat záznamu."
+
+#: /Users/m/w/cesnet/oarepo-requests/oarepo_requests/types/edit_record.py:78
+#: /Users/m/w/cesnet/oarepo-requests/oarepo_requests/types/edit_record.py:95
+msgid ""
+"Request edit access to the record. You will be notified about the decision "
+"by email."
+msgstr "Zažádat o úpravu záznamu. O rozhodnutí budete informováni e-mailem."
+
+#: /Users/m/w/cesnet/oarepo-requests/oarepo_requests/types/edit_record.py:85
+msgid ""
+"Edit access requested. You will be notified about the decision by email."
+msgstr "Zažádáno o úpravu záznamu. O rozhodnutí budete informováni e-mailem."
+
+#: /Users/m/w/cesnet/oarepo-requests/oarepo_requests/types/edit_record.py:90
+msgid "You have been requested to grant edit access to the record."
+msgstr "Byl jste požádán o udělení práva na upravení záznamu."
+
+#: /Users/m/w/cesnet/oarepo-requests/oarepo_requests/types/edit_record.py:93
+msgid "Edit access requested."
+msgstr "Zažádáno o úpravu záznamu."
+
+#: /Users/m/w/cesnet/oarepo-requests/oarepo_requests/types/new_version.py:20
+msgid "New Version"
+msgstr "Nová verze"
+
+#: /Users/m/w/cesnet/oarepo-requests/oarepo_requests/types/new_version.py:40
+msgid "Request requesting creation of new version of a published record."
+msgstr "Žádost o vytvoření nové verze zveřejněného záznamu."
+
+#: /Users/m/w/cesnet/oarepo-requests/oarepo_requests/types/new_version.py:65
+#: /Users/m/w/cesnet/oarepo-requests/oarepo_requests/types/new_version.py:70
+msgid "Request new version access"
+msgstr "Zažádat o vytvoření nové verzi"
+
+#: /Users/m/w/cesnet/oarepo-requests/oarepo_requests/types/new_version.py:68
+msgid "New version access requested"
+msgstr "Zažádáno o vytvoření nové verze"
+
+#: /Users/m/w/cesnet/oarepo-requests/oarepo_requests/types/new_version.py:75
+msgid "Click to start creating a new version of the record."
+msgstr "Kliněte pro začátek vytváření nové verze záznamu."
+
+#: /Users/m/w/cesnet/oarepo-requests/oarepo_requests/types/new_version.py:78
+msgid ""
+"Request permission to update record (including files). You will be notified "
+"about the decision by email."
+msgstr ""
+"Zažádat o povolení aktualizace záznamu (včetně souborů). O rozhodnutí budete"
+" informováni e-mailem."
+
+#: /Users/m/w/cesnet/oarepo-requests/oarepo_requests/types/new_version.py:85
+msgid ""
+"Permission to update record (including files) requested. You will be "
+"notified about the decision by email."
+msgstr ""
+"Zažádáno o povolení aktualizace záznamu (včetně souborů). O rozhodnutí "
+"budete informováni e-mailem."
+
+#: /Users/m/w/cesnet/oarepo-requests/oarepo_requests/types/new_version.py:90
+msgid ""
+"You have been asked to approve the request to update the record. You can "
+"approve or reject the request."
+msgstr ""
+"Byl jste požádán o schválení žádosti o aktualizaci záznamu. Můžete žádost "
+"schválit nebo zamítnout."
+
+#: /Users/m/w/cesnet/oarepo-requests/oarepo_requests/types/new_version.py:94
+msgid "Permission to update record (including files) requested. "
+msgstr "Zažádáno o povolení aktualizace záznamu (včetně souborů)."
+
+#: /Users/m/w/cesnet/oarepo-requests/oarepo_requests/types/new_version.py:97
+msgid "Submit request to get edit access to the record."
+msgstr "Odeslat žádost o povolení aktualizace záznamu (včetně souborů)."
+
+#: /Users/m/w/cesnet/oarepo-requests/oarepo_requests/types/publish_draft.py:41
+msgid "Resource version"
+msgstr "Verze záznamu"
+
+#: /Users/m/w/cesnet/oarepo-requests/oarepo_requests/types/publish_draft.py:42
+msgid "Write down the version (first, second…)."
+msgstr "Napište verzi (první, druhá…)."
+
+#: /Users/m/w/cesnet/oarepo-requests/oarepo_requests/types/publish_draft.py:83
+#: /Users/m/w/cesnet/oarepo-requests/oarepo_requests/types/publish_draft.py:88
+msgid "Submit for review"
+msgstr "Odeslat ke kontrole"
+
+#: /Users/m/w/cesnet/oarepo-requests/oarepo_requests/types/publish_draft.py:86
+msgid "Submitted for review"
+msgstr "Odesláno ke kontrole"
+
+#: /Users/m/w/cesnet/oarepo-requests/oarepo_requests/types/publish_draft.py:93
+msgid ""
+"Click to immediately publish the draft. The draft will be a subject to "
+"embargo as requested in the side panel. Note: The action is irreversible."
+msgstr ""
+"Klikněte pro okamžité zveřejnění konceptu. Bylo-li zvoleno, záznam může "
+"podléhat embargu. Upozornění: Tuto akci není možno vzít zpět."
+
+#: /Users/m/w/cesnet/oarepo-requests/oarepo_requests/types/publish_draft.py:100
+msgid ""
+"By submitting the draft for review you are requesting the publication of the"
+" draft. The draft will become locked and no further changes will be possible"
+" until the request is accepted or declined. You will be notified about the "
+"decision by email."
+msgstr ""
+"Odesláním konceptu ke kontrole žádáte o zveřejnění konceptu. Koncept bude "
+"uzamčen a další změny nebudou možné, dokud nebude žádost přijata nebo "
+"zamítnuta. O rozhodnutí budete informováni e-mailem."
+
+#: /Users/m/w/cesnet/oarepo-requests/oarepo_requests/types/publish_draft.py:108
+msgid ""
+"The draft has been submitted for review. It is now locked and no further "
+"changes are possible. You will be notified about the decision by email."
+msgstr ""
+"Koncept byl odeslán ke kontrole. Nyní je uzamčen a další změny nejsou možné."
+" O rozhodnutí budete informováni e-mailem."
+
+#: /Users/m/w/cesnet/oarepo-requests/oarepo_requests/types/publish_draft.py:114
+msgid ""
+"The draft has been submitted for review. You can now accept or decline the "
+"request."
+msgstr ""
+"Koncept Vám byl odeslán ke kontrole. Žádost můžete přijmout nebo zamítnout."
+
+#: /Users/m/w/cesnet/oarepo-requests/oarepo_requests/types/publish_draft.py:118
+msgid "The draft has been submitted for review."
+msgstr "Koncept byl odeslán ke kontrole."
+
+#: /Users/m/w/cesnet/oarepo-requests/oarepo_requests/types/publish_draft.py:121
+msgid ""
+"Submit for review. After submitting the draft for review, it will be locked "
+"and no further modifications will be possible."
+msgstr ""
+"Odeslat ke kontrole. Po odeslání konceptu ke kontrole bude záznam uzamčen a "
+"další změny nebudou možné."
+
+#: /Users/m/w/cesnet/oarepo-requests/oarepo_requests/types/publish_draft.py:125
+msgid "Request not yet submitted."
+msgstr "Žádost zatím nebyla odeslána."
