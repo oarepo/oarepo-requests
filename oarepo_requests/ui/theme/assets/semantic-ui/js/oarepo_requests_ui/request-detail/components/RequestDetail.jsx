@@ -102,9 +102,7 @@ export const RequestDetail = ({
                   <Grid.Row>
                     <Grid.Column>
                       <Message negative>
-                        <Message.Header>
-                          {i18next.t("Action was not successful.")}
-                        </Message.Header>
+                        <Message.Header>{errors.api}</Message.Header>
                       </Message>
                     </Grid.Column>
                   </Grid.Row>
