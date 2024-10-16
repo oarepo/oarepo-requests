@@ -162,8 +162,6 @@ def get_receiver_for_request_type(request_type, identity, topic):
         return None
 
 
-    # creator = ResolverRegistry.reference_identity(identity)
-    # todo - the problem here is that we don't know who the creator is - it can be any of the users community roles at least?
     receivers = workflow_request.reference_receivers(
         identity=identity, record=topic, request_type=request_type, creator=identity
     )
