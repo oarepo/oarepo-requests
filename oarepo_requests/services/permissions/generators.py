@@ -1,6 +1,7 @@
 from flask_principal import Identity
 from invenio_records_permissions.generators import ConditionalGenerator, Generator
 from invenio_records_resources.references.entity_resolvers import EntityProxy
+from invenio_requests.resolvers.registry import ResolverRegistry
 from invenio_search.engine import dsl
 from oarepo_runtime.datastreams.utils import get_record_service_for_record
 from oarepo_workflows.requests.policy import RecipientGeneratorMixin
@@ -147,9 +148,6 @@ class IfRequestedBy(RecipientGeneratorMixin, ConditionalGenerator):
             needs = creator.provides
         else:
             if not isinstance(creator, EntityProxy):
-                # convert to entityproxy
-                from invenio_requests.resolvers.registry import ResolverRegistry
-
                 creator = ResolverRegistry.reference_entity(creator)
             needs = creator.get_needs()
 
