@@ -186,7 +186,7 @@ export const useAction = ({
         const shouldProceed = await onBeforeAction(formik, modalControl);
         if (!shouldProceed) {
           modalControl?.closeModal();
-          return;
+          throw new Error("Could not proceed with the action.");
         }
       }
 

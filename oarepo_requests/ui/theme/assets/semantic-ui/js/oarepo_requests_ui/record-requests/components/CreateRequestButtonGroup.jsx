@@ -76,6 +76,7 @@ export const CreateRequestButtonGroup = ({
                   <CreateSubmitAction
                     requestType={requestType}
                     requireConfirmation={dangerous}
+                    isMutating={isMutating}
                   />
                   <Confirm {...confirmDialogProps} />
                 </React.Fragment>
@@ -95,6 +96,7 @@ export const CreateRequestButtonGroup = ({
                     key={requestType?.type_id}
                     requestType={requestType}
                     requireConfirmation={false}
+                    isMutating={isMutating}
                   />
                   <Confirm {...confirmDialogProps} />
                 </React.Fragment>
