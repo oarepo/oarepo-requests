@@ -133,14 +133,16 @@ export const RequestDetail = ({
                         active={activeTab === "timeline"}
                         onClick={() => setActiveTab("timeline")}
                       />
-                      <Menu.Item
-                        name="topic"
-                        content={`${i18next.t("Record")} ${i18next.t(
-                          "preview"
-                        )}`}
-                        active={activeTab === "topic"}
-                        onClick={() => setActiveTab("topic")}
-                      />
+                      {request?.topic?.links?.self_html && (
+                        <Menu.Item
+                          name="topic"
+                          content={`${i18next.t("Record")} ${i18next.t(
+                            "preview"
+                          )}`}
+                          active={activeTab === "topic"}
+                          onClick={() => setActiveTab("topic")}
+                        />
+                      )}
                     </Menu>
                   </Grid.Column>
                 </Grid.Row>

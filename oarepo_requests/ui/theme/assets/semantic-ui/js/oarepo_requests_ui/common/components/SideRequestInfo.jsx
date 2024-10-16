@@ -39,10 +39,10 @@ export const SideRequestInfo = ({ request }) => {
                 target="_blank"
                 rel="noreferrer"
               >
-                {request.receiver.label}
+                {request?.receiver?.label}
               </a>
             ) : (
-              request.receiver?.label
+              request?.receiver?.label
             )}
           </span>
         </List.Content>
