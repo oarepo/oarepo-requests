@@ -465,7 +465,7 @@ def ui_serialization_result():
 
 @pytest.fixture(scope="module")
 def app_config(app_config):
-    app_config["REQUESTS_REGISTERED_EVENT_TYPES"] = [TestEventType(), LogEventType(), CommentEventType()]
+    app_config["REQUESTS_REGISTERED_EVENT_TYPES"] = [LogEventType(), CommentEventType()]
     app_config["SEARCH_HOSTS"] = [
         {
             "host": os.environ.get("OPENSEARCH_HOST", "localhost"),
@@ -489,6 +489,7 @@ def app_config(app_config):
         ConditionalRecipientRequestType(),
         AnotherTopicUpdatingRequestType(),
     ]
+    app_config["REQUESTS_REGISTERED_EVENT_TYPES"] = [TestEventType()]
     return app_config
 
 
