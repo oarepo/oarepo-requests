@@ -50,7 +50,7 @@ class WorkflowTransitionComponent(RequestActionComponent):
             )
         except (
             NoResultFound
-        ):  # todo HOTFIX!! for error during getting workflow from deleted drafts
+        ):  # parent might be deleted - this is the case for delete_draft request type
             return
         target_state = transitions[action.status_to]
         if (
