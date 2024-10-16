@@ -86,19 +86,13 @@ def search_requests_filter(
     return extra_filter
 
 
-def open_or_created_request_exists(topic_or_reference, type_id):
+def open_request_exists(topic_or_reference, type_id):
     topic_reference = ResolverRegistry.reference_entity(topic_or_reference, raise_=True)
     base_filter = search_requests_filter(
         type_id=type_id, topic_reference=topic_reference, is_open=True
     )
-    created_filter = search_requests_filter(
-        type_id=type_id,
-        topic_reference=topic_reference,
-        is_open=False,
-        add_filter=dsl.Q("term", **{"status": "created"}),
-    )
     results = current_requests_service.search(
-        system_identity, extra_filter=base_filter | created_filter
+        system_identity, extra_filter=base_filter
     ).hits
     return bool(list(results))
 
@@ -160,7 +154,6 @@ def get_receiver_for_request_type(request_type, identity, topic):
         workflow_request: WorkflowRequest = workflow.requests()[request_type.type_id]
     except KeyError:
         return None
-
 
     receivers = workflow_request.reference_receivers(
         identity=identity, record=topic, request_type=request_type, creator=identity
