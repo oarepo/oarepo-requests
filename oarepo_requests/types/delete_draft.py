@@ -21,7 +21,7 @@ class DeleteDraftRequestType(NonDuplicableOARepoRequestType):
             "accept": DeleteDraftAcceptAction,
         }
 
-    description = _("Request draft deletion")
+    description = _("Request deletion of draft")
     receiver_can_be_none = True
     allowed_topic_ref_types = ModelRefTypes(published=False, draft=True)
 

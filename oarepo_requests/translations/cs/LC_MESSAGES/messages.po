@@ -581,3 +581,7 @@ msgstr "Komentář nebyl úspěšně odeslán."
 
 msgid "Leave comment"
 msgstr "Zanechat komentář"
+
+#: /home/dusanst/Projects/oarepo-requests/oarepo_requests/types/delete_draft.py:24
+msgid "Request deletion of draft"
+msgstr "Zažádat o smazání konceptu"
