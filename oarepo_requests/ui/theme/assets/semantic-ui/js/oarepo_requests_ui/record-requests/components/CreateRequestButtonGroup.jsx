@@ -1,63 +1,139 @@
 import React from "react";
-
 import { i18next } from "@translations/oarepo_requests_ui/i18next";
-import { Segment, Header, Button, Placeholder, Message, Icon } from "semantic-ui-react";
+import { Button, Placeholder, Message, Confirm } from "semantic-ui-react";
 import _isEmpty from "lodash/isEmpty";
-
 import { RequestModal, CreateRequestModalContent } from ".";
-import { mapLinksToActions } from "./actions";
-import { useRequestContext } from "../contexts";
+import {
+  useRequestContext,
+  CreateSubmitAction,
+  ConfirmModalContextProvider,
+} from "@js/oarepo_requests_common";
+import PropTypes from "prop-types";
+import { useIsMutating } from "@tanstack/react-query";
 
 /**
- * @typedef {import("../types").Request} Request
- * @typedef {import("../types").RequestType} RequestType
+ * @param {{  applicableRequestsLoading: boolean, applicableRequestsLoadingError: Error }} props
  */
-
-/**
- * @param {{ requestTypes: RequestType[], isLoading: boolean, loadingError: Error }} props
- */
-export const CreateRequestButtonGroup = ({ recordLoading, recordLoadingError }) => {
-  const { requestTypes } = useRequestContext();
-  const createRequests = requestTypes.filter(requestType => requestType.links.actions?.create);
-
-  return (
-    <Segment className="requests-create-request-buttons borderless">
-      <Header size="small" className="detail-sidebar-header">{i18next.t("Requests")}</Header>
-      {recordLoading ?
+export const CreateRequestButtonGroup = ({
+  applicableRequestsLoading,
+  applicableRequestsLoadingError,
+}) => {
+  const { requestTypes, requestButtonsIconsConfig } = useRequestContext();
+  const createRequests = requestTypes?.filter(
+    (requestType) => requestType.links.actions?.create
+  );
+  const isMutating = useIsMutating();
+  if (applicableRequestsLoading) {
+    return (
+      <div className="requests-create-request-buttons borderless">
         <Placeholder>
           {Array.from({ length: 2 }).map((_, index) => (
             <Placeholder.Paragraph key={index}>
-              <Icon name="plus" disabled />
+              <Placeholder.Line length="full" />
+              <Placeholder.Line length="medium" />
             </Placeholder.Paragraph>
           ))}
-        </Placeholder> :
-        recordLoadingError ?
-          <Message negative>
-            <Message.Header>{i18next.t("Error loading request types")}</Message.Header>
-            <p>{recordLoadingError?.message}</p>
-          </Message> :
-          !_isEmpty(createRequests) ?
-            <Button.Group vertical compact fluid>
-              {createRequests.map((requestType) => {
-                const header = !_isEmpty(requestType?.title) ? requestType.title : (!_isEmpty(requestType?.name) ? requestType.name : requestType.type);
-                const modalActions = mapLinksToActions(requestType);
-                return (
-                  <RequestModal
-                    key={requestType.type_id}
+        </Placeholder>
+      </div>
+    );
+  }
+
+  if (applicableRequestsLoadingError) {
+    return (
+      <div className="requests-create-request-buttons borderless">
+        <Message negative>
+          <Message.Header>
+            {i18next.t("Error loading request types")}
+          </Message.Header>
+        </Message>
+      </div>
+    );
+  }
+
+  if (_isEmpty(createRequests)) {
+    return null;
+  }
+
+  return (
+    <div className="requests-create-request-buttons borderless">
+      {createRequests.map((requestType) => {
+        const { dangerous, has_form: hasForm } = requestType;
+        const needsDialog = dangerous || hasForm;
+        const header =
+          requestType?.stateful_name ||
+          requestType?.name ||
+          requestType?.type_id;
+        const buttonIconProps = requestButtonsIconsConfig[requestType.type_id];
+
+        if (!hasForm && dangerous) {
+          return (
+            <ConfirmModalContextProvider
+              key={requestType?.type_id}
+              requestOrRequestType={requestType}
+            >
+              {({ confirmDialogProps }) => (
+                <React.Fragment>
+                  <CreateSubmitAction
                     requestType={requestType}
-                    header={header}
-                    trigger={
-                      <Button icon="plus" className="pl-0" title={i18next.t(requestType.name)} basic compact content={requestType.name} />
-                    }
-                    actions={modalActions}
-                    ContentComponent={CreateRequestModalContent}
+                    requireConfirmation={dangerous}
+                    isMutating={isMutating}
                   />
-                )
-              }
+                  <Confirm {...confirmDialogProps} />
+                </React.Fragment>
               )}
-            </Button.Group> :
-            <p>{i18next.t("No new requests to create")}.</p>
-      }
-    </Segment>
+            </ConfirmModalContextProvider>
+          );
+        }
+        if (!hasForm && !dangerous) {
+          return (
+            <ConfirmModalContextProvider
+              key={requestType?.type_id}
+              requestOrRequestType={requestType}
+            >
+              {({ confirmDialogProps }) => (
+                <React.Fragment>
+                  <CreateSubmitAction
+                    key={requestType?.type_id}
+                    requestType={requestType}
+                    requireConfirmation={false}
+                    isMutating={isMutating}
+                  />
+                  <Confirm {...confirmDialogProps} />
+                </React.Fragment>
+              )}
+            </ConfirmModalContextProvider>
+          );
+        }
+
+        if (needsDialog) {
+          return (
+            <RequestModal
+              key={requestType.type_id}
+              requestType={requestType}
+              header={header}
+              requestCreationModal
+              trigger={
+                <Button
+                  className={`requests request-create-button ${requestType?.type_id}`}
+                  fluid
+                  title={header}
+                  content={header}
+                  disabled={isMutating > 0}
+                  {...buttonIconProps}
+                />
+              }
+              ContentComponent={CreateRequestModalContent}
+            />
+          );
+        }
+
+        return null;
+      })}
+    </div>
   );
-}
+};
+
+CreateRequestButtonGroup.propTypes = {
+  applicableRequestsLoading: PropTypes.bool,
+  applicableRequestsLoadingError: PropTypes.object,
+};

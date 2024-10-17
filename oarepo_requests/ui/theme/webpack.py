@@ -11,13 +11,13 @@ theme = WebpackThemeBundle(
                 "oarepo_requests_ui_request_detail": "./js/oarepo_requests_ui/request-detail/index.js",
                 "oarepo_requests_ui_components": "./js/oarepo_requests_ui/custom-components.js",
             },
-            dependencies={
-                "bluebird": "^3.7.2",
-            },
+            dependencies={},
             devDependencies={},
             aliases={
                 "@translations/oarepo_requests_ui": "translations/oarepo_requests_ui",
                 "@js/oarepo_requests": "js/oarepo_requests_ui/record-requests",
+                "@js/oarepo_requests_detail": "js/oarepo_requests_ui/request-detail",
+                "@js/oarepo_requests_common": "js/oarepo_requests_ui/common",
             },
         )
     },
