@@ -46,8 +46,12 @@ export const RequestDetail = ({
   );
 
   const customFields = data?.data?.custom_fields;
-  const extra_data = data?.data?.extra_data;
-  const actions = mapLinksToActions(request, customFields, extra_data);
+  const requestTypeProperties = data?.data?.request_type_properties;
+  const actions = mapLinksToActions(
+    request,
+    customFields,
+    requestTypeProperties
+  );
   const isMutating = useIsMutating();
   useEffect(() => {
     const handleScrollButtonVisibility = () => {
@@ -90,7 +94,7 @@ export const RequestDetail = ({
                       <React.Fragment key={name}>
                         <ActionComponent
                           request={request}
-                          extraData={extra_data}
+                          extraData={requestTypeProperties}
                           isMutating={isMutating}
                         />
                       </React.Fragment>

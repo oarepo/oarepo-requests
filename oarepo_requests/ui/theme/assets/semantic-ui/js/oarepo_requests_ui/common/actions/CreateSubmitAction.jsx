@@ -17,7 +17,7 @@ const CreateSubmitAction = ({
   isMutating,
 }) => {
   const { confirmAction } = useConfirmModalContext();
-  const { hasForm, dangerous, editable } = requestType;
+  const { has_form:hasForm, dangerous, editable } = requestType;
   const {
     isLoading,
     mutate: createAndSubmit,

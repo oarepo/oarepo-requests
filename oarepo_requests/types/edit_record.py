@@ -28,12 +28,6 @@ class EditPublishedRecordRequestType(NonDuplicableOARepoRequestType):
         ),
     }
 
-    extra_data = {
-        "dangerous": False,
-        "hasForm": False,
-        "editable": False,
-    }
-
     @classmethod
     @property
     def available_actions(cls):

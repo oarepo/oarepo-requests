@@ -57,7 +57,7 @@ export const CreateRequestButtonGroup = ({
   return (
     <div className="requests-create-request-buttons borderless">
       {createRequests.map((requestType) => {
-        const { dangerous, hasForm } = requestType;
+        const { dangerous, has_form: hasForm } = requestType;
         const needsDialog = dangerous || hasForm;
         const header =
           requestType?.stateful_name ||

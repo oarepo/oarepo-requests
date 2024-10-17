@@ -140,12 +140,12 @@ const RequestModalContentAndActions = ({
     }
   );
   const customFields = data?.data?.custom_fields;
-  const extra_data = data?.data?.extra_data;
+  const requestTypeProperties = data?.data?.request_type_properties;
   const isMutating = useIsMutating();
   const modalActions = mapLinksToActions(
     requestCreationModal ? requestType : request,
     customFields,
-    extra_data
+    requestTypeProperties
   );
 
   return (
@@ -180,7 +180,7 @@ const RequestModalContentAndActions = ({
             key={name}
             request={request}
             requestType={requestType}
-            extraData={extra_data}
+            extraData={requestTypeProperties}
             isMutating={isMutating}
           />
         ))}

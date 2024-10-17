@@ -5,8 +5,6 @@ class FormConfigCustomFieldsComponent(UIResourceComponent):
     def form_config(self, *, view_args, form_config, **kwargs):
         type_ = view_args.get("request_type")
         form = getattr(type_, "form", None)
-        extra_data = getattr(type_, "extra_data", {})
-        form_config["extra_data"] = extra_data
         if not form:
             return
 
