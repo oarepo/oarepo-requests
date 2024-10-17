@@ -29,7 +29,7 @@ class DeletePublishedRecordRequestType(NonDuplicableOARepoRequestType):
     allowed_topic_ref_types = ModelRefTypes(published=True, draft=False)
 
     @override
-    def stateful_name(self, identity, *, topic=None, request=None):
+    def stateful_name(self, identity, *, topic, request=None, **kwargs):
         if is_auto_approved(self, identity=identity, topic=topic):
             return self.name
         if not request:
@@ -41,7 +41,7 @@ class DeletePublishedRecordRequestType(NonDuplicableOARepoRequestType):
                 return _("Request record deletion")
 
     @override
-    def stateful_description(self, identity, *, topic=None, request=None):
+    def stateful_description(self, identity, *, topic, request=None, **kwargs):
         if is_auto_approved(self, identity=identity, topic=topic):
             return _("Click to permanently delete the record.")
 
