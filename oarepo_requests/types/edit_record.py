@@ -58,7 +58,7 @@ class EditPublishedRecordRequestType(NonDuplicableOARepoRequestType):
         uow.register(RecordCommitOp(request, indexer=current_requests_service.indexer))
 
     @override
-    def stateful_name(self, identity, *, topic=None, request=None):
+    def stateful_name(self, identity, *, topic, request=None, **kwargs):
         if is_auto_approved(self, identity=identity, topic=topic):
             return self.name
         if not request:
@@ -70,7 +70,7 @@ class EditPublishedRecordRequestType(NonDuplicableOARepoRequestType):
                 return _("Request edit access")
 
     @override
-    def stateful_description(self, identity, *, topic=None, request=None):
+    def stateful_description(self, identity, *, topic, request=None, **kwargs):
         if is_auto_approved(self, identity=identity, topic=topic):
             return _("Click to start editing the metadata of the record.")
 

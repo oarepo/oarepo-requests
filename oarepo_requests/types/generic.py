@@ -65,7 +65,7 @@ class OARepoRequestType(RequestType):
             "decline": OARepoDeclineAction,
         }
 
-    def stateful_name(self, identity, request):
+    def stateful_name(self, *, identity, topic, request=None, **kwargs):
         """
         Returns the name of the request that reflects its current state.
 
@@ -74,7 +74,7 @@ class OARepoRequestType(RequestType):
         """
         return self.name
 
-    def stateful_description(self, identity, request):
+    def stateful_description(self, *, identity, topic, request=None, **kwargs):
         """
         Returns the description of the request that reflects its current state.
 

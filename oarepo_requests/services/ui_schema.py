@@ -1,4 +1,3 @@
-from types import SimpleNamespace
 
 import marshmallow as ma
 from invenio_pidstore.errors import PIDDeletedError
