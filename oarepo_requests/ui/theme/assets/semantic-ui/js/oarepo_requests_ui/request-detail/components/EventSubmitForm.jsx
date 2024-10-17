@@ -105,7 +105,7 @@ export const EventSubmitForm = ({
           type="button"
           loading={isLoading}
           disabled={isLoading}
-          content={i18next.t("Comment")}
+          content={i18next.t("Leave comment")}
           onClick={() => mutate()}
         />
       </Form>

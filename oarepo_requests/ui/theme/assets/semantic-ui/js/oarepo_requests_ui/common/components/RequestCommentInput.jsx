@@ -36,7 +36,6 @@ export const RequestCommentInput = ({ fieldPath, label, editorRef }) => {
   );
 };
 
-// label={`${i18next.t("Add comment")} (${i18next.t("optional")})`}
 RequestCommentInput.propTypes = {
   fieldPath: PropTypes.string,
   label: PropTypes.string,
