@@ -18,7 +18,6 @@ class OARepoRequestType(RequestType):
     description = None
 
     dangerous = False
-    editable = True
 
     @classmethod
     @property
@@ -33,7 +32,7 @@ class OARepoRequestType(RequestType):
     @classmethod
     @property
     def editable(cls):
-        return hasattr(cls, "form")
+        return cls.has_form
 
     def can_create(self, identity, data, receiver, topic, creator, *args, **kwargs):
         current_requests_service.require_permission(
