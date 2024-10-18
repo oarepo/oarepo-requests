@@ -234,7 +234,7 @@ def test_ui_serialization(
         {
             "dangerous": True,
             "description": "Request deletion of draft",
-            "editable": True,
+            "editable": False,
             "has_form": False,
             "links": {
                 "actions": {
@@ -279,7 +279,7 @@ def test_ui_serialization(
             "description": "Request deletion of published record",
             "name": "Delete record",
             "dangerous": True,
-            "editable": True,
+            "editable": False,
             "has_form": False,
             "stateful_description": "Request permission to delete the record.",
             "stateful_name": "Request record deletion",
@@ -294,7 +294,7 @@ def test_ui_serialization(
             "description": "Request re-opening of published record",
             "name": "Edit record",
             "dangerous": False,
-            "editable": True,
+            "editable": False,
             "has_form": False,
             "stateful_description": "Click to start editing the metadata of the record.",
             "stateful_name": "Edit record",
@@ -309,7 +309,7 @@ def test_ui_serialization(
             "description": "Request requesting creation of new version of a published record.",
             "name": "New Version",
             "dangerous": False,
-            "editable": True,
+            "editable": False,
             "has_form": False,
             "stateful_description": "Click to start creating a new version of the "
             "record.",
