@@ -157,7 +157,7 @@ def test_form_config(app, client, record_ui_resource, fake_manifest):
             },
             "request_type_properties": {
                 "dangerous": False,
-                "editable": True,
+                "editable": False,
                 "has_form": True,
             },
         }
