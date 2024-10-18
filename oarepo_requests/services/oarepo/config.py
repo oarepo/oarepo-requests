@@ -47,6 +47,7 @@ class OARepoRequestsServiceConfig(RequestsServiceConfig):
         "self": RequestLink("{+api}/requests/extended/{id}"),
         "comments": RequestLink("{+api}/requests/extended/{id}/comments"),
         "timeline": RequestLink("{+api}/requests/extended/{id}/timeline"),
+        "self_html": RequestLink("{+ui}/requests/{id}"),
         "topic": RequestEntityLink("{+entity_self}"),
         "topic_html": RequestEntityLink("{+entity_self_html}"),
         "created_by": RequestEntityLink("{+entity_self}", entity="created_by"),
