@@ -138,9 +138,7 @@ export const RequestDetail = ({
                       {request?.topic?.links?.self_html && (
                         <Menu.Item
                           name="topic"
-                          content={`${i18next.t("Record")} ${i18next.t(
-                            "preview"
-                          )}`}
+                          content={i18next.t("Record preview")}
                           active={activeTab === "topic"}
                           onClick={() => setActiveTab("topic")}
                         />

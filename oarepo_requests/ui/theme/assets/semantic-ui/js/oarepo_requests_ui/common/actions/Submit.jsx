@@ -23,10 +23,9 @@ const Submit = ({ request, extraData, isMutating }) => {
     confirmAction,
     modalControl,
   });
-  const requireConfirmation = extraData?.hasForm || extraData?.dangerous;
 
   const handleClick = () => {
-    if (requireConfirmation) {
+    if (extraData?.dangerous) {
       confirmAction(
         () => saveAndSubmitRequest(),
         REQUEST_TYPE.SUBMIT,

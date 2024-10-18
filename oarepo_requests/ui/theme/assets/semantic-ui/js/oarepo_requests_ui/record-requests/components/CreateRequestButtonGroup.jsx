@@ -41,7 +41,7 @@ export const CreateRequestButtonGroup = ({
   if (applicableRequestsLoadingError) {
     return (
       <div className="requests-create-request-buttons borderless">
-        <Message negative>
+        <Message negative className="rel-mb-1">
           <Message.Header>
             {i18next.t("Error loading request types")}
           </Message.Header>

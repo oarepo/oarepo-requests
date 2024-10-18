@@ -15,7 +15,6 @@ const CreateAndSubmit = ({ requestType, extraData, isMutating }) => {
   const formik = useFormikContext();
   const { confirmAction } = useConfirmModalContext();
   const modalControl = useModalControlContext();
-  const requireConfirmation = extraData?.dangerous;
   const { isLoading, mutate: saveAndSubmitRequest } = useAction({
     action: saveAndSubmit,
     requestOrRequestType: requestType,
@@ -24,7 +23,7 @@ const CreateAndSubmit = ({ requestType, extraData, isMutating }) => {
     modalControl,
   });
   const handleClick = () => {
-    if (requireConfirmation) {
+    if (extraData?.dangerous) {
       confirmAction(
         () => saveAndSubmitRequest(),
         REQUEST_TYPE.CREATE,
