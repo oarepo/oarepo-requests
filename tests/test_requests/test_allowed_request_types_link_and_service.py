@@ -256,7 +256,7 @@ def test_ui_serialization(
             "name": "Publish draft",
             "type_id": "publish_draft",
             "dangerous": False,
-            "editable": True,
+            "editable": False,
             "has_form": True,
             "stateful_description": "By submitting the draft for review you are "
             "requesting the publication of the draft. The draft "

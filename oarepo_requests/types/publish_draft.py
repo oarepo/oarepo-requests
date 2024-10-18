@@ -57,6 +57,8 @@ class PublishDraftRequestType(NonDuplicableOARepoRequestType):
     receiver_can_be_none = True
     allowed_topic_ref_types = ModelRefTypes(published=True, draft=True)
 
+    editable = False
+
     def can_create(self, identity, data, receiver, topic, creator, *args, **kwargs):
         if not topic.is_draft:
             raise ValueError("Trying to create publish request on published record")
