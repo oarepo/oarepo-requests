@@ -76,7 +76,7 @@ class PublishDraftRequestType(NonDuplicableOARepoRequestType):
         uow.register(RecordCommitOp(request, indexer=current_requests_service.indexer))
 
     @override
-    def stateful_name(self, identity, *, topic=None, request=None):
+    def stateful_name(self, identity, *, topic, request=None, **kwargs):
         if is_auto_approved(self, identity=identity, topic=topic):
             return _("Publish draft")
         if not request:
@@ -88,7 +88,7 @@ class PublishDraftRequestType(NonDuplicableOARepoRequestType):
                 return _("Submit for review")
 
     @override
-    def stateful_description(self, identity, *, topic=None, request=None):
+    def stateful_description(self, identity, *, topic, request=None, **kwargs):
         if is_auto_approved(self, identity=identity, topic=topic):
             return _(
                 "Click to immediately publish the draft. "

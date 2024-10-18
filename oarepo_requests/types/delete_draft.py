@@ -26,7 +26,7 @@ class DeleteDraftRequestType(NonDuplicableOARepoRequestType):
     allowed_topic_ref_types = ModelRefTypes(published=False, draft=True)
 
     @override
-    def stateful_name(self, identity, *, topic=None, request=None):
+    def stateful_name(self, identity, *, topic, request=None, **kwargs):
         if is_auto_approved(self, identity=identity, topic=topic):
             return self.name
         if not request:
@@ -38,7 +38,7 @@ class DeleteDraftRequestType(NonDuplicableOARepoRequestType):
                 return _("Request draft deletion")
 
     @override
-    def stateful_description(self, identity, *, topic=None, request=None):
+    def stateful_description(self, identity, *, topic, request=None, **kwargs):
         if is_auto_approved(self, identity=identity, topic=topic):
             return _("Click to permanently delete the draft.")
 
