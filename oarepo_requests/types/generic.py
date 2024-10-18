@@ -30,6 +30,11 @@ class OARepoRequestType(RequestType):
     def has_form(cls):
         return hasattr(cls, "form")
 
+    @classmethod
+    @property
+    def editable(cls):
+        return hasattr(cls, "form")
+
     def can_create(self, identity, data, receiver, topic, creator, *args, **kwargs):
         current_requests_service.require_permission(
             identity, "create", record=topic, request_type=self, **kwargs
