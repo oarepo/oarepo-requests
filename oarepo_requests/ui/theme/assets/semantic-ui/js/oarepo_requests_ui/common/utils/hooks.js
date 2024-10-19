@@ -1,6 +1,6 @@
 import React, { useState, useCallback } from "react";
 import { i18next } from "@translations/oarepo_requests_ui/i18next";
-import { Button } from "semantic-ui-react";
+import { Button, Message, Icon } from "semantic-ui-react";
 import { useMutation } from "@tanstack/react-query";
 import {
   useCallbackContext,
@@ -155,6 +155,14 @@ export const useConfirmDialog = (requestOrRequestType) => {
               <RequestCommentInput
                 label={`${i18next.t("Add comment")} (${i18next.t("optional")})`}
               />
+              <Message>
+                <Icon name="info circle" className="text size large" />
+                <span>
+                  {i18next.t(
+                    "It is highly recommended to provide an explanation for the rejection of the request. Note that it is always possible to provide explanation later on the request timeline."
+                  )}
+                </span>
+              </Message>
             </div>
           );
           break;

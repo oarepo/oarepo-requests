@@ -85,7 +85,6 @@ export const EventSubmitForm = ({
     }
     return () => isError && reset();
   }, [isError, reset, resetForm]);
-  console.log(isError);
   return (
     <FormikProvider value={formik}>
       <Form className="ui form">

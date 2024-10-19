@@ -94,9 +94,13 @@ export const RequestModal = ({
                   ContentComponent={ContentComponent}
                   requestCreationModal={requestCreationModal}
                   isMutating={isMutating}
+                  onClose={onClose}
                 />
               </Modal>
-              <Confirm {...confirmDialogProps} />
+              <Confirm
+                className="requests dangerous-action-confirmation-modal"
+                {...confirmDialogProps}
+              />
             </React.Fragment>
           )}
         </ConfirmModalContextProvider>

@@ -78,7 +78,10 @@ export const CreateRequestButtonGroup = ({
                     requireConfirmation={dangerous}
                     isMutating={isMutating}
                   />
-                  <Confirm {...confirmDialogProps} />
+                  <Confirm
+                    {...confirmDialogProps}
+                    className="requests dangerous-action-confirmation-modal"
+                  />
                 </React.Fragment>
               )}
             </ConfirmModalContextProvider>
@@ -98,7 +101,10 @@ export const CreateRequestButtonGroup = ({
                     requireConfirmation={false}
                     isMutating={isMutating}
                   />
-                  <Confirm {...confirmDialogProps} />
+                  <Confirm
+                    {...confirmDialogProps}
+                    className="requests dangerous-action-confirmation-modal"
+                  />
                 </React.Fragment>
               )}
             </ConfirmModalContextProvider>

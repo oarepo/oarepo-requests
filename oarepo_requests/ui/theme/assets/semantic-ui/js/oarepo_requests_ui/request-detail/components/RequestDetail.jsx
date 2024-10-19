@@ -101,7 +101,10 @@ export const RequestDetail = ({
                     ))}
                   </Grid.Column>
                 </Grid.Row>
-                <Confirm {...confirmDialogProps} />
+                <Confirm
+                  {...confirmDialogProps}
+                  className="requests dangerous-action-confirmation-modal"
+                />
                 {errors?.api && (
                   <Grid.Row>
                     <Grid.Column>
