@@ -39,6 +39,27 @@ export const getRequestStatusIcon = (requestStatus) => {
   }
 };
 
+export const getFeedMessage = (requestStatus, creatorLabel) => {
+  switch (requestStatus?.toLowerCase()) {
+    case "created":
+      return i18next.t("requestCreated", { creatorLabel });
+    case "submitted":
+      return i18next.t("requestSubmitted", { creatorLabel });
+    case "cancelled":
+      return i18next.t("requestCancelled", { creatorLabel });
+    case "accepted":
+      return i18next.t("requestAccepted", { creatorLabel });
+    case "declined":
+      return i18next.t("requestDeclined", { creatorLabel });
+    case "expired":
+      return i18next.t("Request expired.");
+    case "deleted":
+      return i18next.t("requestDeleted", { creatorLabel });
+    default:
+      return i18next.t("requestCommented", { creatorLabel });
+  }
+};
+
 export const serializeCustomFields = (formData) => {
   if (!formData) return {};
   if (

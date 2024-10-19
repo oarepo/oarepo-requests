@@ -600,3 +600,27 @@ msgstr "Náhled záznamu"
 msgid ""
 "This action is irreversible. Are you sure you wish to accept this request?"
 msgstr "Tato akce je nevratná. Opravdu si přejete tuto žádost přijmout?"
+
+msgid "requestCreated"
+msgstr "{{creatorLabel}} vytvořil(a) tuto žádost"
+
+msgid "requestSubmitted"
+msgstr "{{creatorLabel}} odeslal(a) tuto žádost"
+
+msgid "requestCancelled"
+msgstr "{{creatorLabel}} zrušil(a) tuto žádost"
+
+msgid "requestAccepted"
+msgstr "{{creatorLabel}} přijal(a) tuto žádost"
+
+msgid "requestDeclined"
+msgstr "{{creatorLabel}} odmítl(a) tuto žádost"
+
+msgid "Request expired."
+msgstr "Žádost vypršela"
+
+msgid "requestDeleted"
+msgstr "{{creatorLabel}} smazal(a) tuto žádost"
+
+msgid "requestCommented"
+msgstr "{{creatorLabel}} komentoval(a)"

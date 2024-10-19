@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2024-10-19 21:46+0200\n"
+"POT-Creation-Date: 2024-10-19 23:21+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -499,6 +499,30 @@ msgstr ""
 msgid "Invalid format."
 msgstr ""
 
+msgid "requestCreated"
+msgstr ""
+
+msgid "requestSubmitted"
+msgstr ""
+
+msgid "requestCancelled"
+msgstr ""
+
+msgid "requestAccepted"
+msgstr ""
+
+msgid "requestDeclined"
+msgstr ""
+
+msgid "Request expired."
+msgstr ""
+
+msgid "requestDeleted"
+msgstr ""
+
+msgid "requestCommented"
+msgstr ""
+
 msgid "Error loading request types"
 msgstr ""
 
@@ -527,7 +551,4 @@ msgid "commented"
 msgstr ""
 
 msgid "icon"
-msgstr ""
-
-msgid "this request"
 msgstr ""

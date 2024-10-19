@@ -565,5 +565,29 @@ msgid ""
 "This action is irreversible. Are you sure you wish to accept this request?"
 msgstr ""
 
+msgid "requestCreated"
+msgstr "{{creatorLabel}} created this request"
+
+msgid "requestSubmitted"
+msgstr "{{creatorLabel}} submitted this request"
+
+msgid "requestCancelled"
+msgstr "{{creatorLabel}} canceled this request"
+
+msgid "requestAccepted"
+msgstr "{{creatorLabel}} accepted this request"
+
+msgid "requestDeclined"
+msgstr "{{creatorLabel}} declined this request"
+
+msgid "Request expired."
+msgstr "Request expired"
+
+msgid "requestDeleted"
+msgstr "{{creatorLabel}} deleted this request"
+
+msgid "requestCommented"
+msgstr "{{creatorLabel}} commented"
+
 #~ msgid "No status"
 #~ msgstr ""
