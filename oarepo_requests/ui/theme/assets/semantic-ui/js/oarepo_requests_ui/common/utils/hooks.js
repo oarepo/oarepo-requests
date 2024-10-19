@@ -178,8 +178,7 @@ export const useAction = ({
   formik,
   modalControl,
 } = {}) => {
-  const { onBeforeAction, onAfterAction, onActionError, fetchNewRequests } =
-    useCallbackContext();
+  const { onBeforeAction, onAfterAction, onActionError } = useCallbackContext();
   return useMutation(
     async () => {
       if (onBeforeAction) {
@@ -230,7 +229,10 @@ export const useAction = ({
         if (redirectionURL) {
           window.location.href = redirectionURL;
         } else {
-          fetchNewRequests?.();
+          // TODO: some requests after they complete no longer have a topic_html,
+          // so redirecting to dashboard instead
+          window.location.href = "/me/records/";
+          // fetchNewRequests?.();
         }
       },
     }

@@ -1,6 +1,5 @@
 import React, { useCallback } from "react";
 import PropTypes from "prop-types";
-import { SegmentGroup } from "semantic-ui-react";
 import { CreateRequestButtonGroup, RequestListContainer } from ".";
 import {
   RequestContextProvider,
@@ -139,9 +138,7 @@ RecordRequestsWithQueryClient.propTypes = {
 };
 
 const ContainerComponent = ({ children }) => (
-  <SegmentGroup className="requests-container borderless">
-    {children}
-  </SegmentGroup>
+  <div className="requests-container borderless">{children}</div>
 );
 
 ContainerComponent.propTypes = {
