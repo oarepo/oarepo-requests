@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2024-10-17 10:28+0200\n"
+"POT-Creation-Date: 2024-10-19 21:46+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -348,7 +348,7 @@ msgid "Submit request to get edit access to the record."
 msgstr ""
 
 #: /home/dusanst/Projects/oarepo-requests/oarepo_requests/types/publish_draft.py:24
-#: /home/dusanst/Projects/oarepo-requests/oarepo_requests/types/publish_draft.py:81
+#: /home/dusanst/Projects/oarepo-requests/oarepo_requests/types/publish_draft.py:83
 msgid "Publish draft"
 msgstr ""
 
@@ -364,22 +364,22 @@ msgstr ""
 msgid "Request publishing of a draft"
 msgstr ""
 
-#: /home/dusanst/Projects/oarepo-requests/oarepo_requests/types/publish_draft.py:83
-#: /home/dusanst/Projects/oarepo-requests/oarepo_requests/types/publish_draft.py:88
+#: /home/dusanst/Projects/oarepo-requests/oarepo_requests/types/publish_draft.py:85
+#: /home/dusanst/Projects/oarepo-requests/oarepo_requests/types/publish_draft.py:90
 msgid "Submit for review"
 msgstr ""
 
-#: /home/dusanst/Projects/oarepo-requests/oarepo_requests/types/publish_draft.py:86
+#: /home/dusanst/Projects/oarepo-requests/oarepo_requests/types/publish_draft.py:88
 msgid "Submitted for review"
 msgstr ""
 
-#: /home/dusanst/Projects/oarepo-requests/oarepo_requests/types/publish_draft.py:93
+#: /home/dusanst/Projects/oarepo-requests/oarepo_requests/types/publish_draft.py:95
 msgid ""
 "Click to immediately publish the draft. The draft will be a subject to "
 "embargo as requested in the side panel. Note: The action is irreversible."
 msgstr ""
 
-#: /home/dusanst/Projects/oarepo-requests/oarepo_requests/types/publish_draft.py:100
+#: /home/dusanst/Projects/oarepo-requests/oarepo_requests/types/publish_draft.py:102
 msgid ""
 "By submitting the draft for review you are requesting the publication of the"
 " draft. The draft will become locked and no further changes will be possible"
@@ -387,29 +387,29 @@ msgid ""
 "decision by email."
 msgstr ""
 
-#: /home/dusanst/Projects/oarepo-requests/oarepo_requests/types/publish_draft.py:108
+#: /home/dusanst/Projects/oarepo-requests/oarepo_requests/types/publish_draft.py:110
 msgid ""
 "The draft has been submitted for review. It is now locked and no further "
 "changes are possible. You will be notified about the decision by email."
 msgstr ""
 
-#: /home/dusanst/Projects/oarepo-requests/oarepo_requests/types/publish_draft.py:114
+#: /home/dusanst/Projects/oarepo-requests/oarepo_requests/types/publish_draft.py:116
 msgid ""
 "The draft has been submitted for review. You can now accept or decline the "
 "request."
 msgstr ""
 
-#: /home/dusanst/Projects/oarepo-requests/oarepo_requests/types/publish_draft.py:118
+#: /home/dusanst/Projects/oarepo-requests/oarepo_requests/types/publish_draft.py:120
 msgid "The draft has been submitted for review."
 msgstr ""
 
-#: /home/dusanst/Projects/oarepo-requests/oarepo_requests/types/publish_draft.py:121
+#: /home/dusanst/Projects/oarepo-requests/oarepo_requests/types/publish_draft.py:123
 msgid ""
 "Submit for review. After submitting the draft for review, it will be locked "
 "and no further modifications will be possible."
 msgstr ""
 
-#: /home/dusanst/Projects/oarepo-requests/oarepo_requests/types/publish_draft.py:125
+#: /home/dusanst/Projects/oarepo-requests/oarepo_requests/types/publish_draft.py:127
 msgid "Request not yet submitted."
 msgstr ""
 
@@ -469,10 +469,20 @@ msgid ""
 "not be possible to reverse the action."
 msgstr ""
 
+msgid ""
+"This action is irreversible. Are you sure you wish to accept this request?"
+msgstr ""
+
 msgid "Add comment"
 msgstr ""
 
 msgid "optional"
+msgstr ""
+
+msgid ""
+"It is highly recommended to provide an explanation for the rejection of the "
+"request. Note that it is always possible to provide explanation later on the"
+" request timeline."
 msgstr ""
 
 msgid ""
@@ -507,10 +517,7 @@ msgstr ""
 msgid "Back to requests"
 msgstr ""
 
-msgid "Record"
-msgstr ""
-
-msgid "preview"
+msgid "Record preview"
 msgstr ""
 
 msgid "to top"

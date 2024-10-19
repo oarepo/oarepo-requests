@@ -552,5 +552,18 @@ msgstr ""
 msgid "Leave comment"
 msgstr ""
 
+msgid ""
+"It is highly recommended to provide an explanation for the rejection of the "
+"request. Note that it is always possible to provide explanation later on the"
+" request timeline."
+msgstr ""
+
+msgid "Record preview"
+msgstr ""
+
+msgid ""
+"This action is irreversible. Are you sure you wish to accept this request?"
+msgstr ""
+
 #~ msgid "No status"
 #~ msgstr ""

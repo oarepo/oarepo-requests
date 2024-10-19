@@ -585,3 +585,18 @@ msgstr "Zanechat komentář"
 #: /home/dusanst/Projects/oarepo-requests/oarepo_requests/types/delete_draft.py:24
 msgid "Request deletion of draft"
 msgstr "Zažádat o smazání konceptu"
+
+msgid ""
+"It is highly recommended to provide an explanation for the rejection of the "
+"request. Note that it is always possible to provide explanation later on the"
+" request timeline."
+msgstr ""
+"Důrazně doporučujeme poskytnout vysvětlení zamítnutí žádosti. Všimněte si, "
+"že je vždy možné poskytnout vysvětlení později v rámci časové osy žádosti."
+
+msgid "Record preview"
+msgstr "Náhled záznamu"
+
+msgid ""
+"This action is irreversible. Are you sure you wish to accept this request?"
+msgstr "Tato akce je nevratná. Opravdu si přejete tuto žádost přijmout?"

@@ -132,9 +132,9 @@ export const useConfirmDialog = (requestOrRequestType) => {
             <React.Fragment>
               {dangerous && (
                 <WarningMessage
-                  message={
+                  message={i18next.t(
                     "This action is irreversible. Are you sure you wish to accept this request?"
-                  }
+                  )}
                 />
               )}
             </React.Fragment>
