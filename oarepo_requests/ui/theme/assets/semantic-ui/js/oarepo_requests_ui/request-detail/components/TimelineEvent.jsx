@@ -11,7 +11,6 @@ import PropTypes from "prop-types";
 
 const TimelineEvent = ({ event }) => {
   const eventLabel = event.payload?.event ?? i18next.t("commented");
-  console.log(eventLabel);
   const eventIcon = getRequestStatusIcon(eventLabel) ?? {
     name: "user circle",
     color: "grey",
