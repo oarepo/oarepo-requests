@@ -1,93 +1,155 @@
-import React, { useEffect, useState, useCallback } from "react";
+import React, { useCallback } from "react";
 import PropTypes from "prop-types";
-
-import axios from "axios";
-import { SegmentGroup } from "semantic-ui-react";
-
 import { CreateRequestButtonGroup, RequestListContainer } from ".";
-import { RequestContextProvider } from "../contexts";
-import { sortByStatusCode } from "../utils";
+import {
+  RequestContextProvider,
+  CallbackContextProvider,
+} from "@js/oarepo_requests_common";
+import {
+  useQuery,
+  useQueryClient,
+  QueryClient,
+  QueryClientProvider,
+} from "@tanstack/react-query";
+import { http } from "@js/oarepo_ui";
 
-export const RecordRequests = ({ record: initialRecord }) => {
-  const [recordLoading, setRecordLoading] = useState(true);
-  const [requestsLoading, setRequestsLoading] = useState(true);
+export const requestButtonsDefaultIconConfig = {
+  delete_published_record: { icon: "trash", labelPosition: "left" },
+  publish_draft: { icon: "upload", labelPosition: "left" },
+  new_version: { icon: "tag", labelPosition: "left" },
+  edit_published_record: { icon: "pencil", labelPosition: "left" },
+  assign_doi: { icon: "address card", labelPosition: "left" },
+  created: { icon: "paper plane", labelPosition: "left" },
+  submitted: { icon: "clock", labelPosition: "left" },
+};
 
-  const [recordLoadingError, setRecordLoadingError] = useState(null);
-  const [requestsLoadingError, setRequestsLoadingError] = useState(null);
+const queryClient = new QueryClient();
 
-  const [record, setRecord] = useState(initialRecord);
-  const [requests, setRequests] = useState(sortByStatusCode(record?.requests ?? []) ?? []);
+const RecordRequests = ({
+  record: initialRecord,
+  ContainerComponent,
+  onBeforeAction,
+  onAfterAction,
+  onActionError,
+  requestButtonsIconsConfig,
+}) => {
+  const queryClient = useQueryClient();
 
-  const requestsSetter = useCallback(newRequests => setRequests(newRequests), []);
+  const {
+    data: requestTypes,
+    error: applicableRequestsLoadingError,
+    isFetching: applicableRequestTypesLoading,
+  } = useQuery(
+    ["applicableRequestTypes"],
+    () => http.get(initialRecord.links["applicable-requests"]),
+    {
+      enabled: !!initialRecord.links?.["applicable-requests"],
+      refetchOnWindowFocus: false,
+    }
+  );
+  const {
+    data: recordRequests,
+    error: requestsLoadingError,
+    isFetching: requestsLoading,
+  } = useQuery(["requests"], () => http.get(initialRecord.links?.requests), {
+    enabled: !!initialRecord.links?.requests,
+    refetchOnWindowFocus: false,
+  });
+  const applicableRequestTypes = requestTypes?.data?.hits?.hits;
 
-  const fetchRecord = useCallback(async (initRequests = false) => {
-    setRecordLoading(true);
-    setRecordLoadingError(null);
-    return axios({
-      method: 'get',
-      url: record.links?.self + "?expand=true",
-      headers: {
-        'Content-Type': 'application/json',
-        'Accept': 'application/vnd.inveniordm.v1+json'
-      }
-    })
-      .then(response => {
-        setRecord(response.data);
-        initRequests && setRequests(sortByStatusCode(response.data?.expanded?.requests ?? []));
-      })
-      .catch(error => {
-        setRecordLoadingError(error);
-        initRequests && setRequestsLoadingError(error);
-      })
-      .finally(() => {
-        setRecordLoading(false);
-        initRequests && setRequestsLoading(false);
-      });
-  }, [record.links?.self]);
-
-  const fetchRequests = useCallback(async () => {
-    setRequestsLoading(true);
-    setRequestsLoadingError(null);
-    return axios({
-      method: 'get',
-      url: record.links?.requests,
-      headers: {
-        'Content-Type': 'application/json',
-        'Accept': 'application/vnd.inveniordm.v1+json'
-      }
-    })
-      .then(response => {
-        setRequests(sortByStatusCode(response.data?.hits?.hits));
-      })
-      .catch(error => {
-        setRequestsLoadingError(error);
-      })
-      .finally(() => {
-        setRequestsLoading(false);
-      });
-  }, [record.links?.requests]);
-
+  const requests = recordRequests?.data?.hits?.hits;
   const fetchNewRequests = useCallback(() => {
-    fetchRecord();
-    fetchRequests();
-  }, [fetchRecord, fetchRequests]);
-
-  useEffect(() => {
-    fetchRecord(true);
-  }, [fetchRecord]);
-
-  const requestTypes = record?.expanded?.request_types ?? [];
-
+    queryClient.invalidateQueries(["applicableRequestTypes"]);
+    queryClient.invalidateQueries(["requests"]);
+  }, [queryClient]);
   return (
-    <RequestContextProvider requests={{ requests, requestTypes, setRequests: requestsSetter, fetchNewRequests }}>
-      <SegmentGroup className="requests-container">
-        <CreateRequestButtonGroup recordLoading={recordLoading} recordLoadingError={recordLoadingError} />
-        <RequestListContainer requestsLoading={requestsLoading} requestsLoadingError={requestsLoadingError} />
-      </SegmentGroup>
+    <RequestContextProvider
+      value={{
+        requests,
+        requestTypes: applicableRequestTypes,
+        record: initialRecord,
+        requestButtonsIconsConfig: {
+          ...requestButtonsDefaultIconConfig,
+          ...requestButtonsIconsConfig,
+        },
+      }}
+    >
+      <CallbackContextProvider
+        value={{
+          onBeforeAction,
+          onAfterAction,
+          onActionError,
+          fetchNewRequests,
+        }}
+      >
+        <ContainerComponent>
+          <CreateRequestButtonGroup
+            applicableRequestsLoading={applicableRequestTypesLoading}
+            applicableRequestsLoadingError={applicableRequestsLoadingError}
+          />
+          <RequestListContainer
+            requestsLoading={requestsLoading}
+            requestsLoadingError={requestsLoadingError}
+          />
+        </ContainerComponent>
+      </CallbackContextProvider>
     </RequestContextProvider>
   );
-}
+};
 
 RecordRequests.propTypes = {
   record: PropTypes.object.isRequired,
+  ContainerComponent: PropTypes.func,
+  onBeforeAction: PropTypes.func,
+  onAfterAction: PropTypes.func,
+  onActionError: PropTypes.func,
+  requestButtonsIconsConfig: PropTypes.object,
 };
+
+const RecordRequestsWithQueryClient = ({
+  record: initialRecord,
+  ContainerComponent,
+  onBeforeAction,
+  onAfterAction,
+  onActionError,
+  requestButtonsIconsConfig,
+}) => {
+  return (
+    <QueryClientProvider client={queryClient}>
+      <RecordRequests
+        record={initialRecord}
+        ContainerComponent={ContainerComponent}
+        onBeforeAction={onBeforeAction}
+        onAfterAction={onAfterAction}
+        onActionError={onActionError}
+        requestButtonsIconsConfig={requestButtonsIconsConfig}
+      />
+    </QueryClientProvider>
+  );
+};
+
+RecordRequestsWithQueryClient.propTypes = {
+  record: PropTypes.object.isRequired,
+  ContainerComponent: PropTypes.func,
+  onBeforeAction: PropTypes.func,
+  onAfterAction: PropTypes.func,
+  onActionError: PropTypes.func,
+  requestButtonsIconsConfig: PropTypes.object,
+};
+
+const ContainerComponent = ({ children }) => (
+  <div className="requests-container borderless">{children}</div>
+);
+
+ContainerComponent.propTypes = {
+  children: PropTypes.node,
+};
+
+RecordRequestsWithQueryClient.defaultProps = {
+  ContainerComponent: ContainerComponent,
+  onBeforeAction: undefined,
+  onAfterAction: undefined,
+  onActionError: undefined,
+};
+
+export { RecordRequestsWithQueryClient as RecordRequests };

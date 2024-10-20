@@ -459,5 +459,135 @@ msgstr ""
 msgid "Request not yet submitted."
 msgstr ""
 
+#: /home/dusanst/Projects/oarepo-requests/oarepo_requests/types/delete_draft.py:12
+msgid "Delete draft"
+msgstr ""
+
+#: /home/dusanst/Projects/oarepo-requests/oarepo_requests/types/delete_draft.py:24
+msgid "Request deletion of draft"
+msgstr ""
+
+#: /home/dusanst/Projects/oarepo-requests/oarepo_requests/types/delete_draft.py:33
+#: /home/dusanst/Projects/oarepo-requests/oarepo_requests/types/delete_draft.py:38
+msgid "Request draft deletion"
+msgstr ""
+
+#: /home/dusanst/Projects/oarepo-requests/oarepo_requests/types/delete_draft.py:36
+msgid "Draft deletion requested"
+msgstr ""
+
+#: /home/dusanst/Projects/oarepo-requests/oarepo_requests/types/delete_draft.py:43
+msgid "Click to permanently delete the draft."
+msgstr ""
+
+#: /home/dusanst/Projects/oarepo-requests/oarepo_requests/types/delete_draft.py:46
+msgid "Request permission to delete the draft."
+msgstr ""
+
+#: /home/dusanst/Projects/oarepo-requests/oarepo_requests/types/delete_draft.py:50
+msgid ""
+"Permission to delete draft requested. You will be notified about the "
+"decision by email."
+msgstr ""
+
+#: /home/dusanst/Projects/oarepo-requests/oarepo_requests/types/delete_draft.py:55
+msgid ""
+"You have been asked to approve the request to permanently delete the draft. "
+"You can approve or reject the request."
+msgstr ""
+
+#: /home/dusanst/Projects/oarepo-requests/oarepo_requests/types/delete_draft.py:59
+msgid "Permission to delete draft (including files) requested. "
+msgstr ""
+
+#: /home/dusanst/Projects/oarepo-requests/oarepo_requests/types/delete_draft.py:62
+msgid "Submit request to get permission to delete the draft."
+msgstr ""
+
+msgid "Request not created successfully. Please try again in a moment."
+msgstr ""
+
+msgid "Form fields could not be fetched."
+msgstr ""
+
+msgid "Request details"
+msgstr ""
+
+msgid "Topic"
+msgstr ""
+
+msgid "Request topic"
+msgstr ""
+
+msgid ""
+"Are you sure you want to proceed? Once the action is completed, it will not "
+"be possible to undo it."
+msgstr ""
+
+msgid "Are you sure you wish to"
+msgstr ""
+
+msgid "Proceed"
+msgstr ""
+
+msgid ""
+"Are you sure you wish to proceed? After this request is accepted, it will "
+"not be possible to reverse the action."
+msgstr ""
+
+msgid ""
+"The request could not be created due to validation errors. Please correct "
+"the errors and try again."
+msgstr ""
+
+msgid "The action could not be executed. Please try again in a moment."
+msgstr ""
+
+msgid "Record has validation errors. Redirecting to form..."
+msgstr ""
+
+msgid "Comment was not submitted successfully."
+msgstr ""
+
+msgid "Leave comment"
+msgstr ""
+
+msgid ""
+"It is highly recommended to provide an explanation for the rejection of the "
+"request. Note that it is always possible to provide explanation later on the"
+" request timeline."
+msgstr ""
+
+msgid "Record preview"
+msgstr ""
+
+msgid ""
+"This action is irreversible. Are you sure you wish to accept this request?"
+msgstr ""
+
+msgid "requestCreated"
+msgstr "{{creatorLabel}} created this request"
+
+msgid "requestSubmitted"
+msgstr "{{creatorLabel}} submitted this request"
+
+msgid "requestCancelled"
+msgstr "{{creatorLabel}} canceled this request"
+
+msgid "requestAccepted"
+msgstr "{{creatorLabel}} accepted this request"
+
+msgid "requestDeclined"
+msgstr "{{creatorLabel}} declined this request"
+
+msgid "Request expired."
+msgstr "Request expired"
+
+msgid "requestDeleted"
+msgstr "{{creatorLabel}} deleted this request"
+
+msgid "requestCommented"
+msgstr "{{creatorLabel}} commented"
+
 #~ msgid "No status"
 #~ msgstr ""
