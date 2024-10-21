@@ -2,6 +2,7 @@ from oarepo_requests.actions.components import (
     AutoAcceptComponent,
     RequestIdentityComponent,
 )
+from oarepo_requests.types.events import TopicDeleteEventType
 from oarepo_requests.types.events.topic_update import TopicUpdateEventType
 
 try:
@@ -39,7 +40,7 @@ REQUESTS_REGISTERED_TYPES = [
 ]
 
 REQUESTS_REGISTERED_EVENT_TYPES = [
-    TopicUpdateEventType(),
+    TopicUpdateEventType(), TopicDeleteEventType()
 ] + invenio_requests.config.REQUESTS_REGISTERED_EVENT_TYPES
 
 REQUESTS_ALLOWED_RECEIVERS = ["user", "group", "auto_approve"]
