@@ -7,7 +7,6 @@ from invenio_requests import (
 from invenio_requests.records import Request
 from invenio_requests.resolvers.registry import ResolverRegistry
 
-from oarepo_requests.types.events import TopicDeleteEventType, TopicUpdateEventType
 from oarepo_requests.utils import _reference_query_term
 
 
@@ -17,6 +16,7 @@ def _str_from_ref(ref):
 
 
 def update_topic(request, old_topic, new_topic, uow):
+    from oarepo_requests.types.events import TopicUpdateEventType
 
     old_topic_ref = ResolverRegistry.reference_entity(old_topic)
     new_topic_ref = ResolverRegistry.reference_entity(new_topic)
@@ -49,6 +49,7 @@ def update_topic(request, old_topic, new_topic, uow):
 
 
 def cancel_requests_on_topic_delete(request, topic, uow):
+    from oarepo_requests.types.events import TopicDeleteEventType
 
     topic_ref = ResolverRegistry.reference_entity(topic)
     requests_with_topic = current_requests_service.scan(
