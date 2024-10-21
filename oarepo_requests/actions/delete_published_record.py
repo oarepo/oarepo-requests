@@ -9,5 +9,5 @@ class DeletePublishedRecordAcceptAction(OARepoAcceptAction):
         topic_service = get_record_service_for_record(topic)
         if not topic_service:
             raise KeyError(f"topic {topic} service not found")
-        cancel_requests_on_topic_delete(self.request, topic, uow)
         topic_service.delete(identity, topic["id"], uow=uow, *args, **kwargs)
+        cancel_requests_on_topic_delete(self.request, topic, uow)
