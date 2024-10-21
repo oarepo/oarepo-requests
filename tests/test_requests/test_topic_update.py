@@ -118,17 +118,18 @@ def test_cascade_update(
         "thesis_draft": draft2.json["id"]
     }  # check request on the other draft is unchanged
 
+
 def test_cascade_cancel(
-        vocab_cf,
-        logged_client,
-        users,
-        urls,
-        publish_request_data_function,
-        another_topic_updating_request_function,
-        create_draft_via_resource,
-        create_request_by_link,
-        submit_request_by_link,
-        search_clear,
+    vocab_cf,
+    logged_client,
+    users,
+    urls,
+    publish_request_data_function,
+    another_topic_updating_request_function,
+    create_draft_via_resource,
+    create_request_by_link,
+    submit_request_by_link,
+    search_clear,
 ):
     creator = users[0]
     receiver = users[1]
@@ -139,19 +140,11 @@ def test_cascade_cancel(
     draft1 = create_draft_via_resource(creator_client, custom_workflow="cascade_update")
     draft2 = create_draft_via_resource(creator_client, custom_workflow="cascade_update")
 
-    r1 = submit_request_by_link(
-        creator_client, draft1, "publish_draft"
-    )
-    r2 = create_request_by_link(
-        creator_client, draft1, "another_topic_updating"
-    )
-    r3 = submit_request_by_link(
-        creator_client, draft2, "publish_draft"
-    )
+    r1 = submit_request_by_link(creator_client, draft1, "publish_draft")
+    r2 = create_request_by_link(creator_client, draft1, "another_topic_updating")
+    r3 = submit_request_by_link(creator_client, draft2, "publish_draft")
 
-    delete_request = submit_request_by_link(
-        creator_client, draft1, "delete_draft"
-    )
+    delete_request = submit_request_by_link(creator_client, draft1, "delete_draft")
 
     r1_read = receiver_client.get(f"{urls['BASE_URL_REQUESTS']}{r1.json['id']}")
     r2_read = receiver_client.get(f"{urls['BASE_URL_REQUESTS']}{r2.json['id']}")
@@ -160,9 +153,6 @@ def test_cascade_cancel(
     assert r1_read.json["status"] == "cancelled"
     assert r2_read.json["status"] == "cancelled"
     assert r3_read.json["status"] == "submitted"
-
-
-
 
 
 def test_edit(

@@ -1,16 +1,17 @@
+from invenio_access.permissions import system_identity
 from invenio_records_resources.services.errors import PermissionDeniedError
 from invenio_requests.customizations import RequestType
 from invenio_requests.customizations.states import RequestState
 from invenio_requests.proxies import current_requests_service
-from invenio_access.permissions import system_identity
 
 from oarepo_requests.errors import OpenRequestAlreadyExists
 from oarepo_requests.utils import open_request_exists
 
 from ..actions.generic import (
     OARepoAcceptAction,
+    OARepoCancelAction,
     OARepoDeclineAction,
-    OARepoSubmitAction, OARepoCancelAction,
+    OARepoSubmitAction,
 )
 from .ref_types import ModelRefTypes, ReceiverRefTypes
 
