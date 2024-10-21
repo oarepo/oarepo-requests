@@ -7,8 +7,8 @@ from .generic import (
     AddTopicLinksOnPayloadMixin,
     OARepoAcceptAction,
     OARepoSubmitAction,
-    update_topic,
 )
+from .cascade_events import update_topic
 
 
 class PublishDraftSubmitAction(OARepoSubmitAction):

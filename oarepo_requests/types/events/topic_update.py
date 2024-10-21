@@ -1,13 +1,7 @@
 from invenio_requests.customizations.event_types import EventType
 from marshmallow import fields
 
-
-def _serialized_topic_validator(value):
-    if len(value.split(".")) != 2:
-        raise ValueError(
-            "Serialized topic must be a string with model and id separated by a single dot."
-        )
-    return value
+from oarepo_requests.types.events.validation import _serialized_topic_validator
 
 
 class TopicUpdateEventType(EventType):

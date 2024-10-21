@@ -1,6 +1,7 @@
 from oarepo_runtime.datastreams.utils import get_record_service_for_record
 
-from .generic import OARepoAcceptAction, cancel_requests_on_topic_delete
+from .generic import OARepoAcceptAction
+from .cascade_events import cancel_requests_on_topic_delete
 
 
 class DeletePublishedRecordAcceptAction(OARepoAcceptAction):
