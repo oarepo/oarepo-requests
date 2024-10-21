@@ -1,3 +1,4 @@
+from invenio_access.permissions import system_identity
 from invenio_records_resources.services.errors import PermissionDeniedError
 from invenio_requests.customizations import RequestType
 from invenio_requests.customizations.states import RequestState
@@ -8,6 +9,7 @@ from oarepo_requests.utils import open_request_exists
 
 from ..actions.generic import (
     OARepoAcceptAction,
+    OARepoCancelAction,
     OARepoDeclineAction,
     OARepoSubmitAction,
 )
@@ -18,6 +20,9 @@ class OARepoRequestType(RequestType):
     description = None
 
     dangerous = False
+
+    def on_topic_delete(self, request, topic):
+        current_requests_service.execute_action(system_identity, request.id, "cancel")
 
     @classmethod
     @property
@@ -67,6 +72,7 @@ class OARepoRequestType(RequestType):
             "submit": OARepoSubmitAction,
             "accept": OARepoAcceptAction,
             "decline": OARepoDeclineAction,
+            "cancel": OARepoCancelAction,
         }
 
     def stateful_name(self, *, identity, topic, request=None, **kwargs):
