@@ -71,5 +71,3 @@ class OARepoAcceptAction(OARepoGenericActionMixin, actions.AcceptAction):
 class OARepoCancelAction(actions.CancelAction):
     status_from = ["created", "submitted"]
     status_to = "cancelled"
-
-

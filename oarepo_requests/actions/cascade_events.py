@@ -1,9 +1,13 @@
 from invenio_access.permissions import system_identity
-from invenio_requests import current_requests_service, current_request_type_registry, current_events_service
+from invenio_requests import (
+    current_events_service,
+    current_request_type_registry,
+    current_requests_service,
+)
 from invenio_requests.records import Request
 from invenio_requests.resolvers.registry import ResolverRegistry
-from oarepo_requests.types.events import TopicUpdateEventType, TopicDeleteEventType
 
+from oarepo_requests.types.events import TopicDeleteEventType, TopicUpdateEventType
 from oarepo_requests.utils import _reference_query_term
 
 
@@ -13,7 +17,6 @@ def _str_from_ref(ref):
 
 
 def update_topic(request, old_topic, new_topic, uow):
-
 
     old_topic_ref = ResolverRegistry.reference_entity(old_topic)
     new_topic_ref = ResolverRegistry.reference_entity(new_topic)
@@ -60,7 +63,9 @@ def cancel_requests_on_topic_delete(request, topic, uow):
                 continue
             cur_request = Request.get_record(request_from_search["id"])
             if cur_request.is_open:
-                request_type.on_topic_delete(cur_request, uow) #possibly return message to save on event payload?
+                request_type.on_topic_delete(
+                    cur_request, uow
+                )  # possibly return message to save on event payload?
                 event = TopicDeleteEventType(
                     payload=dict(
                         topic=_str_from_ref(topic_ref),
@@ -70,4 +75,3 @@ def cancel_requests_on_topic_delete(request, topic, uow):
                 current_events_service.create(
                     system_identity, cur_request.id, _data, event, uow=uow
                 )
-

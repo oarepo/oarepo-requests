@@ -1,9 +1,7 @@
-from invenio_requests.records.api import RequestEvent
 from thesis.records.api import ThesisDraft
 
-from oarepo_requests.types.events.topic_update import TopicUpdateEventType
-
 from .utils import link_api2testclient
+
 
 def test_publish(
     vocab_cf,
@@ -38,6 +36,7 @@ def test_publish(
         ),
     )
     check_publish_topic_update(creator_client, urls, record, resp_request_create)
+
 
 def test_edit(
     vocab_cf,

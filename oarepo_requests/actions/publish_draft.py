@@ -3,12 +3,8 @@ from invenio_records_resources.services.uow import RecordCommitOp
 from marshmallow import ValidationError
 from oarepo_runtime.datastreams.utils import get_record_service_for_record
 
-from .generic import (
-    AddTopicLinksOnPayloadMixin,
-    OARepoAcceptAction,
-    OARepoSubmitAction,
-)
 from .cascade_events import update_topic
+from .generic import AddTopicLinksOnPayloadMixin, OARepoAcceptAction, OARepoSubmitAction
 
 
 class PublishDraftSubmitAction(OARepoSubmitAction):

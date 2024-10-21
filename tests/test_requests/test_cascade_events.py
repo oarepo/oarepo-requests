@@ -1,8 +1,6 @@
 from invenio_requests.records.api import RequestEvent
-from thesis.records.api import ThesisDraft
 
 from oarepo_requests.types.events import TopicDeleteEventType
-from oarepo_requests.types.events.topic_update import TopicUpdateEventType
 
 from .utils import link_api2testclient
 

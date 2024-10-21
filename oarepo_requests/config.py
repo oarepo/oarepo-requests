@@ -40,7 +40,8 @@ REQUESTS_REGISTERED_TYPES = [
 ]
 
 REQUESTS_REGISTERED_EVENT_TYPES = [
-    TopicUpdateEventType(), TopicDeleteEventType()
+    TopicUpdateEventType(),
+    TopicDeleteEventType(),
 ] + invenio_requests.config.REQUESTS_REGISTERED_EVENT_TYPES
 
 REQUESTS_ALLOWED_RECEIVERS = ["user", "group", "auto_approve"]

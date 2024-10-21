@@ -19,7 +19,7 @@ from invenio_records_permissions.generators import (
 from invenio_records_resources.services.uow import RecordCommitOp
 from invenio_requests.customizations import CommentEventType, LogEventType
 from invenio_requests.proxies import current_requests, current_requests_service
-from invenio_requests.records.api import Request, RequestEventFormat, RequestEvent
+from invenio_requests.records.api import Request, RequestEvent, RequestEventFormat
 from invenio_requests.services.generators import Receiver
 from invenio_requests.services.permissions import (
     PermissionPolicy as InvenioRequestsPermissionPolicy,
@@ -56,7 +56,6 @@ from oarepo_requests.services.permissions.workflow_policies import (
     RequestBasedWorkflowPermissions,
 )
 from oarepo_requests.types import ModelRefTypes, NonDuplicableOARepoRequestType
-from oarepo_requests.types.events import TopicDeleteEventType
 from oarepo_requests.types.events.topic_update import TopicUpdateEventType
 from tests.test_requests.utils import link_api2testclient
 
@@ -467,7 +466,7 @@ def ui_serialization_result():
 @pytest.fixture(scope="module")
 def app_config(app_config):
     app_config["REQUESTS_REGISTERED_EVENT_TYPES"] = [
-        TestEventType(), # remaining are loaded from .config
+        TestEventType(),  # remaining are loaded from .config
     ]
     app_config["SEARCH_HOSTS"] = [
         {
@@ -745,7 +744,9 @@ def submit_request_by_link(create_request_by_link):
 
 @pytest.fixture
 def check_publish_topic_update():
-    def _check_publish_topic_update(creator_client, urls, record, before_update_response):
+    def _check_publish_topic_update(
+        creator_client, urls, record, before_update_response
+    ):
         request_id = before_update_response.json["id"]
         record_id = record.json["id"]
 
@@ -765,7 +766,9 @@ def check_publish_topic_update():
         ]
         assert len(topic_updated_events) == 1
         assert (
-            topic_updated_events[0]["payload"]["old_topic"] == f"thesis_draft.{record_id}"
+            topic_updated_events[0]["payload"]["old_topic"]
+            == f"thesis_draft.{record_id}"
         )
         assert topic_updated_events[0]["payload"]["new_topic"] == f"thesis.{record_id}"
+
     return _check_publish_topic_update
