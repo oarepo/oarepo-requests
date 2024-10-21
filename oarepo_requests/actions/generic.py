@@ -77,6 +77,10 @@ class OARepoDeclineAction(OARepoGenericActionMixin, actions.DeclineAction):
 class OARepoAcceptAction(OARepoGenericActionMixin, actions.AcceptAction):
     """"""
 
+class OARepoCancelAction(actions.CancelAction):
+    status_from = ["created","submitted"]
+    status_to = "cancelled"
+
 
 def _str_from_ref(ref):
     k, v = list(ref.items())[0]
@@ -114,3 +118,34 @@ def update_topic(request, old_topic, new_topic, uow):
                 current_events_service.create(
                     system_identity, cur_request.id, _data, event, uow=uow
                 )
+
+
+def cancel_requests_on_topic_delete(request, topic, uow):
+
+    topic_ref = ResolverRegistry.reference_entity(topic)
+    requests_with_topic = current_requests_service.scan(
+        system_identity, extra_filter=_reference_query_term("topic", topic_ref)
+    )
+    for request_from_search in requests_with_topic:
+        request_type = current_request_type_registry.lookup(
+            request_from_search["type"], quiet=True
+        )
+        if hasattr(request_type, "on_topic_delete"):
+            if request_from_search["id"] == str(request.id):
+                continue
+            cur_request = Request.get_record(request_from_search["id"])
+            if cur_request.is_open:
+                request_type.on_topic_delete(cur_request, uow)
+            """ implement TopicDeleteEventType
+            if cur_request.topic.reference_dict != old_topic_ref:
+                event = TopicUpdateEventType(
+                    payload=dict(
+                        old_topic=_str_from_ref(old_topic_ref),
+                        new_topic=_str_from_ref(new_topic_ref),
+                    )  # event jsonschema requires string
+                )
+                _data = dict(payload=event.payload)
+                current_events_service.create(
+                    system_identity, cur_request.id, _data, event, uow=uow
+                )
+            """
