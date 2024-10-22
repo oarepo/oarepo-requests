@@ -11,6 +11,7 @@ from typing_extensions import override
 
 from oarepo_requests.actions.publish_draft import (
     PublishDraftAcceptAction,
+    PublishDraftDeclineAction,
     PublishDraftSubmitAction,
 )
 
@@ -51,6 +52,7 @@ class PublishDraftRequestType(NonDuplicableOARepoRequestType):
             **super().available_actions,
             "submit": PublishDraftSubmitAction,
             "accept": PublishDraftAcceptAction,
+            "decline": PublishDraftDeclineAction,
         }
 
     description = _("Request publishing of a draft")

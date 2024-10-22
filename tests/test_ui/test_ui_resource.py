@@ -160,4 +160,15 @@ def test_form_config(app, client, record_ui_resource, fake_manifest):
                 "editable": False,
                 "has_form": True,
             },
+            "action_labels": {
+                {
+                    "accept": "Publish",
+                    "cancel": "Cancel",
+                    "create": "Create",
+                    "decline": "Return for correction",
+                    "delete": "Delete",
+                    "expire": "Expire",
+                    "submit": "Submit",
+                }
+            },
         }

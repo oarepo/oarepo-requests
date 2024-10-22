@@ -9,6 +9,7 @@ from invenio_requests import (
 from invenio_requests.customizations import actions
 from invenio_requests.records.api import Request
 from invenio_requests.resolvers.registry import ResolverRegistry
+from oarepo_runtime.i18n import lazy_gettext as _
 
 from oarepo_requests.proxies import current_oarepo_requests
 
@@ -16,6 +17,10 @@ from ..utils import _reference_query_term
 
 
 class OARepoGenericActionMixin:
+    @classmethod
+    def stateful_name(cls, identity, **kwargs):
+        return cls.name
+
     def apply(self, identity, request_type, topic, uow, *args, **kwargs):
         pass
 
@@ -67,14 +72,17 @@ class AddTopicLinksOnPayloadMixin:
 
 
 class OARepoSubmitAction(OARepoGenericActionMixin, actions.SubmitAction):
+    name = _("Submit")
     """"""
 
 
 class OARepoDeclineAction(OARepoGenericActionMixin, actions.DeclineAction):
+    name = _("Decline")
     """"""
 
 
 class OARepoAcceptAction(OARepoGenericActionMixin, actions.AcceptAction):
+    name = _("Accept")
     """"""
 
 
