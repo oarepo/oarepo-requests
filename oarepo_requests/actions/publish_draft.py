@@ -11,6 +11,8 @@ from .generic import (
     OARepoSubmitAction,
     update_topic,
 )
+from .cascade_events import update_topic
+from .generic import AddTopicLinksOnPayloadMixin, OARepoAcceptAction, OARepoSubmitAction
 
 
 class PublishDraftSubmitAction(OARepoSubmitAction):
