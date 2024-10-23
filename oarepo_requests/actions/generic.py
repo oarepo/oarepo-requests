@@ -1,8 +1,6 @@
 from functools import cached_property
 
 from invenio_requests.customizations import actions
-from invenio_requests.records.api import Request
-from invenio_requests.resolvers.registry import ResolverRegistry
 from oarepo_runtime.i18n import lazy_gettext as _
 
 from oarepo_requests.proxies import current_oarepo_requests

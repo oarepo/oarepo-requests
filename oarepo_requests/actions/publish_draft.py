@@ -4,15 +4,13 @@ from marshmallow import ValidationError
 from oarepo_runtime.datastreams.utils import get_record_service_for_record
 from oarepo_runtime.i18n import lazy_gettext as _
 
+from .cascade_events import update_topic
 from .generic import (
     AddTopicLinksOnPayloadMixin,
     OARepoAcceptAction,
     OARepoDeclineAction,
     OARepoSubmitAction,
-    update_topic,
 )
-from .cascade_events import update_topic
-from .generic import AddTopicLinksOnPayloadMixin, OARepoAcceptAction, OARepoSubmitAction
 
 
 class PublishDraftSubmitAction(OARepoSubmitAction):
