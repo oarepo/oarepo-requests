@@ -10,6 +10,4 @@ class DeleteDraftAcceptAction(OARepoAcceptAction):
         if not topic_service:
             raise KeyError(f"topic {topic} service not found")
         topic_service.delete_draft(identity, topic["id"], uow=uow, *args, **kwargs)
-        cancel_requests_on_topic_delete(
-            self.request, topic, uow
-        )
+        cancel_requests_on_topic_delete(self.request, topic, uow)
