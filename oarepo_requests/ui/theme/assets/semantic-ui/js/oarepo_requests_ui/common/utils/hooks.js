@@ -203,28 +203,26 @@ export const useAction = ({
       onError: (e, variables) => {
         if (onActionError) {
           onActionError(e, variables, formik, modalControl);
+        } else if (e?.response?.data?.errors) {
+          formik?.setFieldError(
+            "api",
+            i18next.t(
+              "The request could not be created due to validation errors. Please correct the errors and try again."
+            )
+          );
+          setTimeout(() => {
+            modalControl?.closeModal();
+          }, 2500);
         } else {
-          if (e?.response?.data?.errors) {
-            formik?.setFieldError(
-              "api",
-              i18next.t(
-                "The request could not be created due to validation errors. Please correct the errors and try again."
-              )
-            );
-            setTimeout(() => {
-              modalControl?.closeModal();
-            }, 2500);
-          } else {
-            formik?.setFieldError(
-              "api",
-              i18next.t(
-                "The action could not be executed. Please try again in a moment."
-              )
-            );
-            setTimeout(() => {
-              modalControl?.closeModal();
-            }, 2500);
-          }
+          formik?.setFieldError(
+            "api",
+            i18next.t(
+              "The action could not be executed. Please try again in a moment."
+            )
+          );
+          setTimeout(() => {
+            modalControl?.closeModal();
+          }, 2500);
         }
       },
       onSuccess: (data, variables) => {

@@ -244,10 +244,10 @@ msgid "Your comment here..."
 msgstr "Váš komentář..."
 
 msgid "Comment was not created successfully."
-msgstr "Komnetář nebyl úspěšně vytvořen."
+msgstr "Komentář nebyl úspěšně vytvořen."
 
 msgid "Comment"
-msgstr "Komnetář"
+msgstr "Komentář"
 
 msgid "Error while submitting the comment"
 msgstr "Chyba při odesílání komentáře"

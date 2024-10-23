@@ -6,7 +6,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 
 const recordRequestsAppDiv = document.getElementById("request-detail");
 
-let request = recordRequestsAppDiv.dataset?.request
+const request = recordRequestsAppDiv.dataset?.request
   ? JSON.parse(recordRequestsAppDiv.dataset.request)
   : {};
 const formConfig = recordRequestsAppDiv.dataset?.formConfig
