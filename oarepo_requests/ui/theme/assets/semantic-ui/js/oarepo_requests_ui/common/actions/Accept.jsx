@@ -1,50 +1,25 @@
 import React from "react";
 import { i18next } from "@translations/oarepo_requests_ui/i18next";
-import { Button, Icon } from "semantic-ui-react";
 import PropTypes from "prop-types";
-import { useFormikContext } from "formik";
-import {
-  useConfirmModalContext,
-  useModalControlContext,
-  useAction,
-  accept,
-  REQUEST_TYPE,
-} from "@js/oarepo_requests_common";
+import { accept, REQUEST_TYPE } from "@js/oarepo_requests_common";
+import { RequestActionButton } from "./RequestActionButton";
 
 const Accept = ({ request, extraData, isMutating }) => {
-  const formik = useFormikContext();
-  const { confirmAction } = useConfirmModalContext();
-  const modalControl = useModalControlContext();
-  const { isLoading, mutate: acceptRequest } = useAction({
-    action: accept,
-    requestOrRequestType: request,
-    formik,
-    modalControl,
-  });
-  const handleClick = () => {
-    if (extraData?.dangerous) {
-      confirmAction(() => acceptRequest(), REQUEST_TYPE.ACCEPT, extraData);
-    } else {
-      acceptRequest();
-    }
-  };
-
   return (
-    <Button
+    <RequestActionButton
       title={i18next.t("Accept request")}
-      onClick={() => handleClick()}
       className="requests request-accept-button"
       positive={!extraData?.dangerous}
       negative={extraData?.dangerous}
-      icon
-      labelPosition="left"
       floated="right"
-      loading={isLoading}
-      disabled={isMutating > 0}
-    >
-      <Icon name="check" />
-      {request?.name || i18next.t("Accept")}
-    </Button>
+      iconName="check"
+      isMutating={isMutating}
+      action={accept}
+      extraData={extraData}
+      requestOrRequestType={request}
+      buttonLabel={request.name || i18next.t("Accept")}
+      requestActionName={REQUEST_TYPE.ACCEPT}
+    />
   );
 };
 

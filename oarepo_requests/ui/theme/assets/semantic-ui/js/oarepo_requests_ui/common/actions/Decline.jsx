@@ -1,47 +1,25 @@
 import React from "react";
 import { i18next } from "@translations/oarepo_requests_ui/i18next";
-import { Button, Icon } from "semantic-ui-react";
 import PropTypes from "prop-types";
-import { useFormikContext } from "formik";
-import {
-  useConfirmModalContext,
-  useModalControlContext,
-  useAction,
-  decline,
-  REQUEST_TYPE,
-} from "@js/oarepo_requests_common";
+import { decline, REQUEST_TYPE } from "@js/oarepo_requests_common";
+import { RequestActionButton } from "./RequestActionButton";
 
 const Decline = ({ request, extraData, isMutating }) => {
-  const formik = useFormikContext();
-  const { confirmAction } = useConfirmModalContext();
-  const modalControl = useModalControlContext();
-
-  const { isLoading, mutate: declineRequest } = useAction({
-    action: decline,
-    requestOrRequestType: request,
-    formik,
-    confirmAction,
-    modalControl,
-  });
-
-  const handleClick = () => {
-    confirmAction(() => declineRequest(), REQUEST_TYPE.DECLINE, extraData);
-  };
   return (
-    <Button
+    <RequestActionButton
       title={i18next.t("Decline request")}
-      onClick={() => handleClick()}
-      negative
       className="requests request-decline-button"
-      icon
-      labelPosition="left"
+      negative
       floated="left"
-      loading={isLoading}
-      disabled={isMutating > 0}
-    >
-      <Icon name="cancel" />
-      {i18next.t("Decline")}
-    </Button>
+      iconName="cancel"
+      isMutating={isMutating}
+      action={decline}
+      extraData={extraData}
+      requestOrRequestType={request}
+      buttonLabel={i18next.t("Decline")}
+      requireConfirmation={true}
+      requestActionName={REQUEST_TYPE.DECLINE}
+    />
   );
 };
 

@@ -4,7 +4,6 @@ import Decline from "./Decline";
 import Cancel from "./Cancel";
 import Create from "./Create";
 import Submit from "./Submit";
-import Save from "./Save";
 import CreateAndSubmit from "./CreateAndSubmit";
 import CreateSubmitAction from "./CreateSubmitAction";
 
@@ -39,7 +38,7 @@ export const mapLinksToActions = (
         if (customFields?.ui && hasLongForm) {
           actionComponents.push({
             name: REQUEST_TYPE.SAVE,
-            component: Save,
+            component: Create,
           });
         }
         actionComponents.push({
@@ -55,7 +54,7 @@ export const mapLinksToActions = (
         if (customFields?.ui) {
           actionComponents.push({
             name: REQUEST_TYPE.SAVE,
-            component: Save,
+            component: Create,
           });
         }
         break;
@@ -66,13 +65,4 @@ export const mapLinksToActions = (
   return actionComponents;
 };
 
-export {
-  Accept,
-  Decline,
-  Cancel,
-  Create,
-  Submit,
-  Save,
-  CreateAndSubmit,
-  CreateSubmitAction,
-};
+export { CreateSubmitAction };
