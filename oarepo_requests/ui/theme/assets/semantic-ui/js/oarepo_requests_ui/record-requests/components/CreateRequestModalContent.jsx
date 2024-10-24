@@ -1,71 +1,38 @@
 import React from "react";
 import PropTypes from "prop-types";
-
-import { Segment, Form, Divider } from "semantic-ui-react";
-import { useFormikContext } from "formik";
-
-import _isEmpty from "lodash/isEmpty";
+import { Form, Divider } from "semantic-ui-react";
 import { CustomFields } from "react-invenio-forms";
 
-import { REQUEST_TYPE } from "../utils/objects";
-import { useRequestsApi } from "../utils/hooks";
-
-/** 
- * @typedef {import("../types").RequestType} RequestType
+/**
+ * @typedef {import("../../record-requests/types").RequestType} RequestType
  * @typedef {import("formik").FormikConfig} FormikConfig
  */
 
 /** @param {{ requestType: RequestType, customSubmitHandler: (e) => void }} props */
-export const CreateRequestModalContent = ({ requestType, onCompletedAction }) => {  
-  const { doAction, doCreateAndSubmitAction } = useRequestsApi(requestType, onCompletedAction);
-  const { submitForm, setErrors, setSubmitting } = useFormikContext();
-
-  const payloadUI = requestType?.payload_ui;
-
-  const onFormSubmit = async (event) => {
-    event.preventDefault();
-    const submitButtonName = event?.nativeEvent?.submitter?.name;
-    try {
-      await submitForm();
-      if (submitButtonName === "create-and-submit-request") {
-        doCreateAndSubmitAction(!_isEmpty(payloadUI));
-        return;
-      }
-      doAction(REQUEST_TYPE.CREATE);
-    } catch (error) {
-      setErrors({ api: error });
-    } finally {
-      setSubmitting(false);
-    }
-  };
-
+export const CreateRequestModalContent = ({ requestType, customFields }) => {
+  const description =
+    requestType?.stateful_description || requestType?.description;
   return (
     <>
-      {requestType?.description &&
-        <p id="request-modal-desc">
-          {requestType.description}
-        </p>
-      }
-      {payloadUI &&
-        <Form onSubmit={onFormSubmit} id="request-form">
-          <Segment basic>
-            <CustomFields
-              config={payloadUI}
-              templateLoaders={[
-                (widget) => import(`@templates/custom_fields/${widget}.js`),
-                (widget) => import(`react-invenio-forms`)
-              ]}
-              fieldPathPrefix="payload"
-            />
-            <Divider hidden />
-          </Segment>
+      {description && <p id="request-modal-desc">{description}</p>}
+      {customFields?.ui && (
+        <Form id="request-form">
+          <CustomFields
+            config={customFields?.ui}
+            templateLoaders={[
+              (widget) => import(`@templates/custom_fields/${widget}.js`),
+              () => import(`react-invenio-forms`),
+            ]}
+            fieldPathPrefix="payload"
+          />
+          <Divider hidden />
         </Form>
-      }
+      )}
     </>
   );
-}
+};
 
 CreateRequestModalContent.propTypes = {
   requestType: PropTypes.object.isRequired,
-  extraPreSubmitEvent: PropTypes.func
+  customFields: PropTypes.object,
 };
