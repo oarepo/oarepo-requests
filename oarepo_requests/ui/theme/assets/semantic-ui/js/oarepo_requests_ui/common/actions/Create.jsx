@@ -18,6 +18,7 @@ const Create = ({ requestType, extraData, isMutating }) => {
       requestOrRequestType={requestType}
       buttonLabel={i18next.t("Save")}
       requestActionName={REQUEST_TYPE.CREATE}
+      requireConfirmation={extraData?.dangerous}
     />
   );
 };

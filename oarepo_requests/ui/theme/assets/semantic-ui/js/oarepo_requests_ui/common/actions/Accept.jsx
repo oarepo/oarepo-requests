@@ -19,6 +19,7 @@ const Accept = ({ request, extraData, isMutating }) => {
       requestOrRequestType={request}
       buttonLabel={request.name || i18next.t("Accept")}
       requestActionName={REQUEST_TYPE.ACCEPT}
+      requireConfirmation={extraData?.dangerous}
     />
   );
 };

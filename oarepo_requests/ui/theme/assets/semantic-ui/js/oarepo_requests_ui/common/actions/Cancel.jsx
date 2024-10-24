@@ -18,6 +18,7 @@ const Cancel = ({ request, isMutating, extraData }) => {
       requestOrRequestType={request}
       buttonLabel={i18next.t("Cancel")}
       requestActionName={REQUEST_TYPE.CANCEL}
+      requireConfirmation={false}
     />
   );
 };

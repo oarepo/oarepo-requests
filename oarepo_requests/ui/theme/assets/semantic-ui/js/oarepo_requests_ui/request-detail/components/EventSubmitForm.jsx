@@ -1,4 +1,4 @@
-import React, { useRef, useEffect } from "react";
+import React, { useEffect } from "react";
 import PropTypes from "prop-types";
 import { i18next } from "@translations/oarepo_requests_ui/i18next";
 import { Button, Message, Form } from "semantic-ui-react";
@@ -31,7 +31,6 @@ export const EventSubmitForm = ({
   });
 
   const { resetForm, values, setFieldError } = formik;
-  const editorRef = useRef(null);
   const queryClient = useQueryClient();
 
   const { mutate, isError, isLoading, reset } = useMutation(
@@ -63,7 +62,6 @@ export const EventSubmitForm = ({
           );
         }
         setTimeout(() => refetch(), 1000);
-        editorRef.current.setContent("");
         resetForm();
       },
       onError: (error) => {
@@ -88,7 +86,7 @@ export const EventSubmitForm = ({
   return (
     <FormikProvider value={formik}>
       <Form className="ui form">
-        <RequestCommentInput editorRef={editorRef} />
+        <RequestCommentInput />
         {isError && (
           <Message negative>
             <Message.Header>

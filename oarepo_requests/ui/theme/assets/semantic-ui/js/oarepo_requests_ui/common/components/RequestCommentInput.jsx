@@ -6,7 +6,7 @@ import { useFormikContext } from "formik";
 import sanitizeHtml from "sanitize-html";
 import PropTypes from "prop-types";
 
-export const RequestCommentInput = ({ fieldPath, label, editorRef }) => {
+export const RequestCommentInput = ({ fieldPath, label }) => {
   const { values, setFieldValue, setFieldTouched } = useFormikContext();
   return (
     <FormField>
@@ -23,7 +23,6 @@ export const RequestCommentInput = ({ fieldPath, label, editorRef }) => {
             inputValue={() => values?.payload?.content}
             optimized
             editorConfig={{ auto_focus: true, min_height: 130 }}
-            onFocus={(event, editor) => (editorRef.current = editor)}
             onBlur={(event, editor) => {
               const cleanedContent = sanitizeHtml(editor.getContent());
               setFieldValue(fieldPath, cleanedContent);
@@ -39,7 +38,6 @@ export const RequestCommentInput = ({ fieldPath, label, editorRef }) => {
 RequestCommentInput.propTypes = {
   fieldPath: PropTypes.string,
   label: PropTypes.string,
-  editorRef: PropTypes.object,
 };
 
 RequestCommentInput.defaultProps = {

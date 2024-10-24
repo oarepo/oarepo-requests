@@ -29,7 +29,7 @@ export const RequestActionButton = ({
     modalControl,
   });
   const handleClick = () => {
-    if (requireConfirmation || extraData?.dangerous) {
+    if (requireConfirmation) {
       confirmAction(() => requestAction(), requestActionName, extraData);
     } else {
       requestAction();
@@ -62,10 +62,6 @@ RequestActionButton.propTypes = {
   buttonLabel: PropTypes.string,
   requireConfirmation: PropTypes.bool,
   requestActionName: PropTypes.string,
-};
-
-RequestActionButton.defaultProps = {
-  requireConfirmation: false,
 };
 
 export default RequestActionButton;

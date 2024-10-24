@@ -18,6 +18,7 @@ const CreateAndSubmit = ({ requestType, extraData, isMutating }) => {
       requestOrRequestType={requestType}
       buttonLabel={i18next.t("Submit")}
       requestActionName={REQUEST_TYPE.SUBMIT}
+      requireConfirmation={extraData?.dangerous}
     />
   );
 };
