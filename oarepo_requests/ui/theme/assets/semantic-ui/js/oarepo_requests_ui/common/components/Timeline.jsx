@@ -84,5 +84,5 @@ Timeline.propTypes = {
 };
 
 Timeline.defaultProps = {
-  timelinePageSize: 10,
+  timelinePageSize: 25,
 };
