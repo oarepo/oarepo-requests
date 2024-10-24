@@ -19,7 +19,6 @@ const Accept = ({ request, extraData, isMutating }) => {
     action: accept,
     requestOrRequestType: request,
     formik,
-    confirmAction,
     modalControl,
   });
   const handleClick = () => {

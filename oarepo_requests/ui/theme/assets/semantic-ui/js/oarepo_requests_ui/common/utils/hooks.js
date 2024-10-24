@@ -1,12 +1,14 @@
 import React, { useState, useCallback } from "react";
 import { i18next } from "@translations/oarepo_requests_ui/i18next";
-import { Button, Message, Icon } from "semantic-ui-react";
+import { Message, Icon } from "semantic-ui-react";
 import { useMutation } from "@tanstack/react-query";
 import {
   useCallbackContext,
   REQUEST_TYPE,
   WarningMessage,
   RequestCommentInput,
+  ConfirmationModalCancelButton,
+  ConfirmationModalConfirmButton,
 } from "@js/oarepo_requests_common";
 import { useFormikContext } from "formik";
 
@@ -14,21 +16,6 @@ import { useFormikContext } from "formik";
  * @typedef {import("semantic-ui-react").ConfirmProps} ConfirmProps
  */
 
-const ConfirmationModalConfirmButton = (uiProps) => (
-  <Button
-    className="requests confirmation-modal-confirm-button"
-    content={i18next.t("OK")}
-    {...uiProps}
-  />
-);
-
-const ConfirmationModalCancelButton = (uiProps) => (
-  <Button
-    content={i18next.t("Cancel")}
-    className="requests confirmation-modal-cancel-button"
-    {...uiProps}
-  />
-);
 export const useConfirmDialog = (requestOrRequestType) => {
   /** @type {[ConfirmProps, (props: ConfirmProps) => void]} */
   const formik = useFormikContext();
