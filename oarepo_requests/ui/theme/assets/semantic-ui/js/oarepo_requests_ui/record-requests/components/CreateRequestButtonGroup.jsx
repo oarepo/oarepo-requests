@@ -23,119 +23,113 @@ export const CreateRequestButtonGroup = ({
     (requestType) => requestType.links.actions?.create
   );
   const isMutating = useIsMutating();
+
+  let content;
+
   if (applicableRequestsLoading) {
-    return (
-      <div className="requests-create-request-buttons borderless">
-        <Placeholder>
-          {Array.from({ length: 2 }).map((_, index) => (
-            <Placeholder.Paragraph key={index}>
-              <Placeholder.Line length="full" />
-              <Placeholder.Line length="medium" />
-            </Placeholder.Paragraph>
-          ))}
-        </Placeholder>
-      </div>
+    content = (
+      <Placeholder>
+        {Array.from({ length: 2 }).map((_, index) => (
+          <Placeholder.Paragraph key={index}>
+            <Placeholder.Line length="full" />
+            <Placeholder.Line length="medium" />
+          </Placeholder.Paragraph>
+        ))}
+      </Placeholder>
     );
-  }
-
-  if (applicableRequestsLoadingError) {
-    return (
-      <div className="requests-create-request-buttons borderless">
-        <Message negative className="rel-mb-1">
-          <Message.Header>
-            {i18next.t("Error loading request types")}
-          </Message.Header>
-        </Message>
-      </div>
+  } else if (applicableRequestsLoadingError) {
+    content = (
+      <Message negative className="rel-mb-1">
+        <Message.Header>
+          {i18next.t("Error loading request types")}
+        </Message.Header>
+      </Message>
     );
-  }
+  } else if (_isEmpty(createRequests)) {
+    return null; // No need to render anything if there are no requests
+  } else {
+    content = createRequests.map((requestType) => {
+      const { dangerous, has_form: hasForm } = requestType;
+      const needsDialog = dangerous || hasForm;
+      const header =
+        requestType.stateful_name || requestType.name || requestType.type_id;
+      const buttonIconProps = requestButtonsIconsConfig[requestType.type_id];
 
-  if (_isEmpty(createRequests)) {
-    return null;
+      if (!hasForm && dangerous) {
+        return (
+          <ConfirmModalContextProvider
+            key={requestType.type_id}
+            requestOrRequestType={requestType}
+          >
+            {({ confirmDialogProps }) => (
+              <>
+                <CreateSubmitAction
+                  requestType={requestType}
+                  requireConfirmation={dangerous}
+                  isMutating={isMutating}
+                />
+                <Confirm
+                  {...confirmDialogProps}
+                  className="requests dangerous-action-confirmation-modal"
+                />
+              </>
+            )}
+          </ConfirmModalContextProvider>
+        );
+      }
+
+      if (!hasForm && !dangerous) {
+        return (
+          <ConfirmModalContextProvider
+            key={requestType.type_id}
+            requestOrRequestType={requestType}
+          >
+            {({ confirmDialogProps }) => (
+              <>
+                <CreateSubmitAction
+                  key={requestType.type_id}
+                  requestType={requestType}
+                  requireConfirmation={false}
+                  isMutating={isMutating}
+                />
+                <Confirm
+                  {...confirmDialogProps}
+                  className="requests dangerous-action-confirmation-modal"
+                />
+              </>
+            )}
+          </ConfirmModalContextProvider>
+        );
+      }
+
+      if (needsDialog) {
+        return (
+          <RequestModal
+            key={requestType.type_id}
+            requestType={requestType}
+            header={header}
+            requestCreationModal
+            trigger={
+              <Button
+                className={`requests request-create-button ${requestType.type_id}`}
+                fluid
+                title={header}
+                content={header}
+                disabled={isMutating > 0}
+                {...buttonIconProps}
+              />
+            }
+            ContentComponent={CreateRequestModalContent}
+          />
+        );
+      }
+
+      return null;
+    });
   }
 
   return (
-    <div className="requests-create-request-buttons borderless">
-      {createRequests.map((requestType) => {
-        const { dangerous, has_form: hasForm } = requestType;
-        const needsDialog = dangerous || hasForm;
-        const header =
-          requestType?.stateful_name ||
-          requestType?.name ||
-          requestType?.type_id;
-        const buttonIconProps = requestButtonsIconsConfig[requestType.type_id];
-
-        if (!hasForm && dangerous) {
-          return (
-            <ConfirmModalContextProvider
-              key={requestType?.type_id}
-              requestOrRequestType={requestType}
-            >
-              {({ confirmDialogProps }) => (
-                <React.Fragment>
-                  <CreateSubmitAction
-                    requestType={requestType}
-                    requireConfirmation={dangerous}
-                    isMutating={isMutating}
-                  />
-                  <Confirm
-                    {...confirmDialogProps}
-                    className="requests dangerous-action-confirmation-modal"
-                  />
-                </React.Fragment>
-              )}
-            </ConfirmModalContextProvider>
-          );
-        }
-        if (!hasForm && !dangerous) {
-          return (
-            <ConfirmModalContextProvider
-              key={requestType?.type_id}
-              requestOrRequestType={requestType}
-            >
-              {({ confirmDialogProps }) => (
-                <React.Fragment>
-                  <CreateSubmitAction
-                    key={requestType?.type_id}
-                    requestType={requestType}
-                    requireConfirmation={false}
-                    isMutating={isMutating}
-                  />
-                  <Confirm
-                    {...confirmDialogProps}
-                    className="requests dangerous-action-confirmation-modal"
-                  />
-                </React.Fragment>
-              )}
-            </ConfirmModalContextProvider>
-          );
-        }
-
-        if (needsDialog) {
-          return (
-            <RequestModal
-              key={requestType.type_id}
-              requestType={requestType}
-              header={header}
-              requestCreationModal
-              trigger={
-                <Button
-                  className={`requests request-create-button ${requestType?.type_id}`}
-                  fluid
-                  title={header}
-                  content={header}
-                  disabled={isMutating > 0}
-                  {...buttonIconProps}
-                />
-              }
-              ContentComponent={CreateRequestModalContent}
-            />
-          );
-        }
-
-        return null;
-      })}
-    </div>
+    <div className="requests-create-request-buttons borderless">{content}</div>
   );
 };
 
