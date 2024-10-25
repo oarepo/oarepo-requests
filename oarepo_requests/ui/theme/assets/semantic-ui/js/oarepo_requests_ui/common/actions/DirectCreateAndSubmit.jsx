@@ -11,7 +11,7 @@ import {
 import { i18next } from "@translations/oarepo_requests_ui/i18next";
 
 // Directly create and submit request without modal
-const CreateSubmitAction = ({
+const DirectCreateAndSubmit = ({
   requestType,
   requireConfirmation,
   isMutating,
@@ -79,10 +79,10 @@ const CreateSubmitAction = ({
   );
 };
 
-CreateSubmitAction.propTypes = {
+DirectCreateAndSubmit.propTypes = {
   requestType: PropTypes.object,
   requireConfirmation: PropTypes.bool,
   isMutating: PropTypes.number,
 };
 
-export default CreateSubmitAction;
+export default DirectCreateAndSubmit;

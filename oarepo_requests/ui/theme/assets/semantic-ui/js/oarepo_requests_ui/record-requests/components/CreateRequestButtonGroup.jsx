@@ -5,7 +5,7 @@ import _isEmpty from "lodash/isEmpty";
 import { RequestModal, CreateRequestModalContent } from ".";
 import {
   useRequestContext,
-  CreateSubmitAction,
+  DirectCreateAndSubmit,
   ConfirmModalContextProvider,
 } from "@js/oarepo_requests_common";
 import PropTypes from "prop-types";
@@ -63,7 +63,7 @@ export const CreateRequestButtonGroup = ({
           >
             {({ confirmDialogProps }) => (
               <>
-                <CreateSubmitAction
+                <DirectCreateAndSubmit
                   requestType={requestType}
                   requireConfirmation={dangerous}
                   isMutating={isMutating}
@@ -86,7 +86,7 @@ export const CreateRequestButtonGroup = ({
           >
             {({ confirmDialogProps }) => (
               <>
-                <CreateSubmitAction
+                <DirectCreateAndSubmit
                   key={requestType.type_id}
                   requestType={requestType}
                   requireConfirmation={false}

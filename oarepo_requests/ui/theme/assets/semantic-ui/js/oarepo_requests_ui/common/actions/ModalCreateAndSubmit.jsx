@@ -5,7 +5,7 @@ import { saveAndSubmit, REQUEST_TYPE } from "@js/oarepo_requests_common";
 import { RequestActionButton } from "./RequestActionButton";
 
 // used inside of the modal to create and submit request
-const CreateAndSubmit = ({ requestType, extraData, isMutating }) => {
+const ModalCreateAndSubmit = ({ requestType, extraData, isMutating }) => {
   return (
     <RequestActionButton
       title={i18next.t("Submit request")}
@@ -24,10 +24,10 @@ const CreateAndSubmit = ({ requestType, extraData, isMutating }) => {
   );
 };
 
-CreateAndSubmit.propTypes = {
+ModalCreateAndSubmit.propTypes = {
   requestType: PropTypes.object,
   extraData: PropTypes.object,
   isMutating: PropTypes.number,
 };
 
-export default CreateAndSubmit;
+export default ModalCreateAndSubmit;

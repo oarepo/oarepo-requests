@@ -4,8 +4,8 @@ import Decline from "./Decline";
 import Cancel from "./Cancel";
 import Create from "./Create";
 import Submit from "./Submit";
-import CreateAndSubmit from "./CreateAndSubmit";
-import CreateSubmitAction from "./CreateSubmitAction";
+import ModalCreateAndSubmit from "./ModalCreateAndSubmit";
+import DirectCreateAndSubmit from "./DirectCreateAndSubmit";
 
 export const mapLinksToActions = (
   requestOrRequestType,
@@ -43,7 +43,7 @@ export const mapLinksToActions = (
         }
         actionComponents.push({
           name: REQUEST_TYPE.SUBMIT,
-          component: CreateAndSubmit,
+          component: ModalCreateAndSubmit,
         });
         break;
       case REQUEST_TYPE.SUBMIT:
@@ -65,4 +65,4 @@ export const mapLinksToActions = (
   return actionComponents;
 };
 
-export { CreateSubmitAction };
+export { DirectCreateAndSubmit };
