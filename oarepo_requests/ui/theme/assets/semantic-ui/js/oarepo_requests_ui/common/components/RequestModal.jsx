@@ -10,7 +10,6 @@ import {
 } from "@js/oarepo_requests_common";
 import PropTypes from "prop-types";
 import { useIsMutating } from "@tanstack/react-query";
-// TODO: remove when /configs starts using vnd zenodo accept header
 
 /**
  * @typedef {import("../../record-requests/types").Request} Request
