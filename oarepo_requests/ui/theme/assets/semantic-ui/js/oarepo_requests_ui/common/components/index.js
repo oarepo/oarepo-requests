@@ -9,3 +9,4 @@ export * from "./SideRequestInfo";
 export * from "./Timeline";
 export * from "./ConfirmationModalCancelButton";
 export * from "./ConfirmationModalConfirmButton";
+export * from "./RequestModalContentAndActions";

@@ -1,26 +1,16 @@
 import React from "react";
 import { useConfirmationModal } from "@js/oarepo_ui";
-import { i18next } from "@translations/oarepo_requests_ui/i18next";
-import {
-  Dimmer,
-  Loader,
-  Modal,
-  Button,
-  Icon,
-  Confirm,
-  Message,
-} from "semantic-ui-react";
-import { useFormik, FormikProvider, useFormikContext } from "formik";
+import { Dimmer, Loader, Modal, Button, Confirm } from "semantic-ui-react";
+import { useFormik, FormikProvider } from "formik";
 import _isEmpty from "lodash/isEmpty";
 import {
   ModalControlContextProvider,
-  mapLinksToActions,
   ConfirmModalContextProvider,
+  RequestModalContentAndActions,
 } from "@js/oarepo_requests_common";
 import PropTypes from "prop-types";
-import { useQuery, useIsMutating } from "@tanstack/react-query";
+import { useIsMutating } from "@tanstack/react-query";
 // TODO: remove when /configs starts using vnd zenodo accept header
-import { http } from "react-invenio-forms";
 
 /**
  * @typedef {import("../../record-requests/types").Request} Request
@@ -116,92 +106,4 @@ RequestModal.propTypes = {
   trigger: PropTypes.element,
   ContentComponent: PropTypes.func,
   requestCreationModal: PropTypes.bool,
-};
-
-const RequestModalContentAndActions = ({
-  request,
-  requestType,
-  onSubmit,
-  ContentComponent,
-  requestCreationModal,
-  onClose,
-}) => {
-  const { errors } = useFormikContext();
-  const error = errors?.api;
-
-  const {
-    data,
-    error: customFieldsLoadingError,
-    isLoading,
-  } = useQuery(
-    ["applicableCustomFields", requestType?.type_id || request?.type],
-    () =>
-      http.get(`/requests/configs/${requestType?.type_id || request?.type}`),
-    {
-      enabled: !!(requestType?.type_id || request?.type),
-      refetchOnWindowFocus: false,
-      staleTime: Infinity,
-    }
-  );
-  const customFields = data?.data?.custom_fields;
-  const requestTypeProperties = data?.data?.request_type_properties;
-  const isMutating = useIsMutating();
-  const modalActions = mapLinksToActions(
-    requestCreationModal ? requestType : request,
-    customFields,
-    requestTypeProperties
-  );
-
-  return (
-    <React.Fragment>
-      <Dimmer active={isLoading}>
-        <Loader inverted />
-      </Dimmer>
-      <Modal.Content>
-        {error && (
-          <Message negative>
-            <Message.Header>{error}</Message.Header>
-          </Message>
-        )}
-        {customFieldsLoadingError && (
-          <Message negative>
-            <Message.Header>
-              {i18next.t("Form fields could not be fetched.")}
-            </Message.Header>
-          </Message>
-        )}
-        <ContentComponent
-          request={request}
-          requestType={requestType}
-          onCompletedAction={onSubmit}
-          customFields={customFields}
-          modalActions={modalActions}
-        />
-      </Modal.Content>
-      <Modal.Actions>
-        {modalActions.map(({ name, component: ActionComponent }) => (
-          <ActionComponent
-            key={name}
-            request={request}
-            requestType={requestType}
-            extraData={requestTypeProperties}
-            isMutating={isMutating}
-          />
-        ))}
-        <Button onClick={onClose} icon labelPosition="left">
-          <Icon name="cancel" />
-          {i18next.t("Close")}
-        </Button>
-      </Modal.Actions>
-    </React.Fragment>
-  );
-};
-
-RequestModalContentAndActions.propTypes = {
-  request: PropTypes.object,
-  requestType: PropTypes.object,
-  ContentComponent: PropTypes.func,
-  requestCreationModal: PropTypes.bool,
-  onSubmit: PropTypes.func,
-  onClose: PropTypes.func,
 };
