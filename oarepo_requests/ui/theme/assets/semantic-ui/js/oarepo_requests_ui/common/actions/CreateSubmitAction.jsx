@@ -17,7 +17,7 @@ const CreateSubmitAction = ({
   isMutating,
 }) => {
   const { confirmAction } = useConfirmModalContext();
-  const { has_form:hasForm, dangerous, editable } = requestType;
+  const { has_form: hasForm, dangerous, editable } = requestType;
   const {
     isLoading,
     mutate: createAndSubmit,
@@ -28,7 +28,6 @@ const CreateSubmitAction = ({
     requestOrRequestType: requestType,
     confirmAction,
   });
-  // const isMutating = useIsMutating();
   const { requestButtonsIconsConfig } = useRequestContext();
   const buttonIconProps = requestButtonsIconsConfig[requestType.type_id];
   const buttonContent =

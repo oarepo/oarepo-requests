@@ -4,6 +4,7 @@ import PropTypes from "prop-types";
 import { saveAndSubmit, REQUEST_TYPE } from "@js/oarepo_requests_common";
 import { RequestActionButton } from "./RequestActionButton";
 
+// used inside of the modal to create and submit request
 const CreateAndSubmit = ({ requestType, extraData, isMutating }) => {
   return (
     <RequestActionButton

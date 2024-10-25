@@ -16,8 +16,85 @@ import { useFormikContext } from "formik";
  * @typedef {import("semantic-ui-react").ConfirmProps} ConfirmProps
  */
 
+const createConfirmDialogProps = (requestOrRequestType) => ({
+  header: `${i18next.t("Create request")} (${requestOrRequestType.name})`,
+  confirmButton: (
+    <ConfirmationModalConfirmButton negative content={i18next.t("Proceed")} />
+  ),
+  content: (
+    <WarningMessage
+      message={i18next.t(
+        "Are you sure you wish to proceed? After this request is accepted, it will not be possible to reverse the action."
+      )}
+    />
+  ),
+});
+
+const submitConfirmDialogProps = (requestOrRequestType) => ({
+  header: `${i18next.t("Submit request")} (${requestOrRequestType.name})`,
+  confirmButton: (
+    <ConfirmationModalConfirmButton negative content={i18next.t("Proceed")} />
+  ),
+  content: (
+    <WarningMessage
+      message={i18next.t(
+        "Are you sure you wish to proceed? After this request is accepted, it will not be possible to reverse the action."
+      )}
+    />
+  ),
+});
+
+const cancelConfirmDialogProps = (requestOrRequestType) => ({
+  header: `${i18next.t("Cancel request")} (${requestOrRequestType.name})`,
+  confirmButton: (
+    <ConfirmationModalConfirmButton
+      content={i18next.t("Cancel request")}
+      negative
+    />
+  ),
+});
+
+const acceptConfirmDialogProps = (requestOrRequestType, dangerous) => ({
+  header: `${i18next.t("Accept request")} (${requestOrRequestType.name})`,
+  confirmButton: (
+    <ConfirmationModalConfirmButton
+      positive={!dangerous}
+      negative={dangerous}
+      content={i18next.t("Accept")}
+    />
+  ),
+  content: dangerous && (
+    <WarningMessage
+      message={i18next.t(
+        "This action is irreversible. Are you sure you wish to accept this request?"
+      )}
+    />
+  ),
+});
+
+const declineConfirmDialogProps = (requestOrRequestType) => ({
+  header: `${i18next.t("Decline request")} (${requestOrRequestType.name})`,
+  confirmButton: (
+    <ConfirmationModalConfirmButton content={i18next.t("Decline")} negative />
+  ),
+  content: (
+    <div className="content">
+      <RequestCommentInput
+        label={`${i18next.t("Add comment")} (${i18next.t("optional")})`}
+      />
+      <Message>
+        <Icon name="info circle" className="text size large" />
+        <span>
+          {i18next.t(
+            "It is highly recommended to provide an explanation for the rejection of the request. Note that it is always possible to provide explanation later on the request timeline."
+          )}
+        </span>
+      </Message>
+    </div>
+  ),
+});
+
 export const useConfirmDialog = (requestOrRequestType) => {
-  /** @type {[ConfirmProps, (props: ConfirmProps) => void]} */
   const formik = useFormikContext();
   const [confirmDialogProps, setConfirmDialogProps] = useState({
     open: false,
@@ -33,12 +110,9 @@ export const useConfirmDialog = (requestOrRequestType) => {
   const confirmAction = useCallback(
     (onConfirm, requestActionType, extraData) => {
       const dangerous = extraData?.dangerous;
-      /** @type {ConfirmProps} */
-      let newConfirmDialogProps = {
+
+      const baseConfirmDialogProps = {
         open: true,
-        header: `${i18next.t("Are you sure you wish to")} ${
-          requestOrRequestType.name
-        }`,
         content: dangerous ? <WarningMessage /> : i18next.t("Are you sure?"),
         onConfirm: () => {
           setConfirmDialogProps((props) => ({ ...props, open: false }));
@@ -49,116 +123,35 @@ export const useConfirmDialog = (requestOrRequestType) => {
           formik?.resetForm();
         },
       };
+
+      let caseSpecificProps = {};
       switch (requestActionType) {
         case REQUEST_TYPE.CREATE:
-          newConfirmDialogProps.header = `${i18next.t("Create request")} (${
-            requestOrRequestType.name
-          })`;
-
-          if (dangerous) {
-            newConfirmDialogProps.confirmButton = (
-              <ConfirmationModalConfirmButton
-                negative
-                content={i18next.t("Proceed")}
-              />
-            );
-            newConfirmDialogProps.content = (
-              <WarningMessage
-                message={i18next.t(
-                  "Are you sure you wish to proceed? After this request is accepted, it will not be possible to reverse the action."
-                )}
-              />
-            );
-          }
-
+          caseSpecificProps = createConfirmDialogProps(requestOrRequestType);
           break;
         case REQUEST_TYPE.SUBMIT:
-          newConfirmDialogProps.header = `${i18next.t("Submit request")} (${
-            requestOrRequestType.name
-          })`;
-
-          if (dangerous) {
-            newConfirmDialogProps.confirmButton = (
-              <ConfirmationModalConfirmButton
-                negative
-                content={i18next.t("Proceed")}
-              />
-            );
-            newConfirmDialogProps.content = (
-              <WarningMessage
-                message={i18next.t(
-                  "Are you sure you wish to proceed? After this request is accepted, it will not be possible to reverse the action."
-                )}
-              />
-            );
-          }
+          caseSpecificProps = submitConfirmDialogProps(requestOrRequestType);
           break;
         case REQUEST_TYPE.CANCEL:
-          newConfirmDialogProps.header = `${i18next.t("Cancel request")} (${
-            requestOrRequestType.name
-          })`;
-          newConfirmDialogProps.confirmButton = (
-            <ConfirmationModalConfirmButton
-              content={i18next.t("Cancel request")}
-              negative
-            />
-          );
+          caseSpecificProps = cancelConfirmDialogProps(requestOrRequestType);
           break;
         case REQUEST_TYPE.ACCEPT:
-          newConfirmDialogProps.header = `${i18next.t("Accept request")} (${
-            requestOrRequestType.name
-          })`;
-          newConfirmDialogProps.confirmButton = (
-            <ConfirmationModalConfirmButton
-              positive={!dangerous}
-              negative={dangerous}
-              content={i18next.t("Accept")}
-            />
-          );
-          newConfirmDialogProps.content = (
-            <React.Fragment>
-              {dangerous && (
-                <WarningMessage
-                  message={i18next.t(
-                    "This action is irreversible. Are you sure you wish to accept this request?"
-                  )}
-                />
-              )}
-            </React.Fragment>
+          caseSpecificProps = acceptConfirmDialogProps(
+            requestOrRequestType,
+            dangerous
           );
           break;
         case REQUEST_TYPE.DECLINE:
-          newConfirmDialogProps.header = `${i18next.t("Decline request")} (${
-            requestOrRequestType.name
-          })`;
-          newConfirmDialogProps.confirmButton = (
-            <ConfirmationModalConfirmButton
-              content={i18next.t("Decline")}
-              negative
-            />
-          );
-          newConfirmDialogProps.content = (
-            <div className="content">
-              <RequestCommentInput
-                label={`${i18next.t("Add comment")} (${i18next.t("optional")})`}
-              />
-              <Message>
-                <Icon name="info circle" className="text size large" />
-                <span>
-                  {i18next.t(
-                    "It is highly recommended to provide an explanation for the rejection of the request. Note that it is always possible to provide explanation later on the request timeline."
-                  )}
-                </span>
-              </Message>
-            </div>
-          );
+          caseSpecificProps = declineConfirmDialogProps(requestOrRequestType);
           break;
         default:
           break;
       }
+
       setConfirmDialogProps((props) => ({
         ...props,
-        ...newConfirmDialogProps,
+        ...baseConfirmDialogProps,
+        ...caseSpecificProps,
       }));
     },
     []
