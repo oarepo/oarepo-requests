@@ -18,6 +18,7 @@ from oarepo_ui.resources.config import FormConfigResourceConfig, UIResourceConfi
 from oarepo_ui.resources.links import UIRecordLink
 
 from oarepo_requests.ui.components import (
+    ActionLabelsComponent,
     FormConfigCustomFieldsComponent,
     FormConfigRequestTypePropertiesComponent,
 )
@@ -46,6 +47,7 @@ class RequestsFormConfigResourceConfig(FormConfigResourceConfig):
         AllowedHtmlTagsComponent,
         FormConfigCustomFieldsComponent,
         FormConfigRequestTypePropertiesComponent,
+        ActionLabelsComponent,
     ]
     request_view_args = {"request_type": RequestTypeSchema()}
     routes = {

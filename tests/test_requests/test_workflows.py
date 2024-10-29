@@ -2,6 +2,8 @@ import pytest
 from invenio_drafts_resources.services.records.uow import ParentRecordCommitOp
 from invenio_records_resources.services.errors import PermissionDeniedError
 from invenio_records_resources.services.uow import RecordCommitOp, unit_of_work
+from invenio_requests.customizations.event_types import LogEventType
+from invenio_requests.records.api import RequestEvent
 from thesis.records.api import ThesisDraft, ThesisRecord
 
 from oarepo_requests.services.permissions.workflow_policies import (
@@ -408,3 +410,61 @@ def test_workflow_events(
             event_type=TestEventType,
         )
     assert create_event_u1
+
+
+def test_delete_log(
+    vocab_cf,
+    patch_requests_permissions,
+    logged_client,
+    users,
+    urls,
+    submit_request_by_link,
+    record_factory,
+    search_clear,
+):
+    creator = users[0]
+    receiver = users[1]
+    creator_client = logged_client(creator)
+    receiver_client = logged_client(receiver)
+
+    record = record_factory(creator.identity)
+    record_id = record["id"]
+
+    record_response = creator_client.get(
+        f"{urls['BASE_URL']}{record_id}?expand=true",
+    )
+
+    request = submit_request_by_link(
+        creator_client, record_response, "delete_published_record"
+    )
+    request_id = request.json["id"]
+
+    request_receiver = receiver_client.get(
+        f'{urls["BASE_URL_REQUESTS"]}{request_id}',
+    )
+
+    accept = receiver_client.post(
+        link_api2testclient(request_receiver.json["links"]["actions"]["accept"])
+    )
+    post_delete_record_read = receiver_client.get(f"{urls['BASE_URL']}{record_id}")
+    post_delete_request_read_json = receiver_client.get(
+        f'{urls["BASE_URL_REQUESTS"]}{request_id}',
+    ).json
+    assert accept.status_code == 200
+    assert post_delete_record_read.status_code == 410
+    assert post_delete_request_read_json["status"] == "accepted"
+    assert post_delete_request_read_json["topic"] == {"thesis": record_id}
+
+    RequestEvent.index.refresh()
+    events = receiver_client.get(
+        f"{urls['BASE_URL_REQUESTS']}extended/{request_id}/timeline"
+    ).json["hits"]["hits"]
+
+    for event in events:
+        if (
+            event["type"] == LogEventType.type_id
+            and event["payload"]["event"] == "accepted"
+        ):
+            break
+    else:
+        assert False

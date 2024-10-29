@@ -94,7 +94,6 @@ def test_request_detail_page(
         assert c.status_code == 200
         print(c.text)
 
-
 def test_form_config(app, client, record_ui_resource, fake_manifest):
     with client.get("/requests/configs/publish_draft") as c:
         assert c.json == {
@@ -159,5 +158,14 @@ def test_form_config(app, client, record_ui_resource, fake_manifest):
                 "dangerous": False,
                 "editable": False,
                 "has_form": True,
+            },
+            "action_labels": {
+                "accept": "Publish",
+                "cancel": "Cancel",
+                "create": "Create",
+                "decline": "Return for correction",
+                "delete": "Delete",
+                "expire": "Expire",
+                "submit": "Submit",
             },
         }
