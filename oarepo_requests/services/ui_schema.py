@@ -1,7 +1,7 @@
 from types import SimpleNamespace
 
 import marshmallow as ma
-from invenio_pidstore.errors import PIDDeletedError
+from invenio_pidstore.errors import PersistentIdentifierError, PIDDeletedError
 from invenio_requests.proxies import current_request_type_registry, current_requests
 from invenio_requests.resolvers.registry import ResolverRegistry
 from invenio_requests.services.schemas import (
@@ -40,6 +40,8 @@ class UIReferenceSchema(ma.Schema):
                 return resolve(self.context["identity"], data["reference"])
             except PIDDeletedError:
                 return {**data, "status": "removed"}
+            except PersistentIdentifierError:
+                return {**data, "status": "invalid"}
         resolved_cache = self.context["resolved"]
         return resolved_cache.dereference(data["reference"])
 
@@ -99,7 +101,7 @@ class UIRequestSchemaMixin:
                         # not very nice, but we need to pass the request object to the stateful_description function
                         request=SimpleNamespace(**data),
                     )
-        except PIDDeletedError:
+        except PersistentIdentifierError:
             pass
 
         return stateful_name, stateful_description

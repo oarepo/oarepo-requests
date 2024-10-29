@@ -1,4 +1,5 @@
 from invenio_access.permissions import system_identity
+from invenio_pidstore.errors import PersistentIdentifierError
 from invenio_records_resources.proxies import current_service_registry
 from invenio_requests.proxies import (
     current_request_type_registry,
@@ -184,7 +185,10 @@ def request_identity_matches(entity_reference, identity):
     if not entity_reference:
         return False
 
-    entity = ResolverRegistry.resolve_entity_proxy(entity_reference)
-    if entity:
-        needs = entity.get_needs()
-        return bool(identity.provides.intersection(needs))
+    try:
+        entity = ResolverRegistry.resolve_entity_proxy(entity_reference)
+        if entity:
+            needs = entity.get_needs()
+            return bool(identity.provides.intersection(needs))
+    except PersistentIdentifierError:
+        return False
