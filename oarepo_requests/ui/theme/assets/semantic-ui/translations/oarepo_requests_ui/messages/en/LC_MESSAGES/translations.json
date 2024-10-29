@@ -1,1 +1,1 @@
-{"api.requests":"Requests API"}
+{"api.requests":"Requests API","requestCreated":"{{creatorLabel}} created this request","requestSubmitted":"{{creatorLabel}} submitted this request","requestCancelled":"{{creatorLabel}} canceled this request","requestAccepted":"{{creatorLabel}} accepted this request","requestDeclined":"{{creatorLabel}} declined this request","Request expired.":"Request expired","requestDeleted":"{{creatorLabel}} deleted this request","requestCommented":"{{creatorLabel}} commented"}

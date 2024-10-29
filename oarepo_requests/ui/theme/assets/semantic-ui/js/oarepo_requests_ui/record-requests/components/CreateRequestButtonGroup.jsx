@@ -1,63 +1,72 @@
 import React from "react";
-
 import { i18next } from "@translations/oarepo_requests_ui/i18next";
-import { Segment, Header, Button, Placeholder, Message, Icon } from "semantic-ui-react";
+import { Placeholder, Message } from "semantic-ui-react";
 import _isEmpty from "lodash/isEmpty";
-
-import { RequestModal, CreateRequestModalContent } from ".";
-import { mapLinksToActions } from "./actions";
-import { useRequestContext } from "../contexts";
-
-/**
- * @typedef {import("../types").Request} Request
- * @typedef {import("../types").RequestType} RequestType
- */
+import { useRequestContext } from "@js/oarepo_requests_common";
+import PropTypes from "prop-types";
+import { useIsMutating } from "@tanstack/react-query";
+import { CreateRequestButton } from "./CreateRequestButton";
 
 /**
- * @param {{ requestTypes: RequestType[], isLoading: boolean, loadingError: Error }} props
+ * @param {{  applicableRequestsLoading: boolean, applicableRequestsLoadingError: Error }} props
  */
-export const CreateRequestButtonGroup = ({ recordLoading, recordLoadingError }) => {
-  const { requestTypes } = useRequestContext();
-  const createRequests = requestTypes.filter(requestType => requestType.links.actions?.create);
+export const CreateRequestButtonGroup = ({
+  applicableRequestsLoading,
+  applicableRequestsLoadingError,
+}) => {
+  const { requestTypes, requestButtonsIconsConfig } = useRequestContext();
+  const createRequests = requestTypes?.filter(
+    (requestType) => requestType.links.actions?.create
+  );
+  const isMutating = useIsMutating();
+
+  let content;
+
+  if (applicableRequestsLoading) {
+    content = (
+      <Placeholder>
+        {Array.from({ length: 2 }).map((_, index) => (
+          <Placeholder.Paragraph key={index}>
+            <Placeholder.Line length="full" />
+            <Placeholder.Line length="medium" />
+          </Placeholder.Paragraph>
+        ))}
+      </Placeholder>
+    );
+  } else if (applicableRequestsLoadingError) {
+    content = (
+      <Message negative className="rel-mb-1">
+        <Message.Header>
+          {i18next.t("Error loading request types")}
+        </Message.Header>
+      </Message>
+    );
+  } else if (_isEmpty(createRequests)) {
+    return null; // No need to render anything if there are no requests
+  } else {
+    content = createRequests.map((requestType) => {
+      const header =
+        requestType.stateful_name || requestType.name || requestType.type_id;
+      const buttonIconProps = requestButtonsIconsConfig[requestType.type_id];
+
+      return (
+        <CreateRequestButton
+          key={requestType.type_id}
+          requestType={requestType}
+          isMutating={isMutating}
+          buttonIconProps={buttonIconProps}
+          header={header}
+        />
+      );
+    });
+  }
 
   return (
-    <Segment className="requests-create-request-buttons borderless">
-      <Header size="small" className="detail-sidebar-header">{i18next.t("Requests")}</Header>
-      {recordLoading ?
-        <Placeholder>
-          {Array.from({ length: 2 }).map((_, index) => (
-            <Placeholder.Paragraph key={index}>
-              <Icon name="plus" disabled />
-            </Placeholder.Paragraph>
-          ))}
-        </Placeholder> :
-        recordLoadingError ?
-          <Message negative>
-            <Message.Header>{i18next.t("Error loading request types")}</Message.Header>
-            <p>{recordLoadingError?.message}</p>
-          </Message> :
-          !_isEmpty(createRequests) ?
-            <Button.Group vertical compact fluid>
-              {createRequests.map((requestType) => {
-                const header = !_isEmpty(requestType?.title) ? requestType.title : (!_isEmpty(requestType?.name) ? requestType.name : requestType.type);
-                const modalActions = mapLinksToActions(requestType);
-                return (
-                  <RequestModal
-                    key={requestType.type_id}
-                    requestType={requestType}
-                    header={header}
-                    trigger={
-                      <Button icon="plus" className="pl-0" title={i18next.t(requestType.name)} basic compact content={requestType.name} />
-                    }
-                    actions={modalActions}
-                    ContentComponent={CreateRequestModalContent}
-                  />
-                )
-              }
-              )}
-            </Button.Group> :
-            <p>{i18next.t("No new requests to create")}.</p>
-      }
-    </Segment>
+    <div className="requests-create-request-buttons borderless">{content}</div>
   );
-}
+};
+
+CreateRequestButtonGroup.propTypes = {
+  applicableRequestsLoading: PropTypes.bool,
+  applicableRequestsLoadingError: PropTypes.object,
+};

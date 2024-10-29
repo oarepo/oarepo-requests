@@ -244,10 +244,10 @@ msgid "Your comment here..."
 msgstr "Váš komentář..."
 
 msgid "Comment was not created successfully."
-msgstr "Komnetář nebyl úspěšně vytvořen."
+msgstr "Komentář nebyl úspěšně vytvořen."
 
 msgid "Comment"
-msgstr "Komnetář"
+msgstr "Komentář"
 
 msgid "Error while submitting the comment"
 msgstr "Chyba při odesílání komentáře"
@@ -482,3 +482,145 @@ msgstr ""
 #: /Users/m/w/cesnet/oarepo-requests/oarepo_requests/types/publish_draft.py:125
 msgid "Request not yet submitted."
 msgstr "Žádost zatím nebyla odeslána."
+
+#: /home/dusanst/Projects/oarepo-requests/oarepo_requests/types/delete_draft.py:12
+msgid "Delete draft"
+msgstr "Smazat koncept"
+
+#: /home/dusanst/Projects/oarepo-requests/oarepo_requests/types/delete_draft.py:33
+#: /home/dusanst/Projects/oarepo-requests/oarepo_requests/types/delete_draft.py:38
+msgid "Request draft deletion"
+msgstr "Zažádat o smazání konceptu"
+
+#: /home/dusanst/Projects/oarepo-requests/oarepo_requests/types/delete_draft.py:36
+msgid "Draft deletion requested"
+msgstr "Zažádáno o smazání konceptu"
+
+#: /home/dusanst/Projects/oarepo-requests/oarepo_requests/types/delete_draft.py:43
+msgid "Click to permanently delete the draft."
+msgstr "Klikněte pro trvalé smazání konceptu."
+
+#: /home/dusanst/Projects/oarepo-requests/oarepo_requests/types/delete_draft.py:46
+msgid "Request permission to delete the draft."
+msgstr "Zažádat o povolení ke smazání konceptu."
+
+#: /home/dusanst/Projects/oarepo-requests/oarepo_requests/types/delete_draft.py:50
+msgid ""
+"Permission to delete draft requested. You will be notified about the "
+"decision by email."
+msgstr ""
+"Zažádáno o povolení ke smazání konceptu. O rozhodnutí budete informováni "
+"emailem."
+
+#: /home/dusanst/Projects/oarepo-requests/oarepo_requests/types/delete_draft.py:55
+msgid ""
+"You have been asked to approve the request to permanently delete the draft. "
+"You can approve or reject the request."
+msgstr ""
+"Byli jste požádáni o schválení žádosti o trvalé smazání konceptu. Můžete "
+"žádost schválit nebo odmítnout."
+
+#: /home/dusanst/Projects/oarepo-requests/oarepo_requests/types/delete_draft.py:59
+msgid "Permission to delete draft (including files) requested. "
+msgstr "Zažádáno o povolení ke smazání konceptu (včetně souborů)."
+
+#: /home/dusanst/Projects/oarepo-requests/oarepo_requests/types/delete_draft.py:62
+msgid "Submit request to get permission to delete the draft."
+msgstr "Odeslat žádost o povolení ke smazání konceptu."
+
+msgid "Request not created successfully. Please try again in a moment."
+msgstr "Žádost nebyla úspěšně vytvořena. Zkuste to prosím za chvíli znovu."
+
+msgid "Form fields could not be fetched."
+msgstr "Formulářová pole nebyla načtena."
+
+msgid "Request details"
+msgstr "Podrobnosti žádosti"
+
+msgid "Topic"
+msgstr "Téma"
+
+msgid "Request topic"
+msgstr "Téma žádosti"
+
+msgid ""
+"Are you sure you want to proceed? Once the action is completed, it will not "
+"be possible to undo it."
+msgstr ""
+"Jste si jisti, že chcete pokračovat? Po dokončení akce ji nebude možné "
+"vrátit zpět."
+
+msgid "Are you sure you wish to"
+msgstr "Jste si jisti, že chcete"
+
+msgid "Proceed"
+msgstr "Pokračovat"
+
+msgid ""
+"Are you sure you wish to proceed? After this request is accepted, it will "
+"not be possible to reverse the action."
+msgstr ""
+"Jste si jisti, že chcete pokračovat? Po přijetí této žádosti nebude možné "
+"akci zvrátit."
+
+msgid ""
+"The request could not be created due to validation errors. Please correct "
+"the errors and try again."
+msgstr ""
+"Žádost nemohla být vytvořena kvůli validačním chybám. Prosím opravte chyby a"
+" zkuste to znovu."
+
+msgid "The action could not be executed. Please try again in a moment."
+msgstr "Akce nebyla úspěšně provedena. Zkuste to prosím za chvíli znovu."
+
+msgid "Record has validation errors. Redirecting to form..."
+msgstr "Záznam obsahuje validační chyby. Přesměrování na formulář..."
+
+msgid "Comment was not submitted successfully."
+msgstr "Komentář nebyl úspěšně odeslán."
+
+msgid "Leave comment"
+msgstr "Zanechat komentář"
+
+#: /home/dusanst/Projects/oarepo-requests/oarepo_requests/types/delete_draft.py:24
+msgid "Request deletion of draft"
+msgstr "Zažádat o smazání konceptu"
+
+msgid ""
+"It is highly recommended to provide an explanation for the rejection of the "
+"request. Note that it is always possible to provide explanation later on the"
+" request timeline."
+msgstr ""
+"Důrazně doporučujeme poskytnout vysvětlení zamítnutí žádosti. Všimněte si, "
+"že je vždy možné poskytnout vysvětlení později v rámci časové osy žádosti."
+
+msgid "Record preview"
+msgstr "Náhled záznamu"
+
+msgid ""
+"This action is irreversible. Are you sure you wish to accept this request?"
+msgstr "Tato akce je nevratná. Opravdu si přejete tuto žádost přijmout?"
+
+msgid "requestCreated"
+msgstr "{{creatorLabel}} vytvořil(a) tuto žádost"
+
+msgid "requestSubmitted"
+msgstr "{{creatorLabel}} odeslal(a) tuto žádost"
+
+msgid "requestCancelled"
+msgstr "{{creatorLabel}} zrušil(a) tuto žádost"
+
+msgid "requestAccepted"
+msgstr "{{creatorLabel}} přijal(a) tuto žádost"
+
+msgid "requestDeclined"
+msgstr "{{creatorLabel}} odmítl(a) tuto žádost"
+
+msgid "Request expired."
+msgstr "Žádost vypršela"
+
+msgid "requestDeleted"
+msgstr "{{creatorLabel}} smazal(a) tuto žádost"
+
+msgid "requestCommented"
+msgstr "{{creatorLabel}} komentoval(a)"

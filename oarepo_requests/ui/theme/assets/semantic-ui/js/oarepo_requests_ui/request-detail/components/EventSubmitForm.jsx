@@ -1,105 +1,118 @@
-import React, { useState, useRef } from "react";
-
+import React, { useEffect } from "react";
+import PropTypes from "prop-types";
 import { i18next } from "@translations/oarepo_requests_ui/i18next";
-import { Button, Message, FormField } from "semantic-ui-react";
-import _isEmpty from "lodash/isEmpty";
-import axios from "axios";
-import { RichEditor, RichInputField } from "react-invenio-forms";
-import { Formik, Form } from "formik";
+import { Button, Message, Form } from "semantic-ui-react";
+import { useFormik, FormikProvider } from "formik";
+// TODO: until we figure out a way to globally use sanitization with our hook
+import {
+  CommentPayloadSchema,
+  RequestCommentInput,
+} from "@js/oarepo_requests_common";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { http } from "@js/oarepo_ui";
 
-import { useSanitizeInput } from "@js/oarepo_ui";
-import { CommentPayloadSchema } from "../utils";
-
-export const EventSubmitForm = ({ request, setEvents }) => {
-  const [error, setError] = useState(null);
-  const { sanitizeInput } = useSanitizeInput()
-  
-  const editorRef = useRef(null);
-
-  const callApi = async (url, method = "POST", data = null) => {
-    if (_isEmpty(url)) {
-      console.log("URL parameter is missing or invalid.");
-    }
-    return axios({
-      url: url,
-      method: method,
-      headers: {
-        'Content-Type': 'application/json',
-        'Accept': 'application/vnd.inveniordm.v1+json'
+export const EventSubmitForm = ({
+  request,
+  refetch,
+  page,
+  timelinePageSize,
+}) => {
+  const formik = useFormik({
+    initialValues: {
+      payload: {
+        content: "",
+        format: "html",
       },
-      data: data
-  })};
+    },
+    onSubmit: () => {},
+    validationSchema: CommentPayloadSchema,
+    validateOnBlur: false,
+    validateOnChange: false,
+  });
 
-  const onSubmit = async (values, { setSubmitting, resetForm }) => {
-    setSubmitting(true);
-    setError(null);
-    try {
-      const response = await callApi(request.links?.comments, "POST", values);
-      if (response.status !== 201) {
-        throw new Error(i18next.t("Comment was not created successfully."));
-      }
-      setEvents((events) => [...events, response.data]);
-    } catch (error) {
-      setError(error);
-    } finally {
-      editorRef.current.setContent("");
-      resetForm();
-      setSubmitting(false);
-    }
-  };
+  const { resetForm, values, setFieldError } = formik;
+  const queryClient = useQueryClient();
 
-  return (
-    <Formik
-      initialValues={{ 
-        payload: { 
-          content: "",
-          format: "html"
+  const { mutate, isError, isLoading, reset } = useMutation(
+    () => http.post(request.links?.comments, values),
+    {
+      onSuccess: (response) => {
+        if (response.status === 201) {
+          queryClient.setQueryData(
+            ["requestEvents", request.id, page],
+            (oldData) => {
+              if (!oldData) return;
+              // a bit ugly, but it is a limitation of react query when data you recieve is nested
+              const newData = [...oldData.data.hits.hits];
+              if (oldData.data.hits.total + 1 > timelinePageSize) {
+                newData.pop();
+              }
+              return {
+                ...oldData,
+                data: {
+                  ...oldData.data,
+                  hits: {
+                    ...oldData.data.hits,
+                    total: oldData.data.hits.total + 1,
+                    hits: [response.data, ...newData],
+                  },
+                },
+              };
+            }
+          );
         }
-      }}
-      validationSchema={CommentPayloadSchema}
-      onSubmit={onSubmit}
-    >
-      {({ values, isSubmitting, setFieldValue, setFieldTouched }) => (
-        <Form>
-          <FormField className={error ? "mt-25" : "mt-25 mb-25"}>
-            <RichInputField
-              fieldPath="payload.content"
-              label={
-                <label htmlFor="payload.content" hidden>{i18next.t("Comment")}</label>
-              }
-              optimized="true"
-              placeholder={i18next.t('Your comment here...')}
-              editor={
-                <RichEditor
-                  value={values.payload.content}
-                  optimized
-                  onFocus={(event, editor) => editorRef.current = editor}
-                  onBlur={(event, editor) => {
-                    const cleanedContent = sanitizeInput(editor.getContent());
-                    setFieldValue("payload.content", cleanedContent);
-                    setFieldTouched("payload.content", true);
-                  }}
-                />
-              }
-            />
-          </FormField>
-          {error && (
-            <Message error>
-              <Message.Header>{i18next.t("Error while submitting the comment")}</Message.Header>
-              <p>{error?.message}</p>
-            </Message>
-          )}
-          <Button
-            floated="right"
-            color="blue"
-            icon="send"
-            type="submit"
-            loading={isSubmitting}
-            disabled={isSubmitting}
-            content={i18next.t("Comment")}
-          />
-        </Form>
-      )}
-    </Formik>
+        setTimeout(() => refetch(), 1000);
+        resetForm();
+      },
+      onError: (error) => {
+        if (error.response?.data?.errors?.length > 0) {
+          error.response.data.errors.forEach((error) => {
+            setFieldError(error.field, error.messages[0]);
+          });
+        }
+      },
+    }
   );
-}
+
+  useEffect(() => {
+    if (isError) {
+      setTimeout(() => {
+        reset();
+        resetForm();
+      }, 2500);
+    }
+    return () => isError && reset();
+  }, [isError, reset, resetForm]);
+  return (
+    <FormikProvider value={formik}>
+      <Form className="ui form">
+        <RequestCommentInput />
+        {isError && (
+          <Message negative>
+            <Message.Header>
+              {i18next.t("Comment was not submitted successfully.")}
+            </Message.Header>
+          </Message>
+        )}
+        <Button
+          size="tiny"
+          floated="right"
+          color="blue"
+          icon="send"
+          type="button"
+          loading={isLoading}
+          disabled={isLoading}
+          content={i18next.t("Leave comment")}
+          onClick={() => mutate()}
+        />
+      </Form>
+    </FormikProvider>
+  );
+};
+
+EventSubmitForm.propTypes = {
+  request: PropTypes.object,
+  refetch: PropTypes.func,
+  page: PropTypes.number,
+  timelinePageSize: PropTypes.number,
+};
