@@ -39,6 +39,12 @@ class RequestEntityLink(RequestLink):
     def _expand_entity(self, entity, vars):
         vars.update({f"entity_{k}": v for k, v in entity.get("links", {}).items()})
 
+    def expand(self, obj, context):
+        """Expand the URI Template."""
+        # Optimization: pre-resolve the entity and put it into the shared context
+        # under the key - so that it can be reused by other links
+        self._resolve(obj, context)
+        return super().expand(obj, context)
 
 class OARepoRequestsServiceConfig(RequestsServiceConfig):
     service_id = "oarepo_requests"
