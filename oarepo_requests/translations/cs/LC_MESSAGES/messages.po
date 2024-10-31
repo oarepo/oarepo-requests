@@ -624,3 +624,27 @@ msgstr "{{creatorLabel}} smazal(a) tuto žádost"
 
 msgid "requestCommented"
 msgstr "{{creatorLabel}} komentoval(a)"
+
+#: /home/ron/prace/oarepo-requests/oarepo_requests/actions/delete_published_record.py:9
+msgid "Permanently delete"
+msgstr "Trvale smazat"
+
+#: /home/ron/prace/oarepo-requests/oarepo_requests/actions/delete_published_record.py:20
+msgid "Keep the record"
+msgstr "Ponechat záznam"
+
+#: /home/ron/prace/oarepo-requests/oarepo_requests/actions/publish_draft.py:36
+msgid "Publish"
+msgstr "Publikovat"
+
+#: /home/ron/prace/oarepo-requests/oarepo_requests/actions/publish_draft.py:58
+msgid "Return for correction"
+msgstr "Vrátit k opravě"
+
+#: /home/ron/prace/oarepo-requests/oarepo_requests/translations/_only_for_translations.py:33
+msgid "api.applicable-requests"
+msgstr "API pro vytváření žádostí"
+
+#: /home/ron/prace/oarepo-requests/oarepo_requests/resolvers/ui.py:143
+msgid "System user"
+msgstr "Systémový uživatel"
