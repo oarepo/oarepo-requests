@@ -146,7 +146,7 @@ class UserEntityReferenceUIResolver(OARepoUIResolver):
             "profile" in record.data
             and "full_name" in record.data["profile"]
             and record.data["profile"]["full_name"]
-        ):  # username undefined?
+        ):
             label = record.data["profile"]["full_name"]
         elif "username" in record.data and record.data["username"]:
             label = record.data["username"]
