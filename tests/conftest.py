@@ -422,7 +422,7 @@ def ui_serialization_result():
         return {
             # 'created': '2024-01-26T10:06:17.945916',
             "created_by": {
-                "label": "user1@example.org",
+                "label": "id: 1",
                 "links": {"self": "https://127.0.0.1:5000/api/users/1"},
                 "reference": {"user": "1"},
                 "type": "user",
@@ -521,6 +521,7 @@ def users(app, db, UserFixture):
     user2 = UserFixture(
         email="user2@example.org",
         password="beetlesmasher",
+        username="beetlesmasher",
         active=True,
         confirmed=True,
     )
@@ -529,6 +530,11 @@ def users(app, db, UserFixture):
     user3 = UserFixture(
         email="user3@example.org",
         password="beetlesmasher",
+        username="beetlesmasherXXL",
+        user_profile={
+            "full_name": "Maxipes Fik",
+            "affiliations": "CERN",
+        },
         active=True,
         confirmed=True,
     )

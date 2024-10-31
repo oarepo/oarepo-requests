@@ -4,6 +4,7 @@ from invenio_users_resources.proxies import (
     current_groups_service,
     current_users_service,
 )
+from oarepo_runtime.i18n import gettext as _
 
 from ..proxies import current_oarepo_requests
 from ..utils import get_matching_service_for_refdict
@@ -105,13 +106,7 @@ class GroupEntityReferenceUIResolver(OARepoUIResolver):
             return None
 
     def _resolve(self, record, reference):
-        if record.data["name"] is None:
-            if "id" in record.data:
-                label = record.data["id"]
-            else:
-                label = fallback_label_result(reference)
-        else:
-            label = record.data["name"]
+        label = record.data["name"]
         ret = {
             "reference": reference,
             "type": "group",
@@ -144,13 +139,19 @@ class UserEntityReferenceUIResolver(OARepoUIResolver):
             return None
 
     def _resolve(self, record, reference):
-        if record.data["username"] is None:  # username undefined?
-            if "email" in record.data:
-                label = record.data["email"]
-            else:
-                label = fallback_label_result(reference)
-        else:
+
+        if record.data["id"] == "system":
+            label = _("System user")
+        elif (
+            "profile" in record.data
+            and "full_name" in record.data["profile"]
+            and record.data["profile"]["full_name"]
+        ):
+            label = record.data["profile"]["full_name"]
+        elif "username" in record.data and record.data["username"]:
             label = record.data["username"]
+        else:
+            label = fallback_label_result(reference)
         ret = {
             "reference": reference,
             "type": "user",

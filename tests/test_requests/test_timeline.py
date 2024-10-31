@@ -58,7 +58,7 @@ def test_timeline(
             "created_by": {
                 "reference": {"user": "1"},
                 "type": "user",
-                "label": "user1@example.org",
+                "label": "id: 1",
                 "links": {"self": "https://127.0.0.1:5000/api/users/1"},
             },
             "permissions": {},

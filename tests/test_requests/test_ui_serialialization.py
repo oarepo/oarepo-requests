@@ -9,7 +9,7 @@ from oarepo_requests.resolvers.ui import FallbackEntityReferenceUIResolver
 from .utils import is_valid_subdict, link_api2testclient
 
 
-def test_publish(
+def test_user_serialization(
     users,
     urls,
     publish_request_data_function,
@@ -18,19 +18,34 @@ def test_publish(
     logged_client,
     search_clear,
 ):
-    creator = users[0]
-    creator_client = logged_client(creator)
+    client_fallback_label = logged_client(users[0])
+    client_username_label = logged_client(users[1])
+    client_fullname_label = logged_client(users[2])
 
-    draft1 = create_draft_via_resource(creator_client)
+    draft1 = create_draft_via_resource(client_fallback_label)
+    draft2 = create_draft_via_resource(client_username_label)
+    draft3 = create_draft_via_resource(client_fullname_label)
+
     draft_id = draft1.json["id"]
     ThesisRecord.index.refresh()
     ThesisDraft.index.refresh()
 
-    resp_request_create = creator_client.post(
+    resp_request_create = client_fallback_label.post(
         urls["BASE_URL_REQUESTS"],
         json=publish_request_data_function(draft1.json["id"]),
         headers={"Accept": "application/vnd.inveniordm.v1+json"},
     )
+    resp_request_create_username = client_username_label.post(
+        urls["BASE_URL_REQUESTS"],
+        json=publish_request_data_function(draft2.json["id"]),
+        headers={"Accept": "application/vnd.inveniordm.v1+json"},
+    )
+    resp_request_create_fullname = client_fullname_label.post(
+        urls["BASE_URL_REQUESTS"],
+        json=publish_request_data_function(draft3.json["id"]),
+        headers={"Accept": "application/vnd.inveniordm.v1+json"},
+    )
+
     pprint(resp_request_create.json)
     assert resp_request_create.json["stateful_name"] == "Submit for review"
     assert resp_request_create.json["stateful_description"] == (
@@ -38,7 +53,7 @@ def test_publish(
         "it will be locked and no further modifications will be possible."
     )
 
-    resp_request_submit = creator_client.post(
+    resp_request_submit = client_fallback_label.post(
         link_api2testclient(resp_request_create.json["links"]["actions"]["submit"]),
         headers={"Accept": "application/vnd.inveniordm.v1+json"},
     )
@@ -49,8 +64,8 @@ def test_publish(
         == "The draft has been submitted for review. It is now locked and no further changes are possible. You will be notified about the decision by email."
     )
 
-    record = creator_client.get(f"{urls['BASE_URL']}{draft_id}/draft").json
-    ui_record = creator_client.get(
+    record = client_fallback_label.get(f"{urls['BASE_URL']}{draft_id}/draft").json
+    ui_record = client_fallback_label.get(
         f"{urls['BASE_URL']}{draft_id}/draft?expand=true",
         headers={"Accept": "application/vnd.inveniordm.v1+json"},
     ).json
@@ -60,6 +75,46 @@ def test_publish(
     )
     assert "dictionary_item_removed" not in diff
     assert "dictionary_item_changed" not in diff
+
+    creator_serialization = {
+        "label": "id: 1",
+        "links": {"self": "https://127.0.0.1:5000/api/users/1"},
+        "reference": {"user": "1"},
+        "type": "user",
+    }
+
+    creator_serialization_username = {
+        "label": "beetlesmasher",
+        "links": {"self": "https://127.0.0.1:5000/api/users/2"},
+        "reference": {"user": "2"},
+        "type": "user",
+    }
+
+    creator_serialization_fullname = {
+        "label": "Maxipes Fik",
+        "links": {"self": "https://127.0.0.1:5000/api/users/3"},
+        "reference": {"user": "3"},
+        "type": "user",
+    }
+
+    ui_record_username = client_username_label.get(
+        f"{urls['BASE_URL']}{draft2.json['id']}/draft?expand=true",
+        headers={"Accept": "application/vnd.inveniordm.v1+json"},
+    ).json
+    ui_record_fullname = client_fullname_label.get(
+        f"{urls['BASE_URL']}{draft3.json['id']}/draft?expand=true",
+        headers={"Accept": "application/vnd.inveniordm.v1+json"},
+    ).json
+
+    assert ui_record["expanded"]["requests"][0]["created_by"] == creator_serialization
+    assert (
+        ui_record_username["expanded"]["requests"][0]["created_by"]
+        == creator_serialization_username
+    )
+    assert (
+        ui_record_fullname["expanded"]["requests"][0]["created_by"]
+        == creator_serialization_fullname
+    )
 
 
 def test_resolver_fallback(

@@ -589,5 +589,29 @@ msgstr "{{creatorLabel}} deleted this request"
 msgid "requestCommented"
 msgstr "{{creatorLabel}} commented"
 
+#: /home/ron/prace/oarepo-requests/oarepo_requests/actions/delete_published_record.py:9
+msgid "Permanently delete"
+msgstr ""
+
+#: /home/ron/prace/oarepo-requests/oarepo_requests/actions/delete_published_record.py:20
+msgid "Keep the record"
+msgstr ""
+
+#: /home/ron/prace/oarepo-requests/oarepo_requests/actions/publish_draft.py:36
+msgid "Publish"
+msgstr ""
+
+#: /home/ron/prace/oarepo-requests/oarepo_requests/actions/publish_draft.py:58
+msgid "Return for correction"
+msgstr ""
+
+#: /home/ron/prace/oarepo-requests/oarepo_requests/resolvers/ui.py:143
+msgid "System user"
+msgstr ""
+
+#: /home/ron/prace/oarepo-requests/oarepo_requests/translations/_only_for_translations.py:33
+msgid "api.applicable-requests"
+msgstr ""
+
 #~ msgid "No status"
 #~ msgstr ""
