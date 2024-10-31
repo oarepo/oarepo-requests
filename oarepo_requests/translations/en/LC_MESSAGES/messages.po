@@ -611,7 +611,7 @@ msgstr ""
 
 #: /home/ron/prace/oarepo-requests/oarepo_requests/translations/_only_for_translations.py:33
 msgid "api.applicable-requests"
-msgstr ""
+msgstr "Applicable requests API"
 
 #~ msgid "No status"
 #~ msgstr ""
