@@ -605,32 +605,6 @@ msgstr ""
 msgid "Return for correction"
 msgstr ""
 
-#: /home/ron/prace/oarepo-requests/oarepo_requests/resolvers/ui.py:24
-#, python-format
-msgid "id: %(id)s"
-msgstr ""
-
-#: /home/ron/prace/oarepo-requests/oarepo_requests/resolvers/ui.py:114
-msgid "name"
-msgstr ""
-
-#: /home/ron/prace/oarepo-requests/oarepo_requests/resolvers/ui.py:117
-msgid "group"
-msgstr ""
-
-#: /home/ron/prace/oarepo-requests/oarepo_requests/resolvers/ui.py:153
-msgid "username"
-msgstr ""
-
-#: /home/ron/prace/oarepo-requests/oarepo_requests/resolvers/ui.py:156
-msgid "user"
-msgstr ""
-
-#: /home/ron/prace/oarepo-requests/oarepo_requests/resolvers/ui.py:185
-#: /home/ron/prace/oarepo-requests/oarepo_requests/resolvers/ui.py:243
-msgid "metadatatitle"
-msgstr ""
-
 #: /home/ron/prace/oarepo-requests/oarepo_requests/resolvers/ui.py:143
 msgid "System user"
 msgstr ""
