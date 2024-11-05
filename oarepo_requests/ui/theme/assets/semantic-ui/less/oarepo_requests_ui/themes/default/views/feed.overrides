@@ -1,0 +1,19 @@
+.ui.feed {
+  .event {
+    border: 1px solid @borderColor;
+  }
+  .vertical-line {
+    height: 2rem;
+    width: 0;
+    border-left: 1px solid @borderColor;
+    margin-left: 2rem;
+  }
+}
+
+.ui.feed > .event:first-child {
+  border-top: 1px solid @borderColor;
+}
+
+.ui.feed > .vertical-line:last-child {
+  display: none;
+}
