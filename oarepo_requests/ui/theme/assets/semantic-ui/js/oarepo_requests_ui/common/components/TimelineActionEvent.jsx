@@ -33,7 +33,7 @@ export const TimelineActionEvent = ({ event }) => {
                 alt={i18next.t("User avatar")}
               />
             </div>
-            <b className="rel-ml-1">{creatorLabel}</b>
+            <b className="ml-5">{creatorLabel}</b>
             <Feed.Date>
               {feedMessage} {toRelativeTime(event.created, i18next.language)}
             </Feed.Date>
