@@ -25,7 +25,7 @@ export const getRequestStatusIcon = (requestStatus) => {
     case "submitted":
       return { name: "clock", color: "grey" };
     case "cancelled":
-      return { name: "square", color: "black" };
+      return { name: "close", color: "red" };
     case "accepted":
       return { name: "check circle", color: "green" };
     case "declined":
@@ -39,24 +39,24 @@ export const getRequestStatusIcon = (requestStatus) => {
   }
 };
 
-export const getFeedMessage = (requestStatus, creatorLabel) => {
+export const getFeedMessage = (requestStatus) => {
   switch (requestStatus?.toLowerCase()) {
     case "created":
-      return i18next.t("requestCreated", { creatorLabel });
+      return i18next.t("requestCreated");
     case "submitted":
-      return i18next.t("requestSubmitted", { creatorLabel });
+      return i18next.t("requestSubmitted");
     case "cancelled":
-      return i18next.t("requestCancelled", { creatorLabel });
+      return i18next.t("requestCancelled");
     case "accepted":
-      return i18next.t("requestAccepted", { creatorLabel });
+      return i18next.t("requestAccepted");
     case "declined":
-      return i18next.t("requestDeclined", { creatorLabel });
+      return i18next.t("requestDeclined");
     case "expired":
       return i18next.t("Request expired.");
     case "deleted":
-      return i18next.t("requestDeleted", { creatorLabel });
+      return i18next.t("requestDeleted");
     default:
-      return i18next.t("requestCommented", { creatorLabel });
+      return i18next.t("requestCommented");
   }
 };
 

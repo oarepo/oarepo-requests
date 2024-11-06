@@ -9,7 +9,7 @@ import {
   RequestCommentInput,
 } from "@js/oarepo_requests_common";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { http } from "@js/oarepo_ui";
+import { http } from "react-invenio-forms";
 
 export const EventSubmitForm = ({
   request,
@@ -34,7 +34,7 @@ export const EventSubmitForm = ({
   const queryClient = useQueryClient();
 
   const { mutate, isError, isLoading, reset } = useMutation(
-    () => http.post(request.links?.comments, values),
+    () => http.post(request.links?.comments + "?expand=1", values),
     {
       onSuccess: (response) => {
         if (response.status === 201) {

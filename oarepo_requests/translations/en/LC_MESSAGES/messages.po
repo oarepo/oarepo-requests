@@ -566,28 +566,28 @@ msgid ""
 msgstr ""
 
 msgid "requestCreated"
-msgstr "{{creatorLabel}} created this request"
+msgstr "created"
 
 msgid "requestSubmitted"
-msgstr "{{creatorLabel}} submitted this request"
+msgstr "submitted"
 
 msgid "requestCancelled"
-msgstr "{{creatorLabel}} canceled this request"
+msgstr "canceled"
 
 msgid "requestAccepted"
-msgstr "{{creatorLabel}} accepted this request"
+msgstr "accepted"
 
 msgid "requestDeclined"
-msgstr "{{creatorLabel}} declined this request"
+msgstr "declined"
 
 msgid "Request expired."
 msgstr "Request expired"
 
 msgid "requestDeleted"
-msgstr "{{creatorLabel}} deleted this request"
+msgstr "deleted"
 
 msgid "requestCommented"
-msgstr "{{creatorLabel}} commented"
+msgstr "commented"
 
 #: /home/ron/prace/oarepo-requests/oarepo_requests/actions/delete_published_record.py:9
 msgid "Permanently delete"
@@ -612,6 +612,9 @@ msgstr ""
 #: /home/ron/prace/oarepo-requests/oarepo_requests/translations/_only_for_translations.py:33
 msgid "api.applicable-requests"
 msgstr "Applicable requests API"
+
+msgid "User avatar"
+msgstr ""
 
 #~ msgid "No status"
 #~ msgstr ""

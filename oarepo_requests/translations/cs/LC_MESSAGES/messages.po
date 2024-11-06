@@ -602,28 +602,28 @@ msgid ""
 msgstr "Tato akce je nevratná. Opravdu si přejete tuto žádost přijmout?"
 
 msgid "requestCreated"
-msgstr "{{creatorLabel}} vytvořil(a) tuto žádost"
+msgstr "vytvořil(a)"
 
 msgid "requestSubmitted"
-msgstr "{{creatorLabel}} odeslal(a) tuto žádost"
+msgstr "odeslal(a)"
 
 msgid "requestCancelled"
-msgstr "{{creatorLabel}} zrušil(a) tuto žádost"
+msgstr "zrušil(a)"
 
 msgid "requestAccepted"
-msgstr "{{creatorLabel}} přijal(a) tuto žádost"
+msgstr "přijal(a)"
 
 msgid "requestDeclined"
-msgstr "{{creatorLabel}} odmítl(a) tuto žádost"
+msgstr "odmítl(a)"
 
 msgid "Request expired."
 msgstr "Žádost vypršela"
 
 msgid "requestDeleted"
-msgstr "{{creatorLabel}} smazal(a) tuto žádost"
+msgstr "smazal(a)"
 
 msgid "requestCommented"
-msgstr "{{creatorLabel}} komentoval(a)"
+msgstr "komentoval(a)"
 
 #: /home/ron/prace/oarepo-requests/oarepo_requests/actions/delete_published_record.py:9
 msgid "Permanently delete"
@@ -648,3 +648,6 @@ msgstr "API pro vytváření žádostí"
 #: /home/ron/prace/oarepo-requests/oarepo_requests/resolvers/ui.py:143
 msgid "System user"
 msgstr "Systémový uživatel"
+
+msgid "User avatar"
+msgstr ""

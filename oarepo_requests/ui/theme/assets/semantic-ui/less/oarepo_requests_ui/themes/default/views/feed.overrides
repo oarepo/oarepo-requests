@@ -1,19 +1,187 @@
 .ui.feed {
-  .event {
-    border: 1px solid @borderColor;
+  .requests.comment-event-container {
+    position: relative;
+    .event {
+      border: 1px solid @borderColor;
+      border-radius: 5px;
+      padding: 0.5rem;
+      .requests.comment-event-avatar {
+        width: 2rem;
+        height: 2rem;
+        position: absolute;
+        bottom: 0.5rem;
+        left: 1rem;
+        z-index: 1;
+      }
+    }
+    .comment-event-vertical-line {
+      height: 3rem;
+      width: 0;
+      border-left: 1px solid @borderColor;
+      margin-left: 2rem;
+    }
   }
-  .vertical-line {
-    height: 2rem;
-    width: 0;
-    border-left: 1px solid @borderColor;
-    margin-left: 2rem;
+  .requests.action-event-container {
+    position: relative;
+    min-height: 3rem;
+    .event {
+      padding-top: 1rem;
+      padding-bottom: 2rem;
+      .requests.action-event-avatar {
+        width: 1.5rem;
+        height: 1.5rem;
+      }
+      .summary {
+        .requests.action-event-avatar {
+          flex-shrink: 0;
+        }
+        position: relative;
+        z-index: 1;
+        margin-left: 1.25rem;
+      }
+    }
+    .requests.action-event-icon {
+      font-size: 1.5rem;
+    }
+    .action-event-vertical-line {
+      position: absolute;
+      top: 0;
+      bottom: 0;
+      width: 0;
+      border-left: 1px solid @borderColor;
+      margin-left: 2rem;
+    }
   }
 }
 
-.ui.feed > .event:first-child {
-  border-top: 1px solid @borderColor;
-}
+.ui.feed {
+  // override SUI defaults  to bypass immediate parent rule for feed
+  .event > .content .user {
+    display: inline-block;
+    font-weight: @userFontWeight;
+    margin-right: @userDistance;
+    vertical-align: baseline;
+  }
 
-.ui.feed > .vertical-line:last-child {
-  display: none;
+  .event > .content .user img {
+    margin: @userImageMargin;
+    width: @userImageWidth;
+    height: @userImageHeight;
+    vertical-align: @userImageVerticalAlign;
+  }
+
+  /*--------------
+     Inline Date
+  ---------------*/
+
+  /* Date inside Summary */
+
+  .event > .content .summary > .date {
+    display: @summaryDateDisplay;
+    float: @summaryDateFloat;
+    font-weight: @summaryDateFontWeight;
+    font-size: @summaryDateFontSize;
+    font-style: @summaryDateFontStyle;
+    margin: @summaryDateMargin;
+    padding: @summaryDatePadding;
+    color: @summaryDateColor;
+  }
+
+  /*--------------
+    Extra Summary
+  ---------------*/
+
+  .event > .content .extra {
+    margin: @extraMargin;
+    background: @extraBackground;
+    padding: @extraPadding;
+    color: @extraColor;
+  }
+
+  /* Images */
+
+  .event > .content .extra.images img {
+    display: inline-block;
+    margin: @extraImageMargin;
+    width: @extraImageWidth;
+  }
+
+  /* Text */
+
+  .event > .content .extra.text {
+    padding: @extraTextPadding;
+    border-left: @extraTextPointer;
+    font-size: @extraTextFontSize;
+    line-height: @extraTextLineHeight;
+  }
+
+  /*--------------
+        Meta
+  ---------------*/
+
+  .event > .content .meta {
+    display: @metadataDisplay;
+    font-size: @metadataFontSize;
+    margin: @metadataMargin;
+    background: @metadataBackground;
+    border: @metadataBorder;
+    border-radius: @metadataBorderRadius;
+    box-shadow: @metadataBoxShadow;
+    padding: @metadataPadding;
+    color: @metadataColor;
+  }
+
+  .event > .content .meta > * {
+    position: relative;
+    margin-left: @metadataElementSpacing;
+  }
+
+  .event > .content .meta > *:after {
+    content: @metadataDivider;
+    color: @metadataDividerColor;
+    top: 0;
+    left: @metadataDividerOffset;
+    opacity: 1;
+    position: absolute;
+    vertical-align: top;
+  }
+
+  .event > .content .meta .like {
+    color: @likeColor;
+    transition: @likeTransition;
+  }
+
+  .event > .content .meta .like:hover .icon {
+    color: @likeHoverColor;
+  }
+
+  .event > .content .meta .active.like .icon {
+    color: @likeActiveColor;
+  }
+
+  /* First element */
+
+  .event > .content .meta > :first-child {
+    margin-left: 0em;
+  }
+
+  .event > .content .meta > :first-child::after {
+    display: none;
+  }
+
+  /* Action */
+
+  .event > .content .meta a,
+  .event > .content .meta > .icon {
+    cursor: @metadataActionCursor;
+    opacity: @metadataActionOpacity;
+    color: @metadataActionColor;
+    transition: @metadataActionTransition;
+  }
+
+  .event > .content .meta a:hover,
+  .event > .content .meta a:hover .icon,
+  .event > .content .meta > .icon:hover {
+    color: @metadataActionHoverColor;
+  }
 }

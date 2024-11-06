@@ -200,5 +200,5 @@ RequestDetail.defaultProps = {
   onBeforeAction: undefined,
   onAfterAction: undefined,
   onActionError: undefined,
-  timelinePageSize: 10,
+  timelinePageSize: 25,
 };
