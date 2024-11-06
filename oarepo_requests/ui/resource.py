@@ -177,5 +177,5 @@ class RequestUIResource(UIResource):
                 default_macro="PermissionDenied",
             ),
             pid=getattr(error, "pid_value", None) or getattr(error, "pid", None),
-            # error=error,
+            error=error,
         )

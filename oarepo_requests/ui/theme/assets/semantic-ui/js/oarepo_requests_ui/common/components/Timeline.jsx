@@ -14,7 +14,7 @@ import Overridable, {
   overrideStore,
 } from "react-overridable";
 
-const overriddenComponents = { ...overrideStore.getAll() };
+const overriddenComponents = overrideStore.getAll();
 
 export const Timeline = ({ request, timelinePageSize }) => {
   const [page, setPage] = useState(1);
