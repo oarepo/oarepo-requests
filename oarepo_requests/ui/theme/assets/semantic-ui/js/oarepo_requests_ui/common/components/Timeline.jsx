@@ -5,7 +5,7 @@ import {
   EventSubmitForm,
   TimelineCommentEvent,
   TimelineActionEvent,
-} from "@js/oarepo_requests_detail/components";
+} from "@js/oarepo_requests_common";
 import PropTypes from "prop-types";
 import { http } from "react-invenio-forms";
 import { useQuery } from "@tanstack/react-query";

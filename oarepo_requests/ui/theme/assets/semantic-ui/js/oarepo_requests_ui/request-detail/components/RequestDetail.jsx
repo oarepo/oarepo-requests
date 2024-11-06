@@ -12,7 +12,6 @@ import {
   Loader,
   Message,
 } from "semantic-ui-react";
-import { TopicPreview } from ".";
 import PropTypes from "prop-types";
 import { useQuery, useIsMutating } from "@tanstack/react-query";
 import { http } from "react-invenio-forms";
@@ -23,6 +22,7 @@ import {
   SideRequestInfo,
   Timeline,
   CallbackContextProvider,
+  TopicPreview,
 } from "@js/oarepo_requests_common";
 import { Formik } from "formik";
 

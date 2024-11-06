@@ -10,3 +10,7 @@ export * from "./Timeline";
 export * from "./ConfirmationModalCancelButton";
 export * from "./ConfirmationModalConfirmButton";
 export * from "./RequestModalContentAndActions";
+export { TopicPreview } from "./TopicPreview";
+export { default as TimelineCommentEvent } from "./TimelineCommentEvent";
+export { EventSubmitForm } from "./EventSubmitForm";
+export { TimelineActionEvent } from "./TimelineActionEvent";
