@@ -24,7 +24,7 @@ const TimelineCommentEvent = ({ event }) => {
           <Feed.Summary>
             <b>{creatorLabel}</b>
             <Feed.Date>
-              {i18next.t("commented")}{" "}
+              {i18next.t("requestCommented")}{" "}
               {toRelativeTime(event.created, i18next.language)}
             </Feed.Date>
           </Feed.Summary>
