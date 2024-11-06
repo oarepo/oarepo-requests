@@ -166,6 +166,7 @@ class RequestUIResource(UIResource):
                 default_macro="NotFound",
             ),
             pid=getattr(error, "pid_value", None) or getattr(error, "pid", None),
+            error=error,
         )
 
     def permission_denied(self, error, *args, **kwargs):
@@ -176,4 +177,5 @@ class RequestUIResource(UIResource):
                 default_macro="PermissionDenied",
             ),
             pid=getattr(error, "pid_value", None) or getattr(error, "pid", None),
+            # error=error,
         )

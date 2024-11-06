@@ -16,7 +16,7 @@ export const TimelineActionEvent = ({ event }) => {
 
   return (
     <div className="requests action-event-container">
-      <Feed.Event key={event.id}>
+      <Feed.Event>
         <div className="action-event-vertical-line"></div>
         <Feed.Content>
           <Feed.Summary className="flex align-items-center">

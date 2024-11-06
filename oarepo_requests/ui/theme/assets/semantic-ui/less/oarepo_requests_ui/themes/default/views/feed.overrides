@@ -2,23 +2,23 @@
   .requests.comment-event-container {
     position: relative;
     .event {
-      border: 1px solid @borderColor;
-      border-radius: 5px;
-      padding: 0.5rem;
+      border: @commentEventBorder;
+      border-radius: @commentEventBorderRadius;
+      padding: @commentEventPadding;
       .requests.comment-event-avatar {
-        width: 2rem;
-        height: 2rem;
+        width: @commentEventAvatarWidth;
+        height: @commentEventAvatarHeight;
         position: absolute;
         bottom: 0.5rem;
-        left: 1rem;
+        left: calc(@verticalLineLeftMargin - @commentEventAvatarWidth / 2);
         z-index: 1;
       }
     }
     .comment-event-vertical-line {
       height: 3rem;
       width: 0;
-      border-left: 1px solid @borderColor;
-      margin-left: 2rem;
+      border-left: @commentEventBorder;
+      margin-left: @verticalLineLeftMargin;
     }
   }
   .requests.action-event-container {
@@ -28,8 +28,8 @@
       padding-top: 1rem;
       padding-bottom: 2rem;
       .requests.action-event-avatar {
-        width: 1.5rem;
-        height: 1.5rem;
+        width: @actionEventAvatarWidth;
+        height: @actionEventAvatarHeight;
       }
       .summary {
         .requests.action-event-avatar {
@@ -37,19 +37,23 @@
         }
         position: relative;
         z-index: 1;
-        margin-left: 1.25rem;
+        margin-left: calc(
+          @verticalLineLeftMargin - @actionEventIconSize / 2 -
+            @commentEventBorderWidth
+        );
       }
     }
     .requests.action-event-icon {
-      font-size: 1.5rem;
+      font-size: @actionEventIconSize;
+      line-height: normal;
     }
     .action-event-vertical-line {
       position: absolute;
       top: 0;
       bottom: 0;
       width: 0;
-      border-left: 1px solid @borderColor;
-      margin-left: 2rem;
+      border-left: @commentEventBorder;
+      margin-left: @verticalLineLeftMargin;
     }
   }
 }

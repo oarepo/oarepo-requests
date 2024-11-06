@@ -25,7 +25,7 @@ export const getRequestStatusIcon = (requestStatus) => {
     case "submitted":
       return { name: "clock", color: "grey" };
     case "cancelled":
-      return { name: "close", color: "red" };
+      return { name: "square", color: "black" };
     case "accepted":
       return { name: "check circle", color: "green" };
     case "declined":
@@ -39,8 +39,8 @@ export const getRequestStatusIcon = (requestStatus) => {
   }
 };
 
-export const getFeedMessage = (requestStatus) => {
-  switch (requestStatus?.toLowerCase()) {
+export const getFeedMessage = (eventStatus) => {
+  switch (eventStatus?.toLowerCase()) {
     case "created":
       return i18next.t("requestCreated");
     case "submitted":
