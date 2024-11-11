@@ -1,3 +1,5 @@
+import copy
+
 from invenio_access.permissions import system_identity
 from invenio_pidstore.errors import PersistentIdentifierError
 from invenio_records_resources.proxies import current_service_registry
@@ -192,3 +194,18 @@ def request_identity_matches(entity_reference, identity):
             return bool(identity.provides.intersection(needs))
     except PersistentIdentifierError:
         return False
+
+
+def merge_resource_configs(config_to_merge_in, original_config):
+    actual_config = copy.deepcopy(config_to_merge_in)
+    original_keys = {x for x in dir(original_config) if not x.startswith("_")}
+    merge_in_keys = {
+        x for x in dir(config_to_merge_in) if not x.startswith("_")
+    }  # have to do this bc hasattr fails on resolving response_handlers
+    for copy_from_original_key in original_keys - merge_in_keys:
+        setattr(
+            actual_config,
+            copy_from_original_key,
+            getattr(original_config, copy_from_original_key),
+        )
+    return actual_config
