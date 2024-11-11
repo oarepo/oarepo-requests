@@ -5,6 +5,7 @@ from invenio_users_resources.proxies import (
     current_users_service,
 )
 from oarepo_runtime.i18n import gettext as _
+from invenio_pidstore.errors import PIDDoesNotExistError
 
 from ..proxies import current_oarepo_requests
 from ..utils import get_matching_service_for_refdict
@@ -51,8 +52,11 @@ class OARepoUIResolver:
         raise NotImplementedError("Parent entity ui resolver should be abstract")
 
     def resolve_one(self, identity, reference):
-        record = self._search_one(identity, reference)
-        if not record:
+        try:
+            record = self._search_one(identity, reference)
+            if not record:
+                return fallback_result(reference)
+        except PIDDoesNotExistError:
             return fallback_result(reference)
         resolved = self._resolve(record, reference)
         return resolved
