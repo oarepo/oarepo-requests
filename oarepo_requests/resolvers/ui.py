@@ -1,3 +1,4 @@
+from invenio_pidstore.errors import PIDDoesNotExistError
 from invenio_records_resources.resources.errors import PermissionDeniedError
 from invenio_search.engine import dsl
 from invenio_users_resources.proxies import (
@@ -5,7 +6,6 @@ from invenio_users_resources.proxies import (
     current_users_service,
 )
 from oarepo_runtime.i18n import gettext as _
-from invenio_pidstore.errors import PIDDoesNotExistError
 
 from ..proxies import current_oarepo_requests
 from ..utils import get_matching_service_for_refdict

@@ -46,6 +46,26 @@ class RequestEntityLink(RequestLink):
         self._resolve(obj, context)
         return super().expand(obj, context)
 
+
+class RequestTypeSpecificLinks(RequestLink):
+    """Utility class for keeping track of and resolve links."""
+
+    def __init__(self, when=None, vars=None):
+        """Constructor."""
+        self._when_func = when
+        self._vars_func = vars
+
+    def should_render(self, obj, ctx):
+        """Determine if the link should be rendered."""
+        if not hasattr(obj.type, "links"):
+            return False
+        return super().should_render(obj, ctx)
+
+    def expand(self, obj, context):
+        """Expand the URI Template."""
+        return obj.type.links(request=obj, **context)
+
+
 class OARepoRequestsServiceConfig(RequestsServiceConfig):
     service_id = "oarepo_requests"
 
@@ -62,4 +82,5 @@ class OARepoRequestsServiceConfig(RequestsServiceConfig):
         ),
         "receiver": RequestEntityLink("{+entity_self}", entity="receiver"),
         "receiver_html": RequestEntityLink("{+entity_self_html}", entity="receiver"),
+        "type_specific": RequestTypeSpecificLinks(),
     }
