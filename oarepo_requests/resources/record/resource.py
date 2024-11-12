@@ -1,4 +1,3 @@
-import copy
 
 from flask import g
 from flask_resources import resource_requestctx, response_handler, route
@@ -11,6 +10,8 @@ from invenio_records_resources.resources.records.resource import (
 )
 from invenio_records_resources.resources.records.utils import search_preference
 
+from oarepo_requests.utils import merge_resource_configs
+
 
 class RecordRequestsResource(RecordResource):
     def __init__(self, record_requests_config, config, service):
@@ -19,13 +20,10 @@ class RecordRequestsResource(RecordResource):
         :param service:
         :param record_requests_config: config specific for the record request serivce
         """
-        actual_config = copy.deepcopy(record_requests_config)
-        actual_config.blueprint_name = f"{config.blueprint_name}_requests"
-        vars_to_overwrite = [x for x in dir(config) if not x.startswith("_")]
-        actual_keys = dir(actual_config)
-        for var in vars_to_overwrite:
-            if var not in actual_keys:
-                setattr(actual_config, var, getattr(config, var))
+        record_requests_config.blueprint_name = f"{config.blueprint_name}_requests"
+        actual_config = merge_resource_configs(
+            config_to_merge_in=record_requests_config, original_config=config
+        )
         super().__init__(actual_config, service)
 
     def create_url_rules(self):
