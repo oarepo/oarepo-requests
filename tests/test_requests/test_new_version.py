@@ -37,6 +37,7 @@ def test_new_version_autoaccept(
     assert request["status"] == "accepted"
     assert not request["is_open"]
     assert request["is_closed"]
+    assert "topic_redirect_link" in request["links"]["type_specific"]
 
     assert "draft_record:links:self" in request["payload"]
     assert "draft_record:links:self_html" in request["payload"]

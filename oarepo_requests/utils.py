@@ -1,5 +1,6 @@
 import copy
 
+from flask import current_app
 from invenio_access.permissions import system_identity
 from invenio_pidstore.errors import PersistentIdentifierError
 from invenio_records_resources.proxies import current_service_registry
@@ -209,3 +210,11 @@ def merge_resource_configs(config_to_merge_in, original_config):
             getattr(original_config, copy_from_original_key),
         )
     return actual_config
+
+
+def get_record_service_for_record_cls(record_cls):
+    if not record_cls:
+        return None
+    if "OAREPO_PRIMARY_RECORD_SERVICE" in current_app.config:
+        service_id = current_app.config["OAREPO_PRIMARY_RECORD_SERVICE"][record_cls]
+        return current_service_registry.get(service_id)

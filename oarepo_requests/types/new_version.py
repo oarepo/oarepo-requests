@@ -8,7 +8,11 @@ from oarepo_runtime.i18n import lazy_gettext as _
 from typing_extensions import override
 
 from ..actions.new_version import NewVersionAcceptAction
-from ..utils import is_auto_approved, request_identity_matches
+from ..utils import (
+    get_record_service_for_record_cls,
+    is_auto_approved,
+    request_identity_matches,
+)
 from .generic import NonDuplicableOARepoRequestType
 from .ref_types import ModelRefTypes
 
@@ -28,6 +32,14 @@ class NewVersionRequestType(
             data_key="draft_record:links:self_html",
         ),
     }
+
+    def links(self, request, **kwargs):
+        if request.status == "accepted":
+            service = get_record_service_for_record_cls(request.topic.record_cls)
+            record_item = service.read_draft(
+                kwargs["identity"], request.topic._parse_ref_dict_id()
+            )
+            return {"topic_redirect_link": record_item["links"]["edit_html"]}
 
     @classmethod
     @property
