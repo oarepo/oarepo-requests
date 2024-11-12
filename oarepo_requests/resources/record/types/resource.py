@@ -1,4 +1,3 @@
-
 from flask import g
 from flask_resources import resource_requestctx, response_handler, route
 from flask_resources.resources import Resource

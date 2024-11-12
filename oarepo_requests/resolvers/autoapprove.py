@@ -16,7 +16,7 @@ class AutoApproveProxy(EntityProxy):
         return []  # granttokens calls this
 
     def pick_resolved_fields(self, identity, resolved_dict):
-        return {"auto_approve": resolved_dict["value"]}
+        return {"auto_approve": resolved_dict["id"]}
 
 
 class AutoApproveResolver(EntityResolver):
@@ -25,7 +25,7 @@ class AutoApproveResolver(EntityResolver):
     def __init__(self):
         self.type_key = self.type_id
         super().__init__(
-            None,
+            "auto_approve",
         )
 
     def matches_reference_dict(self, ref_dict):
