@@ -3,7 +3,7 @@ from functools import cached_property
 import importlib_metadata
 from invenio_base.utils import obj_or_import_string
 from invenio_requests.proxies import current_events_service
-from oarepo_runtime.services.keyword_entity.service import KeywordEntityService
+from oarepo_runtime.services.entity.service import KeywordEntityService
 
 from oarepo_requests.proxies import current_oarepo_requests
 from oarepo_requests.resources.events.config import OARepoRequestsCommentsResourceConfig

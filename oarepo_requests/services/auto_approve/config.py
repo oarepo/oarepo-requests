@@ -1,4 +1,4 @@
-from oarepo_runtime.services.keyword_entity.config import KeywordEntityServiceConfig
+from oarepo_runtime.services.entity.config import KeywordEntityServiceConfig
 
 
 class AutoApproveEntityServiceConfig(KeywordEntityServiceConfig):
