@@ -9,29 +9,18 @@ from invenio_requests.proxies import (
 )
 from invenio_requests.resolvers.registry import ResolverRegistry
 from invenio_search.engine import dsl
-
-try:
-    from oarepo_workflows import AutoApprove, Workflow, WorkflowRequest
-    from oarepo_workflows.errors import MissingWorkflowError
-    from oarepo_workflows.proxies import current_oarepo_workflows
-except ImportError:
-    current_oarepo_workflows = None
-    Workflow = None
-    WorkflowRequest = None
-    AutoApprove = None
-    MissingWorkflowError = None
+from oarepo_workflows import AutoApprove, Workflow, WorkflowRequest
+from oarepo_workflows.errors import MissingWorkflowError
+from oarepo_workflows.proxies import current_oarepo_workflows
 
 
 def allowed_request_types_for_record(record):
-    if current_oarepo_workflows:
-        try:
-            workflow_requests = current_oarepo_workflows.get_workflow(record).requests()
-        except MissingWorkflowError:
-            # workflow not defined on the record, probably not a workflow-enabled record
-            # so returning all matching request types
-            # TODO: is this correct?
-            workflow_requests = None
-    else:
+    try:
+        workflow_requests = current_oarepo_workflows.get_workflow(record).requests()
+    except MissingWorkflowError:
+        # workflow not defined on the record, probably not a workflow-enabled record
+        # so returning all matching request types
+        # TODO: is this correct?
         workflow_requests = None
 
     request_types = current_request_type_registry._registered_types
@@ -168,9 +157,6 @@ def get_receiver_for_request_type(request_type, identity, topic):
 
 
 def is_auto_approved(request_type, *, identity=None, topic=None, receiver=None):
-    if not current_oarepo_workflows:
-        return False
-
     if not receiver:
         receiver = get_receiver_for_request_type(
             request_type=request_type, identity=identity, topic=topic

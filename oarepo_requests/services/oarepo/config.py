@@ -46,6 +46,7 @@ class RequestEntityLink(RequestLink):
         self._resolve(obj, context)
         return super().expand(obj, context)
 
+
 class OARepoRequestsServiceConfig(RequestsServiceConfig):
     service_id = "oarepo_requests"
 

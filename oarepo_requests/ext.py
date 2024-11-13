@@ -3,14 +3,12 @@ from functools import cached_property
 import importlib_metadata
 from invenio_base.utils import obj_or_import_string
 from invenio_requests.proxies import current_events_service
-from oarepo_runtime.services.entity.service import KeywordEntityService
 
 from oarepo_requests.proxies import current_oarepo_requests
 from oarepo_requests.resources.events.config import OARepoRequestsCommentsResourceConfig
 from oarepo_requests.resources.events.resource import OARepoRequestsCommentsResource
 from oarepo_requests.resources.oarepo.config import OARepoRequestsResourceConfig
 from oarepo_requests.resources.oarepo.resource import OARepoRequestsResource
-from oarepo_requests.services.auto_approve.config import AutoApproveEntityServiceConfig
 from oarepo_requests.services.oarepo.config import OARepoRequestsServiceConfig
 from oarepo_requests.services.oarepo.service import OARepoRequestsService
 
@@ -98,10 +96,6 @@ class OARepoRequests:
             config=OARepoRequestsCommentsResourceConfig.build(app),
         )
 
-        self.autoapprove_service = KeywordEntityService(
-            config=AutoApproveEntityServiceConfig()
-        )
-
     from invenio_requests.customizations.actions import RequestAction
 
     def action_components(self, action: RequestAction):
@@ -160,11 +154,6 @@ def finalize_app(app):
     rr_ext.registry.register(
         ext.requests_service,
         service_id=ext.requests_service.config.service_id,
-    )
-
-    rr_ext.registry.register(
-        ext.autoapprove_service,
-        service_id=ext.autoapprove_service.config.service_id,
     )
 
     # todo i have to do this cause there is bug in invenio-requests for events

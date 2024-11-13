@@ -4,6 +4,9 @@ from invenio_records_resources.references.entity_resolvers import EntityProxy
 from invenio_requests.resolvers.registry import ResolverRegistry
 from invenio_search.engine import dsl
 from oarepo_runtime.datastreams.utils import get_record_service_for_record
+from oarepo_workflows import WorkflowPermission
+from oarepo_workflows.errors import InvalidWorkflowError, MissingWorkflowError
+from oarepo_workflows.proxies import current_oarepo_workflows
 from oarepo_workflows.requests.policy import RecipientGeneratorMixin
 from sqlalchemy.exc import NoResultFound
 
@@ -48,90 +51,84 @@ class IfEventType(ConditionalGenerator):
         return event_type.type_id in self.event_types
 
 
-try:
-    from oarepo_workflows import WorkflowPermission
-    from oarepo_workflows.errors import InvalidWorkflowError, MissingWorkflowError
-    from oarepo_workflows.proxies import current_oarepo_workflows
+class RequestPolicyWorkflowCreators(WorkflowPermission):
+    #
 
-    class RequestPolicyWorkflowCreators(WorkflowPermission):
-        #
+    def _getter(self, **kwargs):
+        raise NotImplementedError()
 
-        def _getter(self, **kwargs):
-            raise NotImplementedError()
+    def _kwargs_parser(self, **kwargs):
+        return kwargs
 
-        def _kwargs_parser(self, **kwargs):
-            return kwargs
+    # return empty needs on MissingTopicError
+    # match None in query filter
+    # excludes empty needs
+    def needs(self, **kwargs):
+        try:
+            kwargs = self._kwargs_parser(**kwargs)
+            workflow_request = self._getter(**kwargs)
+            return workflow_request.needs(**kwargs)
+        except (MissingWorkflowError, InvalidWorkflowError, MissingTopicError):
+            return []
 
-        # return empty needs on MissingTopicError
-        # match None in query filter
-        # excludes empty needs
-        def needs(self, **kwargs):
-            try:
-                kwargs = self._kwargs_parser(**kwargs)
-                workflow_request = self._getter(**kwargs)
-                return workflow_request.needs(**kwargs)
-            except (MissingWorkflowError, InvalidWorkflowError, MissingTopicError):
-                return []
+    def excludes(self, **kwargs):
+        try:
+            kwargs = self._kwargs_parser(**kwargs)
+            workflow_request = self._getter(**kwargs)
+            return workflow_request.excludes(**kwargs)
+        except (MissingWorkflowError, InvalidWorkflowError, MissingTopicError):
+            return []
 
-        def excludes(self, **kwargs):
-            try:
-                kwargs = self._kwargs_parser(**kwargs)
-                workflow_request = self._getter(**kwargs)
-                return workflow_request.excludes(**kwargs)
-            except (MissingWorkflowError, InvalidWorkflowError, MissingTopicError):
-                return []
-
-        # not tested
-        def query_filter(self, record=None, request_type=None, **kwargs):
-            try:
-                workflow_request = current_oarepo_workflows.get_workflow(
-                    record
-                ).requests()[request_type.type_id]
-                return workflow_request.query_filters(
-                    request_type=request_type, record=record, **kwargs
-                )
-            except (MissingWorkflowError, InvalidWorkflowError, MissingTopicError):
-                return dsl.Q("match_none")
-
-    class RequestCreatorsFromWorkflow(RequestPolicyWorkflowCreators):
-        def _getter(self, **kwargs):
-            request_type = kwargs["request_type"]
-            if "record" not in kwargs:
-                raise MissingTopicError(
-                    "Topic not found in request permissions generator arguments, can't get workflow."
-                )
-            record = kwargs["record"]
-            return current_oarepo_workflows.get_workflow(record).requests()[
+    # not tested
+    def query_filter(self, record=None, request_type=None, **kwargs):
+        try:
+            workflow_request = current_oarepo_workflows.get_workflow(record).requests()[
                 request_type.type_id
             ]
-
-    class EventCreatorsFromWorkflow(RequestPolicyWorkflowCreators):
-        def _kwargs_parser(self, **kwargs):
-            try:
-                record = kwargs[
-                    "request"
-                ].topic.resolve()  # publish tries to resolve deleted draft
-            except:
-                raise MissingTopicError(
-                    "Topic not found in request event permissions generator arguments, can't get workflow."
-                )
-            kwargs["record"] = record
-            return kwargs
-
-        def _getter(self, **kwargs):
-            if "record" not in kwargs:
-                return None
-            event_type = kwargs["event_type"]
-            request = kwargs["request"]
-            record = kwargs["record"]
-            return (
-                current_oarepo_workflows.get_workflow(record)
-                .requests()[request.type.type_id]
-                .allowed_events[event_type.type_id]
+            return workflow_request.query_filters(
+                request_type=request_type, record=record, **kwargs
             )
+        except (MissingWorkflowError, InvalidWorkflowError, MissingTopicError):
+            return dsl.Q("match_none")
 
-except ImportError:
-    pass
+
+class RequestCreatorsFromWorkflow(RequestPolicyWorkflowCreators):
+    def _getter(self, **kwargs):
+        request_type = kwargs["request_type"]
+        if "record" not in kwargs:
+            raise MissingTopicError(
+                "Topic not found in request permissions generator arguments, can't get workflow."
+            )
+        record = kwargs["record"]
+        return current_oarepo_workflows.get_workflow(record).requests()[
+            request_type.type_id
+        ]
+
+
+class EventCreatorsFromWorkflow(RequestPolicyWorkflowCreators):
+    def _kwargs_parser(self, **kwargs):
+        try:
+            record = kwargs[
+                "request"
+            ].topic.resolve()  # publish tries to resolve deleted draft
+        except:
+            raise MissingTopicError(
+                "Topic not found in request event permissions generator arguments, can't get workflow."
+            )
+        kwargs["record"] = record
+        return kwargs
+
+    def _getter(self, **kwargs):
+        if "record" not in kwargs:
+            return None
+        event_type = kwargs["event_type"]
+        request = kwargs["request"]
+        record = kwargs["record"]
+        return (
+            current_oarepo_workflows.get_workflow(record)
+            .requests()[request.type.type_id]
+            .allowed_events[event_type.type_id]
+        )
 
 
 class IfRequestedBy(RecipientGeneratorMixin, ConditionalGenerator):
