@@ -11,7 +11,7 @@ from ..actions.new_version import NewVersionAcceptAction
 from ..utils import is_auto_approved, request_identity_matches
 from .generic import NonDuplicableOARepoRequestType
 from .ref_types import ModelRefTypes
-
+from marshmallow.validate import OneOf
 
 class NewVersionRequestType(
     NonDuplicableOARepoRequestType
@@ -27,6 +27,7 @@ class NewVersionRequestType(
             attribute="draft_record:links:self_html",
             data_key="draft_record:links:self_html",
         ),
+        "keep_files": ma.fields.String(validate=OneOf(['true', 'false']))
     }
 
     @classmethod
@@ -39,6 +40,16 @@ class NewVersionRequestType(
 
     description = _("Request requesting creation of new version of a published record.")
     allowed_topic_ref_types = ModelRefTypes(published=True, draft=True)
+
+    form = {
+        "field": "keep_files",
+        "ui_widget": "BooleanCheckbox",
+        "props": {
+            "label": _("Keep files"),
+            "placeholder": _("Keep files in the new version?"),
+            "required": False,
+        },
+    }
 
     @classmethod
     def is_applicable_to(cls, identity, topic, *args, **kwargs):
