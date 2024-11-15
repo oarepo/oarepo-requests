@@ -26,7 +26,8 @@ def test_publish_service(users, record_service, default_workflow_json, search_cl
     )
     assert "created_by" in submit_result.links
     assert "topic" in submit_result.links
-    assert "topic_html" in submit_result.links
+    assert "self" in submit_result.links["topic"]
+    assert "self_html" in submit_result.links["topic"]
 
     accept_result = current_invenio_requests_service.execute_action(
         receiver.identity, request.id, "accept"
