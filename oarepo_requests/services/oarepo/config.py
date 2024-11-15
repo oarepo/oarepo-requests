@@ -2,13 +2,13 @@ from invenio_requests.records.api import Request
 from invenio_requests.services import RequestsServiceConfig
 from invenio_requests.services.requests import RequestLink
 
-from oarepo_requests.resolvers.ui import resolve
+from oarepo_requests.utils import get_record_service_for_record_cls
 
 
 class RequestEntityLink(RequestLink):
     def __init__(self, uritemplate, when=None, vars=None, entity="topic"):
         super().__init__(uritemplate, when, vars)
-        self.entity = entity
+        self._entity = entity
 
     def vars(self, record: Request, vars):
         super().vars(record, vars)
@@ -23,21 +23,29 @@ class RequestEntityLink(RequestLink):
             return True
 
     def _resolve(self, obj, ctx):
-        reference_dict = getattr(obj, self.entity).reference_dict
+        reference_dict = getattr(obj, self._entity).reference_dict
         key = "entity:" + ":".join(
             f"{x[0]}:{x[1]}" for x in sorted(reference_dict.items())
         )
         if key in ctx:
             return ctx[key]
         try:
-            entity = resolve(ctx["identity"], reference_dict)
+            topic = obj.topic.resolve()
+            service = get_record_service_for_record_cls(obj.topic.record_cls)
+            reader = (
+                service.read_draft
+                if getattr(topic, "is_draft", False)
+                else service.read
+            )
+            entity = reader(ctx["identity"], obj.topic._parse_ref_dict_id())
         except Exception:  # noqa
             entity = {}
         ctx[key] = entity
         return entity
 
     def _expand_entity(self, entity, vars):
-        vars.update({f"entity_{k}": v for k, v in entity.get("links", {}).items()})
+        if hasattr(entity, "links"):
+            vars.update({f"entity_{k}": v for k, v in entity.links.items()})
 
     def expand(self, obj, context):
         """Expand the URI Template."""
@@ -47,23 +55,35 @@ class RequestEntityLink(RequestLink):
         return super().expand(obj, context)
 
 
-class RequestTypeSpecificLinks(RequestLink):
+class RequestEntityLinks(RequestEntityLink):
     """Utility class for keeping track of and resolve links."""
 
-    def __init__(self, when=None, vars=None):
+    def __init__(self, *request_entity_links, entity="topic", when=None, vars=None):
         """Constructor."""
+        self._request_entity_links = [
+            {name: RequestEntityLink(link, entity=entity, **kwargs)}
+            for name, link, kwargs in request_entity_links
+        ]
+        self._entity = entity
         self._when_func = when
         self._vars_func = vars
 
-    def should_render(self, obj, ctx):
-        """Determine if the link should be rendered."""
-        if not hasattr(obj.type, "links"):
-            return False
-        return super().should_render(obj, ctx)
-
     def expand(self, obj, context):
-        """Expand the URI Template."""
-        return obj.type.links(request=obj, **context)
+        res = {}
+        for link_dict in self._request_entity_links:
+            name = list(link_dict.keys())[0]
+            link = list(link_dict.values())[0]
+            if link.should_render(obj, context):
+                res[name] = link.expand(obj, context)
+        if hasattr(obj.type, "type_links"):
+            entity = self._resolve(obj, context)
+            res.update(
+                obj.type.type_links(
+                    request=obj,
+                    **(context | {"cur_entity": entity, "entity_type": self._entity}),
+                )
+            )
+        return res
 
 
 class OARepoRequestsServiceConfig(RequestsServiceConfig):
@@ -74,13 +94,18 @@ class OARepoRequestsServiceConfig(RequestsServiceConfig):
         "comments": RequestLink("{+api}/requests/extended/{id}/comments"),
         "timeline": RequestLink("{+api}/requests/extended/{id}/timeline"),
         "self_html": RequestLink("{+ui}/requests/{id}"),
-        "topic": RequestEntityLink("{+entity_self}"),
-        "topic_html": RequestEntityLink("{+entity_self_html}"),
-        "created_by": RequestEntityLink("{+entity_self}", entity="created_by"),
-        "created_by_html": RequestEntityLink(
-            "{+entity_self_html}", entity="created_by"
+        "topic": RequestEntityLinks(
+            ("self", "{+entity_self}", {}),  # can't use self=RequestEntityLink...
+            ("self_html", "{+entity_self_html}", {}),
         ),
-        "receiver": RequestEntityLink("{+entity_self}", entity="receiver"),
-        "receiver_html": RequestEntityLink("{+entity_self_html}", entity="receiver"),
-        "type_specific": RequestTypeSpecificLinks(),
+        "created_by": RequestEntityLinks(
+            ("self", "{+entity_self}", {}),
+            ("self_html", "{+entity_self_html}", {}),
+            entity="created_by",
+        ),
+        "receiver": RequestEntityLinks(
+            ("self", "{+entity_self}", {}),
+            ("self_html", "{+entity_self_html}", {}),
+            entity="receiver",
+        ),
     }

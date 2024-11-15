@@ -9,11 +9,7 @@ from typing_extensions import override
 
 from oarepo_requests.actions.edit_topic import EditTopicAcceptAction
 
-from ..utils import (
-    get_record_service_for_record_cls,
-    is_auto_approved,
-    request_identity_matches,
-)
+from ..utils import is_auto_approved, request_identity_matches
 from .generic import NonDuplicableOARepoRequestType
 from .ref_types import ModelRefTypes
 
@@ -32,13 +28,11 @@ class EditPublishedRecordRequestType(NonDuplicableOARepoRequestType):
         ),
     }
 
-    def links(self, request, **kwargs):
-        if request.status == "accepted":
-            service = get_record_service_for_record_cls(request.topic.record_cls)
-            record_item = service.read_draft(
-                kwargs["identity"], request.topic._parse_ref_dict_id()
-            )
-            return {"topic_redirect_link": record_item["links"]["edit_html"]}
+    def type_links(self, request, **kwargs):
+        if request.status == "accepted" and kwargs["entity_type"] == "topic":
+            return {"topic_redirect_link": kwargs["cur_entity"]["links"]["edit_html"]}
+        else:
+            return {}
 
     @classmethod
     @property
