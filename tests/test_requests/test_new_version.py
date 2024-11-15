@@ -53,6 +53,7 @@ def test_new_version_autoaccept(
     assert search[0]["id"] != search[1]["id"]
     assert search[0]["parent"]["id"] == search[1]["parent"]["id"]
 
+
 def test_new_version_files(
     vocab_cf,
     logged_client,
@@ -70,7 +71,10 @@ def test_new_version_files(
 
     resp_request_create1 = creator_client.post(
         urls["BASE_URL_REQUESTS"],
-        json={**new_version_data_function(record1["id"]), "payload": {"keep_files": "true"}},
+        json={
+            **new_version_data_function(record1["id"]),
+            "payload": {"keep_files": "true"},
+        },
     )
     resp_request_create2 = creator_client.post(
         urls["BASE_URL_REQUESTS"],
@@ -85,9 +89,19 @@ def test_new_version_files(
     )
 
     ThesisDraft.index.refresh()
-    draft_search = creator_client.get(f"/user/thesis/").json["hits"]["hits"]  # a link is in another pull request for now
-    new_version_1 = [x for x in draft_search if x["parent"]["id"] == record1.parent["id"] and x["state"] == "draft"]
-    new_version_2 = [x for x in draft_search if x["parent"]["id"] == record2.parent["id"] and x["state"] == "draft"]
+    draft_search = creator_client.get(f"/user/thesis/").json["hits"][
+        "hits"
+    ]  # a link is in another pull request for now
+    new_version_1 = [
+        x
+        for x in draft_search
+        if x["parent"]["id"] == record1.parent["id"] and x["state"] == "draft"
+    ]
+    new_version_2 = [
+        x
+        for x in draft_search
+        if x["parent"]["id"] == record2.parent["id"] and x["state"] == "draft"
+    ]
 
     assert len(new_version_1) == 1
     assert len(new_version_2) == 1

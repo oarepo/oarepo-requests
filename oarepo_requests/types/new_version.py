@@ -4,6 +4,7 @@ import marshmallow as ma
 from invenio_records_resources.services.uow import RecordCommitOp
 from invenio_requests.proxies import current_requests_service
 from invenio_requests.records.api import Request
+from marshmallow.validate import OneOf
 from oarepo_runtime.i18n import lazy_gettext as _
 from typing_extensions import override
 
@@ -11,7 +12,7 @@ from ..actions.new_version import NewVersionAcceptAction
 from ..utils import is_auto_approved, request_identity_matches
 from .generic import NonDuplicableOARepoRequestType
 from .ref_types import ModelRefTypes
-from marshmallow.validate import OneOf
+
 
 class NewVersionRequestType(
     NonDuplicableOARepoRequestType
@@ -27,7 +28,7 @@ class NewVersionRequestType(
             attribute="draft_record:links:self_html",
             data_key="draft_record:links:self_html",
         ),
-        "keep_files": ma.fields.String(validate=OneOf(['true', 'false']))
+        "keep_files": ma.fields.String(validate=OneOf(["true", "false"])),
     }
 
     @classmethod
@@ -48,6 +49,7 @@ class NewVersionRequestType(
             "label": _("Keep files"),
             "placeholder": _("Keep files in the new version?"),
             "required": False,
+            "default": True,
         },
     }
 
