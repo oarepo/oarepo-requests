@@ -41,6 +41,7 @@ class NewVersionRequestType(
 
     description = _("Request requesting creation of new version of a published record.")
     allowed_topic_ref_types = ModelRefTypes(published=True, draft=True)
+    editable = False
 
     form = {
         "field": "keep_files",
