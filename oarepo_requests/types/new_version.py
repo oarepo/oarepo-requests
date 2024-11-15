@@ -59,7 +59,7 @@ class NewVersionRequestType(
         "field": "keep_files",
         "ui_widget": "BooleanCheckbox",
         "props": {
-            "label": _("Keep files"),
+            "label": _("Keep files."),
             "placeholder": _("Keep files in the new version?"),
             "required": False,
             "default": True,
