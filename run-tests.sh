@@ -22,7 +22,9 @@ pip install -U oarepo-model-builder \
                oarepo-model-builder-tests \
                oarepo-model-builder-requests \
                oarepo-model-builder-drafts \
-               oarepo-model-builder-workflows
+               oarepo-model-builder-workflows \
+               oarepo-model-builder-files \
+               oarepo-model-builder-drafts-files
 
 if test -d ./$BUILD_TEST_DIR/$MODEL; then
   rm -rf ./$BUILD_TEST_DIR/$MODEL

@@ -52,3 +52,66 @@ def test_new_version_autoaccept(
     assert len(search) == 2
     assert search[0]["id"] != search[1]["id"]
     assert search[0]["parent"]["id"] == search[1]["parent"]["id"]
+
+
+def test_new_version_files(
+    vocab_cf,
+    logged_client,
+    users,
+    urls,
+    new_version_data_function,
+    record_with_files_factory,
+    search_clear,
+):
+    creator = users[0]
+    creator_client = logged_client(creator)
+
+    record1 = record_with_files_factory(creator.identity)
+    record2 = record_with_files_factory(creator.identity)
+
+    resp_request_create1 = creator_client.post(
+        urls["BASE_URL_REQUESTS"],
+        json={
+            **new_version_data_function(record1["id"]),
+            "payload": {"keep_files": "true"},
+        },
+    )
+    resp_request_create2 = creator_client.post(
+        urls["BASE_URL_REQUESTS"],
+        json=new_version_data_function(record2["id"]),
+    )
+
+    resp_request_submit1 = creator_client.post(
+        link_api2testclient(resp_request_create1.json["links"]["actions"]["submit"]),
+    )
+    resp_request_submit2 = creator_client.post(
+        link_api2testclient(resp_request_create2.json["links"]["actions"]["submit"]),
+    )
+
+    ThesisDraft.index.refresh()
+    draft_search = creator_client.get(f"/user/thesis/").json["hits"][
+        "hits"
+    ]  # a link is in another pull request for now
+    new_version_1 = [
+        x
+        for x in draft_search
+        if x["parent"]["id"] == record1.parent["id"] and x["state"] == "draft"
+    ]
+    new_version_2 = [
+        x
+        for x in draft_search
+        if x["parent"]["id"] == record2.parent["id"] and x["state"] == "draft"
+    ]
+
+    assert len(new_version_1) == 1
+    assert len(new_version_2) == 1
+
+    record1 = creator_client.get(
+        f"{urls['BASE_URL']}{new_version_1[0]['id']}/draft/files",
+    ).json
+    record2 = creator_client.get(
+        f"{urls['BASE_URL']}{new_version_2[0]['id']}/draft/files",
+    ).json
+
+    assert len(record1["entries"]) == 1
+    assert len(record2["entries"]) == 0

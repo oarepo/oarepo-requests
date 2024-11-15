@@ -1,5 +1,6 @@
 import copy
 import os
+from io import BytesIO
 from typing import Dict
 
 import pytest
@@ -491,7 +492,18 @@ def app_config(app_config):
         ConditionalRecipientRequestType(),
         AnotherTopicUpdatingRequestType(),
     ]
+    app_config["FILES_REST_STORAGE_CLASS_LIST"] = {
+        "L": "Local",
+        "F": "Fetch",
+        "R": "Remote",
+    }
+    app_config["FILES_REST_DEFAULT_STORAGE_CLASS"] = "L"
     return app_config
+
+
+@pytest.fixture(scope="module", autouse=True)
+def location(location):
+    return location
 
 
 @pytest.fixture(scope="module")
@@ -630,6 +642,52 @@ def record_factory(record_service, default_workflow_json):
 
 
 @pytest.fixture()
+def record_with_files_factory(record_service, default_workflow_json):
+    def record(identity, custom_workflow=None, additional_data=None):
+        json = copy.deepcopy(default_workflow_json)
+        if (
+            "files" in default_workflow_json
+            and "enabled" in default_workflow_json["files"]
+        ):
+            default_workflow_json["files"]["enabled"] = True
+        if custom_workflow:  # specifying this assumes use of workflows
+            json["parent"]["workflow"] = custom_workflow
+        json = {
+            "metadata": {
+                "creators": [
+                    "Creator 1",
+                    "Creator 2",
+                ],
+                "contributors": ["Contributor 1"],
+            }
+        }
+        json = always_merger.merge(json, default_workflow_json)
+        if additional_data:
+            always_merger.merge(json, additional_data)
+        draft = record_service.create(identity, json)
+
+        # upload file
+        # Initialize files upload
+        files_service = record_service._draft_files
+        init = files_service.init_files(
+            identity,
+            draft["id"],
+            data=[
+                {"key": "test.pdf", "metadata": {"title": "Test file"}},
+            ],
+        )
+        upload = files_service.set_file_content(
+            identity, draft["id"], "test.pdf", stream=BytesIO(b"testfile")
+        )
+        commit = files_service.commit_file(identity, draft["id"], "test.pdf")
+
+        record = record_service.publish(system_identity, draft.id)
+        return record._obj
+
+    return record
+
+
+@pytest.fixture()
 def create_draft_via_resource(default_workflow_json, urls):
     def _create_draft(
         client, expand=True, custom_workflow=None, additional_data=None, **kwargs
@@ -690,7 +748,11 @@ def role_ui_serialization():
 
 @pytest.fixture()
 def default_workflow_json():
-    return {"parent": {"workflow": "default"}, "metadata": {"title": "blabla"}}
+    return {
+        "parent": {"workflow": "default"},
+        "metadata": {"title": "blabla"},
+        "files": {"enabled": False},
+    }
 
 
 @pytest.fixture()
