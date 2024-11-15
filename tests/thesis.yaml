@@ -15,12 +15,26 @@ record:
         contributors[]:
           type: keyword
 
+  files:
+    properties:
+      metadata:
+        properties:
+          title:
+            type: fulltext
+
+    use:
+      - invenio_files
+
   draft: {}
+
+  draft-files: {}
 
 settings:
   schema-server: 'local://'
 profiles:
 - record
 - draft
+- files
+- draft_files
 
 
