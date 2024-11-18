@@ -2,7 +2,7 @@ from invenio_requests.records.api import Request
 from invenio_requests.services import RequestsServiceConfig
 from invenio_requests.services.requests import RequestLink
 
-from oarepo_requests.utils import get_record_service_for_record_cls
+from oarepo_requests.resolvers.ui import resolve
 
 
 class RequestEntityLink(RequestLink):
@@ -30,14 +30,7 @@ class RequestEntityLink(RequestLink):
         if key in ctx:
             return ctx[key]
         try:
-            topic = obj.topic.resolve()
-            service = get_record_service_for_record_cls(obj.topic.record_cls)
-            reader = (
-                service.read_draft
-                if getattr(topic, "is_draft", False)
-                else service.read
-            )
-            entity = reader(ctx["identity"], obj.topic._parse_ref_dict_id())
+            entity = resolve(ctx["identity"], reference_dict, keep_all_links=True)
         except Exception:  # noqa
             entity = {}
         ctx[key] = entity
@@ -75,10 +68,10 @@ class RequestEntityLinks(RequestEntityLink):
             link = list(link_dict.values())[0]
             if link.should_render(obj, context):
                 res[name] = link.expand(obj, context)
-        if hasattr(obj.type, "type_links"):
+        if hasattr(obj.type, "extra_request_links"):
             entity = self._resolve(obj, context)
             res.update(
-                obj.type.type_links(
+                obj.type.extra_request_links(
                     request=obj,
                     **(context | {"cur_entity": entity, "entity_type": self._entity}),
                 )
