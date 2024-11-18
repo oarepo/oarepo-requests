@@ -37,8 +37,8 @@ class RequestEntityLink(RequestLink):
         return entity
 
     def _expand_entity(self, entity, vars):
-        if hasattr(entity, "links"):
-            vars.update({f"entity_{k}": v for k, v in entity.links.items()})
+        if "links" in entity:
+            vars.update({f"entity_{k}": v for k, v in entity["links"].items()})
 
     def expand(self, obj, context):
         """Expand the URI Template."""
