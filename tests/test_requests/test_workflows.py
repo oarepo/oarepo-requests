@@ -412,6 +412,89 @@ def test_workflow_events(
     assert create_event_u1
 
 
+def test_workflow_events_resource(
+    logged_client,
+    users,
+    urls,
+    patch_requests_permissions,
+    record_service,
+    publish_request_data_function,
+    serialization_result,
+    ui_serialization_result,
+    events_resource_data,
+    create_draft_via_resource,
+    events_service,
+    search_clear,
+):
+    user1 = users[0]
+    user2 = users[1]
+
+    user1_client = logged_client(user1)
+    user2_client = logged_client(user2)
+
+    draft1 = create_draft_via_resource(user1_client, custom_workflow="with_approve")
+    record_id = draft1.json["id"]
+
+    approve_request_data = {
+        "request_type": "approve_draft",
+        "topic": {"thesis_draft": str(record_id)},
+    }
+    resp_request_create = user1_client.post(
+        urls["BASE_URL_REQUESTS"],
+        json=approve_request_data,
+    )
+    resp_request_submit = user1_client.post(
+        link_api2testclient(resp_request_create.json["links"]["actions"]["submit"]),
+    )
+
+    read_from_record = user1_client.get(
+        f"{urls['BASE_URL']}{draft1.json['id']}/draft?expand=true",
+    )
+
+    request_id = read_from_record.json["expanded"]["requests"][0]["id"]
+    json = {**events_resource_data, "type": TestEventType.type_id}
+    create_event_u1 = user1_client.post(
+        f"{urls['BASE_URL_REQUESTS']}{request_id}/timeline", json=json
+    )
+    create_event_u2 = user2_client.post(
+        f"{urls['BASE_URL_REQUESTS']}{request_id}/timeline", json=json
+    )
+
+    assert create_event_u1.status_code == 403
+    assert create_event_u2.status_code == 201
+
+    record_receiver = user2_client.get(
+        f'{urls["BASE_URL"]}{record_id}/draft?expand=true'
+    ).json
+    accept = user2_client.post(
+        link_api2testclient(
+            record_receiver["expanded"]["requests"][0]["links"]["actions"]["accept"]
+        ),
+    )
+    assert accept.status_code == 200
+    publishing_record = record_service.read_draft(user1.identity, record_id)._record
+    assert publishing_record["state"] == "publishing"
+
+    read_from_record = user2_client.get(
+        f"{urls['BASE_URL']}{draft1.json['id']}/draft?expand=true",
+    )
+    publish_request = [
+        request
+        for request in read_from_record.json["expanded"]["requests"]
+        if request["type"] == "publish_draft"
+    ][0]
+    request_id = publish_request["id"]
+
+    create_event_u1 = user1_client.post(
+        f"{urls['BASE_URL_REQUESTS']}{request_id}/timeline", json=json
+    )
+    create_event_u2 = user2_client.post(
+        f"{urls['BASE_URL_REQUESTS']}{request_id}/timeline", json=json
+    )
+    assert create_event_u1.status_code == 201
+    assert create_event_u2.status_code == 403
+
+
 def test_delete_log(
     vocab_cf,
     patch_requests_permissions,
