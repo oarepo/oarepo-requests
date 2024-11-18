@@ -1,5 +1,15 @@
+"""State change notifier."""
+
+from __future__ import annotations
+
+from typing import TYPE_CHECKING, Any
+
 from invenio_access.permissions import system_identity
-from invenio_records_resources.services.uow import RecordCommitOp, unit_of_work
+from invenio_records_resources.services.uow import (
+    RecordCommitOp,
+    UnitOfWork,
+    unit_of_work,
+)
 from invenio_requests.customizations.actions import RequestActions
 from invenio_requests.errors import CannotExecuteActionError
 from invenio_requests.proxies import current_requests_service
@@ -9,11 +19,28 @@ from oarepo_workflows.services.permissions.identity import auto_request_need
 
 from oarepo_requests.proxies import current_oarepo_requests_service
 
+if TYPE_CHECKING:
+    from flask_principal import Identity
+    from invenio_records_resources.records import Record
+
+# TODO: move this to a more appropriate place
+
 
 @unit_of_work()
 def auto_request_state_change_notifier(
-    identity, record, prev_value, value, uow=None, **kwargs
-):
+    identity: Identity,
+    record: Record,
+    prev_state: str,
+    new_state: str,
+    uow: UnitOfWork | None = None,
+    **kwargs: Any,
+) -> None:
+    """Create requests that should be created automatically on state change.
+
+    For each of the WorkflowRequest definition in the workflow of the record,
+    take the needs from the generators of possible creators. If any of those
+    needs is an auto_request_need, create a request for it automatically.
+    """
     for request_type_id, workflow_request in (
         current_oarepo_workflows.get_workflow(record).requests().items()
     ):
@@ -21,7 +48,7 @@ def auto_request_state_change_notifier(
             request_type=request_type_id, record=record, **kwargs
         )
         if auto_request_need in needs:
-            data = kwargs["data"] if "data" in kwargs else {}
+            data = kwargs.get("data", {})
             creator_ref = ResolverRegistry.reference_identity(identity)
             request_item = current_oarepo_requests_service.create(
                 system_identity,

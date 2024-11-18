@@ -22,7 +22,7 @@ from oarepo_requests.resources.ui import (
     OARepoRequestsUIJSONSerializer,
 )
 from oarepo_requests.services.oarepo.config import OARepoRequestsServiceConfig
-from oarepo_requests.utils import _reference_query_term
+from oarepo_requests.utils import create_query_term_for_reference
 
 
 class RequestOwnerFilterParam(FilterParam):
@@ -43,14 +43,13 @@ class RequestReceiverFilterParam(FilterParam):
         if value is not None:
             references = current_oarepo_requests.identity_to_entity_references(identity)
             for reference in references:
-                query_term = _reference_query_term(self.field_name, reference)
+                query_term = create_query_term_for_reference(self.field_name, reference)
                 terms |= query_term
             search = search.filter(Bool(filter=terms))
         return search
 
 
 class IsClosedParam(IsOpenParam):
-
     def apply(self, identity, search, params):
         """Evaluate the is_closed parameter on the search."""
         if params.get("is_closed") is True:
@@ -74,7 +73,7 @@ class ExtendedRequestSearchRequestArgsSchema(RequestSearchRequestArgsSchema):
     is_closed = fields.Boolean()
 
 
-def override_invenio_requests_config(blueprint, *args, **kwargs):
+def override_invenio_requests_config(blueprint, *args, **kwargs) -> None:
     with blueprint.app.app_context():
         # this monkey patch should be done better (support from invenio)
         RequestsServiceConfig.search = EnhancedRequestSearchOptions
@@ -87,7 +86,7 @@ def override_invenio_requests_config(blueprint, *args, **kwargs):
                 RequestsServiceConfig.links_item[k] = v
 
         class LazySerializer:
-            def __init__(self, serializer_cls):
+            def __init__(self, serializer_cls) -> None:
                 self.serializer_cls = serializer_cls
 
             @cached_property

@@ -14,7 +14,7 @@ from .generic import (
 
 
 class PublishDraftSubmitAction(OARepoSubmitAction):
-    def can_execute(self):
+    def can_execute(self) -> bool:
         if not super().can_execute():
             return False
         try:

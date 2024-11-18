@@ -30,7 +30,6 @@ class ModelUIResourceConfig(RecordsUIResourceConfig):
 
 
 class ModelUIResource(RecordsUIResource):
-
     def _get_record(self, resource_requestctx, allow_draft=False):
         try:
             if allow_draft:

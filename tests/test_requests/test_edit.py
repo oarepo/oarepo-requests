@@ -48,9 +48,7 @@ def test_edit_autoaccept(
     # edit action worked?
     search = creator_client.get(
         f'user{urls["BASE_URL"]}',
-    ).json[
-        "hits"
-    ]["hits"]
+    ).json["hits"]["hits"]
     assert len(search) == 1
     assert search[0]["links"]["self"].endswith("/draft")
     assert search[0]["id"] == id_

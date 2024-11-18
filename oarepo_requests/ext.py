@@ -14,13 +14,13 @@ from oarepo_requests.services.oarepo.service import OARepoRequestsService
 
 
 class OARepoRequests:
-    def __init__(self, app=None):
+    def __init__(self, app=None) -> None:
         """Extension initialization."""
         self.requests_resource = None
         if app:
             self.init_app(app)
 
-    def init_app(self, app):
+    def init_app(self, app) -> None:
         """Flask application initialization."""
         self.app = app
         self.init_config(app)
@@ -80,12 +80,12 @@ class OARepoRequests:
 
         return ServiceConfigs
 
-    def init_services(self, app):
+    def init_services(self, app) -> None:
         service_configs = self.service_configs(app)
         """Initialize the service and resource for Requests."""
         self.requests_service = OARepoRequestsService(config=service_configs.requests)
 
-    def init_resources(self, app):
+    def init_resources(self, app) -> None:
         """Init resources."""
         self.requests_resource = OARepoRequestsResource(
             oarepo_requests_service=self.requests_service,
@@ -109,9 +109,8 @@ class OARepoRequests:
             for component in components[action.status_to]
         ]
 
-    def init_config(self, app):
+    def init_config(self, app) -> None:
         """Initialize configuration."""
-
         from . import config
 
         app.config.setdefault("REQUESTS_ALLOWED_RECEIVERS", []).extend(
@@ -135,12 +134,12 @@ class OARepoRequests:
                 app_registered_event_types.append(event_type)
 
 
-def api_finalize_app(app):
+def api_finalize_app(app) -> None:
     """Finalize app."""
     finalize_app(app)
 
 
-def finalize_app(app):
+def finalize_app(app) -> None:
     """Finalize app."""
     from invenio_requests.proxies import current_event_type_registry
 

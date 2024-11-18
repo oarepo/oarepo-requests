@@ -1,10 +1,12 @@
+"""Permissions for requests based on workflows."""
+
 from invenio_records_permissions.generators import SystemProcess
 from invenio_requests.customizations.event_types import CommentEventType, LogEventType
 from invenio_requests.services.generators import Creator, Receiver
 from invenio_requests.services.permissions import (
     PermissionPolicy as InvenioRequestsPermissionPolicy,
 )
-from oarepo_workflows import DefaultWorkflowPermissions
+from oarepo_workflows.services.permissions import DefaultWorkflowPermissions
 
 from oarepo_requests.services.permissions.generators import (
     EventCreatorsFromWorkflow,
@@ -16,8 +18,11 @@ from oarepo_requests.services.permissions.generators import (
 
 
 class RequestBasedWorkflowPermissions(DefaultWorkflowPermissions):
-    """
-    Base class for workflow permissions, subclass from it and put the result to Workflow constructor.
+    """Base class for workflow permissions, subclass from it and put the result to Workflow constructor.
+
+    This permission adds a special generator RequestActive() to the default permissions.
+    Whenever the request is in `accept` action, the RequestActive generator matches.
+
     Example:
         class MyWorkflowPermissions(RequestBasedWorkflowPermissions):
             can_read = [AnyUser()]
@@ -27,6 +32,7 @@ class RequestBasedWorkflowPermissions(DefaultWorkflowPermissions):
             permission_policy_cls = MyWorkflowPermissions, ...
         )
     }
+
     """
 
     can_delete = DefaultWorkflowPermissions.can_delete + [RequestActive()]
@@ -36,6 +42,13 @@ class RequestBasedWorkflowPermissions(DefaultWorkflowPermissions):
 
 
 class CreatorsFromWorkflowRequestsPermissionPolicy(InvenioRequestsPermissionPolicy):
+    """Permissions for requests based on workflows.
+
+    This permission adds a special generator RequestCreatorsFromWorkflow() to the default permissions.
+    This generator takes a topic, gets the workflow from the topic and returns the generator for
+    creators defined on the WorkflowRequest.
+    """
+
     can_create = [
         SystemProcess(),
         RequestCreatorsFromWorkflow(),

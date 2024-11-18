@@ -1,4 +1,14 @@
-def create_oarepo_requests(app):
+"""API views."""
+
+from __future__ import annotations
+
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from flask import Blueprint, Flask
+
+
+def create_oarepo_requests(app: Flask) -> Blueprint:
     """Create requests blueprint."""
     ext = app.extensions["oarepo-requests"]
     blueprint = ext.requests_resource.as_blueprint()
@@ -10,8 +20,8 @@ def create_oarepo_requests(app):
     return blueprint
 
 
-def create_oarepo_requests_events(app):
-    """Create requests blueprint."""
+def create_oarepo_requests_events(app: Flask) -> Blueprint:
+    """Create events blueprint."""
     ext = app.extensions["oarepo-requests"]
     blueprint = ext.request_events_resource.as_blueprint()
     return blueprint

@@ -168,9 +168,9 @@ def test_resolver_fallback(
     expected_result = ui_serialization_result(
         draft_id, ui_record["expanded"]["requests"][0]["id"]
     )
-    expected_result["created_by"][
-        "label"
-    ] = f"id: {creator.id}"  # the user resolver uses name or email as label, the fallback doesn't know what to use
+    expected_result["created_by"]["label"] = (
+        f"id: {creator.id}"  # the user resolver uses name or email as label, the fallback doesn't know what to use
+    )
     assert is_valid_subdict(
         expected_result,
         ui_record["expanded"]["requests"][0],
@@ -189,7 +189,6 @@ def test_role(
     create_draft_via_resource,
     search_clear,
 ):
-
     config_restore = app.config["OAREPO_REQUESTS_DEFAULT_RECEIVER"]
 
     def current_receiver(record=None, request_type=None, **kwargs):

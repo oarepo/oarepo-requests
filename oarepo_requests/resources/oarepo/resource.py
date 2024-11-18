@@ -19,7 +19,7 @@ class OARepoRequestsResource(RequestsResource, ErrorHandlersMixin):
         config,
         oarepo_requests_service,
         invenio_requests_service=current_requests_service,
-    ):
+    ) -> None:
         # so super methods can be used with original service
         super().__init__(config, invenio_requests_service)
         self.oarepo_requests_service = oarepo_requests_service
@@ -27,7 +27,7 @@ class OARepoRequestsResource(RequestsResource, ErrorHandlersMixin):
     def create_url_rules(self):
         """Create the URL rules for the record resource."""
 
-        def p(route):
+        def p(route) -> str:
             """Prefix a route with the URL prefix."""
             return f"{self.config.url_prefix}{route}"
 

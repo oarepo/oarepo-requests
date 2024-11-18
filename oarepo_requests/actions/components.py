@@ -13,9 +13,7 @@ class RequestActionComponent:
     def apply(
         self, identity, request_type, action, topic, uow, *args, **kwargs
     ) -> Generator:
-        """
-
-        :param action:
+        """:param action:
         :param identity:
         :param uow:
         :param args:

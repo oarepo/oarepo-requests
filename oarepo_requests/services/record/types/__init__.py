@@ -1,0 +1,1 @@
+"""Record request type service."""

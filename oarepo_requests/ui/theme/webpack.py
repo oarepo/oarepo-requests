@@ -1,3 +1,5 @@
+"""Webpack entry points for the UI components of the module (requests components and dialogs)."""
+
 from invenio_assets.webpack import WebpackThemeBundle
 
 theme = WebpackThemeBundle(

@@ -7,10 +7,10 @@ from invenio_requests import (
 from invenio_requests.records import Request
 from invenio_requests.resolvers.registry import ResolverRegistry
 
-from oarepo_requests.utils import _reference_query_term
+from oarepo_requests.utils import create_query_term_for_reference
 
 
-def _str_from_ref(ref):
+def _str_from_ref(ref) -> str:
     k, v = list(ref.items())[0]
     return f"{k}.{v}"
 
@@ -18,12 +18,13 @@ def _str_from_ref(ref):
 def _get_topic_ref_with_requests(topic):
     topic_ref = ResolverRegistry.reference_entity(topic)
     requests_with_topic = current_requests_service.scan(
-        system_identity, extra_filter=_reference_query_term("topic", topic_ref)
+        system_identity,
+        extra_filter=create_query_term_for_reference("topic", topic_ref),
     )
     return requests_with_topic, topic_ref
 
 
-def _create_event(cur_request, payload, event_type, uow):
+def _create_event(cur_request, payload, event_type, uow) -> None:
     data = {"payload": payload}
     current_events_service.create(
         system_identity,
@@ -34,7 +35,7 @@ def _create_event(cur_request, payload, event_type, uow):
     )
 
 
-def update_topic(request, old_topic, new_topic, uow):
+def update_topic(request, old_topic, new_topic, uow) -> None:
     from oarepo_requests.types.events import TopicUpdateEventType
 
     requests_with_topic, old_topic_ref = _get_topic_ref_with_requests(old_topic)
@@ -60,7 +61,7 @@ def update_topic(request, old_topic, new_topic, uow):
                 _create_event(cur_request, payload, TopicUpdateEventType, uow)
 
 
-def cancel_requests_on_topic_delete(request, topic, uow):
+def cancel_requests_on_topic_delete(request, topic, uow) -> None:
     from oarepo_requests.types.events import TopicDeleteEventType
 
     requests_with_topic, topic_ref = _get_topic_ref_with_requests(topic)

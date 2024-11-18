@@ -48,7 +48,7 @@ def _create_cache(identity, reference_map):
 
 
 class CachedReferenceResolver:
-    def __init__(self, identity, references):
+    def __init__(self, identity, references) -> None:
         reference_map = _reference_map_from_list(references)
         self._cache = _create_cache(identity, reference_map)
         self._identity = identity
@@ -67,7 +67,7 @@ class CachedReferenceResolver:
 class OARepoRequestsUIJSONSerializer(LocalizedUIJSONSerializer):
     """UI JSON serializer."""
 
-    def __init__(self):
+    def __init__(self) -> None:
         """Initialise Serializer."""
         super().__init__(
             format_serializer_cls=JSONSerializer,
@@ -93,7 +93,7 @@ class OARepoRequestsUIJSONSerializer(LocalizedUIJSONSerializer):
 
 
 class OARepoRequestEventsUIJSONSerializer(LocalizedUIJSONSerializer):
-    def __init__(self):
+    def __init__(self) -> None:
         """Initialise Serializer."""
         super().__init__(
             format_serializer_cls=JSONSerializer,
@@ -104,7 +104,7 @@ class OARepoRequestEventsUIJSONSerializer(LocalizedUIJSONSerializer):
 
 
 class OARepoRequestTypesUIJSONSerializer(LocalizedUIJSONSerializer):
-    def __init__(self):
+    def __init__(self) -> None:
         """Initialise Serializer."""
         super().__init__(
             format_serializer_cls=JSONSerializer,

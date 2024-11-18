@@ -11,12 +11,12 @@ class OARepoGenericActionMixin:
     def stateful_name(cls, identity, **kwargs):
         return cls.name
 
-    def apply(self, identity, request_type, topic, uow, *args, **kwargs):
+    def apply(self, identity, request_type, topic, uow, *args, **kwargs) -> None:
         pass
 
     def _execute_with_components(
         self, components, identity, request_type, topic, uow, *args, **kwargs
-    ):
+    ) -> None:
         if not components:
             self.apply(identity, request_type, topic, uow, *args, **kwargs)
             super().execute(identity, uow, *args, **kwargs)
@@ -35,7 +35,7 @@ class OARepoGenericActionMixin:
             for component_cls in current_oarepo_requests.action_components(self)
         ]
 
-    def execute(self, identity, uow, *args, **kwargs):
+    def execute(self, identity, uow, *args, **kwargs) -> None:
         request_type = self.request.type
         topic = self.request.topic.resolve()
         self._execute_with_components(

@@ -21,7 +21,7 @@ def resolve(identity, reference):
         return entity_resolvers["fallback"].resolve_one(identity, reference)
 
 
-def fallback_label_result(reference):
+def fallback_label_result(reference) -> str:
     id_ = list(reference.values())[0]
     return f"id: {id_}"
 
@@ -36,7 +36,7 @@ def fallback_result(reference):
 
 
 class OARepoUIResolver:
-    def __init__(self, reference_type):
+    def __init__(self, reference_type) -> None:
         self.reference_type = reference_type
 
     def _get_id(self, result):
@@ -143,7 +143,6 @@ class UserEntityReferenceUIResolver(OARepoUIResolver):
             return None
 
     def _resolve(self, record, reference):
-
         if record.data["id"] == "system":
             label = _("System user")
         elif (
@@ -223,7 +222,7 @@ class FallbackEntityReferenceUIResolver(OARepoUIResolver):
             return result.data["id"]
         return result["id"]
 
-    def _search_many(self, identity, values, *args, **kwargs):
+    def _search_many(self, identity, values, *args, **kwargs) -> None:
         """"""
 
     def _search_one(self, identity, reference, *args, **kwargs):

@@ -1,3 +1,5 @@
+"""Topic update event type."""
+
 from invenio_requests.customizations.event_types import EventType
 from marshmallow import fields
 

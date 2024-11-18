@@ -13,9 +13,8 @@ from oarepo_requests.utils import merge_resource_configs
 
 
 class RecordRequestsResource(RecordResource):
-    def __init__(self, record_requests_config, config, service):
-        """
-        :param config: main record resource config
+    def __init__(self, record_requests_config, config, service) -> None:
+        """:param config: main record resource config
         :param service:
         :param record_requests_config: config specific for the record request serivce
         """

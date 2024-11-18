@@ -1,8 +1,19 @@
+"""Request custom fields component."""
+
+from __future__ import annotations
+
+from typing import Any
+
 from oarepo_ui.resources.components import UIResourceComponent
 
 
 class FormConfigCustomFieldsComponent(UIResourceComponent):
-    def form_config(self, *, view_args, form_config, **kwargs):
+    """Component for adding custom fields to request's form config."""
+
+    def form_config(
+        self, *, view_args: dict[str, Any], form_config: dict, **kwargs: Any
+    ) -> None:
+        """Add custom fields to the form config."""
         type_ = view_args.get("request_type")
         form = getattr(type_, "form", None)
         if not form:
@@ -31,7 +42,12 @@ class FormConfigCustomFieldsComponent(UIResourceComponent):
 
 
 class FormConfigRequestTypePropertiesComponent(UIResourceComponent):
-    def form_config(self, *, view_args, form_config, **kwargs):
+    """Component for adding request type properties to request's form config."""
+
+    def form_config(
+        self, *, view_args: dict[str, Any], form_config: dict, **kwargs: Any
+    ) -> None:
+        """Add request type properties to the form config (dangerous, editable, has_form)."""
         type_ = view_args.get("request_type")
 
         request_type_properties = {}
