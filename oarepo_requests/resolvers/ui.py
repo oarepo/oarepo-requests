@@ -11,27 +11,29 @@ from ..proxies import current_oarepo_requests
 from ..utils import get_matching_service_for_refdict
 
 
-def resolve(identity, reference):
+def resolve(identity, reference, **kwargs):
     reference_type = list(reference.keys())[0]
     entity_resolvers = current_oarepo_requests.entity_reference_ui_resolvers
     if reference_type in entity_resolvers:
-        return entity_resolvers[reference_type].resolve_one(identity, reference)
+        return entity_resolvers[reference_type].resolve_one(
+            identity, reference, **kwargs
+        )
     else:
         # TODO log warning
-        return entity_resolvers["fallback"].resolve_one(identity, reference)
+        return entity_resolvers["fallback"].resolve_one(identity, reference, **kwargs)
 
 
-def fallback_label_result(reference):
+def fallback_label_result(reference, **kwargs):
     id_ = list(reference.values())[0]
     return f"id: {id_}"
 
 
-def fallback_result(reference):
+def fallback_result(reference, **kwargs):
     type = list(reference.keys())[0]
     return {
         "reference": reference,
         "type": type,
-        "label": fallback_label_result(reference),
+        "label": fallback_label_result(reference, **kwargs),
     }
 
 
@@ -48,20 +50,20 @@ class OARepoUIResolver:
     def _search_one(self, identity, reference, *args, **kwargs):
         raise NotImplementedError("Parent entity ui resolver should be abstract")
 
-    def _resolve(self, record, reference):
+    def _resolve(self, record, reference, **kwargs):
         raise NotImplementedError("Parent entity ui resolver should be abstract")
 
-    def resolve_one(self, identity, reference):
+    def resolve_one(self, identity, reference, **kwargs):
         try:
             record = self._search_one(identity, reference)
             if not record:
-                return fallback_result(reference)
+                return fallback_result(reference, **kwargs)
         except PIDDoesNotExistError:
-            return fallback_result(reference)
-        resolved = self._resolve(record, reference)
+            return fallback_result(reference, **kwargs)
+        resolved = self._resolve(record, reference, **kwargs)
         return resolved
 
-    def resolve_many(self, identity, values):
+    def resolve_many(self, identity, values, **kwargs):
         # the pattern is broken here by using values instead of reference?
         search_results = self._search_many(identity, values)
         ret = []
@@ -72,7 +74,7 @@ class OARepoUIResolver:
             )
         return ret
 
-    def _resolve_links(self, record):
+    def _resolve_links(self, record, keep_all_links=False, **kwargs):
         links = {}
         record_links = {}
         if isinstance(record, dict):
@@ -81,6 +83,8 @@ class OARepoUIResolver:
         elif hasattr(record, "data"):
             if "links" in record.data:
                 record_links = record.data["links"]
+        if keep_all_links:
+            return record_links
         for link_type in ("self", "self_html"):
             if link_type in record_links:
                 links[link_type] = record_links[link_type]
@@ -109,13 +113,13 @@ class GroupEntityReferenceUIResolver(OARepoUIResolver):
         except PermissionDeniedError:
             return None
 
-    def _resolve(self, record, reference):
+    def _resolve(self, record, reference, **kwargs):
         label = record.data["name"]
         ret = {
             "reference": reference,
             "type": "group",
             "label": label,
-            "links": self._resolve_links(record),
+            "links": self._resolve_links(record, **kwargs),
         }
         return ret
 
@@ -142,7 +146,7 @@ class UserEntityReferenceUIResolver(OARepoUIResolver):
         except PermissionDeniedError:
             return None
 
-    def _resolve(self, record, reference):
+    def _resolve(self, record, reference, **kwargs):
 
         if record.data["id"] == "system":
             label = _("System user")
@@ -155,12 +159,12 @@ class UserEntityReferenceUIResolver(OARepoUIResolver):
         elif "username" in record.data and record.data["username"]:
             label = record.data["username"]
         else:
-            label = fallback_label_result(reference)
+            label = fallback_label_result(reference, **kwargs)
         ret = {
             "reference": reference,
             "type": "user",
             "label": label,
-            "links": self._resolve_links(record),
+            "links": self._resolve_links(record, **kwargs),
         }
         return ret
 
@@ -185,16 +189,16 @@ class RecordEntityReferenceUIResolver(OARepoUIResolver):
         service = get_matching_service_for_refdict(reference)
         return service.read(identity, id).data
 
-    def _resolve(self, record, reference):
+    def _resolve(self, record, reference, **kwargs):
         if "metadata" in record and "title" in record["metadata"]:
             label = record["metadata"]["title"]
         else:
-            label = fallback_label_result(reference)
+            label = fallback_label_result(reference, **kwargs)
         ret = {
             "reference": reference,
             "type": list(reference.keys())[0],
             "label": label,
-            "links": self._resolve_links(record),
+            "links": self._resolve_links(record, **kwargs),
         }
         return ret
 
@@ -243,16 +247,16 @@ class FallbackEntityReferenceUIResolver(OARepoUIResolver):
             response = response.data
         return response
 
-    def _resolve(self, record, reference):
+    def _resolve(self, record, reference, **kwargs):
         if "metadata" in record and "title" in record["metadata"]:
             label = record["metadata"]["title"]
         else:
-            label = fallback_label_result(reference)
+            label = fallback_label_result(reference, **kwargs)
 
         ret = {
             "reference": reference,
             "type": list(reference.keys())[0],
             "label": label,
-            "links": self._resolve_links(record),
+            "links": self._resolve_links(record, **kwargs),
         }
         return ret

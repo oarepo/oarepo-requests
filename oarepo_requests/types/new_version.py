@@ -31,7 +31,7 @@ class NewVersionRequestType(
         "keep_files": ma.fields.String(validate=OneOf(["true", "false"])),
     }
 
-    def type_links(self, request, **kwargs):
+    def extra_request_links(self, request, **kwargs):
         if request.status == "accepted" and kwargs["entity_type"] == "topic":
             return {"topic_redirect_link": kwargs["cur_entity"]["links"]["edit_html"]}
         else:
