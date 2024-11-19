@@ -624,7 +624,6 @@ msgstr ""
 msgid "Keep files in the new version?"
 msgstr ""
 
-#: /Users/miroslavbauer/Code/github.com/oarepo/oarepo-requests/oarepo_requests/types/new_version.py:50
 msgid "Keep files."
 msgstr ""
 
