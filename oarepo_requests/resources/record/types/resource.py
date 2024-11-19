@@ -1,3 +1,9 @@
+"""API resource for applicable request types for a record."""
+
+from __future__ import annotations
+
+from typing import TYPE_CHECKING
+
 from flask import g
 from flask_resources import resource_requestctx, response_handler, route
 from flask_resources.resources import Resource
@@ -6,10 +12,27 @@ from invenio_records_resources.resources.records.resource import request_view_ar
 
 from oarepo_requests.utils import merge_resource_configs
 
+if TYPE_CHECKING:
+    from invenio_records_resources.resources.records import RecordResourceConfig
+
+    from ....services.record.types.service import RecordRequestTypesService
+    from .config import RecordRequestTypesResourceConfig
+
+# TODO: is this class used?
+
 
 class RecordRequestTypesResource(ErrorHandlersMixin, Resource):
-    def __init__(self, record_requests_config, config, service) -> None:
-        """:param config: main record resource config
+    """API resource for applicable request types for a record."""
+
+    def __init__(
+        self,
+        record_requests_config: RecordRequestTypesResourceConfig,
+        config: RecordResourceConfig,
+        service: RecordRequestTypesService,
+    ) -> None:
+        """Initialize the resource.
+
+        :param config: main record resource config
         :param service:
         :param record_requests_config: config specific for the record request serivce
         """
@@ -22,7 +45,7 @@ class RecordRequestTypesResource(ErrorHandlersMixin, Resource):
         super().__init__(actual_config)
         self.service = service
 
-    def create_url_rules(self):
+    def create_url_rules(self) -> list[dict]:
         """Create the URL rules for the record resource."""
         routes = self.config.routes
 
@@ -37,7 +60,7 @@ class RecordRequestTypesResource(ErrorHandlersMixin, Resource):
 
     @request_view_args
     @response_handler(many=True)
-    def get_applicable_request_types(self):
+    def get_applicable_request_types(self) -> tuple[dict, int]:
         """List request types."""
         hits = self.service.get_applicable_request_types(
             identity=g.identity,

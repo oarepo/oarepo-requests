@@ -1,3 +1,5 @@
+"""Configuration of the record requests resource."""
+
 import marshmallow as ma
 from flask_resources import JSONSerializer, ResponseHandler
 from invenio_records_resources.resources import RecordResourceConfig
@@ -7,6 +9,12 @@ from oarepo_requests.resources.ui import OARepoRequestsUIJSONSerializer
 
 
 class RecordRequestsResourceConfig:
+    """Configuration of the record requests resource.
+
+    This configuration is merged with the configuration of a record on top of which
+    the requests resource lives.
+    """
+
     routes = {
         "list-requests": "/<pid_value>/requests",
         "request-type": "/<pid_value>/requests/<request_type>",
@@ -16,7 +24,8 @@ class RecordRequestsResourceConfig:
     }
 
     @property
-    def response_handlers(self):
+    def response_handlers(self) -> dict[str, ResponseHandler]:
+        """Response handlers for the record requests resource."""
         return {
             "application/vnd.inveniordm.v1+json": ResponseHandler(
                 OARepoRequestsUIJSONSerializer()

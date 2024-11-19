@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 import copy
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Any
 
 from invenio_access.permissions import system_identity
 from invenio_pidstore.errors import PersistentIdentifierError
@@ -289,7 +289,7 @@ def request_identity_matches(
         return False
 
 
-def merge_resource_configs[T](config_to_merge_in: T, original_config: T) -> T:
+def merge_resource_configs[T](config_to_merge_in: T, original_config: Any) -> T:
     """Merge resource configurations."""
     actual_config = copy.deepcopy(config_to_merge_in)
     original_keys = {x for x in dir(original_config) if not x.startswith("_")}

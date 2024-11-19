@@ -1,3 +1,9 @@
+"""API resource for serving record requests."""
+
+from __future__ import annotations
+
+from typing import TYPE_CHECKING
+
 from flask import g
 from flask_resources import resource_requestctx, response_handler, route
 from invenio_records_resources.resources import RecordResource
@@ -11,10 +17,25 @@ from invenio_records_resources.resources.records.utils import search_preference
 
 from oarepo_requests.utils import merge_resource_configs
 
+if TYPE_CHECKING:
+    from invenio_records_resources.resources.records import RecordResourceConfig
+
+    from ...services.record.service import RecordRequestsService
+    from .config import RecordRequestsResourceConfig
+
 
 class RecordRequestsResource(RecordResource):
-    def __init__(self, record_requests_config, config, service) -> None:
-        """:param config: main record resource config
+    """API resource for serving record requests."""
+
+    def __init__(
+        self,
+        record_requests_config: RecordRequestsResourceConfig,
+        config: RecordResourceConfig,
+        service: RecordRequestsService,
+    ) -> None:
+        """Initialize the service.
+
+        :param config: main record resource config
         :param service:
         :param record_requests_config: config specific for the record request serivce
         """
@@ -24,7 +45,7 @@ class RecordRequestsResource(RecordResource):
         )
         super().__init__(actual_config, service)
 
-    def create_url_rules(self):
+    def create_url_rules(self) -> list[dict]:
         """Create the URL rules for the record resource."""
         routes = self.config.routes
 
@@ -38,7 +59,7 @@ class RecordRequestsResource(RecordResource):
     @request_search_args
     @request_view_args
     @response_handler(many=True)
-    def search_requests_for_record(self):
+    def search_requests_for_record(self) -> tuple[dict, int]:
         """Perform a search over the items."""
         hits = self.service.search_requests_for_record(
             identity=g.identity,
@@ -53,7 +74,7 @@ class RecordRequestsResource(RecordResource):
     @request_view_args
     @request_data
     @response_handler()
-    def create(self):
+    def create(self) -> tuple[dict, int]:
         """Create an item."""
         items = self.service.create(
             identity=g.identity,

@@ -1,3 +1,7 @@
+"""Draft record requests resource."""
+
+from __future__ import annotations
+
 from flask import g
 from flask_resources import resource_requestctx, response_handler, route
 from invenio_records_resources.resources.records.resource import (
@@ -13,7 +17,10 @@ from oarepo_requests.utils import stringify_first_val
 
 
 class DraftRecordRequestsResource(RecordRequestsResource):
-    def create_url_rules(self):
+    """Draft record requests resource."""
+
+    def create_url_rules(self) -> list[dict]:
+        """Create the URL rules for the record resource."""
         old_rules = super().create_url_rules()
         """Create the URL rules for the record resource."""
         routes = self.config.routes
@@ -28,7 +35,7 @@ class DraftRecordRequestsResource(RecordRequestsResource):
     @request_search_args
     @request_view_args
     @response_handler(many=True)
-    def search_requests_for_draft(self):
+    def search_requests_for_draft(self) -> tuple[dict, int]:
         """Perform a search over the items."""
         hits = self.service.search_requests_for_draft(
             identity=g.identity,
@@ -43,7 +50,7 @@ class DraftRecordRequestsResource(RecordRequestsResource):
     @request_view_args
     @request_data
     @response_handler()
-    def create_for_draft(self):
+    def create_for_draft(self) -> tuple[dict, int]:
         """Create an item."""
         items = self.service.create_for_draft(
             identity=g.identity,
