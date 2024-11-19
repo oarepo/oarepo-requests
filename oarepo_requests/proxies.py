@@ -1,3 +1,10 @@
+#
+# Copyright (C) 2024 CESNET z.s.p.o.
+#
+# oarepo-requests is free software; you can redistribute it and/or
+# modify it under the terms of the MIT License; see LICENSE file for more
+# details.
+#
 """Proxy objects for accessing the current application's requests service and resource."""
 
 from flask import current_app

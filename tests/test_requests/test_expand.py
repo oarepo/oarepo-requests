@@ -1,3 +1,10 @@
+#
+# Copyright (C) 2024 CESNET z.s.p.o.
+#
+# oarepo-requests is free software; you can redistribute it and/or
+# modify it under the terms of the MIT License; see LICENSE file for more
+# details.
+#
 from tests.test_requests.test_create_inmodel import pick_request_type
 from tests.test_requests.utils import link_api2testclient
 

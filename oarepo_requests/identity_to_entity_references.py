@@ -1,3 +1,10 @@
+#
+# Copyright (C) 2024 CESNET z.s.p.o.
+#
+# oarepo-requests is free software; you can redistribute it and/or
+# modify it under the terms of the MIT License; see LICENSE file for more
+# details.
+#
 """Helper functions to convert identity to entity references."""
 
 from __future__ import annotations

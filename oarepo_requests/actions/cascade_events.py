@@ -1,3 +1,16 @@
+#
+# Copyright (C) 2024 CESNET z.s.p.o.
+#
+# oarepo-requests is free software; you can redistribute it and/or
+# modify it under the terms of the MIT License; see LICENSE file for more
+# details.
+#
+"""Helper functions for cascading request update on topic change or delete."""
+
+from __future__ import annotations
+
+from typing import TYPE_CHECKING, Any
+
 from invenio_access.permissions import system_identity
 from invenio_requests import (
     current_events_service,
@@ -9,22 +22,33 @@ from invenio_requests.resolvers.registry import ResolverRegistry
 
 from oarepo_requests.utils import create_query_term_for_reference
 
+if TYPE_CHECKING:
+    from invenio_records_resources.services.uow import UnitOfWork
+    from invenio_requests.customizations import EventType
 
-def _str_from_ref(ref) -> str:
-    k, v = list(ref.items())[0]
+    from oarepo_requests.typing import EntityReference
+
+
+def _str_from_ref(ref: EntityReference) -> str:
+    k, v = next(iter(ref.items()))
     return f"{k}.{v}"
 
 
-def _get_topic_ref_with_requests(topic):
-    topic_ref = ResolverRegistry.reference_entity(topic)
+def _get_topic_reference(topic: Any) -> EntityReference:
+    return ResolverRegistry.reference_entity(topic)
+
+
+def _get_requests_with_topic_reference(topic_ref: EntityReference) -> list[dict]:
     requests_with_topic = current_requests_service.scan(
         system_identity,
         extra_filter=create_query_term_for_reference("topic", topic_ref),
     )
-    return requests_with_topic, topic_ref
+    return requests_with_topic
 
 
-def _create_event(cur_request, payload, event_type, uow) -> None:
+def _create_event(
+    cur_request: Request, payload: dict, event_type: type[EventType], uow: UnitOfWork
+) -> None:
     data = {"payload": payload}
     current_events_service.create(
         system_identity,
@@ -35,10 +59,20 @@ def _create_event(cur_request, payload, event_type, uow) -> None:
     )
 
 
-def update_topic(request, old_topic, new_topic, uow) -> None:
+def update_topic(
+    request: Request, old_topic: Any, new_topic: Any, uow: UnitOfWork
+) -> None:
+    """Update topic on all requests with the old topic to the new topic.
+
+    :param request: Request on which the action is being executed, might be handled differently than the rest of the requests with the same topic
+    :param old_topic: Old topic
+    :param new_topic: New topic
+    :param uow: Unit of work
+    """
     from oarepo_requests.types.events import TopicUpdateEventType
 
-    requests_with_topic, old_topic_ref = _get_topic_ref_with_requests(old_topic)
+    old_topic_ref = _get_topic_reference(old_topic)
+    requests_with_topic = _get_requests_with_topic_reference(old_topic_ref)
     new_topic_ref = ResolverRegistry.reference_entity(new_topic)
     for request_from_search in requests_with_topic:
         request_type = current_request_type_registry.lookup(
@@ -61,10 +95,14 @@ def update_topic(request, old_topic, new_topic, uow) -> None:
                 _create_event(cur_request, payload, TopicUpdateEventType, uow)
 
 
-def cancel_requests_on_topic_delete(request, topic, uow) -> None:
+def cancel_requests_on_topic_delete(
+    request: Request, topic: Any, uow: UnitOfWork
+) -> None:
+    """Cancel all requests with the topic that is being deleted."""
     from oarepo_requests.types.events import TopicDeleteEventType
 
-    requests_with_topic, topic_ref = _get_topic_ref_with_requests(topic)
+    topic_ref = _get_topic_reference(topic)
+    requests_with_topic = _get_requests_with_topic_reference(topic_ref)
     for request_from_search in requests_with_topic:
         request_type = current_request_type_registry.lookup(
             request_from_search["type"], quiet=True
