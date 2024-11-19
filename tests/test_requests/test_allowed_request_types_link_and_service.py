@@ -310,7 +310,7 @@ def test_ui_serialization(
             "name": "New Version",
             "dangerous": False,
             "editable": False,
-            "has_form": False,
+            "has_form": True,
             "stateful_description": "Click to start creating a new version of the "
             "record.",
             "stateful_name": "New Version",
