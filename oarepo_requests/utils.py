@@ -30,6 +30,8 @@ if TYPE_CHECKING:
     from invenio_requests.customizations.request_types import RequestType
     from opensearch_dsl.query import Query
 
+    from oarepo_requests.typing import EntityReference
+
     from .services.record.service import RecordRequestsService
 
 
@@ -69,7 +71,7 @@ def allowed_request_types_for_record(
 
 
 def create_query_term_for_reference(
-    field_name: str, reference: dict[str, str]
+    field_name: str, reference: EntityReference
 ) -> Query:
     """Create an opensearch query term for the reference.
 
@@ -119,7 +121,7 @@ def search_requests_filter(
 
 
 def open_request_exists(
-    topic_or_reference: Record | dict[str, str], type_id: str
+    topic_or_reference: Record | EntityReference, type_id: str
 ) -> bool:
     """Check if there is an open request of a given type for the topic.
 
@@ -136,13 +138,13 @@ def open_request_exists(
     return bool(list(results))
 
 
-def resolve_reference_dict[T: Record](reference_dict: dict[str, str]) -> T:
+def resolve_reference_dict[T: Record](reference_dict: EntityReference) -> T:
     """Resolve the reference dict to the entity (such as Record, User, ...)."""
     return ResolverRegistry.resolve_entity_proxy(reference_dict).resolve()
 
 
 def get_matching_service_for_refdict(
-    reference_dict: dict[str, str],
+    reference_dict: EntityReference,
 ) -> RecordService | None:
     """Get the service that is responsible for entities matching the reference dict.
 
@@ -194,7 +196,7 @@ def stringify_first_val[T](dct: T) -> T:
     return dct
 
 
-def reference_to_tuple(reference: dict[str, str]) -> tuple[str, str]:
+def reference_to_tuple(reference: EntityReference) -> tuple[str, str]:
     """Convert the reference dict to a tuple.
 
     :param reference: Reference dict in the form {"datasets": "id"}.
@@ -205,7 +207,7 @@ def reference_to_tuple(reference: dict[str, str]) -> tuple[str, str]:
 
 def get_receiver_for_request_type(
     request_type: RequestType, identity: Identity, topic: Record
-) -> dict[str, str] | None:
+) -> EntityReference | None:
     """Get the default receiver for the request type, identity and topic.
 
     This call gets the workflow from the topic, looks up the request inside the workflow
@@ -265,7 +267,7 @@ def is_auto_approved(
 
 
 def request_identity_matches(
-    entity_reference: dict[str, str], identity: Identity
+    entity_reference: EntityReference, identity: Identity
 ) -> bool:
     """Check if the identity matches the entity reference.
 

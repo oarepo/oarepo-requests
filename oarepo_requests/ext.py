@@ -1,10 +1,15 @@
+"""OARepo-Requests extension."""
+
+from __future__ import annotations
+
+import dataclasses
 from functools import cached_property
+from typing import TYPE_CHECKING
 
 import importlib_metadata
 from invenio_base.utils import obj_or_import_string
 from invenio_requests.proxies import current_events_service
 
-from oarepo_requests.proxies import current_oarepo_requests
 from oarepo_requests.resources.events.config import OARepoRequestsCommentsResourceConfig
 from oarepo_requests.resources.events.resource import OARepoRequestsCommentsResource
 from oarepo_requests.resources.oarepo.config import OARepoRequestsResourceConfig
@@ -12,15 +17,35 @@ from oarepo_requests.resources.oarepo.resource import OARepoRequestsResource
 from oarepo_requests.services.oarepo.config import OARepoRequestsServiceConfig
 from oarepo_requests.services.oarepo.service import OARepoRequestsService
 
+if TYPE_CHECKING:
+    from flask import Flask
+    from flask_principal import Identity
+    from invenio_records_resources.records.api import Record
+    from invenio_requests.customizations import RequestType
+
+    from oarepo_requests.actions.components import RequestActionComponent
+    from oarepo_requests.resolvers.ui import OARepoUIResolver
+    from oarepo_requests.typing import EntityReference
+
+
+@dataclasses.dataclass
+class ServiceConfigs:
+    """Configurations for services provided by this package."""
+
+    requests: OARepoRequestsServiceConfig
+    # request_events = RequestEventsServiceConfig.build(app)
+
 
 class OARepoRequests:
-    def __init__(self, app=None) -> None:
+    """OARepo-Requests extension."""
+
+    def __init__(self, app: Flask = None) -> None:
         """Extension initialization."""
         self.requests_resource = None
         if app:
             self.init_app(app)
 
-    def init_app(self, app) -> None:
+    def init_app(self, app: Flask) -> None:
         """Flask application initialization."""
         self.app = app
         self.init_config(app)
@@ -29,14 +54,43 @@ class OARepoRequests:
         app.extensions["oarepo-requests"] = self
 
     @property
-    def entity_reference_ui_resolvers(self):
+    def entity_reference_ui_resolvers(self) -> dict[str, OARepoUIResolver]:
+        """Resolvers for entity references.
+
+        :return: a dictionary (entity-type -> resolver instance)
+        """
         return self.app.config["ENTITY_REFERENCE_UI_RESOLVERS"]
 
     @property
-    def ui_serialization_referenced_fields(self):
+    def ui_serialization_referenced_fields(self) -> list[str]:
+        """Request fields containing EntityReference that should be serialized in the UI.
+
+        These fields will be dereferenced, serialized to UI using one of the entity_reference_ui_resolvers
+        and included in the serialized request.
+        """
         return self.app.config["REQUESTS_UI_SERIALIZATION_REFERENCED_FIELDS"]
 
-    def default_request_receiver(self, identity, request_type, record, creator, data):
+    def default_request_receiver(
+        self,
+        identity: Identity,
+        request_type: RequestType,
+        record: Record,
+        creator: EntityReference | Identity,
+        data: dict,
+    ) -> EntityReference | None:
+        """Return the default receiver for the request.
+
+        Gets the default receiver for the request based on the request type, record and data.
+        It is used when the receiver is not explicitly set when creating a request. It does so
+        by taking a function from the configuration under the key OAREPO_REQUESTS_DEFAULT_RECEIVER
+        and calling it with the given parameters.
+
+        :param identity: Identity of the user creating the request.
+        :param request_type: Type of the request.
+        :param record: Record the request is about.
+        :param creator: Creator of the request.
+        :param data: Payload of the request.
+        """
         # TODO: if the topic is one of the workflow topics, use the workflow to determine the receiver
         # otherwise use the default receiver
         return obj_or_import_string(
@@ -50,42 +104,52 @@ class OARepoRequests:
         )
 
     @property
-    def allowed_receiver_ref_types(self):
+    def allowed_receiver_ref_types(self) -> list[str]:
+        """Return a list of allowed receiver entity reference types.
+
+        This value is taken from the configuration key REQUESTS_ALLOWED_RECEIVERS.
+        """
         return self.app.config.get("REQUESTS_ALLOWED_RECEIVERS", [])
 
     @cached_property
-    def identity_to_entity_references_fncs(self):
+    def identity_to_entity_references_functions(self) -> list[callable]:
+        """Return a list of functions that map identity to entity references.
+
+        These functions are used to map the identity of the user to entity references
+        that represent the needs of the identity. The functions are taken from the entrypoints
+        registered under the group oarepo_requests.identity_to_entity_references.
+        """
         group_name = "oarepo_requests.identity_to_entity_references"
         return [
             x.load() for x in importlib_metadata.entry_points().select(group=group_name)
         ]
 
-    def identity_to_entity_references(self, identity):
-        mappings = current_oarepo_requests.identity_to_entity_references_fncs
+    def identity_to_entity_references(
+        self, identity: Identity
+    ) -> list[EntityReference]:
+        """Map the identity to entity references."""
         ret = [
-            mapping_fnc(identity) for mapping_fnc in mappings if mapping_fnc(identity)
+            mapping_fnc(identity)
+            for mapping_fnc in (self.identity_to_entity_references_functions)
+            if mapping_fnc(identity)
         ]
         flattened_ret = []
         for mapping_result in ret:
-            flattened_ret += mapping_result
+            if mapping_result:
+                flattened_ret += mapping_result
         return flattened_ret
 
     # copied from invenio_requests for now
-    def service_configs(self, app):
-        """Customized service configs."""
+    def service_configs(self, app: Flask) -> ServiceConfigs:
+        """Return customized service configs."""
+        return ServiceConfigs(requests=OARepoRequestsServiceConfig.build(app))
 
-        class ServiceConfigs:
-            requests = OARepoRequestsServiceConfig.build(app)
-            # request_events = RequestEventsServiceConfig.build(app)
-
-        return ServiceConfigs
-
-    def init_services(self, app) -> None:
+    def init_services(self, app: Flask) -> None:
+        """Initialize services provided by this extension."""
         service_configs = self.service_configs(app)
-        """Initialize the service and resource for Requests."""
         self.requests_service = OARepoRequestsService(config=service_configs.requests)
 
-    def init_resources(self, app) -> None:
+    def init_resources(self, app: Flask) -> None:
         """Init resources."""
         self.requests_resource = OARepoRequestsResource(
             oarepo_requests_service=self.requests_service,
@@ -98,10 +162,9 @@ class OARepoRequests:
 
     from invenio_requests.customizations.actions import RequestAction
 
-    def action_components(self, action: RequestAction):
-        from . import config
-
-        components = config.REQUESTS_ACTION_COMPONENTS
+    def action_components(self, action: RequestAction) -> list[RequestActionComponent]:
+        """Return components for the given action."""
+        components = self.app.config["REQUESTS_ACTION_COMPONENTS"]
         if callable(components):
             return components(action)
         return [
@@ -109,7 +172,7 @@ class OARepoRequests:
             for component in components[action.status_to]
         ]
 
-    def init_config(self, app) -> None:
+    def init_config(self, app: Flask) -> None:
         """Initialize configuration."""
         from . import config
 
@@ -126,6 +189,12 @@ class OARepoRequests:
             config.DEFAULT_WORKFLOW_EVENT_SUBMITTERS
         )
 
+        # let the user override the action components
+        rac = app.config.setdefault("REQUESTS_ACTION_COMPONENTS", {})
+        for k, v in config.REQUESTS_ACTION_COMPONENTS.items():
+            if k not in rac:
+                rac[k] = v
+
         app_registered_event_types = app.config.setdefault(
             "REQUESTS_REGISTERED_EVENT_TYPES", []
         )
@@ -134,12 +203,12 @@ class OARepoRequests:
                 app_registered_event_types.append(event_type)
 
 
-def api_finalize_app(app) -> None:
+def api_finalize_app(app: Flask) -> None:
     """Finalize app."""
     finalize_app(app)
 
 
-def finalize_app(app) -> None:
+def finalize_app(app: Flask) -> None:
     """Finalize app."""
     from invenio_requests.proxies import current_event_type_registry
 

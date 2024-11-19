@@ -1,3 +1,5 @@
+"""Default configuration of oarepo-requests."""
+
 import invenio_requests.config
 import oarepo_workflows  # noqa
 from invenio_requests.customizations import CommentEventType, LogEventType

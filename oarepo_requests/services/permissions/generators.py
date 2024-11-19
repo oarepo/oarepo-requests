@@ -26,6 +26,8 @@ if TYPE_CHECKING:
     from invenio_requests.records import Request
     from opensearch_dsl.query import Query
 
+    from oarepo_requests.typing import EntityReference
+
 
 class RequestActive(Generator):
     """A generator that requires that a request is being handled.
@@ -234,7 +236,7 @@ class IfRequestedBy(RecipientGeneratorMixin, ConditionalGenerator):
         record: Record | None = None,
         request_type: RequestType | None = None,
         **context: Any,
-    ) -> list[dict[str, str]]:  # pragma: no cover
+    ) -> list[EntityReference]:  # pragma: no cover
         ret = []
         for gen in self._generators(
             record=record, request_type=request_type, **context

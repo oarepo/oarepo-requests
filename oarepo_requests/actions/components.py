@@ -1,30 +1,73 @@
+"""Request action components.
+
+These components are called as context managers when an action is executed.
+"""
+
+from __future__ import annotations
+
 import abc
 import contextlib
-from typing import Generator
+from typing import TYPE_CHECKING, Any, ContextManager, override
 
-from invenio_requests.customizations import RequestActions
+from invenio_requests.customizations import RequestAction, RequestActions, RequestType
 from invenio_requests.errors import CannotExecuteActionError
 
 from oarepo_requests.services.permissions.identity import request_active
 
+if TYPE_CHECKING:
+    from flask_principal import Identity
+    from invenio_records_resources.services.uow import UnitOfWork
 
-class RequestActionComponent:
+    from .generic import OARepoGenericActionMixin
+
+type ActionType = (
+    OARepoGenericActionMixin | RequestAction
+)  # should be a type intersection, not yet in python
+
+
+class RequestActionComponent(abc.ABC):
+    """Abstract request action component."""
+
     @abc.abstractmethod
     def apply(
-        self, identity, request_type, action, topic, uow, *args, **kwargs
-    ) -> Generator:
-        """:param action:
-        :param identity:
-        :param uow:
-        :param args:
-        :param kwargs:
-        :return:
+        self,
+        identity: Identity,
+        request_type: RequestType,
+        action: ActionType,
+        topic: Any,
+        uow: UnitOfWork,
+        *args: Any,
+        **kwargs: Any,
+    ) -> ContextManager:
+        """Apply the component.
+
+        Must return a context manager
+
+        :param identity: Identity of the user.
+        :param request_type: Request type.
+        :param action: Action being executed.
+        :param topic: Topic of the request.
+        :param uow: Unit of work.
+        :param args: Additional arguments.
+        :param kwargs: Additional keyword arguments.
         """
 
 
 class RequestIdentityComponent(RequestActionComponent):
+    """A component that adds a request active permission to the identity and removes it after processing."""
+
+    @override
     @contextlib.contextmanager
-    def apply(self, identity, request_type, action, topic, uow, *args, **kwargs):
+    def apply(
+        self,
+        identity: Identity,
+        request_type: RequestType,
+        action: ActionType,
+        topic: Any,
+        uow: UnitOfWork,
+        *args: Any,
+        **kwargs: Any,
+    ) -> ContextManager:
         identity.provides.add(request_active)
         try:
             yield
@@ -34,8 +77,25 @@ class RequestIdentityComponent(RequestActionComponent):
 
 
 class WorkflowTransitionComponent(RequestActionComponent):
+    """A component that applies a workflow transition after processing the action.
+
+    When the action is applied, the "status_to" of the request is looked up in
+    the workflow transitions for the request and if found, the topic's state is changed
+    to the target state.
+    """
+
+    @override
     @contextlib.contextmanager
-    def apply(self, identity, request_type, action, topic, uow, *args, **kwargs):
+    def apply(
+        self,
+        identity: Identity,
+        request_type: RequestType,
+        action: ActionType,
+        topic: Any,
+        uow: UnitOfWork,
+        *args: Any,
+        **kwargs: Any,
+    ) -> ContextManager:
         from oarepo_workflows.proxies import current_oarepo_workflows
         from sqlalchemy.exc import NoResultFound
 
@@ -64,8 +124,20 @@ class WorkflowTransitionComponent(RequestActionComponent):
 
 
 class AutoAcceptComponent(RequestActionComponent):
+    """A component that auto-accepts the request if the receiver has auto-approve enabled."""
+
+    @override
     @contextlib.contextmanager
-    def apply(self, identity, request_type, action, topic, uow, *args, **kwargs):
+    def apply(
+        self,
+        identity: Identity,
+        request_type: RequestType,
+        action: ActionType,
+        topic: Any,
+        uow: UnitOfWork,
+        *args: Any,
+        **kwargs: Any,
+    ) -> ContextManager:
         yield
         if action.request.status != "submitted":
             return

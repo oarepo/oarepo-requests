@@ -24,6 +24,8 @@ if TYPE_CHECKING:
     from invenio_requests.customizations.actions import RequestAction
     from invenio_requests.records.api import Request
 
+    from oarepo_requests.typing import EntityReference
+
 
 class EditPublishedRecordRequestType(NonDuplicableOARepoRequestType):
     """Request type for requesting edit of a published record.
@@ -71,9 +73,9 @@ class EditPublishedRecordRequestType(NonDuplicableOARepoRequestType):
         self,
         identity: Identity,
         data: dict,
-        receiver: dict[str, str],
+        receiver: EntityReference,
         topic: Record,
-        creator: dict[str, str],
+        creator: EntityReference,
         *args: Any,
         **kwargs: Any,
     ) -> None:

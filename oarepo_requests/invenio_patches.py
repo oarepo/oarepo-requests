@@ -1,4 +1,9 @@
+"""Patches to invenio service to allow for more flexible requests handling."""
+
+from __future__ import annotations
+
 from functools import cached_property
+from typing import TYPE_CHECKING, Any, Callable
 
 from flask_resources import JSONSerializer, ResponseHandler
 from invenio_records_resources.resources.records.headers import etag_headers
@@ -13,6 +18,7 @@ from invenio_requests.services.requests.config import (
     RequestsServiceConfig,
 )
 from invenio_requests.services.requests.params import IsOpenParam
+from invenio_search.engine import dsl
 from marshmallow import fields
 from opensearch_dsl.query import Bool
 
@@ -24,20 +30,33 @@ from oarepo_requests.resources.ui import (
 from oarepo_requests.services.oarepo.config import OARepoRequestsServiceConfig
 from oarepo_requests.utils import create_query_term_for_reference
 
+if TYPE_CHECKING:
+    from flask.blueprints import BlueprintSetupState
+    from flask_principal import Identity
+    from flask_resources.serializers.base import BaseSerializer
+    from opensearch_dsl.query import Query
+
 
 class RequestOwnerFilterParam(FilterParam):
-    def apply(self, identity, search, params):
+    """Filter requests by owner."""
+
+    def apply(self, identity: Identity, search: Query, params: dict[str, str]) -> Query:
+        """Apply the filter to the search."""
         value = params.pop(self.param_name, None)
         if value is not None:
             search = search.filter("term", **{self.field_name: identity.id})
         return search
 
 
-from invenio_search.engine import dsl
-
-
 class RequestReceiverFilterParam(FilterParam):
-    def apply(self, identity, search, params):
+    """Filter requests by receiver.
+
+    Note: This is different from the invenio handling. Invenio requires receiver to be
+    a user, we handle it as a more generic reference.
+    """
+
+    def apply(self, identity: Identity, search: Query, params: dict[str, str]) -> Query:
+        """Apply the filter to the search."""
         value = params.pop(self.param_name, None)
         terms = dsl.Q("match_none")
         if value is not None:
@@ -50,7 +69,9 @@ class RequestReceiverFilterParam(FilterParam):
 
 
 class IsClosedParam(IsOpenParam):
-    def apply(self, identity, search, params):
+    """Get just the closed requests."""
+
+    def apply(self, identity: Identity, search: Query, params: dict[str, str]) -> Query:
         """Evaluate the is_closed parameter on the search."""
         if params.get("is_closed") is True:
             search = search.filter("term", **{self.field_name: True})
@@ -60,6 +81,8 @@ class IsClosedParam(IsOpenParam):
 
 
 class EnhancedRequestSearchOptions(RequestSearchOptions):
+    """Searched options enhanced with additional filters."""
+
     params_interpreters_cls = RequestSearchOptions.params_interpreters_cls + [
         RequestOwnerFilterParam.factory("mine", "created_by.user"),
         RequestReceiverFilterParam.factory("assigned", "receiver"),
@@ -68,13 +91,22 @@ class EnhancedRequestSearchOptions(RequestSearchOptions):
 
 
 class ExtendedRequestSearchRequestArgsSchema(RequestSearchRequestArgsSchema):
+    """Marshmallow schema for the extra filters."""
+
     mine = fields.Boolean()
     assigned = fields.Boolean()
     is_closed = fields.Boolean()
 
 
-def override_invenio_requests_config(blueprint, *args, **kwargs) -> None:
-    with blueprint.app.app_context():
+def override_invenio_requests_config(
+    state: BlueprintSetupState, *args: Any, **kwargs: Any
+) -> None:
+    """Override the invenio requests configuration.
+
+    This function is called from the blueprint setup function as this should be a safe moment
+    to monkey patch the invenio requests configuration.
+    """
+    with state.app.app_context():
         # this monkey patch should be done better (support from invenio)
         RequestsServiceConfig.search = EnhancedRequestSearchOptions
         RequestsResourceConfig.request_search_args = (
@@ -86,19 +118,19 @@ def override_invenio_requests_config(blueprint, *args, **kwargs) -> None:
                 RequestsServiceConfig.links_item[k] = v
 
         class LazySerializer:
-            def __init__(self, serializer_cls) -> None:
+            def __init__(self, serializer_cls: type[BaseSerializer]) -> None:
                 self.serializer_cls = serializer_cls
 
             @cached_property
-            def __instance(self):
+            def __instance(self) -> BaseSerializer:
                 return self.serializer_cls()
 
             @property
-            def serialize_object_list(self):
+            def serialize_object_list(self) -> Callable:
                 return self.__instance.serialize_object_list
 
             @property
-            def serialize_object(self):
+            def serialize_object(self) -> Callable:
                 return self.__instance.serialize_object
 
         RequestsResourceConfig.response_handlers = {

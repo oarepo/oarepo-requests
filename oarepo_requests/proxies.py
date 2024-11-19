@@ -1,3 +1,5 @@
+"""Proxy objects for accessing the current application's requests service and resource."""
+
 from flask import current_app
 from werkzeug.local import LocalProxy
 

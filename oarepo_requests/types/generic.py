@@ -28,6 +28,8 @@ if TYPE_CHECKING:
     from invenio_requests.customizations.actions import RequestAction
     from invenio_requests.records.api import Request
 
+    from oarepo_requests.typing import EntityReference
+
 
 class OARepoRequestType(RequestType):
     """Base request type for OARepo requests."""
@@ -69,9 +71,9 @@ class OARepoRequestType(RequestType):
         self,
         identity: Identity,
         data: dict,
-        receiver: dict[str, str],
+        receiver: EntityReference,
         topic: Record,
-        creator: dict[str, str],
+        creator: EntityReference,
         *args: Any,
         **kwargs: Any,
     ) -> None:
@@ -167,9 +169,9 @@ class NonDuplicableOARepoRequestType(OARepoRequestType):
         self,
         identity: Identity,
         data: dict,
-        receiver: dict[str, str],
+        receiver: EntityReference,
         topic: Record,
-        creator: dict[str, str],
+        creator: EntityReference,
         *args: Any,
         **kwargs: Any,
     ) -> None:

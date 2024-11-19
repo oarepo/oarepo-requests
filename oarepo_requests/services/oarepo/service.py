@@ -19,6 +19,8 @@ if TYPE_CHECKING:
     from invenio_records_resources.services.uow import UnitOfWork
     from invenio_requests.services.requests.results import RequestItem
 
+    from oarepo_requests.typing import EntityReference
+
 
 class OARepoRequestsService(RequestsService):
     """OARepo extension to invenio-requests service."""
@@ -29,8 +31,8 @@ class OARepoRequestsService(RequestsService):
         identity: Identity,
         data: dict,
         request_type: str,
-        receiver: dict[str, str] | Any | None = None,
-        creator: dict[str, str] | Any | None = None,
+        receiver: EntityReference | Any | None = None,
+        creator: EntityReference | Any | None = None,
         topic: RecordBase = None,
         expires_at: datetime | None = None,
         uow: UnitOfWork = None,
