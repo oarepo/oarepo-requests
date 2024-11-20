@@ -46,6 +46,7 @@
     .requests.action-event-icon {
       font-size: @actionEventIconSize;
       line-height: normal;
+      background-color: white;
     }
     .action-event-vertical-line {
       position: absolute;
