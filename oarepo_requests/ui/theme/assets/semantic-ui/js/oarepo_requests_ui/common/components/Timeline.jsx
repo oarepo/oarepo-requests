@@ -1,22 +1,17 @@
 import React, { useState } from "react";
 import { i18next } from "@translations/oarepo_requests_ui/i18next";
 import { Message, Feed, Dimmer, Loader, Pagination } from "semantic-ui-react";
-import {
-  EventSubmitForm,
-  TimelineCommentEvent,
-  TimelineActionEvent,
-} from "@js/oarepo_requests_common";
+import { CommentSubmitForm, TimelineEvent } from "@js/oarepo_requests_common";
 import PropTypes from "prop-types";
 import { http } from "react-invenio-forms";
-import { useQuery } from "@tanstack/react-query";
-import Overridable, {
-  OverridableContext,
-  overrideStore,
-} from "react-overridable";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { OverridableContext, overrideStore } from "react-overridable";
 
 const overriddenComponents = overrideStore.getAll();
 
 export const Timeline = ({ request, timelinePageSize }) => {
+  const queryClient = useQueryClient();
+
   const [page, setPage] = useState(1);
   const { data, error, isLoading, refetch } = useQuery(
     ["requestEvents", request.id, page],
@@ -33,6 +28,40 @@ export const Timeline = ({ request, timelinePageSize }) => {
       refetchInterval: 10000,
     }
   );
+
+  const commentSubmitMutation = useMutation(
+    (values) => http.post(request.links?.comments + "?expand=1", values),
+    {
+      onSuccess: (response) => {
+        if (response.status === 201) {
+          queryClient.setQueryData(
+            ["requestEvents", request.id, page],
+            (oldData) => {
+              if (!oldData) return;
+              // a bit ugly, but it is a limitation of react query when data you recieve is nested
+              const newData = [...oldData.data.hits.hits];
+              if (oldData.data.hits.total + 1 > timelinePageSize) {
+                newData.pop();
+              }
+              return {
+                ...oldData,
+                data: {
+                  ...oldData.data,
+                  hits: {
+                    ...oldData.data.hits,
+                    total: oldData.data.hits.total + 1,
+                    hits: [response.data, ...newData],
+                  },
+                },
+              };
+            }
+          );
+        }
+        setTimeout(() => refetch(), 1000);
+      },
+    }
+  );
+
   const handlePageChange = (activePage) => {
     if (activePage === page) return;
     setPage(activePage);
@@ -48,12 +77,7 @@ export const Timeline = ({ request, timelinePageSize }) => {
           </Loader>
         </Dimmer>
         <div className="rel-mb-5">
-          <EventSubmitForm
-            request={request}
-            refetch={refetch}
-            page={page}
-            timelinePageSize={timelinePageSize}
-          />
+          <CommentSubmitForm commentSubmitMutation={commentSubmitMutation} />
         </div>
         {error && (
           <Message negative>
@@ -65,24 +89,7 @@ export const Timeline = ({ request, timelinePageSize }) => {
         {events?.length > 0 && (
           <Feed>
             {events.map((event) => (
-              <React.Fragment key={event.id}>
-                {event.type === "C" && (
-                  <Overridable
-                    id="OarepoRequests.TimelineCommentEvent"
-                    event={event}
-                  >
-                    <TimelineCommentEvent event={event} />
-                  </Overridable>
-                )}
-                {event.type === "L" && (
-                  <Overridable
-                    id={`OarepoRequests.TimelineActionEvent.${event.payload.event}`}
-                    event={event}
-                  >
-                    <TimelineActionEvent event={event} />
-                  </Overridable>
-                )}
-              </React.Fragment>
+              <TimelineEvent key={event.id} event={event} />
             ))}
           </Feed>
         )}

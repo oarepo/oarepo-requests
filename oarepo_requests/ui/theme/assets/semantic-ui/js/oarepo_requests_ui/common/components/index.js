@@ -12,5 +12,6 @@ export * from "./ConfirmationModalConfirmButton";
 export * from "./RequestModalContentAndActions";
 export { TopicPreview } from "./TopicPreview";
 export { default as TimelineCommentEvent } from "./TimelineCommentEvent";
-export { EventSubmitForm } from "./EventSubmitForm";
+export { CommentSubmitForm } from "./CommentSubmitForm";
 export { TimelineActionEvent } from "./TimelineActionEvent";
+export { TimelineEvent } from "./TimelineEvent";

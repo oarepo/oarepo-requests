@@ -22,7 +22,12 @@ export const RequestCommentInput = ({ fieldPath, label }) => {
             initialValue={values?.payload?.content}
             inputValue={() => values?.payload?.content}
             optimized
-            editorConfig={{ auto_focus: true, min_height: 130 }}
+            editorConfig={{
+              auto_focus: true,
+              min_height: 130,
+              valid_elements:
+                "blocks | bold italic | bullist numlist | outdent indent | undo redo",
+            }}
             onBlur={(event, editor) => {
               const cleanedContent = sanitizeHtml(editor.getContent());
               setFieldValue(fieldPath, cleanedContent);
