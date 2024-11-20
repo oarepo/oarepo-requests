@@ -76,8 +76,5 @@ export const CommentSubmitForm = ({ commentSubmitMutation }) => {
 };
 
 CommentSubmitForm.propTypes = {
-  request: PropTypes.object,
-  refetch: PropTypes.func,
-  page: PropTypes.number,
-  timelinePageSize: PropTypes.number,
+  commentSubmitMutation: PropTypes.object.isRequired,
 };
