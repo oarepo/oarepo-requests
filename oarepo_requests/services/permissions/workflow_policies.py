@@ -15,11 +15,13 @@ from invenio_requests.services.permissions import (
 )
 from oarepo_workflows.services.permissions import DefaultWorkflowPermissions
 
-from oarepo_requests.services.permissions.generators import (
-    EventCreatorsFromWorkflow,
+from oarepo_requests.services.permissions.generators.active import RequestActive
+from oarepo_requests.services.permissions.generators.conditional import (
     IfEventType,
     IfRequestType,
-    RequestActive,
+)
+from oarepo_requests.services.permissions.generators.workflow_based import (
+    EventCreatorsFromWorkflow,
     RequestCreatorsFromWorkflow,
 )
 

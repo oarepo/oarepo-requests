@@ -10,7 +10,7 @@
 from __future__ import annotations
 
 from collections import defaultdict
-from typing import TYPE_CHECKING, Any
+from typing import TYPE_CHECKING, Any, cast
 
 from flask import g
 from flask_resources import BaseListSchema
@@ -31,7 +31,7 @@ if TYPE_CHECKING:
     from flask_principal import Identity
 
 
-def _reference_map_from_list(obj_list: dict) -> dict[str, set]:
+def _reference_map_from_list(obj_list: list[dict]) -> dict[str, set]:
     """Create a map of references from a list of requests from opensearch.
 
     For each of the serialized requests in the list, extract the fields that represent
@@ -41,10 +41,9 @@ def _reference_map_from_list(obj_list: dict) -> dict[str, set]:
     """
     if not obj_list:
         return {}
-    hits = obj_list["hits"]["hits"]
     reference_map = defaultdict(set)
     reference_types = current_oarepo_requests.ui_serialization_referenced_fields
-    for hit in hits:
+    for hit in obj_list:
         for reference_type in reference_types:
             if reference_type in hit:
                 reference = hit[reference_type]
@@ -64,15 +63,16 @@ def _create_cache(
 
     This call uses resolve_many to extract all references of the same type.
     """
-    cache = {}
+    cache: dict[tuple[str, str], dict] = {}
     entity_resolvers = current_oarepo_requests.entity_reference_ui_resolvers
     for reference_type, values in reference_map.items():
         if reference_type in entity_resolvers:
             resolver = entity_resolvers[reference_type]
-            results = resolver.resolve_many(identity, values)
+            results = resolver.resolve_many(identity, list(values))
             # we are expecting "reference" in results
             cache_for_type = {
-                reference_to_tuple(result["reference"]): result for result in results
+                reference_to_tuple(result["reference"]): cast(dict, result)
+                for result in results
             }
             cache |= cache_for_type
     return cache
@@ -81,12 +81,12 @@ def _create_cache(
 class CachedReferenceResolver:
     """Cached reference resolver."""
 
-    def __init__(self, identity: Identity, references: dict) -> None:
+    def __init__(self, identity: Identity, serialized_requests: list[dict]) -> None:
         """Initialise the resolver.
 
         The references is a dictionary of requests in opensearch list format
         """
-        reference_map = _reference_map_from_list(references)
+        reference_map = _reference_map_from_list(serialized_requests)
         self._cache = _create_cache(identity, reference_map)
         self._identity = identity
 
@@ -107,7 +107,7 @@ class CachedReferenceResolver:
             return self._cache[key]
         else:
             try:
-                return resolve(self._identity, reference)
+                return cast(dict, resolve(self._identity, reference))
             except PIDDeletedError:
                 return {"reference": reference, "status": "deleted"}
 
@@ -144,7 +144,7 @@ class OARepoRequestsUIJSONSerializer(LocalizedUIJSONSerializer):
         """
         extra_context = {
             "resolved": CachedReferenceResolver(
-                self.schema_context["identity"], obj_list
+                self.schema_context["identity"], obj_list["hits"]["hits"]
             )
         }
         return super().dump_list(obj_list, *args, extra_context=extra_context, **kwargs)

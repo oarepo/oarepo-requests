@@ -16,6 +16,7 @@ from oarepo_requests.errors import ReceiverNonReferencable, RequestTypeNotInWork
 if TYPE_CHECKING:
     from invenio_records_resources.records.api import Record
     from invenio_requests.customizations.request_types import RequestType
+    from oarepo_workflows import WorkflowRequest
 
     from oarepo_requests.typing import EntityReference
 
@@ -36,14 +37,14 @@ def default_workflow_receiver_function(
         return None  # exception?
 
     try:
-        request = getattr(
+        request: WorkflowRequest = getattr(
             current_oarepo_workflows.record_workflows[workflow_id].requests(),
             request_type.type_id,
         )
     except AttributeError as e:
         raise RequestTypeNotInWorkflow(request_type.type_id, workflow_id) from e
 
-    receiver = request.reference_receivers(
+    receiver = request.recipient_entity_reference(
         record=record, request_type=request_type, **kwargs
     )
     if not request_type.receiver_can_be_none and not receiver:

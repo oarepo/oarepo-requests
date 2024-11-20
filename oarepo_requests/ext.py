@@ -11,7 +11,7 @@ from __future__ import annotations
 
 import dataclasses
 from functools import cached_property
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Callable
 
 import importlib_metadata
 from invenio_base.utils import obj_or_import_string
@@ -48,7 +48,6 @@ class OARepoRequests:
 
     def __init__(self, app: Flask = None) -> None:
         """Extension initialization."""
-        self.requests_resource = None
         if app:
             self.init_app(app)
 
@@ -119,7 +118,7 @@ class OARepoRequests:
         return self.app.config.get("REQUESTS_ALLOWED_RECEIVERS", [])
 
     @cached_property
-    def identity_to_entity_references_functions(self) -> list[callable]:
+    def identity_to_entity_references_functions(self) -> list[Callable]:
         """Return a list of functions that map identity to entity references.
 
         These functions are used to map the identity of the user to entity references
@@ -169,7 +168,9 @@ class OARepoRequests:
 
     from invenio_requests.customizations.actions import RequestAction
 
-    def action_components(self, action: RequestAction) -> list[RequestActionComponent]:
+    def action_components(
+        self, action: RequestAction
+    ) -> list[type[RequestActionComponent]]:
         """Return components for the given action."""
         components = self.app.config["REQUESTS_ACTION_COMPONENTS"]
         if callable(components):
@@ -192,9 +193,13 @@ class OARepoRequests:
         app.config.setdefault("REQUESTS_UI_SERIALIZATION_REFERENCED_FIELDS", []).extend(
             config.REQUESTS_UI_SERIALIZATION_REFERENCED_FIELDS
         )
-        app.config.setdefault("DEFAULT_WORKFLOW_EVENT_SUBMITTERS", {}).update(
-            config.DEFAULT_WORKFLOW_EVENT_SUBMITTERS
+        # do not overwrite user's stuff
+        app_default_workflow_events = app.config.setdefault(
+            "DEFAULT_WORKFLOW_EVENTS", {}
         )
+        for k, v in config.DEFAULT_WORKFLOW_EVENTS.items():
+            if k not in app_default_workflow_events:
+                app_default_workflow_events[k] = v
 
         # let the user override the action components
         rac = app.config.setdefault("REQUESTS_ACTION_COMPONENTS", {})

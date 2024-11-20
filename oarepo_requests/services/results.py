@@ -9,13 +9,14 @@
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Any, Iterator
+from typing import TYPE_CHECKING, Any, Iterator, cast
 
 from invenio_records_resources.services import LinksTemplate
 from invenio_records_resources.services.errors import PermissionDeniedError
 from oarepo_runtime.datastreams.utils import get_record_service_for_record
 from oarepo_runtime.services.results import RecordList, ResultsComponent
 
+from oarepo_requests.services.draft.service import DraftRecordRequestsService
 from oarepo_requests.services.schema import RequestTypeSchema
 from oarepo_requests.utils import (
     allowed_request_types_for_record,
@@ -90,7 +91,7 @@ class RequestsComponent(ResultsComponent):
             get_record_service_for_record(record)
         )
         reader = (
-            service.search_requests_for_draft  # noqa
+            cast(DraftRecordRequestsService, service).search_requests_for_draft
             if getattr(record, "is_draft", False)
             else service.search_requests_for_record
         )

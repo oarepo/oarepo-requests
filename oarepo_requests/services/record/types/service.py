@@ -58,7 +58,7 @@ class RecordRequestTypesService:
         """Return factory for creating a record class."""
         return self.record_service.config.record_cls
 
-    def get_applicable_request_types(
+    def get_applicable_request_types_for_published_record(
         self, identity: Identity, record_id: str
     ) -> RequestTypesList:
         """Get applicable request types for a record given by persistent identifier."""

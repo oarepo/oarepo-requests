@@ -19,7 +19,7 @@ from oarepo_requests.actions.delete_published_record import (
     DeletePublishedRecordDeclineAction,
 )
 
-from ..utils import is_auto_approved, request_identity_matches
+from ..utils import classproperty, is_auto_approved, request_identity_matches
 from .generic import NonDuplicableOARepoRequestType
 from .ref_types import ModelRefTypes
 
@@ -39,8 +39,7 @@ class DeletePublishedRecordRequestType(NonDuplicableOARepoRequestType):
 
     dangerous = True
 
-    @classmethod
-    @property
+    @classproperty
     def available_actions(cls) -> dict[str, type[RequestAction]]:
         """Return available actions for the request type."""
         return {
@@ -104,3 +103,4 @@ class DeletePublishedRecordRequestType(NonDuplicableOARepoRequestType):
             case _:
                 if request_identity_matches(request.created_by, identity):
                     return _("Submit request to get permission to delete the record.")
+                return _("You do not have permission to delete the record.")

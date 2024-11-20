@@ -10,7 +10,7 @@
 from __future__ import annotations
 
 import copy
-from typing import TYPE_CHECKING, Any
+from typing import TYPE_CHECKING, Any, Callable
 
 from invenio_access.permissions import system_identity
 from invenio_pidstore.errors import PersistentIdentifierError
@@ -42,6 +42,18 @@ if TYPE_CHECKING:
     from .services.record.service import RecordRequestsService
 
 
+class classproperty[T]:
+    """Class property decorator as decorator chaining for declaring class properties was deprecated in python 3.11."""
+
+    def __init__(self, func: Callable):
+        """Initialize the class property."""
+        self.fget = func
+
+    def __get__(self, instance: Any, owner: Any) -> T:
+        """Get the value of the class property."""
+        return self.fget(owner)
+
+
 def allowed_request_types_for_record(
     identity: Identity, record: Record
 ) -> dict[str, RequestType]:
@@ -57,8 +69,8 @@ def allowed_request_types_for_record(
     try:
         workflow_requests = current_oarepo_workflows.get_workflow(record).requests()
         return {
-            type_id: current_request_type_registry.lookup(type_id)
-            for (type_id, _) in workflow_requests.applicable_workflow_requests(
+            type_id: wr.request_type
+            for (type_id, wr) in workflow_requests.applicable_workflow_requests(
                 identity, record=record
             )
         }
@@ -145,7 +157,7 @@ def open_request_exists(
     return bool(list(results))
 
 
-def resolve_reference_dict[T: Record](reference_dict: EntityReference) -> T:
+def resolve_reference_dict(reference_dict: EntityReference) -> Record:
     """Resolve the reference dict to the entity (such as Record, User, ...)."""
     return ResolverRegistry.resolve_entity_proxy(reference_dict).resolve()
 
@@ -266,10 +278,13 @@ def is_auto_approved(
         request_type=request_type, identity=identity, topic=topic
     )
 
-    return receiver and (
-        isinstance(receiver, AutoApprove)
-        or isinstance(receiver, dict)
-        and receiver.get("auto_approve")
+    return bool(
+        receiver
+        and (
+            isinstance(receiver, AutoApprove)
+            or isinstance(receiver, dict)
+            and receiver.get("auto_approve")
+        )
     )
 
 
@@ -296,6 +311,7 @@ def request_identity_matches(
             return bool(identity.provides.intersection(needs))
     except PersistentIdentifierError:
         return False
+    return False
 
 
 def merge_resource_configs[T](config_to_merge_in: T, original_config: Any) -> T:

@@ -10,7 +10,7 @@
 from __future__ import annotations
 
 import abc
-from typing import TYPE_CHECKING, Any, TypedDict, override
+from typing import TYPE_CHECKING, Any, TypedDict, cast, override
 
 from invenio_records_resources.resources.errors import PermissionDeniedError
 from invenio_search.engine import dsl
@@ -50,10 +50,10 @@ def resolve(identity: Identity, reference: dict[str, str]) -> UIResolvedReferenc
     reference_type, reference_value = next(iter(reference.items()))
     entity_resolvers = current_oarepo_requests.entity_reference_ui_resolvers
     if reference_type in entity_resolvers:
-        return entity_resolvers[reference_type].resolve_one(identity, reference_value)
+        return entity_resolvers[reference_type].resolve_one(identity, reference_value, reference_type=reference_type)
     else:
         # TODO log warning
-        return entity_resolvers["fallback"].resolve_one(identity, reference_value)
+        return entity_resolvers["fallback"].resolve_one(identity, reference_value, reference_type=reference_type)
 
 
 def fallback_label_result(reference: dict[str, str]) -> str:
@@ -62,7 +62,7 @@ def fallback_label_result(reference: dict[str, str]) -> str:
     return f"id: {id_}"
 
 
-def fallback_result(reference: dict[str, str]) -> UIResolvedReference:
+def fallback_result(reference: dict[str, str], **kwargs: Any) -> UIResolvedReference:
     """Get a fallback result for a reference if there is no other way to get it."""
     return {
         "reference": reference,
@@ -129,17 +129,20 @@ class OARepoUIResolver(abc.ABC):
         """
         raise NotImplementedError(f"Implement this in {self.__class__.__name__}")
 
-    def resolve_one(self, identity: Identity, _id: str) -> UIResolvedReference:
+    def resolve_one(self, identity: Identity, _id: str, **kwargs: Any) -> UIResolvedReference:
         """Resolve a single reference to a UI representation.
 
         :param identity:    identity of the user
         :param _id:         id of the entity
         :return:            UI representation of the reference
         """
-        reference = {self.reference_type: _id}
+        if 'reference_type' in kwargs:
+            reference = {kwargs['reference_type']: _id}
+        else:
+            reference = {self.reference_type: _id}
         entity = self._search_one(identity, _id)
         if not entity:
-            return fallback_result(reference)
+            return fallback_result(reference, **kwargs)
         resolved = self._get_entity_ui_representation(entity, reference)
         return resolved
 
@@ -202,9 +205,9 @@ class GroupEntityReferenceUIResolver(OARepoUIResolver):
         :return:            list of records found
         """
         result = []
-        for group in ids:
+        for group_id in ids:
             try:
-                group: RecordItem = current_groups_service.read(identity, group)
+                group: RecordItem = current_groups_service.read(identity, group_id)
                 result.append(group.data)
             except PermissionDeniedError:
                 pass
@@ -236,13 +239,12 @@ class GroupEntityReferenceUIResolver(OARepoUIResolver):
         :return:        UI representation of the entity
         """
         label = entity["name"]
-        ret = {
-            "reference": reference,
-            "type": "group",
-            "label": label,
-            "links": self._extract_links_from_resolved_reference(entity),
-        }
-        return ret
+        return UIResolvedReference(
+            reference=reference,
+            type="group",
+            label=label,
+            links=self._extract_links_from_resolved_reference(entity),
+        )
 
 
 class UserEntityReferenceUIResolver(OARepoUIResolver):
@@ -269,9 +271,9 @@ class UserEntityReferenceUIResolver(OARepoUIResolver):
         :return:            list of records found
         """
         result: list[dict] = []
-        for user in ids:
+        for user_id in ids:
             try:
-                user: RecordItem = current_users_service.read(identity, user)
+                user: RecordItem = current_users_service.read(identity, user_id)
                 result.append(user.data)
             except PermissionDeniedError:
                 pass
@@ -314,12 +316,12 @@ class UserEntityReferenceUIResolver(OARepoUIResolver):
             label = entity["username"]
         else:
             label = fallback_label_result(reference)
-        ret = {
-            "reference": reference,
-            "type": "user",
-            "label": label,
-            "links": self._extract_links_from_resolved_reference(entity),
-        }
+        ret = UIResolvedReference(
+            reference=reference,
+            type="user",
+            label=label,
+            links=self._extract_links_from_resolved_reference(entity),
+        )
         return ret
 
 
@@ -351,6 +353,10 @@ class RecordEntityReferenceUIResolver(OARepoUIResolver):
             return []
         # todo what if search not permitted?
         service = get_matching_service_for_refdict({self.reference_type: list(ids)[0]})
+        if not service:
+            raise ValueError(
+                f"No service found for handling reference type {self.reference_type}"
+            )
         extra_filter = dsl.Q("terms", **{"id": list(ids)})
         return service.search(identity, extra_filter=extra_filter).data["hits"]["hits"]
 
@@ -364,6 +370,10 @@ class RecordEntityReferenceUIResolver(OARepoUIResolver):
         :param _id:         id to search for
         """
         service = get_matching_service_for_refdict({self.reference_type: _id})
+        if not service:
+            raise ValueError(
+                f"No service found for handling reference type {self.reference_type}"
+            )
         return service.read(identity, _id).data
 
     @override
@@ -380,12 +390,12 @@ class RecordEntityReferenceUIResolver(OARepoUIResolver):
             label = entity["metadata"]["title"]
         else:
             label = fallback_label_result(reference)
-        ret = {
-            "reference": reference,
-            "type": list(reference.keys())[0],
-            "label": label,
-            "links": self._extract_links_from_resolved_reference(entity),
-        }
+        ret = UIResolvedReference(
+            reference=reference,
+            type=list(reference.keys())[0],
+            label=label,
+            links=self._extract_links_from_resolved_reference(entity),
+        )
         return ret
 
 
@@ -469,7 +479,10 @@ class FallbackEntityReferenceUIResolver(OARepoUIResolver):
         try:
             service = get_matching_service_for_refdict(reference)
         except:  # noqa - we don't care which exception has been caught, just returning fallback result
-            return fallback_result(reference)
+            return cast(dict, fallback_result(reference))
+
+        if not service:
+            return cast(dict, fallback_result(reference))
 
         # TODO: we might have a problem here - draft and published entity can have the same
         # id, but in reference they have the same type. So later on, we can not differentiate
@@ -482,7 +495,7 @@ class FallbackEntityReferenceUIResolver(OARepoUIResolver):
             try:
                 response = service.read_draft(identity, _id)  # type: ignore
             except:  # noqa - we don't care which exception has been caught, just returning fallback result
-                return fallback_result(reference)
+                return cast(dict, fallback_result(reference))
 
         if hasattr(response, "data"):
             response = response.data
@@ -503,10 +516,9 @@ class FallbackEntityReferenceUIResolver(OARepoUIResolver):
         else:
             label = fallback_label_result(reference)
 
-        ret = {
-            "reference": reference,
-            "type": list(reference.keys())[0],
-            "label": label,
-            "links": self._extract_links_from_resolved_reference(entity),
-        }
-        return ret
+        return UIResolvedReference(
+            reference=reference,
+            type=list(reference.keys())[0],
+            label=label,
+            links=self._extract_links_from_resolved_reference(entity),
+        )

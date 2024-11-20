@@ -22,7 +22,7 @@ from invenio_requests.errors import CannotExecuteActionError
 from invenio_requests.proxies import current_requests_service
 from invenio_requests.resolvers.registry import ResolverRegistry
 from oarepo_workflows.proxies import current_oarepo_workflows
-from oarepo_workflows.services.permissions.identity import auto_request_need
+from oarepo_workflows.requests.generators import auto_request_need
 
 from oarepo_requests.proxies import current_oarepo_requests_service
 
@@ -48,10 +48,11 @@ def auto_request_state_change_notifier(
     take the needs from the generators of possible creators. If any of those
     needs is an auto_request_need, create a request for it automatically.
     """
-    for request_type_id, workflow_request in (
-        current_oarepo_workflows.get_workflow(record).requests().items()
-    ):
-        needs = workflow_request.needs(
+    assert uow is not None
+
+    record_workflow = current_oarepo_workflows.get_workflow(record)
+    for request_type_id, workflow_request in record_workflow.requests().items():
+        needs = workflow_request.requester_generator.needs(
             request_type=request_type_id, record=record, **kwargs
         )
         if auto_request_need in needs:

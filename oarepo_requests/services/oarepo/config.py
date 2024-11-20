@@ -9,7 +9,7 @@
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Any, Callable
+from typing import TYPE_CHECKING, Any, Callable, cast
 
 from invenio_requests.services import RequestsServiceConfig
 from invenio_requests.services.requests import RequestLink
@@ -45,8 +45,7 @@ class RequestEntityLink(RequestLink):
         """Check if the link should be rendered."""
         if not super().should_render(obj, ctx):
             return False
-        if self.expand(obj, ctx):
-            return True
+        return bool(self.expand(obj, ctx))
 
     def _resolve(self, obj: Request, ctx: dict[str, Any]) -> dict:
         """Resolve the entity and put it into the context cache.
@@ -55,14 +54,14 @@ class RequestEntityLink(RequestLink):
         :param ctx: Context cache
         :return: The resolved entity
         """
-        reference_dict = getattr(obj, self.entity).reference_dict
+        reference_dict: dict = getattr(obj, self.entity).reference_dict
         key = "entity:" + ":".join(
             f"{x[0]}:{x[1]}" for x in sorted(reference_dict.items())
         )
         if key in ctx:
             return ctx[key]
         try:
-            entity = resolve(ctx["identity"], reference_dict)
+            entity = cast(dict, resolve(ctx["identity"], reference_dict))
         except Exception:  # noqa
             entity = {}
         ctx[key] = entity

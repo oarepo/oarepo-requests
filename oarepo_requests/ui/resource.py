@@ -107,10 +107,10 @@ class RequestUIResource(UIResource):
 
         make_links_absolute(record["links"], self.config.url_prefix)
 
-        extra_context = dict()
+        extra_context: dict[str, Any] = {}
         # TODO: this needs to be reimplemented in:
         # https://linear.app/ducesnet/issue/BE-346/on-request-detail-page-generate-form-config-for-the-comment-stream
-        form_config = {}
+        form_config: dict[str, Any] = {}
 
         self.run_components(
             "form_config",
@@ -168,10 +168,10 @@ class RequestUIResource(UIResource):
         self,
         template_type: str,
         *,
-        identity: Identity,
-        args: dict[str, Any],
-        view_args: dict[str, Any],
-        default_macro: str,
+        identity: Identity | None = None,
+        args: dict[str, Any] | None = None,
+        view_args: dict[str, Any] | None = None,
+        default_macro: str | None = None,
     ) -> str:
         """Return which jinjax macro should be used for rendering the template.
 

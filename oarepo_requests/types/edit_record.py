@@ -20,7 +20,7 @@ from typing_extensions import override
 
 from oarepo_requests.actions.edit_topic import EditTopicAcceptAction
 
-from ..utils import is_auto_approved, request_identity_matches
+from ..utils import classproperty, is_auto_approved, request_identity_matches
 from .generic import NonDuplicableOARepoRequestType
 from .ref_types import ModelRefTypes
 
@@ -54,8 +54,7 @@ class EditPublishedRecordRequestType(NonDuplicableOARepoRequestType):
         ),
     }
 
-    @classmethod
-    @property
+    @classproperty
     def available_actions(cls) -> dict[str, type[RequestAction]]:
         """Return available actions for the request type."""
         return {

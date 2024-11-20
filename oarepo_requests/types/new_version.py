@@ -18,7 +18,7 @@ from oarepo_runtime.i18n import lazy_gettext as _
 from typing_extensions import override
 
 from ..actions.new_version import NewVersionAcceptAction
-from ..utils import is_auto_approved, request_identity_matches
+from ..utils import classproperty, is_auto_approved, request_identity_matches
 from .generic import NonDuplicableOARepoRequestType
 from .ref_types import ModelRefTypes
 
@@ -48,8 +48,7 @@ class NewVersionRequestType(NonDuplicableOARepoRequestType):
         ),
     }
 
-    @classmethod
-    @property
+    @classproperty
     def available_actions(cls) -> dict[str, type[RequestAction]]:
         """Return available actions for the request type."""
         return {
@@ -145,3 +144,4 @@ class NewVersionRequestType(NonDuplicableOARepoRequestType):
             case _:
                 if request_identity_matches(request.created_by, identity):
                     return _("Submit request to get edit access to the record.")
+                return _("You do not have permission to update the record.")

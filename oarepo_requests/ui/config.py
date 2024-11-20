@@ -36,6 +36,7 @@ from oarepo_requests.ui.components import (
 
 if TYPE_CHECKING:
     from flask_resources.serializers.base import BaseSerializer
+    from invenio_records_resources.records import Record
     from invenio_requests.customizations.request_types import RequestType
 
 
@@ -112,12 +113,16 @@ class RequestUIResourceConfig(UIResourceConfig):
     def custom_fields(self, **kwargs: Any) -> dict:
         """Get the custom fields for the request."""
         api_service = current_service_registry.get(self.api_service)
-        # get the record class
-        record_class = getattr(api_service, "record_cls", None)
-        ui = []
+
+        ui: list[dict] = []
         ret = {
             "ui": ui,
         }
+
+        # get the record class
+        if not hasattr(api_service, "record_cls"):
+            return ret
+        record_class: type[Record] = api_service.record_cls
         if not record_class:
             return ret
         # try to get custom fields from the record

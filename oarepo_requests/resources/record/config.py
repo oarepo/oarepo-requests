@@ -22,6 +22,10 @@ class RecordRequestsResourceConfig:
     the requests resource lives.
     """
 
+    blueprint_name: str | None = (
+        None  # will be merged from the record's resource config
+    )
+
     routes = {
         "list-requests": "/<pid_value>/requests",
         "request-type": "/<pid_value>/requests/<request_type>",

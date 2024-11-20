@@ -23,6 +23,7 @@ if TYPE_CHECKING:
     from invenio_records_resources.records import Record
     from invenio_records_resources.services.uow import UnitOfWork
     from invenio_requests.customizations import RequestType
+    from invenio_requests.records.api import Request
 
     from oarepo_requests.actions.components import RequestActionComponent
 
@@ -92,7 +93,7 @@ class OARepoGenericActionMixin:
         self, identity: Identity, uow: UnitOfWork, *args: Any, **kwargs: Any
     ) -> None:
         """Execute the action."""
-        request: Request = self.request  # noqa
+        request: Request = self.request  # type: ignore
         request_type = request.type
         topic = request.topic.resolve()
         self._execute_with_components(
@@ -103,8 +104,8 @@ class OARepoGenericActionMixin:
 class AddTopicLinksOnPayloadMixin:
     """A mixin for action that takes links from the topic and stores them inside the payload."""
 
-    self_link = None
-    self_html_link = None
+    self_link: str | None = None
+    self_html_link: str | None = None
 
     def apply(
         self,
@@ -118,7 +119,7 @@ class AddTopicLinksOnPayloadMixin:
         """Apply the action to the topic."""
         topic_dict = topic.to_dict()
 
-        request = self.request  # noqa
+        request: Request = self.request  # type: ignore
 
         if "payload" not in request:
             request["payload"] = {}

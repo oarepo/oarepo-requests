@@ -14,7 +14,13 @@ from __future__ import annotations
 
 import abc
 import contextlib
-from typing import TYPE_CHECKING, Any, ContextManager, override
+from typing import (
+    TYPE_CHECKING,
+    Any,
+    ContextManager,
+    Generator,
+    override,
+)
 
 from invenio_requests.customizations import RequestAction, RequestActions, RequestType
 from invenio_requests.errors import CannotExecuteActionError
@@ -24,6 +30,7 @@ from oarepo_requests.services.permissions.identity import request_active
 if TYPE_CHECKING:
     from flask_principal import Identity
     from invenio_records_resources.services.uow import UnitOfWork
+    from invenio_requests.records.api import Request
 
     from .generic import OARepoGenericActionMixin
 
@@ -74,7 +81,7 @@ class RequestIdentityComponent(RequestActionComponent):
         uow: UnitOfWork,
         *args: Any,
         **kwargs: Any,
-    ) -> ContextManager:
+    ) -> Generator[None, None, None]:
         identity.provides.add(request_active)
         try:
             yield
@@ -102,7 +109,7 @@ class WorkflowTransitionComponent(RequestActionComponent):
         uow: UnitOfWork,
         *args: Any,
         **kwargs: Any,
-    ) -> ContextManager:
+    ) -> Generator[None, None, None]:
         from oarepo_workflows.proxies import current_oarepo_workflows
         from sqlalchemy.exc import NoResultFound
 
@@ -117,7 +124,7 @@ class WorkflowTransitionComponent(RequestActionComponent):
             NoResultFound
         ):  # parent might be deleted - this is the case for delete_draft request type
             return
-        target_state = transitions[action.status_to]
+        target_state = transitions[action.status_to]  # type: ignore
         if (
             target_state and not topic.model.is_deleted
         ):  # commit doesn't work on deleted record?
@@ -125,7 +132,7 @@ class WorkflowTransitionComponent(RequestActionComponent):
                 identity,
                 topic,
                 target_state,
-                request=action.request,
+                request=action.request,  # type: ignore
                 uow=uow,
             )
 
@@ -144,15 +151,16 @@ class AutoAcceptComponent(RequestActionComponent):
         uow: UnitOfWork,
         *args: Any,
         **kwargs: Any,
-    ) -> ContextManager:
+    ) -> Generator[None, None, None]:
         yield
-        if action.request.status != "submitted":
+        request: Request = action.request  # type: ignore
+        if request.status != "submitted":
             return
-        receiver_ref = action.request.receiver  # this is <x>proxy, not dict
+        receiver_ref = request.receiver  # this is <x>proxy, not dict
         if not receiver_ref.reference_dict.get("auto_approve"):
             return
 
-        action_obj = RequestActions.get_action(action.request, "accept")
+        action_obj = RequestActions.get_action(request, "accept")
         if not action_obj.can_execute():
             raise CannotExecuteActionError("accept")
         action_obj.execute(identity, uow, *args, **kwargs)

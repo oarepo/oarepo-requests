@@ -34,7 +34,7 @@ class ModelRefTypes:
         for ref_type in current_requests.entity_resolvers_registry:
             if not isinstance(ref_type, RecordResolver):
                 continue
-            is_draft = getattr(ref_type.record_cls, "is_draft", False)
+            is_draft: bool = getattr(ref_type.record_cls, "is_draft", False)
             if self.published and not is_draft or self.draft and is_draft:
                 ret.append(ref_type.type_key)
         return ret

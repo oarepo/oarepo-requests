@@ -9,7 +9,7 @@
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Any, override
+from typing import TYPE_CHECKING, Any
 
 from invenio_records_resources.services.uow import IndexRefreshOp, unit_of_work
 from invenio_requests import current_request_type_registry
@@ -95,12 +95,11 @@ class OARepoRequestsService(RequestsService):
             )
             return result
 
-    @override
     def read(self, identity: Identity, id_: str, expand: bool = False) -> RequestItem:
+        """Retrieve a request."""
         api_request = super().read(identity, id_, expand)
         return api_request
 
-    @override
     @unit_of_work()
     def update(
         self,
@@ -111,6 +110,8 @@ class OARepoRequestsService(RequestsService):
         uow: UnitOfWork | None = None,
         expand: bool = False,
     ) -> RequestItem:
+        """Update a request."""
+        assert uow is not None
         result = super().update(
             identity, id_, data, revision_id=revision_id, uow=uow, expand=expand
         )

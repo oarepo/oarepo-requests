@@ -15,6 +15,7 @@ from oarepo_ui.resources.components import UIResourceComponent
 
 if TYPE_CHECKING:
     from flask_principal import Identity
+    from invenio_requests.customizations import RequestType
 
 
 class ActionLabelsComponent(UIResourceComponent):
@@ -29,13 +30,14 @@ class ActionLabelsComponent(UIResourceComponent):
         **kwargs: Any,
     ) -> None:
         """Add action labels to the form config."""
-        type_ = view_args.get("request_type")
+        type_: RequestType = view_args.get("request_type")
         action_labels = {}
-        for action_type, action in type_.available_actions.items():
-            if hasattr(action, "stateful_name"):
-                name = action.stateful_name(identity, **kwargs)
-            else:
-                name = action_type.capitalize()
-            action_labels[action_type] = name
+        if type_:
+            for action_type, action in type_.available_actions.items():
+                if hasattr(action, "stateful_name"):
+                    name = action.stateful_name(identity, **kwargs)
+                else:
+                    name = action_type.capitalize()
+                action_labels[action_type] = name
 
         form_config["action_labels"] = action_labels

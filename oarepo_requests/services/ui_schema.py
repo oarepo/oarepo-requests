@@ -10,7 +10,7 @@
 from __future__ import annotations
 
 from types import SimpleNamespace
-from typing import TYPE_CHECKING, Any
+from typing import TYPE_CHECKING, Any, cast
 
 import marshmallow as ma
 from invenio_pidstore.errors import PersistentIdentifierError, PIDDeletedError
@@ -53,15 +53,16 @@ class UIReferenceSchema(ma.Schema):
     """Links to the entity."""
 
     @ma.pre_dump
-    def _create_reference(self, data: Any, **kwargs: Any) -> dict:
+    def _create_reference(self, data: Any, **kwargs: Any) -> dict | None:
         if data:
             return dict(reference=data)
+        return None
 
     @ma.post_dump
-    def _dereference(self, data: dict, **kwargs: Any) -> dict:
+    def _dereference(self, data: dict, **kwargs: Any) -> dict[str, Any]:
         if "resolved" not in self.context:
             try:
-                return resolve(self.context["identity"], data["reference"])
+                return cast(dict, resolve(self.context["identity"], data["reference"]))
             except PIDDeletedError:
                 return {**data, "status": "removed"}
             except PersistentIdentifierError:
@@ -127,7 +128,7 @@ class UIRequestSchemaMixin:
 
     def _get_stateful_labels(
         self, type_obj: RequestType, data: dict
-    ) -> tuple[str, str]:
+    ) -> tuple[str | None, str | None]:
         stateful_name = None
         stateful_description = None
         try:
@@ -135,14 +136,14 @@ class UIRequestSchemaMixin:
             if topic:
                 if hasattr(type_obj, "stateful_name"):
                     stateful_name = type_obj.stateful_name(
-                        identity=self.context["identity"],
+                        identity=self.context["identity"],  # type: ignore
                         topic=topic,
                         # not very nice, but we need to pass the request object to the stateful_name function
                         request=SimpleNamespace(**data),
                     )
                 if hasattr(type_obj, "stateful_description"):
                     stateful_description = type_obj.stateful_description(
-                        identity=self.context["identity"],
+                        identity=self.context["identity"],  # type: ignore
                         topic=topic,
                         # not very nice, but we need to pass the request object to the stateful_description function
                         request=SimpleNamespace(**data),
@@ -153,7 +154,7 @@ class UIRequestSchemaMixin:
         return stateful_name, stateful_description
 
     @ma.pre_dump
-    def _process_status(self, data: dict, **kwargs: any) -> dict:
+    def _process_status(self, data: dict, **kwargs: Any) -> dict:
         data["status_code"] = data["status"]
         data["status"] = _(data["status"].capitalize())
         return data
@@ -223,13 +224,15 @@ class UIRequestTypeSchema(RequestTypeSchema):
 class UIRequestsSerializationMixin(ma.Schema):
     """Mixin for serialization of record that adds information from request type."""
 
-    @ma.post_dump()
-    def _add_request_types(self, data: dict, **kwargs: Any) -> dict:
+    @ma.post_dump(pass_original=True)
+    def _add_request_types(
+        self, data: dict, original_data: dict, **kwargs: Any
+    ) -> dict:
         """If the expansion is requested, add UI form of request types and requests to the serialized record."""
         expanded = data.get("expanded", {})
         if not expanded:
             return data
-        context = {**self.context, "topic": data}
+        context = {**self.context, "topic": original_data}
         if "request_types" in expanded:
             expanded["request_types"] = UIRequestTypeSchema(context=context).dump(
                 expanded["request_types"], many=True

@@ -22,6 +22,10 @@ class RecordRequestTypesResourceConfig:
     the request types resource lives.
     """
 
+    blueprint_name: str | None = (
+        None  # will be merged from the record's resource config
+    )
+
     routes = {
         "list-applicable-requests": "/<pid_value>/requests/applicable",
     }

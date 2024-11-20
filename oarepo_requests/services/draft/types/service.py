@@ -9,7 +9,7 @@
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, override
+from typing import TYPE_CHECKING
 
 from oarepo_requests.services.record.types.service import RecordRequestTypesService
 
@@ -31,9 +31,9 @@ class DraftRecordRequestTypesService(RecordRequestTypesService):
         """Factory for creating a record class."""
         return self.record_service.config.draft_cls
 
-    @override
-    def get_applicable_request_types(
+    def get_applicable_request_types_for_draft_record(
         self, identity: Identity, record_id: str
     ) -> RequestTypesList:
+        """Return applicable request types for a draft record."""
         record = self.draft_cls.pid.resolve(record_id, registered_only=False)
         return self._get_applicable_request_types(identity, record)

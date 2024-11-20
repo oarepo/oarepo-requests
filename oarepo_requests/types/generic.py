@@ -18,7 +18,7 @@ from invenio_requests.customizations.states import RequestState
 from invenio_requests.proxies import current_requests_service
 
 from oarepo_requests.errors import OpenRequestAlreadyExists
-from oarepo_requests.utils import open_request_exists
+from oarepo_requests.utils import classproperty, open_request_exists
 
 from ..actions.generic import (
     OARepoAcceptAction,
@@ -53,8 +53,7 @@ class OARepoRequestType(RequestType):
         """
         current_requests_service.execute_action(system_identity, request.id, "cancel")
 
-    @classmethod
-    @property
+    @classproperty[dict[str, RequestState]]
     def available_statuses(cls) -> dict[str, RequestState]:
         """Return available statuses for the request type.
 
@@ -62,14 +61,12 @@ class OARepoRequestType(RequestType):
         """
         return {**super().available_statuses, "created": RequestState.OPEN}
 
-    @classmethod
-    @property
+    @classproperty[bool]
     def has_form(cls) -> bool:
         """Return whether the request type has a form."""
         return hasattr(cls, "form")
 
-    @classmethod
-    @property
+    @classproperty[bool]
     def editable(cls) -> bool:
         """Return whether the request type is editable."""
         return cls.has_form  # noqa
@@ -121,8 +118,7 @@ class OARepoRequestType(RequestType):
     allowed_topic_ref_types = ModelRefTypes()
     allowed_receiver_ref_types = ReceiverRefTypes()
 
-    @classmethod
-    @property
+    @classproperty
     def available_actions(cls) -> dict[str, type[RequestAction]]:
         """Return available actions for the request type."""
         return {

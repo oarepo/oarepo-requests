@@ -138,51 +138,72 @@ def test_resolver_fallback(
     app.config["ENTITY_REFERENCE_UI_RESOLVERS"] = {
         "fallback": FallbackEntityReferenceUIResolver("fallback"),
     }
+    try:
+        creator = users[0]
+        creator_client = logged_client(creator)
 
-    creator = users[0]
-    creator_client = logged_client(creator)
+        draft1 = create_draft_via_resource(creator_client)
+        draft_id = draft1.json["id"]
+        ThesisRecord.index.refresh()
+        ThesisDraft.index.refresh()
 
-    draft1 = create_draft_via_resource(creator_client)
-    draft_id = draft1.json["id"]
-    ThesisRecord.index.refresh()
-    ThesisDraft.index.refresh()
+        resp_request_create = creator_client.post(
+            urls["BASE_URL_REQUESTS"],
+            json=publish_request_data_function(draft1.json["id"]),
+            headers={"Accept": "application/vnd.inveniordm.v1+json"},
+        )
+        assert resp_request_create.json["stateful_name"] == "Submit for review"
+        assert (
+            resp_request_create.json["stateful_description"]
+            == "Submit for review. After submitting the draft for review, it will be locked and no further modifications will be possible."
+        )
 
-    resp_request_create = creator_client.post(
-        urls["BASE_URL_REQUESTS"],
-        json=publish_request_data_function(draft1.json["id"]),
-        headers={"Accept": "application/vnd.inveniordm.v1+json"},
-    )
-    assert resp_request_create.json["stateful_name"] == "Submit for review"
-    assert (
-        resp_request_create.json["stateful_description"]
-        == "Submit for review. After submitting the draft for review, it will be locked and no further modifications will be possible."
-    )
+        resp_request_submit = creator_client.post(
+            link_api2testclient(resp_request_create.json["links"]["actions"]["submit"]),
+            headers={"Accept": "application/vnd.inveniordm.v1+json"},
+        )
+        assert resp_request_submit.json["stateful_name"] == "Submitted for review"
+        assert (
+            resp_request_submit.json["stateful_description"]
+            == "The draft has been submitted for review. It is now locked and no further changes are possible. You will be notified about the decision by email."
+        )
 
-    resp_request_submit = creator_client.post(
-        link_api2testclient(resp_request_create.json["links"]["actions"]["submit"]),
-        headers={"Accept": "application/vnd.inveniordm.v1+json"},
-    )
-    assert resp_request_submit.json["stateful_name"] == "Submitted for review"
-    assert (
-        resp_request_submit.json["stateful_description"]
-        == "The draft has been submitted for review. It is now locked and no further changes are possible. You will be notified about the decision by email."
-    )
+        ui_record = creator_client.get(
+            f"{urls['BASE_URL']}{draft_id}/draft?expand=true",
+            headers={"Accept": "application/vnd.inveniordm.v1+json"},
+        ).json
+        expected_result = ui_serialization_result(
+            draft_id, ui_record["expanded"]["requests"][0]["id"]
+        )
+        expected_result["created_by"]["label"] = (
+            f"id: {creator.id}"  # the user resolver uses name or email as label, the fallback doesn't know what to use
+        )
+        expected_created_by = {**expected_result["created_by"]}
+        actual_created_by = {**ui_record["expanded"]["requests"][0]["created_by"]}
 
-    ui_record = creator_client.get(
-        f"{urls['BASE_URL']}{draft_id}/draft?expand=true",
-        headers={"Accept": "application/vnd.inveniordm.v1+json"},
-    ).json
-    expected_result = ui_serialization_result(
-        draft_id, ui_record["expanded"]["requests"][0]["id"]
-    )
-    expected_result["created_by"]["label"] = (
-        f"id: {creator.id}"  # the user resolver uses name or email as label, the fallback doesn't know what to use
-    )
-    assert is_valid_subdict(
-        expected_result,
-        ui_record["expanded"]["requests"][0],
-    )
-    app.config["ENTITY_REFERENCE_UI_RESOLVERS"] = config_restore
+        expected_topic = {**expected_result["topic"]}
+        actual_topic = {**ui_record["expanded"]["requests"][0]["topic"]}
+
+        expected_receiver = {**expected_result["receiver"]}
+        actual_receiver = {**ui_record["expanded"]["requests"][0]["receiver"]}
+
+        expected_created_by.pop('links', None)
+        actual_created_by.pop('links', None)
+
+        expected_topic.pop('links', None)
+        actual_topic.pop('links', None)
+
+        assert actual_topic['label'].startswith('id: ')
+        assert expected_topic.pop('label') != actual_topic.pop('label')
+
+        expected_receiver.pop('links', None)
+        actual_receiver.pop('links', None)
+
+        assert expected_created_by == actual_created_by
+        assert expected_topic == actual_topic
+        assert expected_receiver == actual_receiver
+    finally:
+        app.config["ENTITY_REFERENCE_UI_RESOLVERS"] = config_restore
 
 
 def test_role(

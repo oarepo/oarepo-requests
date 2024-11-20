@@ -9,9 +9,14 @@
 
 from __future__ import annotations
 
-from typing import Any
+from typing import TYPE_CHECKING, Any
 
 from oarepo_ui.resources.components import UIResourceComponent
+
+from oarepo_requests.types.generic import OARepoRequestType
+
+if TYPE_CHECKING:
+    from invenio_requests.customizations import RequestType
 
 
 class FormConfigCustomFieldsComponent(UIResourceComponent):
@@ -22,7 +27,8 @@ class FormConfigCustomFieldsComponent(UIResourceComponent):
     ) -> None:
         """Add custom fields to the form config."""
         type_ = view_args.get("request_type")
-        form = getattr(type_, "form", None)
+        # ignore the type as we are checking for alternatives below
+        form: dict | list = getattr(type_, "form", None)  # type: ignore
         if not form:
             return
 
@@ -55,14 +61,15 @@ class FormConfigRequestTypePropertiesComponent(UIResourceComponent):
         self, *, view_args: dict[str, Any], form_config: dict, **kwargs: Any
     ) -> None:
         """Add request type properties to the form config (dangerous, editable, has_form)."""
-        type_ = view_args.get("request_type")
+        type_: RequestType = view_args.get("request_type")
 
         request_type_properties = {}
-        if hasattr(type_, "dangerous"):
-            request_type_properties["dangerous"] = type_.dangerous
-        if hasattr(type_, "editable"):
-            request_type_properties["editable"] = type_.editable
-        if hasattr(type_, "has_form"):
-            request_type_properties["has_form"] = type_.has_form
+        if type_ and isinstance(type_, OARepoRequestType):
+            if hasattr(type_, "dangerous"):
+                request_type_properties["dangerous"] = type_.dangerous
+            if hasattr(type_, "editable"):
+                request_type_properties["editable"] = type_.editable
+            if hasattr(type_, "has_form"):
+                request_type_properties["has_form"] = type_.has_form
 
         form_config["request_type_properties"] = request_type_properties

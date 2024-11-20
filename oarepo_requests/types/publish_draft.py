@@ -25,7 +25,7 @@ from oarepo_requests.actions.publish_draft import (
     PublishDraftSubmitAction,
 )
 
-from ..utils import is_auto_approved, request_identity_matches
+from ..utils import classproperty, is_auto_approved, request_identity_matches
 from .generic import NonDuplicableOARepoRequestType
 from .ref_types import ModelRefTypes
 
@@ -66,8 +66,7 @@ class PublishDraftRequestType(NonDuplicableOARepoRequestType):
         },
     }
 
-    @classmethod
-    @property
+    @classproperty
     def available_actions(cls) -> dict[str, type[RequestAction]]:
         """Return available actions for the request type."""
         return {
@@ -81,7 +80,7 @@ class PublishDraftRequestType(NonDuplicableOARepoRequestType):
     receiver_can_be_none = True
     allowed_topic_ref_types = ModelRefTypes(published=True, draft=True)
 
-    editable = False
+    editable = False  # type: ignore
 
     def can_create(
         self,

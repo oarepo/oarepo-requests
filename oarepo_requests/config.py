@@ -46,7 +46,7 @@ REQUESTS_REGISTERED_EVENT_TYPES = [
 
 REQUESTS_ALLOWED_RECEIVERS = ["user", "group", "auto_approve"]
 
-DEFAULT_WORKFLOW_EVENT_SUBMITTERS = {
+DEFAULT_WORKFLOW_EVENTS = {
     CommentEventType.type_id: WorkflowEvent(
         submitters=InvenioRequestsPermissionPolicy.can_create_comment
     ),
