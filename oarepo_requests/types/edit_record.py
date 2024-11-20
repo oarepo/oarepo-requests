@@ -16,7 +16,7 @@ from .ref_types import ModelRefTypes
 
 class EditPublishedRecordRequestType(NonDuplicableOARepoRequestType):
     type_id = "edit_published_record"
-    name = _("Edit record")
+    name = _("Edit metadata")
     payload_schema = {
         "draft_record.links.self": ma.fields.Str(
             attribute="draft_record:links:self",

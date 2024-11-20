@@ -627,5 +627,28 @@ msgstr ""
 msgid "Keep files."
 msgstr ""
 
+#: /home/dusanst/Projects/oarepo-requests/oarepo_requests/types/edit_record.py:19
+msgid "Edit metadata"
+msgstr ""
+
+#: /home/dusanst/Projects/oarepo-requests/oarepo_requests/types/new_version.py:50
+msgid "Keep files:"
+msgstr ""
+
+#: /home/dusanst/Projects/oarepo-requests/oarepo_requests/types/new_version.py:52
+msgid ""
+"If you choose yes, the current record's files will be linked to the new "
+"version of the record. Then you will be able to add/remove files in the "
+"form."
+msgstr ""
+
+#: /home/dusanst/Projects/oarepo-requests/oarepo_requests/types/new_version.py:55
+msgid "No"
+msgstr ""
+
+#: /home/dusanst/Projects/oarepo-requests/oarepo_requests/types/new_version.py:56
+msgid "Yes"
+msgstr ""
+
 #~ msgid "No status"
 #~ msgstr ""

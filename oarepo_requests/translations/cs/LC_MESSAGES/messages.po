@@ -659,3 +659,28 @@ msgstr "Ponechat soubory."
 #: /home/ron/prace/oarepo-requests-alt/oarepo_requests/types/new_version.py:51
 msgid "Keep files in the new version?"
 msgstr "Ponechat soubory v nové verzi?"
+
+#: /home/dusanst/Projects/oarepo-requests/oarepo_requests/types/edit_record.py:19
+msgid "Edit metadata"
+msgstr ""
+
+#: /home/dusanst/Projects/oarepo-requests/oarepo_requests/types/new_version.py:50
+msgid "Keep files:"
+msgstr "Ponechat soubory:"
+
+#: /home/dusanst/Projects/oarepo-requests/oarepo_requests/types/new_version.py:52
+msgid ""
+"If you choose yes, the current record's files will be linked to the new "
+"version of the record. Then you will be able to add/remove files in the "
+"form."
+msgstr ""
+"Pokud zvolíte ano, soubory aktuálního záznamu budou propojeny s novou verzí "
+"záznamu. Poté budete moci přidávat/odstraňovat soubory ve formuláři."
+
+#: /home/dusanst/Projects/oarepo-requests/oarepo_requests/types/new_version.py:55
+msgid "No"
+msgstr "Ne"
+
+#: /home/dusanst/Projects/oarepo-requests/oarepo_requests/types/new_version.py:56
+msgid "Yes"
+msgstr "Ano"
