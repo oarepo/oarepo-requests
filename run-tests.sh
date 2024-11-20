@@ -43,7 +43,7 @@ pip install "oarepo[tests]==$OAREPO_VERSION.*"
 pip install -e "./$BUILD_TEST_DIR/${MODEL}"
 
 # local development
-pip install --config-settings editable_mode=compat -e ../oarepo-workflows
+# pip install --config-settings editable_mode=compat -e ../oarepo-workflows
 
 # Check if we can import all the sources
 find oarepo_requests -name '*.py' | grep -v '__init__.py' | sed 's/.py$//' | tr '/' '.' | sort -u | while read MODULE ; do
