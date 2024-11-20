@@ -41,7 +41,7 @@ def test_record_delete_request_present(
                     "create": f"https://127.0.0.1:5000/api/thesis/{topic['id']}/requests/edit_published_record"
                 }
             },
-            "name": "Edit record",
+            "name": "Edit metadata",
         }
         assert data["creatable_request_types"]["delete_published_record"] == {
             "description": "Request deletion of published record",
@@ -93,6 +93,7 @@ def test_request_detail_page(
     with creator_client.get(f"/requests/{request_id}") as c:
         assert c.status_code == 200
         print(c.text)
+
 
 def test_form_config(app, client, record_ui_resource, fake_manifest):
     with client.get("/requests/configs/publish_draft") as c:

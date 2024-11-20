@@ -292,12 +292,12 @@ def test_ui_serialization(
                 }
             },
             "description": "Request re-opening of published record",
-            "name": "Edit record",
+            "name": "Edit metadata",
             "dangerous": False,
             "editable": False,
             "has_form": False,
             "stateful_description": "Click to start editing the metadata of the record.",
-            "stateful_name": "Edit record",
+            "stateful_name": "Edit metadata",
         },
         {
             "type_id": "new_version",

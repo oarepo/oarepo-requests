@@ -662,7 +662,7 @@ msgstr "Ponechat soubory v nové verzi?"
 
 #: /home/dusanst/Projects/oarepo-requests/oarepo_requests/types/edit_record.py:19
 msgid "Edit metadata"
-msgstr ""
+msgstr "Upravit metadata"
 
 #: /home/dusanst/Projects/oarepo-requests/oarepo_requests/types/new_version.py:50
 msgid "Keep files:"
