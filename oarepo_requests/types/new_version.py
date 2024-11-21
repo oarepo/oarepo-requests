@@ -14,6 +14,7 @@ from typing import TYPE_CHECKING, Any
 import marshmallow as ma
 from invenio_records_resources.services.uow import RecordCommitOp, UnitOfWork
 from invenio_requests.proxies import current_requests_service
+from marshmallow.validate import OneOf
 from oarepo_runtime.i18n import lazy_gettext as _
 from typing_extensions import override
 
@@ -46,6 +47,7 @@ class NewVersionRequestType(NonDuplicableOARepoRequestType):
             attribute="draft_record:links:self_html",
             data_key="draft_record:links:self_html",
         ),
+        "keep_files": ma.fields.String(validate=OneOf(["true", "false"])),
     }
 
     @classproperty
@@ -58,6 +60,18 @@ class NewVersionRequestType(NonDuplicableOARepoRequestType):
 
     description = _("Request requesting creation of new version of a published record.")
     allowed_topic_ref_types = ModelRefTypes(published=True, draft=True)
+    editable = False
+
+    form = {
+        "field": "keep_files",
+        "ui_widget": "BooleanCheckbox",
+        "props": {
+            "label": _("Keep files."),
+            "placeholder": _("Keep files in the new version?"),
+            "required": False,
+            "default": True,
+        },
+    }
 
     @classmethod
     def is_applicable_to(

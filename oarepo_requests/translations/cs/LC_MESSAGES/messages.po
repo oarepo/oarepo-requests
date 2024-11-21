@@ -648,3 +648,11 @@ msgstr "API pro vytváření žádostí"
 #: /home/ron/prace/oarepo-requests/oarepo_requests/resolvers/ui.py:143
 msgid "System user"
 msgstr "Systémový uživatel"
+
+#: /home/ron/prace/oarepo-requests-alt/oarepo_requests/types/new_version.py:50
+msgid "Keep files."
+msgstr "Ponechat soubory."
+
+#: /home/ron/prace/oarepo-requests-alt/oarepo_requests/types/new_version.py:51
+msgid "Keep files in the new version?"
+msgstr "Ponechat soubory v nové verzi?"
