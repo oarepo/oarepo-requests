@@ -656,3 +656,15 @@ msgstr "Ponechat soubory."
 #: /home/ron/prace/oarepo-requests-alt/oarepo_requests/types/new_version.py:51
 msgid "Keep files in the new version?"
 msgstr "Ponechat soubory v nové verzi?"
+
+#: /Users/m/w/cesnet/oarepo-requests/oarepo_requests/types/delete_draft.py:101
+msgid "You do not have permission to delete the draft."
+msgstr "Nemáte právo smazat rozpracovaný záznam."
+
+#: /Users/m/w/cesnet/oarepo-requests/oarepo_requests/types/delete_published_record.py:106
+msgid "You do not have permission to delete the record."
+msgstr "Nemáte právo smazat záznam."
+
+#: /Users/m/w/cesnet/oarepo-requests/oarepo_requests/types/new_version.py:161
+msgid "You do not have permission to update the record."
+msgstr "Nemáte právo zažádat o aktualizaci záznamu."
