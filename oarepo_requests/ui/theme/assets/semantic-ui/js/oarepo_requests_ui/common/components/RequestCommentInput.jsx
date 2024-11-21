@@ -25,7 +25,7 @@ export const RequestCommentInput = ({ fieldPath, label }) => {
             editorConfig={{
               auto_focus: true,
               min_height: 130,
-              valid_elements:
+              toolbar:
                 "blocks | bold italic | bullist numlist | outdent indent | undo redo",
             }}
             onBlur={(event, editor) => {

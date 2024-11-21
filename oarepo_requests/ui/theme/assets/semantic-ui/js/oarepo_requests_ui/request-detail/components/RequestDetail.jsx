@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import { i18next } from "@translations/oarepo_requests_ui/i18next";
 import { scrollTop } from "@js/oarepo_ui";
 import {
@@ -25,6 +25,7 @@ import {
   TopicPreview,
 } from "@js/oarepo_requests_common";
 import { Formik } from "formik";
+import _isEmpty from "lodash/isEmpty";
 
 export const RequestDetail = ({
   request,
@@ -44,7 +45,6 @@ export const RequestDetail = ({
       staleTime: Infinity,
     }
   );
-
   const customFields = data?.data?.custom_fields;
   const requestTypeProperties = data?.data?.request_type_properties;
   const actions = mapLinksToActions(
@@ -65,13 +65,19 @@ export const RequestDetail = ({
     };
   }, []);
 
+  const formikInitialValues = useMemo(() => {
+    return {
+      payload: !_isEmpty(request?.payload) ? request.payload : {},
+    };
+  }, [request?.payload]);
+
   const requestHeader = request?.stateful_name || request?.name;
   const description = request?.stateful_description || request?.description;
   return (
     <CallbackContextProvider
       value={{ onBeforeAction, onAfterAction, onActionError }}
     >
-      <Formik initialValues={{}}>
+      <Formik initialValues={formikInitialValues}>
         {({ errors }) => (
           <ConfirmModalContextProvider requestOrRequestType={request}>
             {({ confirmDialogProps }) => (
