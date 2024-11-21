@@ -509,19 +509,15 @@ class FallbackEntityReferenceUIResolver(OARepoUIResolver):
         if not service:
             return cast(dict, fallback_result(reference))
 
-        # TODO: we might have a problem here - draft and published entity can have the same
-        # id, but in reference they have the same type. So later on, we can not differentiate
-        # between draft and published record.
-        # This would be a problem if a single request type could be applicable both to draft
-        # and published record.
         try:
-            response = service.read(identity, _id)
-        except:  # noqa - we don't care which exception has been caught, just returning fallback result
-            try:
+            if self.reference_type.endswith('_draft'):
                 response = service.read_draft(identity, _id)  # type: ignore
-            except:  # noqa - we don't care which exception has been caught, just returning fallback result
-                return cast(dict, fallback_result(reference))
+            else:
+                response = service.read(identity, _id)
+        except:  # noqa - we don't care which exception has been caught, just returning fallback result
+            return cast(dict, fallback_result(reference))
 
+        # TODO: should not this be "to_dict" ?
         if hasattr(response, "data"):
             response = response.data
         return response
