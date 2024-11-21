@@ -10,6 +10,7 @@
 from __future__ import annotations
 
 import abc
+import copy
 from typing import TYPE_CHECKING, Any, TypedDict, cast, override
 
 from invenio_records_resources.resources.errors import PermissionDeniedError
@@ -50,10 +51,16 @@ def resolve(identity: Identity, reference: dict[str, str]) -> UIResolvedReferenc
     reference_type, reference_value = next(iter(reference.items()))
     entity_resolvers = current_oarepo_requests.entity_reference_ui_resolvers
     if reference_type in entity_resolvers:
-        return entity_resolvers[reference_type].resolve_one(identity, reference_value, reference_type=reference_type)
+        return entity_resolvers[reference_type].resolve_one(
+            identity, reference_value
+        )
     else:
+        fallback_resolver = copy.copy(entity_resolvers["fallback"])
+        fallback_resolver.reference_type = reference_type
         # TODO log warning
-        return entity_resolvers["fallback"].resolve_one(identity, reference_value, reference_type=reference_type)
+        return fallback_resolver.resolve_one(
+            identity, reference_value
+        )
 
 
 def fallback_label_result(reference: dict[str, str]) -> str:
@@ -129,17 +136,16 @@ class OARepoUIResolver(abc.ABC):
         """
         raise NotImplementedError(f"Implement this in {self.__class__.__name__}")
 
-    def resolve_one(self, identity: Identity, _id: str, **kwargs: Any) -> UIResolvedReference:
+    def resolve_one(
+        self, identity: Identity, _id: str, **kwargs: Any
+    ) -> UIResolvedReference:
         """Resolve a single reference to a UI representation.
 
         :param identity:    identity of the user
         :param _id:         id of the entity
         :return:            UI representation of the reference
         """
-        if 'reference_type' in kwargs:
-            reference = {kwargs['reference_type']: _id}
-        else:
-            reference = {self.reference_type: _id}
+        reference = {self.reference_type: _id}
         entity = self._search_one(identity, _id)
         if not entity:
             return fallback_result(reference, **kwargs)

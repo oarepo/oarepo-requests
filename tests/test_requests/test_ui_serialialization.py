@@ -187,17 +187,16 @@ def test_resolver_fallback(
         expected_receiver = {**expected_result["receiver"]}
         actual_receiver = {**ui_record["expanded"]["requests"][0]["receiver"]}
 
-        expected_created_by.pop('links', None)
-        actual_created_by.pop('links', None)
+        expected_created_by.pop("links", None)
+        actual_created_by.pop("links", None)
 
-        expected_topic.pop('links', None)
-        actual_topic.pop('links', None)
+        expected_topic.pop("links", None)
+        actual_topic.pop("links", None)
 
-        assert actual_topic['label'].startswith('id: ')
-        assert expected_topic.pop('label') != actual_topic.pop('label')
+        assert expected_topic.pop("label") == actual_topic.pop("label")
 
-        expected_receiver.pop('links', None)
-        actual_receiver.pop('links', None)
+        expected_receiver.pop("links", None)
+        actual_receiver.pop("links", None)
 
         assert expected_created_by == actual_created_by
         assert expected_topic == actual_topic

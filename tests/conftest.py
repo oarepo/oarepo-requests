@@ -118,7 +118,7 @@ class DefaultRequests(WorkflowRequestPolicy):
     delete_draft = WorkflowRequest(
         requesters=[
             IfInState("draft", [RecordOwners()]),
-            IfInState("publishing", [RecordOwners()])
+            IfInState("publishing", [RecordOwners()]),
         ],
         recipients=[AutoApprove()],
         transitions=WorkflowTransitions(),
