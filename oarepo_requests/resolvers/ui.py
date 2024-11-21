@@ -447,7 +447,7 @@ class RecordEntityDraftReferenceUIResolver(RecordEntityReferenceUIResolver):
             {self.reference_type: list(ids)[0]}
         )
         extra_filter = dsl.Q("terms", **{"id": list(ids)})
-        return service.search_drafts(identity, extra_filter=extra_filter).data["hits"][
+        return service.search_drafts(identity, extra_filter=extra_filter).to_dict()["hits"][
             "hits"
         ]
 
