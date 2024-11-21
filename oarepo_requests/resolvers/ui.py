@@ -10,9 +10,11 @@
 from __future__ import annotations
 
 import abc
+import contextlib
 import copy
 from typing import TYPE_CHECKING, Any, TypedDict, cast, override
 
+from flask import request
 from invenio_records_resources.resources.errors import PermissionDeniedError
 from invenio_search.engine import dsl
 from invenio_users_resources.proxies import (
@@ -49,18 +51,35 @@ def resolve(identity: Identity, reference: dict[str, str]) -> UIResolvedReferenc
     :param reference: Reference to resolve.
     """
     reference_type, reference_value = next(iter(reference.items()))
+
+    # use cache to avoid multiple resolve for the same reference within one request
+    # the runtime error is risen when we are outside the request context - in this case we just skip the cache
+    with contextlib.suppress(RuntimeError):
+        if not hasattr(request, "current_oarepo_requests_ui_resolve_cache"):
+            request.current_oarepo_requests_ui_resolve_cache = {}
+        cache = request.current_oarepo_requests_ui_resolve_cache
+        if (reference_type, reference_value) in cache:
+            return cache[(reference_type, reference_value)]
+
     entity_resolvers = current_oarepo_requests.entity_reference_ui_resolvers
     if reference_type in entity_resolvers:
-        return entity_resolvers[reference_type].resolve_one(
+        resolved = entity_resolvers[reference_type].resolve_one(
             identity, reference_value
         )
     else:
         fallback_resolver = copy.copy(entity_resolvers["fallback"])
         fallback_resolver.reference_type = reference_type
         # TODO log warning
-        return fallback_resolver.resolve_one(
+        resolved = fallback_resolver.resolve_one(
             identity, reference_value
         )
+
+    # use cache to avoid multiple resolve for the same reference within one request
+    # the runtime error is risen when we are outside the request context - in this case we just skip the cache
+    with contextlib.suppress(RuntimeError):
+        request.current_oarepo_requests_ui_resolve_cache[(reference_type, reference_value)] = resolved
+
+    return resolved
 
 
 def fallback_label_result(reference: dict[str, str]) -> str:
