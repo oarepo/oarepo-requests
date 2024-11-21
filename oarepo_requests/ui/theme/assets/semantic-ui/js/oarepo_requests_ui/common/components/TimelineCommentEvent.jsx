@@ -1,4 +1,4 @@
-import React, { memo } from "react";
+import React from "react";
 import { i18next } from "@translations/oarepo_requests_ui/i18next";
 import { Feed, Image } from "semantic-ui-react";
 import _has from "lodash/has";
@@ -47,7 +47,4 @@ const TimelineCommentEvent = ({ event }) => {
 TimelineCommentEvent.propTypes = {
   event: PropTypes.object.isRequired,
 };
-export default memo(
-  TimelineCommentEvent,
-  (prevProps, nextProps) => prevProps.event.updated === nextProps.event.updated
-);
+export default TimelineCommentEvent;
