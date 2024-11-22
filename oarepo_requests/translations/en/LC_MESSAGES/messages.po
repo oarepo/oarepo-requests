@@ -625,5 +625,17 @@ msgstr ""
 msgid "Keep files."
 msgstr ""
 
+#: /Users/m/w/cesnet/oarepo-requests/oarepo_requests/types/delete_draft.py:101
+msgid "You do not have permission to delete the draft."
+msgstr ""
+
+#: /Users/m/w/cesnet/oarepo-requests/oarepo_requests/types/delete_published_record.py:106
+msgid "You do not have permission to delete the record."
+msgstr ""
+
+#: /Users/m/w/cesnet/oarepo-requests/oarepo_requests/types/new_version.py:161
+msgid "You do not have permission to update the record."
+msgstr ""
+
 #~ msgid "No status"
 #~ msgstr ""
