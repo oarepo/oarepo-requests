@@ -223,7 +223,7 @@ def reference_to_tuple(reference: EntityReference) -> tuple[str, str]:
     """
     return next(iter(reference.items()))
 
-
+# TODO: consider moving to oarepo-workflows
 def get_receiver_for_request_type(
     request_type: RequestType, identity: Identity, topic: Record
 ) -> EntityReference | None:
@@ -260,6 +260,7 @@ def get_receiver_for_request_type(
     return receivers
 
 
+# TODO: consider moving to oarepo-workflows
 def is_auto_approved(
     request_type: RequestType,
     *,
