@@ -70,14 +70,14 @@ def resolve(identity: Identity, reference: dict[str, str]) -> UIResolvedReferenc
         fallback_resolver = copy.copy(entity_resolvers["fallback"])
         fallback_resolver.reference_type = reference_type
         # TODO log warning
-        resolved = fallback_resolver.resolve_one(
-            identity, reference_value
-        )
+        resolved = fallback_resolver.resolve_one(identity, reference_value)
 
     # use cache to avoid multiple resolve for the same reference within one request
     # the runtime error is risen when we are outside the request context - in this case we just skip the cache
     with contextlib.suppress(RuntimeError):
-        request.current_oarepo_requests_ui_resolve_cache[(reference_type, reference_value)] = resolved
+        request.current_oarepo_requests_ui_resolve_cache[
+            (reference_type, reference_value)
+        ] = resolved
 
     return resolved
 
@@ -447,9 +447,9 @@ class RecordEntityDraftReferenceUIResolver(RecordEntityReferenceUIResolver):
             {self.reference_type: list(ids)[0]}
         )
         extra_filter = dsl.Q("terms", **{"id": list(ids)})
-        return service.search_drafts(identity, extra_filter=extra_filter).to_dict()["hits"][
+        return service.search_drafts(identity, extra_filter=extra_filter).to_dict()[
             "hits"
-        ]
+        ]["hits"]
 
     @override
     def _search_one(
@@ -510,7 +510,7 @@ class FallbackEntityReferenceUIResolver(OARepoUIResolver):
             return cast(dict, fallback_result(reference))
 
         try:
-            if self.reference_type.endswith('_draft'):
+            if self.reference_type.endswith("_draft"):
                 response = service.read_draft(identity, _id)  # type: ignore
             else:
                 response = service.read(identity, _id)

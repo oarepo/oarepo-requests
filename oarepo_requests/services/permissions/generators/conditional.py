@@ -9,7 +9,6 @@
 
 from __future__ import annotations
 
-import abc
 from typing import TYPE_CHECKING, Any
 
 from flask_principal import Identity
@@ -18,35 +17,41 @@ from invenio_records_resources.references.entity_resolvers import EntityProxy
 from invenio_requests.resolvers.registry import ResolverRegistry
 from oarepo_runtime.datastreams.utils import get_record_service_for_record
 from oarepo_workflows.requests import RecipientGeneratorMixin
+from oarepo_workflows.requests.generators import (
+    IfEventType as WorkflowIfEventType,
+)
+from oarepo_workflows.requests.generators import (
+    IfRequestType as WorkflowIfRequestType,
+)
+from oarepo_workflows.requests.generators import (
+    IfRequestTypeBase,
+)
 from sqlalchemy.exc import NoResultFound
+from typing_extensions import deprecated
 
 if TYPE_CHECKING:
     from invenio_records_resources.records import Record
-    from invenio_requests.customizations import EventType, RequestType
+    from invenio_requests.customizations import RequestType
     from invenio_requests.records import Request
     from opensearch_dsl.query import Query
 
     from oarepo_requests.typing import EntityReference
 
 
-class IfRequestTypeBase(abc.ABC, ConditionalGenerator):
-    """Base class for conditional generators that generate needs based on request type."""
+@deprecated("Use oarepo_workflows.requests.generators.IfEventType instead.")
+class IfEventType(WorkflowIfEventType):
+    """Conditional generator that generates needs based on the event type.
 
-    def __init__(
-        self, request_types: list[str] | tuple[str] | str, then_: list[Generator]
-    ) -> None:
-        """Initialize the generator."""
-        super().__init__(then_, else_=[])
-        if not isinstance(request_types, (list, tuple)):
-            request_types = [request_types]
-        self.request_types = request_types
+    This class is deprecated. Use oarepo_workflows.requests.generators.IfEventType instead.
+    """
 
 
-class IfRequestType(IfRequestTypeBase):
-    """Conditional generator that generates needs when a current request is of a given type."""
+@deprecated("Use oarepo_workflows.requests.generators.IfRequestType instead.")
+class IfRequestType(WorkflowIfRequestType):
+    """Conditional generator that generates needs based on the request type.
 
-    def _condition(self, request_type: RequestType, **kwargs: Any) -> bool:
-        return request_type.type_id in self.request_types
+    This class is deprecated. Use oarepo_workflows.requests.generators.IfRequestType instead.
+    """
 
 
 class IfEventOnRequestType(IfRequestTypeBase):
@@ -54,26 +59,6 @@ class IfEventOnRequestType(IfRequestTypeBase):
 
     def _condition(self, request: Request, **kwargs: Any) -> bool:
         return request.type.type_id in self.request_types
-
-
-class IfEventType(ConditionalGenerator):
-    """Conditional generator that generates needs when a current event is of a given type."""
-
-    def __init__(
-        self,
-        event_types: list[str] | tuple[str] | str,
-        then_: list[Generator],
-        else_: list[Generator] | None = None,
-    ) -> None:
-        """Initialize the generator."""
-        else_ = [] if else_ is None else else_
-        super().__init__(then_, else_=else_)
-        if not isinstance(event_types, (list, tuple)):
-            event_types = [event_types]
-        self.event_types = event_types
-
-    def _condition(self, event_type: EventType, **kwargs: Any) -> bool:
-        return event_type.type_id in self.event_types
 
 
 class IfRequestedBy(RecipientGeneratorMixin, ConditionalGenerator):

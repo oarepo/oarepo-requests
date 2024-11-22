@@ -67,8 +67,8 @@ class FormConfigRequestTypePropertiesComponent(UIResourceComponent):
         if type_ and isinstance(type_, OARepoRequestType):
             if hasattr(type_, "dangerous"):
                 request_type_properties["dangerous"] = type_.dangerous
-            if hasattr(type_, "editable"):
-                request_type_properties["editable"] = type_.editable
+            if hasattr(type_, "is_editable"):
+                request_type_properties["editable"] = type_.is_editable
             if hasattr(type_, "has_form"):
                 request_type_properties["has_form"] = type_.has_form
 

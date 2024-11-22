@@ -44,8 +44,9 @@ from oarepo_workflows import (
     WorkflowTransitions,
 )
 from oarepo_workflows.base import Workflow
-from oarepo_workflows.requests import RecipientGeneratorMixin
 from oarepo_workflows.requests.events import WorkflowEvent
+from oarepo_workflows.requests.generators import RecipientGeneratorMixin
+
 from thesis.proxies import current_service
 from thesis.records.api import ThesisDraft
 

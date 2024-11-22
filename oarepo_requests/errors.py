@@ -11,11 +11,35 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING, Any
 
-from marshmallow import ValidationError
+from oarepo_workflows.errors import (
+    EventTypeNotInWorkflow as WorkflowEventTypeNotInWorkflow,
+)
+from oarepo_workflows.errors import (
+    RequestTypeNotInWorkflow as WorkflowRequestTypeNotInWorkflow,
+)
+from typing_extensions import deprecated
 
 if TYPE_CHECKING:
     from invenio_records_resources.records import Record
     from invenio_requests.customizations import RequestType
+
+
+@deprecated(
+    "This exception is deprecated. Use oarepo_workflows.errors.RequestTypeNotInWorkflow instead."
+)
+class EventTypeNotInWorkflow(WorkflowEventTypeNotInWorkflow):
+    """Raised when an event type is not in the workflow."""
+
+    ...
+
+
+@deprecated(
+    "This exception is deprecated. Use oarepo_workflows.errors.RequestTypeNotInWorkflow instead."
+)
+class RequestTypeNotInWorkflow(WorkflowRequestTypeNotInWorkflow):
+    """Raised when a request type is not in the workflow."""
+
+    ...
 
 
 class OpenRequestAlreadyExists(Exception):
@@ -45,35 +69,6 @@ class UnknownRequestType(Exception):
         return f"Unknown request type {self.request_type}."
 
 
-class RequestTypeNotInWorkflow(Exception):
-    """Exception raised when user tries to create a request with a request type that is not defined in the workflow."""
-
-    def __init__(self, request_type: str, workflow_code: str) -> None:
-        """Initialize the exception."""
-        self.request_type = request_type
-        self.workflow = workflow_code
-
-    @property
-    def description(self) -> str:
-        """Exception's description."""
-        return f"Request type {self.request_type} not in workflow {self.workflow}."
-
-
-class EventTypeNotInWorkflow(Exception):
-    """Exception raised when user tries to create a request with a request type that is not defined in the workflow."""
-
-    def __init__(self, request_type: str, event_type: str, workflow_code: str) -> None:
-        """Initialize the exception."""
-        self.request_type = request_type
-        self.workflow = workflow_code
-        self.event_type = event_type
-
-    @property
-    def description(self) -> str:
-        """Exception's description."""
-        return f"Event type {self.event_type} is not on request type {self.request_type} in workflow {self.workflow}."
-
-
 class ReceiverNonReferencable(Exception):
     """Raised when receiver is required but could not be estimated from the record/caller."""
 
@@ -93,7 +88,3 @@ class ReceiverNonReferencable(Exception):
             message += "\n Additional keyword arguments:"
             message += f"\n{', '.join(self.kwargs)}"
         return message
-
-
-class MissingTopicError(ValidationError):
-    """Raised when an EntityReference can not be dereferenced to a topic."""

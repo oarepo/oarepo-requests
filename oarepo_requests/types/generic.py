@@ -66,9 +66,14 @@ class OARepoRequestType(RequestType):
         """Return whether the request type has a form."""
         return hasattr(cls, "form")
 
+    editable: bool | None = None
+    """Whether the request type can be edited multiple times before it is submitted."""
+
     @classproperty[bool]
-    def editable(cls) -> bool:
+    def is_editable(cls) -> bool:
         """Return whether the request type is editable."""
+        if cls.editable is not None:
+            return cls.editable
         return cls.has_form  # noqa
 
     def can_create(

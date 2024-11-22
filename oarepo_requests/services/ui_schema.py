@@ -205,8 +205,8 @@ class UIRequestTypeSchema(RequestTypeSchema):
             data["name"] = type_obj.name
         if hasattr(type_obj, "dangerous"):
             data["dangerous"] = type_obj.dangerous
-        if hasattr(type_obj, "editable"):
-            data["editable"] = type_obj.editable
+        if hasattr(type_obj, "is_editable"):
+            data["editable"] = type_obj.is_editable
         if hasattr(type_obj, "has_form"):
             data["has_form"] = type_obj.has_form
 
