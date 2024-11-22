@@ -13,7 +13,7 @@ from thesis.records.api import ThesisDraft, ThesisRecord
 
 from oarepo_requests.resolvers.ui import FallbackEntityReferenceUIResolver
 
-from .utils import is_valid_subdict, link_api2testclient
+from .utils import link_api2testclient
 
 
 def test_user_serialization(
@@ -23,6 +23,7 @@ def test_user_serialization(
     ui_serialization_result,
     create_draft_via_resource,
     logged_client,
+    user_links,
     search_clear,
 ):
     client_fallback_label = logged_client(users[0])
@@ -85,21 +86,21 @@ def test_user_serialization(
 
     creator_serialization = {
         "label": "id: 1",
-        "links": {"self": "https://127.0.0.1:5000/api/users/1"},
+        "links": user_links(1),
         "reference": {"user": "1"},
         "type": "user",
     }
 
     creator_serialization_username = {
         "label": "beetlesmasher",
-        "links": {"self": "https://127.0.0.1:5000/api/users/2"},
+        "links": user_links(2),
         "reference": {"user": "2"},
         "type": "user",
     }
 
     creator_serialization_fullname = {
         "label": "Maxipes Fik",
-        "links": {"self": "https://127.0.0.1:5000/api/users/3"},
+        "links": user_links(3),
         "reference": {"user": "3"},
         "type": "user",
     }
@@ -175,9 +176,9 @@ def test_resolver_fallback(
         expected_result = ui_serialization_result(
             draft_id, ui_record["expanded"]["requests"][0]["id"]
         )
-        expected_result["created_by"]["label"] = (
-            f"id: {creator.id}"  # the user resolver uses name or email as label, the fallback doesn't know what to use
-        )
+        expected_result["created_by"][
+            "label"
+        ] = f"id: {creator.id}"  # the user resolver uses name or email as label, the fallback doesn't know what to use
         expected_created_by = {**expected_result["created_by"]}
         actual_created_by = {**ui_record["expanded"]["requests"][0]["created_by"]}
 

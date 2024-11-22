@@ -112,15 +112,21 @@ def test_ui_resolve_topic(
         headers={"Accept": "application/vnd.inveniordm.v1+json"},
     )
     assert resp.status_code == 200
-    assert resp.json["topic"] == {
-        "reference": {"thesis": record1["id"]},
-        "type": "thesis",
-        "label": "blabla",
-        "links": {
+    assert (
+        resp.json["topic"].items()
+        >= {
+            "reference": {"thesis": record1["id"]},
+            "type": "thesis",
+            "label": "blabla",
+        }.items()
+    )
+    assert (
+        resp.json["topic"]["links"].items()
+        >= {
             "self": f"https://127.0.0.1:5000/api/thesis/{record1['id']}",
             "self_html": f"https://127.0.0.1:5000/thesis/{record1['id']}",
-        },
-    }
+        }.items()
+    )
     assert resp.json["stateful_name"] == "Record deletion requested"
     assert resp.json["stateful_description"] == (
         "Permission to delete record requested. "

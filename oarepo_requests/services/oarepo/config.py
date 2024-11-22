@@ -9,8 +9,11 @@
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Any, Callable, cast
+import logging
+from typing import TYPE_CHECKING, Any
 
+from invenio_pidstore.errors import PersistentIdentifierError
+from invenio_records_resources.services.base.links import Link
 from invenio_requests.services import RequestsServiceConfig
 from invenio_requests.services.requests import RequestLink
 
@@ -18,34 +21,11 @@ from oarepo_requests.resolvers.ui import resolve
 
 if TYPE_CHECKING:
     from invenio_requests.records.api import Request
+log = logging.getLogger(__name__)
 
 
-class RequestEntityLink(RequestLink):
-    """Link to an entity within a request."""
-
-    def __init__(
-        self,
-        uritemplate: str,
-        when: Callable | None = None,
-        vars: dict | None = None,
-        entity: str = "topic",
-    ) -> None:
-        """Create a new link."""
-        super().__init__(uritemplate, when, vars)
-        self._entity = entity
-
-    def vars(self, record: Request, vars: dict) -> dict:
-        """Expand the vars with the entity."""
-        super().vars(record, vars)
-        entity = self._resolve(record, vars)
-        self._expand_entity(entity, vars)
-        return vars
-
-    def should_render(self, obj: Request, ctx: dict[str, Any]) -> bool:
-        """Check if the link should be rendered."""
-        if not super().should_render(obj, ctx):
-            return False
-        return bool(self.expand(obj, ctx))
+class RequestEntityLinks(Link):
+    """Utility class for keeping track of and resolve links."""
 
     def _resolve(self, obj: Request, ctx: dict[str, Any]) -> dict:
         """Resolve the entity and put it into the context cache.
@@ -54,53 +34,35 @@ class RequestEntityLink(RequestLink):
         :param ctx: Context cache
         :return: The resolved entity
         """
-        reference_dict: dict = getattr(obj, self.entity).reference_dict
+        reference_dict: dict = getattr(obj, self._entity).reference_dict
         key = "entity:" + ":".join(
             f"{x[0]}:{x[1]}" for x in sorted(reference_dict.items())
         )
         if key in ctx:
             return ctx[key]
         try:
-            entity = resolve(ctx["identity"], reference_dict, keep_all_links=True)
-        except Exception:  # noqa
-            entity = {}
+            entity = resolve(ctx["identity"], reference_dict)
+        except Exception as e:  # noqa
+            if not isinstance(e, PersistentIdentifierError):
+                log.exception(
+                    "Error resolving %s for identity %s",
+                    reference_dict,
+                    ctx["identity"],
+                )
+            entity = {"links": {}}
         ctx[key] = entity
         return entity
 
-    def _expand_entity(self, entity: Any, vars: dict) -> None:
-        """Expand the entity links into the vars."""
-        vars.update({f"entity_{k}": v for k, v in entity.get("links", {}).items()})
-
-    def expand(self, obj: Request, context: dict[str, Any]) -> str:
-        """Expand the URI Template."""
-        # Optimization: pre-resolve the entity and put it into the shared context
-        # under the key - so that it can be reused by other links
-        self._resolve(obj, context)
-
-        # now expand the link
-        return super().expand(obj, context)
-
-
-class RequestEntityLinks(RequestEntityLink):
-    """Utility class for keeping track of and resolve links."""
-
-    def __init__(self, *request_entity_links, entity="topic", when=None, vars=None):
+    def __init__(self, entity: str, when: callable = None):
         """Constructor."""
-        self._request_entity_links = [
-            {name: RequestEntityLink(link, entity=entity, **kwargs)}
-            for name, link, kwargs in request_entity_links
-        ]
         self._entity = entity
         self._when_func = when
-        self._vars_func = vars
 
-    def expand(self, obj, context):
+    def expand(self, obj: Request, context: dict) -> dict:
+        """Create the request links."""
         res = {}
-        for link_dict in self._request_entity_links:
-            name = list(link_dict.keys())[0]
-            link = list(link_dict.values())[0]
-            if link.should_render(obj, context):
-                res[name] = link.expand(obj, context)
+        res.update(self._resolve(obj, context)["links"])
+
         if hasattr(obj.type, "extra_request_links"):
             entity = self._resolve(obj, context)
             res.update(
@@ -109,6 +71,7 @@ class RequestEntityLinks(RequestEntityLink):
                     **(context | {"cur_entity": entity, "entity_type": self._entity}),
                 )
             )
+
         return res
 
 
@@ -122,18 +85,7 @@ class OARepoRequestsServiceConfig(RequestsServiceConfig):
         "comments": RequestLink("{+api}/requests/extended/{id}/comments"),
         "timeline": RequestLink("{+api}/requests/extended/{id}/timeline"),
         "self_html": RequestLink("{+ui}/requests/{id}"),
-        "topic": RequestEntityLinks(
-            ("self", "{+entity_self}", {}),  # can't use self=RequestEntityLink...
-            ("self_html", "{+entity_self_html}", {}),
-        ),
-        "created_by": RequestEntityLinks(
-            ("self", "{+entity_self}", {}),
-            ("self_html", "{+entity_self_html}", {}),
-            entity="created_by",
-        ),
-        "receiver": RequestEntityLinks(
-            ("self", "{+entity_self}", {}),
-            ("self_html", "{+entity_self_html}", {}),
-            entity="receiver",
-        ),
+        "topic": RequestEntityLinks(entity="topic"),
+        "created_by": RequestEntityLinks(entity="created_by"),
+        "receiver": RequestEntityLinks(entity="receiver"),
     }

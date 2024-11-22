@@ -18,6 +18,7 @@ def test_timeline(
     urls,
     publish_request_data_function,
     create_draft_via_resource,
+    user_links,
     search_clear,
 ):
     creator = users[0]
@@ -66,7 +67,7 @@ def test_timeline(
                 "reference": {"user": "1"},
                 "type": "user",
                 "label": "id: 1",
-                "links": {"self": "https://127.0.0.1:5000/api/users/1"},
+                "links": user_links(1),
             },
             "permissions": {},
             "payload": {"content": "test", "format": "html"},

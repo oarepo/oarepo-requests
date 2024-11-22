@@ -5,6 +5,7 @@
 # modify it under the terms of the MIT License; see LICENSE file for more
 # details.
 #
+
 from thesis.records.api import ThesisDraft, ThesisRecord
 
 from tests.test_requests.utils import link_api2testclient
@@ -53,7 +54,9 @@ def test_new_version_autoaccept(
     # new_version action worked?
     search = creator_client.get(
         f'user{urls["BASE_URL"]}',
-    ).json["hits"]["hits"]
+    ).json[
+        "hits"
+    ]["hits"]
     assert len(search) == 2
     assert search[0]["id"] != search[1]["id"]
     assert search[0]["parent"]["id"] == search[1]["parent"]["id"]
@@ -143,6 +146,7 @@ def test_redirect_url(
         link_api2testclient(resp_request_create.json["links"]["actions"]["submit"]),
     )
     # is request accepted and closed?
+
     request = creator_client.get(
         f'{urls["BASE_URL_REQUESTS"]}{resp_request_create.json["id"]}',
     ).json
