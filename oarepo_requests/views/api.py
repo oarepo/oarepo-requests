@@ -1,4 +1,21 @@
-def create_oarepo_requests(app):
+#
+# Copyright (C) 2024 CESNET z.s.p.o.
+#
+# oarepo-requests is free software; you can redistribute it and/or
+# modify it under the terms of the MIT License; see LICENSE file for more
+# details.
+#
+"""API views."""
+
+from __future__ import annotations
+
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from flask import Blueprint, Flask
+
+
+def create_oarepo_requests(app: Flask) -> Blueprint:
     """Create requests blueprint."""
     ext = app.extensions["oarepo-requests"]
     blueprint = ext.requests_resource.as_blueprint()
@@ -6,21 +23,12 @@ def create_oarepo_requests(app):
     from oarepo_requests.invenio_patches import override_invenio_requests_config
 
     blueprint.record_once(override_invenio_requests_config)
-    blueprint.record_once(register_autoapprove_entity_resolver)
 
     return blueprint
 
 
-def register_autoapprove_entity_resolver(state):
-    from oarepo_requests.resolvers.autoapprove import AutoApproveResolver
-
-    app = state.app
-    requests = app.extensions["invenio-requests"]
-    requests.entity_resolvers_registry.register_type(AutoApproveResolver())
-
-
-def create_oarepo_requests_events(app):
-    """Create requests blueprint."""
+def create_oarepo_requests_events(app: Flask) -> Blueprint:
+    """Create events blueprint."""
     ext = app.extensions["oarepo-requests"]
     blueprint = ext.request_events_resource.as_blueprint()
     return blueprint

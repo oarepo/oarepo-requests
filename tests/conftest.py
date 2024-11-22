@@ -1,3 +1,10 @@
+#
+# Copyright (C) 2024 CESNET z.s.p.o.
+#
+# oarepo-requests is free software; you can redistribute it and/or
+# modify it under the terms of the MIT License; see LICENSE file for more
+# details.
+#
 import copy
 import os
 from io import BytesIO
@@ -37,8 +44,9 @@ from oarepo_workflows import (
     WorkflowTransitions,
 )
 from oarepo_workflows.base import Workflow
-from oarepo_workflows.requests import RecipientGeneratorMixin
 from oarepo_workflows.requests.events import WorkflowEvent
+from oarepo_workflows.requests.generators import RecipientGeneratorMixin
+
 from thesis.proxies import current_service
 from thesis.records.api import ThesisDraft
 
@@ -48,10 +56,10 @@ from oarepo_requests.actions.generic import (
     OARepoSubmitAction,
 )
 from oarepo_requests.receiver import default_workflow_receiver_function
-from oarepo_requests.services.permissions.generators import (
-    IfNoEditDraft,
-    IfNoNewVersionDraft,
+from oarepo_requests.services.permissions.generators.conditional import (
     IfRequestedBy,
+    IfNoNewVersionDraft,
+    IfNoEditDraft,
 )
 from oarepo_requests.services.permissions.workflow_policies import (
     RequestBasedWorkflowPermissions,
@@ -110,7 +118,10 @@ class DefaultRequests(WorkflowRequestPolicy):
         ),
     )
     delete_draft = WorkflowRequest(
-        requesters=[IfInState("draft", [RecordOwners()])],
+        requesters=[
+            IfInState("draft", [RecordOwners()]),
+            IfInState("publishing", [RecordOwners()]),
+        ],
         recipients=[AutoApprove()],
         transitions=WorkflowTransitions(),
     )
