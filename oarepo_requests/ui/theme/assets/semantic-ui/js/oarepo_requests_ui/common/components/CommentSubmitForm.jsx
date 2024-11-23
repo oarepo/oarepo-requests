@@ -51,9 +51,10 @@ export const CommentSubmitForm = ({ commentSubmitMutation }) => {
         <Button
           size="tiny"
           floated="right"
-          color="blue"
+          primary
           icon="send"
           type="button"
+          labelPosition="left"
           loading={isLoading}
           disabled={isLoading}
           content={i18next.t("Leave comment")}

@@ -6,11 +6,11 @@ import {
 } from "@js/oarepo_requests_common";
 import PropTypes from "prop-types";
 
-export const TimelineEvent = ({ event }) => (
+export const TimelineEvent = ({ event, requestId, page }) => (
   <React.Fragment>
     {event.type === "C" && (
       <Overridable id="OarepoRequests.TimelineCommentEvent" event={event}>
-        <TimelineCommentEvent event={event} />
+        <TimelineCommentEvent event={event} requestId={requestId} page={page} />
       </Overridable>
     )}
     {event.type === "L" && (
@@ -25,5 +25,7 @@ export const TimelineEvent = ({ event }) => (
 );
 
 TimelineEvent.propTypes = {
-  event: PropTypes.object,
+  event: PropTypes.object.isRequired,
+  requestId: PropTypes.string.isRequired,
+  page: PropTypes.number.isRequired,
 };

@@ -23,8 +23,8 @@ export const TimelineActionEvent = ({ event }) => {
             <div className="flex align-items-center justify-center">
               <Icon
                 className="requests action-event-icon"
-                name={eventIcon.name}
-                color={eventIcon.color}
+                name={eventIcon?.name}
+                color={eventIcon?.color}
               />
             </div>
             <div className="requests action-event-avatar inline-block">
@@ -35,7 +35,7 @@ export const TimelineActionEvent = ({ event }) => {
             </div>
             <b className="ml-5">{creatorLabel}</b>
             <Feed.Date>
-              {feedMessage} {toRelativeTime(event.created, i18next.language)}
+              {feedMessage} {toRelativeTime(event.updated, i18next.language)}
             </Feed.Date>
           </Feed.Summary>
         </Feed.Content>

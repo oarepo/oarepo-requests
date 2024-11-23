@@ -1,5 +1,8 @@
 .ui.modal {
   &.requests-request-modal {
+    .field {
+      margin-bottom: 1rem !important;
+    }
     .ui.accordion {
       .active.title {
         display: none;

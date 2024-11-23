@@ -170,7 +170,11 @@ export const useAction = ({
   return useMutation(
     async () => {
       if (onBeforeAction) {
-        const shouldProceed = await onBeforeAction(formik, modalControl);
+        const shouldProceed = await onBeforeAction(
+          formik,
+          modalControl,
+          requestOrRequestType
+        );
         if (!shouldProceed) {
           modalControl?.closeModal();
           throw new Error("Could not proceed with the action.");
@@ -182,7 +186,13 @@ export const useAction = ({
     {
       onError: (e, variables) => {
         if (onActionError) {
-          onActionError(e, variables, formik, modalControl);
+          onActionError(
+            e,
+            variables,
+            formik,
+            modalControl,
+            requestOrRequestType
+          );
         } else if (e?.response?.data?.errors) {
           formik?.setFieldError(
             "api",
@@ -207,7 +217,13 @@ export const useAction = ({
       },
       onSuccess: (data, variables) => {
         if (onAfterAction) {
-          onAfterAction(data, variables, formik, modalControl);
+          onAfterAction(
+            data,
+            variables,
+            formik,
+            modalControl,
+            requestOrRequestType
+          );
         }
         const redirectionURL = data?.data?.links?.topic_html;
         modalControl?.closeModal();

@@ -13,7 +13,13 @@ export const RequestCommentInput = ({ fieldPath, label }) => {
       <RichInputField
         fieldPath={fieldPath}
         label={
-          <FieldLabel htmlFor={fieldPath} label={label} className="rel-mb-25" />
+          label ? (
+            <FieldLabel
+              htmlFor={fieldPath}
+              label={label}
+              className="rel-mb-25"
+            />
+          ) : null
         }
         optimized="true"
         placeholder={i18next.t("Your comment here...")}
@@ -24,7 +30,7 @@ export const RequestCommentInput = ({ fieldPath, label }) => {
             optimized
             editorConfig={{
               auto_focus: true,
-              min_height: 130,
+              min_height: 100,
               toolbar:
                 "blocks | bold italic | bullist numlist | outdent indent | undo redo",
             }}
