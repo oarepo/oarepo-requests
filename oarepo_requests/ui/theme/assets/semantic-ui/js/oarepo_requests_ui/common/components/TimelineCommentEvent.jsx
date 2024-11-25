@@ -90,7 +90,7 @@ const TimelineCommentEvent = ({ event, requestId, page }) => {
           const currentComment = newHits[indexCommentToDelete];
 
           const deletionPayload = {
-            content: i18next.t("deleted a comment"),
+            content: i18next.t("deleted comment"),
             event: "comment_deleted",
             format: "html",
           };

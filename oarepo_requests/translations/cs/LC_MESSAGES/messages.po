@@ -668,3 +668,58 @@ msgstr "Nemáte právo smazat záznam."
 #: /Users/m/w/cesnet/oarepo-requests/oarepo_requests/types/new_version.py:161
 msgid "You do not have permission to update the record."
 msgstr "Nemáte právo zažádat o aktualizaci záznamu."
+
+#: /home/dusanst/Projects/oarepo-requests/oarepo_requests/types/edit_record.py:45
+msgid "Edit metadata"
+msgstr "Upravit metadata"
+
+#: /home/dusanst/Projects/oarepo-requests/oarepo_requests/types/new_version.py:69
+msgid "Keep files:"
+msgstr "Ponechat soubory:"
+
+#: /home/dusanst/Projects/oarepo-requests/oarepo_requests/types/new_version.py:71
+msgid ""
+"If you choose yes, the current record's files will be linked to the new "
+"version of the record. Then you will be able to add/remove files in the "
+"form."
+msgstr ""
+"Pokud zvolíte ano, soubory aktuálního záznamu budou propojeny s novou verzí "
+"záznamu. Poté budete moci přidávat/odstraňovat soubory ve formuláři."
+
+#: /home/dusanst/Projects/oarepo-requests/oarepo_requests/types/new_version.py:74
+msgid "No"
+msgstr "Ne"
+
+#: /home/dusanst/Projects/oarepo-requests/oarepo_requests/types/new_version.py:75
+msgid "Yes"
+msgstr "Ano"
+
+msgid "Comment was not submitted successfully. Please try again in a moment."
+msgstr "Komentář nebyl úspěšně odeslán. Zkuste to prosím za chvíli znovu."
+
+msgid "User avatar"
+msgstr "Uživatelský avatar"
+
+msgid "Actions"
+msgstr "Akce"
+
+msgid "Edit"
+msgstr "Upravit"
+
+msgid "Comment was not edited successfully. Please try again in a moment."
+msgstr "Komentář nebyl úspěšně upraven. Zkuste to prosím za chvíli znovu."
+
+msgid "Comment was not deleted successfully. Please try again in a moment."
+msgstr "Komentář nebyl úspěšně smazán. Zkuste to prosím za chvíli znovu."
+
+msgid "Edited"
+msgstr "Upraveno"
+
+msgid "Delete comment"
+msgstr "Smazat komentář"
+
+msgid "Are you sure you want to delete this comment?"
+msgstr "Opravdu chcete tento komentář smazat?"
+
+msgid "deleted comment"
+msgstr "smazal(a) komentář"
