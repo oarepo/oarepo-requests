@@ -1,3 +1,12 @@
+#
+# Copyright (C) 2024 CESNET z.s.p.o.
+#
+# oarepo-requests is free software; you can redistribute it and/or
+# modify it under the terms of the MIT License; see LICENSE file for more
+# details.
+#
+"""Webpack entry points for the UI components of the module (requests components and dialogs)."""
+
 from invenio_assets.webpack import WebpackThemeBundle
 
 theme = WebpackThemeBundle(

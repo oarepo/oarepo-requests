@@ -271,7 +271,7 @@ msgid "Error while fetching timeline events"
 msgstr "Chyba při načítání událostí časové osy"
 
 msgid "commented"
-msgstr "komentoval"
+msgstr "komnetoval"
 
 msgid "icon"
 msgstr "ikona"
@@ -602,28 +602,28 @@ msgid ""
 msgstr "Tato akce je nevratná. Opravdu si přejete tuto žádost přijmout?"
 
 msgid "requestCreated"
-msgstr "vytvořil(a)"
+msgstr "{{creatorLabel}} vytvořil(a) tuto žádost"
 
 msgid "requestSubmitted"
-msgstr "odeslal(a)"
+msgstr "{{creatorLabel}} odeslal(a) tuto žádost"
 
 msgid "requestCancelled"
-msgstr "zrušil(a)"
+msgstr "{{creatorLabel}} zrušil(a) tuto žádost"
 
 msgid "requestAccepted"
-msgstr "přijal(a)"
+msgstr "{{creatorLabel}} přijal(a) tuto žádost"
 
 msgid "requestDeclined"
-msgstr "odmítl(a)"
+msgstr "{{creatorLabel}} odmítl(a) tuto žádost"
 
 msgid "Request expired."
 msgstr "Žádost vypršela"
 
 msgid "requestDeleted"
-msgstr "smazal(a)"
+msgstr "{{creatorLabel}} smazal(a) tuto žádost"
 
 msgid "requestCommented"
-msgstr "komentoval(a)"
+msgstr "{{creatorLabel}} komentoval(a)"
 
 #: /home/ron/prace/oarepo-requests/oarepo_requests/actions/delete_published_record.py:9
 msgid "Permanently delete"
@@ -649,9 +649,6 @@ msgstr "API pro vytváření žádostí"
 msgid "System user"
 msgstr "Systémový uživatel"
 
-msgid "User avatar"
-msgstr ""
-
 #: /home/ron/prace/oarepo-requests-alt/oarepo_requests/types/new_version.py:50
 msgid "Keep files."
 msgstr "Ponechat soubory."
@@ -660,27 +657,14 @@ msgstr "Ponechat soubory."
 msgid "Keep files in the new version?"
 msgstr "Ponechat soubory v nové verzi?"
 
-#: /home/dusanst/Projects/oarepo-requests/oarepo_requests/types/edit_record.py:19
-msgid "Edit metadata"
-msgstr "Upravit metadata"
+#: /Users/m/w/cesnet/oarepo-requests/oarepo_requests/types/delete_draft.py:101
+msgid "You do not have permission to delete the draft."
+msgstr "Nemáte právo smazat rozpracovaný záznam."
 
-#: /home/dusanst/Projects/oarepo-requests/oarepo_requests/types/new_version.py:50
-msgid "Keep files:"
-msgstr "Ponechat soubory:"
+#: /Users/m/w/cesnet/oarepo-requests/oarepo_requests/types/delete_published_record.py:106
+msgid "You do not have permission to delete the record."
+msgstr "Nemáte právo smazat záznam."
 
-#: /home/dusanst/Projects/oarepo-requests/oarepo_requests/types/new_version.py:52
-msgid ""
-"If you choose yes, the current record's files will be linked to the new "
-"version of the record. Then you will be able to add/remove files in the "
-"form."
-msgstr ""
-"Pokud zvolíte ano, soubory aktuálního záznamu budou propojeny s novou verzí "
-"záznamu. Poté budete moci přidávat/odstraňovat soubory ve formuláři."
-
-#: /home/dusanst/Projects/oarepo-requests/oarepo_requests/types/new_version.py:55
-msgid "No"
-msgstr "Ne"
-
-#: /home/dusanst/Projects/oarepo-requests/oarepo_requests/types/new_version.py:56
-msgid "Yes"
-msgstr "Ano"
+#: /Users/m/w/cesnet/oarepo-requests/oarepo_requests/types/new_version.py:161
+msgid "You do not have permission to update the record."
+msgstr "Nemáte právo zažádat o aktualizaci záznamu."

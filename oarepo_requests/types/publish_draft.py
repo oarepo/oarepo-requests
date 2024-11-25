@@ -1,10 +1,20 @@
-from typing import Dict
+#
+# Copyright (C) 2024 CESNET z.s.p.o.
+#
+# oarepo-requests is free software; you can redistribute it and/or
+# modify it under the terms of the MIT License; see LICENSE file for more
+# details.
+#
+"""Publish draft request type."""
+
+from __future__ import annotations
+
+from typing import TYPE_CHECKING, Any
 
 import marshmallow as ma
 from invenio_access.permissions import system_identity
-from invenio_records_resources.services.uow import RecordCommitOp
+from invenio_records_resources.services.uow import RecordCommitOp, UnitOfWork
 from invenio_requests.proxies import current_requests_service
-from invenio_requests.records.api import Request
 from oarepo_runtime.datastreams.utils import get_record_service_for_record
 from oarepo_runtime.i18n import lazy_gettext as _
 from typing_extensions import override
@@ -15,12 +25,23 @@ from oarepo_requests.actions.publish_draft import (
     PublishDraftSubmitAction,
 )
 
-from ..utils import is_auto_approved, request_identity_matches
+from ..utils import classproperty, is_auto_approved, request_identity_matches
 from .generic import NonDuplicableOARepoRequestType
 from .ref_types import ModelRefTypes
 
+if TYPE_CHECKING:
+    from flask_babel.speaklater import LazyString
+    from flask_principal import Identity
+    from invenio_drafts_resources.records import Record
+    from invenio_requests.customizations.actions import RequestAction
+    from invenio_requests.records.api import Request
+
+    from oarepo_requests.typing import EntityReference
+
 
 class PublishDraftRequestType(NonDuplicableOARepoRequestType):
+    """Publish draft request type."""
+
     type_id = "publish_draft"
     name = _("Publish draft")
     payload_schema = {
@@ -45,9 +66,9 @@ class PublishDraftRequestType(NonDuplicableOARepoRequestType):
         },
     }
 
-    @classmethod
-    @property
-    def available_actions(cls):
+    @classproperty
+    def available_actions(cls) -> dict[str, type[RequestAction]]:
+        """Return available actions for the request type."""
         return {
             **super().available_actions,
             "submit": PublishDraftSubmitAction,
@@ -59,9 +80,19 @@ class PublishDraftRequestType(NonDuplicableOARepoRequestType):
     receiver_can_be_none = True
     allowed_topic_ref_types = ModelRefTypes(published=True, draft=True)
 
-    editable = False
+    editable = False  # type: ignore
 
-    def can_create(self, identity, data, receiver, topic, creator, *args, **kwargs):
+    def can_create(
+        self,
+        identity: Identity,
+        data: dict,
+        receiver: EntityReference,
+        topic: Record,
+        creator: EntityReference,
+        *args: Any,
+        **kwargs: Any,
+    ) -> None:
+        """Check if the request can be created."""
         if not topic.is_draft:
             raise ValueError("Trying to create publish request on published record")
         super().can_create(identity, data, receiver, topic, creator, *args, **kwargs)
@@ -69,18 +100,30 @@ class PublishDraftRequestType(NonDuplicableOARepoRequestType):
         topic_service.validate_draft(system_identity, topic["id"])
 
     @classmethod
-    def is_applicable_to(cls, identity, topic, *args, **kwargs):
+    def is_applicable_to(
+        cls, identity: Identity, topic: Record, *args: Any, **kwargs: Any
+    ) -> bool:
+        """Check if the request type is applicable to the topic."""
         if not topic.is_draft:
             return False
         super_ = super().is_applicable_to(identity, topic, *args, **kwargs)
         return super_
 
-    def topic_change(self, request: Request, new_topic: Dict, uow):
-        setattr(request, "topic", new_topic)
+    def topic_change(self, request: Request, new_topic: dict, uow: UnitOfWork) -> None:
+        """Change the topic of the request."""
+        request.topic = new_topic
         uow.register(RecordCommitOp(request, indexer=current_requests_service.indexer))
 
     @override
-    def stateful_name(self, identity, *, topic, request=None, **kwargs):
+    def stateful_name(
+        self,
+        identity: Identity,
+        *,
+        topic: Record,
+        request: Request | None = None,
+        **kwargs: Any,
+    ) -> str | LazyString:
+        """Return the stateful name of the request."""
         if is_auto_approved(self, identity=identity, topic=topic):
             return _("Publish draft")
         if not request:
@@ -92,7 +135,15 @@ class PublishDraftRequestType(NonDuplicableOARepoRequestType):
                 return _("Submit for review")
 
     @override
-    def stateful_description(self, identity, *, topic, request=None, **kwargs):
+    def stateful_description(
+        self,
+        identity: Identity,
+        *,
+        topic: Record,
+        request: Request | None = None,
+        **kwargs: Any,
+    ) -> str | LazyString:
+        """Return the stateful description of the request."""
         if is_auto_approved(self, identity=identity, topic=topic):
             return _(
                 "Click to immediately publish the draft. "

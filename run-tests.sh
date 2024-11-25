@@ -2,6 +2,7 @@
 set -e
 
 OAREPO_VERSION=${OAREPO_VERSION:-12}
+PYTHON="${PYTHON:-python3.12}"
 
 MODEL="thesis"
 
@@ -15,7 +16,7 @@ if test -d $BUILDER_VENV ; then
 	rm -rf $BUILDER_VENV
 fi
 
-python3 -m venv $BUILDER_VENV
+"${PYTHON}" -m venv $BUILDER_VENV
 . $BUILDER_VENV/bin/activate
 pip install -U setuptools pip wheel
 pip install -U oarepo-model-builder \
@@ -37,13 +38,14 @@ MODEL_VENV=".venv-tests"
 if test -d $MODEL_VENV; then
 	rm -rf $MODEL_VENV
 fi
-python3 -m venv $MODEL_VENV
+"${PYTHON}" -m venv $MODEL_VENV
 . $MODEL_VENV/bin/activate
 pip install -U setuptools pip wheel
 pip install "oarepo[tests]==$OAREPO_VERSION.*"
 pip install -e "./$BUILD_TEST_DIR/${MODEL}"
-pip install oarepo-ui
-pip install deepdiff
+
+# local development
+# pip install --config-settings editable_mode=compat -e ../oarepo-workflows
 
 # Check if we can import all the sources
 find oarepo_requests -name '*.py' | grep -v '__init__.py' | sed 's/.py$//' | tr '/' '.' | sort -u | while read MODULE ; do

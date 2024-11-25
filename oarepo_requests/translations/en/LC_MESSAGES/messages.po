@@ -566,28 +566,28 @@ msgid ""
 msgstr ""
 
 msgid "requestCreated"
-msgstr "created"
+msgstr "{{creatorLabel}} created this request"
 
 msgid "requestSubmitted"
-msgstr "submitted"
+msgstr "{{creatorLabel}} submitted this request"
 
 msgid "requestCancelled"
-msgstr "canceled"
+msgstr "{{creatorLabel}} canceled this request"
 
 msgid "requestAccepted"
-msgstr "accepted"
+msgstr "{{creatorLabel}} accepted this request"
 
 msgid "requestDeclined"
-msgstr "declined"
+msgstr "{{creatorLabel}} declined this request"
 
 msgid "Request expired."
 msgstr "Request expired"
 
 msgid "requestDeleted"
-msgstr "deleted"
+msgstr "{{creatorLabel}} deleted this request"
 
 msgid "requestCommented"
-msgstr "commented"
+msgstr "{{creatorLabel}} commented"
 
 #: /home/ron/prace/oarepo-requests/oarepo_requests/actions/delete_published_record.py:9
 msgid "Permanently delete"
@@ -613,9 +613,6 @@ msgstr ""
 msgid "api.applicable-requests"
 msgstr "Applicable requests API"
 
-msgid "User avatar"
-msgstr ""
-
 #: /home/ron/prace/oarepo-requests-alt/oarepo_requests/types/new_version.py:50
 msgid "Keep files"
 msgstr ""
@@ -624,30 +621,20 @@ msgstr ""
 msgid "Keep files in the new version?"
 msgstr ""
 
+#: /home/ron/prace/oarepo-requests-alt/oarepo_requests/types/new_version.py:50
 msgid "Keep files."
 msgstr ""
 
-#: /home/dusanst/Projects/oarepo-requests/oarepo_requests/types/edit_record.py:19
-msgid "Edit metadata"
+#: /Users/m/w/cesnet/oarepo-requests/oarepo_requests/types/delete_draft.py:101
+msgid "You do not have permission to delete the draft."
 msgstr ""
 
-#: /home/dusanst/Projects/oarepo-requests/oarepo_requests/types/new_version.py:50
-msgid "Keep files:"
+#: /Users/m/w/cesnet/oarepo-requests/oarepo_requests/types/delete_published_record.py:106
+msgid "You do not have permission to delete the record."
 msgstr ""
 
-#: /home/dusanst/Projects/oarepo-requests/oarepo_requests/types/new_version.py:52
-msgid ""
-"If you choose yes, the current record's files will be linked to the new "
-"version of the record. Then you will be able to add/remove files in the "
-"form."
-msgstr ""
-
-#: /home/dusanst/Projects/oarepo-requests/oarepo_requests/types/new_version.py:55
-msgid "No"
-msgstr ""
-
-#: /home/dusanst/Projects/oarepo-requests/oarepo_requests/types/new_version.py:56
-msgid "Yes"
+#: /Users/m/w/cesnet/oarepo-requests/oarepo_requests/types/new_version.py:161
+msgid "You do not have permission to update the record."
 msgstr ""
 
 #~ msgid "No status"

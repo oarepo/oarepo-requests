@@ -1,5 +1,16 @@
+#
+# Copyright (C) 2024 CESNET z.s.p.o.
+#
+# oarepo-requests is free software; you can redistribute it and/or
+# modify it under the terms of the MIT License; see LICENSE file for more
+# details.
+#
+"""Config for the UI resources."""
+
+from __future__ import annotations
+
 import inspect
-import typing
+from typing import TYPE_CHECKING, Any, Mapping
 
 import marshmallow as ma
 from flask import current_app
@@ -23,24 +34,34 @@ from oarepo_requests.ui.components import (
     FormConfigRequestTypePropertiesComponent,
 )
 
+if TYPE_CHECKING:
+    from flask_resources.serializers.base import BaseSerializer
+    from invenio_records_resources.records import Record
+    from invenio_requests.customizations.request_types import RequestType
 
-def _get_custom_fields_ui_config(key, **kwargs):
+
+def _get_custom_fields_ui_config(key: str, **kwargs: Any) -> list[dict]:
     return current_app.config.get(f"{key}_UI", [])
 
 
 class RequestTypeSchema(ma.fields.Str):
+    """Schema that makes sure that the request type is a valid request type."""
+
     def _deserialize(
         self,
-        value: typing.Any,
+        value: Any,
         attr: str | None,
-        data: typing.Mapping[str, typing.Any] | None,
-        **kwargs,
-    ):
+        data: Mapping[str, Any] | None,
+        **kwargs: Any,
+    ) -> RequestType:
+        """Deserialize the value and check if it is a valid request type."""
         ret = super()._deserialize(value, attr, data, **kwargs)
         return current_request_type_registry.lookup(ret, quiet=True)
 
 
 class RequestsFormConfigResourceConfig(FormConfigResourceConfig):
+    """Config for the requests form config resource."""
+
     url_prefix = "/requests"
     blueprint_name = "oarepo_requests_form_config"
     components = [
@@ -56,6 +77,8 @@ class RequestsFormConfigResourceConfig(FormConfigResourceConfig):
 
 
 class RequestUIResourceConfig(UIResourceConfig):
+    """Config for request detail page."""
+
     url_prefix = "/requests"
     api_service = "requests"
     blueprint_name = "oarepo_requests_ui"
@@ -83,21 +106,27 @@ class RequestUIResourceConfig(UIResourceConfig):
     request_view_args = {"pid_value": ma.fields.Str()}
 
     @property
-    def ui_serializer(self):
+    def ui_serializer(self) -> BaseSerializer:
+        """Return the UI serializer for the request."""
         return obj_or_import_string(self.ui_serializer_class)()
 
-    def custom_fields(self, **kwargs):
+    def custom_fields(self, **kwargs: Any) -> dict:
+        """Get the custom fields for the request."""
         api_service = current_service_registry.get(self.api_service)
-        # get the record class
-        record_class = getattr(api_service, "record_cls", None)
-        ui = []
+
+        ui: list[dict] = []
         ret = {
             "ui": ui,
         }
+
+        # get the record class
+        if not hasattr(api_service, "record_cls"):
+            return ret
+        record_class: type[Record] = api_service.record_cls
         if not record_class:
             return ret
         # try to get custom fields from the record
-        for fld_name, fld in sorted(inspect.getmembers(record_class)):
+        for _fld_name, fld in sorted(inspect.getmembers(record_class)):
             if isinstance(fld, InlinedCustomFields):
                 prefix = ""
             elif isinstance(fld, CustomFields):
