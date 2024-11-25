@@ -11,10 +11,11 @@ import {
 import _has from "lodash/has";
 import sanitizeHtml from "sanitize-html";
 import PropTypes from "prop-types";
-import { toRelativeTime, RichEditor } from "react-invenio-forms";
+import { toRelativeTime } from "react-invenio-forms";
 import {
   ConfirmationModalCancelButton,
   ConfirmationModalConfirmButton,
+  RequestCommentInput,
 } from "@js/oarepo_requests_common";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { httpApplicationJson } from "@js/oarepo_ui";
@@ -25,9 +26,6 @@ const TimelineCommentEvent = ({ event, requestId, page }) => {
   const [editMode, setEditMode] = useState(false);
   const [deleteMode, setDeleteMode] = useState(false);
   const [comment, setComment] = useState(event.payload.content);
-  const [plainTextComment, setPlainTextComment] = useState(
-    event.payload.content
-  );
   const toggleEditMode = () => setEditMode(!editMode);
   const toggleDeleteMode = () => setDeleteMode(!deleteMode);
   const canUpdate = event?.permissions?.can_update_comment;
@@ -151,8 +149,12 @@ const TimelineCommentEvent = ({ event, requestId, page }) => {
     setDeleteMode(false);
   };
 
+  const handleCommentChange = (event, value) => {
+    setComment(value);
+  };
+
   const editButtonDisabled =
-    editLoading || comment === event.payload.content || !plainTextComment;
+    editLoading || comment === event.payload.content || !comment;
 
   return (
     <div className="requests comment-event-container">
@@ -205,7 +207,7 @@ const TimelineCommentEvent = ({ event, requestId, page }) => {
           )}
           {editMode && (
             <React.Fragment>
-              <RichEditor
+              {/* <RichEditor
                 initialValue={event?.payload?.content}
                 inputValue={comment}
                 onEditorChange={(event, editor) => {
@@ -220,6 +222,11 @@ const TimelineCommentEvent = ({ event, requestId, page }) => {
                   toolbar:
                     "blocks | bold italic | bullist numlist | outdent indent | undo redo",
                 }}
+              /> */}
+              <RequestCommentInput
+                comment={comment}
+                initialValue={event?.payload?.content}
+                handleChange={handleCommentChange}
               />
               <div className="requests edit-comment-buttons">
                 <Button

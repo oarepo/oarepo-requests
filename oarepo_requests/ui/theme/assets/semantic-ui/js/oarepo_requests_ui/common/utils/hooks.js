@@ -1,4 +1,4 @@
-import React, { useState, useCallback } from "react";
+import React, { useState, useCallback, useRef } from "react";
 import { i18next } from "@translations/oarepo_requests_ui/i18next";
 import { Message, Icon } from "semantic-ui-react";
 import { useMutation } from "@tanstack/react-query";
@@ -10,7 +10,6 @@ import {
   ConfirmationModalCancelButton,
   ConfirmationModalConfirmButton,
 } from "@js/oarepo_requests_common";
-import { useFormikContext } from "formik";
 
 /**
  * @typedef {import("semantic-ui-react").ConfirmProps} ConfirmProps
@@ -72,30 +71,33 @@ const acceptConfirmDialogProps = (requestOrRequestType, dangerous) => ({
   ),
 });
 
-const declineConfirmDialogProps = (requestOrRequestType) => ({
-  header: `${i18next.t("Decline request")} (${requestOrRequestType.name})`,
-  confirmButton: (
-    <ConfirmationModalConfirmButton content={i18next.t("Decline")} negative />
-  ),
-  content: (
-    <div className="content">
-      <RequestCommentInput
-        label={`${i18next.t("Add comment")} (${i18next.t("optional")})`}
-      />
-      <Message>
-        <Icon name="info circle" className="text size large" />
-        <span>
-          {i18next.t(
-            "It is highly recommended to provide an explanation for the rejection of the request. Note that it is always possible to provide explanation later on the request timeline."
-          )}
-        </span>
-      </Message>
-    </div>
-  ),
-});
+const declineConfirmDialogProps = (
+  requestOrRequestType,
+  comment,
+  handleChange
+) => {
+  return {
+    header: `${i18next.t("Decline request")} (${requestOrRequestType.name})`,
+    confirmButton: (
+      <ConfirmationModalConfirmButton content={i18next.t("Decline")} negative />
+    ),
+    content: (
+      <div className="content">
+        <RequestCommentInput comment={comment} handleChange={handleChange} />
+        <Message>
+          <Icon name="info circle" className="text size large" />
+          <span>
+            {i18next.t(
+              "It is highly recommended to provide an explanation for the rejection of the request. Note that it is always possible to provide explanation later on the request timeline."
+            )}
+          </span>
+        </Message>
+      </div>
+    ),
+  };
+};
 
 export const useConfirmDialog = (requestOrRequestType) => {
-  const formik = useFormikContext();
   const [confirmDialogProps, setConfirmDialogProps] = useState({
     open: false,
     content: i18next.t("Are you sure?"),
@@ -106,21 +108,26 @@ export const useConfirmDialog = (requestOrRequestType) => {
     onConfirm: () =>
       setConfirmDialogProps((props) => ({ ...props, open: false })),
   });
+  const [comment, setComment] = useState("");
+  const commentRef = useRef(comment);
 
+  const handleChange = (event, value) => {
+    setComment(value);
+    commentRef.current = value;
+  };
   const confirmAction = useCallback(
     (onConfirm, requestActionType, extraData) => {
       const dangerous = extraData?.dangerous;
-
       const baseConfirmDialogProps = {
         open: true,
         content: dangerous ? <WarningMessage /> : i18next.t("Are you sure?"),
         onConfirm: () => {
           setConfirmDialogProps((props) => ({ ...props, open: false }));
-          onConfirm();
+          onConfirm(commentRef.current);
         },
         onCancel: () => {
           setConfirmDialogProps((props) => ({ ...props, open: false }));
-          formik?.resetForm();
+          setComment("");
         },
       };
 
@@ -142,7 +149,11 @@ export const useConfirmDialog = (requestOrRequestType) => {
           );
           break;
         case REQUEST_TYPE.DECLINE:
-          caseSpecificProps = declineConfirmDialogProps(requestOrRequestType);
+          caseSpecificProps = declineConfirmDialogProps(
+            requestOrRequestType,
+            comment,
+            handleChange
+          );
           break;
         default:
           break;
@@ -154,7 +165,7 @@ export const useConfirmDialog = (requestOrRequestType) => {
         ...caseSpecificProps,
       }));
     },
-    []
+    [comment, requestOrRequestType]
   );
 
   return { confirmDialogProps, confirmAction };
@@ -168,7 +179,7 @@ export const useAction = ({
 } = {}) => {
   const { onBeforeAction, onAfterAction, onActionError } = useCallbackContext();
   return useMutation(
-    async () => {
+    async (values) => {
       if (onBeforeAction) {
         const shouldProceed = await onBeforeAction(
           formik,
@@ -180,8 +191,11 @@ export const useAction = ({
           throw new Error("Could not proceed with the action.");
         }
       }
-
-      return action(requestOrRequestType, formik?.values);
+      const formValues = { ...formik?.values };
+      if (values) {
+        formValues.payload.content = values;
+      }
+      return action(requestOrRequestType, formValues);
     },
     {
       onError: (e, variables) => {
