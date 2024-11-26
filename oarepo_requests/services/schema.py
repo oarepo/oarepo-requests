@@ -1,3 +1,14 @@
+#
+# Copyright (C) 2024 CESNET z.s.p.o.
+#
+# oarepo-requests is free software; you can redistribute it and/or
+# modify it under the terms of the MIT License; see LICENSE file for more
+# details.
+#
+"""Enhancements to the request schema."""
+
+from typing import Any
+
 import marshmallow as ma
 from invenio_records_resources.services import ConditionalLink
 from invenio_records_resources.services.base.links import Link, LinksTemplate
@@ -7,19 +18,24 @@ from oarepo_runtime.datastreams.utils import get_record_service_for_record
 from oarepo_runtime.records import is_published_record
 
 
-def get_links_schema():
+def get_links_schema() -> ma.fields.Dict:
+    """Get links schema."""
     return ma.fields.Dict(
         keys=ma.fields.String()
     )  # value is either string or dict of strings (for actions)
 
 
 class RequestTypeSchema(ma.Schema):
+    """Request type schema."""
+
     type_id = ma.fields.String()
+    """Type ID of the request type."""
+
     links = get_links_schema()
-    # links = Links()
+    """Links to the request type."""
 
     @ma.post_dump
-    def create_link(self, data, **kwargs):
+    def _create_link(self, data: dict, **kwargs: Any) -> dict:
         if "links" in data:
             return data
         if "record" not in self.context:
@@ -42,10 +58,14 @@ class RequestTypeSchema(ma.Schema):
         return data
 
 
-class NoneReceiverGenericRequestSchema(GenericRequestSchema):
+class NoReceiverAllowedGenericRequestSchema(GenericRequestSchema):
+    """A mixin that allows serialization of requests without a receiver."""
+
     receiver = fields.Dict(allow_none=True)
 
 
 class RequestsSchemaMixin:
-    requests = ma.fields.List(ma.fields.Nested(NoneReceiverGenericRequestSchema))
+    """A mixin that allows serialization of requests together with their request type."""
+
+    requests = ma.fields.List(ma.fields.Nested(NoReceiverAllowedGenericRequestSchema))
     request_types = ma.fields.List(ma.fields.Nested(RequestTypeSchema))

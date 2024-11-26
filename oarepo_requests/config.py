@@ -1,27 +1,25 @@
-from oarepo_requests.actions.components import (
-    AutoAcceptComponent,
-    RequestIdentityComponent,
-)
-from oarepo_requests.types.events import TopicDeleteEventType
-from oarepo_requests.types.events.topic_update import TopicUpdateEventType
-
-try:
-    import oarepo_workflows  # noqa
-    from oarepo_workflows.requests.events import WorkflowEvent
-
-    from oarepo_requests.actions.components import WorkflowTransitionComponent
-
-    workflow_action_components = [WorkflowTransitionComponent]
-except ImportError:
-    workflow_action_components = []
-    WorkflowEvent = None
+#
+# Copyright (C) 2024 CESNET z.s.p.o.
+#
+# oarepo-requests is free software; you can redistribute it and/or
+# modify it under the terms of the MIT License; see LICENSE file for more
+# details.
+#
+"""Default configuration of oarepo-requests."""
 
 import invenio_requests.config
+import oarepo_workflows  # noqa
 from invenio_requests.customizations import CommentEventType, LogEventType
 from invenio_requests.services.permissions import (
     PermissionPolicy as InvenioRequestsPermissionPolicy,
 )
+from oarepo_workflows.requests.events import WorkflowEvent
 
+from oarepo_requests.actions.components import (
+    AutoAcceptComponent,
+    RequestIdentityComponent,
+    WorkflowTransitionComponent,
+)
 from oarepo_requests.resolvers.ui import (
     FallbackEntityReferenceUIResolver,
     GroupEntityReferenceUIResolver,
@@ -32,6 +30,8 @@ from oarepo_requests.types import (
     EditPublishedRecordRequestType,
     PublishDraftRequestType,
 )
+from oarepo_requests.types.events import TopicDeleteEventType
+from oarepo_requests.types.events.topic_update import TopicUpdateEventType
 
 REQUESTS_REGISTERED_TYPES = [
     DeletePublishedRecordRequestType(),
@@ -46,20 +46,17 @@ REQUESTS_REGISTERED_EVENT_TYPES = [
 
 REQUESTS_ALLOWED_RECEIVERS = ["user", "group", "auto_approve"]
 
-if WorkflowEvent:
-    DEFAULT_WORKFLOW_EVENT_SUBMITTERS = {
-        CommentEventType.type_id: WorkflowEvent(
-            submitters=InvenioRequestsPermissionPolicy.can_create_comment
-        ),
-        LogEventType.type_id: WorkflowEvent(
-            submitters=InvenioRequestsPermissionPolicy.can_create_comment
-        ),
-        TopicUpdateEventType.type_id: WorkflowEvent(
-            submitters=InvenioRequestsPermissionPolicy.can_create_comment
-        ),
-    }
-else:
-    DEFAULT_WORKFLOW_EVENT_SUBMITTERS = {}
+DEFAULT_WORKFLOW_EVENTS = {
+    CommentEventType.type_id: WorkflowEvent(
+        submitters=InvenioRequestsPermissionPolicy.can_create_comment
+    ),
+    LogEventType.type_id: WorkflowEvent(
+        submitters=InvenioRequestsPermissionPolicy.can_create_comment
+    ),
+    TopicUpdateEventType.type_id: WorkflowEvent(
+        submitters=InvenioRequestsPermissionPolicy.can_create_comment
+    ),
+}
 
 
 ENTITY_REFERENCE_UI_RESOLVERS = {
@@ -69,6 +66,8 @@ ENTITY_REFERENCE_UI_RESOLVERS = {
 }
 
 REQUESTS_UI_SERIALIZATION_REFERENCED_FIELDS = ["created_by", "receiver", "topic"]
+
+workflow_action_components = [WorkflowTransitionComponent]
 
 REQUESTS_ACTION_COMPONENTS = {
     "accepted": [

@@ -1,3 +1,16 @@
+#
+# Copyright (C) 2024 CESNET z.s.p.o.
+#
+# oarepo-requests is free software; you can redistribute it and/or
+# modify it under the terms of the MIT License; see LICENSE file for more
+# details.
+#
+"""Request for deleting published record."""
+
+from __future__ import annotations
+
+from typing import TYPE_CHECKING, Any
+
 from oarepo_runtime.i18n import lazy_gettext as _
 from typing_extensions import override
 
@@ -6,20 +19,29 @@ from oarepo_requests.actions.delete_published_record import (
     DeletePublishedRecordDeclineAction,
 )
 
-from ..utils import is_auto_approved, request_identity_matches
+from ..utils import classproperty, is_auto_approved, request_identity_matches
 from .generic import NonDuplicableOARepoRequestType
 from .ref_types import ModelRefTypes
 
+if TYPE_CHECKING:
+    from flask_babel.speaklater import LazyString
+    from flask_principal import Identity
+    from invenio_drafts_resources.records import Record
+    from invenio_requests.customizations.actions import RequestAction
+    from invenio_requests.records.api import Request
+
 
 class DeletePublishedRecordRequestType(NonDuplicableOARepoRequestType):
+    """Request type for requesting deletion of a published record."""
+
     type_id = "delete_published_record"
     name = _("Delete record")
 
     dangerous = True
 
-    @classmethod
-    @property
-    def available_actions(cls):
+    @classproperty
+    def available_actions(cls) -> dict[str, type[RequestAction]]:
+        """Return available actions for the request type."""
         return {
             **super().available_actions,
             "accept": DeletePublishedRecordAcceptAction,
@@ -31,7 +53,15 @@ class DeletePublishedRecordRequestType(NonDuplicableOARepoRequestType):
     allowed_topic_ref_types = ModelRefTypes(published=True, draft=False)
 
     @override
-    def stateful_name(self, identity, *, topic, request=None, **kwargs):
+    def stateful_name(
+        self,
+        identity: Identity,
+        *,
+        topic: Record,
+        request: Request | None = None,
+        **kwargs: Any,
+    ) -> str | LazyString:
+        """Return the stateful name of the request."""
         if is_auto_approved(self, identity=identity, topic=topic):
             return self.name
         if not request:
@@ -43,7 +73,15 @@ class DeletePublishedRecordRequestType(NonDuplicableOARepoRequestType):
                 return _("Request record deletion")
 
     @override
-    def stateful_description(self, identity, *, topic, request=None, **kwargs):
+    def stateful_description(
+        self,
+        identity: Identity,
+        *,
+        topic: Record,
+        request: Request | None = None,
+        **kwargs: Any,
+    ) -> str | LazyString:
+        """Return the stateful description of the request."""
         if is_auto_approved(self, identity=identity, topic=topic):
             return _("Click to permanently delete the record.")
 
@@ -65,3 +103,4 @@ class DeletePublishedRecordRequestType(NonDuplicableOARepoRequestType):
             case _:
                 if request_identity_matches(request.created_by, identity):
                     return _("Submit request to get permission to delete the record.")
+                return _("You do not have permission to delete the record.")

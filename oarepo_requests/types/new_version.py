@@ -1,22 +1,41 @@
-from typing import Dict
+#
+# Copyright (C) 2024 CESNET z.s.p.o.
+#
+# oarepo-requests is free software; you can redistribute it and/or
+# modify it under the terms of the MIT License; see LICENSE file for more
+# details.
+#
+"""Request type for requesting new version of a published record."""
+
+from __future__ import annotations
+
+from typing import TYPE_CHECKING, Any
 
 import marshmallow as ma
-from invenio_records_resources.services.uow import RecordCommitOp
+from invenio_records_resources.services.uow import RecordCommitOp, UnitOfWork
 from invenio_requests.proxies import current_requests_service
-from invenio_requests.records.api import Request
 from marshmallow.validate import OneOf
 from oarepo_runtime.i18n import lazy_gettext as _
 from typing_extensions import override
 
 from ..actions.new_version import NewVersionAcceptAction
-from ..utils import is_auto_approved, request_identity_matches
+from ..utils import classproperty, is_auto_approved, request_identity_matches
 from .generic import NonDuplicableOARepoRequestType
 from .ref_types import ModelRefTypes
 
+if TYPE_CHECKING:
+    from flask_babel.speaklater import LazyString
+    from flask_principal import Identity
+    from invenio_drafts_resources.records import Record
+    from invenio_requests.customizations.actions import RequestAction
+    from invenio_requests.records.api import Request
 
-class NewVersionRequestType(
-    NonDuplicableOARepoRequestType
-):  # NewVersionFromPublishedRecord? or just new_version
+    from oarepo_requests.typing import EntityReference
+
+
+class NewVersionRequestType(NonDuplicableOARepoRequestType):
+    """Request type for requesting new version of a published record."""
+
     type_id = "new_version"
     name = _("New Version")
     payload_schema = {
@@ -31,9 +50,9 @@ class NewVersionRequestType(
         "keep_files": ma.fields.String(validate=OneOf(["true", "false"])),
     }
 
-    @classmethod
-    @property
-    def available_actions(cls):
+    @classproperty
+    def available_actions(cls) -> dict[str, type[RequestAction]]:
+        """Return available actions for the request type."""
         return {
             **super().available_actions,
             "accept": NewVersionAcceptAction,
@@ -55,24 +74,46 @@ class NewVersionRequestType(
     }
 
     @classmethod
-    def is_applicable_to(cls, identity, topic, *args, **kwargs):
+    def is_applicable_to(
+        cls, identity: Identity, topic: Record, *args: Any, **kwargs: Any
+    ) -> bool:
+        """Check if the request type is applicable to the topic."""
         if topic.is_draft:
             return False
         return super().is_applicable_to(identity, topic, *args, **kwargs)
 
-    def can_create(self, identity, data, receiver, topic, creator, *args, **kwargs):
+    def can_create(
+        self,
+        identity: Identity,
+        data: dict,
+        receiver: EntityReference,
+        topic: Record,
+        creator: EntityReference,
+        *args: Any,
+        **kwargs: Any,
+    ) -> None:
+        """Check if the request can be created."""
         if topic.is_draft:
             raise ValueError(
                 "Trying to create new version request on draft record"
             )  # todo - if we want the active topic thing, we have to allow published as allowed topic and have to check this somewhere else
         super().can_create(identity, data, receiver, topic, creator, *args, **kwargs)
 
-    def topic_change(self, request: Request, new_topic: Dict, uow):
-        setattr(request, "topic", new_topic)
+    def topic_change(self, request: Request, new_topic: dict, uow: UnitOfWork) -> None:
+        """Change the topic of the request."""
+        request.topic = new_topic
         uow.register(RecordCommitOp(request, indexer=current_requests_service.indexer))
 
     @override
-    def stateful_name(self, identity, *, topic, request=None, **kwargs):
+    def stateful_name(
+        self,
+        identity: Identity,
+        *,
+        topic: Record,
+        request: Request | None = None,
+        **kwargs: Any,
+    ) -> str | LazyString:
+        """Return the stateful name of the request."""
         if is_auto_approved(self, identity=identity, topic=topic):
             return self.name
         if not request:
@@ -84,7 +125,15 @@ class NewVersionRequestType(
                 return _("Request new version access")
 
     @override
-    def stateful_description(self, identity, *, topic, request=None, **kwargs):
+    def stateful_description(
+        self,
+        identity: Identity,
+        *,
+        topic: Record,
+        request: Request | None = None,
+        **kwargs: Any,
+    ) -> str | LazyString:
+        """Return the stateful description of the request."""
         if is_auto_approved(self, identity=identity, topic=topic):
             return _("Click to start creating a new version of the record.")
 
@@ -109,3 +158,4 @@ class NewVersionRequestType(
             case _:
                 if request_identity_matches(request.created_by, identity):
                     return _("Submit request to get edit access to the record.")
+                return _("You do not have permission to update the record.")

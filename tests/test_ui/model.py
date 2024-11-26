@@ -1,3 +1,10 @@
+#
+# Copyright (C) 2024 CESNET z.s.p.o.
+#
+# oarepo-requests is free software; you can redistribute it and/or
+# modify it under the terms of the MIT License; see LICENSE file for more
+# details.
+#
 from flask import g
 from flask_principal import PermissionDenied
 from oarepo_ui.resources import (
@@ -30,7 +37,6 @@ class ModelUIResourceConfig(RecordsUIResourceConfig):
 
 
 class ModelUIResource(RecordsUIResource):
-
     def _get_record(self, resource_requestctx, allow_draft=False):
         try:
             if allow_draft:

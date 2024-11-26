@@ -1,21 +1,36 @@
+#
+# Copyright (C) 2024 CESNET z.s.p.o.
+#
+# oarepo-requests is free software; you can redistribute it and/or
+# modify it under the terms of the MIT License; see LICENSE file for more
+# details.
+#
+"""Blueprints for the app and events views."""
+
+from __future__ import annotations
+
+from typing import TYPE_CHECKING
+
 from flask import Blueprint
 
+if TYPE_CHECKING:
+    from flask import Flask
 
-def create_app_blueprint(app):
+
+def create_app_blueprint(app: Flask) -> Blueprint:
+    """Create a blueprint for the requests endpoint.
+
+    :param app: Flask application
+    """
     blueprint = Blueprint("oarepo_requests_app", __name__, url_prefix="/requests/")
-    blueprint.record_once(register_autoapprove_entity_resolver)
     return blueprint
 
 
-def register_autoapprove_entity_resolver(state):
-    from oarepo_requests.resolvers.autoapprove import AutoApproveResolver
+def create_app_events_blueprint(app: Flask) -> Blueprint:
+    """Create a blueprint for the requests events endpoint.
 
-    app = state.app
-    requests = app.extensions["invenio-requests"]
-    requests.entity_resolvers_registry.register_type(AutoApproveResolver())
-
-
-def create_app_events_blueprint(app):
+    :param app: Flask application
+    """
     blueprint = Blueprint(
         "oarepo_requests_events_app", __name__, url_prefix="/requests/"
     )

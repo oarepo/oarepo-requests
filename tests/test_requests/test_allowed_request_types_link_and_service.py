@@ -1,3 +1,10 @@
+#
+# Copyright (C) 2024 CESNET z.s.p.o.
+#
+# oarepo-requests is free software; you can redistribute it and/or
+# modify it under the terms of the MIT License; see LICENSE file for more
+# details.
+#
 from flask import current_app
 from thesis.ext import ThesisExt
 from thesis.records.api import ThesisDraft, ThesisRecord
@@ -24,7 +31,7 @@ def test_allowed_request_types_on_draft_service(
     thesis_requests_service = thesis_ext.service_record_request_types
 
     allowed_request_types = (
-        thesis_requests_service.get_applicable_request_types_for_draft(
+        thesis_requests_service.get_applicable_request_types_for_draft_record(
             creator.identity, draft1.json["id"]
         )
     )
@@ -137,6 +144,7 @@ def test_allowed_request_types_on_published_resource(
     publish_request_data_function,
     create_draft_via_resource,
     search_clear,
+    app,
 ):
     creator = users[0]
     receiver = users[1]
@@ -156,6 +164,7 @@ def test_allowed_request_types_on_published_resource(
     allowed_request_types = creator_client.get(
         link_api2testclient(applicable_requests_link)
     )
+    assert allowed_request_types.status_code == 200
     assert sorted(
         allowed_request_types.json["hits"]["hits"], key=lambda x: x["type_id"]
     ) == [
