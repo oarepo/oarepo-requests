@@ -2,7 +2,8 @@ import React from "react";
 import { RichEditor } from "react-invenio-forms";
 import sanitizeHtml from "sanitize-html";
 import PropTypes from "prop-types";
-import { useQueryClient } from "@tanstack/react-query";
+import { useQuery } from "@tanstack/react-query";
+import { httpApplicationJson } from "@js/oarepo_ui";
 
 export const RequestCommentInput = ({
   comment,
@@ -14,20 +15,20 @@ export const RequestCommentInput = ({
     editor.selection.select(editor.getBody(), true);
     editor.selection.collapse(false);
   };
+  // TODO: there is no appropriate URL to call here. I think this one is the safest, because we know it exists and it does
+  // not rely on external library (like those that contain /me that are from dashboard). To be discussed how to handle this appropriately.
+  // maybe some link that lives in oarepo ui and that can universaly provide allowed tags and attributes
+  const { data } = useQuery(
+    ["allowedHtmlTagsAttrs"],
+    () => httpApplicationJson.get(`/requests/configs/publish_draft`),
+    {
+      refetchOnWindowFocus: false,
+      staleTime: Infinity,
+    }
+  );
 
-  const queryClient = useQueryClient();
-  // the request for request specific info, shall be already fetched at this point
-  const data = queryClient.getQueriesData({
-    queryKey: ["applicableCustomFields"],
-  });
-
-  let allowedHtmlAttrs;
-  let allowedHtmlTags;
-  if (data.length > 0) {
-    allowedHtmlAttrs = data[0][1]?.data?.allowedHtmlAttrs;
-    allowedHtmlTags = data[0][1]?.data?.allowedHtmlTags;
-  }
-
+  const allowedHtmlAttrs = data?.data?.allowedHtmlAttrs;
+  const allowedHtmlTags = data?.data?.allowedHtmlTags;
   return (
     <RichEditor
       initialValue={initialValue}
