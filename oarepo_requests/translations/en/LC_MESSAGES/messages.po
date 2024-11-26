@@ -587,7 +587,7 @@ msgid "requestDeleted"
 msgstr "{{creatorLabel}} deleted this request"
 
 msgid "requestCommented"
-msgstr "{{creatorLabel}} commented"
+msgstr "commented"
 
 #: /home/ron/prace/oarepo-requests/oarepo_requests/actions/delete_published_record.py:9
 msgid "Permanently delete"

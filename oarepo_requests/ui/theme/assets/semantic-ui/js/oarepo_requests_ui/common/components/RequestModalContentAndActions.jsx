@@ -42,6 +42,9 @@ export const RequestModalContentAndActions = ({
     }
   );
   const customFields = data?.data?.custom_fields;
+  const allowedHtmlAttrs = data?.data?.allowedHtmlAttrs;
+  const allowedHtmlTags = data?.data?.allowedHtmlTags;
+
   const requestTypeProperties = data?.data?.request_type_properties;
   const isMutating = useIsMutating();
   const modalActions = mapLinksToActions(
@@ -74,6 +77,8 @@ export const RequestModalContentAndActions = ({
           onCompletedAction={onSubmit}
           customFields={customFields}
           modalActions={modalActions}
+          allowedHtmlAttrs={allowedHtmlAttrs}
+          allowedHtmlTags={allowedHtmlTags}
         />
       </Modal.Content>
       <Modal.Actions>

@@ -25,6 +25,7 @@ import {
 } from "@js/oarepo_requests_common";
 import { Formik } from "formik";
 import _isEmpty from "lodash/isEmpty";
+import sanitizeHtml from "sanitize-html";
 
 export const RequestDetail = ({
   request,
@@ -45,6 +46,9 @@ export const RequestDetail = ({
     }
   );
   const customFields = data?.data?.custom_fields;
+  const allowedHtmlAttrs = data?.data?.allowedHtmlAttrs;
+  const allowedHtmlTags = data?.data?.allowedHtmlTags;
+
   const requestTypeProperties = data?.data?.request_type_properties;
   const actions = mapLinksToActions(
     request,
@@ -72,6 +76,11 @@ export const RequestDetail = ({
 
   const requestHeader = request?.stateful_name || request?.name;
   const description = request?.stateful_description || request?.description;
+  const sanitizedDescription = sanitizeHtml(description, {
+    allowedTags: allowedHtmlTags,
+    allowedAttributes: allowedHtmlAttrs,
+  });
+
   return (
     <CallbackContextProvider
       value={{ onBeforeAction, onAfterAction, onActionError }}
@@ -122,7 +131,13 @@ export const RequestDetail = ({
                 <Grid.Row>
                   <Grid.Column>
                     <Header as="h1">{requestHeader}</Header>
-                    {description && <p>{description}</p>}
+                    {description && (
+                      <p
+                        dangerouslySetInnerHTML={{
+                          __html: sanitizedDescription,
+                        }}
+                      ></p>
+                    )}
                     <SideRequestInfo request={request} />
                   </Grid.Column>
                 </Grid.Row>

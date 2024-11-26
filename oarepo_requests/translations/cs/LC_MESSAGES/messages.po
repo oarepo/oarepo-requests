@@ -623,7 +623,7 @@ msgid "requestDeleted"
 msgstr "{{creatorLabel}} smazal(a) tuto žádost"
 
 msgid "requestCommented"
-msgstr "{{creatorLabel}} komentoval(a)"
+msgstr "komentoval(a)"
 
 #: /home/ron/prace/oarepo-requests/oarepo_requests/actions/delete_published_record.py:9
 msgid "Permanently delete"
