@@ -1,7 +1,7 @@
 @commentEventBorderWidth: 1px;
 @commentEventBorder: @commentEventBorderWidth solid @borderColor;
 @commentEventBorderRadius: 5px;
-@commentEventPadding: 0.5rem;
+@commentEventPadding: 1.5rem;
 @commentEventAvatarWidth: 2rem;
 @commentEventAvatarHeight: 2rem;
 @verticalLineLeftMargin: 2rem;
