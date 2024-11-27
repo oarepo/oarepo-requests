@@ -1,5 +1,5 @@
 import _isEmpty from "lodash/isEmpty";
-import { http } from "@js/oarepo_ui";
+import { httpVnd } from "@js/oarepo_ui";
 import _set from "lodash/set";
 import _has from "lodash/has";
 import { i18next } from "@translations/oarepo_requests_ui/i18next";
@@ -83,7 +83,7 @@ export const serializeCustomFields = (formData) => {
 
 export const saveAndSubmit = async (request, formValues) => {
   const response = await createOrSave(request, formValues);
-  const submittedRequest = await http.post(
+  const submittedRequest = await httpVnd.post(
     response?.data?.links?.actions?.submit,
     {}
   );
@@ -93,31 +93,34 @@ export const saveAndSubmit = async (request, formValues) => {
 export const createOrSave = async (requestOrRequestType, formValues) => {
   const customFieldsData = serializeCustomFields(formValues);
   if (requestOrRequestType?.links?.actions?.create) {
-    return await http.post(
+    return await httpVnd.post(
       requestOrRequestType.links.actions.create,
       customFieldsData
     );
   } else {
-    return await http.put(requestOrRequestType?.links?.self, customFieldsData);
+    return await httpVnd.put(
+      requestOrRequestType?.links?.self,
+      customFieldsData
+    );
   }
 };
 
 export const accept = async (request, formData) => {
-  return await http.post(
+  return await httpVnd.post(
     request.links?.actions?.accept,
     serializeDataForInvenioApi(formData)
   );
 };
 
 export const decline = async (request, formData) => {
-  return await http.post(
+  return await httpVnd.post(
     request.links?.actions?.decline,
     serializeDataForInvenioApi(formData)
   );
 };
 
 export const cancel = async (request, formData) => {
-  return await http.post(
+  return await httpVnd.post(
     request.links?.actions?.cancel,
     serializeDataForInvenioApi(formData)
   );

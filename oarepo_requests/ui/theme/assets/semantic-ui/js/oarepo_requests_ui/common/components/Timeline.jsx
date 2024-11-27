@@ -6,7 +6,7 @@ import {
   TimelineEvent,
 } from "@js/oarepo_requests_detail/components";
 import PropTypes from "prop-types";
-import { http } from "@js/oarepo_ui";
+import { httpVnd } from "@js/oarepo_ui";
 import { useQuery } from "@tanstack/react-query";
 
 export const Timeline = ({ request, timelinePageSize }) => {
@@ -15,7 +15,7 @@ export const Timeline = ({ request, timelinePageSize }) => {
     ["requestEvents", request.id, page],
     () =>
       // q=!(type:T) to eliminate system created events
-      http.get(
+      httpVnd.get(
         `${request.links?.timeline}?q=!(type:T)&page=${page}&size=${timelinePageSize}&sort=newest`
       ),
     {
