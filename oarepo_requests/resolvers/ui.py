@@ -383,7 +383,7 @@ class RecordEntityReferenceUIResolver(OARepoUIResolver):
                 f"No service found for handling reference type {self.reference_type}"
             )
         extra_filter = dsl.Q("terms", **{"id": list(ids)})
-        return service.search(identity, extra_filter=extra_filter).data["hits"]["hits"]
+        return service.search(identity, extra_filter=extra_filter).to_dict()["hits"]["hits"]
 
     @override
     def _search_one(
