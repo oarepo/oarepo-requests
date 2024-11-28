@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2024-11-26 11:39+0100\n"
+"POT-Creation-Date: 2024-11-28 23:02+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -489,6 +489,9 @@ msgid "Comment was not submitted successfully. Please try again in a moment."
 msgstr ""
 
 msgid "Leave comment"
+msgstr ""
+
+msgid "Remaining characters: "
 msgstr ""
 
 msgid "Request details"

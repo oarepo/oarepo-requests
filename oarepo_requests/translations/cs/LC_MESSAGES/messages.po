@@ -602,25 +602,25 @@ msgid ""
 msgstr "Tato akce je nevratná. Opravdu si přejete tuto žádost přijmout?"
 
 msgid "requestCreated"
-msgstr "{{creatorLabel}} vytvořil(a) tuto žádost"
+msgstr "vytvořil(a) tuto žádost"
 
 msgid "requestSubmitted"
-msgstr "{{creatorLabel}} odeslal(a) tuto žádost"
+msgstr "odeslal(a) tuto žádost"
 
 msgid "requestCancelled"
-msgstr "{{creatorLabel}} zrušil(a) tuto žádost"
+msgstr "zrušil(a) tuto žádost"
 
 msgid "requestAccepted"
-msgstr "{{creatorLabel}} přijal(a) tuto žádost"
+msgstr "přijal(a) tuto žádost"
 
 msgid "requestDeclined"
-msgstr "{{creatorLabel}} odmítl(a) tuto žádost"
+msgstr "odmítl(a) tuto žádost"
 
 msgid "Request expired."
 msgstr "Žádost vypršela"
 
 msgid "requestDeleted"
-msgstr "{{creatorLabel}} smazal(a) tuto žádost"
+msgstr "smazal(a) tuto žádost"
 
 msgid "requestCommented"
 msgstr "komentoval(a)"
@@ -723,3 +723,6 @@ msgstr "Opravdu chcete tento komentář smazat?"
 
 msgid "deleted comment"
 msgstr "smazal(a) komentář"
+
+msgid "Remaining characters: "
+msgstr "Zbývající znaky: "

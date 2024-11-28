@@ -5,9 +5,6 @@ import { CommentSubmitForm, TimelineEvent } from "@js/oarepo_requests_common";
 import PropTypes from "prop-types";
 import { httpApplicationJson } from "@js/oarepo_ui";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { OverridableContext, overrideStore } from "react-overridable";
-
-const overriddenComponents = overrideStore.getAll();
 
 export const Timeline = ({ request, timelinePageSize }) => {
   const queryClient = useQueryClient();
@@ -70,51 +67,49 @@ export const Timeline = ({ request, timelinePageSize }) => {
   const events = data?.data?.hits?.hits;
   const totalPages = Math.ceil(data?.data?.hits?.total / timelinePageSize);
   return (
-    <OverridableContext.Provider value={overriddenComponents}>
-      <Dimmer.Dimmable blurring dimmed={isLoading}>
-        <Dimmer active={isLoading} inverted>
-          <Loader indeterminate size="big">
-            {i18next.t("Loading timeline...")}
-          </Loader>
-        </Dimmer>
-        <div className="rel-mb-5">
-          <CommentSubmitForm commentSubmitMutation={commentSubmitMutation} />
-        </div>
-        {error && (
-          <Message negative>
-            <Message.Header>
-              {i18next.t("Error while fetching timeline events")}
-            </Message.Header>
-          </Message>
-        )}
-        {events?.length > 0 && (
-          <Feed>
-            {events.map((event) => (
-              <TimelineEvent
-                key={event.id}
-                event={event}
-                // necessary for query invalidation and setting state of the request events query
-                requestId={request.id}
-                page={page}
-              />
-            ))}
-          </Feed>
-        )}
-        {data?.data?.hits?.total > timelinePageSize && (
-          <div className="centered rel-mb-1">
-            <Pagination
-              size="mini"
-              activePage={page}
-              totalPages={totalPages}
-              onPageChange={(_, { activePage }) => handlePageChange(activePage)}
-              ellipsisItem={null}
-              firstItem={null}
-              lastItem={null}
+    <Dimmer.Dimmable blurring dimmed={isLoading}>
+      <Dimmer active={isLoading} inverted>
+        <Loader indeterminate size="big">
+          {i18next.t("Loading timeline...")}
+        </Loader>
+      </Dimmer>
+      <div className="rel-mb-5">
+        <CommentSubmitForm commentSubmitMutation={commentSubmitMutation} />
+      </div>
+      {error && (
+        <Message negative>
+          <Message.Header>
+            {i18next.t("Error while fetching timeline events")}
+          </Message.Header>
+        </Message>
+      )}
+      {events?.length > 0 && (
+        <Feed>
+          {events.map((event) => (
+            <TimelineEvent
+              key={event.id}
+              event={event}
+              // necessary for query invalidation and setting state of the request events query
+              requestId={request.id}
+              page={page}
             />
-          </div>
-        )}
-      </Dimmer.Dimmable>
-    </OverridableContext.Provider>
+          ))}
+        </Feed>
+      )}
+      {data?.data?.hits?.total > timelinePageSize && (
+        <div className="centered rel-mb-1">
+          <Pagination
+            size="mini"
+            activePage={page}
+            totalPages={totalPages}
+            onPageChange={(_, { activePage }) => handlePageChange(activePage)}
+            ellipsisItem={null}
+            firstItem={null}
+            lastItem={null}
+          />
+        </div>
+      )}
+    </Dimmer.Dimmable>
   );
 };
 
