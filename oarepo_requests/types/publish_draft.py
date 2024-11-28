@@ -95,15 +95,23 @@ class PublishDraftRequestType(NonDuplicableOARepoRequestType):
         if not topic.is_draft:
             raise ValueError("Trying to create publish request on published record")
         super().can_create(identity, data, receiver, topic, creator, *args, **kwargs)
+        self.validate_topic(identity, topic)
+
+    @classmethod
+    def validate_topic(cls, identity: Identity, topic: Record) -> None:
+        """Validate the topic.
+
+        :param: identity: identity of the caller
+        :param: topic: topic of the request
+
+        :raises: ValidationError: if the topic is not valid
+        """
         topic_service = get_record_service_for_record(topic)
         topic_service.validate_draft(identity, topic["id"])
-
         can_toggle_files = topic_service.check_permission(
             identity, "manage_files", record=topic
         )
-
-        draft_files = topic.files   # type: ignore
-
+        draft_files = topic.files  # type: ignore
         if draft_files.enabled and not draft_files.items():
             if can_toggle_files:
                 my_message = _(
@@ -113,7 +121,6 @@ class PublishDraftRequestType(NonDuplicableOARepoRequestType):
                 my_message = _("Missing uploaded files.")
 
             raise ma.ValidationError({"files.enabled": [my_message]})
-
 
     @classmethod
     def is_applicable_to(
