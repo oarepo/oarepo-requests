@@ -13,7 +13,6 @@ from typing import TYPE_CHECKING, Any
 
 from invenio_access.permissions import system_identity
 from invenio_records_resources.services.uow import RecordCommitOp, UnitOfWork
-from marshmallow import ValidationError
 from oarepo_runtime.datastreams.utils import get_record_service_for_record
 from oarepo_runtime.i18n import lazy_gettext as _
 
@@ -29,34 +28,36 @@ if TYPE_CHECKING:
     from flask_principal import Identity
     from invenio_drafts_resources.records import Record
     from invenio_requests.customizations import RequestType
+    from invenio_requests.customizations.actions import RequestAction
 
+class PublishMixin:
+    """Mixin for publish actions."""
 
-class PublishDraftSubmitAction(OARepoSubmitAction):
+    def can_execute(self: RequestAction) -> bool:
+        """Check if the action can be executed."""
+        if not super().can_execute():       # type: ignore
+            return False
+
+        try:
+            from ..types.publish_draft import PublishDraftRequestType
+            topic = self.request.topic.resolve()
+            PublishDraftRequestType.validate_topic(system_identity, topic)
+            return True
+        except: # noqa E722: used for displaying buttons, so ignore errors here
+            return False
+
+class PublishDraftSubmitAction(PublishMixin, OARepoSubmitAction):
     """Submit action for publishing draft requests."""
 
-    def can_execute(self) -> bool:
-        """Check if the action can be executed."""
-        if not super().can_execute():
-            return False
-        try:
-            topic = self.request.topic.resolve()
-        except:  # noqa E722: used for displaying buttons, so ignore errors here
-            return False
-        topic_service = get_record_service_for_record(topic)
-        try:
-            topic_service.validate_draft(system_identity, topic["id"])
-            return True
-        except ValidationError:
-            return False
 
-
-class PublishDraftAcceptAction(AddTopicLinksOnPayloadMixin, OARepoAcceptAction):
+class PublishDraftAcceptAction(PublishMixin, AddTopicLinksOnPayloadMixin, OARepoAcceptAction):
     """Accept action for publishing draft requests."""
 
     self_link = "published_record:links:self"
     self_html_link = "published_record:links:self_html"
 
     name = _("Publish")
+
 
     def apply(
         self,
