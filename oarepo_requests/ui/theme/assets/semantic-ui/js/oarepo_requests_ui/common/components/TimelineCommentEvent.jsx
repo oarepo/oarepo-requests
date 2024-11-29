@@ -200,22 +200,6 @@ const TimelineCommentEvent = ({ event, requestId, page }) => {
           )}
           {editMode && (
             <React.Fragment>
-              {/* <RichEditor
-                initialValue={event?.payload?.content}
-                inputValue={comment}
-                onEditorChange={(event, editor) => {
-                  setComment(editor.getContent());
-                  setPlainTextComment(
-                    editor.getContent({ format: "text" }).trim()
-                  );
-                }}
-                minHeight={100}
-                editorConfig={{
-                  auto_focus: true,
-                  toolbar:
-                    "blocks | bold italic | bullist numlist | outdent indent | undo redo",
-                }}
-              /> */}
               <RequestCommentInput
                 comment={comment}
                 initialValue={event?.payload?.content}
