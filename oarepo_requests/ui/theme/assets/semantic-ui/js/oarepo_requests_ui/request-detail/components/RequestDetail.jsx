@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import { i18next } from "@translations/oarepo_requests_ui/i18next";
 import { scrollTop, httpApplicationJson } from "@js/oarepo_ui";
 import {
@@ -12,7 +12,6 @@ import {
   Loader,
   Message,
 } from "semantic-ui-react";
-import { TopicPreview } from ".";
 import PropTypes from "prop-types";
 import { useQuery, useIsMutating } from "@tanstack/react-query";
 import {
@@ -22,8 +21,11 @@ import {
   SideRequestInfo,
   Timeline,
   CallbackContextProvider,
+  TopicPreview,
 } from "@js/oarepo_requests_common";
 import { Formik } from "formik";
+import _isEmpty from "lodash/isEmpty";
+import sanitizeHtml from "sanitize-html";
 
 export const RequestDetail = ({
   request,
@@ -43,8 +45,10 @@ export const RequestDetail = ({
       staleTime: Infinity,
     }
   );
-
   const customFields = data?.data?.custom_fields;
+  const allowedHtmlAttrs = data?.data?.allowedHtmlAttrs;
+  const allowedHtmlTags = data?.data?.allowedHtmlTags;
+
   const requestTypeProperties = data?.data?.request_type_properties;
   const actions = mapLinksToActions(
     request,
@@ -64,13 +68,24 @@ export const RequestDetail = ({
     };
   }, []);
 
+  const formikInitialValues = useMemo(() => {
+    return {
+      payload: !_isEmpty(request?.payload) ? request.payload : {},
+    };
+  }, [request?.payload]);
+
   const requestHeader = request?.stateful_name || request?.name;
   const description = request?.stateful_description || request?.description;
+  const sanitizedDescription = sanitizeHtml(description, {
+    allowedTags: allowedHtmlTags,
+    allowedAttributes: allowedHtmlAttrs,
+  });
+
   return (
     <CallbackContextProvider
       value={{ onBeforeAction, onAfterAction, onActionError }}
     >
-      <Formik initialValues={{}}>
+      <Formik initialValues={formikInitialValues}>
         {({ errors }) => (
           <ConfirmModalContextProvider requestOrRequestType={request}>
             {({ confirmDialogProps }) => (
@@ -116,7 +131,13 @@ export const RequestDetail = ({
                 <Grid.Row>
                   <Grid.Column>
                     <Header as="h1">{requestHeader}</Header>
-                    {description && <p>{description}</p>}
+                    {description && (
+                      <p
+                        dangerouslySetInnerHTML={{
+                          __html: sanitizedDescription,
+                        }}
+                      ></p>
+                    )}
                     <SideRequestInfo request={request} />
                   </Grid.Column>
                 </Grid.Row>
@@ -199,5 +220,5 @@ RequestDetail.defaultProps = {
   onBeforeAction: undefined,
   onAfterAction: undefined,
   onActionError: undefined,
-  timelinePageSize: 10,
+  timelinePageSize: 25,
 };

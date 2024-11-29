@@ -58,7 +58,7 @@ export const RequestModal = ({
           {({ confirmDialogProps }) => (
             <React.Fragment>
               <Modal
-                className="requests-request-modal"
+                className="requests-request-modal form-modal"
                 as={Dimmer.Dimmable}
                 blurring
                 onClose={onClose}

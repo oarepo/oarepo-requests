@@ -12,6 +12,8 @@ import {
   QueryClientProvider,
 } from "@tanstack/react-query";
 import { httpVnd } from "@js/oarepo_ui";
+import { OverridableContext, overrideStore } from "react-overridable";
+const overriddenComponents = overrideStore.getAll();
 
 export const requestButtonsDefaultIconConfig = {
   delete_published_record: { icon: "trash", labelPosition: "left" },
@@ -115,16 +117,18 @@ const RecordRequestsWithQueryClient = ({
   requestButtonsIconsConfig,
 }) => {
   return (
-    <QueryClientProvider client={queryClient}>
-      <RecordRequests
-        record={initialRecord}
-        ContainerComponent={ContainerComponent}
-        onBeforeAction={onBeforeAction}
-        onAfterAction={onAfterAction}
-        onActionError={onActionError}
-        requestButtonsIconsConfig={requestButtonsIconsConfig}
-      />
-    </QueryClientProvider>
+    <OverridableContext.Provider value={overriddenComponents}>
+      <QueryClientProvider client={queryClient}>
+        <RecordRequests
+          record={initialRecord}
+          ContainerComponent={ContainerComponent}
+          onBeforeAction={onBeforeAction}
+          onAfterAction={onAfterAction}
+          onActionError={onActionError}
+          requestButtonsIconsConfig={requestButtonsIconsConfig}
+        />
+      </QueryClientProvider>
+    </OverridableContext.Provider>
   );
 };
 

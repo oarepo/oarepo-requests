@@ -34,29 +34,33 @@ export const getRequestStatusIcon = (requestStatus) => {
       return { name: "hourglass end", color: "orange" };
     case "deleted":
       return { name: "thrash", color: "black" };
+    case "comment_deleted":
+      return { name: "eraser", color: "grey" };
     default:
       return null;
   }
 };
 
-export const getFeedMessage = (requestStatus, creatorLabel) => {
-  switch (requestStatus?.toLowerCase()) {
+export const getFeedMessage = (eventStatus) => {
+  switch (eventStatus?.toLowerCase()) {
     case "created":
-      return i18next.t("requestCreated", { creatorLabel });
+      return i18next.t("requestCreated");
     case "submitted":
-      return i18next.t("requestSubmitted", { creatorLabel });
+      return i18next.t("requestSubmitted");
     case "cancelled":
-      return i18next.t("requestCancelled", { creatorLabel });
+      return i18next.t("requestCancelled");
     case "accepted":
-      return i18next.t("requestAccepted", { creatorLabel });
+      return i18next.t("requestAccepted");
     case "declined":
-      return i18next.t("requestDeclined", { creatorLabel });
+      return i18next.t("requestDeclined");
     case "expired":
       return i18next.t("Request expired.");
     case "deleted":
-      return i18next.t("requestDeleted", { creatorLabel });
+      return i18next.t("requestDeleted");
+    case "comment_deleted":
+      return i18next.t("deleted comment");
     default:
-      return i18next.t("requestCommented", { creatorLabel });
+      return i18next.t("requestCommented");
   }
 };
 
