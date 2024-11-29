@@ -39,7 +39,6 @@ def test_delete(
     resp_request_submit = creator_client.post(
         link_api2testclient(resp_request_create.json["links"]["actions"]["submit"]),
     )
-    print()
 
     record = receiver_client.get(f"{urls['BASE_URL']}{record1['id']}?expand=true")
     assert record.json["expanded"]["requests"][0]["links"]["actions"].keys() == {
@@ -50,6 +49,10 @@ def test_delete(
         link_api2testclient(
             record.json["expanded"]["requests"][0]["links"]["actions"]["accept"]
         ),
+    )
+    assert (
+        link_api2testclient(delete.json["links"]["redirect_urls"]["accept"])
+        == "/thesis/"
     )
 
     ThesisRecord.index.refresh()
@@ -130,4 +133,8 @@ def test_delete_draft(
     )  # autoapprove suggested here
     assert request_after.json["status"] == "accepted"
     assert request_after.json["is_closed"]
+    assert (
+        link_api2testclient(request_after.json["links"]["redirect_urls"]["accept"])
+        == "/thesis/"
+    )
     assert read_deleted.status_code == 404

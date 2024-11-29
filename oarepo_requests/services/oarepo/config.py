@@ -66,13 +66,31 @@ class RequestEntityLinks(Link):
         if hasattr(obj.type, "extra_request_links"):
             entity = self._resolve(obj, context)
             res.update(
-                obj.type.extra_request_links(
+                obj.type.extra_entity_links(
                     request=obj,
                     **(context | {"cur_entity": entity, "entity_type": self._entity}),
                 )
             )
 
         return res
+
+
+class RedirectLinks(Link):
+
+    def __init__(self, when: callable = None):
+        """Constructor."""
+        self._when_func = when
+
+    def expand(self, obj: Request, context: dict) -> dict:
+        """Create the request links."""
+        links = {}
+        available_statuses = {"accept", "decline", "submit"}
+        for status in available_statuses:
+            if hasattr(obj.type, f"{status}_redirect_url"):
+                links[status] = getattr(obj.type, f"{status}_redirect_url")(
+                    obj, context
+                )
+        return links
 
 
 class OARepoRequestsServiceConfig(RequestsServiceConfig):
@@ -88,4 +106,5 @@ class OARepoRequestsServiceConfig(RequestsServiceConfig):
         "topic": RequestEntityLinks(entity="topic"),
         "created_by": RequestEntityLinks(entity="created_by"),
         "receiver": RequestEntityLinks(entity="receiver"),
+        "redirect_urls": RedirectLinks(),
     }

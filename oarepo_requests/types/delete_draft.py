@@ -11,6 +11,7 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING, Any
 
+from oarepo_runtime.datastreams.utils import get_record_service_for_record_class
 from oarepo_runtime.i18n import lazy_gettext as _
 from typing_extensions import override
 
@@ -34,6 +35,11 @@ class DeleteDraftRequestType(NonDuplicableOARepoRequestType):
     name = _("Delete draft")
 
     dangerous = True
+
+    def accept_redirect_url(self, request, context, **kwargs):
+        topic_cls = request.topic.record_cls
+        service = get_record_service_for_record_class(topic_cls)
+        return service.config.links_search["self_html"].expand(None, context)
 
     @classproperty
     def available_actions(cls) -> dict[str, type[RequestAction]]:
