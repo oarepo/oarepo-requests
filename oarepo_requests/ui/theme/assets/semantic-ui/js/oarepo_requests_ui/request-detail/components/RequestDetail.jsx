@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { i18next } from "@translations/oarepo_requests_ui/i18next";
-import { scrollTop } from "@js/oarepo_ui";
+import { scrollTop, httpApplicationJson } from "@js/oarepo_ui";
 import {
   Button,
   Grid,
@@ -15,7 +15,6 @@ import {
 import { TopicPreview } from ".";
 import PropTypes from "prop-types";
 import { useQuery, useIsMutating } from "@tanstack/react-query";
-import { http } from "react-invenio-forms";
 import {
   mapLinksToActions,
   ConfirmModalContextProvider,
@@ -37,7 +36,7 @@ export const RequestDetail = ({
   const [scrollToTopVisible, setScrollToTopVisible] = useState(false);
   const { data, isLoading } = useQuery(
     ["applicableCustomFields", request?.type],
-    () => http.get(`/requests/configs/${request?.type}`),
+    () => httpApplicationJson.get(`/requests/configs/${request?.type}`),
     {
       enabled: !!request?.type,
       refetchOnWindowFocus: false,
