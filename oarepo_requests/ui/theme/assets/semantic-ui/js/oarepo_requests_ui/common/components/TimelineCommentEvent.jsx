@@ -1,17 +1,10 @@
 import React, { useState } from "react";
 import { i18next } from "@translations/oarepo_requests_ui/i18next";
-import {
-  Feed,
-  Image,
-  Dropdown,
-  Button,
-  Confirm,
-  Message,
-} from "semantic-ui-react";
+import { Feed, Dropdown, Button, Confirm, Message } from "semantic-ui-react";
 import _has from "lodash/has";
 import sanitizeHtml from "sanitize-html";
 import PropTypes from "prop-types";
-import { toRelativeTime } from "react-invenio-forms";
+import { toRelativeTime, Image } from "react-invenio-forms";
 import {
   ConfirmationModalCancelButton,
   ConfirmationModalConfirmButton,

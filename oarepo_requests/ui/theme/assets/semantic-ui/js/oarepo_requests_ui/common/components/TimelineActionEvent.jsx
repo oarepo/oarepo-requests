@@ -4,9 +4,9 @@ import {
   getFeedMessage,
 } from "@js/oarepo_requests_common";
 import PropTypes from "prop-types";
-import { Icon, Feed, Image } from "semantic-ui-react";
+import { Icon, Feed } from "semantic-ui-react";
 import { i18next } from "@translations/oarepo_requests_ui/i18next";
-import { toRelativeTime } from "react-invenio-forms";
+import { toRelativeTime, Image } from "react-invenio-forms";
 
 export const TimelineActionEvent = ({ event }) => {
   const createdBy = event?.expanded?.created_by;
