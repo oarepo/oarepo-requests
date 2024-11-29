@@ -1,10 +1,12 @@
-import React, { useState } from "react";
+// import React, { useState } from "react";
+import React from "react";
 import { RichEditor } from "react-invenio-forms";
 import sanitizeHtml from "sanitize-html";
 import PropTypes from "prop-types";
 import { useQuery } from "@tanstack/react-query";
 import { httpApplicationJson } from "@js/oarepo_ui";
-import { i18next } from "@translations/oarepo_requests_ui/i18next";
+// import { i18next } from "@translations/oarepo_requests_ui/i18next";
+// import { Message } from "semantic-ui-react";
 
 export const RequestCommentInput = ({
   comment,
@@ -17,7 +19,8 @@ export const RequestCommentInput = ({
     editor.selection.select(editor.getBody(), true);
     editor.selection.collapse(false);
   };
-  const [length, setLength] = useState(initialValue?.length);
+  // const [pasteError, setPasteError] = useState(false);
+  // const [length, setLength] = useState(initialValue?.length);
   // TODO: there is no appropriate URL to call here. I think this one is the safest, because we know it exists and it does
   // not rely on external library (like those that contain /me that are from dashboard). To be discussed how to handle this appropriately.
   // maybe some link that lives in oarepo ui and that can universaly provide allowed tags and attributes
@@ -42,48 +45,61 @@ export const RequestCommentInput = ({
           min_height: 100,
           toolbar:
             "blocks | bold italic | bullist numlist | outdent indent | undo redo",
-          setup: (editor) => {
-            editor.on(
-              "BeforeAddUndo",
-              (event) => {
-                const length = editor.getContent({ format: "text" }).length;
-                if (length > maxCommentLength) {
-                  event.preventDefault();
-                }
-              },
-              editor.on("PastePreProcess", (event) => {
-                const pastedText = event.content;
-                const currentLength = editor.getContent({
-                  format: "text",
-                }).length;
-                const newLength = currentLength + pastedText.length;
+          // setup: (editor) => {
+          //   editor.on("BeforeAddUndo", (event) => {
+          //     const length = editor.getContent({ format: "text" }).length;
+          //     if (length >= maxCommentLength) {
+          //       event.preventDefault();
+          //     }
+          //   });
 
-                if (newLength > maxCommentLength) {
-                  event.preventDefault();
-                }
-              }),
-              editor.on("init", () => {
-                setLength(editor.getContent({ format: "text" }).length);
-              })
-            );
-          },
+          //   editor.on("PastePreProcess", (event) => {
+          //     const pastedText = event.content;
+          //     const sanitizedText = sanitizeHtml(pastedText, {
+          //       allowedTags: allowedHtmlTags,
+          //       allowedAttributes: allowedHtmlAttrs,
+          //     });
+          //     if (sanitizedText.length > maxCommentLength) {
+          //       event.preventDefault();
+          //       setPasteError(true);
+          //     }
+          //   });
+
+          //   editor.on("init", () => {
+          //     setLength(editor.getContent({ format: "text" }).length);
+          //   });
+          // },
         }}
         onEditorChange={(event, editor) => {
           const cleanedContent = sanitizeHtml(editor.getContent(), {
             allowedTags: allowedHtmlTags,
             allowedAttributes: allowedHtmlAttrs,
           });
-          const length = editor.getContent({ format: "text" }).length;
-          if (length <= maxCommentLength) {
-            handleChange(event, cleanedContent);
-            setLength(length);
-          }
+          // const textContent = editor.getContent({ format: "text" });
+          // const length = textContent.length;
+          handleChange(event, cleanedContent);
+
+          // if (length <= maxCommentLength) {
+          //   handleChange(event, cleanedContent);
+          //   if (textContent.trim().length === 0) {
+          //     setLength(0);
+          //   } else {
+          //     setLength(length);
+          //   }
+          // }
         }}
         onFocus={handleFocus}
       />
-      <small>{`${i18next.t("Remaining characters: ")}${
+      {/* <small>{`${i18next.t("Remaining characters: ")}${
         maxCommentLength - length
       }`}</small>
+      {pasteError && (
+        <Message size="small" info>
+          <Message.Content>
+            {i18next.t("Content you are trying to paste is too long.")}
+          </Message.Content>
+        </Message>
+      )} */}
     </React.Fragment>
   );
 };
@@ -97,5 +113,5 @@ RequestCommentInput.propTypes = {
 
 RequestCommentInput.defaultProps = {
   initialValue: "",
-  maxCommentLength: 1000,
+  maxCommentLength: 100,
 };
