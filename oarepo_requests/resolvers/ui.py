@@ -383,7 +383,9 @@ class RecordEntityReferenceUIResolver(OARepoUIResolver):
                 f"No service found for handling reference type {self.reference_type}"
             )
         extra_filter = dsl.Q("terms", **{"id": list(ids)})
-        return service.search(identity, extra_filter=extra_filter).to_dict()["hits"]["hits"]
+        return service.search(identity, extra_filter=extra_filter).to_dict()["hits"][
+            "hits"
+        ]
 
     @override
     def _search_one(
@@ -544,6 +546,7 @@ class FallbackEntityReferenceUIResolver(OARepoUIResolver):
             links=self._extract_links_from_resolved_reference(entity),
         )
 
+
 class KeywordUIEntityResolver(OARepoUIResolver):
     keyword = None
 
@@ -581,6 +584,7 @@ class KeywordUIEntityResolver(OARepoUIResolver):
         """
         return {self.keyword: _id}
 
+
 class AutoApproveUIEntityResolver(KeywordUIEntityResolver):
     keyword = "auto_approve"
 
@@ -601,4 +605,3 @@ class AutoApproveUIEntityResolver(KeywordUIEntityResolver):
             label=_("Auto approve"),
             links={},
         )
-
