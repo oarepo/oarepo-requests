@@ -23,7 +23,7 @@ from oarepo_requests.actions.components import (
 from oarepo_requests.resolvers.ui import (
     FallbackEntityReferenceUIResolver,
     GroupEntityReferenceUIResolver,
-    UserEntityReferenceUIResolver,
+    UserEntityReferenceUIResolver, AutoApproveUIEntityResolver,
 )
 from oarepo_requests.types import (
     DeletePublishedRecordRequestType,
@@ -63,6 +63,7 @@ ENTITY_REFERENCE_UI_RESOLVERS = {
     "user": UserEntityReferenceUIResolver("user"),
     "fallback": FallbackEntityReferenceUIResolver("fallback"),
     "group": GroupEntityReferenceUIResolver("group"),
+    "auto_approve": AutoApproveUIEntityResolver("auto_approve"),
 }
 
 REQUESTS_UI_SERIALIZATION_REFERENCED_FIELDS = ["created_by", "receiver", "topic"]

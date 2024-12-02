@@ -253,3 +253,32 @@ def test_role(
         assert ui_record["expanded"]["requests"][0]["receiver"] == role_ui_serialization
     finally:
         app.config["OAREPO_REQUESTS_DEFAULT_RECEIVER"] = config_restore
+
+def test_auto_approve(
+    vocab_cf,
+    logged_client,
+    users,
+    urls,
+    new_version_data_function,
+    record_factory,
+    search_clear,
+):
+    creator = users[0]
+    creator_client = logged_client(creator)
+
+    record1 = record_factory(creator.identity)
+
+    resp_request_create = creator_client.post(
+        urls["BASE_URL_REQUESTS"],
+        json=new_version_data_function(record1["id"]),
+    )
+    resp_request_submit = creator_client.post(
+        link_api2testclient(resp_request_create.json["links"]["actions"]["submit"]),
+    )
+    # is request accepted and closed?
+    request_json = creator_client.get(
+        f'{urls["BASE_URL_REQUESTS"]}{resp_request_create.json["id"]}',
+        headers={"Accept": "application/vnd.inveniordm.v1+json"}
+    ).json
+
+    assert request_json["receiver"]["label"] == "Auto approve"
