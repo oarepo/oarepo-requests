@@ -32,10 +32,6 @@ class OARepoRequestsCommentsResourceConfig(
     }
 
     @property
-    def request_view_args(self):
-        return {**super().request_view_args, "event_type": ma.fields.Str()}
-
-    @property
     def request_item_view_args(self):
         return {
         **super().request_item_view_args,

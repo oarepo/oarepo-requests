@@ -28,12 +28,6 @@ from invenio_requests.resources.events.resource import RequestCommentsResource
 class OARepoRequestsCommentsResource(RequestCommentsResource, ErrorHandlersMixin):
     """OARepo extensions to invenio requests comments resource."""
 
-    """
-    list_view_args_parser = request_parser(
-        from_conf("request_list_view_args"), location="view_args"
-    )
-    """
-
     item_view_args_parser = request_parser(
         from_conf("request_item_view_args"), location="view_args"
     )
@@ -84,7 +78,6 @@ class OARepoRequestsCommentsResource(RequestCommentsResource, ErrorHandlersMixin
     def search_extended(self) -> tuple[dict, int]:
         """Search for comments."""
         return super().search()
-
 
 
     @item_view_args_parser
