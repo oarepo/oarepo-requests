@@ -461,10 +461,10 @@ def test_workflow_events_resource(
     request_id = read_from_record.json["expanded"]["requests"][0]["id"]
     json = {**events_resource_data, "type": TestEventType.type_id}
     create_event_u1 = user1_client.post(
-        f"{urls['BASE_URL_REQUESTS']}{request_id}/timeline", json=json
+        f"{urls['BASE_URL_REQUESTS']}{request_id}/timeline/{TestEventType.type_id}", json=json
     )
     create_event_u2 = user2_client.post(
-        f"{urls['BASE_URL_REQUESTS']}{request_id}/timeline", json=json
+        f"{urls['BASE_URL_REQUESTS']}{request_id}/timeline/{TestEventType.type_id}", json=json
     )
 
     assert create_event_u1.status_code == 403
@@ -493,10 +493,10 @@ def test_workflow_events_resource(
     request_id = publish_request["id"]
 
     create_event_u1 = user1_client.post(
-        f"{urls['BASE_URL_REQUESTS']}{request_id}/timeline", json=json
+        f"{urls['BASE_URL_REQUESTS']}{request_id}/timeline/{TestEventType.type_id}", json=json
     )
     create_event_u2 = user2_client.post(
-        f"{urls['BASE_URL_REQUESTS']}{request_id}/timeline", json=json
+        f"{urls['BASE_URL_REQUESTS']}{request_id}/timeline/{TestEventType.type_id}", json=json
     )
     assert create_event_u1.status_code == 201
     assert create_event_u2.status_code == 403
