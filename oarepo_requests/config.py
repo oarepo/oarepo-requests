@@ -21,9 +21,10 @@ from oarepo_requests.actions.components import (
     WorkflowTransitionComponent,
 )
 from oarepo_requests.resolvers.ui import (
+    AutoApproveUIEntityResolver,
     FallbackEntityReferenceUIResolver,
     GroupEntityReferenceUIResolver,
-    UserEntityReferenceUIResolver, AutoApproveUIEntityResolver,
+    UserEntityReferenceUIResolver,
 )
 from oarepo_requests.types import (
     DeletePublishedRecordRequestType,
