@@ -41,7 +41,7 @@ def test_record_delete_request_present(
                     "create": f"https://127.0.0.1:5000/api/thesis/{topic['id']}/requests/edit_published_record"
                 }
             },
-            "name": "Edit record",
+            "name": "Edit metadata",
         }
         assert data["creatable_request_types"]["delete_published_record"] == {
             "description": "Request deletion of published record",

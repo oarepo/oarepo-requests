@@ -383,7 +383,9 @@ class RecordEntityReferenceUIResolver(OARepoUIResolver):
                 f"No service found for handling reference type {self.reference_type}"
             )
         extra_filter = dsl.Q("terms", **{"id": list(ids)})
-        return service.search(identity, extra_filter=extra_filter).to_dict()["hits"]["hits"]
+        return service.search(identity, extra_filter=extra_filter).to_dict()["hits"][
+            "hits"
+        ]
 
     @override
     def _search_one(
@@ -542,4 +544,64 @@ class FallbackEntityReferenceUIResolver(OARepoUIResolver):
             type=list(reference.keys())[0],
             label=label,
             links=self._extract_links_from_resolved_reference(entity),
+        )
+
+
+class KeywordUIEntityResolver(OARepoUIResolver):
+    keyword = None
+
+    @override
+    def _get_id(self, entity: dict) -> str:
+        """Get the id of the serialized entity.
+
+        :result:    value of the keyword of the entity
+        """
+        return list(entity.values())[0]
+
+    @override
+    def _search_many(
+        self, identity: Identity, ids: list[str], *args: Any, **kwargs: Any
+    ) -> list[dict]:
+        """Returns list of references of keyword entities.
+
+        :param identity:    identity of the user
+        :param ids:         ids to search for
+        :param args:        additional arguments
+        :param kwargs:      additional keyword arguments
+        :return:            list of records found
+        """
+        return [{self.keyword: _id} for _id in ids]
+
+    @override
+    def _search_one(
+        self, identity: Identity, _id: str, *args: Any, **kwargs: Any
+    ) -> dict | None:
+        """Returns keyword entity reference.
+
+        :param identity:    identity of the user
+        :param _id:         the keyword value
+        :return:            API serialization of the data
+        """
+        return {self.keyword: _id}
+
+
+class AutoApproveUIEntityResolver(KeywordUIEntityResolver):
+    keyword = "auto_approve"
+
+    @override
+    def _get_entity_ui_representation(
+        self, entity: dict, reference: EntityReference
+    ) -> UIResolvedReference:
+        """Create a UI representation of an auto approve entity.
+
+        :entity:        resolved entity
+        :reference:     reference to the entity
+        :return:        UI representation of the entity
+        """
+
+        return UIResolvedReference(
+            reference=reference,
+            type=self.keyword,
+            label=_("Auto approve"),
+            links={},
         )

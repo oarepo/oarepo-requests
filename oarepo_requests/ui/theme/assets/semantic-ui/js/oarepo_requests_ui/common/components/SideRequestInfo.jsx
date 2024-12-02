@@ -2,6 +2,7 @@ import React from "react";
 import { i18next } from "@translations/oarepo_requests_ui/i18next";
 import { Icon, List } from "semantic-ui-react";
 import _has from "lodash/has";
+import _truncate from "lodash/truncate";
 import { getRequestStatusIcon } from "@js/oarepo_requests_common";
 import PropTypes from "prop-types";
 
@@ -64,12 +65,12 @@ export const SideRequestInfo = ({ request }) => {
         <List.Item>
           <List.Header as="h3">{i18next.t("Topic")}</List.Header>
           <List.Content>
-            <a
-              href={request?.links?.topic_html}
-              target="_blank"
-              rel="noreferrer"
-            >
-              {i18next.t("Request topic")}
+            <a href={request.links.topic_html} target="_blank" rel="noreferrer">
+              {request?.topic?.label
+                ? _truncate(request?.topic?.label, {
+                    length: 350,
+                  })
+                : i18next.t("Request topic")}
             </a>
           </List.Content>
         </List.Item>

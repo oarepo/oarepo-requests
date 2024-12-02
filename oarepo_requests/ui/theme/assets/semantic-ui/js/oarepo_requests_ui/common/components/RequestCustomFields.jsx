@@ -1,11 +1,7 @@
 import React from "react";
-import { Grid, List, Form, Divider } from "semantic-ui-react";
+import { Grid, Form, Divider } from "semantic-ui-react";
 import { CustomFields } from "react-invenio-forms";
-import {
-  ReadOnlyCustomFields,
-  REQUEST_TYPE,
-  REQUEST_MODAL_TYPE,
-} from "@js/oarepo_requests_common";
+import { REQUEST_TYPE, REQUEST_MODAL_TYPE } from "@js/oarepo_requests_common";
 import PropTypes from "prop-types";
 
 export const RequestCustomFields = ({
@@ -36,6 +32,21 @@ export const RequestCustomFields = ({
     })
     .flat();
 
+  const readOnlyCustomFieldsConfig = customFields?.ui.map((section) => {
+    const { fields } = section;
+    const fieldsWithReadOnlyWidget = fields.map((field) => {
+      const { read_only_ui_widget } = field;
+      return {
+        ...field,
+        ui_widget: read_only_ui_widget,
+      };
+    });
+    return {
+      ...section,
+      fields: fieldsWithReadOnlyWidget,
+    };
+  });
+
   const renderReadOnlyData =
     customFieldsType === REQUEST_MODAL_TYPE.READ_ONLY &&
     Object.keys(request?.payload || {}).some((key) =>
@@ -46,41 +57,35 @@ export const RequestCustomFields = ({
     <Grid.Row>
       <Grid.Column width={columnWidth}>
         {renderSubmitForm && !request.is_closed && (
-          <Form className="requests-form-cf">
-            <CustomFields
-              config={customFields?.ui}
-              templateLoaders={[
-                (widget) => import(`@templates/custom_fields/${widget}.js`),
-                () => import(`react-invenio-forms`),
-              ]}
-              fieldPathPrefix="payload"
-            />
-            <Divider hidden />
+          <Form>
+            <div className="requests-form-cf">
+              <CustomFields
+                config={customFields?.ui}
+                templateLoaders={[
+                  (widget) => import(`@templates/custom_fields/${widget}.js`),
+                  () => import(`react-invenio-forms`),
+                ]}
+                fieldPathPrefix="payload"
+              />
+              <Divider hidden />
+            </div>
           </Form>
         )}
 
         {renderReadOnlyData && (
-          <List relaxed>
-            {Object.keys(request.payload).map((key) => (
-              <List.Item key={key}>
-                <List.Content>
-                  <List.Header>{key}</List.Header>
-                  <ReadOnlyCustomFields
-                    className="requests-form-cf"
-                    config={customFields?.ui}
-                    data={{ [key]: request.payload[key] }}
-                    templateLoaders={[
-                      (widget) =>
-                        import(
-                          `@js/oarepo_requests_common/widgets/${widget}.jsx`
-                        ),
-                      () => import(`react-invenio-forms`),
-                    ]}
-                  />
-                </List.Content>
-              </List.Item>
-            ))}
-          </List>
+          <div className="requests-form-cf">
+            <CustomFields
+              config={readOnlyCustomFieldsConfig}
+              templateLoaders={[
+                (widget) => import(`@templates/custom_fields/${widget}.js`),
+                (widget) =>
+                  import(
+                    `@js/oarepo_requests_common/components/DefaultView.jsx`
+                  ),
+              ]}
+              fieldPathPrefix="payload"
+            />
+          </div>
         )}
       </Grid.Column>
     </Grid.Row>
