@@ -13,7 +13,7 @@ from thesis.records.api import ThesisDraft, ThesisRecord
 
 from oarepo_requests.resolvers.ui import FallbackEntityReferenceUIResolver
 
-from .utils import is_valid_subdict, link_api2testclient
+from .utils import link_api2testclient
 
 
 def test_user_serialization(
@@ -175,9 +175,9 @@ def test_resolver_fallback(
         expected_result = ui_serialization_result(
             draft_id, ui_record["expanded"]["requests"][0]["id"]
         )
-        expected_result["created_by"]["label"] = (
-            f"id: {creator.id}"  # the user resolver uses name or email as label, the fallback doesn't know what to use
-        )
+        expected_result["created_by"][
+            "label"
+        ] = f"id: {creator.id}"  # the user resolver uses name or email as label, the fallback doesn't know what to use
         expected_created_by = {**expected_result["created_by"]}
         actual_created_by = {**ui_record["expanded"]["requests"][0]["created_by"]}
 
@@ -253,3 +253,33 @@ def test_role(
         assert ui_record["expanded"]["requests"][0]["receiver"] == role_ui_serialization
     finally:
         app.config["OAREPO_REQUESTS_DEFAULT_RECEIVER"] = config_restore
+
+
+def test_auto_approve(
+    vocab_cf,
+    logged_client,
+    users,
+    urls,
+    new_version_data_function,
+    record_factory,
+    search_clear,
+):
+    creator = users[0]
+    creator_client = logged_client(creator)
+
+    record1 = record_factory(creator.identity)
+
+    resp_request_create = creator_client.post(
+        urls["BASE_URL_REQUESTS"],
+        json=new_version_data_function(record1["id"]),
+    )
+    resp_request_submit = creator_client.post(
+        link_api2testclient(resp_request_create.json["links"]["actions"]["submit"]),
+    )
+    # is request accepted and closed?
+    request_json = creator_client.get(
+        f'{urls["BASE_URL_REQUESTS"]}{resp_request_create.json["id"]}',
+        headers={"Accept": "application/vnd.inveniordm.v1+json"},
+    ).json
+
+    assert request_json["receiver"]["label"] == "Auto approve"
