@@ -735,7 +735,9 @@ msgstr "Automaticky schváleno"
 msgid ""
 "Missing uploaded files. To disable files for this record please mark it as "
 "metadata-only."
-msgstr "Chybí nahrané soubory. Označte záznam jako 'pouze metadata' pokud je nahrávat neplánujete."
+msgstr ""
+"Chybí nahrané soubory. Označte záznam jako 'pouze metadata' pokud je "
+"nahrávat neplánujete."
 
 #: /home/ron/prace/oarepo-requests/oarepo_requests/types/publish_draft.py:124
 msgid "Missing uploaded files."
