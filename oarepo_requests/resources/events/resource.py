@@ -80,6 +80,7 @@ class OARepoRequestsCommentsResource(RequestCommentsResource, ErrorHandlersMixin
         return super().search()
 
 
+    # list args parser in invenio parses request_id input through UUID instead of Str; does this have any relevance for us?
     @item_view_args_parser
     @request_extra_args
     @data_parser
