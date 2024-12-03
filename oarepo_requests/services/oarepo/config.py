@@ -63,12 +63,13 @@ class RequestEntityLinks(Link):
         res = {}
         res.update(self._resolve(obj, context)["links"])
 
-        if hasattr(obj.type, "extra_request_links"):
+        if hasattr(obj.type, "extra_entity_links"):
             entity = self._resolve(obj, context)
             res.update(
                 obj.type.extra_entity_links(
                     request=obj,
-                    **(context | {"cur_entity": entity, "entity_type": self._entity}),
+                    entity=entity,
+                    entity_type=self._entity
                 )
             )
 

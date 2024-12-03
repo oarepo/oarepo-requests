@@ -9,7 +9,7 @@ from flask import current_app
 from thesis.ext import ThesisExt
 from thesis.records.api import ThesisDraft, ThesisRecord
 
-from tests.test_requests.utils import link_api2testclient
+from tests.test_requests.utils import link2testclient
 
 
 def test_allowed_request_types_on_draft_service(
@@ -79,7 +79,7 @@ def test_allowed_request_types_on_draft_resource(
         == f'https://127.0.0.1:5000/api/thesis/{draft1.json["id"]}/draft/requests/applicable'
     )
     allowed_request_types = creator_client.get(
-        link_api2testclient(applicable_requests_link)
+        link2testclient(applicable_requests_link)
     )
     assert sorted(
         allowed_request_types.json["hits"]["hits"], key=lambda x: x["type_id"]
@@ -106,34 +106,32 @@ def test_allowed_request_types_on_draft_resource(
 def publish_record(
     creator_client, urls, publish_request_data_function, draft1, receiver_client
 ):
+    id_ = draft1.json["id"]
     resp_request_create = creator_client.post(
         urls["BASE_URL_REQUESTS"],
         json=publish_request_data_function(draft1.json["id"]),
     )
 
     resp_request_submit = creator_client.post(
-        link_api2testclient(resp_request_create.json["links"]["actions"]["submit"]),
+        link2testclient(resp_request_create.json["links"]["actions"]["submit"]),
     )
     ThesisRecord.index.refresh()
     ThesisDraft.index.refresh()
 
     record = receiver_client.get(
-        f"{urls['BASE_URL']}{draft1.json['id']}/draft?expand=true"
+        f"{urls['BASE_URL']}{id_}/draft?expand=true"
     )
+
     assert record.json["expanded"]["requests"][0]["links"]["actions"].keys() == {
         "accept",
         "decline",
     }
     publish = receiver_client.post(
-        link_api2testclient(
+        link2testclient(
             record.json["expanded"]["requests"][0]["links"]["actions"]["accept"]
         ),
     )
-
-    ThesisRecord.index.refresh()
-    ThesisDraft.index.refresh()
-    lst = creator_client.get(urls["BASE_URL"])
-    return lst.json["hits"]["hits"][0]
+    return creator_client.get(f"{urls['BASE_URL']}{id_}?expand=true").json
 
 
 def test_allowed_request_types_on_published_resource(
@@ -162,7 +160,7 @@ def test_allowed_request_types_on_published_resource(
         == f'https://127.0.0.1:5000/api/thesis/{published1["id"]}/requests/applicable'
     )
     allowed_request_types = creator_client.get(
-        link_api2testclient(applicable_requests_link)
+        link2testclient(applicable_requests_link)
     )
     assert allowed_request_types.status_code == 200
     assert sorted(
@@ -227,12 +225,12 @@ def test_ui_serialization(
     applicable_requests_link_published = published1["links"]["applicable-requests"]
 
     allowed_request_types_draft = creator_client.get(
-        link_api2testclient(applicable_requests_link_draft),
+        link2testclient(applicable_requests_link_draft),
         headers={"Accept": "application/vnd.inveniordm.v1+json"},
     )
 
     allowed_request_types_published = creator_client.get(
-        link_api2testclient(applicable_requests_link_published),
+        link2testclient(applicable_requests_link_published),
         headers={"Accept": "application/vnd.inveniordm.v1+json"},
     )
 

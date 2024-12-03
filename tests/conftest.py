@@ -65,7 +65,7 @@ from oarepo_requests.services.permissions.workflow_policies import (
 )
 from oarepo_requests.types import ModelRefTypes, NonDuplicableOARepoRequestType
 from oarepo_requests.types.events.topic_update import TopicUpdateEventType
-from tests.test_requests.utils import link_api2testclient
+from tests.test_requests.utils import link2testclient
 
 can_comment_only_receiver = [
     Receiver(),
@@ -802,9 +802,9 @@ def get_request_link(get_request_type):
 def create_request_by_link(get_request_link):
     def _create_request(client, record, request_type):
         applicable_requests = client.get(
-            link_api2testclient(record.json["links"]["applicable-requests"])
+            link2testclient(record.json["links"]["applicable-requests"])
         ).json["hits"]["hits"]
-        create_link = link_api2testclient(
+        create_link = link2testclient(
             get_request_link(applicable_requests, request_type)
         )
         create_response = client.post(create_link)
@@ -818,7 +818,7 @@ def submit_request_by_link(create_request_by_link):
     def _submit_request(client, record, request_type):
         create_response = create_request_by_link(client, record, request_type)
         submit_response = client.post(
-            link_api2testclient(create_response.json["links"]["actions"]["submit"])
+            link2testclient(create_response.json["links"]["actions"]["submit"])
         )
         return submit_response
 

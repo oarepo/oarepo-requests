@@ -36,7 +36,7 @@ class DeleteDraftRequestType(NonDuplicableOARepoRequestType):
 
     dangerous = True
 
-    def accept_redirect_url(self, request, context, **kwargs):
+    def accept_redirect_url(self, request: Request, context: dict, **kwargs):
         topic_cls = request.topic.record_cls
         service = get_record_service_for_record_class(topic_cls)
         return service.config.links_search["self_html"].expand(None, context)

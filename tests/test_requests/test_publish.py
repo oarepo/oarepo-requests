@@ -9,7 +9,7 @@ import copy
 
 from thesis.records.api import ThesisDraft, ThesisRecord
 
-from .utils import link_api2testclient
+from .utils import link2testclient
 
 
 def test_publish_service(users, record_service, default_workflow_json, search_clear):
@@ -81,7 +81,7 @@ def test_publish(
     )
 
     resp_request_submit = creator_client.post(
-        link_api2testclient(resp_request_create.json["links"]["actions"]["submit"]),
+        link2testclient(resp_request_create.json["links"]["actions"]["submit"]),
     )
     ThesisRecord.index.refresh()
     ThesisDraft.index.refresh()
@@ -94,7 +94,7 @@ def test_publish(
         "decline",
     }
     publish = receiver_client.post(
-        link_api2testclient(
+        link2testclient(
             record.json["expanded"]["requests"][0]["links"]["actions"]["accept"]
         ),
     )
@@ -120,13 +120,13 @@ def test_publish(
         json=publish_request_data_function(draft2.json["id"]),
     )
     resp_request_submit = creator_client.post(
-        link_api2testclient(resp_request_create.json["links"]["actions"]["submit"]),
+        link2testclient(resp_request_create.json["links"]["actions"]["submit"]),
     )
     record = receiver_client.get(
         f"{urls['BASE_URL']}{draft2.json['id']}/draft?expand=true"
     )
     decline = receiver_client.post(
-        link_api2testclient(
+        link2testclient(
             record.json["expanded"]["requests"][0]["links"]["actions"]["decline"]
         ),
     )
@@ -141,7 +141,7 @@ def test_publish(
         json=publish_request_data_function(draft3.json["id"]),
     )
     resp_request_submit = creator_client.post(
-        link_api2testclient(resp_request_create.json["links"]["actions"]["submit"]),
+        link2testclient(resp_request_create.json["links"]["actions"]["submit"]),
     )
     record = creator_client.get(
         f"{urls['BASE_URL']}{draft3.json['id']}/draft?expand=true"
@@ -150,7 +150,7 @@ def test_publish(
         "cancel"
     }
     cancel = creator_client.post(
-        link_api2testclient(
+        link2testclient(
             record.json["expanded"]["requests"][0]["links"]["actions"]["cancel"]
         ),
     )

@@ -8,7 +8,7 @@
 
 from thesis.records.api import ThesisDraft, ThesisRecord
 
-from tests.test_requests.utils import link_api2testclient
+from tests.test_requests.utils import link2testclient
 
 
 def test_new_version_autoaccept(
@@ -35,7 +35,7 @@ def test_new_version_autoaccept(
         json=new_version_data_function(record1["id"]),
     )
     resp_request_submit = creator_client.post(
-        link_api2testclient(resp_request_create.json["links"]["actions"]["submit"]),
+        link2testclient(resp_request_create.json["links"]["actions"]["submit"]),
     )
     # is request accepted and closed?
     request = creator_client.get(
@@ -90,10 +90,10 @@ def test_new_version_files(
     )
 
     resp_request_submit1 = creator_client.post(
-        link_api2testclient(resp_request_create1.json["links"]["actions"]["submit"]),
+        link2testclient(resp_request_create1.json["links"]["actions"]["submit"]),
     )
     resp_request_submit2 = creator_client.post(
-        link_api2testclient(resp_request_create2.json["links"]["actions"]["submit"]),
+        link2testclient(resp_request_create2.json["links"]["actions"]["submit"]),
     )
 
     ThesisDraft.index.refresh()
@@ -143,7 +143,7 @@ def test_redirect_url(
         json=new_version_data_function(record1["id"]),
     )
     resp_request_submit = creator_client.post(
-        link_api2testclient(resp_request_create.json["links"]["actions"]["submit"]),
+        link2testclient(resp_request_create.json["links"]["actions"]["submit"]),
     )
     # is request accepted and closed?
 

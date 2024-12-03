@@ -8,7 +8,7 @@
 from invenio_requests.records.api import RequestEvent
 
 from tests.test_requests.test_create_inmodel import pick_request_type
-from tests.test_requests.utils import link_api2testclient
+from tests.test_requests.utils import link2testclient
 
 
 def test_timeline(
@@ -25,7 +25,7 @@ def test_timeline(
     creator_client = logged_client(creator)
 
     draft1 = create_draft_via_resource(creator_client)
-    link = link_api2testclient(
+    link = link2testclient(
         pick_request_type(draft1.json["expanded"]["request_types"], "publish_draft")[
             "links"
         ]["actions"]["create"]
@@ -35,26 +35,26 @@ def test_timeline(
     assert publish_request_resp.status_code == 201
 
     publish_request_submit_resp = creator_client.post(
-        link_api2testclient(publish_request_resp.json["links"]["actions"]["submit"]),
+        link2testclient(publish_request_resp.json["links"]["actions"]["submit"]),
     )
     assert publish_request_submit_resp.status_code == 200
 
     comment_resp = creator_client.post(
-        link_api2testclient(publish_request_resp.json["links"]["comments"]),
+        link2testclient(publish_request_resp.json["links"]["comments"]),
         json={"payload": {"content": "test"}},
     )
     assert comment_resp.status_code == 201
     RequestEvent.index.refresh()
 
     timeline_resp = creator_client.get(
-        link_api2testclient(publish_request_resp.json["links"]["timeline"]),
+        link2testclient(publish_request_resp.json["links"]["timeline"]),
     )
     assert timeline_resp.status_code == 200
     assert len(timeline_resp.json["hits"]["hits"]) == 1
 
     # vnd serialization
     timeline_resp = creator_client.get(
-        link_api2testclient(publish_request_resp.json["links"]["timeline"]),
+        link2testclient(publish_request_resp.json["links"]["timeline"]),
         headers={"Accept": "application/vnd.inveniordm.v1+json"},
     )
     assert timeline_resp.status_code == 200

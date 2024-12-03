@@ -7,7 +7,7 @@
 #
 from thesis.records.api import ThesisDraft, ThesisRecord
 
-from .utils import link_api2testclient
+from .utils import link2testclient
 
 
 def test_delete(
@@ -37,7 +37,7 @@ def test_delete(
         json=delete_record_data_function(record1["id"]),
     )
     resp_request_submit = creator_client.post(
-        link_api2testclient(resp_request_create.json["links"]["actions"]["submit"]),
+        link2testclient(resp_request_create.json["links"]["actions"]["submit"]),
     )
 
     record = receiver_client.get(f"{urls['BASE_URL']}{record1['id']}?expand=true")
@@ -46,13 +46,13 @@ def test_delete(
         "decline",
     }
     delete = receiver_client.post(
-        link_api2testclient(
+        link2testclient(
             record.json["expanded"]["requests"][0]["links"]["actions"]["accept"]
         ),
     )
     assert (
-        link_api2testclient(delete.json["links"]["redirect_urls"]["accept"])
-        == "/thesis/"
+            link2testclient(delete.json["links"]["redirect_urls"]["accept"], ui=True)
+            == "/thesis/"
     )
 
     ThesisRecord.index.refresh()
@@ -65,11 +65,11 @@ def test_delete(
         json=delete_record_data_function(record2["id"]),
     )
     resp_request_submit = creator_client.post(
-        link_api2testclient(resp_request_create.json["links"]["actions"]["submit"]),
+        link2testclient(resp_request_create.json["links"]["actions"]["submit"]),
     )
     record = receiver_client.get(f"{urls['BASE_URL']}{record2['id']}?expand=true")
     decline = receiver_client.post(
-        link_api2testclient(
+        link2testclient(
             record.json["expanded"]["requests"][0]["links"]["actions"]["decline"]
         )
     )
@@ -83,14 +83,14 @@ def test_delete(
         json=delete_record_data_function(record3["id"]),
     )
     resp_request_submit = creator_client.post(
-        link_api2testclient(resp_request_create.json["links"]["actions"]["submit"]),
+        link2testclient(resp_request_create.json["links"]["actions"]["submit"]),
     )
     record = creator_client.get(f"{urls['BASE_URL']}{record3['id']}?expand=true")
     assert record.json["expanded"]["requests"][0]["links"]["actions"].keys() == {
         "cancel"
     }
     cancel = creator_client.post(
-        link_api2testclient(
+        link2testclient(
             record.json["expanded"]["requests"][0]["links"]["actions"]["cancel"]
         ),
     )
@@ -119,12 +119,12 @@ def test_delete_draft(
     assert read.status_code == 200
 
     resp_request_create = creator_client.post(
-        link_api2testclient(
+        link2testclient(
             get_request_link(read.json["expanded"]["request_types"], "delete_draft")
         )
     )
     resp_request_submit = creator_client.post(
-        link_api2testclient(resp_request_create.json["links"]["actions"]["submit"]),
+        link2testclient(resp_request_create.json["links"]["actions"]["submit"]),
     )
 
     read_deleted = creator_client.get(f"{urls['BASE_URL']}{draft_id}/draft?expand=true")
@@ -134,7 +134,7 @@ def test_delete_draft(
     assert request_after.json["status"] == "accepted"
     assert request_after.json["is_closed"]
     assert (
-        link_api2testclient(request_after.json["links"]["redirect_urls"]["accept"])
-        == "/thesis/"
+            link2testclient(request_after.json["links"]["redirect_urls"]["accept"], ui=True)
+            == "/thesis/"
     )
     assert read_deleted.status_code == 404

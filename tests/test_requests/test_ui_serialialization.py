@@ -13,7 +13,7 @@ from thesis.records.api import ThesisDraft, ThesisRecord
 
 from oarepo_requests.resolvers.ui import FallbackEntityReferenceUIResolver
 
-from .utils import link_api2testclient
+from .utils import link2testclient
 
 
 def test_user_serialization(
@@ -62,7 +62,7 @@ def test_user_serialization(
     )
 
     resp_request_submit = client_fallback_label.post(
-        link_api2testclient(resp_request_create.json["links"]["actions"]["submit"]),
+        link2testclient(resp_request_create.json["links"]["actions"]["submit"]),
         headers={"Accept": "application/vnd.inveniordm.v1+json"},
     )
     pprint(resp_request_submit.json)
@@ -160,7 +160,7 @@ def test_resolver_fallback(
         )
 
         resp_request_submit = creator_client.post(
-            link_api2testclient(resp_request_create.json["links"]["actions"]["submit"]),
+            link2testclient(resp_request_create.json["links"]["actions"]["submit"]),
             headers={"Accept": "application/vnd.inveniordm.v1+json"},
         )
         assert resp_request_submit.json["stateful_name"] == "Submitted for review"
