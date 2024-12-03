@@ -223,6 +223,7 @@ def reference_to_tuple(reference: EntityReference) -> tuple[str, str]:
     """
     return next(iter(reference.items()))
 
+
 # TODO: consider moving to oarepo-workflows
 def get_receiver_for_request_type(
     request_type: RequestType, identity: Identity, topic: Record

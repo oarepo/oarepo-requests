@@ -7,6 +7,8 @@
 #
 """Configuration of the record requests resource."""
 
+from __future__ import annotations
+
 import marshmallow as ma
 from flask_resources import JSONSerializer, ResponseHandler
 from invenio_records_resources.resources import RecordResourceConfig

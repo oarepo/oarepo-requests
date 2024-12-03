@@ -548,6 +548,8 @@ class FallbackEntityReferenceUIResolver(OARepoUIResolver):
 
 
 class KeywordUIEntityResolver(OARepoUIResolver):
+    """UI resolver for keyword-like entities."""
+
     keyword = None
 
     @override
@@ -562,7 +564,7 @@ class KeywordUIEntityResolver(OARepoUIResolver):
     def _search_many(
         self, identity: Identity, ids: list[str], *args: Any, **kwargs: Any
     ) -> list[dict]:
-        """Returns list of references of keyword entities.
+        """Return list of references of keyword entities.
 
         :param identity:    identity of the user
         :param ids:         ids to search for
@@ -576,7 +578,7 @@ class KeywordUIEntityResolver(OARepoUIResolver):
     def _search_one(
         self, identity: Identity, _id: str, *args: Any, **kwargs: Any
     ) -> dict | None:
-        """Returns keyword entity reference.
+        """Return keyword entity reference.
 
         :param identity:    identity of the user
         :param _id:         the keyword value
@@ -586,6 +588,8 @@ class KeywordUIEntityResolver(OARepoUIResolver):
 
 
 class AutoApproveUIEntityResolver(KeywordUIEntityResolver):
+    """UI resolver for auto approve entities."""
+
     keyword = "auto_approve"
 
     @override
@@ -598,7 +602,6 @@ class AutoApproveUIEntityResolver(KeywordUIEntityResolver):
         :reference:     reference to the entity
         :return:        UI representation of the entity
         """
-
         return UIResolvedReference(
             reference=reference,
             type=self.keyword,

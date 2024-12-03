@@ -7,6 +7,8 @@
 #
 """Resource for request events/comments that lives on the extended url."""
 
+from __future__ import annotations
+
 from flask_resources import route
 from invenio_records_resources.resources.errors import ErrorHandlersMixin
 from invenio_requests.resources.events.resource import RequestCommentsResource

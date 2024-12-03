@@ -30,34 +30,38 @@ if TYPE_CHECKING:
     from invenio_requests.customizations import RequestType
     from invenio_requests.customizations.actions import RequestAction
 
+
 class PublishMixin:
     """Mixin for publish actions."""
 
     def can_execute(self: RequestAction) -> bool:
         """Check if the action can be executed."""
-        if not super().can_execute():       # type: ignore
+        if not super().can_execute():  # type: ignore
             return False
 
         try:
             from ..types.publish_draft import PublishDraftRequestType
+
             topic = self.request.topic.resolve()
             PublishDraftRequestType.validate_topic(system_identity, topic)
             return True
-        except: # noqa E722: used for displaying buttons, so ignore errors here
+        except:  # noqa E722: used for displaying buttons, so ignore errors here
             return False
+
 
 class PublishDraftSubmitAction(PublishMixin, OARepoSubmitAction):
     """Submit action for publishing draft requests."""
 
 
-class PublishDraftAcceptAction(PublishMixin, AddTopicLinksOnPayloadMixin, OARepoAcceptAction):
+class PublishDraftAcceptAction(
+    PublishMixin, AddTopicLinksOnPayloadMixin, OARepoAcceptAction
+):
     """Accept action for publishing draft requests."""
 
     self_link = "published_record:links:self"
     self_html_link = "published_record:links:self_html"
 
     name = _("Publish")
-
 
     def apply(
         self,
