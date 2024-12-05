@@ -50,7 +50,7 @@ class NewVersionRequestType(NonDuplicableOARepoRequestType):
         "keep_files": ma.fields.String(validate=OneOf(["true", "false"])),
     }
 
-    def extra_entity_links(self, request, entity, entity_type: str, **kwargs):
+    def extra_entity_links(self, request: Request, entity: dict, entity_type: str, **kwargs) -> dict:
         if request.status == "accepted" and entity_type == "topic":
             return {"topic_redirect_link": entity["links"]["edit_html"]}
         else:
