@@ -11,7 +11,9 @@ import {
   QueryClient,
   QueryClientProvider,
 } from "@tanstack/react-query";
-import { http } from "@js/oarepo_ui";
+import { httpVnd } from "@js/oarepo_ui";
+import { OverridableContext, overrideStore } from "react-overridable";
+const overriddenComponents = overrideStore.getAll();
 
 export const requestButtonsDefaultIconConfig = {
   delete_published_record: { icon: "trash", labelPosition: "left" },
@@ -41,7 +43,7 @@ const RecordRequests = ({
     isFetching: applicableRequestTypesLoading,
   } = useQuery(
     ["applicableRequestTypes"],
-    () => http.get(initialRecord.links["applicable-requests"]),
+    () => httpVnd.get(initialRecord.links["applicable-requests"]),
     {
       enabled: !!initialRecord.links?.["applicable-requests"],
       refetchOnWindowFocus: false,
@@ -51,7 +53,7 @@ const RecordRequests = ({
     data: recordRequests,
     error: requestsLoadingError,
     isFetching: requestsLoading,
-  } = useQuery(["requests"], () => http.get(initialRecord.links?.requests), {
+  } = useQuery(["requests"], () => httpVnd.get(initialRecord.links?.requests), {
     enabled: !!initialRecord.links?.requests,
     refetchOnWindowFocus: false,
   });
@@ -115,16 +117,18 @@ const RecordRequestsWithQueryClient = ({
   requestButtonsIconsConfig,
 }) => {
   return (
-    <QueryClientProvider client={queryClient}>
-      <RecordRequests
-        record={initialRecord}
-        ContainerComponent={ContainerComponent}
-        onBeforeAction={onBeforeAction}
-        onAfterAction={onAfterAction}
-        onActionError={onActionError}
-        requestButtonsIconsConfig={requestButtonsIconsConfig}
-      />
-    </QueryClientProvider>
+    <OverridableContext.Provider value={overriddenComponents}>
+      <QueryClientProvider client={queryClient}>
+        <RecordRequests
+          record={initialRecord}
+          ContainerComponent={ContainerComponent}
+          onBeforeAction={onBeforeAction}
+          onAfterAction={onAfterAction}
+          onActionError={onActionError}
+          requestButtonsIconsConfig={requestButtonsIconsConfig}
+        />
+      </QueryClientProvider>
+    </OverridableContext.Provider>
   );
 };
 

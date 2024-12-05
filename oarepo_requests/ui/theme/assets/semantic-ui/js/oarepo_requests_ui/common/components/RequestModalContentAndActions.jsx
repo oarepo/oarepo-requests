@@ -12,8 +12,7 @@ import { useFormikContext } from "formik";
 import { mapLinksToActions } from "@js/oarepo_requests_common";
 import PropTypes from "prop-types";
 import { useQuery, useIsMutating } from "@tanstack/react-query";
-// TODO: remove when /configs starts using vnd zenodo accept header
-import { http } from "react-invenio-forms";
+import { httpApplicationJson } from "@js/oarepo_ui";
 
 export const RequestModalContentAndActions = ({
   request,
@@ -33,7 +32,9 @@ export const RequestModalContentAndActions = ({
   } = useQuery(
     ["applicableCustomFields", requestType?.type_id || request?.type],
     () =>
-      http.get(`/requests/configs/${requestType?.type_id || request?.type}`),
+      httpApplicationJson.get(
+        `/requests/configs/${requestType?.type_id || request?.type}`
+      ),
     {
       enabled: !!(requestType?.type_id || request?.type),
       refetchOnWindowFocus: false,
@@ -41,6 +42,9 @@ export const RequestModalContentAndActions = ({
     }
   );
   const customFields = data?.data?.custom_fields;
+  const allowedHtmlAttrs = data?.data?.allowedHtmlAttrs;
+  const allowedHtmlTags = data?.data?.allowedHtmlTags;
+
   const requestTypeProperties = data?.data?.request_type_properties;
   const isMutating = useIsMutating();
   const modalActions = mapLinksToActions(
@@ -73,6 +77,8 @@ export const RequestModalContentAndActions = ({
           onCompletedAction={onSubmit}
           customFields={customFields}
           modalActions={modalActions}
+          allowedHtmlAttrs={allowedHtmlAttrs}
+          allowedHtmlTags={allowedHtmlTags}
         />
       </Modal.Content>
       <Modal.Actions>

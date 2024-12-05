@@ -28,9 +28,14 @@ export const RequestActionButton = ({
     formik,
     modalControl,
   });
+
   const handleClick = () => {
     if (requireConfirmation) {
-      confirmAction(() => requestAction(), requestActionName, extraData);
+      confirmAction(
+        (value) => requestAction(value),
+        requestActionName,
+        extraData
+      );
     } else {
       requestAction();
     }

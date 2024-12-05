@@ -1,46 +1,64 @@
 import React from "react";
-import { i18next } from "@translations/oarepo_requests_ui/i18next";
-import { FormField } from "semantic-ui-react";
-import { RichInputField, FieldLabel, RichEditor } from "react-invenio-forms";
-import { useFormikContext } from "formik";
+import { RichEditor } from "react-invenio-forms";
 import sanitizeHtml from "sanitize-html";
 import PropTypes from "prop-types";
+import { useQuery } from "@tanstack/react-query";
+import { httpApplicationJson } from "@js/oarepo_ui";
 
-export const RequestCommentInput = ({ fieldPath, label }) => {
-  const { values, setFieldValue, setFieldTouched } = useFormikContext();
+export const RequestCommentInput = ({
+  comment,
+  handleChange,
+  initialValue,
+}) => {
+  // when focused move the cursor at the end of any existing content
+  const handleFocus = (event, editor) => {
+    editor.selection.select(editor.getBody(), true);
+    editor.selection.collapse(false);
+  };
+
+  // TODO: there is no appropriate URL to call here. I think this one is the safest, because we know it exists and it does
+  // not rely on external library (like those that contain /me that are from dashboard). To be discussed how to handle this appropriately.
+  // maybe some link that lives in oarepo ui and that can universaly provide allowed tags and attributes
+  const { data } = useQuery(
+    ["allowedHtmlTagsAttrs"],
+    () => httpApplicationJson.get(`/requests/configs/publish_draft`),
+    {
+      refetchOnWindowFocus: false,
+      staleTime: Infinity,
+    }
+  );
+
+  const allowedHtmlAttrs = data?.data?.allowedHtmlAttrs;
+  const allowedHtmlTags = data?.data?.allowedHtmlTags;
   return (
-    <FormField>
-      <RichInputField
-        fieldPath={fieldPath}
-        label={
-          <FieldLabel htmlFor={fieldPath} label={label} className="rel-mb-25" />
-        }
-        optimized="true"
-        placeholder={i18next.t("Your comment here...")}
-        editor={
-          <RichEditor
-            initialValue={values?.payload?.content}
-            inputValue={() => values?.payload?.content}
-            optimized
-            editorConfig={{ auto_focus: true, min_height: 130 }}
-            onBlur={(event, editor) => {
-              const cleanedContent = sanitizeHtml(editor.getContent());
-              setFieldValue(fieldPath, cleanedContent);
-              setFieldTouched(fieldPath, true);
-            }}
-          />
-        }
-      />
-    </FormField>
+    <RichEditor
+      initialValue={initialValue}
+      inputValue={comment}
+      editorConfig={{
+        auto_focus: true,
+        min_height: 100,
+        toolbar:
+          "blocks | bold italic | bullist numlist | outdent indent | undo redo",
+      }}
+      onEditorChange={(event, editor) => {
+        const cleanedContent = sanitizeHtml(editor.getContent(), {
+          allowedTags: allowedHtmlTags,
+          allowedAttributes: allowedHtmlAttrs,
+        });
+
+        handleChange(event, cleanedContent);
+      }}
+      onFocus={handleFocus}
+    />
   );
 };
 
 RequestCommentInput.propTypes = {
-  fieldPath: PropTypes.string,
-  label: PropTypes.string,
+  comment: PropTypes.string,
+  handleChange: PropTypes.func,
+  initialValue: PropTypes.string,
 };
 
 RequestCommentInput.defaultProps = {
-  fieldPath: "payload.content",
-  label: i18next.t("Comment"),
+  initialValue: "",
 };

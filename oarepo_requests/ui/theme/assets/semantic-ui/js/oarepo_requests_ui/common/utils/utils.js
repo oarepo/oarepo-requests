@@ -1,5 +1,5 @@
 import _isEmpty from "lodash/isEmpty";
-import { http } from "@js/oarepo_ui";
+import { httpVnd } from "@js/oarepo_ui";
 import _set from "lodash/set";
 import _has from "lodash/has";
 import { i18next } from "@translations/oarepo_requests_ui/i18next";
@@ -34,29 +34,33 @@ export const getRequestStatusIcon = (requestStatus) => {
       return { name: "hourglass end", color: "orange" };
     case "deleted":
       return { name: "thrash", color: "black" };
+    case "comment_deleted":
+      return { name: "eraser", color: "grey" };
     default:
       return null;
   }
 };
 
-export const getFeedMessage = (requestStatus, creatorLabel) => {
-  switch (requestStatus?.toLowerCase()) {
+export const getFeedMessage = (eventStatus) => {
+  switch (eventStatus?.toLowerCase()) {
     case "created":
-      return i18next.t("requestCreated", { creatorLabel });
+      return i18next.t("requestCreated");
     case "submitted":
-      return i18next.t("requestSubmitted", { creatorLabel });
+      return i18next.t("requestSubmitted");
     case "cancelled":
-      return i18next.t("requestCancelled", { creatorLabel });
+      return i18next.t("requestCancelled");
     case "accepted":
-      return i18next.t("requestAccepted", { creatorLabel });
+      return i18next.t("requestAccepted");
     case "declined":
-      return i18next.t("requestDeclined", { creatorLabel });
+      return i18next.t("requestDeclined");
     case "expired":
       return i18next.t("Request expired.");
     case "deleted":
-      return i18next.t("requestDeleted", { creatorLabel });
+      return i18next.t("requestDeleted");
+    case "comment_deleted":
+      return i18next.t("deleted comment");
     default:
-      return i18next.t("requestCommented", { creatorLabel });
+      return i18next.t("requestCommented");
   }
 };
 
@@ -83,7 +87,7 @@ export const serializeCustomFields = (formData) => {
 
 export const saveAndSubmit = async (request, formValues) => {
   const response = await createOrSave(request, formValues);
-  const submittedRequest = await http.post(
+  const submittedRequest = await httpVnd.post(
     response?.data?.links?.actions?.submit,
     {}
   );
@@ -93,31 +97,34 @@ export const saveAndSubmit = async (request, formValues) => {
 export const createOrSave = async (requestOrRequestType, formValues) => {
   const customFieldsData = serializeCustomFields(formValues);
   if (requestOrRequestType?.links?.actions?.create) {
-    return await http.post(
+    return await httpVnd.post(
       requestOrRequestType.links.actions.create,
       customFieldsData
     );
   } else {
-    return await http.put(requestOrRequestType?.links?.self, customFieldsData);
+    return await httpVnd.put(
+      requestOrRequestType?.links?.self,
+      customFieldsData
+    );
   }
 };
 
 export const accept = async (request, formData) => {
-  return await http.post(
+  return await httpVnd.post(
     request.links?.actions?.accept,
     serializeDataForInvenioApi(formData)
   );
 };
 
 export const decline = async (request, formData) => {
-  return await http.post(
+  return await httpVnd.post(
     request.links?.actions?.decline,
     serializeDataForInvenioApi(formData)
   );
 };
 
 export const cancel = async (request, formData) => {
-  return await http.post(
+  return await httpVnd.post(
     request.links?.actions?.cancel,
     serializeDataForInvenioApi(formData)
   );

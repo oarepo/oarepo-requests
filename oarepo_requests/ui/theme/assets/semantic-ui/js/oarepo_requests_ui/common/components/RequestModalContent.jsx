@@ -1,13 +1,13 @@
 import React from "react";
 import PropTypes from "prop-types";
 import { Grid } from "semantic-ui-react";
-import {} from "react-invenio-forms";
 import {
   SideRequestInfo,
   RequestCustomFields,
   Timeline,
 } from "@js/oarepo_requests_common";
 import { i18next } from "@translations/oarepo_requests_ui/i18next";
+import sanitizeHtml from "sanitize-html";
 
 /**
  * @typedef {import("../../record-requests/types").Request} Request
@@ -20,16 +20,24 @@ export const RequestModalContent = ({
   request,
   customFields,
   modalActions,
+  allowedHtmlAttrs,
+  allowedHtmlTags,
 }) => {
   /** @type {{requests: Request[], setRequests: (requests: Request[]) => void}} */
 
   const description = request?.stateful_description || request?.description;
+
+  const sanitizedDescription = sanitizeHtml(description, {
+    allowedTags: allowedHtmlTags,
+    allowedAttributes: allowedHtmlAttrs,
+  });
+
   return (
     <Grid doubling stackable>
       <Grid.Row>
         {description && (
           <Grid.Column as="p" id="request-modal-desc">
-            {description}{" "}
+            <span dangerouslySetInnerHTML={{ __html: sanitizedDescription }} />{" "}
             <a
               href={request?.links?.self_html}
               target="_blank"
@@ -63,4 +71,6 @@ RequestModalContent.propTypes = {
   request: PropTypes.object.isRequired,
   customFields: PropTypes.object,
   modalActions: PropTypes.array,
+  allowedHtmlAttrs: PropTypes.object,
+  allowedHtmlTags: PropTypes.array,
 };
