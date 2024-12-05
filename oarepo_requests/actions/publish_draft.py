@@ -23,6 +23,9 @@ from .generic import (
     OARepoDeclineAction,
     OARepoSubmitAction,
 )
+from invenio_notifications.services.uow import NotificationOp
+
+from ..services.notifications.builders.publish import PublishDraftRequestAcceptNotificationBuilder
 
 if TYPE_CHECKING:
     from flask_principal import Identity
@@ -82,6 +85,13 @@ class PublishDraftAcceptAction(PublishMixin, AddTopicLinksOnPayloadMixin, OARepo
             identity, id_, *args, uow=uow, expand=False, **kwargs
         )
         update_topic(self.request, topic, published_topic._record, uow)
+        uow.register(
+            NotificationOp(
+                PublishDraftRequestAcceptNotificationBuilder.build(
+                    request=self.request
+                )
+            )
+        )
         return super().apply(
             identity, request_type, published_topic, uow, *args, **kwargs
         )
