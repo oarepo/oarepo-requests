@@ -54,7 +54,11 @@ class RequestEntityLink(RequestLink):
         :param ctx: Context cache
         :return: The resolved entity
         """
-        reference_dict: dict = getattr(obj, self.entity).reference_dict
+        entity_field_value = getattr(obj, self.entity)
+        if not entity_field_value:
+            return {}
+
+        reference_dict: dict = entity_field_value.reference_dict
         key = "entity:" + ":".join(
             f"{x[0]}:{x[1]}" for x in sorted(reference_dict.items())
         )
