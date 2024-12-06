@@ -34,7 +34,7 @@ class RequestEntityLinks(Link):
         :param ctx: Context cache
         :return: The resolved entity
         """
-        entity_field_value = getattr(obj, self.entity)
+        entity_field_value = getattr(obj, self._entity)
         if not entity_field_value:
             return {}
 
