@@ -6,7 +6,7 @@
 # details.
 #
 from tests.test_requests.test_create_inmodel import pick_request_type
-from tests.test_requests.utils import link_api2testclient
+from tests.test_requests.utils import link2testclient
 
 
 def test_requests_field(
@@ -24,7 +24,7 @@ def test_requests_field(
     receiver_client = logged_client(receiver)
 
     draft1 = create_draft_via_resource(creator_client)
-    link = link_api2testclient(
+    link = link2testclient(
         pick_request_type(draft1.json["expanded"]["request_types"], "publish_draft")[
             "links"
         ]["actions"]["create"]
@@ -33,7 +33,7 @@ def test_requests_field(
     resp_request_create = creator_client.post(link)
     assert resp_request_create.status_code == 201
     resp_request_submit = creator_client.post(
-        link_api2testclient(resp_request_create.json["links"]["actions"]["submit"]),
+        link2testclient(resp_request_create.json["links"]["actions"]["submit"]),
     )
     record = receiver_client.get(f"{urls['BASE_URL']}{draft1.json['id']}/draft")
     expanded_record = receiver_client.get(
@@ -63,7 +63,7 @@ def test_autoaccept_receiver(
         json=edit_record_data_function(record1["id"]),
     )
     resp_request_submit = creator_client.post(
-        link_api2testclient(resp_request_create.json["links"]["actions"]["submit"]),
+        link2testclient(resp_request_create.json["links"]["actions"]["submit"]),
     )
     request = creator_client.get(
         f'{urls["BASE_URL_REQUESTS"]}{resp_request_create.json["id"]}?expand=true'

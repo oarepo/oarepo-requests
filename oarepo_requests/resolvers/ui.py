@@ -196,14 +196,10 @@ class OARepoUIResolver(abc.ABC):
         self, resolved_reference: dict
     ) -> dict[str, str]:
         """Extract links from a entity."""
-        links = {}
         entity_links = {}
         if "links" in resolved_reference:
             entity_links = resolved_reference["links"]
-        for link_type in ("self", "self_html"):
-            if link_type in entity_links:
-                links[link_type] = entity_links[link_type]
-        return links
+        return entity_links
 
 
 class GroupEntityReferenceUIResolver(OARepoUIResolver):
