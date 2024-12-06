@@ -275,7 +275,7 @@ def test_auto_approve(
         json=new_version_data_function(record1["id"]),
     )
     resp_request_submit = creator_client.post(
-        link_api2testclient(resp_request_create.json["links"]["actions"]["submit"]),
+        link2testclient(resp_request_create.json["links"]["actions"]["submit"]),
     )
     # is request accepted and closed?
     request_json = creator_client.get(
