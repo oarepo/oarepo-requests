@@ -451,7 +451,7 @@ def test_workflow_events_resource(
         json=approve_request_data,
     )
     resp_request_submit = user1_client.post(
-        link_api2testclient(resp_request_create.json["links"]["actions"]["submit"]),
+        link2testclient(resp_request_create.json["links"]["actions"]["submit"]),
     )
 
     read_from_record = user1_client.get(
@@ -474,7 +474,7 @@ def test_workflow_events_resource(
         f'{urls["BASE_URL"]}{record_id}/draft?expand=true'
     ).json
     accept = user2_client.post(
-        link_api2testclient(
+        link2testclient(
             record_receiver["expanded"]["requests"][0]["links"]["actions"]["accept"]
         ),
     )
