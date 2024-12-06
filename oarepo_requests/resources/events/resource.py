@@ -7,6 +7,8 @@
 #
 """Resource for request events/comments that lives on the extended url."""
 
+from __future__ import annotations
+
 from flask_resources import route
 from copy import deepcopy
 

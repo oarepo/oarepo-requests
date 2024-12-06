@@ -7,7 +7,9 @@
 #
 """Permissions for requests based on workflows."""
 
-from oarepo_workflows.requests.permissions import (  # this is for backward compatibility ...
+from __future__ import annotations
+
+from oarepo_workflows.requests.permissions import (
     CreatorsFromWorkflowRequestsPermissionPolicy,
 )
 from oarepo_workflows.services.permissions import DefaultWorkflowPermissions

@@ -17,8 +17,6 @@ import contextlib
 from typing import (
     TYPE_CHECKING,
     Any,
-    ContextManager,
-    Generator,
     override,
 )
 
@@ -28,6 +26,8 @@ from invenio_requests.errors import CannotExecuteActionError
 from oarepo_requests.services.permissions.identity import request_active
 
 if TYPE_CHECKING:
+    from collections.abc import Generator
+
     from flask_principal import Identity
     from invenio_records_resources.services.uow import UnitOfWork
     from invenio_requests.records.api import Request
@@ -52,7 +52,7 @@ class RequestActionComponent(abc.ABC):
         uow: UnitOfWork,
         *args: Any,
         **kwargs: Any,
-    ) -> ContextManager:
+    ) -> contextlib.AbstractContextManager:
         """Apply the component.
 
         Must return a context manager

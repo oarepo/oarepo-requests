@@ -7,6 +7,8 @@
 #
 """Resource configuration for events and comments."""
 
+from __future__ import annotations
+
 from flask_resources import ResponseHandler
 from invenio_records_resources.services.base.config import ConfiguratorMixin
 from invenio_requests.resources.events.config import RequestCommentsResourceConfig
