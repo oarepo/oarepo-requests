@@ -65,7 +65,9 @@ class RequestEntityLinks(Link):
     def expand(self, obj: Request, context: dict) -> dict:
         """Create the request links."""
         res = {}
-        res.update(self._resolve(obj, context)["links"])
+        resolved = self._resolve(obj, context)
+        if "links" in resolved:
+            res.update(resolved["links"])
 
         if hasattr(obj.type, "extra_entity_links"):
             entity = self._resolve(obj, context)
