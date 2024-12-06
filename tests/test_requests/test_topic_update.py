@@ -7,7 +7,7 @@
 #
 from thesis.records.api import ThesisDraft
 
-from .utils import link_api2testclient
+from .utils import link2testclient
 
 
 def test_publish(
@@ -32,13 +32,13 @@ def test_publish(
         json=publish_request_data_function(draft1.json["id"]),
     )
     resp_request_submit = creator_client.post(
-        link_api2testclient(resp_request_create.json["links"]["actions"]["submit"]),
+        link2testclient(resp_request_create.json["links"]["actions"]["submit"]),
     )
     record = receiver_client.get(
         f"{urls['BASE_URL']}{draft1.json['id']}/draft?expand=true"
     )
     publish = receiver_client.post(
-        link_api2testclient(
+        link2testclient(
             record.json["expanded"]["requests"][0]["links"]["actions"]["accept"]
         ),
     )
@@ -65,7 +65,7 @@ def test_edit(
         json=edit_record_data_function(record1["id"]),
     )
     resp_request_submit = creator_client.post(
-        link_api2testclient(resp_request_create.json["links"]["actions"]["submit"]),
+        link2testclient(resp_request_create.json["links"]["actions"]["submit"]),
     )
     # is request accepted and closed?
     request = creator_client.get(
@@ -95,7 +95,7 @@ def test_new_version(
         json=new_version_data_function(record1["id"]),
     )
     resp_request_submit = creator_client.post(
-        link_api2testclient(resp_request_create.json["links"]["actions"]["submit"]),
+        link2testclient(resp_request_create.json["links"]["actions"]["submit"]),
     )
     # is request accepted and closed?
     request = creator_client.get(

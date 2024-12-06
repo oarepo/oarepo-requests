@@ -5,7 +5,7 @@
 # modify it under the terms of the MIT License; see LICENSE file for more
 # details.
 #
-from tests.test_requests.utils import link_api2testclient
+from tests.test_requests.utils import link2testclient
 
 
 def _init(users, logged_client, create_draft_via_resource, submit_request, urls):
@@ -107,7 +107,7 @@ def test_open_param_interpreter(
 
     read = user2_client.get(f'{urls["BASE_URL"]}{draft1.json["id"]}/draft?expand=true')
     publish = user2_client.post(
-        link_api2testclient(
+        link2testclient(
             read.json["expanded"]["requests"][0]["links"]["actions"]["accept"]
         )
     )

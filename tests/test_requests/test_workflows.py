@@ -17,7 +17,7 @@ from oarepo_requests.services.permissions.workflow_policies import (
     CreatorsFromWorkflowRequestsPermissionPolicy,
 )
 from tests.conftest import TestEventType
-from tests.test_requests.utils import link_api2testclient
+from tests.test_requests.utils import link2testclient
 
 
 @unit_of_work()
@@ -108,7 +108,7 @@ def test_publish_with_workflows(
     assert resp_request_create.status_code == 201
 
     resp_request_submit = creator_client.post(
-        link_api2testclient(resp_request_create.json["links"]["actions"]["submit"]),
+        link2testclient(resp_request_create.json["links"]["actions"]["submit"]),
     )
     assert resp_request_submit.status_code == 200
 
@@ -131,7 +131,7 @@ def test_publish_with_workflows(
     ].keys()
 
     accept = receiver_client.post(
-        link_api2testclient(
+        link2testclient(
             record_receiver["expanded"]["requests"][0]["links"]["actions"]["accept"]
         ),
     )
@@ -170,7 +170,7 @@ def test_autorequest(
     )
     assert resp_request_create.status_code == 201
     resp_request_submit = creator_client.post(
-        link_api2testclient(resp_request_create.json["links"]["actions"]["submit"]),
+        link2testclient(resp_request_create.json["links"]["actions"]["submit"]),
     )
     approving_record = record_service.read_draft(creator.identity, record_id)._record
     assert resp_request_submit.status_code == 200
@@ -179,7 +179,7 @@ def test_autorequest(
         f'{urls["BASE_URL"]}{record_id}/draft?expand=true'
     ).json
     accept = receiver_client.post(
-        link_api2testclient(
+        link2testclient(
             record_receiver["expanded"]["requests"][0]["links"]["actions"]["accept"]
         ),
     )
@@ -220,7 +220,7 @@ def test_if_no_new_version_draft(
         json=new_version_data_function(id_),
     )
     resp_request_submit = creator_client.post(
-        link_api2testclient(resp_request_create.json["links"]["actions"]["submit"]),
+        link2testclient(resp_request_create.json["links"]["actions"]["submit"]),
     )
     request = creator_client.get(
         f'{urls["BASE_URL_REQUESTS"]}{resp_request_create.json["id"]}',
@@ -243,7 +243,7 @@ def test_if_no_new_version_draft(
         json=edit_record_data_function(id2_),
     )
     resp_request_submit = creator_client.post(
-        link_api2testclient(resp_request_create.json["links"]["actions"]["submit"]),
+        link2testclient(resp_request_create.json["links"]["actions"]["submit"]),
     )
     request = creator_client.get(
         f'{urls["BASE_URL_REQUESTS"]}{resp_request_create.json["id"]}',
@@ -288,7 +288,7 @@ def test_if_no_edit_draft(
         json=edit_record_data_function(id_),
     )
     resp_request_submit = creator_client.post(
-        link_api2testclient(resp_request_create.json["links"]["actions"]["submit"]),
+        link2testclient(resp_request_create.json["links"]["actions"]["submit"]),
     )
     request = creator_client.get(
         f'{urls["BASE_URL_REQUESTS"]}{resp_request_create.json["id"]}',
@@ -311,7 +311,7 @@ def test_if_no_edit_draft(
         json=new_version_data_function(id2_),
     )
     resp_request_submit = creator_client.post(
-        link_api2testclient(resp_request_create.json["links"]["actions"]["submit"]),
+        link2testclient(resp_request_create.json["links"]["actions"]["submit"]),
     )
     request = creator_client.get(
         f'{urls["BASE_URL_REQUESTS"]}{resp_request_create.json["id"]}',
@@ -358,7 +358,7 @@ def test_workflow_events(
         json=approve_request_data,
     )
     resp_request_submit = user1_client.post(
-        link_api2testclient(resp_request_create.json["links"]["actions"]["submit"]),
+        link2testclient(resp_request_create.json["links"]["actions"]["submit"]),
     )
 
     read_from_record = user1_client.get(
@@ -385,7 +385,7 @@ def test_workflow_events(
         f'{urls["BASE_URL"]}{record_id}/draft?expand=true'
     ).json
     accept = user2_client.post(
-        link_api2testclient(
+        link2testclient(
             record_receiver["expanded"]["requests"][0]["links"]["actions"]["accept"]
         ),
     )
@@ -451,7 +451,7 @@ def test_delete_log(
     )
 
     accept = receiver_client.post(
-        link_api2testclient(request_receiver.json["links"]["actions"]["accept"])
+        link2testclient(request_receiver.json["links"]["actions"]["accept"])
     )
     post_delete_record_read = receiver_client.get(f"{urls['BASE_URL']}{record_id}")
     post_delete_request_read_json = receiver_client.get(
