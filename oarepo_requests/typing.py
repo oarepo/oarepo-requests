@@ -7,4 +7,6 @@
 #
 """Base types for requests."""
 
+from __future__ import annotations
+
 type EntityReference = dict[str, str]

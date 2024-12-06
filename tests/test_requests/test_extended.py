@@ -8,7 +8,7 @@
 from invenio_requests.records.api import RequestEvent
 from thesis.records.api import ThesisDraft
 
-from .utils import is_valid_subdict, link_api2testclient
+from .utils import is_valid_subdict, link2testclient
 
 
 def test_listing(
@@ -62,7 +62,7 @@ def test_read_extended(
         json=publish_request_data_function(draft_id),
     )
     resp_request_submit = creator_client.post(
-        link_api2testclient(resp_request_create.json["links"]["actions"]["submit"]),
+        link2testclient(resp_request_create.json["links"]["actions"]["submit"]),
     )
 
     old_call = creator_client.get(
@@ -106,15 +106,15 @@ def test_update_self_link(
         json=publish_request_data_function(draft1.json["id"]),
     )
     resp_request_submit = creator_client.post(
-        link_api2testclient(resp_request_create.json["links"]["actions"]["submit"])
+        link2testclient(resp_request_create.json["links"]["actions"]["submit"])
     )
     read_before = creator_client.get(
-        link_api2testclient(resp_request_submit.json["links"]["self"]),
+        link2testclient(resp_request_submit.json["links"]["self"]),
     )
     read_from_record = creator_client.get(
         f"{urls['BASE_URL']}{draft1.json['id']}/draft?expand=true",
     )
-    link_to_extended = link_api2testclient(
+    link_to_extended = link2testclient(
         read_from_record.json["expanded"]["requests"][0]["links"]["self"]
     )
 
@@ -125,7 +125,7 @@ def test_update_self_link(
     )
     assert update_extended.status_code == 200
     read_after = creator_client.get(
-        link_api2testclient(resp_request_submit.json["links"]["self"]),
+        link2testclient(resp_request_submit.json["links"]["self"]),
     )
     assert read_before.json["title"] == ""
     assert read_after.json["title"] == "lalala"
@@ -151,20 +151,20 @@ def test_events_resource(
         json=publish_request_data_function(draft1.json["id"]),
     )
     resp_request_submit = creator_client.post(
-        link_api2testclient(resp_request_create.json["links"]["actions"]["submit"])
+        link2testclient(resp_request_create.json["links"]["actions"]["submit"])
     )
     read_before = creator_client.get(
-        link_api2testclient(resp_request_submit.json["links"]["self"]),
+        link2testclient(resp_request_submit.json["links"]["self"]),
         headers={"Accept": "application/vnd.inveniordm.v1+json"},
     )
     read_from_record = creator_client.get(
         f"{urls['BASE_URL']}{draft1.json['id']}/draft?expand=true",
     )
 
-    comments_link = link_api2testclient(
+    comments_link = link2testclient(
         read_from_record.json["expanded"]["requests"][0]["links"]["comments"]
     )
-    timeline_link = link_api2testclient(
+    timeline_link = link2testclient(
         read_from_record.json["expanded"]["requests"][0]["links"]["timeline"]
     )
 

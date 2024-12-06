@@ -74,14 +74,19 @@ def update_topic(
     old_topic_ref = _get_topic_reference(old_topic)
     requests_with_topic = _get_requests_with_topic_reference(old_topic_ref)
     new_topic_ref = ResolverRegistry.reference_entity(new_topic)
-    for request_from_search in requests_with_topic:
+    for (
+        request_from_search
+    ) in (
+        requests_with_topic._results
+    ):  # result list links might crash before update of the topic
+        request_from_search_id = request_from_search["uuid"]
         request_type = current_request_type_registry.lookup(
             request_from_search["type"], quiet=True
         )
         if hasattr(request_type, "topic_change"):
             cur_request = (
-                Request.get_record(request_from_search["id"])
-                if request_from_search["id"] != str(request.id)
+                Request.get_record(request_from_search_id)
+                if request_from_search_id != str(request.id)
                 else request
             )  # request on which the action is executed is recommited later, the change must be done on the same instance
             request_type.topic_change(cur_request, new_topic_ref, uow)
@@ -103,14 +108,19 @@ def cancel_requests_on_topic_delete(
 
     topic_ref = _get_topic_reference(topic)
     requests_with_topic = _get_requests_with_topic_reference(topic_ref)
-    for request_from_search in requests_with_topic:
+    for (
+        request_from_search
+    ) in (
+        requests_with_topic._results
+    ):  # result list links might crash before update of the topic
+        request_from_search_id = request_from_search["uuid"]
         request_type = current_request_type_registry.lookup(
             request_from_search["type"], quiet=True
         )
         if hasattr(request_type, "on_topic_delete"):
-            if request_from_search["id"] == str(request.id):
+            if request_from_search_id == str(request.id):
                 continue
-            cur_request = Request.get_record(request_from_search["id"])
+            cur_request = Request.get_record(request_from_search_id)
             if cur_request.is_open:
                 request_type.on_topic_delete(
                     cur_request, uow

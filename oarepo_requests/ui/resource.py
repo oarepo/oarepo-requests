@@ -7,10 +7,11 @@
 #
 """UI resource for requests - python part."""
 
-from typing import Any
+from __future__ import annotations
+
+from typing import TYPE_CHECKING, Any
 
 from flask import Response, g
-from flask_principal import Identity
 from flask_resources import resource_requestctx, route
 from invenio_records_resources.proxies import current_service_registry
 from invenio_records_resources.resources.records.resource import (
@@ -18,13 +19,16 @@ from invenio_records_resources.resources.records.resource import (
     request_view_args,
 )
 from invenio_records_resources.services import LinksTemplate
-from invenio_requests.records.api import Request
-from invenio_requests.services import RequestsService
 from oarepo_ui.proxies import current_oarepo_ui
 from oarepo_ui.resources.resource import UIResource
 from oarepo_ui.resources.templating.data import FieldData
 
-from oarepo_requests.ui.config import RequestUIResourceConfig
+if TYPE_CHECKING:
+    from flask_principal import Identity
+    from invenio_requests.records.api import Request
+    from invenio_requests.services import RequestsService
+
+    from oarepo_requests.ui.config import RequestUIResourceConfig
 
 
 def make_links_absolute(links: dict[str, str | Any], api_prefix: str) -> None:

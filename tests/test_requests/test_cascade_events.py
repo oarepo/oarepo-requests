@@ -9,7 +9,7 @@ from invenio_requests.records.api import RequestEvent
 
 from oarepo_requests.types.events import TopicDeleteEventType
 
-from .utils import link_api2testclient
+from .utils import link2testclient
 
 
 def test_cascade_update(
@@ -45,13 +45,13 @@ def test_cascade_update(
         json=publish_request_data_function(draft2.json["id"]),
     )
     resp_request_submit = creator_client.post(
-        link_api2testclient(publish_request_create.json["links"]["actions"]["submit"]),
+        link2testclient(publish_request_create.json["links"]["actions"]["submit"]),
     )
     record = receiver_client.get(
         f"{urls['BASE_URL']}{draft1.json['id']}/draft?expand=true"
     )
     publish = receiver_client.post(
-        link_api2testclient(
+        link2testclient(
             record.json["expanded"]["requests"][0]["links"]["actions"]["accept"]
         ),
     )

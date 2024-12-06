@@ -7,6 +7,8 @@
 #
 """Draft request types resource configuration."""
 
+from __future__ import annotations
+
 from oarepo_requests.resources.record.types.config import (
     RecordRequestTypesResourceConfig,
 )
