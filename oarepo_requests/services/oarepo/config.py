@@ -34,7 +34,11 @@ class RequestEntityLinks(Link):
         :param ctx: Context cache
         :return: The resolved entity
         """
-        reference_dict: dict = getattr(obj, self._entity).reference_dict
+        entity_field_value = getattr(obj, self._entity)
+        if not entity_field_value:
+            return {}
+
+        reference_dict: dict = entity_field_value.reference_dict
         key = "entity:" + ":".join(
             f"{x[0]}:{x[1]}" for x in sorted(reference_dict.items())
         )
@@ -61,15 +65,15 @@ class RequestEntityLinks(Link):
     def expand(self, obj: Request, context: dict) -> dict:
         """Create the request links."""
         res = {}
-        res.update(self._resolve(obj, context)["links"])
+        resolved = self._resolve(obj, context)
+        if "links" in resolved:
+            res.update(resolved["links"])
 
         if hasattr(obj.type, "extra_entity_links"):
             entity = self._resolve(obj, context)
             res.update(
                 obj.type.extra_entity_links(
-                    request=obj,
-                    entity=entity,
-                    entity_type=self._entity
+                    request=obj, entity=entity, entity_type=self._entity
                 )
             )
 
@@ -77,7 +81,6 @@ class RequestEntityLinks(Link):
 
 
 class RedirectLinks(Link):
-
     def __init__(self, when: callable = None):
         """Constructor."""
         self._when_func = when

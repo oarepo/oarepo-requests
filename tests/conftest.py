@@ -183,6 +183,10 @@ class RequestsWithCT(WorkflowRequestPolicy):
             IfRequestedBy(UserGenerator(1), [UserGenerator(2)], [UserGenerator(3)])
         ],
     )
+    approve_draft = WorkflowRequest(
+        requesters=[IfInState("draft", [RecordOwners()])],
+        recipients=[],
+    )
 
 
 class RequestsWithAnotherTopicUpdatingRequestType(DefaultRequests):
