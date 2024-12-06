@@ -7,7 +7,7 @@
 #
 from thesis.records.api import ThesisDraft, ThesisRecord
 
-from .utils import link_api2testclient
+from .utils import link2testclient
 
 
 def test_read_requests_on_draft(
@@ -34,13 +34,13 @@ def test_read_requests_on_draft(
         json=publish_request_data_function(draft1.json["id"]),
     )
     resp_request_submit = creator_client.post(
-        link_api2testclient(r1.json["links"]["actions"]["submit"]),
+        link2testclient(r1.json["links"]["actions"]["submit"]),
     )
     record = receiver_client.get(
         f"{urls['BASE_URL']}{draft1.json['id']}/draft?expand=true"
     )
     decline = receiver_client.post(
-        link_api2testclient(
+        link2testclient(
             record.json["expanded"]["requests"][0]["links"]["actions"]["decline"]
         ),
     )
@@ -54,9 +54,9 @@ def test_read_requests_on_draft(
         json=publish_request_data_function(draft2.json["id"]),
     )
 
-    creator_client.get(link_api2testclient(r1.json["links"]["actions"]["submit"]))
-    creator_client.get(link_api2testclient(r2.json["links"]["actions"]["submit"]))
-    creator_client.get(link_api2testclient(r3.json["links"]["actions"]["submit"]))
+    creator_client.get(link2testclient(r1.json["links"]["actions"]["submit"]))
+    creator_client.get(link2testclient(r2.json["links"]["actions"]["submit"]))
+    creator_client.get(link2testclient(r3.json["links"]["actions"]["submit"]))
 
     resp1 = creator_client.get(
         f"{urls['BASE_URL']}{draft1.json['id']}/draft/requests"
@@ -96,11 +96,11 @@ def test_read_requests_on_record(
         json=delete_record_data_function(record1["id"]),
     )
     resp_request_submit = creator_client.post(
-        link_api2testclient(r1.json["links"]["actions"]["submit"]),
+        link2testclient(r1.json["links"]["actions"]["submit"]),
     )
     record = receiver_client.get(f"{urls['BASE_URL']}{record1['id']}?expand=true")
     decline = receiver_client.post(
-        link_api2testclient(
+        link2testclient(
             record.json["expanded"]["requests"][0]["links"]["actions"]["decline"]
         ),
     )
@@ -114,9 +114,9 @@ def test_read_requests_on_record(
         json=delete_record_data_function(record2["id"]),
     )
 
-    creator_client.post(link_api2testclient(r1.json["links"]["actions"]["submit"]))
-    creator_client.post(link_api2testclient(r2.json["links"]["actions"]["submit"]))
-    creator_client.post(link_api2testclient(r3.json["links"]["actions"]["submit"]))
+    creator_client.post(link2testclient(r1.json["links"]["actions"]["submit"]))
+    creator_client.post(link2testclient(r2.json["links"]["actions"]["submit"]))
+    creator_client.post(link2testclient(r3.json["links"]["actions"]["submit"]))
 
     resp1 = creator_client.get(f"{urls['BASE_URL']}{record1['id']}/requests").json[
         "hits"

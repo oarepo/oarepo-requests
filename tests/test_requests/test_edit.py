@@ -7,7 +7,7 @@
 #
 from thesis.records.api import ThesisDraft, ThesisRecord
 
-from tests.test_requests.utils import link_api2testclient
+from tests.test_requests.utils import link2testclient
 
 
 def test_edit_autoaccept(
@@ -36,7 +36,7 @@ def test_edit_autoaccept(
         json=edit_record_data_function(record1["id"]),
     )
     resp_request_submit = creator_client.post(
-        link_api2testclient(resp_request_create.json["links"]["actions"]["submit"]),
+        link2testclient(resp_request_create.json["links"]["actions"]["submit"]),
     )
     # is request accepted and closed?
     request = creator_client.get(
@@ -55,7 +55,9 @@ def test_edit_autoaccept(
     # edit action worked?
     search = creator_client.get(
         f'user{urls["BASE_URL"]}',
-    ).json["hits"]["hits"]
+    ).json[
+        "hits"
+    ]["hits"]
     assert len(search) == 1
     assert search[0]["links"]["self"].endswith("/draft")
     assert search[0]["id"] == id_
