@@ -37,6 +37,7 @@ export const RequestCommentInput = ({
       editorConfig={{
         auto_focus: true,
         min_height: 100,
+        width: "100%",
         toolbar:
           "blocks | bold italic | bullist numlist | outdent indent | undo redo",
       }}

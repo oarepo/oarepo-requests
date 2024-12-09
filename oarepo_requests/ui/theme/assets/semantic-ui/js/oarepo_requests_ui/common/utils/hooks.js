@@ -183,16 +183,18 @@ export const useAction = ({
   requestOrRequestType,
   formik,
   modalControl,
+  requestActionName,
 } = {}) => {
   const { onBeforeAction, onAfterAction, onActionError } = useCallbackContext();
   return useMutation(
     async (values) => {
       if (onBeforeAction) {
-        const shouldProceed = await onBeforeAction(
+        const shouldProceed = await onBeforeAction({
           formik,
           modalControl,
-          requestOrRequestType
-        );
+          requestOrRequestType,
+          requestActionName,
+        });
         if (!shouldProceed) {
           modalControl?.closeModal();
           throw new Error("Could not proceed with the action.");
@@ -207,13 +209,14 @@ export const useAction = ({
     {
       onError: (e, variables) => {
         if (onActionError) {
-          onActionError(
+          onActionError({
             e,
             variables,
             formik,
             modalControl,
-            requestOrRequestType
-          );
+            requestOrRequestType,
+            requestActionName,
+          });
         } else if (e?.response?.data?.errors) {
           formik?.setFieldError(
             "api",
@@ -238,15 +241,17 @@ export const useAction = ({
       },
       onSuccess: (data, variables) => {
         if (onAfterAction) {
-          onAfterAction(
+          onAfterAction({
             data,
             variables,
             formik,
             modalControl,
-            requestOrRequestType
-          );
+            requestOrRequestType,
+            requestActionName,
+          });
         }
-        const redirectionURL = data?.data?.links?.topic_html;
+        const redirectionURL = data?.data?.links?.redirect_urls?.self_html;
+        console.log(data.data);
         modalControl?.closeModal();
 
         if (redirectionURL) {
@@ -254,7 +259,7 @@ export const useAction = ({
         } else {
           // TODO: some requests after they complete no longer have a topic_html,
           // so redirecting to dashboard instead
-          window.location.href = "/me/records/";
+          // window.location.href = "/me/records/";
           // fetchNewRequests?.();
         }
       },

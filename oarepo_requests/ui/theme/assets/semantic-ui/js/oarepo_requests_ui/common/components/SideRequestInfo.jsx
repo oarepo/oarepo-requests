@@ -15,9 +15,9 @@ export const SideRequestInfo = ({ request }) => {
         <List.Content>
           <Icon name="user circle outline" />
           <span>
-            {_has(request, "links.created_by_html") ? (
+            {_has(request, "links.created_by.self_html") ? (
               <a
-                href={request.links.created_by_html}
+                href={request.links.created_by.self_html}
                 target="_blank"
                 rel="noreferrer"
               >
@@ -34,9 +34,9 @@ export const SideRequestInfo = ({ request }) => {
         <List.Content>
           <Icon name="mail outline" />
           <span>
-            {_has(request, "links.receiver_html") ? (
+            {_has(request, "links.receiver.self_html") ? (
               <a
-                href={request.links.receiver_html}
+                href={request.links.receiver.self_html}
                 target="_blank"
                 rel="noreferrer"
               >
@@ -61,11 +61,15 @@ export const SideRequestInfo = ({ request }) => {
         <List.Header as="h3">{i18next.t("Created")}</List.Header>
         <List.Content>{request.created}</List.Content>
       </List.Item>
-      {request?.links?.topic_html && (
+      {request?.links?.topic?.self_html && (
         <List.Item>
           <List.Header as="h3">{i18next.t("Topic")}</List.Header>
           <List.Content>
-            <a href={request.links.topic_html} target="_blank" rel="noreferrer">
+            <a
+              href={request.links.topic.self_html}
+              target="_blank"
+              rel="noreferrer"
+            >
               {request?.topic?.label
                 ? _truncate(request?.topic?.label, {
                     length: 350,
