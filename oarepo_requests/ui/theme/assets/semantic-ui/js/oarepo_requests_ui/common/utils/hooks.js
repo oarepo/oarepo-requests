@@ -1,3 +1,10 @@
+/*
+ * Copyright (C) 2024 CESNET z.s.p.o.
+ *
+ * oarepo-requests is free software; you can redistribute it and/or
+ * modify it under the terms of the MIT License; see LICENSE file for more
+ * details.
+ */
 import React, { useState, useCallback, useRef } from "react";
 import { i18next } from "@translations/oarepo_requests_ui/i18next";
 import { Message, Icon } from "semantic-ui-react";

@@ -5,6 +5,8 @@
 # modify it under the terms of the MIT License; see LICENSE file for more
 # details.
 #
+from __future__ import annotations
+
 from oarepo_runtime.i18n import lazy_gettext as _
 
 _("Create Request")

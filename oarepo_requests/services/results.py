@@ -9,7 +9,7 @@
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Any, Iterator, cast
+from typing import TYPE_CHECKING, Any, cast
 
 from invenio_records_resources.services import LinksTemplate
 from invenio_records_resources.services.errors import PermissionDeniedError
@@ -24,6 +24,8 @@ from oarepo_requests.utils import (
 )
 
 if TYPE_CHECKING:
+    from collections.abc import Iterator
+
     from flask_principal import Identity
     from invenio_records_resources.records.api import Record
     from invenio_requests.customizations.request_types import RequestType

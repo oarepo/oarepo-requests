@@ -7,6 +7,8 @@
 #
 """Permission generators."""
 
+from __future__ import annotations
+
 from .active import RequestActive
 from .conditional import (
     IfEventOnRequestType,

@@ -7,7 +7,7 @@
 #
 from thesis.records.api import ThesisRecord
 
-from tests.test_requests.utils import link_api2testclient
+from tests.test_requests.utils import link2testclient
 
 
 def pick_request_type(types_list, queried_type):
@@ -34,7 +34,7 @@ def test_record(
     record1 = record_factory(creator.identity)
     record1 = creator_client.get(f"{urls['BASE_URL']}{record1['id']}?expand=true")
 
-    link = link_api2testclient(
+    link = link2testclient(
         pick_request_type(
             record1.json["expanded"]["request_types"], "delete_published_record"
         )["links"]["actions"]["create"]
@@ -43,12 +43,12 @@ def test_record(
     resp_request_create = creator_client.post(link)
     assert resp_request_create.status_code == 201
     resp_request_submit = creator_client.post(
-        link_api2testclient(resp_request_create.json["links"]["actions"]["submit"]),
+        link2testclient(resp_request_create.json["links"]["actions"]["submit"]),
     )
 
     record = receiver_client.get(f"{urls['BASE_URL']}{record1.json['id']}?expand=true")
     delete = receiver_client.post(
-        link_api2testclient(
+        link2testclient(
             record.json["expanded"]["requests"][0]["links"]["actions"]["accept"]
         )
     )
@@ -72,7 +72,7 @@ def test_draft(
     receiver_client = logged_client(receiver)
 
     draft1 = create_draft_via_resource(creator_client)
-    link = link_api2testclient(
+    link = link2testclient(
         pick_request_type(draft1.json["expanded"]["request_types"], "publish_draft")[
             "links"
         ]["actions"]["create"]
@@ -83,13 +83,13 @@ def test_draft(
     )
     assert resp_request_create.status_code == 201
     resp_request_submit = creator_client.post(
-        link_api2testclient(resp_request_create.json["links"]["actions"]["submit"]),
+        link2testclient(resp_request_create.json["links"]["actions"]["submit"]),
     )
     record = receiver_client.get(
         f"{urls['BASE_URL']}{draft1.json['id']}/draft?expand=true"
     )
     delete = receiver_client.post(
-        link_api2testclient(
+        link2testclient(
             record.json["expanded"]["requests"][0]["links"]["actions"]["accept"]
         )
     )

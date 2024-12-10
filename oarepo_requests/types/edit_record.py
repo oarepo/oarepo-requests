@@ -54,6 +54,12 @@ class EditPublishedRecordRequestType(NonDuplicableOARepoRequestType):
         ),
     }
 
+    def extra_entity_links(self, request: Request, entity: dict, entity_type: str, **kwargs) -> dict:
+        if request.status == "accepted" and entity_type == "topic":
+            return {"topic_redirect_link": entity["links"]["edit_html"]}
+        else:
+            return {}
+
     @classproperty
     def available_actions(cls) -> dict[str, type[RequestAction]]:
         """Return available actions for the request type."""

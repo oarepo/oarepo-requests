@@ -7,11 +7,14 @@
 #
 """Resource configuration for events and comments."""
 
+from __future__ import annotations
+
 from flask_resources import ResponseHandler
 from invenio_records_resources.services.base.config import ConfiguratorMixin
 from invenio_requests.resources.events.config import RequestCommentsResourceConfig
 
 from oarepo_requests.resources.ui import OARepoRequestEventsUIJSONSerializer
+import marshmallow as ma
 
 
 class OARepoRequestsCommentsResourceConfig(
@@ -24,8 +27,17 @@ class OARepoRequestsCommentsResourceConfig(
     routes = {
         **RequestCommentsResourceConfig.routes,
         "list-extended": "/extended/<request_id>/comments",
-        "item-extended": "/extended/<request_id>/comments/<comment_id>",
         "timeline-extended": "/extended/<request_id>/timeline",
+        "item-extended": "/extended/<request_id>/comments/<comment_id>",
+        "event-type": "/<request_id>/timeline/<event_type>",
+        "event-type-extended": "/extended/<request_id>/timeline/<event_type>",
+    }
+
+    @property
+    def request_item_view_args(self):
+        return {
+        **super().request_item_view_args,
+        "event_type": ma.fields.Str(),
     }
 
     @property

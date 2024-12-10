@@ -7,6 +7,8 @@
 #
 """Request events."""
 
+from __future__ import annotations
+
 from .topic_delete import TopicDeleteEventType
 from .topic_update import TopicUpdateEventType
 

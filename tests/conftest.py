@@ -46,7 +46,6 @@ from oarepo_workflows import (
 from oarepo_workflows.base import Workflow
 from oarepo_workflows.requests.events import WorkflowEvent
 from oarepo_workflows.requests.generators import RecipientGeneratorMixin
-
 from thesis.proxies import current_service
 from thesis.records.api import ThesisDraft
 
@@ -58,16 +57,16 @@ from oarepo_requests.actions.generic import (
 from oarepo_requests.receiver import default_workflow_receiver_function
 from oarepo_requests.services.notifications.builders.publish import PublishDraftRequestAcceptNotificationBuilder
 from oarepo_requests.services.permissions.generators.conditional import (
-    IfRequestedBy,
-    IfNoNewVersionDraft,
     IfNoEditDraft,
+    IfNoNewVersionDraft,
+    IfRequestedBy,
 )
 from oarepo_requests.services.permissions.workflow_policies import (
     RequestBasedWorkflowPermissions,
 )
 from oarepo_requests.types import ModelRefTypes, NonDuplicableOARepoRequestType
 from oarepo_requests.types.events.topic_update import TopicUpdateEventType
-from tests.test_requests.utils import link_api2testclient
+from tests.test_requests.utils import link2testclient
 from invenio_notifications.backends import EmailNotificationBackend
 
 
@@ -187,6 +186,10 @@ class RequestsWithCT(WorkflowRequestPolicy):
             IfRequestedBy(UserGenerator(1), [UserGenerator(2)], [UserGenerator(3)])
         ],
     )
+    approve_draft = WorkflowRequest(
+        requesters=[IfInState("draft", [RecordOwners()])],
+        recipients=[],
+    )
 
 
 class RequestsWithAnotherTopicUpdatingRequestType(DefaultRequests):
@@ -250,6 +253,7 @@ class TestWorkflowPermissions(RequestBasedWorkflowPermissions):
         IfInState("draft", [RecordOwners()]),
         IfInState("publishing", [RecordOwners(), UserGenerator(2)]),
         IfInState("published", [AnyUser()]),
+        IfInState("published", [AuthenticatedUser()]),
         IfInState("deleting", [AnyUser()]),
     ]
 
@@ -260,6 +264,7 @@ class WithApprovalPermissions(RequestBasedWorkflowPermissions):
         IfInState("approving", [RecordOwners(), UserGenerator(2)]),
         IfInState("approved", [RecordOwners(), UserGenerator(2)]),
         IfInState("publishing", [RecordOwners(), UserGenerator(2)]),
+        IfInState("published", [AuthenticatedUser()]),
         IfInState("deleting", [AuthenticatedUser()]),
     ]
 
@@ -802,7 +807,10 @@ def role(database):
 def role_ui_serialization():
     return {
         "label": "it-dep",
-        "links": {"self": "https://127.0.0.1:5000/api/groups/it-dep"},
+        "links": {
+            "avatar": "https://127.0.0.1:5000/api/groups/it-dep/avatar.svg",
+            "self": "https://127.0.0.1:5000/api/groups/it-dep",
+        },
         "reference": {"group": "it-dep"},
         "type": "group",
     }
@@ -849,9 +857,9 @@ def get_request_link(get_request_type):
 def create_request_by_link(get_request_link):
     def _create_request(client, record, request_type):
         applicable_requests = client.get(
-            link_api2testclient(record.json["links"]["applicable-requests"])
+            link2testclient(record.json["links"]["applicable-requests"])
         ).json["hits"]["hits"]
-        create_link = link_api2testclient(
+        create_link = link2testclient(
             get_request_link(applicable_requests, request_type)
         )
         create_response = client.post(create_link)
@@ -865,7 +873,7 @@ def submit_request_by_link(create_request_by_link):
     def _submit_request(client, record, request_type):
         create_response = create_request_by_link(client, record, request_type)
         submit_response = client.post(
-            link_api2testclient(create_response.json["links"]["actions"]["submit"])
+            link2testclient(create_response.json["links"]["actions"]["submit"])
         )
         return submit_response
 
@@ -902,3 +910,15 @@ def check_publish_topic_update():
         assert topic_updated_events[0]["payload"]["new_topic"] == f"thesis.{record_id}"
 
     return _check_publish_topic_update
+
+
+@pytest.fixture
+def user_links():
+    def _user_links(user_id):
+        return {
+            "avatar": f"https://127.0.0.1:5000/api/users/{user_id}/avatar.svg",
+            "records_html": f"https://127.0.0.1:5000/search/records?q=user:{user_id}",
+            "self": f"https://127.0.0.1:5000/api/users/{user_id}",
+        }
+
+    return _user_links
