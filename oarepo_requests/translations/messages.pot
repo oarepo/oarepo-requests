@@ -8,454 +8,454 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2024-12-02 14:20+0100\n"
+"POT-Creation-Date: 2024-12-11 10:45+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Generated-By: Babel 2.15.0\n"
+"Generated-By: Babel 2.16.0\n"
 
-#: /home/ron/prace/oarepo-requests/oarepo_requests/invenio_patches.py:163
+#: /home/dusanst/Projects/oarepo-requests/oarepo_requests/invenio_patches.py:159
 msgid "Submitted"
 msgstr ""
 
-#: /home/ron/prace/oarepo-requests/oarepo_requests/invenio_patches.py:164
+#: /home/dusanst/Projects/oarepo-requests/oarepo_requests/invenio_patches.py:160
 msgid "Expired"
 msgstr ""
 
-#: /home/ron/prace/oarepo-requests/oarepo_requests/invenio_patches.py:165
+#: /home/dusanst/Projects/oarepo-requests/oarepo_requests/invenio_patches.py:161
 msgid "Accepted"
 msgstr ""
 
-#: /home/ron/prace/oarepo-requests/oarepo_requests/invenio_patches.py:166
+#: /home/dusanst/Projects/oarepo-requests/oarepo_requests/invenio_patches.py:162
 msgid "Declined"
 msgstr ""
 
-#: /home/ron/prace/oarepo-requests/oarepo_requests/invenio_patches.py:167
+#: /home/dusanst/Projects/oarepo-requests/oarepo_requests/invenio_patches.py:163
 msgid "Cancelled"
 msgstr ""
 
-#: /home/ron/prace/oarepo-requests/oarepo_requests/invenio_patches.py:169
+#: /home/dusanst/Projects/oarepo-requests/oarepo_requests/invenio_patches.py:165
 msgid "Request status"
 msgstr ""
 
-#: /home/ron/prace/oarepo-requests/oarepo_requests/invenio_patches.py:175
+#: /home/dusanst/Projects/oarepo-requests/oarepo_requests/invenio_patches.py:171
 msgid "Type"
 msgstr ""
 
-#: /home/ron/prace/oarepo-requests/oarepo_requests/actions/delete_published_record.py:30
+#: /home/dusanst/Projects/oarepo-requests/oarepo_requests/actions/delete_published_record.py:30
 msgid "Permanently delete"
 msgstr ""
 
-#: /home/ron/prace/oarepo-requests/oarepo_requests/actions/delete_published_record.py:52
+#: /home/dusanst/Projects/oarepo-requests/oarepo_requests/actions/delete_published_record.py:52
 msgid "Keep the record"
 msgstr ""
 
-#: /home/ron/prace/oarepo-requests/oarepo_requests/actions/generic.py:137
-#: /home/ron/prace/oarepo-requests/oarepo_requests/translations/_only_for_translations.py:28
+#: /home/dusanst/Projects/oarepo-requests/oarepo_requests/actions/generic.py:138
+#: /home/dusanst/Projects/oarepo-requests/oarepo_requests/translations/_only_for_translations.py:30
 msgid "Submit"
 msgstr ""
 
-#: /home/ron/prace/oarepo-requests/oarepo_requests/actions/generic.py:143
-#: /home/ron/prace/oarepo-requests/oarepo_requests/translations/_only_for_translations.py:24
+#: /home/dusanst/Projects/oarepo-requests/oarepo_requests/actions/generic.py:144
+#: /home/dusanst/Projects/oarepo-requests/oarepo_requests/translations/_only_for_translations.py:26
 msgid "Decline"
 msgstr ""
 
-#: /home/ron/prace/oarepo-requests/oarepo_requests/actions/generic.py:149
-#: /home/ron/prace/oarepo-requests/oarepo_requests/translations/_only_for_translations.py:22
+#: /home/dusanst/Projects/oarepo-requests/oarepo_requests/actions/generic.py:150
+#: /home/dusanst/Projects/oarepo-requests/oarepo_requests/translations/_only_for_translations.py:24
 msgid "Accept"
 msgstr ""
 
-#: /home/ron/prace/oarepo-requests/oarepo_requests/actions/publish_draft.py:64
+#: /home/dusanst/Projects/oarepo-requests/oarepo_requests/actions/publish_draft.py:64
 msgid "Publish"
 msgstr ""
 
-#: /home/ron/prace/oarepo-requests/oarepo_requests/actions/publish_draft.py:97
+#: /home/dusanst/Projects/oarepo-requests/oarepo_requests/actions/publish_draft.py:97
 msgid "Return for correction"
 msgstr ""
 
-#: /home/ron/prace/oarepo-requests/oarepo_requests/resolvers/ui.py:333
+#: /home/dusanst/Projects/oarepo-requests/oarepo_requests/resolvers/ui.py:329
 msgid "System user"
 msgstr ""
 
-#: /home/ron/prace/oarepo-requests/oarepo_requests/resolvers/ui.py:605
+#: /home/dusanst/Projects/oarepo-requests/oarepo_requests/resolvers/ui.py:604
 msgid "Auto approve"
 msgstr ""
 
-#: /home/ron/prace/oarepo-requests/oarepo_requests/services/ui_schema.py:159
+#: /home/dusanst/Projects/oarepo-requests/oarepo_requests/services/ui_schema.py:159
 msgid "status"
 msgstr ""
 
-#: /home/ron/prace/oarepo-requests/oarepo_requests/translations/_only_for_translations.py:10
+#: /home/dusanst/Projects/oarepo-requests/oarepo_requests/translations/_only_for_translations.py:12
 msgid "Create Request"
 msgstr ""
 
-#: /home/ron/prace/oarepo-requests/oarepo_requests/translations/_only_for_translations.py:11
+#: /home/dusanst/Projects/oarepo-requests/oarepo_requests/translations/_only_for_translations.py:13
 msgid "Open dialog for request"
 msgstr ""
 
-#: /home/ron/prace/oarepo-requests/oarepo_requests/translations/_only_for_translations.py:12
+#: /home/dusanst/Projects/oarepo-requests/oarepo_requests/translations/_only_for_translations.py:14
 msgid "My Requests"
 msgstr ""
 
-#: /home/ron/prace/oarepo-requests/oarepo_requests/translations/_only_for_translations.py:13
+#: /home/dusanst/Projects/oarepo-requests/oarepo_requests/translations/_only_for_translations.py:15
 msgid "Requests to Approve"
 msgstr ""
 
-#: /home/ron/prace/oarepo-requests/oarepo_requests/translations/_only_for_translations.py:14
+#: /home/dusanst/Projects/oarepo-requests/oarepo_requests/translations/_only_for_translations.py:16
 msgid "Are you sure?"
 msgstr ""
 
-#: /home/ron/prace/oarepo-requests/oarepo_requests/translations/_only_for_translations.py:15
+#: /home/dusanst/Projects/oarepo-requests/oarepo_requests/translations/_only_for_translations.py:17
 msgid "Cancel"
 msgstr ""
 
-#: /home/ron/prace/oarepo-requests/oarepo_requests/translations/_only_for_translations.py:16
+#: /home/dusanst/Projects/oarepo-requests/oarepo_requests/translations/_only_for_translations.py:18
 msgid "OK"
 msgstr ""
 
-#: /home/ron/prace/oarepo-requests/oarepo_requests/translations/_only_for_translations.py:17
+#: /home/dusanst/Projects/oarepo-requests/oarepo_requests/translations/_only_for_translations.py:19
 msgid "Create request"
 msgstr ""
 
-#: /home/ron/prace/oarepo-requests/oarepo_requests/translations/_only_for_translations.py:18
+#: /home/dusanst/Projects/oarepo-requests/oarepo_requests/translations/_only_for_translations.py:20
 msgid "Submit request"
 msgstr ""
 
-#: /home/ron/prace/oarepo-requests/oarepo_requests/translations/_only_for_translations.py:19
+#: /home/dusanst/Projects/oarepo-requests/oarepo_requests/translations/_only_for_translations.py:21
 msgid "Delete request"
 msgstr ""
 
-#: /home/ron/prace/oarepo-requests/oarepo_requests/translations/_only_for_translations.py:20
+#: /home/dusanst/Projects/oarepo-requests/oarepo_requests/translations/_only_for_translations.py:22
 msgid "Delete"
 msgstr ""
 
-#: /home/ron/prace/oarepo-requests/oarepo_requests/translations/_only_for_translations.py:21
+#: /home/dusanst/Projects/oarepo-requests/oarepo_requests/translations/_only_for_translations.py:23
 msgid "Accept request"
 msgstr ""
 
-#: /home/ron/prace/oarepo-requests/oarepo_requests/translations/_only_for_translations.py:23
+#: /home/dusanst/Projects/oarepo-requests/oarepo_requests/translations/_only_for_translations.py:25
 msgid "Decline request"
 msgstr ""
 
-#: /home/ron/prace/oarepo-requests/oarepo_requests/translations/_only_for_translations.py:25
+#: /home/dusanst/Projects/oarepo-requests/oarepo_requests/translations/_only_for_translations.py:27
 msgid "Create and submit request"
 msgstr ""
 
-#: /home/ron/prace/oarepo-requests/oarepo_requests/translations/_only_for_translations.py:26
+#: /home/dusanst/Projects/oarepo-requests/oarepo_requests/translations/_only_for_translations.py:28
 msgid "Create and submit"
 msgstr ""
 
-#: /home/ron/prace/oarepo-requests/oarepo_requests/translations/_only_for_translations.py:27
+#: /home/dusanst/Projects/oarepo-requests/oarepo_requests/translations/_only_for_translations.py:29
 msgid "Error sending request"
 msgstr ""
 
-#: /home/ron/prace/oarepo-requests/oarepo_requests/translations/_only_for_translations.py:29
+#: /home/dusanst/Projects/oarepo-requests/oarepo_requests/translations/_only_for_translations.py:31
 msgid "Save drafted request"
 msgstr ""
 
-#: /home/ron/prace/oarepo-requests/oarepo_requests/translations/_only_for_translations.py:30
+#: /home/dusanst/Projects/oarepo-requests/oarepo_requests/translations/_only_for_translations.py:32
 msgid "Save"
 msgstr ""
 
-#: /home/ron/prace/oarepo-requests/oarepo_requests/translations/_only_for_translations.py:31
+#: /home/dusanst/Projects/oarepo-requests/oarepo_requests/translations/_only_for_translations.py:33
 msgid "Create"
 msgstr ""
 
-#: /home/ron/prace/oarepo-requests/oarepo_requests/translations/_only_for_translations.py:32
+#: /home/dusanst/Projects/oarepo-requests/oarepo_requests/translations/_only_for_translations.py:34
 msgid "Creator"
 msgstr ""
 
-#: /home/ron/prace/oarepo-requests/oarepo_requests/translations/_only_for_translations.py:33
+#: /home/dusanst/Projects/oarepo-requests/oarepo_requests/translations/_only_for_translations.py:35
 msgid "Receiver"
 msgstr ""
 
-#: /home/ron/prace/oarepo-requests/oarepo_requests/translations/_only_for_translations.py:34
+#: /home/dusanst/Projects/oarepo-requests/oarepo_requests/translations/_only_for_translations.py:36
 msgid "Request type"
 msgstr ""
 
-#: /home/ron/prace/oarepo-requests/oarepo_requests/translations/_only_for_translations.py:35
+#: /home/dusanst/Projects/oarepo-requests/oarepo_requests/translations/_only_for_translations.py:37
 msgid "Created"
 msgstr ""
 
-#: /home/ron/prace/oarepo-requests/oarepo_requests/translations/_only_for_translations.py:36
+#: /home/dusanst/Projects/oarepo-requests/oarepo_requests/translations/_only_for_translations.py:38
 msgid "Timeline"
 msgstr ""
 
-#: /home/ron/prace/oarepo-requests/oarepo_requests/translations/_only_for_translations.py:37
+#: /home/dusanst/Projects/oarepo-requests/oarepo_requests/translations/_only_for_translations.py:39
 msgid "Submit event"
 msgstr ""
 
-#: /home/ron/prace/oarepo-requests/oarepo_requests/translations/_only_for_translations.py:38
+#: /home/dusanst/Projects/oarepo-requests/oarepo_requests/translations/_only_for_translations.py:40
 msgid "No requests to show"
 msgstr ""
 
-#: /home/ron/prace/oarepo-requests/oarepo_requests/translations/_only_for_translations.py:39
+#: /home/dusanst/Projects/oarepo-requests/oarepo_requests/translations/_only_for_translations.py:41
 msgid "api.requests"
 msgstr ""
 
-#: /home/ron/prace/oarepo-requests/oarepo_requests/translations/_only_for_translations.py:40
+#: /home/dusanst/Projects/oarepo-requests/oarepo_requests/translations/_only_for_translations.py:42
 msgid "api.applicable-requests"
 msgstr ""
 
-#: /home/ron/prace/oarepo-requests/oarepo_requests/types/delete_draft.py:34
+#: /home/dusanst/Projects/oarepo-requests/oarepo_requests/types/delete_draft.py:35
 msgid "Delete draft"
 msgstr ""
 
-#: /home/ron/prace/oarepo-requests/oarepo_requests/types/delete_draft.py:46
+#: /home/dusanst/Projects/oarepo-requests/oarepo_requests/types/delete_draft.py:52
 msgid "Request deletion of draft"
 msgstr ""
 
-#: /home/ron/prace/oarepo-requests/oarepo_requests/types/delete_draft.py:63
-#: /home/ron/prace/oarepo-requests/oarepo_requests/types/delete_draft.py:68
+#: /home/dusanst/Projects/oarepo-requests/oarepo_requests/types/delete_draft.py:69
+#: /home/dusanst/Projects/oarepo-requests/oarepo_requests/types/delete_draft.py:74
 msgid "Request draft deletion"
 msgstr ""
 
-#: /home/ron/prace/oarepo-requests/oarepo_requests/types/delete_draft.py:66
+#: /home/dusanst/Projects/oarepo-requests/oarepo_requests/types/delete_draft.py:72
 msgid "Draft deletion requested"
 msgstr ""
 
-#: /home/ron/prace/oarepo-requests/oarepo_requests/types/delete_draft.py:81
+#: /home/dusanst/Projects/oarepo-requests/oarepo_requests/types/delete_draft.py:87
 msgid "Click to permanently delete the draft."
 msgstr ""
 
-#: /home/ron/prace/oarepo-requests/oarepo_requests/types/delete_draft.py:84
+#: /home/dusanst/Projects/oarepo-requests/oarepo_requests/types/delete_draft.py:90
 msgid "Request permission to delete the draft."
 msgstr ""
 
-#: /home/ron/prace/oarepo-requests/oarepo_requests/types/delete_draft.py:88
+#: /home/dusanst/Projects/oarepo-requests/oarepo_requests/types/delete_draft.py:94
 msgid ""
 "Permission to delete draft requested. You will be notified about the "
 "decision by email."
 msgstr ""
 
-#: /home/ron/prace/oarepo-requests/oarepo_requests/types/delete_draft.py:93
+#: /home/dusanst/Projects/oarepo-requests/oarepo_requests/types/delete_draft.py:99
 msgid ""
 "You have been asked to approve the request to permanently delete the draft. "
 "You can approve or reject the request."
 msgstr ""
 
-#: /home/ron/prace/oarepo-requests/oarepo_requests/types/delete_draft.py:97
+#: /home/dusanst/Projects/oarepo-requests/oarepo_requests/types/delete_draft.py:103
 msgid "Permission to delete draft (including files) requested. "
 msgstr ""
 
-#: /home/ron/prace/oarepo-requests/oarepo_requests/types/delete_draft.py:100
+#: /home/dusanst/Projects/oarepo-requests/oarepo_requests/types/delete_draft.py:106
 msgid "Submit request to get permission to delete the draft."
 msgstr ""
 
-#: /home/ron/prace/oarepo-requests/oarepo_requests/types/delete_draft.py:101
+#: /home/dusanst/Projects/oarepo-requests/oarepo_requests/types/delete_draft.py:107
 msgid "You do not have permission to delete the draft."
 msgstr ""
 
-#: /home/ron/prace/oarepo-requests/oarepo_requests/types/delete_published_record.py:38
+#: /home/dusanst/Projects/oarepo-requests/oarepo_requests/types/delete_published_record.py:39
 msgid "Delete record"
 msgstr ""
 
-#: /home/ron/prace/oarepo-requests/oarepo_requests/types/delete_published_record.py:51
+#: /home/dusanst/Projects/oarepo-requests/oarepo_requests/types/delete_published_record.py:57
 msgid "Request deletion of published record"
 msgstr ""
 
-#: /home/ron/prace/oarepo-requests/oarepo_requests/types/delete_published_record.py:68
-#: /home/ron/prace/oarepo-requests/oarepo_requests/types/delete_published_record.py:73
+#: /home/dusanst/Projects/oarepo-requests/oarepo_requests/types/delete_published_record.py:74
+#: /home/dusanst/Projects/oarepo-requests/oarepo_requests/types/delete_published_record.py:79
 msgid "Request record deletion"
 msgstr ""
 
-#: /home/ron/prace/oarepo-requests/oarepo_requests/types/delete_published_record.py:71
+#: /home/dusanst/Projects/oarepo-requests/oarepo_requests/types/delete_published_record.py:77
 msgid "Record deletion requested"
 msgstr ""
 
-#: /home/ron/prace/oarepo-requests/oarepo_requests/types/delete_published_record.py:86
+#: /home/dusanst/Projects/oarepo-requests/oarepo_requests/types/delete_published_record.py:92
 msgid "Click to permanently delete the record."
 msgstr ""
 
-#: /home/ron/prace/oarepo-requests/oarepo_requests/types/delete_published_record.py:89
+#: /home/dusanst/Projects/oarepo-requests/oarepo_requests/types/delete_published_record.py:95
 msgid "Request permission to delete the record."
 msgstr ""
 
-#: /home/ron/prace/oarepo-requests/oarepo_requests/types/delete_published_record.py:93
+#: /home/dusanst/Projects/oarepo-requests/oarepo_requests/types/delete_published_record.py:99
 msgid ""
 "Permission to delete record requested. You will be notified about the "
 "decision by email."
 msgstr ""
 
-#: /home/ron/prace/oarepo-requests/oarepo_requests/types/delete_published_record.py:98
+#: /home/dusanst/Projects/oarepo-requests/oarepo_requests/types/delete_published_record.py:104
 msgid ""
 "You have been asked to approve the request to permanently delete the record."
 " You can approve or reject the request."
 msgstr ""
 
-#: /home/ron/prace/oarepo-requests/oarepo_requests/types/delete_published_record.py:102
+#: /home/dusanst/Projects/oarepo-requests/oarepo_requests/types/delete_published_record.py:108
 msgid "Permission to delete record (including files) requested. "
 msgstr ""
 
-#: /home/ron/prace/oarepo-requests/oarepo_requests/types/delete_published_record.py:105
+#: /home/dusanst/Projects/oarepo-requests/oarepo_requests/types/delete_published_record.py:111
 msgid "Submit request to get permission to delete the record."
 msgstr ""
 
-#: /home/ron/prace/oarepo-requests/oarepo_requests/types/delete_published_record.py:106
+#: /home/dusanst/Projects/oarepo-requests/oarepo_requests/types/delete_published_record.py:112
 msgid "You do not have permission to delete the record."
 msgstr ""
 
-#: /home/ron/prace/oarepo-requests/oarepo_requests/types/edit_record.py:45
+#: /home/dusanst/Projects/oarepo-requests/oarepo_requests/types/edit_record.py:45
 msgid "Edit metadata"
 msgstr ""
 
-#: /home/ron/prace/oarepo-requests/oarepo_requests/types/edit_record.py:65
+#: /home/dusanst/Projects/oarepo-requests/oarepo_requests/types/edit_record.py:71
 msgid "Request re-opening of published record"
 msgstr ""
 
-#: /home/ron/prace/oarepo-requests/oarepo_requests/types/edit_record.py:122
-#: /home/ron/prace/oarepo-requests/oarepo_requests/types/edit_record.py:127
+#: /home/dusanst/Projects/oarepo-requests/oarepo_requests/types/edit_record.py:128
+#: /home/dusanst/Projects/oarepo-requests/oarepo_requests/types/edit_record.py:133
 msgid "Request edit access"
 msgstr ""
 
-#: /home/ron/prace/oarepo-requests/oarepo_requests/types/edit_record.py:125
+#: /home/dusanst/Projects/oarepo-requests/oarepo_requests/types/edit_record.py:131
 msgid "Edit access requested"
 msgstr ""
 
-#: /home/ron/prace/oarepo-requests/oarepo_requests/types/edit_record.py:140
+#: /home/dusanst/Projects/oarepo-requests/oarepo_requests/types/edit_record.py:146
 msgid "Click to start editing the metadata of the record."
 msgstr ""
 
-#: /home/ron/prace/oarepo-requests/oarepo_requests/types/edit_record.py:143
-#: /home/ron/prace/oarepo-requests/oarepo_requests/types/edit_record.py:160
+#: /home/dusanst/Projects/oarepo-requests/oarepo_requests/types/edit_record.py:149
+#: /home/dusanst/Projects/oarepo-requests/oarepo_requests/types/edit_record.py:166
 msgid ""
 "Request edit access to the record. You will be notified about the decision "
 "by email."
 msgstr ""
 
-#: /home/ron/prace/oarepo-requests/oarepo_requests/types/edit_record.py:150
+#: /home/dusanst/Projects/oarepo-requests/oarepo_requests/types/edit_record.py:156
 msgid ""
 "Edit access requested. You will be notified about the decision by email."
 msgstr ""
 
-#: /home/ron/prace/oarepo-requests/oarepo_requests/types/edit_record.py:155
+#: /home/dusanst/Projects/oarepo-requests/oarepo_requests/types/edit_record.py:161
 msgid "You have been requested to grant edit access to the record."
 msgstr ""
 
-#: /home/ron/prace/oarepo-requests/oarepo_requests/types/edit_record.py:158
+#: /home/dusanst/Projects/oarepo-requests/oarepo_requests/types/edit_record.py:164
 msgid "Edit access requested."
 msgstr ""
 
-#: /home/ron/prace/oarepo-requests/oarepo_requests/types/new_version.py:40
+#: /home/dusanst/Projects/oarepo-requests/oarepo_requests/types/new_version.py:40
 msgid "New Version"
 msgstr ""
 
-#: /home/ron/prace/oarepo-requests/oarepo_requests/types/new_version.py:61
+#: /home/dusanst/Projects/oarepo-requests/oarepo_requests/types/new_version.py:69
 msgid "Request requesting creation of new version of a published record."
 msgstr ""
 
-#: /home/ron/prace/oarepo-requests/oarepo_requests/types/new_version.py:69
+#: /home/dusanst/Projects/oarepo-requests/oarepo_requests/types/new_version.py:77
 msgid "Keep files:"
 msgstr ""
 
-#: /home/ron/prace/oarepo-requests/oarepo_requests/types/new_version.py:70
-msgid "Keep files in the new version?"
+#: /home/dusanst/Projects/oarepo-requests/oarepo_requests/types/new_version.py:78
+msgid "Yes or no"
 msgstr ""
 
-#: /home/ron/prace/oarepo-requests/oarepo_requests/types/new_version.py:71
+#: /home/dusanst/Projects/oarepo-requests/oarepo_requests/types/new_version.py:79
 msgid ""
 "If you choose yes, the current record's files will be linked to the new "
 "version of the record. Then you will be able to add/remove files in the "
 "form."
 msgstr ""
 
-#: /home/ron/prace/oarepo-requests/oarepo_requests/types/new_version.py:74
-msgid "No"
-msgstr ""
-
-#: /home/ron/prace/oarepo-requests/oarepo_requests/types/new_version.py:75
+#: /home/dusanst/Projects/oarepo-requests/oarepo_requests/types/new_version.py:83
 msgid "Yes"
 msgstr ""
 
-#: /home/ron/prace/oarepo-requests/oarepo_requests/types/new_version.py:123
-#: /home/ron/prace/oarepo-requests/oarepo_requests/types/new_version.py:128
+#: /home/dusanst/Projects/oarepo-requests/oarepo_requests/types/new_version.py:84
+msgid "No"
+msgstr ""
+
+#: /home/dusanst/Projects/oarepo-requests/oarepo_requests/types/new_version.py:133
+#: /home/dusanst/Projects/oarepo-requests/oarepo_requests/types/new_version.py:138
 msgid "Request new version access"
 msgstr ""
 
-#: /home/ron/prace/oarepo-requests/oarepo_requests/types/new_version.py:126
+#: /home/dusanst/Projects/oarepo-requests/oarepo_requests/types/new_version.py:136
 msgid "New version access requested"
 msgstr ""
 
-#: /home/ron/prace/oarepo-requests/oarepo_requests/types/new_version.py:141
+#: /home/dusanst/Projects/oarepo-requests/oarepo_requests/types/new_version.py:151
 msgid "Click to start creating a new version of the record."
 msgstr ""
 
-#: /home/ron/prace/oarepo-requests/oarepo_requests/types/new_version.py:144
+#: /home/dusanst/Projects/oarepo-requests/oarepo_requests/types/new_version.py:154
 msgid ""
 "Request permission to update record (including files). You will be notified "
 "about the decision by email."
 msgstr ""
 
-#: /home/ron/prace/oarepo-requests/oarepo_requests/types/new_version.py:151
+#: /home/dusanst/Projects/oarepo-requests/oarepo_requests/types/new_version.py:161
 msgid ""
 "Permission to update record (including files) requested. You will be "
 "notified about the decision by email."
 msgstr ""
 
-#: /home/ron/prace/oarepo-requests/oarepo_requests/types/new_version.py:156
+#: /home/dusanst/Projects/oarepo-requests/oarepo_requests/types/new_version.py:166
 msgid ""
 "You have been asked to approve the request to update the record. You can "
 "approve or reject the request."
 msgstr ""
 
-#: /home/ron/prace/oarepo-requests/oarepo_requests/types/new_version.py:160
+#: /home/dusanst/Projects/oarepo-requests/oarepo_requests/types/new_version.py:170
 msgid "Permission to update record (including files) requested. "
 msgstr ""
 
-#: /home/ron/prace/oarepo-requests/oarepo_requests/types/new_version.py:163
+#: /home/dusanst/Projects/oarepo-requests/oarepo_requests/types/new_version.py:173
 msgid "Submit request to get edit access to the record."
 msgstr ""
 
-#: /home/ron/prace/oarepo-requests/oarepo_requests/types/new_version.py:164
+#: /home/dusanst/Projects/oarepo-requests/oarepo_requests/types/new_version.py:174
 msgid "You do not have permission to update the record."
 msgstr ""
 
-#: /home/ron/prace/oarepo-requests/oarepo_requests/types/publish_draft.py:45
-#: /home/ron/prace/oarepo-requests/oarepo_requests/types/publish_draft.py:154
+#: /home/dusanst/Projects/oarepo-requests/oarepo_requests/types/publish_draft.py:45
+#: /home/dusanst/Projects/oarepo-requests/oarepo_requests/types/publish_draft.py:154
 msgid "Publish draft"
 msgstr ""
 
-#: /home/ron/prace/oarepo-requests/oarepo_requests/types/publish_draft.py:62
+#: /home/dusanst/Projects/oarepo-requests/oarepo_requests/types/publish_draft.py:62
 msgid "Resource version"
 msgstr ""
 
-#: /home/ron/prace/oarepo-requests/oarepo_requests/types/publish_draft.py:63
+#: /home/dusanst/Projects/oarepo-requests/oarepo_requests/types/publish_draft.py:63
 msgid "Write down the version (first, second…)."
 msgstr ""
 
-#: /home/ron/prace/oarepo-requests/oarepo_requests/types/publish_draft.py:78
+#: /home/dusanst/Projects/oarepo-requests/oarepo_requests/types/publish_draft.py:78
 msgid "Request publishing of a draft"
 msgstr ""
 
-#: /home/ron/prace/oarepo-requests/oarepo_requests/types/publish_draft.py:120
+#: /home/dusanst/Projects/oarepo-requests/oarepo_requests/types/publish_draft.py:120
 msgid ""
 "Missing uploaded files. To disable files for this record please mark it as "
 "metadata-only."
 msgstr ""
 
-#: /home/ron/prace/oarepo-requests/oarepo_requests/types/publish_draft.py:124
+#: /home/dusanst/Projects/oarepo-requests/oarepo_requests/types/publish_draft.py:124
 msgid "Missing uploaded files."
 msgstr ""
 
-#: /home/ron/prace/oarepo-requests/oarepo_requests/types/publish_draft.py:156
-#: /home/ron/prace/oarepo-requests/oarepo_requests/types/publish_draft.py:161
+#: /home/dusanst/Projects/oarepo-requests/oarepo_requests/types/publish_draft.py:156
+#: /home/dusanst/Projects/oarepo-requests/oarepo_requests/types/publish_draft.py:161
 msgid "Submit for review"
 msgstr ""
 
-#: /home/ron/prace/oarepo-requests/oarepo_requests/types/publish_draft.py:159
+#: /home/dusanst/Projects/oarepo-requests/oarepo_requests/types/publish_draft.py:159
 msgid "Submitted for review"
 msgstr ""
 
-#: /home/ron/prace/oarepo-requests/oarepo_requests/types/publish_draft.py:174
+#: /home/dusanst/Projects/oarepo-requests/oarepo_requests/types/publish_draft.py:174
 msgid ""
 "Click to immediately publish the draft. The draft will be a subject to "
 "embargo as requested in the side panel. Note: The action is irreversible."
 msgstr ""
 
-#: /home/ron/prace/oarepo-requests/oarepo_requests/types/publish_draft.py:181
+#: /home/dusanst/Projects/oarepo-requests/oarepo_requests/types/publish_draft.py:181
 msgid ""
 "By submitting the draft for review you are requesting the publication of the"
 " draft. The draft will become locked and no further changes will be possible"
@@ -463,37 +463,40 @@ msgid ""
 "decision by email."
 msgstr ""
 
-#: /home/ron/prace/oarepo-requests/oarepo_requests/types/publish_draft.py:189
+#: /home/dusanst/Projects/oarepo-requests/oarepo_requests/types/publish_draft.py:189
 msgid ""
 "The draft has been submitted for review. It is now locked and no further "
 "changes are possible. You will be notified about the decision by email."
 msgstr ""
 
-#: /home/ron/prace/oarepo-requests/oarepo_requests/types/publish_draft.py:195
+#: /home/dusanst/Projects/oarepo-requests/oarepo_requests/types/publish_draft.py:195
 msgid ""
 "The draft has been submitted for review. You can now accept or decline the "
 "request."
 msgstr ""
 
-#: /home/ron/prace/oarepo-requests/oarepo_requests/types/publish_draft.py:199
+#: /home/dusanst/Projects/oarepo-requests/oarepo_requests/types/publish_draft.py:199
 msgid "The draft has been submitted for review."
 msgstr ""
 
-#: /home/ron/prace/oarepo-requests/oarepo_requests/types/publish_draft.py:202
+#: /home/dusanst/Projects/oarepo-requests/oarepo_requests/types/publish_draft.py:202
 msgid ""
 "Submit for review. After submitting the draft for review, it will be locked "
 "and no further modifications will be possible."
 msgstr ""
 
-#: /home/ron/prace/oarepo-requests/oarepo_requests/types/publish_draft.py:206
+#: /home/dusanst/Projects/oarepo-requests/oarepo_requests/types/publish_draft.py:206
 msgid "Request not yet submitted."
 msgstr ""
 
-#: /home/ron/prace/oarepo-requests/oarepo_requests/ui/templates/semantic-ui/oarepo_requests_ui/RequestDetail.jinja:3
+#: /home/dusanst/Projects/oarepo-requests/oarepo_requests/ui/templates/semantic-ui/oarepo_requests_ui/RequestDetail.jinja:3
 msgid "Request"
 msgstr ""
 
 msgid "Cancel request"
+msgstr ""
+
+msgid "Record has validation errors. Redirecting to form..."
 msgstr ""
 
 msgid "Request not created successfully. Please try again in a moment."
@@ -621,9 +624,6 @@ msgid "Error loading request types"
 msgstr ""
 
 msgid "Error loading requests"
-msgstr ""
-
-msgid "Record has validation errors. Redirecting to form..."
 msgstr ""
 
 msgid "Back to requests"

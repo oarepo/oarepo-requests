@@ -710,5 +710,9 @@ msgstr ""
 msgid "Missing uploaded files."
 msgstr ""
 
+#: /home/dusanst/Projects/oarepo-requests/oarepo_requests/types/new_version.py:78
+msgid "Yes or no"
+msgstr ""
+
 #~ msgid "No status"
 #~ msgstr ""
