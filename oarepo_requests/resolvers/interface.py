@@ -1,11 +1,14 @@
 from __future__ import annotations
 
-from typing import Any
+from typing import Any, TYPE_CHECKING
 
 from invenio_pidstore.errors import PersistentIdentifierError
-from invenio_requests.records import Request
 
 from oarepo_requests.resolvers.ui import resolve
+import logging
+if TYPE_CHECKING:
+    from invenio_requests.records import Request
+log = logging.getLogger(__name__)
 
 # todo consider - we are not using this strictly in the ui context - so how should we separate these things in the future
 def resolve_entity(entity: str, obj: Request, ctx: dict[str, Any]) -> dict:
@@ -38,7 +41,7 @@ def resolve_entity(entity: str, obj: Request, ctx: dict[str, Any]) -> dict:
     return entity
 
 
-def entity_context_key(reference_dict):
+def entity_context_key(reference_dict: dict) -> str:
     return "entity:" + ":".join(
         f"{x[0]}:{x[1]}" for x in sorted(reference_dict.items())
     )
