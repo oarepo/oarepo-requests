@@ -9,12 +9,13 @@
 
 from __future__ import annotations
 
-from functools import cached_property
+from functools import cached_property, partial
 from typing import TYPE_CHECKING, Any, Callable
 
 from flask_resources import JSONSerializer, ResponseHandler
 from invenio_records_resources.resources.records.headers import etag_headers
 from invenio_records_resources.services.records.params import FilterParam
+from invenio_records_resources.services.records.params.base import ParamInterpreter
 from invenio_requests.resources.events.config import RequestCommentsResourceConfig
 from invenio_requests.resources.requests.config import (
     RequestSearchRequestArgsSchema,
@@ -50,6 +51,25 @@ class RequestOwnerFilterParam(FilterParam):
         value = params.pop(self.param_name, None)
         if value is not None:
             search = search.filter("term", **{self.field_name: identity.id})
+        return search
+
+
+class RequestAllAvailableFilterParam(ParamInterpreter):
+    """A no-op filter that returns all requests that are readable by the current user."""
+
+    def __init__(self, param_name, config):
+        """Initialize the filter."""
+        self.param_name = param_name
+        super().__init__(config)
+
+    @classmethod
+    def factory(cls, param=None):
+        """Create a new filter parameter."""
+        return partial(cls, param)
+
+    def apply(self, identity, search, params):
+        """Apply the filter to the search - does nothing."""
+        params.pop(self.param_name, None)
         return search
 
 
@@ -89,6 +109,7 @@ class EnhancedRequestSearchOptions(RequestSearchOptions):
     params_interpreters_cls = RequestSearchOptions.params_interpreters_cls + [
         RequestOwnerFilterParam.factory("mine", "created_by.user"),
         RequestNotOwnerFilterParam.factory("assigned", "created_by.user"),
+        RequestAllAvailableFilterParam.factory("all"),
         IsClosedParam.factory("is_closed"),
     ]
 
@@ -98,6 +119,7 @@ class ExtendedRequestSearchRequestArgsSchema(RequestSearchRequestArgsSchema):
 
     mine = fields.Boolean()
     assigned = fields.Boolean()
+    all = fields.Boolean()
     is_closed = fields.Boolean()
 
 
