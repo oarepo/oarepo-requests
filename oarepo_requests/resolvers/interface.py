@@ -6,7 +6,6 @@ from invenio_pidstore.errors import PersistentIdentifierError
 from invenio_requests.records import Request
 
 from oarepo_requests.resolvers.ui import resolve
-from oarepo_requests.utils import log
 
 # todo consider - we are not using this strictly in the ui context - so how should we separate these things in the future
 def resolve_entity(entity: str, obj: Request, ctx: dict[str, Any]) -> dict:
