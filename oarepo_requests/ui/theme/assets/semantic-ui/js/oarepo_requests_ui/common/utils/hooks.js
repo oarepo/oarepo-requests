@@ -250,8 +250,7 @@ export const useAction = ({
             requestActionName,
           });
         }
-        const redirectionURL = data?.data?.links?.redirect_urls?.self_html;
-        console.log(data.data);
+        const redirectionURL = data?.data?.links?.topic?.self_html;
         modalControl?.closeModal();
 
         if (redirectionURL) {
@@ -259,7 +258,7 @@ export const useAction = ({
         } else {
           // TODO: some requests after they complete no longer have a topic_html,
           // so redirecting to dashboard instead
-          // window.location.href = "/me/records/";
+          window.location.href = "/me/records/";
           // fetchNewRequests?.();
         }
       },

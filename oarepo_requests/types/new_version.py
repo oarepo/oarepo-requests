@@ -47,10 +47,12 @@ class NewVersionRequestType(NonDuplicableOARepoRequestType):
             attribute="draft_record:links:self_html",
             data_key="draft_record:links:self_html",
         ),
-        "keep_files": ma.fields.String(validate=OneOf(["true", "false"])),
+        "keep_files": ma.fields.String(validate=OneOf(["yes", "no"])),
     }
 
-    def extra_entity_links(self, request: Request, entity: dict, entity_type: str, **kwargs) -> dict:
+    def extra_entity_links(
+        self, request: Request, entity: dict, entity_type: str, **kwargs
+    ) -> dict:
         if request.status == "accepted" and entity_type == "topic":
             return {"topic_redirect_link": entity["links"]["edit_html"]}
         else:
@@ -70,15 +72,17 @@ class NewVersionRequestType(NonDuplicableOARepoRequestType):
 
     form = {
         "field": "keep_files",
-        "ui_widget": "BooleanCheckbox",
+        "ui_widget": "Dropdown",
         "props": {
             "label": _("Keep files:"),
-            "placeholder": _("Keep files in the new version?"),
+            "placeholder": _("Yes or no"),
             "description": _(
                 "If you choose yes, the current record's files will be linked to the new version of the record. Then you will be able to add/remove files in the form."
             ),
-            "falseLabel": _("No"),
-            "trueLabel": _("Yes"),
+            "options": [
+                {"id": "yes", "title_l10n": _("Yes")},
+                {"id": "no", "title_l10n": _("No")},
+            ],
         },
     }
 

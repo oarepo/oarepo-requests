@@ -47,7 +47,7 @@ class NewVersionAcceptAction(AddTopicLinksOnPayloadMixin, OARepoAcceptAction):
         if (
             "payload" in self.request
             and "keep_files" in self.request["payload"]
-            and self.request["payload"]["keep_files"] == "true"
+            and self.request["payload"]["keep_files"] == "yes"
         ):
             topic_service.import_files(identity, new_version_topic.id)
         update_topic(self.request, topic, new_version_topic._record, uow)

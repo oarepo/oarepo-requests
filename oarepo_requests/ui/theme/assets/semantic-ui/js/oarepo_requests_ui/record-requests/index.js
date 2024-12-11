@@ -16,24 +16,24 @@ const recordRequestsAppDiv = document.getElementById("record-requests");
 if (recordRequestsAppDiv) {
   const record = JSON.parse(recordRequestsAppDiv.dataset.record);
 
-  const onActionError = (e, variables, requestModalFormik, modalControl) => {
+  const onActionError = ({ e, formik, modalControl }) => {
     if (e?.response?.data?.errors) {
       const errorData = e.response.data;
       const jsonErrors = JSON.stringify(errorData);
       const base64EncodedErrors = encodeUnicodeBase64(jsonErrors);
-      if (record?.links?.topic?.edit_html) {
-        requestModalFormik?.setFieldError(
+      if (record?.links?.edit_html) {
+        formik?.setFieldError(
           "api",
           i18next.t("Record has validation errors. Redirecting to form...")
         );
         setTimeout(() => {
           window.location.href =
-            record.links.topic.edit_html + `#${base64EncodedErrors}`;
+            record.links.edit_html + `#${base64EncodedErrors}`;
           modalControl?.closeModal();
         }, 2500);
       }
     } else {
-      requestModalFormik?.setFieldError(
+      formik?.setFieldError(
         "api",
         i18next.t(
           "The action could not be executed. Please try again in a moment."
