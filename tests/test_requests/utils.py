@@ -13,6 +13,19 @@ def link2testclient(link, ui=False):
     return link[len(base_string) - 1 :]
 
 
+def _create_request(client, record_id, request_type, urls):
+    applicable = client.get(
+        f"{urls['BASE_URL']}{record_id}/draft/requests/applicable"
+    ).json["hits"]["hits"]
+    request_link = [
+        type_["links"]["actions"]["create"]
+        for type_ in applicable
+        if type_["type_id"] == request_type
+    ][0]
+    ret = client.post(link2testclient(request_link))
+    return ret
+
+
 # from chatgpt
 def dict_diff(dict1, dict2, path=""):
     ret = defaultdict(list)
