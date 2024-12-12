@@ -22,6 +22,7 @@ const DirectCreateAndSubmit = ({
     isLoading,
     mutate: createAndSubmit,
     isError,
+    error,
     reset,
   } = useAction({
     action: saveAndSubmit,
@@ -69,9 +70,13 @@ const DirectCreateAndSubmit = ({
       {isError && (
         <Message negative>
           <Message.Header>
-            {i18next.t(
-              "Request not created successfully. Please try again in a moment."
-            )}
+            {error?.response?.data?.errors?.length > 0
+              ? i18next.t(
+                  "Record has validation errors. Redirecting to form..."
+                )
+              : i18next.t(
+                  "Request not created successfully. Please try again in a moment."
+                )}
           </Message.Header>
         </Message>
       )}

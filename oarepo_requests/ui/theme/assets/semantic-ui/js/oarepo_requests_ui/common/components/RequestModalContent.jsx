@@ -38,13 +38,15 @@ export const RequestModalContent = ({
         {description && (
           <Grid.Column as="p" id="request-modal-desc">
             <span dangerouslySetInnerHTML={{ __html: sanitizedDescription }} />{" "}
-            <a
-              href={request?.links?.self_html}
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              ({i18next.t("Request details")})
-            </a>
+            {request?.links?.self_html && (
+              <a
+                href={request.links.self_html}
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                ({i18next.t("Request details")})
+              </a>
+            )}
           </Grid.Column>
         )}
       </Grid.Row>

@@ -81,7 +81,7 @@ def test_new_version_files(
         urls["BASE_URL_REQUESTS"],
         json={
             **new_version_data_function(record1["id"]),
-            "payload": {"keep_files": "true"},
+            "payload": {"keep_files": "yes"},
         },
     )
     resp_request_create2 = creator_client.post(

@@ -742,3 +742,7 @@ msgstr ""
 #: /home/ron/prace/oarepo-requests/oarepo_requests/types/publish_draft.py:124
 msgid "Missing uploaded files."
 msgstr "Chybí nahrané soubory."
+
+#: /home/dusanst/Projects/oarepo-requests/oarepo_requests/types/new_version.py:78
+msgid "Yes or no"
+msgstr "Ano nebo ne"
