@@ -154,8 +154,9 @@ class OARepoAcceptAction(OARepoGenericActionMixin, actions.AcceptAction):
     name = _("Accept")
 
 
-class OARepoCancelAction(actions.CancelAction):
+class OARepoCancelAction(OARepoGenericActionMixin, actions.CancelAction):
     """Cancel action extended for oarepo requests."""
+    name = _("Cancel")
 
     status_from = ["created", "submitted"]
     status_to = "cancelled"

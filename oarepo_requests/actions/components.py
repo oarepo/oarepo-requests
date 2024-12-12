@@ -124,7 +124,9 @@ class WorkflowTransitionComponent(RequestActionComponent):
             NoResultFound
         ):  # parent might be deleted - this is the case for delete_draft request type
             return
-        target_state = transitions[action.status_to]  # type: ignore
+        request_target_state = action.status_to
+        transition_state = "declined" if request_target_state is "cancelled" else request_target_state
+        target_state = transitions[transition_state]  # type: ignore
         if (
             target_state and not topic.model.is_deleted
         ):  # commit doesn't work on deleted record?
