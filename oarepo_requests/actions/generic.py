@@ -94,7 +94,10 @@ class OARepoGenericActionMixin:
         """Execute the action."""
         request: Request = self.request  # type: ignore
         request_type = request.type
-        topic = request.topic.resolve()
+        try:
+            topic = request.topic.resolve()
+        except:
+            topic = None
         self._execute_with_components(
             self.components, identity, request_type, topic, uow, *args, **kwargs
         )
@@ -154,8 +157,10 @@ class OARepoAcceptAction(OARepoGenericActionMixin, actions.AcceptAction):
     name = _("Accept")
 
 
-class OARepoCancelAction(actions.CancelAction):
+class OARepoCancelAction(OARepoGenericActionMixin, actions.CancelAction):
     """Cancel action extended for oarepo requests."""
+
+    name = _("Cancel")
 
     status_from = ["created", "submitted"]
     status_to = "cancelled"

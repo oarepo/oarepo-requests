@@ -106,14 +106,20 @@ class DefaultRequests(WorkflowRequestPolicy):
         requesters=[IfInState("draft", [RecordOwners()])],
         recipients=[UserGenerator(2)],
         transitions=WorkflowTransitions(
-            submitted="publishing", accepted="published", declined="draft"
+            submitted="publishing",
+            accepted="published",
+            declined="draft",
+            cancelled="draft",
         ),
     )
     delete_published_record = WorkflowRequest(
         requesters=[IfInState("published", [RecordOwners()])],
         recipients=[UserGenerator(2)],
         transitions=WorkflowTransitions(
-            submitted="deleting", accepted="deleted", declined="published"
+            submitted="deleting",
+            accepted="deleted",
+            declined="published",
+            cancelled="published",
         ),
     )
     delete_draft = WorkflowRequest(
@@ -158,7 +164,10 @@ class RequestsWithApprove(WorkflowRequestPolicy):
         requesters=[IfInState("approved", [AutoRequest()])],
         recipients=[UserGenerator(1)],
         transitions=WorkflowTransitions(
-            submitted="publishing", accepted="published", declined="approved"
+            submitted="publishing",
+            accepted="published",
+            declined="approved",
+            cancelled="approved",
         ),
         events=events_only_receiver_can_comment,
     )
@@ -166,7 +175,10 @@ class RequestsWithApprove(WorkflowRequestPolicy):
         requesters=[IfInState("draft", [RecordOwners()])],
         recipients=[UserGenerator(2)],
         transitions=WorkflowTransitions(
-            submitted="approving", accepted="approved", declined="draft"
+            submitted="approving",
+            accepted="approved",
+            declined="draft",
+            cancelled="draft",
         ),
         events=events_only_receiver_can_comment,
     )
@@ -174,7 +186,10 @@ class RequestsWithApprove(WorkflowRequestPolicy):
         requesters=[IfInState("published", [RecordOwners()])],
         recipients=[UserGenerator(2)],
         transitions=WorkflowTransitions(
-            submitted="deleting", accepted="deleted", declined="published"
+            submitted="deleting",
+            accepted="deleted",
+            declined="published",
+            cancelled="published",
         ),
         events=events_only_receiver_can_comment,
     )

@@ -14,11 +14,7 @@ from __future__ import annotations
 
 import abc
 import contextlib
-from typing import (
-    TYPE_CHECKING,
-    Any,
-    override,
-)
+from typing import TYPE_CHECKING, Any, override
 
 from invenio_requests.customizations import RequestAction, RequestActions, RequestType
 from invenio_requests.errors import CannotExecuteActionError
@@ -114,6 +110,10 @@ class WorkflowTransitionComponent(RequestActionComponent):
         from sqlalchemy.exc import NoResultFound
 
         yield
+        if (
+            not topic
+        ):  # for example if we are cancelling requests after deleting draft, it does not make sense to attempt changing the state of the draft
+            return
         try:
             transitions = (
                 current_oarepo_workflows.get_workflow(topic)
