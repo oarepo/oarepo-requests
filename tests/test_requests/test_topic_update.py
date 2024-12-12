@@ -5,7 +5,6 @@
 # modify it under the terms of the MIT License; see LICENSE file for more
 # details.
 #
-from thesis.records.api import ThesisDraft
 
 from .utils import link2testclient
 
@@ -43,67 +42,3 @@ def test_publish(
         ),
     )
     check_publish_topic_update(creator_client, urls, record, resp_request_create)
-
-
-def test_edit(
-    vocab_cf,
-    logged_client,
-    users,
-    urls,
-    edit_record_data_function,
-    record_factory,
-    search_clear,
-):
-    creator = users[0]
-    creator_client = logged_client(creator)
-
-    record1 = record_factory(creator.identity)
-    id_ = record1["id"]
-
-    resp_request_create = creator_client.post(
-        urls["BASE_URL_REQUESTS"],
-        json=edit_record_data_function(record1["id"]),
-    )
-    resp_request_submit = creator_client.post(
-        link2testclient(resp_request_create.json["links"]["actions"]["submit"]),
-    )
-    # is request accepted and closed?
-    request = creator_client.get(
-        f'{urls["BASE_URL_REQUESTS"]}{resp_request_create.json["id"]}',
-    ).json
-
-    assert request["topic"] == {"thesis_draft": id_}
-
-
-def test_new_version(
-    vocab_cf,
-    logged_client,
-    users,
-    urls,
-    new_version_data_function,
-    record_factory,
-    search_clear,
-):
-    creator = users[0]
-    creator_client = logged_client(creator)
-
-    record1 = record_factory(creator.identity)
-    id_ = record1["id"]
-
-    resp_request_create = creator_client.post(
-        urls["BASE_URL_REQUESTS"],
-        json=new_version_data_function(record1["id"]),
-    )
-    resp_request_submit = creator_client.post(
-        link2testclient(resp_request_create.json["links"]["actions"]["submit"]),
-    )
-    # is request accepted and closed?
-    request = creator_client.get(
-        f'{urls["BASE_URL_REQUESTS"]}{resp_request_create.json["id"]}',
-    ).json
-    ThesisDraft.index.refresh()
-    new_draft_id = creator_client.get(f"/user{urls['BASE_URL']}").json["hits"]["hits"][
-        0
-    ]["id"]
-    assert new_draft_id != id_
-    assert request["topic"] == {"thesis_draft": new_draft_id}

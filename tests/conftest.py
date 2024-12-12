@@ -141,6 +141,16 @@ class RequestsWithDifferentRecipients(DefaultRequests):
         requesters=[AnyUser()],
         recipients=[UserGenerator(1)],
     )
+    edit_published_record = WorkflowRequest(
+        requesters=[IfNoEditDraft([IfInState("published", [RecordOwners()])])],
+        recipients=[UserGenerator(2)],
+        transitions=WorkflowTransitions(),
+    )
+    new_version = WorkflowRequest(
+        requesters=[IfNoNewVersionDraft([IfInState("published", [RecordOwners()])])],
+        recipients=[UserGenerator(2)],
+        transitions=WorkflowTransitions(),
+    )
 
 
 class RequestsWithApprove(WorkflowRequestPolicy):
@@ -638,7 +648,7 @@ def record_factory(record_service, default_workflow_json):
         json = copy.deepcopy(default_workflow_json)
         if custom_workflow:  # specifying this assumes use of workflows
             json["parent"]["workflow"] = custom_workflow
-        json = {
+        json_metadata = {
             "metadata": {
                 "creators": [
                     "Creator 1",
@@ -647,7 +657,7 @@ def record_factory(record_service, default_workflow_json):
                 "contributors": ["Contributor 1"],
             }
         }
-        json = always_merger.merge(json, default_workflow_json)
+        json = always_merger.merge(json, json_metadata)
         if additional_data:
             always_merger.merge(json, additional_data)
         draft = record_service.create(identity, json)

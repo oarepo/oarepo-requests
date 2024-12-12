@@ -13,7 +13,6 @@ from typing import TYPE_CHECKING, Any, override
 
 from oarepo_runtime.datastreams.utils import get_record_service_for_record
 
-from .cascade_events import update_topic
 from .generic import AddTopicLinksOnPayloadMixin, OARepoAcceptAction
 
 if TYPE_CHECKING:
@@ -44,5 +43,4 @@ class EditTopicAcceptAction(AddTopicLinksOnPayloadMixin, OARepoAcceptAction):
         if not topic_service:
             raise KeyError(f"topic {topic} service not found")
         edit_topic = topic_service.edit(identity, topic["id"], uow=uow)
-        update_topic(self.request, topic, edit_topic._record, uow)
         super().apply(identity, request_type, edit_topic, uow, *args, **kwargs)
