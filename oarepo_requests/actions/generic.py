@@ -52,7 +52,6 @@ class OARepoGenericActionMixin:
         **kwargs: Any,
     ) -> None:
         """Apply the action to the topic."""
-        pass
 
     def _execute_with_components(
         self,
@@ -127,8 +126,13 @@ class AddTopicLinksOnPayloadMixin:
         # invenio does not allow non-string values in the payload, so using colon notation here
         # client will need to handle this and convert to links structure
         # can not use dot notation as marshmallow tries to be too smart and does not serialize dotted keys
-        request["payload"][self.self_link] = topic_dict["links"]["self"]
-        request["payload"][self.self_html_link] = topic_dict["links"]["self_html"]
+        if (
+            "self" in topic_dict["links"]
+        ):  # todo consider - this happens if receiver doesn't have read rights to the topic, like after a draft is created after edit
+            # if it's needed in all cases, we could do a system identity call here
+            request["payload"][self.self_link] = topic_dict["links"]["self"]
+        if "self_html" in topic_dict["links"]:
+            request["payload"][self.self_html_link] = topic_dict["links"]["self_html"]
         return topic._record
 
 

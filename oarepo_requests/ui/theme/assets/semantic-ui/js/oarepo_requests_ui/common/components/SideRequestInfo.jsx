@@ -10,44 +10,48 @@ export const SideRequestInfo = ({ request }) => {
   const statusIcon = getRequestStatusIcon(request?.status_code);
   return (
     <List horizontal relaxed divided size="small">
-      <List.Item>
-        <List.Header as="h3">{i18next.t("Creator")}</List.Header>
-        <List.Content>
-          <Icon name="user circle outline" />
-          <span>
-            {_has(request, "links.created_by.self_html") ? (
-              <a
-                href={request.links.created_by.self_html}
-                target="_blank"
-                rel="noreferrer"
-              >
-                {request.created_by.label}
-              </a>
-            ) : (
-              request.created_by?.label
-            )}
-          </span>
-        </List.Content>
-      </List.Item>
-      <List.Item>
-        <List.Header as="h3">{i18next.t("Receiver")}</List.Header>
-        <List.Content>
-          <Icon name="mail outline" />
-          <span>
-            {_has(request, "links.receiver.self_html") ? (
-              <a
-                href={request.links.receiver.self_html}
-                target="_blank"
-                rel="noreferrer"
-              >
-                {request?.receiver?.label}
-              </a>
-            ) : (
-              request?.receiver?.label
-            )}
-          </span>
-        </List.Content>
-      </List.Item>
+      {request?.created_by && (
+        <List.Item>
+          <List.Header as="h3">{i18next.t("Creator")}</List.Header>
+          <List.Content>
+            <Icon name="user circle outline" />
+            <span>
+              {_has(request, "links.created_by.self_html") ? (
+                <a
+                  href={request.links.created_by.self_html}
+                  target="_blank"
+                  rel="noreferrer"
+                >
+                  {request.created_by.label}
+                </a>
+              ) : (
+                request.created_by?.label
+              )}
+            </span>
+          </List.Content>
+        </List.Item>
+      )}
+      {request?.receiver && (
+        <List.Item>
+          <List.Header as="h3">{i18next.t("Receiver")}</List.Header>
+          <List.Content>
+            <Icon name="mail outline" />
+            <span>
+              {_has(request, "links.receiver.self_html") ? (
+                <a
+                  href={request.links.receiver.self_html}
+                  target="_blank"
+                  rel="noreferrer"
+                >
+                  {request?.receiver?.label}
+                </a>
+              ) : (
+                request?.receiver?.label
+              )}
+            </span>
+          </List.Content>
+        </List.Item>
+      )}
       <List.Item>
         <List.Header as="h3">{i18next.t("Status")}</List.Header>
         <List.Content>

@@ -250,16 +250,16 @@ export const useAction = ({
             requestActionName,
           });
         }
-        const redirectionURL = data?.data?.links?.topic?.self_html;
+        const redirectionURL =
+          data?.data?.links?.ui_redirect_url ||
+          data?.data?.links?.topic?.self_html;
+          
         modalControl?.closeModal();
 
         if (redirectionURL) {
           window.location.href = redirectionURL;
         } else {
-          // TODO: some requests after they complete no longer have a topic_html,
-          // so redirecting to dashboard instead
-          window.location.href = "/me/records/";
-          // fetchNewRequests?.();
+          window.location.reload();
         }
       },
     }

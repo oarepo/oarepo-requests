@@ -8,7 +8,7 @@
 
 from thesis.records.api import ThesisDraft, ThesisRecord
 
-from tests.test_requests.utils import link2testclient
+from tests.test_requests.utils import _create_request, link2testclient
 
 
 def test_new_version_autoaccept(
@@ -136,19 +136,22 @@ def test_redirect_url(
 ):
     creator = users[0]
     creator_client = logged_client(creator)
+    receiver_client = logged_client(users[1])
     record1 = record_factory(creator.identity)
+    original_id = record1["id"]
 
     resp_request_create = creator_client.post(
         urls["BASE_URL_REQUESTS"],
-        json=new_version_data_function(record1["id"]),
+        json=new_version_data_function(original_id),
     )
+    original_request_id = resp_request_create.json["id"]
     resp_request_submit = creator_client.post(
         link2testclient(resp_request_create.json["links"]["actions"]["submit"]),
     )
     # is request accepted and closed?
 
     request = creator_client.get(
-        f'{urls["BASE_URL_REQUESTS"]}{resp_request_create.json["id"]}',
+        f'{urls["BASE_URL_REQUESTS"]}{original_request_id}',
     ).json
 
     ThesisDraft.index.refresh()
@@ -161,6 +164,26 @@ def test_redirect_url(
         if x["parent"]["id"] == record1.parent["id"] and x["state"] == "draft"
     ][0]
     assert (
-        request["links"]["topic"]["topic_redirect_link"]
-        == f"https://127.0.0.1:5000/thesis/{new_version['id']}/edit"
+        link2testclient(request["links"]["ui_redirect_url"], ui=True)
+        == f"/thesis/{new_version['id']}/edit"
     )
+
+    publish_request = _create_request(
+        creator_client, new_version["id"], "publish_draft", urls
+    )
+    submit = creator_client.post(
+        link2testclient(publish_request.json["links"]["actions"]["submit"])
+    )
+    receiver_request = receiver_client.get(
+        f"{urls['BASE_URL_REQUESTS']}{submit.json['id']}"
+    )
+    accept = receiver_client.post(
+        link2testclient(receiver_request.json["links"]["actions"]["accept"])
+    )
+
+    original_request = creator_client.get(
+        f'{urls["BASE_URL_REQUESTS"]}{original_request_id}',
+    ).json
+    assert original_request["topic"] == {
+        "thesis": original_id
+    }  # check no weird topic kerfluffle happened here

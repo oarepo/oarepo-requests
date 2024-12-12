@@ -15,7 +15,8 @@ import { httpApplicationJson } from "@js/oarepo_ui";
 
 const TimelineCommentEvent = ({ event, requestId, page }) => {
   const createdBy = event?.expanded?.created_by;
-  const creatorLabel = createdBy?.username || createdBy?.email;
+  const creatorLabel =
+    createdBy?.profile?.full_name || createdBy?.username || createdBy?.email;
   const [editMode, setEditMode] = useState(false);
   const [deleteMode, setDeleteMode] = useState(false);
   const [comment, setComment] = useState(event.payload.content);
