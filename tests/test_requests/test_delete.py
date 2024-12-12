@@ -51,8 +51,7 @@ def test_delete(
         ),
     )
     assert (
-            link2testclient(delete.json["links"]["redirect_urls"]["accept"], ui=True)
-            == "/thesis/"
+        link2testclient(delete.json["links"]["ui_redirect_url"], ui=True) == "/thesis/"
     )
 
     ThesisRecord.index.refresh()
@@ -134,7 +133,7 @@ def test_delete_draft(
     assert request_after.json["status"] == "accepted"
     assert request_after.json["is_closed"]
     assert (
-            link2testclient(request_after.json["links"]["redirect_urls"]["accept"], ui=True)
-            == "/thesis/"
+        link2testclient(request_after.json["links"]["ui_redirect_url"], ui=True)
+        == "/thesis/"
     )
     assert read_deleted.status_code == 404

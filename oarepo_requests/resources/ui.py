@@ -47,9 +47,10 @@ def _reference_map_from_list(obj_list: list[dict]) -> dict[str, set]:
         for reference_type in reference_types:
             if reference_type in hit:
                 reference = hit[reference_type]
-                reference_map[list(reference.keys())[0]].add(
-                    list(reference.values())[0]
-                )
+                if reference:
+                    reference_map[list(reference.keys())[0]].add(
+                        list(reference.values())[0]
+                    )
     return reference_map
 
 
