@@ -16,7 +16,7 @@ from invenio_requests.customizations import actions
 from oarepo_runtime.i18n import lazy_gettext as _
 
 from oarepo_requests.proxies import current_oarepo_requests
-
+from invenio_pidstore.errors import PersistentIdentifierError
 if TYPE_CHECKING:
     from flask_babel.speaklater import LazyString
     from flask_principal import Identity
@@ -96,7 +96,7 @@ class OARepoGenericActionMixin:
         request_type = request.type
         try:
             topic = request.topic.resolve()
-        except:
+        except PersistentIdentifierError:
             topic = None
         self._execute_with_components(
             self.components, identity, request_type, topic, uow, *args, **kwargs
