@@ -461,10 +461,12 @@ def test_workflow_events_resource(
     request_id = read_from_record.json["expanded"]["requests"][0]["id"]
     json = {**events_resource_data, "type": TestEventType.type_id}
     create_event_u1 = user1_client.post(
-        f"{urls['BASE_URL_REQUESTS']}{request_id}/timeline/{TestEventType.type_id}", json=json
+        f"{urls['BASE_URL_REQUESTS']}{request_id}/timeline/{TestEventType.type_id}",
+        json=json,
     )
     create_event_u2 = user2_client.post(
-        f"{urls['BASE_URL_REQUESTS']}{request_id}/timeline/{TestEventType.type_id}", json=json
+        f"{urls['BASE_URL_REQUESTS']}{request_id}/timeline/{TestEventType.type_id}",
+        json=json,
     )
 
     assert create_event_u1.status_code == 403
@@ -493,10 +495,12 @@ def test_workflow_events_resource(
     request_id = publish_request["id"]
 
     create_event_u1 = user1_client.post(
-        f"{urls['BASE_URL_REQUESTS']}{request_id}/timeline/{TestEventType.type_id}", json=json
+        f"{urls['BASE_URL_REQUESTS']}{request_id}/timeline/{TestEventType.type_id}",
+        json=json,
     )
     create_event_u2 = user2_client.post(
-        f"{urls['BASE_URL_REQUESTS']}{request_id}/timeline/{TestEventType.type_id}", json=json
+        f"{urls['BASE_URL_REQUESTS']}{request_id}/timeline/{TestEventType.type_id}",
+        json=json,
     )
     assert create_event_u1.status_code == 201
     assert create_event_u2.status_code == 403
@@ -558,3 +562,44 @@ def test_delete_log(
             break
     else:
         assert False
+
+
+def test_cancel_transition(
+    vocab_cf,
+    logged_client,
+    users,
+    urls,
+    publish_request_data_function,
+    create_draft_via_resource,
+    search_clear,
+):
+    creator = users[0]
+    creator_client = logged_client(creator)
+
+    draft1 = create_draft_via_resource(creator_client)
+
+    resp_request_create = creator_client.post(
+        urls["BASE_URL_REQUESTS"],
+        json=publish_request_data_function(draft1.json["id"]),
+    )
+    resp_request_submit = creator_client.post(
+        link2testclient(resp_request_create.json["links"]["actions"]["submit"]),
+    )
+
+    record = creator_client.get(
+        f"{urls['BASE_URL']}{draft1.json['id']}/draft?expand=true"
+    )
+    assert record.json["expanded"]["requests"][0]["links"]["actions"].keys() == {
+        "cancel",
+    }
+    assert record.json["state"] == "publishing"
+    creator_client.post(
+        link2testclient(
+            record.json["expanded"]["requests"][0]["links"]["actions"]["cancel"]
+        ),
+    )
+
+    record = creator_client.get(
+        f"{urls['BASE_URL']}{draft1.json['id']}/draft?expand=true"
+    )
+    assert record.json["state"] == "draft"
