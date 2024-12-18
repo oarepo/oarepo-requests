@@ -164,3 +164,42 @@ class RequestTypesList(RecordList):
     def total(self) -> int:
         """Total number of hits."""
         return len(self._results)
+
+from invenio_requests.services.requests.results import RequestList
+class OARepoRequestList(RequestList):
+
+    @property
+    def hits(self):
+        """Iterator over the hits."""
+        request_cls = self._service.record_cls
+
+        for hit in self._results:
+            # load dump
+            request = request_cls.loads(hit.to_dict())
+            schema = self._service._wrap_schema(request.type.marshmallow_schema())
+
+            # project the request
+            projection = schema.dump(
+                request,
+                context={
+                    "identity": self._identity,
+                    "record": request,
+                },
+            )
+
+            if hasattr(self._service.config, "links_search_item"):
+                links_tpl = self._service.config.search_item_links_template(
+                    self._service.config.links_search_item,
+                    self._service.config.action_link,
+                    context={
+                        "permission_policy_cls": self._service.config.permission_policy_cls,
+                    },
+                )
+                projection["links"] = links_tpl.expand(self._identity, request)
+
+            elif self._links_item_tpl:
+                projection["links"] = self._links_item_tpl.expand(
+                    self._identity, request
+                )
+
+            yield projection

@@ -23,6 +23,9 @@ from oarepo_requests.resources.oarepo.config import OARepoRequestsResourceConfig
 from oarepo_requests.resources.oarepo.resource import OARepoRequestsResource
 from oarepo_requests.services.oarepo.config import OARepoRequestsServiceConfig
 from oarepo_requests.services.oarepo.service import OARepoRequestsService
+from invenio_requests.services.requests.links import RequestLinksTemplate
+
+from oarepo_requests.services.results import OARepoRequestList
 
 if TYPE_CHECKING:
     from flask import Flask
@@ -240,3 +243,8 @@ def finalize_app(app: Flask) -> None:
     # but imo this is better than entrypoints
     for type in app.config["REQUESTS_REGISTERED_EVENT_TYPES"]:
         current_event_type_registry.register_type(type)
+
+    invenio_requests = app.extensions["invenio-requests"]
+    service = invenio_requests.requests_service
+    service.config.result_list_cls = OARepoRequestList
+    service.config.search_item_links_template = RequestLinksTemplate

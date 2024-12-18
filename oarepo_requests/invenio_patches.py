@@ -141,6 +141,8 @@ def override_invenio_requests_config(
         for k, v in OARepoRequestsServiceConfig.links_item.items():
             if k not in RequestsServiceConfig.links_item:
                 RequestsServiceConfig.links_item[k] = v
+        RequestsServiceConfig.links_search_item = OARepoRequestsServiceConfig.links_search_item
+
 
         class LazySerializer:
             def __init__(self, serializer_cls: type[BaseSerializer]) -> None:

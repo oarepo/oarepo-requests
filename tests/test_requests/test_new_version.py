@@ -124,6 +124,44 @@ def test_new_version_files(
     assert len(record1["entries"]) == 1
     assert len(record2["entries"]) == 0
 
+def test_not_available_with_open_draft(
+    vocab_cf,
+    logged_client,
+    users,
+    urls,
+    new_version_data_function,
+    record_factory,
+    search_clear,
+):
+    creator = users[0]
+    creator_client = logged_client(creator)
+
+    record1 = record_factory(creator.identity)
+
+    applicable_before = creator_client.get(
+        f"{urls['BASE_URL']}{record1['id']}/requests/applicable",
+    ).json["hits"]["hits"]
+
+    resp_request_create = creator_client.post(
+        urls["BASE_URL_REQUESTS"],
+        json=new_version_data_function(record1["id"]),
+    )
+    resp_request_submit = creator_client.post(
+        link2testclient(resp_request_create.json["links"]["actions"]["submit"]),
+    )
+
+    request = creator_client.get(
+        f'{urls["BASE_URL_REQUESTS"]}{resp_request_create.json["id"]}',
+    ).json
+
+    applicable_after = creator_client.get(
+        f"{urls['BASE_URL']}{record1['id']}/requests/applicable",
+    ).json["hits"]["hits"]
+
+    print()
+
+
+
 
 def test_redirect_url(
     vocab_cf,

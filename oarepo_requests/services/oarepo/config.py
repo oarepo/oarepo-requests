@@ -15,6 +15,7 @@ from typing import TYPE_CHECKING
 from invenio_records_resources.services.base.links import Link
 from invenio_requests.services import RequestsServiceConfig
 from invenio_requests.services.requests import RequestLink
+from oarepo_runtime.services.config.link_conditions import has_permission_entity, is_draft_record
 
 from oarepo_requests.resolvers.interface import resolve_entity
 
@@ -64,8 +65,14 @@ class OARepoRequestsServiceConfig(RequestsServiceConfig):
         "comments": RequestLink("{+api}/requests/extended/{id}/comments"),
         "timeline": RequestLink("{+api}/requests/extended/{id}/timeline"),
         "self_html": RequestLink("{+ui}/requests/{id}"),
-        "topic": RequestEntityLinks(entity="topic"),
+        "topic": RequestEntityLinks(entity="topic", when=has_permission_entity
+        (action_name=lambda topic: "read_draft" if is_draft_record()(topic, {}) else "read", entity="topic")),
         "created_by": RequestEntityLinks(entity="created_by"),
         "receiver": RequestEntityLinks(entity="receiver"),
         "ui_redirect_url": RedirectLink(),
+    }
+
+    links_search_item = {
+        "self": RequestLink("{+api}/requests/extended/{id}"),
+        "self_html": RequestLink("{+ui}/requests/{id}"),
     }
