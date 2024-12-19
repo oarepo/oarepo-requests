@@ -62,7 +62,16 @@ def resolve(identity: Identity, reference: dict[str, str]) -> UIResolvedReferenc
             return cache[(reference_type, reference_value)]
 
     entity_resolvers = current_oarepo_requests.entity_reference_ui_resolvers
-    if reference_type in entity_resolvers:
+
+    if reference_type == 'multiple':
+        _resolved = []
+        for item_type, item_value in reference_value.items():
+            _resolved.append(entity_resolvers[item_type].resolve_one(
+                identity, item_value
+            ))
+        print('CESNET', 'resolved', _resolved, flush=True)
+        resolved = ', '.join(_resolved)
+    elif reference_type in entity_resolvers:
         resolved = entity_resolvers[reference_type].resolve_one(
             identity, reference_value
         )

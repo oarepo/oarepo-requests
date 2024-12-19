@@ -31,15 +31,15 @@ export const SideRequestInfo = ({ request }) => {
           </List.Content>
         </List.Item>
       )}
-      {request?.receiver && (
+      {request?.receiver &&
         <List.Item>
           <List.Header as="h3">{i18next.t("Receiver")}</List.Header>
           <List.Content>
             <Icon name="mail outline" />
             <span>
-              {_has(request, "links.receiver.self_html") ? (
+              {_has(request, "links.receiver_html") ? (
                 <a
-                  href={request.links.receiver.self_html}
+                  href={request.links.receiver_html}
                   target="_blank"
                   rel="noreferrer"
                 >
@@ -51,7 +51,7 @@ export const SideRequestInfo = ({ request }) => {
             </span>
           </List.Content>
         </List.Item>
-      )}
+      }
       <List.Item>
         <List.Header as="h3">{i18next.t("Status")}</List.Header>
         <List.Content>
