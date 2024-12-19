@@ -3,6 +3,7 @@ import { i18next } from "@translations/oarepo_requests_ui/i18next";
 import { Icon, List } from "semantic-ui-react";
 import _has from "lodash/has";
 import _truncate from "lodash/truncate";
+import _isArray from "lodash/isArray";
 import { getRequestStatusIcon } from "@js/oarepo_requests_common";
 import PropTypes from "prop-types";
 
@@ -31,7 +32,8 @@ export const SideRequestInfo = ({ request }) => {
           </List.Content>
         </List.Item>
       )}
-      {request?.receiver &&
+      {(request?.receiver &&
+          !_isArray(request.receiver)) ? (
         <List.Item>
           <List.Header as="h3">{i18next.t("Receiver")}</List.Header>
           <List.Content>
@@ -50,7 +52,31 @@ export const SideRequestInfo = ({ request }) => {
               )}
             </span>
           </List.Content>
+        </List.Item>) : (_isArray(request.receiver)) && (
+            <List.Item>
+          <List.Header as="h3">{i18next.t("Receiver")}</List.Header>
+          <List.Content>
+            <Icon name="mail outline" />
+              {request.receiver.map((receiverItem, index) => (
+                <span key={receiverItem.label}>
+                  {receiverItem.links.self_html ? (
+                    <a
+                      href={receiverItem.links.self_html}
+                      target="_blank"
+                      rel="noreferrer"
+                    >
+                      {receiverItem.label}
+                    </a>
+                  ) : (
+                    receiverItem.label
+                  )}
+                    { request.receiver.length - 1 !== index && ', ' }
+                </span>
+
+              ))}
+          </List.Content>
         </List.Item>
+      )
       }
       <List.Item>
         <List.Header as="h3">{i18next.t("Status")}</List.Header>
