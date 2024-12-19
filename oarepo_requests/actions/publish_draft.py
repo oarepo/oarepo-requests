@@ -25,7 +25,8 @@ from .generic import (
 )
 from invenio_notifications.services.uow import NotificationOp
 
-from ..services.notifications.builders.publish import PublishDraftRequestAcceptNotificationBuilder
+from ..notifications.builders.publish import PublishDraftRequestAcceptNotificationBuilder, \
+    PublishDraftRequestSubmitNotificationBuilder
 
 if TYPE_CHECKING:
     from flask_principal import Identity
@@ -54,6 +55,27 @@ class PublishMixin:
 
 class PublishDraftSubmitAction(PublishMixin, OARepoSubmitAction):
     """Submit action for publishing draft requests."""
+    def apply(
+        self,
+        identity: Identity,
+        request_type: RequestType,
+        topic: Record,
+        uow: UnitOfWork,
+        *args: Any,
+        **kwargs: Any,
+    ) -> Record:
+        """Publish the draft."""
+
+        uow.register(
+            NotificationOp(
+                PublishDraftRequestSubmitNotificationBuilder.build(
+                    request=self.request
+                )
+            )
+        )
+        return super().apply(
+            identity, request_type, topic, uow, *args, **kwargs
+        )
 
 
 class PublishDraftAcceptAction(

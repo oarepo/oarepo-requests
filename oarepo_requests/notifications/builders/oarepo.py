@@ -1,4 +1,4 @@
-from .oarepo import OARepoNotificationBuilder
+from invenio_notifications.services.builders import NotificationBuilder
 from invenio_notifications.models import Notification
 from invenio_notifications.registry import EntityResolverRegistry
 from invenio_notifications.services.generators import EntityResolve, UserEmailBackend
@@ -7,8 +7,10 @@ from invenio_users_resources.notifications.generators import (
     EmailRecipient,
 )
 
-class PublishDraftRequestAcceptNotificationBuilder(OARepoNotificationBuilder):
-    type = "publish-draft-request-event.accept"
+class OARepoNotificationBuilder(NotificationBuilder):
+    """"""
+
+class OARepoRequestActionNotificationBuilder(NotificationBuilder):
 
     @classmethod
     def build(cls, request):

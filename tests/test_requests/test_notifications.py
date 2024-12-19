@@ -1,7 +1,6 @@
-from oarepo_requests.services.notifications.builders.publish import PublishDraftRequestAcceptNotificationBuilder
-
+from oarepo_requests.notifications.builders.publish import PublishDraftRequestAcceptNotificationBuilder
 from .test_create_inmodel import pick_request_type
-from .utils import link_api2testclient
+from .utils import link2testclient
 
 
 def test_publish_accept_notification(
@@ -30,7 +29,7 @@ def test_publish_accept_notification(
     receiver_client = logged_client(receiver)
 
     draft1 = create_draft_via_resource(creator_client)
-    link = link_api2testclient(
+    link = link2testclient(
         pick_request_type(draft1.json["expanded"]["request_types"], "publish_draft")[
             "links"
         ]["actions"]["create"]
@@ -39,7 +38,7 @@ def test_publish_accept_notification(
         link, json={"payload": {"version": "1.0"}}
     )
     resp_request_submit = creator_client.post(
-        link_api2testclient(resp_request_create.json["links"]["actions"]["submit"]),
+        link2testclient(resp_request_create.json["links"]["actions"]["submit"]),
     )
 
     record = receiver_client.get(
@@ -50,7 +49,7 @@ def test_publish_accept_notification(
     with mail.record_messages() as outbox:
         # Validate that email was sent
         publish = receiver_client.post(
-            link_api2testclient(
+            link2testclient(
                 record.json["expanded"]["requests"][0]["links"]["actions"]["accept"]
             ),
         )

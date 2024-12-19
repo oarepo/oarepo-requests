@@ -54,8 +54,8 @@ from oarepo_requests.actions.generic import (
     OARepoDeclineAction,
     OARepoSubmitAction,
 )
+
 from oarepo_requests.receiver import default_workflow_receiver_function
-from oarepo_requests.services.notifications.builders.publish import PublishDraftRequestAcceptNotificationBuilder
 from oarepo_requests.services.permissions.generators.conditional import (
     IfNoEditDraft,
     IfNoNewVersionDraft,
@@ -68,7 +68,8 @@ from oarepo_requests.types import ModelRefTypes, NonDuplicableOARepoRequestType
 from oarepo_requests.types.events.topic_update import TopicUpdateEventType
 from tests.test_requests.utils import link2testclient
 from invenio_notifications.backends import EmailNotificationBackend
-
+from oarepo_requests.notifications.builders.publish import PublishDraftRequestAcceptNotificationBuilder, \
+    PublishDraftRequestSubmitNotificationBuilder
 
 can_comment_only_receiver = [
     Receiver(),
@@ -533,7 +534,8 @@ def app_config(app_config):
         EmailNotificationBackend.id: EmailNotificationBackend(),
     }
     app_config["NOTIFICATIONS_BUILDERS"] = {
-        PublishDraftRequestAcceptNotificationBuilder.type: PublishDraftRequestAcceptNotificationBuilder
+        PublishDraftRequestAcceptNotificationBuilder.type: PublishDraftRequestAcceptNotificationBuilder,
+        PublishDraftRequestSubmitNotificationBuilder.type: PublishDraftRequestSubmitNotificationBuilder,
     }
     app_config["NOTIFICATIONS_ENTITY_RESOLVERS"] = [
         #EmailResolver(),
@@ -544,36 +546,7 @@ def app_config(app_config):
         ServiceResultResolver(service_id="request_events", type_key="request_event"),
     ]
     app_config["MAIL_DEFAULT_SENDER"] = "test@invenio-rdm-records.org"
-    """
-    
-        # Specifying dummy builders to avoid raising errors for most tests. Extend as needed.
-    app_config["NOTIFICATIONS_BUILDERS"] = {
-        CommentRequestEventCreateNotificationBuilder.type: DummyNotificationBuilder,
-        CommunityInclusionAcceptNotificationBuilder.type: DummyNotificationBuilder,
-        CommunityInclusionCancelNotificationBuilder.type: DummyNotificationBuilder,
-        CommunityInclusionDeclineNotificationBuilder.type: DummyNotificationBuilder,
-        CommunityInclusionExpireNotificationBuilder.type: DummyNotificationBuilder,
-        CommunityInclusionSubmittedNotificationBuilder.type: DummyNotificationBuilder,
-        CommunityInvitationSubmittedNotificationBuilder.type: DummyNotificationBuilder,
-        GuestAccessRequestTokenCreateNotificationBuilder.type: GuestAccessRequestTokenCreateNotificationBuilder,
-        GuestAccessRequestAcceptNotificationBuilder.type: GuestAccessRequestAcceptNotificationBuilder,
-        GuestAccessRequestSubmitNotificationBuilder.type: GuestAccessRequestSubmitNotificationBuilder,
-        UserAccessRequestAcceptNotificationBuilder.type: UserAccessRequestAcceptNotificationBuilder,
-        UserAccessRequestSubmitNotificationBuilder.type: UserAccessRequestSubmitNotificationBuilder,
-        GrantUserAccessNotificationBuilder.type: GrantUserAccessNotificationBuilder,
-    }
 
-    # Specifying default resolvers. Will only be used in specific test cases.
-    app_config["NOTIFICATIONS_ENTITY_RESOLVERS"] = [
-        EmailResolver(),
-        RDMRecordServiceResultResolver(),
-        ServiceResultResolver(service_id="users", type_key="user"),
-        ServiceResultResolver(service_id="communities", type_key="community"),
-        ServiceResultResolver(service_id="requests", type_key="request"),
-        ServiceResultResolver(service_id="request_events", type_key="request_event"),
-    ]
-    
-    """
 
     return app_config
 

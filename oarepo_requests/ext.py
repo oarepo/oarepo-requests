@@ -17,6 +17,7 @@ import importlib_metadata
 from invenio_base.utils import obj_or_import_string
 from invenio_requests.proxies import current_events_service
 
+from oarepo_requests.resolvers.user import OARepoUserResolver
 from oarepo_requests.resources.events.config import OARepoRequestsCommentsResourceConfig
 from oarepo_requests.resources.events.resource import OARepoRequestsCommentsResource
 from oarepo_requests.resources.oarepo.config import OARepoRequestsResourceConfig
@@ -240,3 +241,9 @@ def finalize_app(app: Flask) -> None:
     # but imo this is better than entrypoints
     for type in app.config["REQUESTS_REGISTERED_EVENT_TYPES"]:
         current_event_type_registry.register_type(type)
+
+    from invenio_requests.proxies import current_requests
+
+    registry = current_requests.entity_resolvers_registry
+    registered_resolvers = registry._registered_types
+    registered_resolvers["user"] = OARepoUserResolver()
