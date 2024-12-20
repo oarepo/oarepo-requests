@@ -12,6 +12,7 @@ def link2testclient(link, ui=False):
     base_string = "https://127.0.0.1:5000/api/" if not ui else "https://127.0.0.1:5000/"
     return link[len(base_string) - 1 :]
 
+
 # from chatgpt
 def dict_diff(dict1, dict2, path=""):
     ret = defaultdict(list)

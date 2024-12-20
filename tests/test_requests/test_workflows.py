@@ -62,6 +62,7 @@ def events_service():
 
     return current_events_service
 
+
 def test_publish_with_workflows(
     logged_client,
     users,
@@ -86,7 +87,9 @@ def test_publish_with_workflows(
     create_non_owner = receiver_client.post(
         f"{urls['BASE_URL']}{draft1.json['id']}/draft/requests/publish_draft",
     )
-    resp_request_create = create_request_by_link(creator_client, draft1, "publish_draft")
+    resp_request_create = create_request_by_link(
+        creator_client, draft1, "publish_draft"
+    )
     assert create_non_owner.status_code == 403
     assert resp_request_create.status_code == 201
 
@@ -206,7 +209,9 @@ def test_if_no_new_version_draft(
     assert "new_version" not in {
         r["type_id"] for r in requests
     }  # new version created, requests should not be available again
-    resp_request_submit = submit_request_by_link(creator_client, record2, "edit_published_record")
+    resp_request_submit = submit_request_by_link(
+        creator_client, record2, "edit_published_record"
+    )
     request = creator_client.get(
         f'{urls["BASE_URL_REQUESTS"]}{resp_request_submit.json["id"]}',
     ).json  # request is autoaccepted
@@ -242,7 +247,9 @@ def test_if_no_edit_draft(
     )
     requests = record.json["expanded"]["request_types"]
     assert "edit_published_record" in {r["type_id"] for r in requests}
-    resp_request_submit = submit_request_by_link(creator_client, record, "edit_published_record")
+    resp_request_submit = submit_request_by_link(
+        creator_client, record, "edit_published_record"
+    )
     request = creator_client.get(
         f'{urls["BASE_URL_REQUESTS"]}{resp_request_submit.json["id"]}',
     ).json  # request is autoaccepted
@@ -503,7 +510,9 @@ def test_cancel_transition(
     creator_client = logged_client(creator)
 
     draft1 = create_draft_via_resource(creator_client)
-    resp_request_submit = submit_request_by_link(creator_client, draft1, "publish_draft")
+    resp_request_submit = submit_request_by_link(
+        creator_client, draft1, "publish_draft"
+    )
     record = creator_client.get(
         f"{urls['BASE_URL']}{draft1.json['id']}/draft?expand=true"
     )

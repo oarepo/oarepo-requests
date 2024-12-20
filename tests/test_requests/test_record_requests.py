@@ -8,7 +8,6 @@
 from thesis.records.api import ThesisDraft, ThesisRecord
 
 from .utils import link2testclient
-from ..conftest import create_request_by_link
 
 
 def test_read_requests_on_draft(
@@ -31,8 +30,9 @@ def test_read_requests_on_draft(
     ThesisRecord.index.refresh()
     ThesisDraft.index.refresh()
 
-
-    resp_request_submit = submit_request_by_link(creator_client, draft1, "publish_draft")
+    resp_request_submit = submit_request_by_link(
+        creator_client, draft1, "publish_draft"
+    )
     record = receiver_client.get(
         f"{urls['BASE_URL']}{draft1.json['id']}/draft?expand=true"
     )
@@ -79,7 +79,9 @@ def test_read_requests_on_record(
     record3 = record_factory(creator_client)
     ThesisRecord.index.refresh()
     ThesisDraft.index.refresh()
-    resp_request_submit = submit_request_by_link(creator_client, record1, "delete_published_record")
+    resp_request_submit = submit_request_by_link(
+        creator_client, record1, "delete_published_record"
+    )
     record = receiver_client.get(f"{urls['BASE_URL']}{record1.json['id']}?expand=true")
     decline = receiver_client.post(
         link2testclient(

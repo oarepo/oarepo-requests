@@ -32,7 +32,9 @@ def test_resolve_topic(
     ThesisRecord.index.refresh()
     ThesisDraft.index.refresh()
 
-    resp_request_submit = submit_request_by_link(creator_client, record1, "delete_published_record")
+    resp_request_submit = submit_request_by_link(
+        creator_client, record1, "delete_published_record"
+    )
     assert resp_request_submit.json["status"] == "submitted"
 
     resp = creator_client.get(
@@ -90,7 +92,9 @@ def test_ui_resolve_topic(
     ThesisRecord.index.refresh()
     ThesisDraft.index.refresh()
 
-    resp_request_submit = submit_request_by_link(creator_client, record1, "delete_published_record")
+    resp_request_submit = submit_request_by_link(
+        creator_client, record1, "delete_published_record"
+    )
     assert resp_request_submit.json["status"] == "submitted"
 
     resp = creator_client.get(

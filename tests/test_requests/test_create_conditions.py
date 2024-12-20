@@ -54,9 +54,7 @@ def test_can_create(
 
     # try declining the request for draft2, we should be able to create again then
     resp_request_submit = creator_client.post(
-        link2testclient(
-            create_for_request_draft2.json["links"]["actions"]["submit"]
-        ),
+        link2testclient(create_for_request_draft2.json["links"]["actions"]["submit"]),
     )
 
     with pytest.raises(OpenRequestAlreadyExists):

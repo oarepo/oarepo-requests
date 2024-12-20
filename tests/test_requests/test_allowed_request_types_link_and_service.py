@@ -7,7 +7,6 @@
 #
 from flask import current_app
 from thesis.ext import ThesisExt
-from thesis.records.api import ThesisDraft, ThesisRecord
 
 from tests.test_requests.utils import link2testclient
 
@@ -104,9 +103,7 @@ def publish_record(
 ):
     id_ = draft1.json["id"]
     submit_request_by_link(creator_client, draft1, "publish_draft")
-    record = receiver_client.get(
-        f"{urls['BASE_URL']}{id_}/draft?expand=true"
-    )
+    record = receiver_client.get(f"{urls['BASE_URL']}{id_}/draft?expand=true")
     assert record.json["expanded"]["requests"][0]["links"]["actions"].keys() == {
         "accept",
         "decline",
@@ -125,7 +122,7 @@ def test_allowed_request_types_on_published_resource(
     urls,
     create_draft_via_resource,
     submit_request_by_link,
-    search_clear
+    search_clear,
 ):
     creator = users[0]
     receiver = users[1]

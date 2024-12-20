@@ -9,12 +9,12 @@
 
 from __future__ import annotations
 
+import marshmallow as ma
 from flask_resources import ResponseHandler
 from invenio_records_resources.services.base.config import ConfiguratorMixin
 from invenio_requests.resources.events.config import RequestCommentsResourceConfig
 
 from oarepo_requests.resources.ui import OARepoRequestEventsUIJSONSerializer
-import marshmallow as ma
 
 
 class OARepoRequestsCommentsResourceConfig(
@@ -36,9 +36,9 @@ class OARepoRequestsCommentsResourceConfig(
     @property
     def request_item_view_args(self):
         return {
-        **super().request_item_view_args,
-        "event_type": ma.fields.Str(),
-    }
+            **super().request_item_view_args,
+            "event_type": ma.fields.Str(),
+        }
 
     @property
     def response_handlers(self) -> dict[str, ResponseHandler]:

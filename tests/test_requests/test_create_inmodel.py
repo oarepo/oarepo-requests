@@ -8,7 +8,9 @@
 from thesis.records.api import ThesisRecord
 
 from tests.test_requests.utils import link2testclient
-#todo since inline is now the default way to create records, these might be redundant
+
+
+# todo since inline is now the default way to create records, these might be redundant
 def test_record(
     logged_client,
     record_factory,
@@ -23,7 +25,9 @@ def test_record(
     receiver_client = logged_client(receiver)
 
     record1 = record_factory(creator_client)
-    resp_request_create = create_request_by_link(creator_client, record1, "delete_published_record")
+    resp_request_create = create_request_by_link(
+        creator_client, record1, "delete_published_record"
+    )
     assert resp_request_create.status_code == 201
     resp_request_submit = creator_client.post(
         link2testclient(resp_request_create.json["links"]["actions"]["submit"]),
@@ -55,7 +59,9 @@ def test_draft(
 
     draft1 = create_draft_via_resource(creator_client)
 
-    resp_request_create = create_request_by_link(creator_client, draft1, "publish_draft")
+    resp_request_create = create_request_by_link(
+        creator_client, draft1, "publish_draft"
+    )
     assert resp_request_create.status_code == 201
     resp_request_submit = creator_client.post(
         link2testclient(resp_request_create.json["links"]["actions"]["submit"]),

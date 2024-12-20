@@ -74,7 +74,9 @@ def test_publish(
     assert len(draft_lst.json["hits"]["hits"]) == 3
     assert len(lst.json["hits"]["hits"]) == 0
 
-    resp_request_submit = submit_request_by_link(creator_client, draft1, "publish_draft")
+    resp_request_submit = submit_request_by_link(
+        creator_client, draft1, "publish_draft"
+    )
     ThesisRecord.index.refresh()
     ThesisDraft.index.refresh()
 
@@ -107,7 +109,9 @@ def test_publish(
     assert len(draft_lst.json["hits"]["hits"]) == 3
     assert len(lst.json["hits"]["hits"]) == 1
 
-    resp_request_submit = submit_request_by_link(creator_client, draft2, "publish_draft")
+    resp_request_submit = submit_request_by_link(
+        creator_client, draft2, "publish_draft"
+    )
     record = receiver_client.get(
         f"{urls['BASE_URL']}{draft2.json['id']}/draft?expand=true"
     )
@@ -121,7 +125,9 @@ def test_publish(
     )
     assert declined_request.json["status"] == "declined"
 
-    resp_request_submit = submit_request_by_link(creator_client, draft3, "publish_draft")
+    resp_request_submit = submit_request_by_link(
+        creator_client, draft3, "publish_draft"
+    )
     record = creator_client.get(
         f"{urls['BASE_URL']}{draft3.json['id']}/draft?expand=true"
     )

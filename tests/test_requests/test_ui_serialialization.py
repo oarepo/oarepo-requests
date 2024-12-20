@@ -38,12 +38,24 @@ def test_user_serialization(
     ThesisRecord.index.refresh()
     ThesisDraft.index.refresh()
 
-    resp_request_create = create_request_by_link(client_fallback_label, draft1, "publish_draft",
-                                                 headers={"Accept": "application/vnd.inveniordm.v1+json"})
-    resp_request_create_username = create_request_by_link(client_username_label, draft2, "publish_draft",
-                                                 headers={"Accept": "application/vnd.inveniordm.v1+json"})
-    resp_request_create_fullname = create_request_by_link(client_fullname_label, draft3, "publish_draft",
-                                                 headers={"Accept": "application/vnd.inveniordm.v1+json"})
+    resp_request_create = create_request_by_link(
+        client_fallback_label,
+        draft1,
+        "publish_draft",
+        headers={"Accept": "application/vnd.inveniordm.v1+json"},
+    )
+    resp_request_create_username = create_request_by_link(
+        client_username_label,
+        draft2,
+        "publish_draft",
+        headers={"Accept": "application/vnd.inveniordm.v1+json"},
+    )
+    resp_request_create_fullname = create_request_by_link(
+        client_fullname_label,
+        draft3,
+        "publish_draft",
+        headers={"Accept": "application/vnd.inveniordm.v1+json"},
+    )
 
     pprint(resp_request_create.json)
     assert resp_request_create.json["stateful_name"] == "Submit for review"
@@ -139,7 +151,12 @@ def test_resolver_fallback(
         ThesisRecord.index.refresh()
         ThesisDraft.index.refresh()
 
-        resp_request_create = create_request_by_link(creator_client, draft1, "publish_draft", headers={"Accept": "application/vnd.inveniordm.v1+json"})
+        resp_request_create = create_request_by_link(
+            creator_client,
+            draft1,
+            "publish_draft",
+            headers={"Accept": "application/vnd.inveniordm.v1+json"},
+        )
         assert resp_request_create.json["stateful_name"] == "Submit for review"
         assert (
             resp_request_create.json["stateful_description"]
@@ -222,8 +239,12 @@ def test_role(
         ThesisRecord.index.refresh()
         ThesisDraft.index.refresh()
 
-        resp_request_create = create_request_by_link(creator_client, draft1, "publish_draft",
-                                                 headers={"Accept": "application/vnd.inveniordm.v1+json"})
+        resp_request_create = create_request_by_link(
+            creator_client,
+            draft1,
+            "publish_draft",
+            headers={"Accept": "application/vnd.inveniordm.v1+json"},
+        )
         assert resp_request_create.json["stateful_name"] == "Submit for review"
         assert (
             resp_request_create.json["stateful_description"]

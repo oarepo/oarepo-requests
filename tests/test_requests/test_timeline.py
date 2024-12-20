@@ -6,6 +6,7 @@
 # details.
 #
 from invenio_requests.records.api import RequestEvent
+
 from tests.test_requests.utils import link2testclient
 
 
@@ -23,7 +24,9 @@ def test_timeline(
 
     draft1 = create_draft_via_resource(creator_client)
 
-    publish_request_submit_resp = submit_request_by_link(creator_client, draft1, "publish_draft")
+    publish_request_submit_resp = submit_request_by_link(
+        creator_client, draft1, "publish_draft"
+    )
 
     comment_resp = creator_client.post(
         link2testclient(publish_request_submit_resp.json["links"]["comments"]),

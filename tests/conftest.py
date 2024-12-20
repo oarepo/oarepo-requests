@@ -321,6 +321,7 @@ WORKFLOWS = {
     ),
 }
 
+
 @pytest.fixture(scope="module")
 def create_app(instance_path, entry_points):
     """Application factory fixture."""
@@ -334,9 +335,11 @@ def vocab_cf(app, db, cache):
     prepare_cf_indices()
     ThesisDraft.index.refresh()
 
+
 @pytest.fixture()
 def urls():
     return {"BASE_URL": "/thesis/", "BASE_URL_REQUESTS": "/requests/"}
+
 
 @pytest.fixture()
 def serialization_result():
@@ -472,6 +475,7 @@ def request_events_service(app):
     service = current_requests.request_events_service
     return service
 
+
 @pytest.fixture(scope="module")
 def record_service():
     return current_service
@@ -547,11 +551,13 @@ def logged_client(client):
 
     return _logged_client
 
+
 @pytest.fixture()
 def example_topic_draft(record_service, users, default_workflow_json):  # needed for ui
     identity = users[0].identity
     draft = record_service.create(identity, default_workflow_json)
     return draft._obj
+
 
 @pytest.fixture()
 def merge_record_data(default_workflow_json):
@@ -572,6 +578,7 @@ def merge_record_data(default_workflow_json):
         if additional_data:
             always_merger.merge(json, additional_data)
         return json
+
     return _merge_data
 
 
@@ -584,21 +591,25 @@ def draft_factory(record_service, merge_record_data):
 
     return record
 
+
 @pytest.fixture()
 def record_factory(record_service, draft_factory, urls):
     # bypassing request pattern with system identity
     def record(client, custom_workflow=None, additional_data=None):
-        draft = draft_factory(client.user_fixture.identity, custom_workflow, additional_data)
-        record = record_service.publish(system_identity, draft['id'])
-        ret = client.get(f"{urls['BASE_URL']}{record['id']}") # unified return value
+        draft = draft_factory(
+            client.user_fixture.identity, custom_workflow, additional_data
+        )
+        record = record_service.publish(system_identity, draft["id"])
+        ret = client.get(f"{urls['BASE_URL']}{record['id']}")  # unified return value
         return ret
 
     return record
 
 
-
 @pytest.fixture()
-def record_with_files_factory(record_service, draft_factory, default_workflow_json, urls):
+def record_with_files_factory(
+    record_service, draft_factory, default_workflow_json, urls
+):
     def record(client, custom_workflow=None, additional_data=None):
         identity = client.user_fixture.identity
         if (
@@ -607,7 +618,7 @@ def record_with_files_factory(record_service, draft_factory, default_workflow_js
         ):
             if not additional_data:
                 additional_data = {}
-            additional_data.setdefault("files",{}).setdefault("enabled", True)
+            additional_data.setdefault("files", {}).setdefault("enabled", True)
         draft = draft_factory(identity, custom_workflow, additional_data)
 
         # upload file
@@ -625,13 +636,12 @@ def record_with_files_factory(record_service, draft_factory, default_workflow_js
         )
         commit = files_service.commit_file(identity, draft["id"], "test.pdf")
 
-        #publish record
+        # publish record
         record = record_service.publish(system_identity, draft["id"])
-        ret = client.get(f"{urls['BASE_URL']}{record['id']}") # unified return value
+        ret = client.get(f"{urls['BASE_URL']}{record['id']}")  # unified return value
         return ret
 
     return record
-
 
 
 @pytest.fixture()
@@ -645,6 +655,7 @@ def create_draft_via_resource(merge_record_data, urls):
 
     return _create_draft
 
+
 @pytest.fixture()
 def events_resource_data():
     """Input data for the Request Events Resource (REST body)."""
@@ -654,6 +665,7 @@ def events_resource_data():
             "format": RequestEventFormat.HTML.value,
         }
     }
+
 
 def _create_role(id, name, description, is_managed, database):
     """Creates a Role/Group."""
@@ -726,13 +738,17 @@ def get_request_link(get_request_type):
 
     return _create_request_from_link
 
+
 @pytest.fixture()
 def request_type_additional_data():
-    return {"publish_draft":{"payload": {"version": "1.0"}}}
+    return {"publish_draft": {"payload": {"version": "1.0"}}}
+
 
 @pytest.fixture
 def create_request_by_link(get_request_link, request_type_additional_data):
-    def _create_request(client, record, request_type, additional_data=None, **request_kwargs):
+    def _create_request(
+        client, record, request_type, additional_data=None, **request_kwargs
+    ):
         if additional_data is None:
             additional_data = {}
         applicable_requests = client.get(
@@ -742,11 +758,15 @@ def create_request_by_link(get_request_link, request_type_additional_data):
             get_request_link(applicable_requests, request_type)
         )
         if request_type in request_type_additional_data:
-            additional_data = always_merger.merge(additional_data, request_type_additional_data[request_type])
+            additional_data = always_merger.merge(
+                additional_data, request_type_additional_data[request_type]
+            )
         if not additional_data:
             create_response = client.post(create_link, **request_kwargs)
         else:
-            create_response = client.post(create_link, json=additional_data, **request_kwargs)
+            create_response = client.post(
+                create_link, json=additional_data, **request_kwargs
+            )
         return create_response
 
     return _create_request
@@ -754,10 +774,19 @@ def create_request_by_link(get_request_link, request_type_additional_data):
 
 @pytest.fixture
 def submit_request_by_link(create_request_by_link):
-    def _submit_request(client, record, request_type, create_additional_data=None, submit_additional_data=None):
-        create_response = create_request_by_link(client, record, request_type, additional_data=create_additional_data)
+    def _submit_request(
+        client,
+        record,
+        request_type,
+        create_additional_data=None,
+        submit_additional_data=None,
+    ):
+        create_response = create_request_by_link(
+            client, record, request_type, additional_data=create_additional_data
+        )
         submit_response = client.post(
-            link2testclient(create_response.json["links"]["actions"]["submit"]), json=submit_additional_data
+            link2testclient(create_response.json["links"]["actions"]["submit"]),
+            json=submit_additional_data,
         )
         return submit_response
 

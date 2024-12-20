@@ -69,8 +69,12 @@ def test_new_version_files(
     record1 = record_with_files_factory(creator_client)
     record2 = record_with_files_factory(creator_client)
 
-    submit1 = submit_request_by_link(creator_client, record1, "new_version",
-                                     create_additional_data={"payload": {"keep_files": "yes"}})
+    submit1 = submit_request_by_link(
+        creator_client,
+        record1,
+        "new_version",
+        create_additional_data={"payload": {"keep_files": "yes"}},
+    )
     submit2 = submit_request_by_link(creator_client, record2, "new_version")
 
     ThesisDraft.index.refresh()

@@ -31,7 +31,9 @@ def test_delete(
     lst = creator_client.get(urls["BASE_URL"])
     assert len(lst.json["hits"]["hits"]) == 3
 
-    resp_request_submit = submit_request_by_link(creator_client, record1, "delete_published_record")
+    resp_request_submit = submit_request_by_link(
+        creator_client, record1, "delete_published_record"
+    )
 
     record = receiver_client.get(f"{urls['BASE_URL']}{record1.json['id']}?expand=true")
     assert record.json["expanded"]["requests"][0]["links"]["actions"].keys() == {
@@ -52,7 +54,9 @@ def test_delete(
     lst = creator_client.get(urls["BASE_URL"])
     assert len(lst.json["hits"]["hits"]) == 2
 
-    resp_request_submit = submit_request_by_link(creator_client, record2, "delete_published_record")
+    resp_request_submit = submit_request_by_link(
+        creator_client, record2, "delete_published_record"
+    )
     record = receiver_client.get(f"{urls['BASE_URL']}{record2.json['id']}?expand=true")
     decline = receiver_client.post(
         link2testclient(
@@ -64,7 +68,9 @@ def test_delete(
     )
     assert declined_request.json["status"] == "declined"
 
-    resp_request_submit = submit_request_by_link(creator_client, record3, "delete_published_record")
+    resp_request_submit = submit_request_by_link(
+        creator_client, record3, "delete_published_record"
+    )
     record = creator_client.get(f"{urls['BASE_URL']}{record3.json['id']}?expand=true")
     assert record.json["expanded"]["requests"][0]["links"]["actions"].keys() == {
         "cancel"

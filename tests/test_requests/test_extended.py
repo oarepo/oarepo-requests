@@ -51,7 +51,9 @@ def test_read_extended(
     draft1 = create_draft_via_resource(creator_client)
     draft_id = draft1.json["id"]
 
-    resp_request_submit = submit_request_by_link(creator_client, draft1, "publish_draft")
+    resp_request_submit = submit_request_by_link(
+        creator_client, draft1, "publish_draft"
+    )
 
     old_call = creator_client.get(
         f"{urls['BASE_URL_REQUESTS']}{resp_request_submit.json['id']}"
@@ -89,7 +91,9 @@ def test_update_self_link(
 
     draft1 = create_draft_via_resource(creator_client)
 
-    resp_request_submit = submit_request_by_link(creator_client, draft1, "publish_draft")
+    resp_request_submit = submit_request_by_link(
+        creator_client, draft1, "publish_draft"
+    )
 
     read_before = creator_client.get(
         link2testclient(resp_request_submit.json["links"]["self"]),
@@ -129,7 +133,9 @@ def test_events_resource(
     creator_client = logged_client(creator)
     draft1 = create_draft_via_resource(creator_client)
 
-    resp_request_submit = submit_request_by_link(creator_client, draft1, "publish_draft")
+    resp_request_submit = submit_request_by_link(
+        creator_client, draft1, "publish_draft"
+    )
 
     read_before = creator_client.get(
         link2testclient(resp_request_submit.json["links"]["self"]),

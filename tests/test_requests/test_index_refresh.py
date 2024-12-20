@@ -21,7 +21,9 @@ def test_search(
 
     draft1 = create_draft_via_resource(creator_client)
 
-    resp_request_create = create_request_by_link(creator_client, draft1, "publish_draft")
+    resp_request_create = create_request_by_link(
+        creator_client, draft1, "publish_draft"
+    )
     # should work without refreshing requests index
     requests_search = creator_client.get(urls["BASE_URL_REQUESTS"]).json
 

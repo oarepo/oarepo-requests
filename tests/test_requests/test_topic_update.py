@@ -7,7 +7,6 @@
 #
 
 from .utils import link2testclient
-from ..conftest import submit_request_by_link
 
 
 def test_publish(
@@ -26,7 +25,9 @@ def test_publish(
     receiver_client = logged_client(receiver)
 
     draft1 = create_draft_via_resource(creator_client)
-    resp_request_submit = submit_request_by_link(creator_client, draft1, "publish_draft")
+    resp_request_submit = submit_request_by_link(
+        creator_client, draft1, "publish_draft"
+    )
     record = receiver_client.get(
         f"{urls['BASE_URL']}{draft1.json['id']}/draft?expand=true"
     )

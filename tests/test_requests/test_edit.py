@@ -30,7 +30,9 @@ def test_edit_autoaccept(
     )
     assert direct_edit.status_code == 403
 
-    resp_request_submit = submit_request_by_link(creator_client, record1, "edit_published_record")
+    resp_request_submit = submit_request_by_link(
+        creator_client, record1, "edit_published_record"
+    )
     # is request accepted and closed?
     request = creator_client.get(
         f'{urls["BASE_URL_REQUESTS"]}{resp_request_submit.json["id"]}',
@@ -72,7 +74,9 @@ def test_redirect_url(
     record1 = record_factory(creator_client, custom_workflow="different_recipients")
     record_id = record1.json["id"]
 
-    resp_request_submit = submit_request_by_link(creator_client, record1, "edit_published_record")
+    resp_request_submit = submit_request_by_link(
+        creator_client, record1, "edit_published_record"
+    )
     edit_request_id = resp_request_submit.json["id"]
 
     receiver_get = receiver_client.get(f"{urls['BASE_URL_REQUESTS']}{edit_request_id}")

@@ -31,9 +31,15 @@ def test_cascade_update(
     draft1 = create_draft_via_resource(creator_client, custom_workflow="cascade_update")
     draft2 = create_draft_via_resource(creator_client, custom_workflow="cascade_update")
 
-    publish_request_create = submit_request_by_link(creator_client, draft1, "publish_draft")
-    another_request_create = create_request_by_link(creator_client, draft1, "another_topic_updating")
-    publish_request_on_second_draft = create_request_by_link(creator_client, draft2, "publish_draft")
+    publish_request_create = submit_request_by_link(
+        creator_client, draft1, "publish_draft"
+    )
+    another_request_create = create_request_by_link(
+        creator_client, draft1, "another_topic_updating"
+    )
+    publish_request_on_second_draft = create_request_by_link(
+        creator_client, draft2, "publish_draft"
+    )
 
     record = receiver_client.get(
         f"{urls['BASE_URL']}{draft1.json['id']}/draft?expand=true"
