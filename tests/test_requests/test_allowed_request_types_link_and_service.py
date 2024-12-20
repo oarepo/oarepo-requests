@@ -13,11 +13,9 @@ from tests.test_requests.utils import link2testclient
 
 
 def test_allowed_request_types_on_draft_service(
-    vocab_cf,
     logged_client,
     users,
     urls,
-    publish_request_data_function,
     create_draft_via_resource,
     search_clear,
 ):
@@ -58,11 +56,9 @@ def test_allowed_request_types_on_draft_service(
 
 
 def test_allowed_request_types_on_draft_resource(
-    vocab_cf,
     logged_client,
     users,
     urls,
-    publish_request_data_function,
     create_draft_via_resource,
     search_clear,
 ):
@@ -104,24 +100,13 @@ def test_allowed_request_types_on_draft_resource(
 
 
 def publish_record(
-    creator_client, urls, publish_request_data_function, draft1, receiver_client
+    creator_client, urls, submit_request_by_link, draft1, receiver_client
 ):
     id_ = draft1.json["id"]
-    resp_request_create = creator_client.post(
-        urls["BASE_URL_REQUESTS"],
-        json=publish_request_data_function(draft1.json["id"]),
-    )
-
-    resp_request_submit = creator_client.post(
-        link2testclient(resp_request_create.json["links"]["actions"]["submit"]),
-    )
-    ThesisRecord.index.refresh()
-    ThesisDraft.index.refresh()
-
+    submit_request_by_link(creator_client, draft1, "publish_draft")
     record = receiver_client.get(
         f"{urls['BASE_URL']}{id_}/draft?expand=true"
     )
-
     assert record.json["expanded"]["requests"][0]["links"]["actions"].keys() == {
         "accept",
         "decline",
@@ -135,14 +120,12 @@ def publish_record(
 
 
 def test_allowed_request_types_on_published_resource(
-    vocab_cf,
     logged_client,
     users,
     urls,
-    publish_request_data_function,
     create_draft_via_resource,
-    search_clear,
-    app,
+    submit_request_by_link,
+    search_clear
 ):
     creator = users[0]
     receiver = users[1]
@@ -151,7 +134,7 @@ def test_allowed_request_types_on_published_resource(
 
     draft1 = create_draft_via_resource(creator_client)
     published1 = publish_record(
-        creator_client, urls, publish_request_data_function, draft1, receiver_client
+        creator_client, urls, submit_request_by_link, draft1, receiver_client
     )
 
     applicable_requests_link = published1["links"]["applicable-requests"]
@@ -194,13 +177,11 @@ def test_allowed_request_types_on_published_resource(
 
 
 def test_ui_serialization(
-    vocab_cf,
     logged_client,
     users,
     urls,
-    publish_request_data_function,
+    submit_request_by_link,
     create_draft_via_resource,
-    record_factory,
     search_clear,
 ):
     creator = users[0]
@@ -214,7 +195,7 @@ def test_ui_serialization(
     published1 = publish_record(
         creator_client,
         urls,
-        publish_request_data_function,
+        submit_request_by_link,
         draft_to_publish,
         receiver_client,
     )

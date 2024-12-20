@@ -13,14 +13,13 @@ from .utils import link2testclient
 
 
 def test_cascade_update(
-    vocab_cf,
     logged_client,
     users,
     urls,
-    publish_request_data_function,
-    another_topic_updating_request_function,
     create_draft_via_resource,
     check_publish_topic_update,
+    create_request_by_link,
+    submit_request_by_link,
     search_clear,
 ):
     creator = users[0]
@@ -32,21 +31,10 @@ def test_cascade_update(
     draft1 = create_draft_via_resource(creator_client, custom_workflow="cascade_update")
     draft2 = create_draft_via_resource(creator_client, custom_workflow="cascade_update")
 
-    publish_request_create = creator_client.post(
-        urls["BASE_URL_REQUESTS"],
-        json=publish_request_data_function(draft1.json["id"]),
-    )
-    another_request_create = creator_client.post(
-        urls["BASE_URL_REQUESTS"],
-        json=another_topic_updating_request_function(draft1.json["id"]),
-    )
-    publish_request_on_second_draft = creator_client.post(
-        urls["BASE_URL_REQUESTS"],
-        json=publish_request_data_function(draft2.json["id"]),
-    )
-    resp_request_submit = creator_client.post(
-        link2testclient(publish_request_create.json["links"]["actions"]["submit"]),
-    )
+    publish_request_create = submit_request_by_link(creator_client, draft1, "publish_draft")
+    another_request_create = create_request_by_link(creator_client, draft1, "another_topic_updating")
+    publish_request_on_second_draft = create_request_by_link(creator_client, draft2, "publish_draft")
+
     record = receiver_client.get(
         f"{urls['BASE_URL']}{draft1.json['id']}/draft?expand=true"
     )
@@ -68,12 +56,9 @@ def test_cascade_update(
 
 
 def test_cascade_cancel(
-    vocab_cf,
     logged_client,
     users,
     urls,
-    publish_request_data_function,
-    another_topic_updating_request_function,
     create_draft_via_resource,
     create_request_by_link,
     submit_request_by_link,

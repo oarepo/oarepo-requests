@@ -7,16 +7,16 @@
 #
 
 from .utils import link2testclient
+from ..conftest import submit_request_by_link
 
 
 def test_publish(
-    vocab_cf,
     logged_client,
     users,
     urls,
-    publish_request_data_function,
     create_draft_via_resource,
     check_publish_topic_update,
+    submit_request_by_link,
     search_clear,
 ):
     creator = users[0]
@@ -26,13 +26,7 @@ def test_publish(
     receiver_client = logged_client(receiver)
 
     draft1 = create_draft_via_resource(creator_client)
-    resp_request_create = creator_client.post(
-        urls["BASE_URL_REQUESTS"],
-        json=publish_request_data_function(draft1.json["id"]),
-    )
-    resp_request_submit = creator_client.post(
-        link2testclient(resp_request_create.json["links"]["actions"]["submit"]),
-    )
+    resp_request_submit = submit_request_by_link(creator_client, draft1, "publish_draft")
     record = receiver_client.get(
         f"{urls['BASE_URL']}{draft1.json['id']}/draft?expand=true"
     )
@@ -41,4 +35,4 @@ def test_publish(
             record.json["expanded"]["requests"][0]["links"]["actions"]["accept"]
         ),
     )
-    check_publish_topic_update(creator_client, urls, record, resp_request_create)
+    check_publish_topic_update(creator_client, urls, record, resp_request_submit)

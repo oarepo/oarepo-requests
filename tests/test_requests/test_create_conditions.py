@@ -16,7 +16,6 @@ def test_can_create(
     logged_client,
     users,
     urls,
-    publish_request_data_function,
     create_draft_via_resource,
     search_clear,
 ):
@@ -30,14 +29,12 @@ def test_can_create(
     draft2 = create_draft_via_resource(creator_client)
 
     resp_request_create = creator_client.post(
-        urls["BASE_URL_REQUESTS"],
-        json=publish_request_data_function(draft1.json["id"]),
+        f"{urls['BASE_URL']}{draft1.json['id']}/draft/requests/publish_draft"
     )
 
     with pytest.raises(OpenRequestAlreadyExists):
         creator_client.post(  # create request after create
-            urls["BASE_URL_REQUESTS"],
-            json=publish_request_data_function(draft1.json["id"]),
+            f"{urls['BASE_URL']}{draft1.json['id']}/draft/requests/publish_draft"
         )
 
     resp_request_submit = creator_client.post(
@@ -46,14 +43,12 @@ def test_can_create(
 
     with pytest.raises(OpenRequestAlreadyExists):
         creator_client.post(  # create request after submit
-            urls["BASE_URL_REQUESTS"],
-            json=publish_request_data_function(draft1.json["id"]),
+            f"{urls['BASE_URL']}{draft1.json['id']}/draft/requests/publish_draft"
         )
 
     # should still be creatable for draft2
     create_for_request_draft2 = creator_client.post(
-        urls["BASE_URL_REQUESTS"],
-        json=publish_request_data_function(draft2.json["id"]),
+        f"{urls['BASE_URL']}{draft2.json['id']}/draft/requests/publish_draft"
     )
     assert create_for_request_draft2.status_code == 201
 
@@ -66,8 +61,7 @@ def test_can_create(
 
     with pytest.raises(OpenRequestAlreadyExists):
         create_for_request_draft2 = creator_client.post(
-            urls["BASE_URL_REQUESTS"],
-            json=publish_request_data_function(draft2.json["id"]),
+            f"{urls['BASE_URL']}{draft2.json['id']}/draft/requests/publish_draft"
         )
     record = receiver_client.get(
         f"{urls['BASE_URL']}{draft2.json['id']}/draft?expand=true"
@@ -79,8 +73,7 @@ def test_can_create(
     )
 
     resp_request_create_again = creator_client.post(
-        urls["BASE_URL_REQUESTS"],
-        json=publish_request_data_function(draft2.json["id"]),
+        f"{urls['BASE_URL']}{draft2.json['id']}/draft/requests/publish_draft"
     )
     assert resp_request_create_again.status_code == 201
 
@@ -89,7 +82,6 @@ def test_can_possibly_create(
     logged_client,
     users,
     urls,
-    publish_request_data_function,
     create_draft_via_resource,
     search_clear,
 ):
@@ -106,8 +98,7 @@ def test_can_possibly_create(
         f"{urls['BASE_URL']}{draft1.json['id']}/draft?expand=true"
     )
     resp_request_create = creator_client.post(
-        urls["BASE_URL_REQUESTS"],
-        json=publish_request_data_function(draft1.json["id"]),
+        f"{urls['BASE_URL']}{draft1.json['id']}/draft/requests/publish_draft"
     )
 
     record_resp_after_create = creator_client.get(
