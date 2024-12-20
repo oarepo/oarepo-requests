@@ -12,11 +12,12 @@ from __future__ import annotations
 from functools import cached_property
 from typing import TYPE_CHECKING, Any
 
+from invenio_pidstore.errors import PersistentIdentifierError
 from invenio_requests.customizations import actions
 from oarepo_runtime.i18n import lazy_gettext as _
 
 from oarepo_requests.proxies import current_oarepo_requests
-from invenio_pidstore.errors import PersistentIdentifierError
+
 if TYPE_CHECKING:
     from flask_babel.speaklater import LazyString
     from flask_principal import Identity

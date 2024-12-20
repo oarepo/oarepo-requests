@@ -13,7 +13,7 @@ def test_no_recipient(
     search_clear,
 ):
     creator = users[0]
-    assert creator.id == '1'
+    assert creator.id == "1"
 
     creator_client = logged_client(creator)
 
@@ -24,8 +24,8 @@ def test_no_recipient(
         json={
             "request_type": "approve_draft",
             "topic": {"thesis_draft": draft1.json["id"]},
-        }
+        },
     )
     assert resp_request_create.status_code == 201
-    assert resp_request_create.json['receiver'] is None
-    assert resp_request_create.json['links']['receiver'] == {}
+    assert resp_request_create.json["receiver"] is None
+    assert resp_request_create.json["links"]["receiver"] == {}

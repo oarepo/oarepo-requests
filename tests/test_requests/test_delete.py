@@ -11,12 +11,11 @@ from .utils import link2testclient
 
 
 def test_delete(
-    vocab_cf,
     logged_client,
     record_factory,
     users,
     urls,
-    delete_record_data_function,
+    submit_request_by_link,
     search_clear,
 ):
     creator = users[0]
@@ -24,23 +23,19 @@ def test_delete(
     creator_client = logged_client(creator)
     receiver_client = logged_client(receiver)
 
-    record1 = record_factory(creator.identity)
-    record2 = record_factory(creator.identity)
-    record3 = record_factory(creator.identity)
+    record1 = record_factory(creator_client)
+    record2 = record_factory(creator_client)
+    record3 = record_factory(creator_client)
     ThesisRecord.index.refresh()
     ThesisDraft.index.refresh()
     lst = creator_client.get(urls["BASE_URL"])
     assert len(lst.json["hits"]["hits"]) == 3
 
-    resp_request_create = creator_client.post(
-        urls["BASE_URL_REQUESTS"],
-        json=delete_record_data_function(record1["id"]),
-    )
-    resp_request_submit = creator_client.post(
-        link2testclient(resp_request_create.json["links"]["actions"]["submit"]),
+    resp_request_submit = submit_request_by_link(
+        creator_client, record1, "delete_published_record"
     )
 
-    record = receiver_client.get(f"{urls['BASE_URL']}{record1['id']}?expand=true")
+    record = receiver_client.get(f"{urls['BASE_URL']}{record1.json['id']}?expand=true")
     assert record.json["expanded"]["requests"][0]["links"]["actions"].keys() == {
         "accept",
         "decline",
@@ -59,32 +54,24 @@ def test_delete(
     lst = creator_client.get(urls["BASE_URL"])
     assert len(lst.json["hits"]["hits"]) == 2
 
-    resp_request_create = creator_client.post(
-        urls["BASE_URL_REQUESTS"],
-        json=delete_record_data_function(record2["id"]),
+    resp_request_submit = submit_request_by_link(
+        creator_client, record2, "delete_published_record"
     )
-    resp_request_submit = creator_client.post(
-        link2testclient(resp_request_create.json["links"]["actions"]["submit"]),
-    )
-    record = receiver_client.get(f"{urls['BASE_URL']}{record2['id']}?expand=true")
+    record = receiver_client.get(f"{urls['BASE_URL']}{record2.json['id']}?expand=true")
     decline = receiver_client.post(
         link2testclient(
             record.json["expanded"]["requests"][0]["links"]["actions"]["decline"]
         )
     )
     declined_request = creator_client.get(
-        f"{urls['BASE_URL_REQUESTS']}{resp_request_create.json['id']}"
+        f"{urls['BASE_URL_REQUESTS']}{resp_request_submit.json['id']}"
     )
     assert declined_request.json["status"] == "declined"
 
-    resp_request_create = creator_client.post(
-        urls["BASE_URL_REQUESTS"],
-        json=delete_record_data_function(record3["id"]),
+    resp_request_submit = submit_request_by_link(
+        creator_client, record3, "delete_published_record"
     )
-    resp_request_submit = creator_client.post(
-        link2testclient(resp_request_create.json["links"]["actions"]["submit"]),
-    )
-    record = creator_client.get(f"{urls['BASE_URL']}{record3['id']}?expand=true")
+    record = creator_client.get(f"{urls['BASE_URL']}{record3.json['id']}?expand=true")
     assert record.json["expanded"]["requests"][0]["links"]["actions"].keys() == {
         "cancel"
     }
@@ -94,18 +81,16 @@ def test_delete(
         ),
     )
     canceled_request = creator_client.get(
-        f"{urls['BASE_URL_REQUESTS']}{resp_request_create.json['id']}"
+        f"{urls['BASE_URL_REQUESTS']}{resp_request_submit.json['id']}"
     )
     assert canceled_request.json["status"] == "cancelled"
 
 
 def test_delete_draft(
-    vocab_cf,
     logged_client,
     create_draft_via_resource,
     users,
     urls,
-    delete_draft_function,
     get_request_link,
     search_clear,
 ):

@@ -51,12 +51,11 @@ def test_publish_service(users, record_service, default_workflow_json, search_cl
 
 
 def test_publish(
-    vocab_cf,
     logged_client,
     users,
     urls,
-    publish_request_data_function,
     create_draft_via_resource,
+    submit_request_by_link,
     search_clear,
 ):
     creator = users[0]
@@ -75,13 +74,8 @@ def test_publish(
     assert len(draft_lst.json["hits"]["hits"]) == 3
     assert len(lst.json["hits"]["hits"]) == 0
 
-    resp_request_create = creator_client.post(
-        urls["BASE_URL_REQUESTS"],
-        json=publish_request_data_function(draft1.json["id"]),
-    )
-
-    resp_request_submit = creator_client.post(
-        link2testclient(resp_request_create.json["links"]["actions"]["submit"]),
+    resp_request_submit = submit_request_by_link(
+        creator_client, draft1, "publish_draft"
     )
     ThesisRecord.index.refresh()
     ThesisDraft.index.refresh()
@@ -115,12 +109,8 @@ def test_publish(
     assert len(draft_lst.json["hits"]["hits"]) == 3
     assert len(lst.json["hits"]["hits"]) == 1
 
-    resp_request_create = creator_client.post(
-        urls["BASE_URL_REQUESTS"],
-        json=publish_request_data_function(draft2.json["id"]),
-    )
-    resp_request_submit = creator_client.post(
-        link2testclient(resp_request_create.json["links"]["actions"]["submit"]),
+    resp_request_submit = submit_request_by_link(
+        creator_client, draft2, "publish_draft"
     )
     record = receiver_client.get(
         f"{urls['BASE_URL']}{draft2.json['id']}/draft?expand=true"
@@ -131,17 +121,12 @@ def test_publish(
         ),
     )
     declined_request = creator_client.get(
-        f"{urls['BASE_URL_REQUESTS']}{resp_request_create.json['id']}"
+        f"{urls['BASE_URL_REQUESTS']}{resp_request_submit.json['id']}"
     )
     assert declined_request.json["status"] == "declined"
-    record = receiver_client.get(f"{urls['BASE_URL']}{draft2.json['id']}/draft")
 
-    resp_request_create = creator_client.post(
-        urls["BASE_URL_REQUESTS"],
-        json=publish_request_data_function(draft3.json["id"]),
-    )
-    resp_request_submit = creator_client.post(
-        link2testclient(resp_request_create.json["links"]["actions"]["submit"]),
+    resp_request_submit = submit_request_by_link(
+        creator_client, draft3, "publish_draft"
     )
     record = creator_client.get(
         f"{urls['BASE_URL']}{draft3.json['id']}/draft?expand=true"
@@ -155,17 +140,15 @@ def test_publish(
         ),
     )
     canceled_request = logged_client(creator).get(
-        f"{urls['BASE_URL_REQUESTS']}{resp_request_create.json['id']}"
+        f"{urls['BASE_URL_REQUESTS']}{resp_request_submit.json['id']}"
     )
     assert canceled_request.json["status"] == "cancelled"
 
 
 def test_create_fails_if_draft_not_validated(
-    vocab_cf,
     logged_client,
     users,
     urls,
-    publish_request_data_function,
     create_draft_via_resource,
     default_workflow_json,
     search_clear,
@@ -182,8 +165,7 @@ def test_create_fails_if_draft_not_validated(
 
     assert "publish_draft" not in draft.json["expanded"]["request_types"]
     resp_request_create = creator_client.post(
-        urls["BASE_URL_REQUESTS"],
-        json=publish_request_data_function(draft.json["id"]),
+        f"{urls["BASE_URL"]}{draft.json['id']}/draft/requests/publish_draft",
     )
     assert resp_request_create.status_code == 400
     assert resp_request_create.json["message"] == "A validation error occurred."

@@ -15,9 +15,7 @@ from typing import TYPE_CHECKING
 from invenio_records_resources.services import LinksTemplate
 from invenio_records_resources.services.base.links import Link
 
-from oarepo_requests.services.results import (
-    RequestTypesList,
-)
+from oarepo_requests.services.results import RequestTypesList
 from oarepo_requests.services.schema import RequestTypeSchema
 from oarepo_requests.utils import allowed_request_types_for_record
 
