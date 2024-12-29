@@ -16,7 +16,7 @@ from invenio_requests.customizations import actions
 from oarepo_runtime.i18n import lazy_gettext as _
 
 from oarepo_requests.proxies import current_oarepo_requests
-
+from invenio_pidstore.errors import PersistentIdentifierError
 if TYPE_CHECKING:
     from flask_babel.speaklater import LazyString
     from flask_principal import Identity
@@ -52,7 +52,6 @@ class OARepoGenericActionMixin:
         **kwargs: Any,
     ) -> None:
         """Apply the action to the topic."""
-        pass
 
     def _execute_with_components(
         self,
@@ -95,7 +94,10 @@ class OARepoGenericActionMixin:
         """Execute the action."""
         request: Request = self.request  # type: ignore
         request_type = request.type
-        topic = request.topic.resolve()
+        try:
+            topic = request.topic.resolve()
+        except PersistentIdentifierError:
+            topic = None
         self._execute_with_components(
             self.components, identity, request_type, topic, uow, *args, **kwargs
         )
@@ -127,8 +129,13 @@ class AddTopicLinksOnPayloadMixin:
         # invenio does not allow non-string values in the payload, so using colon notation here
         # client will need to handle this and convert to links structure
         # can not use dot notation as marshmallow tries to be too smart and does not serialize dotted keys
-        request["payload"][self.self_link] = topic_dict["links"]["self"]
-        request["payload"][self.self_html_link] = topic_dict["links"]["self_html"]
+        if (
+            "self" in topic_dict["links"]
+        ):  # todo consider - this happens if receiver doesn't have read rights to the topic, like after a draft is created after edit
+            # if it's needed in all cases, we could do a system identity call here
+            request["payload"][self.self_link] = topic_dict["links"]["self"]
+        if "self_html" in topic_dict["links"]:
+            request["payload"][self.self_html_link] = topic_dict["links"]["self_html"]
         return topic._record
 
 
@@ -150,8 +157,10 @@ class OARepoAcceptAction(OARepoGenericActionMixin, actions.AcceptAction):
     name = _("Accept")
 
 
-class OARepoCancelAction(actions.CancelAction):
+class OARepoCancelAction(OARepoGenericActionMixin, actions.CancelAction):
     """Cancel action extended for oarepo requests."""
+
+    name = _("Cancel")
 
     status_from = ["created", "submitted"]
     status_to = "cancelled"

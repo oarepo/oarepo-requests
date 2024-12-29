@@ -8,9 +8,22 @@
 from collections import defaultdict
 
 
-def link_api2testclient(api_link):
-    base_string = "https://127.0.0.1:5000/api/"
-    return api_link[len(base_string) - 1 :]
+def link2testclient(link, ui=False):
+    base_string = "https://127.0.0.1:5000/api/" if not ui else "https://127.0.0.1:5000/"
+    return link[len(base_string) - 1 :]
+
+
+def _create_request(client, record_id, request_type, urls):
+    applicable = client.get(
+        f"{urls['BASE_URL']}{record_id}/draft/requests/applicable"
+    ).json["hits"]["hits"]
+    request_link = [
+        type_["links"]["actions"]["create"]
+        for type_ in applicable
+        if type_["type_id"] == request_type
+    ][0]
+    ret = client.post(link2testclient(request_link))
+    return ret
 
 
 # from chatgpt

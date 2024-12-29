@@ -18,7 +18,7 @@ export const RequestCommentInput = ({
     editor.selection.select(editor.getBody(), true);
     editor.selection.collapse(false);
   };
-
+  let timeoutId;
   const [pasteError, setPasteError] = useState(false);
   const [length, setLength] = useState(initialValue?.length);
   // TODO: there is no appropriate URL to call here. I think this one is the safest, because we know it exists and it does
@@ -44,6 +44,7 @@ export const RequestCommentInput = ({
         editorConfig={{
           auto_focus: true,
           min_height: 100,
+          width: "100%",
           toolbar:
             "blocks | bold italic | bullist numlist | outdent indent | undo redo",
           setup: (editor) => {
@@ -71,7 +72,8 @@ export const RequestCommentInput = ({
                   maxCommentLength - currentCommentLength
                 );
                 setPasteError(true);
-                setTimeout(() => setPasteError(false), 3000);
+                clearTimeout(timeoutId);
+                timeoutId = setTimeout(() => setPasteError(false), 3000);
               }
             });
             editor.on("init", () => {
@@ -123,5 +125,5 @@ RequestCommentInput.propTypes = {
 
 RequestCommentInput.defaultProps = {
   initialValue: "",
-  maxCommentLength: 1000,
+  maxCommentLength: 100,
 };

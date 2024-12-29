@@ -7,6 +7,8 @@
 #
 """Default configuration of oarepo-requests."""
 
+from __future__ import annotations
+
 import invenio_requests.config
 import oarepo_workflows  # noqa
 from invenio_requests.customizations import CommentEventType, LogEventType
@@ -21,6 +23,7 @@ from oarepo_requests.actions.components import (
     WorkflowTransitionComponent,
 )
 from oarepo_requests.resolvers.ui import (
+    AutoApproveUIEntityResolver,
     FallbackEntityReferenceUIResolver,
     GroupEntityReferenceUIResolver,
     UserEntityReferenceUIResolver,
@@ -63,6 +66,7 @@ ENTITY_REFERENCE_UI_RESOLVERS = {
     "user": UserEntityReferenceUIResolver("user"),
     "fallback": FallbackEntityReferenceUIResolver("fallback"),
     "group": GroupEntityReferenceUIResolver("group"),
+    "auto_approve": AutoApproveUIEntityResolver("auto_approve"),
 }
 
 REQUESTS_UI_SERIALIZATION_REFERENCED_FIELDS = ["created_by", "receiver", "topic"]

@@ -7,7 +7,7 @@
 #
 from thesis.records.api import ThesisDraft, ThesisRecord
 
-from tests.test_requests.utils import link_api2testclient
+from tests.test_requests.utils import _create_request, link2testclient
 
 
 def test_edit_autoaccept(
@@ -36,7 +36,7 @@ def test_edit_autoaccept(
         json=edit_record_data_function(record1["id"]),
     )
     resp_request_submit = creator_client.post(
-        link_api2testclient(resp_request_create.json["links"]["actions"]["submit"]),
+        link2testclient(resp_request_create.json["links"]["actions"]["submit"]),
     )
     # is request accepted and closed?
     request = creator_client.get(
@@ -55,7 +55,88 @@ def test_edit_autoaccept(
     # edit action worked?
     search = creator_client.get(
         f'user{urls["BASE_URL"]}',
-    ).json["hits"]["hits"]
+    ).json[
+        "hits"
+    ]["hits"]
     assert len(search) == 1
     assert search[0]["links"]["self"].endswith("/draft")
     assert search[0]["id"] == id_
+
+
+def test_redirect_url(
+    vocab_cf,
+    logged_client,
+    users,
+    urls,
+    edit_record_data_function,
+    record_factory,
+    search_clear,
+):
+    creator = users[0]
+    receiver = users[1]
+    creator_client = logged_client(creator)
+    receiver_client = logged_client(receiver)
+
+    record1 = record_factory(creator.identity, custom_workflow="different_recipients")
+    id_ = record1["id"]
+
+    resp_request_create = creator_client.post(
+        urls["BASE_URL_REQUESTS"],
+        json=edit_record_data_function(record1["id"]),
+    )
+    edit_request_id = resp_request_create.json["id"]
+    resp_request_submit = creator_client.post(
+        link2testclient(resp_request_create.json["links"]["actions"]["submit"]),
+    )
+    receiver_get = receiver_client.get(f"{urls['BASE_URL_REQUESTS']}{edit_request_id}")
+    resp_request_accept = receiver_client.post(
+        link2testclient(receiver_get.json["links"]["actions"]["accept"])
+    )
+    # is request accepted and closed?
+    request = creator_client.get(
+        f'{urls["BASE_URL_REQUESTS"]}{edit_request_id}',
+    ).json
+
+    creator_edit_accepted = creator_client.get(
+        f'{urls["BASE_URL_REQUESTS"]}{edit_request_id}',
+    ).json
+    receiver_edit_accepted = receiver_client.get(
+        f'{urls["BASE_URL_REQUESTS"]}{edit_request_id}',
+    ).json  # receiver should be able to get the request but not to edit the draft - should not receive edit link
+
+    assert (
+        link2testclient(creator_edit_accepted["links"]["ui_redirect_url"], ui=True)
+        == f"/thesis/{record1['id']}/edit"
+    )
+    assert receiver_edit_accepted["links"]["ui_redirect_url"] == None
+
+    publish_request = _create_request(creator_client, id_, "publish_draft", urls)
+    creator_client.post(
+        link2testclient(publish_request.json["links"]["actions"]["submit"])
+    )
+    receiver_edit_request_after_publish_draft_submitted = receiver_client.get(
+        f"{urls['BASE_URL_REQUESTS']}{edit_request_id}"
+    ).json  # now receiver should have a right to view but not edit the topic
+    assert (
+        link2testclient(
+            receiver_edit_request_after_publish_draft_submitted["links"][
+                "ui_redirect_url"
+            ],
+            ui=True,
+        )
+        == f"/thesis/{record1['id']}/preview"
+    )
+
+    receiver_publish_request = receiver_client.get(
+        f"{urls['BASE_URL_REQUESTS']}{publish_request.json['id']}"
+    ).json
+    receiver_client.post(
+        link2testclient(receiver_publish_request["links"]["actions"]["accept"])
+    )
+
+    creator_edit_request_after_merge = creator_client.get(
+        f'{urls["BASE_URL_REQUESTS"]}{edit_request_id}',
+    ).json
+    assert (
+        creator_edit_request_after_merge["links"]["ui_redirect_url"] == None
+    )  # draft now doesn't exist so we can't redirect to it

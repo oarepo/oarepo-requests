@@ -5,10 +5,11 @@ import {
   useAction,
   useRequestContext,
   saveAndSubmit,
-  useConfirmModalContext,
+  ConfirmationModal,
   REQUEST_TYPE,
 } from "@js/oarepo_requests_common";
 import { i18next } from "@translations/oarepo_requests_ui/i18next";
+import { useConfirmationModal } from "@js/oarepo_ui";
 
 // Directly create and submit request without modal
 const DirectCreateAndSubmit = ({
@@ -16,17 +17,17 @@ const DirectCreateAndSubmit = ({
   requireConfirmation,
   isMutating,
 }) => {
-  const { confirmAction } = useConfirmModalContext();
-  const { has_form: hasForm, dangerous, editable } = requestType;
+  const { isOpen, close, open } = useConfirmationModal();
+
   const {
     isLoading,
     mutate: createAndSubmit,
     isError,
+    error,
     reset,
   } = useAction({
     action: saveAndSubmit,
     requestOrRequestType: requestType,
-    confirmAction,
   });
   const { requestButtonsIconsConfig } = useRequestContext();
   const buttonIconProps = requestButtonsIconsConfig[requestType.type_id];
@@ -35,11 +36,7 @@ const DirectCreateAndSubmit = ({
 
   const handleClick = () => {
     if (requireConfirmation) {
-      confirmAction(() => createAndSubmit(), REQUEST_TYPE.CREATE, {
-        hasForm,
-        dangerous,
-        editable,
-      });
+      open();
     } else {
       createAndSubmit();
     }
@@ -69,12 +66,26 @@ const DirectCreateAndSubmit = ({
       {isError && (
         <Message negative>
           <Message.Header>
-            {i18next.t(
-              "Request not created successfully. Please try again in a moment."
-            )}
+            {error?.response?.data?.errors?.length > 0
+              ? i18next.t(
+                  "Record has validation errors. Redirecting to form..."
+                )
+              : i18next.t(
+                  "Request not created successfully. Please try again in a moment."
+                )}
           </Message.Header>
         </Message>
       )}
+      <ConfirmationModal
+        requestActionName={REQUEST_TYPE.SUBMIT}
+        requestOrRequestType={requestType}
+        requestExtraData={requestType}
+        onConfirmAction={() => {
+          createAndSubmit();
+        }}
+        isOpen={isOpen}
+        close={close}
+      />
     </React.Fragment>
   );
 };

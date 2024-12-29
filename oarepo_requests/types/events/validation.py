@@ -7,6 +7,8 @@
 #
 """Validation of event types."""
 
+from __future__ import annotations
+
 
 def _serialized_topic_validator(value: str) -> str:
     """Validate the serialized topic. It must be a string with model and id separated by a single dot."""

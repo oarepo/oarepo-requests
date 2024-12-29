@@ -696,5 +696,23 @@ msgstr ""
 msgid "Remaining characters: "
 msgstr ""
 
+#: /home/ron/prace/oarepo-requests/oarepo_requests/resolvers/ui.py:594
+msgid "Auto approve"
+msgstr ""
+
+#: /home/ron/prace/oarepo-requests/oarepo_requests/types/publish_draft.py:120
+msgid ""
+"Missing uploaded files. To disable files for this record please mark it as "
+"metadata-only."
+msgstr ""
+
+#: /home/ron/prace/oarepo-requests/oarepo_requests/types/publish_draft.py:124
+msgid "Missing uploaded files."
+msgstr ""
+
+#: /home/dusanst/Projects/oarepo-requests/oarepo_requests/types/new_version.py:78
+msgid "Yes or no"
+msgstr ""
+
 #~ msgid "No status"
 #~ msgstr ""

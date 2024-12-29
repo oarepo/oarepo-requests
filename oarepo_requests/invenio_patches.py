@@ -9,12 +9,13 @@
 
 from __future__ import annotations
 
-from functools import cached_property
+from functools import cached_property, partial
 from typing import TYPE_CHECKING, Any, Callable
 
 from flask_resources import JSONSerializer, ResponseHandler
 from invenio_records_resources.resources.records.headers import etag_headers
 from invenio_records_resources.services.records.params import FilterParam
+from invenio_records_resources.services.records.params.base import ParamInterpreter
 from invenio_requests.resources.events.config import RequestCommentsResourceConfig
 from invenio_requests.resources.requests.config import (
     RequestSearchRequestArgsSchema,
@@ -29,13 +30,11 @@ from invenio_search.engine import dsl
 from marshmallow import fields
 from opensearch_dsl.query import Bool
 
-from oarepo_requests.proxies import current_oarepo_requests
 from oarepo_requests.resources.ui import (
     OARepoRequestEventsUIJSONSerializer,
     OARepoRequestsUIJSONSerializer,
 )
 from oarepo_requests.services.oarepo.config import OARepoRequestsServiceConfig
-from oarepo_requests.utils import create_query_term_for_reference
 
 if TYPE_CHECKING:
     from flask.blueprints import BlueprintSetupState
@@ -55,23 +54,40 @@ class RequestOwnerFilterParam(FilterParam):
         return search
 
 
-class RequestReceiverFilterParam(FilterParam):
-    """Filter requests by receiver.
+class RequestAllAvailableFilterParam(ParamInterpreter):
+    """A no-op filter that returns all requests that are readable by the current user."""
 
-    Note: This is different from the invenio handling. Invenio requires receiver to be
-    a user, we handle it as a more generic reference.
+    def __init__(self, param_name, config):
+        """Initialize the filter."""
+        self.param_name = param_name
+        super().__init__(config)
+
+    @classmethod
+    def factory(cls, param=None):
+        """Create a new filter parameter."""
+        return partial(cls, param)
+
+    def apply(self, identity, search, params):
+        """Apply the filter to the search - does nothing."""
+        params.pop(self.param_name, None)
+        return search
+
+
+class RequestNotOwnerFilterParam(FilterParam):
+    """Filter requests that are not owned by the current user.
+
+    Note: invenio still does check that the user has the right to see the request,
+    so this is just a filter to narrow down the search to requests, that the user
+    can approve.
     """
 
     def apply(self, identity: Identity, search: Query, params: dict[str, str]) -> Query:
         """Apply the filter to the search."""
         value = params.pop(self.param_name, None)
-        terms = dsl.Q("match_none")
         if value is not None:
-            references = current_oarepo_requests.identity_to_entity_references(identity)
-            for reference in references:
-                query_term = create_query_term_for_reference(self.field_name, reference)
-                terms |= query_term
-            search = search.filter(Bool(filter=terms))
+            search = search.filter(
+                Bool(must_not=[dsl.Q("term", **{self.field_name: identity.id})])
+            )
         return search
 
 
@@ -92,7 +108,8 @@ class EnhancedRequestSearchOptions(RequestSearchOptions):
 
     params_interpreters_cls = RequestSearchOptions.params_interpreters_cls + [
         RequestOwnerFilterParam.factory("mine", "created_by.user"),
-        RequestReceiverFilterParam.factory("assigned", "receiver"),
+        RequestNotOwnerFilterParam.factory("assigned", "created_by.user"),
+        RequestAllAvailableFilterParam.factory("all"),
         IsClosedParam.factory("is_closed"),
     ]
 
@@ -102,6 +119,7 @@ class ExtendedRequestSearchRequestArgsSchema(RequestSearchRequestArgsSchema):
 
     mine = fields.Boolean()
     assigned = fields.Boolean()
+    all = fields.Boolean()
     is_closed = fields.Boolean()
 
 

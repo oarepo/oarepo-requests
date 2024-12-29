@@ -14,13 +14,7 @@ from __future__ import annotations
 
 import abc
 import contextlib
-from typing import (
-    TYPE_CHECKING,
-    Any,
-    ContextManager,
-    Generator,
-    override,
-)
+from typing import TYPE_CHECKING, Any, override
 
 from invenio_requests.customizations import RequestAction, RequestActions, RequestType
 from invenio_requests.errors import CannotExecuteActionError
@@ -28,6 +22,8 @@ from invenio_requests.errors import CannotExecuteActionError
 from oarepo_requests.services.permissions.identity import request_active
 
 if TYPE_CHECKING:
+    from collections.abc import Generator
+
     from flask_principal import Identity
     from invenio_records_resources.services.uow import UnitOfWork
     from invenio_requests.records.api import Request
@@ -52,7 +48,7 @@ class RequestActionComponent(abc.ABC):
         uow: UnitOfWork,
         *args: Any,
         **kwargs: Any,
-    ) -> ContextManager:
+    ) -> contextlib.AbstractContextManager:
         """Apply the component.
 
         Must return a context manager
@@ -114,6 +110,10 @@ class WorkflowTransitionComponent(RequestActionComponent):
         from sqlalchemy.exc import NoResultFound
 
         yield
+        if (
+            not topic
+        ):  # for example if we are cancelling requests after deleting draft, it does not make sense to attempt changing the state of the draft
+            return
         try:
             transitions = (
                 current_oarepo_workflows.get_workflow(topic)

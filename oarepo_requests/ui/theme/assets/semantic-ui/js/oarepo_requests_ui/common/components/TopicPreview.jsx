@@ -31,7 +31,7 @@ export const TopicPreview = ({ request }) => {
         )}
         <iframe
           ref={iframeRef}
-          src={request.topic.links.self_html + "?embed=true"}
+          src={request.links.topic.self_html + "?embed=true"}
           onLoad={() => {
             updateIframeHeight();
             setLoading(false);
