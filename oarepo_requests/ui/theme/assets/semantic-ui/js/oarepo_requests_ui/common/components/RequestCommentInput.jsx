@@ -92,12 +92,11 @@ export const RequestCommentInput = ({
           if (textLength <= maxCommentLength) {
             handleChange(event, cleanedContent);
           }
-          if (textContent.length !== length) {
-            if (textContent.trim().length === 0) {
-              setLength(0);
-            } else {
-              setLength(textLength);
-            }
+          // querky  behavior of the editor, when the content is empty, the length is 1
+          if (textContent.trim().length === 0) {
+            setLength(0);
+          } else {
+            setLength(textLength);
           }
         }}
         onFocus={handleFocus}
@@ -108,6 +107,7 @@ export const RequestCommentInput = ({
       {pasteError && (
         <Message size="mini">
           <Message.Content>
+            <Icon name="warning circle" />
             {i18next.t("Pasted text was shortened to fit the allowed length.")}
           </Message.Content>
         </Message>
@@ -125,5 +125,5 @@ RequestCommentInput.propTypes = {
 
 RequestCommentInput.defaultProps = {
   initialValue: "",
-  maxCommentLength: 100,
+  maxCommentLength: 1000,
 };

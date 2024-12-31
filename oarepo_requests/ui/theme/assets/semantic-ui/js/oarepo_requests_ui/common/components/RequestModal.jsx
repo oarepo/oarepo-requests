@@ -51,37 +51,35 @@ export const RequestModal = ({
           openModal,
         }}
       >
-        <React.Fragment>
-          <Modal
-            className="requests-request-modal form-modal"
-            as={Dimmer.Dimmable}
-            blurring
+        <Modal
+          className="requests-request-modal form-modal"
+          as={Dimmer.Dimmable}
+          blurring
+          onClose={onClose}
+          onOpen={openModal}
+          open={isOpen}
+          trigger={trigger || <Button content="Open Modal" />}
+          closeIcon
+          closeOnDocumentClick={false}
+          closeOnDimmerClick={false}
+          aria-labelledby="request-modal-header"
+          aria-describedby="request-modal-desc"
+        >
+          <Dimmer active={isMutating > 0}>
+            <Loader inverted size="large" />
+          </Dimmer>
+          <Modal.Header as="h1" id="request-modal-header">
+            {header}
+          </Modal.Header>
+          <RequestModalContentAndActions
+            request={request}
+            requestType={requestType}
+            ContentComponent={ContentComponent}
+            requestCreationModal={requestCreationModal}
+            isMutating={isMutating}
             onClose={onClose}
-            onOpen={openModal}
-            open={isOpen}
-            trigger={trigger || <Button content="Open Modal" />}
-            closeIcon
-            closeOnDocumentClick={false}
-            closeOnDimmerClick={false}
-            aria-labelledby="request-modal-header"
-            aria-describedby="request-modal-desc"
-          >
-            <Dimmer active={isMutating > 0}>
-              <Loader inverted size="large" />
-            </Dimmer>
-            <Modal.Header as="h1" id="request-modal-header">
-              {header}
-            </Modal.Header>
-            <RequestModalContentAndActions
-              request={request}
-              requestType={requestType}
-              ContentComponent={ContentComponent}
-              requestCreationModal={requestCreationModal}
-              isMutating={isMutating}
-              onClose={onClose}
-            />
-          </Modal>
-        </React.Fragment>
+          />
+        </Modal>
       </ModalControlContextProvider>
     </FormikProvider>
   );

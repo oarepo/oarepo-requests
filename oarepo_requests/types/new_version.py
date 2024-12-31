@@ -88,7 +88,7 @@ class NewVersionRequestType(NonDuplicableOARepoRequestType):
         "field": "keep_files",
         "ui_widget": "Dropdown",
         "props": {
-            "label": _("Keep files:"),
+            "label": _("Keep files"),
             "placeholder": _("Yes or no"),
             "description": _(
                 "If you choose yes, the current record's files will be linked to the new version of the record. Then you will be able to add/remove files in the form."

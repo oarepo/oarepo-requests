@@ -714,5 +714,8 @@ msgstr ""
 msgid "Yes or no"
 msgstr ""
 
+msgid "Pasted text was shortened to fit the allowed length."
+msgstr ""
+
 #~ msgid "No status"
 #~ msgstr ""

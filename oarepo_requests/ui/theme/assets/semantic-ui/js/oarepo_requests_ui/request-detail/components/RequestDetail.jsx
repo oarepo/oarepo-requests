@@ -104,6 +104,7 @@ export const RequestDetail = ({
                   <React.Fragment key={name}>
                     <ActionComponent
                       request={request}
+                      requestType={request}
                       extraData={requestTypeProperties}
                       isMutating={isMutating}
                     />
@@ -137,7 +138,6 @@ export const RequestDetail = ({
               <RequestCustomFields
                 request={request}
                 customFields={customFields}
-                actions={actions}
               />
               <Loader active={isLoading} />
             </React.Fragment>

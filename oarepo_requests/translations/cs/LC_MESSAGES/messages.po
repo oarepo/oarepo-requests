@@ -746,3 +746,10 @@ msgstr "Chybí nahrané soubory."
 #: /home/dusanst/Projects/oarepo-requests/oarepo_requests/types/new_version.py:78
 msgid "Yes or no"
 msgstr "Ano nebo ne"
+
+#: /home/dusanst/Projects/oarepo-requests/oarepo_requests/types/new_version.py:91
+msgid "Keep files"
+msgstr "Ponechat soubory"
+
+msgid "Pasted text was shortened to fit the allowed length."
+msgstr "Vložený text byl zkrácen, aby odpovídal povolené délce."

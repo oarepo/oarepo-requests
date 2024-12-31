@@ -81,7 +81,7 @@ ConfirmationModal.propTypes = {
 };
 
 const createConfirmDialogProps = (requestOrRequestType) => ({
-  header: `${i18next.t("Create request")} (${requestOrRequestType.name})`,
+  header: `${i18next.t("Create request")} (${requestOrRequestType?.name})`,
   confirmButton: (
     <ConfirmationModalConfirmButton negative content={i18next.t("Proceed")} />
   ),

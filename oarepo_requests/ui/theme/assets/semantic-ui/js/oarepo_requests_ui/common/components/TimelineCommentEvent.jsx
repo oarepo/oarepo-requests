@@ -149,7 +149,6 @@ const TimelineCommentEvent = ({ event, requestId, page }) => {
 
   const editButtonDisabled =
     editLoading || comment === event.payload.content || !comment;
-
   return (
     <div className="requests comment-event-container">
       <Feed.Event key={event.id}>

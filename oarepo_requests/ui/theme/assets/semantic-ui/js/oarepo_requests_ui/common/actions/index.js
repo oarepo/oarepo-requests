@@ -20,7 +20,6 @@ export const mapLinksToActions = (
   extraData
 ) => {
   const hasLongForm = extraData?.editable;
-
   const actionComponents = [];
   for (const actionKey of Object.keys(requestOrRequestType.links?.actions)) {
     switch (actionKey) {

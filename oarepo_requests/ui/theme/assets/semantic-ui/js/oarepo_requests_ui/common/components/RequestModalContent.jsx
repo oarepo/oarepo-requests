@@ -19,7 +19,6 @@ import sanitizeHtml from "sanitize-html";
 export const RequestModalContent = ({
   request,
   customFields,
-  modalActions,
   allowedHtmlAttrs,
   allowedHtmlTags,
 }) => {
@@ -55,11 +54,7 @@ export const RequestModalContent = ({
           <SideRequestInfo request={request} />
         </Grid.Column>
       </Grid.Row>
-      <RequestCustomFields
-        request={request}
-        customFields={customFields}
-        actions={modalActions}
-      />
+      <RequestCustomFields request={request} customFields={customFields} />
       <Grid.Row>
         <Grid.Column>
           <Timeline request={request} />
