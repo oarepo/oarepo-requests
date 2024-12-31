@@ -67,7 +67,6 @@ export const RequestModalContent = ({
 RequestModalContent.propTypes = {
   request: PropTypes.object.isRequired,
   customFields: PropTypes.object,
-  modalActions: PropTypes.array,
   allowedHtmlAttrs: PropTypes.object,
   allowedHtmlTags: PropTypes.array,
 };
