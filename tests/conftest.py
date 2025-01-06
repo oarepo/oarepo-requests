@@ -551,6 +551,7 @@ def logged_client(client):
 
     return _logged_client
 
+
 @pytest.fixture()
 def merge_record_data(default_workflow_json):
     def _merge_data(custom_workflow=None, additional_data=None):
@@ -588,15 +589,16 @@ def draft_factory_record_object(record_service, merge_record_data):
 def record_factory_record_object(record_service, draft_factory_record_object, urls):
     # bypassing request pattern with system identity
     def record(client, custom_workflow=None, additional_data=None):
-        draft = draft_factory_record_object(
-            client, custom_workflow, additional_data
-        )
+        draft = draft_factory_record_object(client, custom_workflow, additional_data)
         return record_service.publish(system_identity, draft["id"])._obj
 
     return record
 
+
 @pytest.fixture()
-def record_factory(record_service, draft_factory_record_object, urls, record_factory_record_object):
+def record_factory(
+    record_service, draft_factory_record_object, urls, record_factory_record_object
+):
 
     def record(client, custom_workflow=None, additional_data=None):
         record = record_factory_record_object(client, custom_workflow, additional_data)
@@ -604,7 +606,6 @@ def record_factory(record_service, draft_factory_record_object, urls, record_fac
         return ret
 
     return record
-
 
 
 @pytest.fixture()

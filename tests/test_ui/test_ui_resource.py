@@ -8,7 +8,12 @@ allowed_actions = ["submit", "delete"]
 
 
 def test_draft_publish_request_present(
-    app, logged_client, users, record_ui_resource, draft_factory_record_object, fake_manifest
+    app,
+    logged_client,
+    users,
+    record_ui_resource,
+    draft_factory_record_object,
+    fake_manifest,
 ):
     creator_client = logged_client(users[0])
     draft = draft_factory_record_object(creator_client)
@@ -28,7 +33,12 @@ def test_draft_publish_request_present(
 
 
 def test_record_delete_request_present(
-    app, record_ui_resource, logged_client, users, record_factory_record_object, fake_manifest
+    app,
+    record_ui_resource,
+    logged_client,
+    users,
+    record_factory_record_object,
+    fake_manifest,
 ):
     creator_client = logged_client(users[0])
     topic = record_factory_record_object(creator_client)
@@ -58,7 +68,13 @@ def test_record_delete_request_present(
 
 
 def test_record_delete_unauthorized(
-    app, record_ui_resource, users, record_factory_record_object, client, logged_client, fake_manifest
+    app,
+    record_ui_resource,
+    users,
+    record_factory_record_object,
+    client,
+    logged_client,
+    fake_manifest,
 ):
     topic = record_factory_record_object(logged_client(users[0]))
     with client.get(f"/thesis/{topic['id']}") as c:
