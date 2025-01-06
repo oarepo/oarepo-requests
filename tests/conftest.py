@@ -551,14 +551,6 @@ def logged_client(client):
 
     return _logged_client
 
-
-@pytest.fixture()
-def example_topic_draft(record_service, users, default_workflow_json):  # needed for ui
-    identity = users[0].identity
-    draft = record_service.create(identity, default_workflow_json)
-    return draft._obj
-
-
 @pytest.fixture()
 def merge_record_data(default_workflow_json):
     def _merge_data(custom_workflow=None, additional_data=None):
@@ -583,32 +575,41 @@ def merge_record_data(default_workflow_json):
 
 
 @pytest.fixture()
-def draft_factory(record_service, merge_record_data):
-    def record(identity, custom_workflow=None, additional_data=None):
+def draft_factory_record_object(record_service, merge_record_data):
+    def record(client, custom_workflow=None, additional_data=None):
         json = merge_record_data(custom_workflow, additional_data)
-        draft = record_service.create(identity, json)
+        draft = record_service.create(client.user_fixture.identity, json)
         return draft._obj
 
     return record
 
 
 @pytest.fixture()
-def record_factory(record_service, draft_factory, urls):
+def record_factory_record_object(record_service, draft_factory_record_object, urls):
     # bypassing request pattern with system identity
     def record(client, custom_workflow=None, additional_data=None):
-        draft = draft_factory(
-            client.user_fixture.identity, custom_workflow, additional_data
+        draft = draft_factory_record_object(
+            client, custom_workflow, additional_data
         )
-        record = record_service.publish(system_identity, draft["id"])
+        return record_service.publish(system_identity, draft["id"])._obj
+
+    return record
+
+@pytest.fixture()
+def record_factory(record_service, draft_factory_record_object, urls, record_factory_record_object):
+
+    def record(client, custom_workflow=None, additional_data=None):
+        record = record_factory_record_object(client, custom_workflow, additional_data)
         ret = client.get(f"{urls['BASE_URL']}{record['id']}")  # unified return value
         return ret
 
     return record
 
 
+
 @pytest.fixture()
 def record_with_files_factory(
-    record_service, draft_factory, default_workflow_json, urls
+    record_service, draft_factory_record_object, default_workflow_json, urls
 ):
     def record(client, custom_workflow=None, additional_data=None):
         identity = client.user_fixture.identity
@@ -619,7 +620,7 @@ def record_with_files_factory(
             if not additional_data:
                 additional_data = {}
             additional_data.setdefault("files", {}).setdefault("enabled", True)
-        draft = draft_factory(identity, custom_workflow, additional_data)
+        draft = draft_factory_record_object(client, custom_workflow, additional_data)
 
         # upload file
         # Initialize files upload
