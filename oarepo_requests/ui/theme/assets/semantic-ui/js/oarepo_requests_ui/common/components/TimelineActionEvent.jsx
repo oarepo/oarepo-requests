@@ -10,7 +10,8 @@ import { toRelativeTime, Image } from "react-invenio-forms";
 
 export const TimelineActionEvent = ({ event }) => {
   const createdBy = event?.expanded?.created_by;
-  const creatorLabel = createdBy?.username || createdBy?.email;
+  const creatorLabel =
+    createdBy?.profile?.full_name || createdBy?.username || createdBy?.email;
   const eventIcon = getRequestStatusIcon(event.payload.event);
   const feedMessage = getFeedMessage(event.payload.event);
 

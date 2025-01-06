@@ -17,15 +17,9 @@ from invenio_records_resources.references.entity_resolvers import EntityProxy
 from invenio_requests.resolvers.registry import ResolverRegistry
 from oarepo_runtime.datastreams.utils import get_record_service_for_record
 from oarepo_workflows.requests import RecipientGeneratorMixin
-from oarepo_workflows.requests.generators import (
-    IfEventType as WorkflowIfEventType,
-)
-from oarepo_workflows.requests.generators import (
-    IfRequestType as WorkflowIfRequestType,
-)
-from oarepo_workflows.requests.generators import (
-    IfRequestTypeBase,
-)
+from oarepo_workflows.requests.generators import IfEventType as WorkflowIfEventType
+from oarepo_workflows.requests.generators import IfRequestType as WorkflowIfRequestType
+from oarepo_workflows.requests.generators import IfRequestTypeBase
 from sqlalchemy.exc import NoResultFound
 from typing_extensions import deprecated
 

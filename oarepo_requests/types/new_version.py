@@ -54,7 +54,7 @@ class NewVersionRequestType(NonDuplicableOARepoRequestType):
             attribute="draft_record:id",
             data_key="draft_record:id",
         ),
-        "keep_files": ma.fields.String(validate=OneOf(["true", "false"])),
+        "keep_files": ma.fields.String(validate=OneOf(["yes", "no"])),
     }
 
     def get_ui_redirect_url(self, request: Request, ctx: dict) -> str:
@@ -86,15 +86,17 @@ class NewVersionRequestType(NonDuplicableOARepoRequestType):
 
     form = {
         "field": "keep_files",
-        "ui_widget": "BooleanCheckbox",
+        "ui_widget": "Dropdown",
         "props": {
             "label": _("Keep files:"),
-            "placeholder": _("Keep files in the new version?"),
+            "placeholder": _("Yes or no"),
             "description": _(
                 "If you choose yes, the current record's files will be linked to the new version of the record. Then you will be able to add/remove files in the form."
             ),
-            "falseLabel": _("No"),
-            "trueLabel": _("Yes"),
+            "options": [
+                {"id": "yes", "title_l10n": _("Yes")},
+                {"id": "no", "title_l10n": _("No")},
+            ],
         },
     }
 

@@ -27,6 +27,7 @@ export const RequestActionButton = ({
     requestOrRequestType: requestOrRequestType,
     formik,
     modalControl,
+    requestActionName,
   });
 
   const handleClick = () => {

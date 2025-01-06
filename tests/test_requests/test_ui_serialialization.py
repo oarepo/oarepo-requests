@@ -19,11 +19,11 @@ from .utils import link2testclient
 def test_user_serialization(
     users,
     urls,
-    publish_request_data_function,
     ui_serialization_result,
     create_draft_via_resource,
     logged_client,
     user_links,
+    create_request_by_link,
     search_clear,
 ):
     client_fallback_label = logged_client(users[0])
@@ -38,19 +38,22 @@ def test_user_serialization(
     ThesisRecord.index.refresh()
     ThesisDraft.index.refresh()
 
-    resp_request_create = client_fallback_label.post(
-        urls["BASE_URL_REQUESTS"],
-        json=publish_request_data_function(draft1.json["id"]),
+    resp_request_create = create_request_by_link(
+        client_fallback_label,
+        draft1,
+        "publish_draft",
         headers={"Accept": "application/vnd.inveniordm.v1+json"},
     )
-    resp_request_create_username = client_username_label.post(
-        urls["BASE_URL_REQUESTS"],
-        json=publish_request_data_function(draft2.json["id"]),
+    resp_request_create_username = create_request_by_link(
+        client_username_label,
+        draft2,
+        "publish_draft",
         headers={"Accept": "application/vnd.inveniordm.v1+json"},
     )
-    resp_request_create_fullname = client_fullname_label.post(
-        urls["BASE_URL_REQUESTS"],
-        json=publish_request_data_function(draft3.json["id"]),
+    resp_request_create_fullname = create_request_by_link(
+        client_fullname_label,
+        draft3,
+        "publish_draft",
         headers={"Accept": "application/vnd.inveniordm.v1+json"},
     )
 
@@ -129,9 +132,9 @@ def test_resolver_fallback(
     app,
     users,
     urls,
-    publish_request_data_function,
     ui_serialization_result,
     create_draft_via_resource,
+    create_request_by_link,
     logged_client,
     search_clear,
 ):
@@ -148,9 +151,10 @@ def test_resolver_fallback(
         ThesisRecord.index.refresh()
         ThesisDraft.index.refresh()
 
-        resp_request_create = creator_client.post(
-            urls["BASE_URL_REQUESTS"],
-            json=publish_request_data_function(draft1.json["id"]),
+        resp_request_create = create_request_by_link(
+            creator_client,
+            draft1,
+            "publish_draft",
             headers={"Accept": "application/vnd.inveniordm.v1+json"},
         )
         assert resp_request_create.json["stateful_name"] == "Submit for review"
@@ -211,7 +215,7 @@ def test_role(
     users,
     role,
     urls,
-    publish_request_data_function,
+    create_request_by_link,
     logged_client,
     role_ui_serialization,
     create_draft_via_resource,
@@ -235,9 +239,10 @@ def test_role(
         ThesisRecord.index.refresh()
         ThesisDraft.index.refresh()
 
-        resp_request_create = creator_client.post(
-            urls["BASE_URL_REQUESTS"],
-            json=publish_request_data_function(draft1.json["id"]),
+        resp_request_create = create_request_by_link(
+            creator_client,
+            draft1,
+            "publish_draft",
             headers={"Accept": "application/vnd.inveniordm.v1+json"},
         )
         assert resp_request_create.json["stateful_name"] == "Submit for review"
@@ -257,29 +262,22 @@ def test_role(
 
 
 def test_auto_approve(
-    vocab_cf,
     logged_client,
     users,
     urls,
-    new_version_data_function,
+    submit_request_by_link,
     record_factory,
     search_clear,
 ):
     creator = users[0]
     creator_client = logged_client(creator)
 
-    record1 = record_factory(creator.identity)
+    record1 = record_factory(creator_client)
 
-    resp_request_create = creator_client.post(
-        urls["BASE_URL_REQUESTS"],
-        json=new_version_data_function(record1["id"]),
-    )
-    resp_request_submit = creator_client.post(
-        link2testclient(resp_request_create.json["links"]["actions"]["submit"]),
-    )
+    resp_request_submit = submit_request_by_link(creator_client, record1, "new_version")
     # is request accepted and closed?
     request_json = creator_client.get(
-        f'{urls["BASE_URL_REQUESTS"]}{resp_request_create.json["id"]}',
+        f'{urls["BASE_URL_REQUESTS"]}{resp_request_submit.json["id"]}',
         headers={"Accept": "application/vnd.inveniordm.v1+json"},
     ).json
 

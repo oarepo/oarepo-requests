@@ -8,9 +8,16 @@ allowed_actions = ["submit", "delete"]
 
 
 def test_draft_publish_request_present(
-    app, logged_client, users, record_ui_resource, example_topic_draft, fake_manifest
+    app,
+    logged_client,
+    users,
+    record_ui_resource,
+    draft_factory_record_object,
+    fake_manifest,
 ):
-    with logged_client(users[0]).get(f"/thesis/{example_topic_draft['id']}/edit") as c:
+    creator_client = logged_client(users[0])
+    draft = draft_factory_record_object(creator_client)
+    with creator_client.get(f"/thesis/{draft['id']}/edit") as c:
         assert c.status_code == 200
         data = json.loads(c.text)
         print(data)
@@ -18,7 +25,7 @@ def test_draft_publish_request_present(
             "description": "Request publishing of a draft",
             "links": {
                 "actions": {
-                    "create": f"https://127.0.0.1:5000/api/thesis/{example_topic_draft['id']}/draft/requests/publish_draft"
+                    "create": f"https://127.0.0.1:5000/api/thesis/{draft['id']}/draft/requests/publish_draft"
                 }
             },
             "name": "Publish draft",
@@ -26,10 +33,16 @@ def test_draft_publish_request_present(
 
 
 def test_record_delete_request_present(
-    app, record_ui_resource, logged_client, users, record_factory, fake_manifest
+    app,
+    record_ui_resource,
+    logged_client,
+    users,
+    record_factory_record_object,
+    fake_manifest,
 ):
-    topic = record_factory(users[0].identity)
-    with logged_client(users[0]).get(f"/thesis/{topic['id']}") as c:
+    creator_client = logged_client(users[0])
+    topic = record_factory_record_object(creator_client)
+    with creator_client.get(f"/thesis/{topic['id']}") as c:
         assert c.status_code == 200
         print(c.text)
         data = json.loads(c.text)
@@ -55,9 +68,15 @@ def test_record_delete_request_present(
 
 
 def test_record_delete_unauthorized(
-    app, record_ui_resource, users, record_factory, client, fake_manifest
+    app,
+    record_ui_resource,
+    users,
+    record_factory_record_object,
+    client,
+    logged_client,
+    fake_manifest,
 ):
-    topic = record_factory(users[0].identity)
+    topic = record_factory_record_object(logged_client(users[0]))
     with client.get(f"/thesis/{topic['id']}") as c:
         assert c.status_code == 200
         data = json.loads(c.text)
@@ -69,13 +88,14 @@ def test_request_detail_page(
     logged_client,
     record_ui_resource,
     users,
-    record_factory,
+    record_factory_record_object,
     client,
     fake_manifest,
     urls,
 ):
-    topic = record_factory(users[0].identity)
     creator_client = logged_client(users[0])
+    topic = record_factory_record_object(creator_client)
+
     creator_identity = users[0].identity
     request = current_requests_service.create(
         creator_identity,
@@ -85,9 +105,6 @@ def test_request_detail_page(
         receiver=users[1].user,
         creator=users[0].user,
     )
-    # resp_request_submit = creator_client.post(
-    #     link_api2testclient(resp_request_create.json["links"]["actions"]["submit"]),
-    # )
     request_id = request["id"]
 
     with creator_client.get(f"/requests/{request_id}") as c:

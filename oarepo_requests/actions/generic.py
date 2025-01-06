@@ -12,6 +12,7 @@ from __future__ import annotations
 from functools import cached_property
 from typing import TYPE_CHECKING, Any
 
+from invenio_pidstore.errors import PersistentIdentifierError
 from invenio_requests.customizations import actions
 from oarepo_runtime.i18n import lazy_gettext as _
 
@@ -94,7 +95,10 @@ class OARepoGenericActionMixin:
         """Execute the action."""
         request: Request = self.request  # type: ignore
         request_type = request.type
-        topic = request.topic.resolve()
+        try:
+            topic = request.topic.resolve()
+        except PersistentIdentifierError:
+            topic = None
         self._execute_with_components(
             self.components, identity, request_type, topic, uow, *args, **kwargs
         )
@@ -154,8 +158,10 @@ class OARepoAcceptAction(OARepoGenericActionMixin, actions.AcceptAction):
     name = _("Accept")
 
 
-class OARepoCancelAction(actions.CancelAction):
+class OARepoCancelAction(OARepoGenericActionMixin, actions.CancelAction):
     """Cancel action extended for oarepo requests."""
+
+    name = _("Cancel")
 
     status_from = ["created", "submitted"]
     status_to = "cancelled"

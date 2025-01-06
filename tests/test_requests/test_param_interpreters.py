@@ -6,6 +6,7 @@
 # details.
 #
 import json
+
 from tests.test_requests.utils import link2testclient
 
 
@@ -82,7 +83,8 @@ def test_owner_param_interpreter(
     search_user1_only = user1_client.get(f'{urls["BASE_URL_REQUESTS"]}?all=true')
     print(json.dumps(search_user1_only.json))
     for hit in search_user1_only.json["hits"]["hits"]:
-        assert hit['created_by'] == {"user": "1"} or hit['receiver'] == {"user": "1"}
+        assert hit["created_by"] == {"user": "1"} or hit["receiver"] == {"user": "1"}
+
 
 def test_open_param_interpreter(
     logged_client,

@@ -1,14 +1,16 @@
 from __future__ import annotations
 
-from typing import Any, TYPE_CHECKING
+import logging
+from typing import TYPE_CHECKING, Any
 
 from invenio_pidstore.errors import PersistentIdentifierError
 
 from oarepo_requests.resolvers.ui import resolve
-import logging
+
 if TYPE_CHECKING:
     from invenio_requests.records import Request
 log = logging.getLogger(__name__)
+
 
 # todo consider - we are not using this strictly in the ui context - so how should we separate these things in the future
 def resolve_entity(entity: str, obj: Request, ctx: dict[str, Any]) -> dict:

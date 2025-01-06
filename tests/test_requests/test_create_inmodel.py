@@ -10,20 +10,13 @@ from thesis.records.api import ThesisRecord
 from tests.test_requests.utils import link2testclient
 
 
-def pick_request_type(types_list, queried_type):
-    for type in types_list:
-        if type["type_id"] == queried_type:
-            return type
-    return None
-
-
+# todo since inline is now the default way to create records, these might be redundant
 def test_record(
-    vocab_cf,
     logged_client,
     record_factory,
     users,
     urls,
-    delete_record_data_function,
+    create_request_by_link,
     search_clear,
 ):
     creator = users[0]
@@ -31,16 +24,10 @@ def test_record(
     creator_client = logged_client(creator)
     receiver_client = logged_client(receiver)
 
-    record1 = record_factory(creator.identity)
-    record1 = creator_client.get(f"{urls['BASE_URL']}{record1['id']}?expand=true")
-
-    link = link2testclient(
-        pick_request_type(
-            record1.json["expanded"]["request_types"], "delete_published_record"
-        )["links"]["actions"]["create"]
+    record1 = record_factory(creator_client)
+    resp_request_create = create_request_by_link(
+        creator_client, record1, "delete_published_record"
     )
-
-    resp_request_create = creator_client.post(link)
     assert resp_request_create.status_code == 201
     resp_request_submit = creator_client.post(
         link2testclient(resp_request_create.json["links"]["actions"]["submit"]),
@@ -58,12 +45,11 @@ def test_record(
 
 
 def test_draft(
-    vocab_cf,
     logged_client,
     users,
     urls,
-    publish_request_data_function,
     create_draft_via_resource,
+    create_request_by_link,
     search_clear,
 ):
     creator = users[0]
@@ -72,14 +58,9 @@ def test_draft(
     receiver_client = logged_client(receiver)
 
     draft1 = create_draft_via_resource(creator_client)
-    link = link2testclient(
-        pick_request_type(draft1.json["expanded"]["request_types"], "publish_draft")[
-            "links"
-        ]["actions"]["create"]
-    )
 
-    resp_request_create = creator_client.post(
-        link, json={"payload": {"version": "1.0"}}
+    resp_request_create = create_request_by_link(
+        creator_client, draft1, "publish_draft"
     )
     assert resp_request_create.status_code == 201
     resp_request_submit = creator_client.post(

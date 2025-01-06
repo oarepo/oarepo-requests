@@ -15,7 +15,7 @@ def test_listing(
     logged_client,
     users,
     urls,
-    publish_request_data_function,
+    create_request_by_link,
     create_draft_via_resource,
     search_clear,
 ):
@@ -25,15 +25,9 @@ def test_listing(
     draft1 = create_draft_via_resource(creator_client)
     draft2 = create_draft_via_resource(creator_client)
 
-    creator_client.post(
-        urls["BASE_URL_REQUESTS"],
-        json=publish_request_data_function(draft1.json["id"]),
-    )
+    create_request_by_link(creator_client, draft1, "publish_draft")
+    create_request_by_link(creator_client, draft2, "publish_draft")
 
-    creator_client.post(
-        urls["BASE_URL_REQUESTS"],
-        json=publish_request_data_function(draft2.json["id"]),
-    )
     ThesisDraft.index.refresh()
     search = creator_client.get(
         urls["BASE_URL_REQUESTS"],
@@ -45,7 +39,7 @@ def test_read_extended(
     logged_client,
     users,
     urls,
-    publish_request_data_function,
+    submit_request_by_link,
     serialization_result,
     ui_serialization_result,
     create_draft_via_resource,
@@ -57,31 +51,27 @@ def test_read_extended(
     draft1 = create_draft_via_resource(creator_client)
     draft_id = draft1.json["id"]
 
-    resp_request_create = creator_client.post(
-        urls["BASE_URL_REQUESTS"],
-        json=publish_request_data_function(draft_id),
-    )
-    resp_request_submit = creator_client.post(
-        link2testclient(resp_request_create.json["links"]["actions"]["submit"]),
+    resp_request_submit = submit_request_by_link(
+        creator_client, draft1, "publish_draft"
     )
 
     old_call = creator_client.get(
-        f"{urls['BASE_URL_REQUESTS']}{resp_request_create.json['id']}"
+        f"{urls['BASE_URL_REQUESTS']}{resp_request_submit.json['id']}"
     )
     new_call = creator_client.get(
-        f"{urls['BASE_URL_REQUESTS']}extended/{resp_request_create.json['id']}",
+        f"{urls['BASE_URL_REQUESTS']}extended/{resp_request_submit.json['id']}",
     )
     new_call2 = creator_client.get(
-        f"{urls['BASE_URL_REQUESTS']}extended/{resp_request_create.json['id']}",
+        f"{urls['BASE_URL_REQUESTS']}extended/{resp_request_submit.json['id']}",
         headers={"Accept": "application/vnd.inveniordm.v1+json"},
     )
 
     assert is_valid_subdict(
-        serialization_result(draft_id, resp_request_create.json["id"]),
+        serialization_result(draft_id, resp_request_submit.json["id"]),
         new_call.json,
     )
     assert is_valid_subdict(
-        ui_serialization_result(draft_id, resp_request_create.json["id"]),
+        ui_serialization_result(draft_id, resp_request_submit.json["id"]),
         new_call2.json,
     )
 
@@ -90,8 +80,8 @@ def test_update_self_link(
     logged_client,
     users,
     urls,
-    publish_request_data_function,
     serialization_result,
+    submit_request_by_link,
     ui_serialization_result,
     create_draft_via_resource,
     search_clear,
@@ -101,13 +91,10 @@ def test_update_self_link(
 
     draft1 = create_draft_via_resource(creator_client)
 
-    resp_request_create = creator_client.post(
-        urls["BASE_URL_REQUESTS"],
-        json=publish_request_data_function(draft1.json["id"]),
+    resp_request_submit = submit_request_by_link(
+        creator_client, draft1, "publish_draft"
     )
-    resp_request_submit = creator_client.post(
-        link2testclient(resp_request_create.json["links"]["actions"]["submit"])
-    )
+
     read_before = creator_client.get(
         link2testclient(resp_request_submit.json["links"]["self"]),
     )
@@ -135,7 +122,7 @@ def test_events_resource(
     logged_client,
     users,
     urls,
-    publish_request_data_function,
+    submit_request_by_link,
     serialization_result,
     ui_serialization_result,
     events_resource_data,
@@ -146,13 +133,10 @@ def test_events_resource(
     creator_client = logged_client(creator)
     draft1 = create_draft_via_resource(creator_client)
 
-    resp_request_create = creator_client.post(
-        urls["BASE_URL_REQUESTS"],
-        json=publish_request_data_function(draft1.json["id"]),
+    resp_request_submit = submit_request_by_link(
+        creator_client, draft1, "publish_draft"
     )
-    resp_request_submit = creator_client.post(
-        link2testclient(resp_request_create.json["links"]["actions"]["submit"])
-    )
+
     read_before = creator_client.get(
         link2testclient(resp_request_submit.json["links"]["self"]),
         headers={"Accept": "application/vnd.inveniordm.v1+json"},

@@ -158,7 +158,7 @@ export const RequestDetail = ({
                         active={activeTab === "timeline"}
                         onClick={() => setActiveTab("timeline")}
                       />
-                      {request?.topic?.links?.self_html && (
+                      {request?.links?.topic?.self_html && (
                         <Menu.Item
                           name="topic"
                           content={i18next.t("Record preview")}

@@ -9,7 +9,7 @@ def test_conditional_receiver_creator_matches(
     logged_client,
     users,
     urls,
-    conditional_recipient_request_data_function,
+    create_request_by_link,
     create_draft_via_resource,
     search_clear,
 ):
@@ -23,9 +23,8 @@ def test_conditional_receiver_creator_matches(
 
     draft1 = create_draft_via_resource(creator_client, custom_workflow="with_ct")
 
-    resp_request_create = creator_client.post(
-        urls["BASE_URL_REQUESTS"],
-        json=conditional_recipient_request_data_function(draft1.json["id"]),
+    resp_request_create = create_request_by_link(
+        creator_client, draft1, "conditional_recipient_rt"
     )
 
     assert resp_request_create.status_code == 201
@@ -36,7 +35,7 @@ def test_conditional_receiver_creator_does_not_match(
     logged_client,
     users,
     urls,
-    conditional_recipient_request_data_function,
+    create_request_by_link,
     create_draft_via_resource,
     search_clear,
 ):
@@ -50,9 +49,8 @@ def test_conditional_receiver_creator_does_not_match(
 
     draft1 = create_draft_via_resource(creator_client, custom_workflow="with_ct")
 
-    resp_request_create = creator_client.post(
-        urls["BASE_URL_REQUESTS"],
-        json=conditional_recipient_request_data_function(draft1.json["id"]),
+    resp_request_create = create_request_by_link(
+        creator_client, draft1, "conditional_recipient_rt"
     )
 
     assert resp_request_create.status_code == 201
