@@ -1,17 +1,20 @@
-import React, { useState } from "react";
+import React from "react";
 import { RichEditor } from "react-invenio-forms";
 import sanitizeHtml from "sanitize-html";
 import PropTypes from "prop-types";
 import { useQuery } from "@tanstack/react-query";
 import { httpApplicationJson } from "@js/oarepo_ui";
 import { i18next } from "@translations/oarepo_requests_ui/i18next";
-import { Message, Icon } from "semantic-ui-react";
 import Overridable from "react-overridable";
+import { MAX_COMMENT_LENGTH } from "@js/oarepo_requests_common";
+import { Icon } from "semantic-ui-react";
 
 const CommentInput = ({
   comment,
   handleChange,
   initialValue,
+  length,
+  setLength,
   maxCommentLength,
 }) => {
   // when focused move the cursor at the end of any existing content
@@ -19,9 +22,6 @@ const CommentInput = ({
     editor.selection.select(editor.getBody(), true);
     editor.selection.collapse(false);
   };
-  let timeoutId;
-  const [pasteError, setPasteError] = useState(false);
-  const [length, setLength] = useState(initialValue?.length);
   // TODO: there is no appropriate URL to call here. I think this one is the safest, because we know it exists and it does
   // not rely on external library (like those that contain /me that are from dashboard). To be discussed how to handle this appropriately.
   // maybe some link that lives in oarepo ui and that can universaly provide allowed tags and attributes
@@ -62,28 +62,6 @@ const CommentInput = ({
                   event.preventDefault();
                 }
               });
-              editor.on("PastePreProcess", (event) => {
-                const pastedText = event.content;
-                const sanitizedText = sanitizeHtml(pastedText, {
-                  allowedTags: allowedHtmlTags,
-                  allowedAttributes: allowedHtmlAttrs,
-                });
-                const currentCommentLength = editor.getContent({
-                  format: "text",
-                }).length;
-                if (
-                  sanitizedText.length + currentCommentLength >
-                  maxCommentLength
-                ) {
-                  event.content = sanitizedText.slice(
-                    0,
-                    maxCommentLength - currentCommentLength
-                  );
-                  setPasteError(true);
-                  clearTimeout(timeoutId);
-                  timeoutId = setTimeout(() => setPasteError(false), 3000);
-                }
-              });
               editor.on("init", () => {
                 setLength(editor.getContent({ format: "text" }).length);
               });
@@ -97,9 +75,7 @@ const CommentInput = ({
             const textContent = editor.getContent({ format: "text" });
             const textLength = textContent.length;
 
-            if (textLength <= maxCommentLength) {
-              handleChange(event, cleanedContent);
-            }
+            handleChange(event, cleanedContent);
             // querky  behavior of the editor, when the content is empty, the length is 1
             if (textContent.trim().length === 0) {
               setLength(0);
@@ -109,18 +85,15 @@ const CommentInput = ({
           }}
           onFocus={handleFocus}
         />
-        <small>{`${i18next.t("Remaining characters: ")}${
-          maxCommentLength - length
-        }`}</small>
-        {pasteError && (
-          <Message size="mini">
-            <Message.Content>
-              <Icon name="warning circle" />
-              {i18next.t(
-                "Pasted text was shortened to fit the allowed length."
-              )}
-            </Message.Content>
-          </Message>
+        {length <= maxCommentLength ? (
+          <small>{`${i18next.t("Remaining characters: ")}${
+            maxCommentLength - length
+          }`}</small>
+        ) : (
+          <small>
+            <Icon name="warning circle" color="red" />
+            {i18next.t("commentTooLong", { count: length - maxCommentLength })}
+          </small>
         )}
       </React.Fragment>
     </Overridable>
@@ -136,10 +109,12 @@ CommentInput.propTypes = {
   comment: PropTypes.string,
   handleChange: PropTypes.func,
   initialValue: PropTypes.string,
+  length: PropTypes.number,
+  setLength: PropTypes.func,
   maxCommentLength: PropTypes.number,
 };
 
 CommentInput.defaultProps = {
   initialValue: "",
-  maxCommentLength: 1000,
+  maxCommentLength: MAX_COMMENT_LENGTH,
 };

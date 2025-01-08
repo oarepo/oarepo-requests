@@ -5,6 +5,7 @@ import {
   ConfirmationModalConfirmButton,
   RequestCommentInput,
   REQUEST_TYPE,
+  MAX_COMMENT_LENGTH,
 } from "@js/oarepo_requests_common";
 import { i18next } from "@translations/oarepo_requests_ui/i18next";
 import PropTypes from "prop-types";
@@ -22,6 +23,10 @@ export const ConfirmationModal = ({
   const handleChange = (event, value) => {
     setComment(value);
   };
+
+  const [length, setLength] = useState(comment.length);
+
+  const handleLengthChange = (length) => setLength(length);
 
   const dangerous = requestExtraData?.dangerous;
   const baseConfirmDialogProps = {
@@ -56,7 +61,9 @@ export const ConfirmationModal = ({
       caseSpecificProps = declineConfirmDialogProps(
         requestOrRequestType,
         comment,
-        handleChange
+        handleChange,
+        length,
+        handleLengthChange
       );
       break;
     default:
@@ -139,16 +146,28 @@ const acceptConfirmDialogProps = (requestOrRequestType, dangerous) => ({
 const declineConfirmDialogProps = (
   requestOrRequestType,
   comment,
-  handleChange
+  handleChange,
+  length,
+  handleLengthChange
 ) => {
   return {
     header: `${i18next.t("Decline request")} (${requestOrRequestType.name})`,
     confirmButton: (
-      <ConfirmationModalConfirmButton content={i18next.t("Decline")} negative />
+      <ConfirmationModalConfirmButton
+        content={i18next.t("Decline")}
+        negative
+        disabled={length > MAX_COMMENT_LENGTH}
+      />
     ),
     content: (
       <div className="content">
-        <RequestCommentInput comment={comment} handleChange={handleChange} />
+        <RequestCommentInput
+          comment={comment}
+          handleChange={handleChange}
+          length={length}
+          setLength={handleLengthChange}
+          maxCommentLength={MAX_COMMENT_LENGTH}
+        />
         <Message>
           <Icon name="info circle" className="text size large" />
           <span>
