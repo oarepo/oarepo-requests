@@ -6,9 +6,8 @@
 # details.
 #
 from flask import current_app
+from pytest_oarepo.functions import link2testclient
 from thesis.ext import ThesisExt
-
-from tests.test_requests.utils import link2testclient
 
 
 def test_allowed_request_types_on_draft_service(
@@ -62,9 +61,7 @@ def test_allowed_request_types_on_draft_resource(
     search_clear,
 ):
     creator = users[0]
-    receiver = users[1]
     creator_client = logged_client(creator)
-    receiver_client = logged_client(receiver)
 
     draft1 = create_draft_via_resource(creator_client)
 

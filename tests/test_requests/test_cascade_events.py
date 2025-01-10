@@ -6,10 +6,9 @@
 # details.
 #
 from invenio_requests.records.api import RequestEvent
+from pytest_oarepo.functions import link2testclient
 
 from oarepo_requests.types.events import TopicDeleteEventType
-
-from .utils import link2testclient
 
 
 def test_cascade_update(

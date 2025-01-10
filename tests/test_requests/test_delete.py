@@ -7,7 +7,7 @@
 #
 from thesis.records.api import ThesisDraft, ThesisRecord
 
-from .utils import link2testclient
+from pytest_oarepo.functions import link2testclient
 
 
 def test_delete(

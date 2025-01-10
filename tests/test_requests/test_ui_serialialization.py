@@ -13,7 +13,7 @@ from thesis.records.api import ThesisDraft, ThesisRecord
 
 from oarepo_requests.resolvers.ui import FallbackEntityReferenceUIResolver
 
-from .utils import link2testclient
+from pytest_oarepo.functions import link2testclient
 
 
 def test_user_serialization(

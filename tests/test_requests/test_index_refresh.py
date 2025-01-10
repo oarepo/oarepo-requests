@@ -5,7 +5,7 @@
 # modify it under the terms of the MIT License; see LICENSE file for more
 # details.
 #
-from tests.test_requests.utils import link2testclient
+from pytest_oarepo.functions import link2testclient
 
 
 def test_search(

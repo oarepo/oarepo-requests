@@ -8,8 +8,8 @@
 from invenio_requests.records.api import RequestEvent
 from thesis.records.api import ThesisDraft
 
-from .utils import is_valid_subdict, link2testclient
 
+from pytest_oarepo.functions import link2testclient, is_valid_subdict
 
 def test_listing(
     logged_client,

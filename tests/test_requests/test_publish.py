@@ -9,10 +9,10 @@ import copy
 
 from thesis.records.api import ThesisDraft, ThesisRecord
 
-from .utils import link2testclient
+from pytest_oarepo.functions import link2testclient
 
 
-def test_publish_service(users, record_service, default_workflow_json, search_clear):
+def test_publish_service(users, record_service, default_record_with_workflow_json, search_clear):
     from invenio_requests.proxies import (
         current_requests_service as current_invenio_requests_service,
     )
@@ -21,7 +21,7 @@ def test_publish_service(users, record_service, default_workflow_json, search_cl
 
     creator = users[0]
     receiver = users[1]
-    draft = record_service.create(creator.identity, default_workflow_json)
+    draft = record_service.create(creator.identity, default_record_with_workflow_json)
     request = current_oarepo_requests_service.create(
         identity=creator.identity,
         data={"payload": {"version": "1.0"}},
@@ -150,7 +150,7 @@ def test_create_fails_if_draft_not_validated(
     users,
     urls,
     create_draft_via_resource,
-    default_workflow_json,
+    default_record_with_workflow_json,
     search_clear,
 ):
     creator = users[0]
@@ -158,7 +158,7 @@ def test_create_fails_if_draft_not_validated(
 
     creator_client = logged_client(creator)
 
-    json = copy.deepcopy(default_workflow_json)
+    json = copy.deepcopy(default_record_with_workflow_json)
     del json["metadata"]["title"]
 
     draft = creator_client.post(f"{urls['BASE_URL']}?expand=true", json=json)

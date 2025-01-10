@@ -17,7 +17,7 @@ from oarepo_requests.services.permissions.workflow_policies import (
     CreatorsFromWorkflowRequestsPermissionPolicy,
 )
 from tests.conftest import TestEventType
-from tests.test_requests.utils import link2testclient
+from pytest_oarepo.functions import link2testclient
 
 
 @unit_of_work()

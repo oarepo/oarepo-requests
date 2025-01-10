@@ -7,7 +7,7 @@
 #
 from thesis.records.api import ThesisRecord
 
-from tests.test_requests.utils import link2testclient
+from pytest_oarepo.functions import link2testclient
 
 
 # todo since inline is now the default way to create records, these might be redundant

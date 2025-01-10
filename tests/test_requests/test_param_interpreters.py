@@ -7,7 +7,7 @@
 #
 import json
 
-from tests.test_requests.utils import link2testclient
+from pytest_oarepo.functions import link2testclient
 
 
 def _init(users, logged_client, create_draft_via_resource, submit_request, urls):

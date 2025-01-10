@@ -21,7 +21,6 @@ def extra_entry_points():
     """Extra entry points to load the mock_module features."""
     return {"invenio_i18n.translations": ["1000-test = tests"]}
 
-
 @pytest.fixture(scope="module")
 def app_config(app_config):
     app_config["I18N_LANGUAGES"] = [("cs", "Czech")]
