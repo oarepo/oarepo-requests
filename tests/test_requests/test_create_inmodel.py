@@ -5,9 +5,8 @@
 # modify it under the terms of the MIT License; see LICENSE file for more
 # details.
 #
-from thesis.records.api import ThesisRecord
-
 from pytest_oarepo.functions import link2testclient
+from thesis.records.api import ThesisRecord
 
 
 # todo since inline is now the default way to create records, these might be redundant

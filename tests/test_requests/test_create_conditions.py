@@ -6,10 +6,9 @@
 # details.
 #
 import pytest
+from pytest_oarepo.functions import link2testclient
 
 from oarepo_requests.errors import OpenRequestAlreadyExists
-
-from pytest_oarepo.functions import link2testclient
 
 
 def test_can_create(

@@ -7,12 +7,13 @@
 #
 import copy
 
+from pytest_oarepo.functions import link2testclient
 from thesis.records.api import ThesisDraft, ThesisRecord
 
-from pytest_oarepo.functions import link2testclient
 
-
-def test_publish_service(users, record_service, default_record_with_workflow_parent_json, search_clear):
+def test_publish_service(
+    users, record_service, default_record_with_workflow_parent_json, search_clear
+):
     from invenio_requests.proxies import (
         current_requests_service as current_invenio_requests_service,
     )
@@ -21,7 +22,9 @@ def test_publish_service(users, record_service, default_record_with_workflow_par
 
     creator = users[0]
     receiver = users[1]
-    draft = record_service.create(creator.identity, default_record_with_workflow_parent_json)
+    draft = record_service.create(
+        creator.identity, default_record_with_workflow_parent_json
+    )
     request = current_oarepo_requests_service.create(
         identity=creator.identity,
         data={"payload": {"version": "1.0"}},

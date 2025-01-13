@@ -17,12 +17,8 @@ def _init(users, logged_client, draft_factory, submit_request, urls):
     user1_client = logged_client(user1)
     user2_client = logged_client(user2)
 
-    draft1 = draft_factory(
-        user1_client, custom_workflow="different_recipients"
-    )
-    draft2 = draft_factory(
-        user2_client, custom_workflow="different_recipients"
-    )
+    draft1 = draft_factory(user1_client, custom_workflow="different_recipients")
+    draft2 = draft_factory(user2_client, custom_workflow="different_recipients")
 
     submit_response_user1 = submit_request(
         user1_client, draft1, "publish_draft"

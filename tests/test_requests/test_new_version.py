@@ -6,9 +6,8 @@
 # details.
 #
 
-from thesis.records.api import ThesisDraft, ThesisRecord
-
 from pytest_oarepo.functions import link2testclient
+from thesis.records.api import ThesisDraft, ThesisRecord
 
 
 def test_new_version_autoaccept(

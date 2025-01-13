@@ -8,9 +8,8 @@
 import json
 
 from invenio_access.permissions import system_identity
-from thesis.records.api import ThesisDraft, ThesisRecord
-
 from pytest_oarepo.functions import link2testclient
+from thesis.records.api import ThesisDraft, ThesisRecord
 
 
 def test_resolve_topic(

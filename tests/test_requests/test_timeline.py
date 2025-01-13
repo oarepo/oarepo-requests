@@ -6,7 +6,6 @@
 # details.
 #
 from invenio_requests.records.api import RequestEvent
-
 from pytest_oarepo.functions import link2testclient
 
 

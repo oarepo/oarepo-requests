@@ -11,13 +11,13 @@ from invenio_records_resources.services.errors import PermissionDeniedError
 from invenio_records_resources.services.uow import RecordCommitOp, unit_of_work
 from invenio_requests.customizations.event_types import LogEventType
 from invenio_requests.records.api import RequestEvent
+from pytest_oarepo.functions import link2testclient
 from thesis.records.api import ThesisDraft, ThesisRecord
 
 from oarepo_requests.services.permissions.workflow_policies import (
     CreatorsFromWorkflowRequestsPermissionPolicy,
 )
 from tests.conftest import TestEventType
-from pytest_oarepo.functions import link2testclient
 
 
 @unit_of_work()

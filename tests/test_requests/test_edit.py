@@ -5,9 +5,8 @@
 # modify it under the terms of the MIT License; see LICENSE file for more
 # details.
 #
-from thesis.records.api import ThesisDraft, ThesisRecord
-
 from pytest_oarepo.functions import link2testclient
+from thesis.records.api import ThesisDraft, ThesisRecord
 
 
 def test_edit_autoaccept(

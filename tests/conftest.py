@@ -16,13 +16,12 @@ from invenio_records_permissions.generators import (
 )
 from invenio_records_resources.services.uow import RecordCommitOp
 from invenio_requests.customizations import CommentEventType, LogEventType
-from invenio_requests.proxies import current_requests, current_requests_service
-from invenio_requests.records.api import Request, RequestEvent, RequestEventFormat
+from invenio_requests.proxies import current_requests_service
+from invenio_requests.records.api import Request, RequestEvent
 from invenio_requests.services.generators import Receiver
 from invenio_requests.services.permissions import (
     PermissionPolicy as InvenioRequestsPermissionPolicy,
 )
-from invenio_users_resources.records import UserAggregate
 from oarepo_runtime.i18n import lazy_gettext as _
 from oarepo_runtime.services.permissions import RecordOwners
 from oarepo_workflows import (
@@ -35,10 +34,8 @@ from oarepo_workflows import (
 )
 from oarepo_workflows.base import Workflow
 from oarepo_workflows.requests.events import WorkflowEvent
-from oarepo_workflows.requests.generators import RecipientGeneratorMixin
-from pytest_oarepo.requests.classes import UserGenerator, TestEventType
+from pytest_oarepo.requests.classes import TestEventType, UserGenerator
 from thesis.proxies import current_service
-from thesis.records.api import ThesisDraft
 
 from oarepo_requests.actions.generic import (
     OARepoAcceptAction,
@@ -58,19 +55,22 @@ from oarepo_requests.types import ModelRefTypes, NonDuplicableOARepoRequestType
 from oarepo_requests.types.events.topic_update import TopicUpdateEventType
 
 pytest_plugins = [
-   "pytest_oarepo.requests.fixtures",
-   "pytest_oarepo.records",
-   "pytest_oarepo.fixtures",
-   "pytest_oarepo.users",
+    "pytest_oarepo.requests.fixtures",
+    "pytest_oarepo.records",
+    "pytest_oarepo.fixtures",
+    "pytest_oarepo.users",
 ]
+
 
 @pytest.fixture(scope="module", autouse=True)
 def location(location):
     return location
 
+
 @pytest.fixture(autouse=True)
 def vocab_cf(vocab_cf):
     return vocab_cf
+
 
 can_comment_only_receiver = [
     Receiver(),
@@ -87,6 +87,7 @@ events_only_receiver_can_comment = {
     ),
     TestEventType.type_id: WorkflowEvent(submitters=can_comment_only_receiver),
 }
+
 
 class DefaultRequests(WorkflowRequestPolicy):
     publish_draft = WorkflowRequest(
@@ -435,9 +436,11 @@ def app_config(app_config):
     app_config["FILES_REST_DEFAULT_STORAGE_CLASS"] = "L"
     return app_config
 
+
 @pytest.fixture(scope="module")
 def record_service():
     return current_service
+
 
 @pytest.fixture
 def check_publish_topic_update():

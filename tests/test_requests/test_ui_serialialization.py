@@ -9,11 +9,10 @@ import copy
 from pprint import pprint
 
 from deepdiff import DeepDiff
+from pytest_oarepo.functions import link2testclient
 from thesis.records.api import ThesisDraft, ThesisRecord
 
 from oarepo_requests.resolvers.ui import FallbackEntityReferenceUIResolver
-
-from pytest_oarepo.functions import link2testclient
 
 
 def test_user_serialization(

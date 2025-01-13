@@ -6,10 +6,9 @@
 # details.
 #
 from invenio_requests.records.api import RequestEvent
+from pytest_oarepo.functions import is_valid_subdict, link2testclient
 from thesis.records.api import ThesisDraft
 
-
-from pytest_oarepo.functions import link2testclient, is_valid_subdict
 
 def test_listing(
     logged_client,
