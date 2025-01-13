@@ -9,7 +9,7 @@ def test_no_recipient(
     logged_client,
     users,
     urls,
-    create_draft_via_resource,
+    draft_factory,
     search_clear,
 ):
     creator = users[0]
@@ -17,7 +17,7 @@ def test_no_recipient(
 
     creator_client = logged_client(creator)
 
-    draft1 = create_draft_via_resource(creator_client, custom_workflow="with_ct")
+    draft1 = draft_factory(creator_client, custom_workflow="with_ct")
 
     resp_request_create = creator_client.post(
         urls["BASE_URL_REQUESTS"],

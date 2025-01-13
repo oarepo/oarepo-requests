@@ -14,14 +14,14 @@ def test_allowed_request_types_on_draft_service(
     logged_client,
     users,
     urls,
-    create_draft_via_resource,
+    draft_factory,
     search_clear,
 ):
     creator = users[0]
     receiver = users[1]
     creator_client = logged_client(creator)
 
-    draft1 = create_draft_via_resource(creator_client)
+    draft1 = draft_factory(creator_client)
 
     thesis_ext: ThesisExt = current_app.extensions["thesis"]
     thesis_requests_service = thesis_ext.service_record_request_types
@@ -57,13 +57,13 @@ def test_allowed_request_types_on_draft_resource(
     logged_client,
     users,
     urls,
-    create_draft_via_resource,
+    draft_factory,
     search_clear,
 ):
     creator = users[0]
     creator_client = logged_client(creator)
 
-    draft1 = create_draft_via_resource(creator_client)
+    draft1 = draft_factory(creator_client)
 
     applicable_requests_link = draft1.json["links"]["applicable-requests"]
     assert (
@@ -117,7 +117,7 @@ def test_allowed_request_types_on_published_resource(
     logged_client,
     users,
     urls,
-    create_draft_via_resource,
+    draft_factory,
     submit_request_by_link,
     search_clear,
 ):
@@ -126,7 +126,7 @@ def test_allowed_request_types_on_published_resource(
     creator_client = logged_client(creator)
     receiver_client = logged_client(receiver)
 
-    draft1 = create_draft_via_resource(creator_client)
+    draft1 = draft_factory(creator_client)
     published1 = publish_record(
         creator_client, urls, submit_request_by_link, draft1, receiver_client
     )
@@ -175,7 +175,7 @@ def test_ui_serialization(
     users,
     urls,
     submit_request_by_link,
-    create_draft_via_resource,
+    draft_factory,
     search_clear,
 ):
     creator = users[0]
@@ -183,9 +183,9 @@ def test_ui_serialization(
     creator_client = logged_client(creator)
     receiver_client = logged_client(receiver)
 
-    draft1 = create_draft_via_resource(creator_client)
+    draft1 = draft_factory(creator_client)
 
-    draft_to_publish = create_draft_via_resource(creator_client)
+    draft_to_publish = draft_factory(creator_client)
     published1 = publish_record(
         creator_client,
         urls,

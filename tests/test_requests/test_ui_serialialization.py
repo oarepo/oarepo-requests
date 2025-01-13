@@ -20,7 +20,7 @@ def test_user_serialization(
     users,
     urls,
     ui_serialization_result,
-    create_draft_via_resource,
+    draft_factory,
     logged_client,
     user_links,
     create_request_by_link,
@@ -30,9 +30,9 @@ def test_user_serialization(
     client_username_label = logged_client(users[1])
     client_fullname_label = logged_client(users[2])
 
-    draft1 = create_draft_via_resource(client_fallback_label)
-    draft2 = create_draft_via_resource(client_username_label)
-    draft3 = create_draft_via_resource(client_fullname_label)
+    draft1 = draft_factory(client_fallback_label)
+    draft2 = draft_factory(client_username_label)
+    draft3 = draft_factory(client_fullname_label)
 
     draft_id = draft1.json["id"]
     ThesisRecord.index.refresh()
@@ -133,7 +133,7 @@ def test_resolver_fallback(
     users,
     urls,
     ui_serialization_result,
-    create_draft_via_resource,
+    draft_factory,
     create_request_by_link,
     logged_client,
     search_clear,
@@ -146,7 +146,7 @@ def test_resolver_fallback(
         creator = users[0]
         creator_client = logged_client(creator)
 
-        draft1 = create_draft_via_resource(creator_client)
+        draft1 = draft_factory(creator_client)
         draft_id = draft1.json["id"]
         ThesisRecord.index.refresh()
         ThesisDraft.index.refresh()
@@ -218,7 +218,7 @@ def test_role(
     create_request_by_link,
     logged_client,
     role_ui_serialization,
-    create_draft_via_resource,
+    draft_factory,
     search_clear,
 ):
     config_restore = app.config["OAREPO_REQUESTS_DEFAULT_RECEIVER"]
@@ -234,7 +234,7 @@ def test_role(
         creator = users[0]
         creator_client = logged_client(creator)
 
-        draft1 = create_draft_via_resource(creator_client)
+        draft1 = draft_factory(creator_client)
         draft_id = draft1.json["id"]
         ThesisRecord.index.refresh()
         ThesisDraft.index.refresh()

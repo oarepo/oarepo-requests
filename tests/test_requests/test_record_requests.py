@@ -16,7 +16,7 @@ def test_read_requests_on_draft(
     urls,
     submit_request_by_link,
     create_request_by_link,
-    create_draft_via_resource,
+    draft_factory,
     search_clear,
 ):
     creator = users[0]
@@ -24,9 +24,9 @@ def test_read_requests_on_draft(
     creator_client = logged_client(creator)
     receiver_client = logged_client(receiver)
 
-    draft1 = create_draft_via_resource(creator_client)
-    draft2 = create_draft_via_resource(creator_client)
-    draft3 = create_draft_via_resource(creator_client)
+    draft1 = draft_factory(creator_client)
+    draft2 = draft_factory(creator_client)
+    draft3 = draft_factory(creator_client)
     ThesisRecord.index.refresh()
     ThesisDraft.index.refresh()
 

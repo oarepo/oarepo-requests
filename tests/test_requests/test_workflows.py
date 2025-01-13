@@ -67,7 +67,7 @@ def test_publish_with_workflows(
     logged_client,
     users,
     urls,
-    create_draft_via_resource,
+    draft_factory,
     create_request_by_link,
     patch_requests_permissions,
     record_service,
@@ -79,7 +79,7 @@ def test_publish_with_workflows(
     creator_client = logged_client(creator)
     receiver_client = logged_client(receiver)
 
-    draft1 = create_draft_via_resource(creator_client)
+    draft1 = draft_factory(creator_client)
     ThesisRecord.index.refresh()
     ThesisDraft.index.refresh()
 
@@ -133,7 +133,7 @@ def test_autorequest(
     urls,
     patch_requests_permissions,
     record_service,
-    create_draft_via_resource,
+    draft_factory,
     search_clear,
 ):
     creator = users[0]
@@ -142,7 +142,7 @@ def test_autorequest(
     creator_client = logged_client(creator)
     receiver_client = logged_client(receiver)
 
-    draft1 = create_draft_via_resource(creator_client, custom_workflow="with_approve")
+    draft1 = draft_factory(creator_client, custom_workflow="with_approve")
     record_id = draft1.json["id"]
 
     approve_request_data = {
@@ -291,7 +291,7 @@ def test_workflow_events(
     serialization_result,
     ui_serialization_result,
     events_resource_data,
-    create_draft_via_resource,
+    draft_factory,
     events_service,
     search_clear,
 ):
@@ -301,7 +301,7 @@ def test_workflow_events(
     user1_client = logged_client(user1)
     user2_client = logged_client(user2)
 
-    draft1 = create_draft_via_resource(user1_client, custom_workflow="with_approve")
+    draft1 = draft_factory(user1_client, custom_workflow="with_approve")
     record_id = draft1.json["id"]
 
     resp_request_submit = submit_request_by_link(user1_client, draft1, "approve_draft")
@@ -374,7 +374,7 @@ def test_workflow_events_resource(
     serialization_result,
     ui_serialization_result,
     events_resource_data,
-    create_draft_via_resource,
+    draft_factory,
     events_service,
     search_clear,
 ):
@@ -384,7 +384,7 @@ def test_workflow_events_resource(
     user1_client = logged_client(user1)
     user2_client = logged_client(user2)
 
-    draft1 = create_draft_via_resource(user1_client, custom_workflow="with_approve")
+    draft1 = draft_factory(user1_client, custom_workflow="with_approve")
     record_id = draft1.json["id"]
 
     resp_request_submit = submit_request_by_link(user1_client, draft1, "approve_draft")
@@ -503,13 +503,13 @@ def test_cancel_transition(
     users,
     urls,
     submit_request_by_link,
-    create_draft_via_resource,
+    draft_factory,
     search_clear,
 ):
     creator = users[0]
     creator_client = logged_client(creator)
 
-    draft1 = create_draft_via_resource(creator_client)
+    draft1 = draft_factory(creator_client)
     resp_request_submit = submit_request_by_link(
         creator_client, draft1, "publish_draft"
     )

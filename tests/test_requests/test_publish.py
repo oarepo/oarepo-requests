@@ -12,7 +12,7 @@ from thesis.records.api import ThesisDraft, ThesisRecord
 from pytest_oarepo.functions import link2testclient
 
 
-def test_publish_service(users, record_service, default_record_with_workflow_json, search_clear):
+def test_publish_service(users, record_service, default_record_with_workflow_parent_json, search_clear):
     from invenio_requests.proxies import (
         current_requests_service as current_invenio_requests_service,
     )
@@ -21,7 +21,7 @@ def test_publish_service(users, record_service, default_record_with_workflow_jso
 
     creator = users[0]
     receiver = users[1]
-    draft = record_service.create(creator.identity, default_record_with_workflow_json)
+    draft = record_service.create(creator.identity, default_record_with_workflow_parent_json)
     request = current_oarepo_requests_service.create(
         identity=creator.identity,
         data={"payload": {"version": "1.0"}},
@@ -54,7 +54,7 @@ def test_publish(
     logged_client,
     users,
     urls,
-    create_draft_via_resource,
+    draft_factory,
     submit_request_by_link,
     search_clear,
 ):
@@ -64,9 +64,9 @@ def test_publish(
     creator_client = logged_client(creator)
     receiver_client = logged_client(receiver)
 
-    draft1 = create_draft_via_resource(creator_client)
-    draft2 = create_draft_via_resource(creator_client)
-    draft3 = create_draft_via_resource(creator_client)
+    draft1 = draft_factory(creator_client)
+    draft2 = draft_factory(creator_client)
+    draft3 = draft_factory(creator_client)
     ThesisRecord.index.refresh()
     ThesisDraft.index.refresh()
     draft_lst = creator_client.get(f"/user{urls['BASE_URL']}")
@@ -149,8 +149,8 @@ def test_create_fails_if_draft_not_validated(
     logged_client,
     users,
     urls,
-    create_draft_via_resource,
-    default_record_with_workflow_json,
+    draft_factory,
+    default_record_with_workflow_parent_json,
     search_clear,
 ):
     creator = users[0]
@@ -158,7 +158,7 @@ def test_create_fails_if_draft_not_validated(
 
     creator_client = logged_client(creator)
 
-    json = copy.deepcopy(default_record_with_workflow_json)
+    json = copy.deepcopy(default_record_with_workflow_parent_json)
     del json["metadata"]["title"]
 
     draft = creator_client.post(f"{urls['BASE_URL']}?expand=true", json=json)

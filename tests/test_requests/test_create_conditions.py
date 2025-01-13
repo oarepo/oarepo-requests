@@ -16,7 +16,7 @@ def test_can_create(
     logged_client,
     users,
     urls,
-    create_draft_via_resource,
+    draft_factory,
     search_clear,
 ):
     creator = users[0]
@@ -25,8 +25,8 @@ def test_can_create(
     creator_client = logged_client(creator)
     receiver_client = logged_client(receiver)
 
-    draft1 = create_draft_via_resource(creator_client)
-    draft2 = create_draft_via_resource(creator_client)
+    draft1 = draft_factory(creator_client)
+    draft2 = draft_factory(creator_client)
 
     resp_request_create = creator_client.post(
         f"{urls['BASE_URL']}{draft1.json['id']}/draft/requests/publish_draft"
@@ -80,7 +80,7 @@ def test_can_possibly_create(
     logged_client,
     users,
     urls,
-    create_draft_via_resource,
+    draft_factory,
     search_clear,
 ):
     creator = users[0]
@@ -89,8 +89,8 @@ def test_can_possibly_create(
     creator_client = logged_client(creator)
     receiver_client = logged_client(receiver)
 
-    draft1 = create_draft_via_resource(creator_client)
-    draft2 = create_draft_via_resource(creator_client)
+    draft1 = draft_factory(creator_client)
+    draft2 = draft_factory(creator_client)
 
     record_resp_no_request = creator_client.get(
         f"{urls['BASE_URL']}{draft1.json['id']}/draft?expand=true"

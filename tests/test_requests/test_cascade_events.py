@@ -15,7 +15,7 @@ def test_cascade_update(
     logged_client,
     users,
     urls,
-    create_draft_via_resource,
+    draft_factory,
     check_publish_topic_update,
     create_request_by_link,
     submit_request_by_link,
@@ -27,8 +27,8 @@ def test_cascade_update(
     creator_client = logged_client(creator)
     receiver_client = logged_client(receiver)
 
-    draft1 = create_draft_via_resource(creator_client, custom_workflow="cascade_update")
-    draft2 = create_draft_via_resource(creator_client, custom_workflow="cascade_update")
+    draft1 = draft_factory(creator_client, custom_workflow="cascade_update")
+    draft2 = draft_factory(creator_client, custom_workflow="cascade_update")
 
     publish_request_create = submit_request_by_link(
         creator_client, draft1, "publish_draft"
@@ -64,7 +64,7 @@ def test_cascade_cancel(
     logged_client,
     users,
     urls,
-    create_draft_via_resource,
+    draft_factory,
     create_request_by_link,
     submit_request_by_link,
     search_clear,
@@ -75,8 +75,8 @@ def test_cascade_cancel(
     creator_client = logged_client(creator)
     receiver_client = logged_client(receiver)
 
-    draft1 = create_draft_via_resource(creator_client, custom_workflow="cascade_update")
-    draft2 = create_draft_via_resource(creator_client, custom_workflow="cascade_update")
+    draft1 = draft_factory(creator_client, custom_workflow="cascade_update")
+    draft2 = draft_factory(creator_client, custom_workflow="cascade_update")
 
     r1 = submit_request_by_link(creator_client, draft1, "publish_draft")
     r2 = create_request_by_link(creator_client, draft1, "another_topic_updating")

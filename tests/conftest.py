@@ -5,23 +5,13 @@
 # modify it under the terms of the MIT License; see LICENSE file for more
 # details.
 #
-import copy
 import os
-from io import BytesIO
 from typing import Dict
 
 import pytest
-from deepmerge import always_merger
-from flask_principal import UserNeed
-from flask_security import login_user
-from invenio_access.permissions import system_identity
-from invenio_accounts.proxies import current_datastore
-from invenio_accounts.testutils import login_user_via_session
-from invenio_app.factory import create_api
 from invenio_records_permissions.generators import (
     AnyUser,
     AuthenticatedUser,
-    Generator,
     SystemProcess,
 )
 from invenio_records_resources.services.uow import RecordCommitOp
@@ -72,8 +62,15 @@ pytest_plugins = [
    "pytest_oarepo.records",
    "pytest_oarepo.fixtures",
    "pytest_oarepo.users",
-
 ]
+
+@pytest.fixture(scope="module", autouse=True)
+def location(location):
+    return location
+
+@pytest.fixture(autouse=True)
+def vocab_cf(vocab_cf):
+    return vocab_cf
 
 can_comment_only_receiver = [
     Receiver(),
@@ -318,15 +315,6 @@ def create_app(instance_path, entry_points):
 """
 
 
-
-@pytest.fixture(autouse=True)
-def vocab_cf(app, db, cache):
-    from oarepo_runtime.services.custom_fields.mappings import prepare_cf_indices
-
-    prepare_cf_indices()
-    ThesisDraft.index.refresh()
-
-
 @pytest.fixture()
 def urls():
     return {"BASE_URL": "/thesis/", "BASE_URL_REQUESTS": "/requests/"}
@@ -447,16 +435,9 @@ def app_config(app_config):
     app_config["FILES_REST_DEFAULT_STORAGE_CLASS"] = "L"
     return app_config
 
-
-@pytest.fixture(scope="module", autouse=True)
-def location(location):
-    return location
-
-
 @pytest.fixture(scope="module")
 def record_service():
     return current_service
-
 
 @pytest.fixture
 def check_publish_topic_update():

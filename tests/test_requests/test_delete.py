@@ -88,7 +88,7 @@ def test_delete(
 
 def test_delete_draft(
     logged_client,
-    create_draft_via_resource,
+    draft_factory,
     users,
     urls,
     get_request_link,
@@ -96,7 +96,7 @@ def test_delete_draft(
 ):
     creator_client = logged_client(users[0])
 
-    draft1 = create_draft_via_resource(creator_client)
+    draft1 = draft_factory(creator_client)
     draft_id = draft1.json["id"]
 
     read = creator_client.get(f"{urls['BASE_URL']}{draft_id}/draft?expand=true")

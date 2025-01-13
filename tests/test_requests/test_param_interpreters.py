@@ -10,17 +10,17 @@ import json
 from pytest_oarepo.functions import link2testclient
 
 
-def _init(users, logged_client, create_draft_via_resource, submit_request, urls):
+def _init(users, logged_client, draft_factory, submit_request, urls):
     user1 = users[0]
     user2 = users[1]
 
     user1_client = logged_client(user1)
     user2_client = logged_client(user2)
 
-    draft1 = create_draft_via_resource(
+    draft1 = draft_factory(
         user1_client, custom_workflow="different_recipients"
     )
-    draft2 = create_draft_via_resource(
+    draft2 = draft_factory(
         user2_client, custom_workflow="different_recipients"
     )
 
@@ -40,12 +40,12 @@ def test_receiver_param_interpreter(
     logged_client,
     users,
     urls,
-    create_draft_via_resource,
+    draft_factory,
     submit_request_by_link,
     search_clear,
 ):
     user1_client, user2_client = _init(
-        users, logged_client, create_draft_via_resource, submit_request_by_link, urls
+        users, logged_client, draft_factory, submit_request_by_link, urls
     )
     search_receiver_only = user2_client.get(
         f'{urls["BASE_URL_REQUESTS"]}?assigned=true'
@@ -59,12 +59,12 @@ def test_owner_param_interpreter(
     logged_client,
     users,
     urls,
-    create_draft_via_resource,
+    draft_factory,
     submit_request_by_link,
     search_clear,
 ):
     user1_client, user2_client = _init(
-        users, logged_client, create_draft_via_resource, submit_request_by_link, urls
+        users, logged_client, draft_factory, submit_request_by_link, urls
     )
 
     search_user1_only = user1_client.get(f'{urls["BASE_URL_REQUESTS"]}?mine=true')
@@ -90,7 +90,7 @@ def test_open_param_interpreter(
     logged_client,
     users,
     urls,
-    create_draft_via_resource,
+    draft_factory,
     create_request_by_link,
     submit_request_by_link,
     search_clear,
@@ -101,9 +101,9 @@ def test_open_param_interpreter(
     user1_client = logged_client(user1)
     user2_client = logged_client(user2)
 
-    draft1 = create_draft_via_resource(user1_client)
-    draft2 = create_draft_via_resource(user1_client)
-    draft3 = create_draft_via_resource(user2_client)
+    draft1 = draft_factory(user1_client)
+    draft2 = draft_factory(user1_client)
+    draft3 = draft_factory(user2_client)
 
     submit_response_user1 = submit_request_by_link(
         user1_client, draft1, "publish_draft"

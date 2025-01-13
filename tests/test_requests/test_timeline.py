@@ -14,7 +14,7 @@ def test_timeline(
     logged_client,
     users,
     urls,
-    create_draft_via_resource,
+    draft_factory,
     submit_request_by_link,
     user_links,
     search_clear,
@@ -22,7 +22,7 @@ def test_timeline(
     creator = users[0]
     creator_client = logged_client(creator)
 
-    draft1 = create_draft_via_resource(creator_client)
+    draft1 = draft_factory(creator_client)
 
     publish_request_submit_resp = submit_request_by_link(
         creator_client, draft1, "publish_draft"

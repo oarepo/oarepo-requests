@@ -12,7 +12,7 @@ def test_requests_field(
     logged_client,
     users,
     urls,
-    create_draft_via_resource,
+    draft_factory,
     create_request_by_link,
     search_clear,
 ):
@@ -21,7 +21,7 @@ def test_requests_field(
     creator_client = logged_client(creator)
     receiver_client = logged_client(receiver)
 
-    draft1 = create_draft_via_resource(creator_client)
+    draft1 = draft_factory(creator_client)
 
     resp_request_create = create_request_by_link(
         creator_client, draft1, "publish_draft"

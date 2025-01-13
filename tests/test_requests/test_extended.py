@@ -16,14 +16,14 @@ def test_listing(
     users,
     urls,
     create_request_by_link,
-    create_draft_via_resource,
+    draft_factory,
     search_clear,
 ):
     creator = users[0]
     creator_client = logged_client(creator)
 
-    draft1 = create_draft_via_resource(creator_client)
-    draft2 = create_draft_via_resource(creator_client)
+    draft1 = draft_factory(creator_client)
+    draft2 = draft_factory(creator_client)
 
     create_request_by_link(creator_client, draft1, "publish_draft")
     create_request_by_link(creator_client, draft2, "publish_draft")
@@ -42,13 +42,13 @@ def test_read_extended(
     submit_request_by_link,
     serialization_result,
     ui_serialization_result,
-    create_draft_via_resource,
+    draft_factory,
     search_clear,
 ):
     creator = users[0]
     creator_client = logged_client(creator)
 
-    draft1 = create_draft_via_resource(creator_client)
+    draft1 = draft_factory(creator_client)
     draft_id = draft1.json["id"]
 
     resp_request_submit = submit_request_by_link(
@@ -83,13 +83,13 @@ def test_update_self_link(
     serialization_result,
     submit_request_by_link,
     ui_serialization_result,
-    create_draft_via_resource,
+    draft_factory,
     search_clear,
 ):
     creator = users[0]
     creator_client = logged_client(creator)
 
-    draft1 = create_draft_via_resource(creator_client)
+    draft1 = draft_factory(creator_client)
 
     resp_request_submit = submit_request_by_link(
         creator_client, draft1, "publish_draft"
@@ -126,12 +126,12 @@ def test_events_resource(
     serialization_result,
     ui_serialization_result,
     events_resource_data,
-    create_draft_via_resource,
+    draft_factory,
     search_clear,
 ):
     creator = users[0]
     creator_client = logged_client(creator)
-    draft1 = create_draft_via_resource(creator_client)
+    draft1 = draft_factory(creator_client)
 
     resp_request_submit = submit_request_by_link(
         creator_client, draft1, "publish_draft"

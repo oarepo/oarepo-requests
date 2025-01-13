@@ -10,7 +10,7 @@ def test_conditional_receiver_creator_matches(
     users,
     urls,
     create_request_by_link,
-    create_draft_via_resource,
+    draft_factory,
     search_clear,
 ):
     # user[0] is creator, user[1] is receiver
@@ -21,7 +21,7 @@ def test_conditional_receiver_creator_matches(
 
     creator_client = logged_client(creator)
 
-    draft1 = create_draft_via_resource(creator_client, custom_workflow="with_ct")
+    draft1 = draft_factory(creator_client, custom_workflow="with_ct")
 
     resp_request_create = create_request_by_link(
         creator_client, draft1, "conditional_recipient_rt"
@@ -36,7 +36,7 @@ def test_conditional_receiver_creator_does_not_match(
     users,
     urls,
     create_request_by_link,
-    create_draft_via_resource,
+    draft_factory,
     search_clear,
 ):
     # user[0] is creator, user[1] is receiver
@@ -47,7 +47,7 @@ def test_conditional_receiver_creator_does_not_match(
 
     creator_client = logged_client(creator)
 
-    draft1 = create_draft_via_resource(creator_client, custom_workflow="with_ct")
+    draft1 = draft_factory(creator_client, custom_workflow="with_ct")
 
     resp_request_create = create_request_by_link(
         creator_client, draft1, "conditional_recipient_rt"

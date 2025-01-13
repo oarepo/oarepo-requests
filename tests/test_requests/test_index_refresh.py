@@ -13,13 +13,13 @@ def test_search(
     users,
     urls,
     create_request_by_link,
-    create_draft_via_resource,
+    draft_factory,
     search_clear,
 ):
     creator = users[0]
     creator_client = logged_client(creator)
 
-    draft1 = create_draft_via_resource(creator_client)
+    draft1 = draft_factory(creator_client)
 
     resp_request_create = create_request_by_link(
         creator_client, draft1, "publish_draft"
