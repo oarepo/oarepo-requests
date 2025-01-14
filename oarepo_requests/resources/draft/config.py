@@ -7,6 +7,8 @@
 #
 """Configuration of the draft record requests resource."""
 
+from __future__ import annotations
+
 from oarepo_requests.resources.record.config import RecordRequestsResourceConfig
 
 

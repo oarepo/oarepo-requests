@@ -9,7 +9,7 @@ import pytest
 
 from oarepo_requests.errors import OpenRequestAlreadyExists
 
-from .utils import link_api2testclient
+from .utils import link2testclient
 
 
 def test_can_create(
@@ -41,7 +41,7 @@ def test_can_create(
         )
 
     resp_request_submit = creator_client.post(
-        link_api2testclient(resp_request_create.json["links"]["actions"]["submit"]),
+        link2testclient(resp_request_create.json["links"]["actions"]["submit"]),
     )
 
     with pytest.raises(OpenRequestAlreadyExists):
@@ -59,7 +59,7 @@ def test_can_create(
 
     # try declining the request for draft2, we should be able to create again then
     resp_request_submit = creator_client.post(
-        link_api2testclient(
+        link2testclient(
             create_for_request_draft2.json["links"]["actions"]["submit"]
         ),
     )
@@ -73,7 +73,7 @@ def test_can_create(
         f"{urls['BASE_URL']}{draft2.json['id']}/draft?expand=true"
     )
     decline = receiver_client.post(
-        link_api2testclient(
+        link2testclient(
             record.json["expanded"]["requests"][0]["links"]["actions"]["decline"]
         ),
     )
@@ -115,7 +115,7 @@ def test_can_possibly_create(
     )
 
     resp_request_submit = creator_client.post(
-        link_api2testclient(resp_request_create.json["links"]["actions"]["submit"]),
+        link2testclient(resp_request_create.json["links"]["actions"]["submit"]),
     )
 
     def find_request_type(requests, type):

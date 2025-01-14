@@ -12,6 +12,7 @@ from __future__ import annotations
 import abc
 import contextlib
 import copy
+import json
 from typing import TYPE_CHECKING, Any, TypedDict, cast, override
 
 from flask import request
@@ -62,7 +63,18 @@ def resolve(identity: Identity, reference: dict[str, str]) -> UIResolvedReferenc
             return cache[(reference_type, reference_value)]
 
     entity_resolvers = current_oarepo_requests.entity_reference_ui_resolvers
-    if reference_type in entity_resolvers:
+
+    if reference_type == 'multiple':
+        # TODO(mirekys): add test coverage
+        resolved = []
+        reference_values_list = list(json.loads(reference_value))
+
+        for reference_values_item in reference_values_list:
+            for key, value in reference_values_item.items():
+                resolved.append(entity_resolvers[key].resolve_one(
+                    identity, value
+                ))
+    elif reference_type in entity_resolvers:
         resolved = entity_resolvers[reference_type].resolve_one(
             identity, reference_value
         )
@@ -196,14 +208,10 @@ class OARepoUIResolver(abc.ABC):
         self, resolved_reference: dict
     ) -> dict[str, str]:
         """Extract links from a entity."""
-        links = {}
         entity_links = {}
         if "links" in resolved_reference:
             entity_links = resolved_reference["links"]
-        for link_type in ("self", "self_html"):
-            if link_type in entity_links:
-                links[link_type] = entity_links[link_type]
-        return links
+        return entity_links
 
 
 class GroupEntityReferenceUIResolver(OARepoUIResolver):
@@ -548,6 +556,8 @@ class FallbackEntityReferenceUIResolver(OARepoUIResolver):
 
 
 class KeywordUIEntityResolver(OARepoUIResolver):
+    """UI resolver for keyword-like entities."""
+
     keyword = None
 
     @override
@@ -562,7 +572,7 @@ class KeywordUIEntityResolver(OARepoUIResolver):
     def _search_many(
         self, identity: Identity, ids: list[str], *args: Any, **kwargs: Any
     ) -> list[dict]:
-        """Returns list of references of keyword entities.
+        """Return list of references of keyword entities.
 
         :param identity:    identity of the user
         :param ids:         ids to search for
@@ -576,7 +586,7 @@ class KeywordUIEntityResolver(OARepoUIResolver):
     def _search_one(
         self, identity: Identity, _id: str, *args: Any, **kwargs: Any
     ) -> dict | None:
-        """Returns keyword entity reference.
+        """Return keyword entity reference.
 
         :param identity:    identity of the user
         :param _id:         the keyword value
@@ -586,6 +596,8 @@ class KeywordUIEntityResolver(OARepoUIResolver):
 
 
 class AutoApproveUIEntityResolver(KeywordUIEntityResolver):
+    """UI resolver for auto approve entities."""
+
     keyword = "auto_approve"
 
     @override
@@ -598,7 +610,6 @@ class AutoApproveUIEntityResolver(KeywordUIEntityResolver):
         :reference:     reference to the entity
         :return:        UI representation of the entity
         """
-
         return UIResolvedReference(
             reference=reference,
             type=self.keyword,

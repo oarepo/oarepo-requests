@@ -1,3 +1,10 @@
+/*
+ * Copyright (C) 2024 CESNET z.s.p.o.
+ *
+ * oarepo-requests is free software; you can redistribute it and/or
+ * modify it under the terms of the MIT License; see LICENSE file for more
+ * details.
+ */
 import React, { useState, useCallback, useRef } from "react";
 import { i18next } from "@translations/oarepo_requests_ui/i18next";
 import { Message, Icon } from "semantic-ui-react";
@@ -176,16 +183,18 @@ export const useAction = ({
   requestOrRequestType,
   formik,
   modalControl,
+  requestActionName,
 } = {}) => {
   const { onBeforeAction, onAfterAction, onActionError } = useCallbackContext();
   return useMutation(
     async (values) => {
       if (onBeforeAction) {
-        const shouldProceed = await onBeforeAction(
+        const shouldProceed = await onBeforeAction({
           formik,
           modalControl,
-          requestOrRequestType
-        );
+          requestOrRequestType,
+          requestActionName,
+        });
         if (!shouldProceed) {
           modalControl?.closeModal();
           throw new Error("Could not proceed with the action.");
@@ -200,13 +209,14 @@ export const useAction = ({
     {
       onError: (e, variables) => {
         if (onActionError) {
-          onActionError(
+          onActionError({
             e,
             variables,
             formik,
             modalControl,
-            requestOrRequestType
-          );
+            requestOrRequestType,
+            requestActionName,
+          });
         } else if (e?.response?.data?.errors) {
           formik?.setFieldError(
             "api",
@@ -231,24 +241,25 @@ export const useAction = ({
       },
       onSuccess: (data, variables) => {
         if (onAfterAction) {
-          onAfterAction(
+          onAfterAction({
             data,
             variables,
             formik,
             modalControl,
-            requestOrRequestType
-          );
+            requestOrRequestType,
+            requestActionName,
+          });
         }
-        const redirectionURL = data?.data?.links?.topic_html;
+        const redirectionURL =
+          data?.data?.links?.ui_redirect_url ||
+          data?.data?.links?.topic?.self_html;
+          
         modalControl?.closeModal();
 
         if (redirectionURL) {
           window.location.href = redirectionURL;
         } else {
-          // TODO: some requests after they complete no longer have a topic_html,
-          // so redirecting to dashboard instead
-          window.location.href = "/me/records/";
-          // fetchNewRequests?.();
+          window.location.reload();
         }
       },
     }

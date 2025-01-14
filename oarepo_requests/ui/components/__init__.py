@@ -7,6 +7,8 @@
 #
 """UI components."""
 
+from __future__ import annotations
+
 from oarepo_requests.ui.components.action_labels import ActionLabelsComponent
 from oarepo_requests.ui.components.custom_fields import (
     FormConfigCustomFieldsComponent,

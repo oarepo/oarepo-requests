@@ -1,4 +1,12 @@
 /*
+ * Copyright (C) 2024 CESNET z.s.p.o.
+ *
+ * oarepo-requests is free software; you can redistribute it and/or
+ * modify it under the terms of the MIT License; see LICENSE file for more
+ * details.
+ */
+
+/*
 This is the registration file for custom components. The components should not be included here,
 but only referenced. The sample component below can be used to start up working on your own custom
 component.

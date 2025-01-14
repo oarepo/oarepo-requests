@@ -9,6 +9,7 @@
 
 from __future__ import annotations
 
+import datetime
 from types import SimpleNamespace
 from typing import TYPE_CHECKING, Any, cast
 
@@ -111,8 +112,25 @@ class UIRequestSchemaMixin:
     """Status code of the request."""
 
     @ma.pre_dump
+    def _convert_dates_for_localized(self, data: dict, **kwargs: Any) -> dict:
+        if isinstance(data.get("created"), str):
+            data["created"] = datetime.datetime.fromisoformat(data["created"])
+
+        if isinstance(data.get("updated"), str):
+            data["updated"] = datetime.datetime.fromisoformat(data["updated"])
+
+        if isinstance(data.get("expires_at"), str):
+            data["expires_at"] = datetime.datetime.fromisoformat(data["expires_at"])
+
+        return data
+
+    @ma.pre_dump
     def _add_type_details(self, data: dict, **kwargs: Any) -> dict:
         """Add details taken from the request type to the serialized request."""
+        if isinstance(data.get("created"), str):
+            data["created"] = datetime.datetime.fromisoformat(data["created"])
+        if isinstance(data.get("updated"), str):
+            data["updated"] = datetime.datetime.fromisoformat(data["updated"])
         type = data["type"]
         type_obj = current_request_type_registry.lookup(type, quiet=True)
         if hasattr(type_obj, "description"):

@@ -7,6 +7,8 @@
 #
 """Topic delete event type."""
 
+from __future__ import annotations
+
 from invenio_requests.customizations.event_types import EventType
 from marshmallow import fields
 

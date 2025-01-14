@@ -12,9 +12,12 @@ from __future__ import annotations
 from typing import TYPE_CHECKING, Any
 
 import marshmallow as ma
+from invenio_drafts_resources.resources.records.errors import DraftNotCreatedError
+from invenio_records_resources.services.errors import PermissionDeniedError
 from invenio_records_resources.services.uow import RecordCommitOp, UnitOfWork
 from invenio_requests.proxies import current_requests_service
 from marshmallow.validate import OneOf
+from oarepo_runtime.datastreams.utils import get_record_service_for_record_class
 from oarepo_runtime.i18n import lazy_gettext as _
 from typing_extensions import override
 
@@ -47,8 +50,27 @@ class NewVersionRequestType(NonDuplicableOARepoRequestType):
             attribute="draft_record:links:self_html",
             data_key="draft_record:links:self_html",
         ),
-        "keep_files": ma.fields.String(validate=OneOf(["true", "false"])),
+        "draft_record.id": ma.fields.Str(
+            attribute="draft_record:id",
+            data_key="draft_record:id",
+        ),
+        "keep_files": ma.fields.String(validate=OneOf(["yes", "no"])),
     }
+
+    def get_ui_redirect_url(self, request: Request, ctx: dict) -> str:
+        if request.status == "accepted":
+            service = get_record_service_for_record_class(request.topic.record_cls)
+            try:
+                result_item = service.read_draft(
+                    ctx["identity"], request["payload"]["draft_record:id"]
+                )
+            except (PermissionDeniedError, DraftNotCreatedError):
+                return None
+
+            if "edit_html" in result_item["links"]:
+                return result_item["links"]["edit_html"]
+            elif "self_html" in result_item["links"]:
+                return result_item["links"]["self_html"]
 
     @classproperty
     def available_actions(cls) -> dict[str, type[RequestAction]]:
@@ -64,15 +86,17 @@ class NewVersionRequestType(NonDuplicableOARepoRequestType):
 
     form = {
         "field": "keep_files",
-        "ui_widget": "BooleanCheckbox",
+        "ui_widget": "Dropdown",
         "props": {
             "label": _("Keep files:"),
-            "placeholder": _("Keep files in the new version?"),
+            "placeholder": _("Yes or no"),
             "description": _(
                 "If you choose yes, the current record's files will be linked to the new version of the record. Then you will be able to add/remove files in the form."
             ),
-            "falseLabel": _("No"),
-            "trueLabel": _("Yes"),
+            "options": [
+                {"id": "yes", "title_l10n": _("Yes")},
+                {"id": "no", "title_l10n": _("No")},
+            ],
         },
     }
 

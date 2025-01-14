@@ -13,7 +13,7 @@ from thesis.records.api import ThesisDraft, ThesisRecord
 
 from oarepo_requests.resolvers.ui import FallbackEntityReferenceUIResolver
 
-from .utils import link_api2testclient
+from .utils import link2testclient
 
 
 def test_user_serialization(
@@ -23,6 +23,7 @@ def test_user_serialization(
     ui_serialization_result,
     create_draft_via_resource,
     logged_client,
+    user_links,
     search_clear,
 ):
     client_fallback_label = logged_client(users[0])
@@ -61,7 +62,7 @@ def test_user_serialization(
     )
 
     resp_request_submit = client_fallback_label.post(
-        link_api2testclient(resp_request_create.json["links"]["actions"]["submit"]),
+        link2testclient(resp_request_create.json["links"]["actions"]["submit"]),
         headers={"Accept": "application/vnd.inveniordm.v1+json"},
     )
     pprint(resp_request_submit.json)
@@ -85,21 +86,21 @@ def test_user_serialization(
 
     creator_serialization = {
         "label": "id: 1",
-        "links": {"self": "https://127.0.0.1:5000/api/users/1"},
+        "links": user_links(1),
         "reference": {"user": "1"},
         "type": "user",
     }
 
     creator_serialization_username = {
         "label": "beetlesmasher",
-        "links": {"self": "https://127.0.0.1:5000/api/users/2"},
+        "links": user_links(2),
         "reference": {"user": "2"},
         "type": "user",
     }
 
     creator_serialization_fullname = {
         "label": "Maxipes Fik",
-        "links": {"self": "https://127.0.0.1:5000/api/users/3"},
+        "links": user_links(3),
         "reference": {"user": "3"},
         "type": "user",
     }
@@ -159,7 +160,7 @@ def test_resolver_fallback(
         )
 
         resp_request_submit = creator_client.post(
-            link_api2testclient(resp_request_create.json["links"]["actions"]["submit"]),
+            link2testclient(resp_request_create.json["links"]["actions"]["submit"]),
             headers={"Accept": "application/vnd.inveniordm.v1+json"},
         )
         assert resp_request_submit.json["stateful_name"] == "Submitted for review"
@@ -274,7 +275,7 @@ def test_auto_approve(
         json=new_version_data_function(record1["id"]),
     )
     resp_request_submit = creator_client.post(
-        link_api2testclient(resp_request_create.json["links"]["actions"]["submit"]),
+        link2testclient(resp_request_create.json["links"]["actions"]["submit"]),
     )
     # is request accepted and closed?
     request_json = creator_client.get(

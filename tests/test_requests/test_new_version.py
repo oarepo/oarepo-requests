@@ -5,9 +5,10 @@
 # modify it under the terms of the MIT License; see LICENSE file for more
 # details.
 #
+
 from thesis.records.api import ThesisDraft, ThesisRecord
 
-from tests.test_requests.utils import link_api2testclient
+from tests.test_requests.utils import _create_request, link2testclient
 
 
 def test_new_version_autoaccept(
@@ -34,7 +35,7 @@ def test_new_version_autoaccept(
         json=new_version_data_function(record1["id"]),
     )
     resp_request_submit = creator_client.post(
-        link_api2testclient(resp_request_create.json["links"]["actions"]["submit"]),
+        link2testclient(resp_request_create.json["links"]["actions"]["submit"]),
     )
     # is request accepted and closed?
     request = creator_client.get(
@@ -53,7 +54,9 @@ def test_new_version_autoaccept(
     # new_version action worked?
     search = creator_client.get(
         f'user{urls["BASE_URL"]}',
-    ).json["hits"]["hits"]
+    ).json[
+        "hits"
+    ]["hits"]
     assert len(search) == 2
     assert search[0]["id"] != search[1]["id"]
     assert search[0]["parent"]["id"] == search[1]["parent"]["id"]
@@ -78,7 +81,7 @@ def test_new_version_files(
         urls["BASE_URL_REQUESTS"],
         json={
             **new_version_data_function(record1["id"]),
-            "payload": {"keep_files": "true"},
+            "payload": {"keep_files": "yes"},
         },
     )
     resp_request_create2 = creator_client.post(
@@ -87,10 +90,10 @@ def test_new_version_files(
     )
 
     resp_request_submit1 = creator_client.post(
-        link_api2testclient(resp_request_create1.json["links"]["actions"]["submit"]),
+        link2testclient(resp_request_create1.json["links"]["actions"]["submit"]),
     )
     resp_request_submit2 = creator_client.post(
-        link_api2testclient(resp_request_create2.json["links"]["actions"]["submit"]),
+        link2testclient(resp_request_create2.json["links"]["actions"]["submit"]),
     )
 
     ThesisDraft.index.refresh()
@@ -120,3 +123,67 @@ def test_new_version_files(
 
     assert len(record1["entries"]) == 1
     assert len(record2["entries"]) == 0
+
+
+def test_redirect_url(
+    vocab_cf,
+    logged_client,
+    users,
+    urls,
+    new_version_data_function,
+    record_factory,
+    search_clear,
+):
+    creator = users[0]
+    creator_client = logged_client(creator)
+    receiver_client = logged_client(users[1])
+    record1 = record_factory(creator.identity)
+    original_id = record1["id"]
+
+    resp_request_create = creator_client.post(
+        urls["BASE_URL_REQUESTS"],
+        json=new_version_data_function(original_id),
+    )
+    original_request_id = resp_request_create.json["id"]
+    resp_request_submit = creator_client.post(
+        link2testclient(resp_request_create.json["links"]["actions"]["submit"]),
+    )
+    # is request accepted and closed?
+
+    request = creator_client.get(
+        f'{urls["BASE_URL_REQUESTS"]}{original_request_id}',
+    ).json
+
+    ThesisDraft.index.refresh()
+    draft_search = creator_client.get(f"/user/thesis/").json["hits"][
+        "hits"
+    ]  # a link is in another pull request for now
+    new_version = [
+        x
+        for x in draft_search
+        if x["parent"]["id"] == record1.parent["id"] and x["state"] == "draft"
+    ][0]
+    assert (
+        link2testclient(request["links"]["ui_redirect_url"], ui=True)
+        == f"/thesis/{new_version['id']}/edit"
+    )
+
+    publish_request = _create_request(
+        creator_client, new_version["id"], "publish_draft", urls
+    )
+    submit = creator_client.post(
+        link2testclient(publish_request.json["links"]["actions"]["submit"])
+    )
+    receiver_request = receiver_client.get(
+        f"{urls['BASE_URL_REQUESTS']}{submit.json['id']}"
+    )
+    accept = receiver_client.post(
+        link2testclient(receiver_request.json["links"]["actions"]["accept"])
+    )
+
+    original_request = creator_client.get(
+        f'{urls["BASE_URL_REQUESTS"]}{original_request_id}',
+    ).json
+    assert original_request["topic"] == {
+        "thesis": original_id
+    }  # check no weird topic kerfluffle happened here

@@ -10,7 +10,7 @@
 from __future__ import annotations
 
 import inspect
-from typing import TYPE_CHECKING, Any, Mapping
+from typing import TYPE_CHECKING, Any
 
 import marshmallow as ma
 from flask import current_app
@@ -35,6 +35,8 @@ from oarepo_requests.ui.components import (
 )
 
 if TYPE_CHECKING:
+    from collections.abc import Mapping
+
     from flask_resources.serializers.base import BaseSerializer
     from invenio_records_resources.records import Record
     from invenio_requests.customizations.request_types import RequestType

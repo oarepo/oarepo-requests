@@ -5,7 +5,7 @@
 # modify it under the terms of the MIT License; see LICENSE file for more
 # details.
 #
-from tests.test_requests.utils import link_api2testclient
+from tests.test_requests.utils import link2testclient
 
 
 def test_search(
@@ -30,7 +30,7 @@ def test_search(
 
     assert len(requests_search["hits"]["hits"]) == 1
 
-    link = link_api2testclient(requests_search["hits"]["hits"][0]["links"]["self"])
+    link = link2testclient(requests_search["hits"]["hits"][0]["links"]["self"])
     extended_link = link.replace("/requests/", "/requests/extended/")
 
     update = creator_client.put(

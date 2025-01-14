@@ -7,6 +7,8 @@
 #
 """Request types defined in oarepo-requests."""
 
+from __future__ import annotations
+
 from .delete_published_record import DeletePublishedRecordRequestType
 from .edit_record import EditPublishedRecordRequestType
 from .generic import NonDuplicableOARepoRequestType
