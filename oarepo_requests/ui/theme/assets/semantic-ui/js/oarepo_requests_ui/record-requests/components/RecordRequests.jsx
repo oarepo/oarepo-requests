@@ -22,6 +22,8 @@ export const requestButtonsDefaultIconConfig = {
   edit_published_record: { icon: "pencil", labelPosition: "left" },
   assign_doi: { icon: "address card", labelPosition: "left" },
   created: { icon: "paper plane", labelPosition: "left" },
+  initiate_community_migration: { icon: "exchange", labelPosition: "left" },
+  confirm_community_migration: { icon: "exchange", labelPosition: "left" },
   submitted: { icon: "clock", labelPosition: "left" },
 };
 

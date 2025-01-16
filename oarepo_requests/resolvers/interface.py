@@ -6,9 +6,11 @@ from invenio_pidstore.errors import PersistentIdentifierError
 
 from oarepo_requests.resolvers.ui import resolve
 import logging
+
 if TYPE_CHECKING:
     from invenio_requests.records import Request
 log = logging.getLogger(__name__)
+
 
 # todo consider - we are not using this strictly in the ui context - so how should we separate these things in the future
 def resolve_entity(entity: str, obj: Request, ctx: dict[str, Any]) -> dict:
@@ -19,12 +21,16 @@ def resolve_entity(entity: str, obj: Request, ctx: dict[str, Any]) -> dict:
     :return: The resolved entity
     """
     entity_field_value = getattr(obj, entity)
+    print(entity_field_value, "entity_field_value", flush=True)
     if not entity_field_value:
         return {}
 
     reference_dict: dict = entity_field_value.reference_dict
+    print(reference_dict, "reference_dict", flush=True)
 
     key = entity_context_key(reference_dict)
+    print(key, "key", flush=True)
+
     if key in ctx:
         return ctx[key]
     try:
@@ -38,6 +44,7 @@ def resolve_entity(entity: str, obj: Request, ctx: dict[str, Any]) -> dict:
             )
         entity = {"links": {}}
     ctx[key] = entity
+    print(entity, "entity", flush=True)
     return entity
 
 

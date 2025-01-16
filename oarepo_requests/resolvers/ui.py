@@ -52,6 +52,8 @@ def resolve(identity: Identity, reference: dict[str, str]) -> UIResolvedReferenc
     :param reference: Reference to resolve.
     """
     reference_type, reference_value = next(iter(reference.items()))
+    print(reference_type, "reference_type", flush=True)
+    print(reference_value, "reference_value", flush=True)
 
     # use cache to avoid multiple resolve for the same reference within one request
     # the runtime error is risen when we are outside the request context - in this case we just skip the cache
@@ -64,16 +66,14 @@ def resolve(identity: Identity, reference: dict[str, str]) -> UIResolvedReferenc
 
     entity_resolvers = current_oarepo_requests.entity_reference_ui_resolvers
 
-    if reference_type == 'multiple':
+    if reference_type == "multiple":
         # TODO(mirekys): add test coverage
         resolved = []
         reference_values_list = list(json.loads(reference_value))
 
         for reference_values_item in reference_values_list:
             for key, value in reference_values_item.items():
-                resolved.append(entity_resolvers[key].resolve_one(
-                    identity, value
-                ))
+                resolved.append(entity_resolvers[key].resolve_one(identity, value))
     elif reference_type in entity_resolvers:
         resolved = entity_resolvers[reference_type].resolve_one(
             identity, reference_value
@@ -473,6 +473,7 @@ class RecordEntityDraftReferenceUIResolver(RecordEntityReferenceUIResolver):
         service: DraftsService = get_matching_service_for_refdict(
             {self.reference_type: _id}
         )
+        print(service, "draftservice", flush=True)
         return service.read_draft(identity, _id).data
 
 

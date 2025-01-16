@@ -10,6 +10,7 @@ import ReactDOM from "react-dom";
 import { RecordRequests } from "./components";
 import { encodeUnicodeBase64 } from "@js/oarepo_ui";
 import { i18next } from "@translations/oarepo_requests_ui/i18next";
+import { setIn } from "formik";
 
 const recordRequestsAppDiv = document.getElementById("record-requests");
 
@@ -17,7 +18,18 @@ if (recordRequestsAppDiv) {
   const record = JSON.parse(recordRequestsAppDiv.dataset.record);
 
   const onActionError = ({ e, formik, modalControl }) => {
-    if (e?.response?.data?.errors) {
+    if (
+      e?.response?.data?.error_type === "cf_validation_error" &&
+      e?.response?.data?.errors
+    ) {
+      let errorsObj = {};
+      console.log(e?.response?.data?.errors);
+      for (const error of e.response.data.errors) {
+        errorsObj = setIn(errorsObj, error.field, error.messages.join(" "));
+      }
+      console.log(errorsObj);
+      formik?.setErrors(errorsObj);
+    } else if (e?.response?.data?.errors) {
       const errorData = e.response.data;
       const jsonErrors = JSON.stringify(errorData);
       const base64EncodedErrors = encodeUnicodeBase64(jsonErrors);
