@@ -21,15 +21,12 @@ def resolve_entity(entity: str, obj: Request, ctx: dict[str, Any]) -> dict:
     :return: The resolved entity
     """
     entity_field_value = getattr(obj, entity)
-    print(entity_field_value, "entity_field_value", flush=True)
     if not entity_field_value:
         return {}
 
     reference_dict: dict = entity_field_value.reference_dict
-    print(reference_dict, "reference_dict", flush=True)
 
     key = entity_context_key(reference_dict)
-    print(key, "key", flush=True)
 
     if key in ctx:
         return ctx[key]
@@ -44,7 +41,6 @@ def resolve_entity(entity: str, obj: Request, ctx: dict[str, Any]) -> dict:
             )
         entity = {"links": {}}
     ctx[key] = entity
-    print(entity, "entity", flush=True)
     return entity
 
 

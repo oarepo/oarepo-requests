@@ -52,8 +52,6 @@ def resolve(identity: Identity, reference: dict[str, str]) -> UIResolvedReferenc
     :param reference: Reference to resolve.
     """
     reference_type, reference_value = next(iter(reference.items()))
-    print(reference_type, "reference_type", flush=True)
-    print(reference_value, "reference_value", flush=True)
 
     # use cache to avoid multiple resolve for the same reference within one request
     # the runtime error is risen when we are outside the request context - in this case we just skip the cache
@@ -473,7 +471,6 @@ class RecordEntityDraftReferenceUIResolver(RecordEntityReferenceUIResolver):
         service: DraftsService = get_matching_service_for_refdict(
             {self.reference_type: _id}
         )
-        print(service, "draftservice", flush=True)
         return service.read_draft(identity, _id).data
 
 

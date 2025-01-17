@@ -13,11 +13,10 @@ export const RequestCustomFields = ({
   // Only applies to RequestModalContent component:
   // READ ONLY modal type contains Accept, Decline, and/or Cancel actions OR contains Cancel action only => only ReadOnlyCustomFields are rendered
   // SUBMIT FORM modal type contains Submit and/or Save, Create, CreateAndSubmit action => Form is rendered
-  const customFieldsType = actions.some(
-    ({ name }) => name === REQUEST_TYPE.ACCEPT || name === REQUEST_TYPE.CANCEL
-  )
-    ? REQUEST_MODAL_TYPE.READ_ONLY
-    : REQUEST_MODAL_TYPE.SUBMIT_FORM;
+  const customFieldsType =
+    request.status_code === "created"
+      ? REQUEST_MODAL_TYPE.SUBMIT_FORM
+      : REQUEST_MODAL_TYPE.READ_ONLY;
 
   const renderSubmitForm =
     customFieldsType === REQUEST_MODAL_TYPE.SUBMIT_FORM &&

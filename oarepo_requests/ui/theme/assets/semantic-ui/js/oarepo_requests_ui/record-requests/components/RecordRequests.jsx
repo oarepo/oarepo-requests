@@ -24,6 +24,8 @@ export const requestButtonsDefaultIconConfig = {
   created: { icon: "paper plane", labelPosition: "left" },
   initiate_community_migration: { icon: "exchange", labelPosition: "left" },
   confirm_community_migration: { icon: "exchange", labelPosition: "left" },
+  secondary_community_submission: { icon: "users", labelPosition: "left" },
+  remove_secondary_community: { icon: "remove", labelPosition: "left" },
   submitted: { icon: "clock", labelPosition: "left" },
 };
 

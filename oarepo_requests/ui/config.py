@@ -26,10 +26,10 @@ from invenio_requests import current_request_type_registry
 from oarepo_runtime.services.custom_fields import CustomFields, InlinedCustomFields
 from oarepo_ui.resources.components import (
     AllowedHtmlTagsComponent,
-    AllowedCommunitiesComponent,
 )
 from oarepo_ui.resources.config import FormConfigResourceConfig, UIResourceConfig
 from oarepo_ui.resources.links import UIRecordLink
+
 from oarepo_requests.ui.components import (
     ActionLabelsComponent,
     FormConfigCustomFieldsComponent,
@@ -73,7 +73,6 @@ class RequestsFormConfigResourceConfig(FormConfigResourceConfig):
         FormConfigCustomFieldsComponent,
         FormConfigRequestTypePropertiesComponent,
         ActionLabelsComponent,
-        AllowedCommunitiesComponent,
     ]
     request_view_args = {"request_type": RequestTypeSchema()}
     routes = {
