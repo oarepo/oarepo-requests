@@ -751,9 +751,6 @@ msgstr "Ano nebo ne"
 msgid "Keep files"
 msgstr "Ponechat soubory"
 
-msgid "Pasted text was shortened to fit the allowed length."
-msgstr "Vložený text byl zkrácen, aby odpovídal povolené délce."
-
 msgid "commentTooLong"
 msgid_plural "commentTooLong"
 msgstr[0] "Váš komentář překročil povolenou délku. Odeberte {{count}} znak."

@@ -714,9 +714,6 @@ msgstr ""
 msgid "Yes or no"
 msgstr ""
 
-msgid "Pasted text was shortened to fit the allowed length."
-msgstr ""
-
 msgid "commentTooLong"
 msgid_plural "commentTooLong"
 msgstr[0] ""
