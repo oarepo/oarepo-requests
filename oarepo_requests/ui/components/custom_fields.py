@@ -31,6 +31,7 @@ class FormConfigCustomFieldsComponent(UIResourceComponent):
         form: dict | list = getattr(type_, "form", None)  # type: ignore
         if not form:
             return
+
         if isinstance(form, dict):
             # it is just a single field
             form = [{"section": "", "fields": [form]}]

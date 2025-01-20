@@ -98,3 +98,21 @@ class OARepoRequestsService(RequestsService):
         """Retrieve a request."""
         api_request = super().read(identity, id_, expand)
         return api_request
+
+    @unit_of_work()
+    def update(
+        self,
+        identity: Identity,
+        id_: str,
+        data: dict,
+        revision_id: int | None = None,
+        uow: UnitOfWork | None = None,
+        expand: bool = False,
+    ) -> RequestItem:
+        """Update a request."""
+        assert uow is not None
+        result = super().update(
+            identity, id_, data, revision_id=revision_id, uow=uow, expand=expand
+        )
+        uow.register(IndexRefreshOp(indexer=self.indexer, index=self.record_cls.index))
+        return result

@@ -24,9 +24,7 @@ from invenio_records_resources.proxies import current_service_registry
 from invenio_records_resources.services.errors import PermissionDeniedError
 from invenio_requests import current_request_type_registry
 from oarepo_runtime.services.custom_fields import CustomFields, InlinedCustomFields
-from oarepo_ui.resources.components import (
-    AllowedHtmlTagsComponent,
-)
+from oarepo_ui.resources.components import AllowedHtmlTagsComponent
 from oarepo_ui.resources.config import FormConfigResourceConfig, UIResourceConfig
 from oarepo_ui.resources.links import UIRecordLink
 

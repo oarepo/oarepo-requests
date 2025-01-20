@@ -1,11 +1,11 @@
 from __future__ import annotations
 
-from typing import Any, TYPE_CHECKING
+import logging
+from typing import TYPE_CHECKING, Any
 
 from invenio_pidstore.errors import PersistentIdentifierError
 
 from oarepo_requests.resolvers.ui import resolve
-import logging
 
 if TYPE_CHECKING:
     from invenio_requests.records import Request
@@ -27,7 +27,6 @@ def resolve_entity(entity: str, obj: Request, ctx: dict[str, Any]) -> dict:
     reference_dict: dict = entity_field_value.reference_dict
 
     key = entity_context_key(reference_dict)
-
     if key in ctx:
         return ctx[key]
     try:
@@ -45,6 +44,7 @@ def resolve_entity(entity: str, obj: Request, ctx: dict[str, Any]) -> dict:
 
 
 def entity_context_key(reference_dict: dict) -> str:
+    """Create a key for the entity context cache."""
     return "entity:" + ":".join(
         f"{x[0]}:{x[1]}" for x in sorted(reference_dict.items())
     )
