@@ -22,13 +22,14 @@ def test_allowed_request_types_on_draft_service(
     creator_client = logged_client(creator)
 
     draft1 = draft_factory(creator_client)
+    draft1_id = draft1["id"]
 
     thesis_ext: ThesisExt = current_app.extensions["thesis"]
     thesis_requests_service = thesis_ext.service_record_request_types
 
     allowed_request_types = (
         thesis_requests_service.get_applicable_request_types_for_draft_record(
-            creator.identity, draft1.json["id"]
+            creator.identity, draft1_id
         )
     )
     assert sorted(
@@ -37,7 +38,7 @@ def test_allowed_request_types_on_draft_service(
         {
             "links": {
                 "actions": {
-                    "create": f'https://127.0.0.1:5000/api/thesis/{draft1.json["id"]}/draft/requests/delete_draft'
+                    "create": f'https://127.0.0.1:5000/api/thesis/{draft1_id}/draft/requests/delete_draft'
                 }
             },
             "type_id": "delete_draft",
@@ -45,7 +46,7 @@ def test_allowed_request_types_on_draft_service(
         {
             "links": {
                 "actions": {
-                    "create": f'https://127.0.0.1:5000/api/thesis/{draft1.json["id"]}/draft/requests/publish_draft'
+                    "create": f'https://127.0.0.1:5000/api/thesis/{draft1_id}/draft/requests/publish_draft'
                 }
             },
             "type_id": "publish_draft",
@@ -64,11 +65,12 @@ def test_allowed_request_types_on_draft_resource(
     creator_client = logged_client(creator)
 
     draft1 = draft_factory(creator_client)
+    draft1_id = draft1["id"]
 
     applicable_requests_link = draft1.json["links"]["applicable-requests"]
     assert (
         applicable_requests_link
-        == f'https://127.0.0.1:5000/api/thesis/{draft1.json["id"]}/draft/requests/applicable'
+        == f'https://127.0.0.1:5000/api/thesis/{draft1_id}/draft/requests/applicable'
     )
     allowed_request_types = creator_client.get(
         link2testclient(applicable_requests_link)
@@ -79,7 +81,7 @@ def test_allowed_request_types_on_draft_resource(
         {
             "links": {
                 "actions": {
-                    "create": f'https://127.0.0.1:5000/api/thesis/{draft1.json["id"]}/draft/requests/delete_draft'
+                    "create": f'https://127.0.0.1:5000/api/thesis/{draft1_id}/draft/requests/delete_draft'
                 }
             },
             "type_id": "delete_draft",
@@ -87,7 +89,7 @@ def test_allowed_request_types_on_draft_resource(
         {
             "links": {
                 "actions": {
-                    "create": f'https://127.0.0.1:5000/api/thesis/{draft1.json["id"]}/draft/requests/publish_draft'
+                    "create": f'https://127.0.0.1:5000/api/thesis/{draft1_id}/draft/requests/publish_draft'
                 }
             },
             "type_id": "publish_draft",
@@ -98,7 +100,7 @@ def test_allowed_request_types_on_draft_resource(
 def publish_record(
     creator_client, urls, submit_request_by_link, draft1, receiver_client
 ):
-    id_ = draft1.json["id"]
+    id_ = draft1["id"]
     submit_request_by_link(creator_client, draft1, "publish_draft")
     record = receiver_client.get(f"{urls['BASE_URL']}{id_}/draft?expand=true")
     assert record.json["expanded"]["requests"][0]["links"]["actions"].keys() == {
@@ -130,11 +132,12 @@ def test_allowed_request_types_on_published_resource(
     published1 = publish_record(
         creator_client, urls, submit_request_by_link, draft1, receiver_client
     )
+    published1_id = published1["id"]
 
     applicable_requests_link = published1["links"]["applicable-requests"]
     assert (
         applicable_requests_link
-        == f'https://127.0.0.1:5000/api/thesis/{published1["id"]}/requests/applicable'
+        == f'https://127.0.0.1:5000/api/thesis/{published1_id}/requests/applicable'
     )
     allowed_request_types = creator_client.get(
         link2testclient(applicable_requests_link)
@@ -146,7 +149,7 @@ def test_allowed_request_types_on_published_resource(
         {
             "links": {
                 "actions": {
-                    "create": f'https://127.0.0.1:5000/api/thesis/{published1["id"]}/requests/delete_published_record'
+                    "create": f'https://127.0.0.1:5000/api/thesis/{published1_id}/requests/delete_published_record'
                 }
             },
             "type_id": "delete_published_record",
@@ -154,7 +157,7 @@ def test_allowed_request_types_on_published_resource(
         {
             "links": {
                 "actions": {
-                    "create": f'https://127.0.0.1:5000/api/thesis/{published1["id"]}/requests/edit_published_record'
+                    "create": f'https://127.0.0.1:5000/api/thesis/{published1_id}/requests/edit_published_record'
                 }
             },
             "type_id": "edit_published_record",
@@ -162,7 +165,7 @@ def test_allowed_request_types_on_published_resource(
         {
             "links": {
                 "actions": {
-                    "create": f'https://127.0.0.1:5000/api/thesis/{published1["id"]}/requests/new_version'
+                    "create": f'https://127.0.0.1:5000/api/thesis/{published1_id}/requests/new_version'
                 }
             },
             "type_id": "new_version",
@@ -193,10 +196,10 @@ def test_ui_serialization(
         draft_to_publish,
         receiver_client,
     )
-    draft_id = draft1.json["id"]
+    draft_id = draft1["id"]
     published_id = published1["id"]
 
-    applicable_requests_link_draft = draft1.json["links"]["applicable-requests"]
+    applicable_requests_link_draft = draft1["links"]["applicable-requests"]
     applicable_requests_link_published = published1["links"]["applicable-requests"]
 
     allowed_request_types_draft = creator_client.get(

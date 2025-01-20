@@ -61,6 +61,9 @@ pytest_plugins = [
     "pytest_oarepo.users",
 ]
 
+@pytest.fixture()
+def record_service():
+    return current_service
 
 @pytest.fixture(scope="module", autouse=True)
 def location(location):
