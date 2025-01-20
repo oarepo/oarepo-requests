@@ -23,11 +23,9 @@ if (recordRequestsAppDiv) {
       e?.response?.data?.errors
     ) {
       let errorsObj = {};
-      console.log(e?.response?.data?.errors);
       for (const error of e.response.data.errors) {
         errorsObj = setIn(errorsObj, error.field, error.messages.join(" "));
       }
-      console.log(errorsObj);
       formik?.setErrors(errorsObj);
     } else if (e?.response?.data?.errors) {
       const errorData = e.response.data;
