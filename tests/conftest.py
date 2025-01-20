@@ -59,6 +59,7 @@ pytest_plugins = [
     "pytest_oarepo.records",
     "pytest_oarepo.fixtures",
     "pytest_oarepo.users",
+    "pytest_oarepo.files"
 ]
 
 @pytest.fixture()
@@ -450,19 +451,19 @@ def check_publish_topic_update():
     def _check_publish_topic_update(
         creator_client, urls, record, before_update_response
     ):
-        request_id = before_update_response.json["id"]
-        record_id = record.json["id"]
+        request_id = before_update_response["id"]
+        record_id = record["id"]
 
         after_update_response = creator_client.get(
             f"{urls['BASE_URL_REQUESTS']}{request_id}"
-        )
+        ).json
         RequestEvent.index.refresh()
         events = creator_client.get(
             f"{urls['BASE_URL_REQUESTS']}extended/{request_id}/timeline"
         ).json["hits"]["hits"]
 
-        assert before_update_response.json["topic"] == {"thesis_draft": record_id}
-        assert after_update_response.json["topic"] == {"thesis": record_id}
+        assert before_update_response["topic"] == {"thesis_draft": record_id}
+        assert after_update_response["topic"] == {"thesis": record_id}
 
         topic_updated_events = [
             e for e in events if e["type"] == TopicUpdateEventType.type_id

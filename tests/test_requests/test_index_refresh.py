@@ -12,17 +12,17 @@ def test_search(
     logged_client,
     users,
     urls,
-    create_request_by_link,
+    create_request_on_draft,
     draft_factory,
     search_clear,
 ):
     creator = users[0]
     creator_client = logged_client(creator)
 
-    draft1 = draft_factory(creator_client)
+    draft1 = draft_factory(creator.identity)
 
-    resp_request_create = create_request_by_link(
-        creator_client, draft1, "publish_draft"
+    resp_request_create = create_request_on_draft(
+        creator.identity, draft1["id"], "publish_draft"
     )
     # should work without refreshing requests index
     requests_search = creator_client.get(urls["BASE_URL_REQUESTS"]).json

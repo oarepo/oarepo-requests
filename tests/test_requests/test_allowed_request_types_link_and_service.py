@@ -11,17 +11,13 @@ from thesis.ext import ThesisExt
 
 
 def test_allowed_request_types_on_draft_service(
-    logged_client,
     users,
-    urls,
     draft_factory,
     search_clear,
 ):
-    creator = users[0]
-    receiver = users[1]
-    creator_client = logged_client(creator)
+    identity = users[0].identity
 
-    draft1 = draft_factory(creator_client)
+    draft1 = draft_factory(identity)
     draft1_id = draft1["id"]
 
     thesis_ext: ThesisExt = current_app.extensions["thesis"]
@@ -29,7 +25,7 @@ def test_allowed_request_types_on_draft_service(
 
     allowed_request_types = (
         thesis_requests_service.get_applicable_request_types_for_draft_record(
-            creator.identity, draft1_id
+            identity, draft1_id
         )
     )
     assert sorted(
@@ -57,17 +53,16 @@ def test_allowed_request_types_on_draft_service(
 def test_allowed_request_types_on_draft_resource(
     logged_client,
     users,
-    urls,
     draft_factory,
     search_clear,
 ):
     creator = users[0]
     creator_client = logged_client(creator)
 
-    draft1 = draft_factory(creator_client)
+    draft1 = draft_factory(creator.identity)
     draft1_id = draft1["id"]
 
-    applicable_requests_link = draft1.json["links"]["applicable-requests"]
+    applicable_requests_link = draft1["links"]["applicable-requests"]
     assert (
         applicable_requests_link
         == f'https://127.0.0.1:5000/api/thesis/{draft1_id}/draft/requests/applicable'
@@ -96,42 +91,17 @@ def test_allowed_request_types_on_draft_resource(
         },
     ]
 
-
-def publish_record(
-    creator_client, urls, submit_request_by_link, draft1, receiver_client
-):
-    id_ = draft1["id"]
-    submit_request_by_link(creator_client, draft1, "publish_draft")
-    record = receiver_client.get(f"{urls['BASE_URL']}{id_}/draft?expand=true")
-    assert record.json["expanded"]["requests"][0]["links"]["actions"].keys() == {
-        "accept",
-        "decline",
-    }
-    publish = receiver_client.post(
-        link2testclient(
-            record.json["expanded"]["requests"][0]["links"]["actions"]["accept"]
-        ),
-    )
-    return creator_client.get(f"{urls['BASE_URL']}{id_}?expand=true").json
-
-
 def test_allowed_request_types_on_published_resource(
     logged_client,
     users,
-    urls,
-    draft_factory,
-    submit_request_by_link,
+    record_factory,
     search_clear,
 ):
     creator = users[0]
     receiver = users[1]
     creator_client = logged_client(creator)
-    receiver_client = logged_client(receiver)
 
-    draft1 = draft_factory(creator_client)
-    published1 = publish_record(
-        creator_client, urls, submit_request_by_link, draft1, receiver_client
-    )
+    published1 = record_factory(creator.identity)
     published1_id = published1["id"]
 
     applicable_requests_link = published1["links"]["applicable-requests"]
@@ -176,26 +146,16 @@ def test_allowed_request_types_on_published_resource(
 def test_ui_serialization(
     logged_client,
     users,
-    urls,
-    submit_request_by_link,
     draft_factory,
+    record_factory,
     search_clear,
 ):
     creator = users[0]
-    receiver = users[1]
     creator_client = logged_client(creator)
-    receiver_client = logged_client(receiver)
 
-    draft1 = draft_factory(creator_client)
+    draft1 = draft_factory(creator.identity)
+    published1 = record_factory(creator.identity)
 
-    draft_to_publish = draft_factory(creator_client)
-    published1 = publish_record(
-        creator_client,
-        urls,
-        submit_request_by_link,
-        draft_to_publish,
-        receiver_client,
-    )
     draft_id = draft1["id"]
     published_id = published1["id"]
 

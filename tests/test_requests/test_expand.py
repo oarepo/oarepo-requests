@@ -13,7 +13,7 @@ def test_requests_field(
     users,
     urls,
     draft_factory,
-    create_request_by_link,
+    create_request_on_draft,
     search_clear,
 ):
     creator = users[0]
@@ -21,18 +21,18 @@ def test_requests_field(
     creator_client = logged_client(creator)
     receiver_client = logged_client(receiver)
 
-    draft1 = draft_factory(creator_client)
+    draft1 = draft_factory(creator.identity)
+    draft1_id = draft1["id"]
 
-    resp_request_create = create_request_by_link(
-        creator_client, draft1, "publish_draft"
+    resp_request_create = create_request_on_draft(
+        creator.identity, draft1_id, "publish_draft"
     )
-    assert resp_request_create.status_code == 201
     resp_request_submit = creator_client.post(
-        link2testclient(resp_request_create.json["links"]["actions"]["submit"]),
+        link2testclient(resp_request_create["links"]["actions"]["submit"]),
     )
-    record = receiver_client.get(f"{urls['BASE_URL']}{draft1.json['id']}/draft")
+    record = receiver_client.get(f"{urls['BASE_URL']}{draft1_id}/draft")
     expanded_record = receiver_client.get(
-        f"{urls['BASE_URL']}{draft1.json['id']}/draft?expand=true"
+        f"{urls['BASE_URL']}{draft1_id}/draft?expand=true"
     )
 
     assert "requests" not in record.json.get("expanded", {})
@@ -43,18 +43,18 @@ def test_autoaccept_receiver(
     logged_client,
     users,
     urls,
-    submit_request_by_link,
+    create_request_on_record,
     record_factory,
     search_clear,
 ):
     creator = users[0]
     creator_client = logged_client(creator)
 
-    record1 = record_factory(creator_client)
-    resp_request_submit = submit_request_by_link(
-        creator_client, record1, "edit_published_record"
+    record1 = record_factory(creator.identity)
+    resp_request_submit = create_request_on_record(
+        creator.identity, record1["id"], "edit_published_record"
     )
     request = creator_client.get(
-        f'{urls["BASE_URL_REQUESTS"]}{resp_request_submit.json["id"]}?expand=true'
+        f'{urls["BASE_URL_REQUESTS"]}{resp_request_submit["id"]}?expand=true'
     ).json
     assert request["expanded"]["receiver"] == {"auto_approve": "true"}

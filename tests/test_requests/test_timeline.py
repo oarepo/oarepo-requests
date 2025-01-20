@@ -14,35 +14,36 @@ def test_timeline(
     users,
     urls,
     draft_factory,
-    submit_request_by_link,
+    submit_request_on_draft,
     user_links,
     search_clear,
 ):
     creator = users[0]
     creator_client = logged_client(creator)
 
-    draft1 = draft_factory(creator_client)
+    draft1 = draft_factory(creator.identity)
+    draft1_id = draft1["id"]
 
-    publish_request_submit_resp = submit_request_by_link(
-        creator_client, draft1, "publish_draft"
+    publish_request_submit_resp = submit_request_on_draft(
+        creator.identity, draft1_id, "publish_draft"
     )
 
     comment_resp = creator_client.post(
-        link2testclient(publish_request_submit_resp.json["links"]["comments"]),
+        link2testclient(publish_request_submit_resp["links"]["comments"]),
         json={"payload": {"content": "test"}},
     )
     assert comment_resp.status_code == 201
     RequestEvent.index.refresh()
 
     timeline_resp = creator_client.get(
-        link2testclient(publish_request_submit_resp.json["links"]["timeline"]),
+        link2testclient(publish_request_submit_resp["links"]["timeline"]),
     )
     assert timeline_resp.status_code == 200
     assert len(timeline_resp.json["hits"]["hits"]) == 1
 
     # vnd serialization
     timeline_resp = creator_client.get(
-        link2testclient(publish_request_submit_resp.json["links"]["timeline"]),
+        link2testclient(publish_request_submit_resp["links"]["timeline"]),
         headers={"Accept": "application/vnd.inveniordm.v1+json"},
     )
     assert timeline_resp.status_code == 200
