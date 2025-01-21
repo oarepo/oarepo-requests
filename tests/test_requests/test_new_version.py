@@ -138,14 +138,14 @@ def test_redirect_url(
     new_draft = [
         x
         for x in draft_search
-        if x["parent"]["id"] == record1.json["parent"]["id"] and x["state"] == "draft"
+        if x["parent"]["id"] == record1["parent"]["id"] and x["state"] == "draft"
     ][0]
     assert (
         link2testclient(request["links"]["ui_redirect_url"], ui=True)
         == f"/thesis/{new_draft['id']}/edit"
     )
 
-    new_draft = creator_client.get(f"{urls['BASE_URL']}{new_draft['id']}/draft")
+    new_draft = creator_client.get(f"{urls['BASE_URL']}{new_draft['id']}/draft").json
     publish_request = submit_request_on_draft(creator.identity, new_draft['id'], "publish_draft")
     receiver_request = receiver_client.get(
         f"{urls['BASE_URL_REQUESTS']}{publish_request['id']}"

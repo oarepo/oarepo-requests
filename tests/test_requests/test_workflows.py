@@ -68,7 +68,7 @@ def test_publish_with_workflows(
     users,
     urls,
     draft_factory,
-    create_request_on_record,
+    create_request_on_draft,
     patch_requests_permissions,
     record_service,
     search_clear,
@@ -88,7 +88,7 @@ def test_publish_with_workflows(
     create_non_owner = receiver_client.post(
         f"{urls['BASE_URL']}{draft1_id}/draft/requests/publish_draft",
     )
-    resp_request_create = create_request_on_record(
+    resp_request_create = create_request_on_draft(
         creator.identity, draft1_id, "publish_draft"
     )
     assert create_non_owner.status_code == 403
@@ -143,7 +143,7 @@ def test_autorequest(
     receiver_client = logged_client(receiver)
 
     draft1 = draft_factory(creator.identity, custom_workflow="with_approve")
-    record_id = draft1.json["id"]
+    record_id = draft1["id"]
 
     approve_request_data = {
         "request_type": "approve_draft",
@@ -190,11 +190,11 @@ def test_if_no_new_version_draft(
     record = record_factory(creator.identity)
     record2 = record_factory(creator.identity)
     record_id = record["id"]
-    record2_id = record["id"]
+    record2_id = record2["id"]
 
     record = creator_client.get(
         f"{urls['BASE_URL']}{record_id}?expand=true",
-    )
+    ).json
     requests = record["expanded"]["request_types"]
     assert "new_version" in {r["type_id"] for r in requests}
 
@@ -206,11 +206,12 @@ def test_if_no_new_version_draft(
     assert request["status"] == "accepted"
     record = creator_client.get(
         f"{urls['BASE_URL']}{record_id}?expand=true",
-    )
+    ).json
     requests = record["expanded"]["request_types"]
     assert "new_version" not in {
         r["type_id"] for r in requests
     }  # new version created, requests should not be available again
+
     resp_request_submit = submit_request_on_record(
         creator.identity, record2_id, "edit_published_record"
     )
@@ -218,13 +219,14 @@ def test_if_no_new_version_draft(
         f'{urls["BASE_URL_REQUESTS"]}{resp_request_submit["id"]}',
     ).json  # request is autoaccepted
     assert request["status"] == "accepted"
+
     record = creator_client.get(
         f"{urls['BASE_URL']}{record2_id}?expand=true",
-    )
+    ).json
     requests = record["expanded"]["request_types"]
     assert "new_version" in {
         r["type_id"] for r in requests
-    }  # new version created, requests should not be available again
+    }
 
 
 def test_if_no_edit_draft(
@@ -241,8 +243,8 @@ def test_if_no_edit_draft(
 
     record = record_factory(creator.identity)
     record2 = record_factory(creator.identity)
-    id_ = record.json["id"]
-    id2_ = record2.json["id"]
+    id_ = record["id"]
+    id2_ = record2["id"]
 
     record = creator_client.get(
         f"{urls['BASE_URL']}{id_}?expand=true",
@@ -303,7 +305,7 @@ def test_workflow_events(
     user1_client = logged_client(user1)
     user2_client = logged_client(user2)
 
-    draft1 = draft_factory(user1_client, custom_workflow="with_approve")
+    draft1 = draft_factory(user1.identity, custom_workflow="with_approve")
     record_id = draft1["id"]
 
     resp_request_submit = submit_request_on_draft(user1.identity, record_id, "approve_draft")
@@ -341,7 +343,7 @@ def test_workflow_events(
     assert publishing_record["state"] == "publishing"
 
     read_from_record = user2_client.get(
-        f"{urls['BASE_URL']}{draft1.json['id']}/draft?expand=true",
+        f"{urls['BASE_URL']}{record_id}/draft?expand=true",
     )
     publish_request = [
         request
@@ -386,8 +388,8 @@ def test_workflow_events_resource(
     user1_client = logged_client(user1)
     user2_client = logged_client(user2)
 
-    draft1 = draft_factory(user1_client, custom_workflow="with_approve")
-    record_id = draft1.json["id"]
+    draft1 = draft_factory(user1.identity, custom_workflow="with_approve")
+    record_id = draft1["id"]
 
     resp_request_submit = submit_request_on_draft(user1.identity, record_id, "approve_draft")
 
@@ -422,7 +424,7 @@ def test_workflow_events_resource(
     assert publishing_record["state"] == "publishing"
 
     read_from_record = user2_client.get(
-        f"{urls['BASE_URL']}{draft1.json['id']}/draft?expand=true",
+        f"{urls['BASE_URL']}{record_id}/draft?expand=true",
     )
     publish_request = [
         request
@@ -458,7 +460,7 @@ def test_delete_log(
     receiver_client = logged_client(receiver)
 
     record = record_factory(creator.identity)
-    record_id = record.json["id"]
+    record_id = record["id"]
 
     record_response = creator_client.get(
         f"{urls['BASE_URL']}{record_id}?expand=true",
@@ -530,6 +532,6 @@ def test_cancel_transition(
     )
 
     record = creator_client.get(
-        f"{urls['BASE_URL']}{draft1.json['id']}/draft?expand=true"
+        f"{urls['BASE_URL']}{draft_id}/draft?expand=true"
     )
     assert record.json["state"] == "draft"

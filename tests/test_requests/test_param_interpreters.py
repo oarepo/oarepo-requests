@@ -21,10 +21,10 @@ def _init(users, logged_client, draft_factory, submit_request, urls):
     draft2 = draft_factory(user2.identity, custom_workflow="different_recipients")
 
     submit_response_user1 = submit_request(
-        user1_client, draft1, "publish_draft"
+        user1.identity, draft1["id"], "publish_draft"
     )  # recipient should be 2
     submit_response_user2 = submit_request(
-        user2_client, draft2, "another_topic_updating"
+        user2.identity, draft2["id"], "another_topic_updating"
     )  # should be 1
 
     search_unfiltered = user2_client.get(urls["BASE_URL_REQUESTS"])

@@ -85,7 +85,7 @@ def test_read_requests_on_record(
     ThesisRecord.index.refresh()
     ThesisDraft.index.refresh()
     resp_request_submit = submit_request_on_record(
-        creator.identity, record1, "delete_published_record"
+        creator.identity, record1_id, "delete_published_record"
     )
     record = receiver_client.get(f"{urls['BASE_URL']}{record1_id}?expand=true")
     decline = receiver_client.post(

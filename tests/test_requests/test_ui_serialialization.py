@@ -22,12 +22,12 @@ def test_user_serialization(
     draft_factory,
     logged_client,
     user_links,
-    create_request_on_record,
+    create_request_on_draft,
     search_clear,
 ):
-    fallback_label = logged_client(users[0])
-    username_label = logged_client(users[1])
-    fullname_label = logged_client(users[2])
+    fallback_label = users[0]
+    username_label = users[1]
+    fullname_label = users[2]
 
     fallback_label_client = logged_client(users[0])
     username_label_client = logged_client(users[1])
@@ -44,23 +44,22 @@ def test_user_serialization(
     ThesisRecord.index.refresh()
     ThesisDraft.index.refresh()
 
-    resp_request_create = create_request_on_record(
+    resp_request_create = create_request_on_draft(
         fallback_label.identity,
         draft1_id,
-        "publish_draft",
-        headers={"Accept": "application/vnd.inveniordm.v1+json"},
+        "publish_draft"
     )
-    resp_request_create_username = create_request_on_record(
+    resp_request_create = fallback_label_client.get(f"{urls['BASE_URL_REQUESTS']}{resp_request_create['id']}",
+                                                   headers={"Accept": "application/vnd.inveniordm.v1+json"}).json
+    resp_request_create_username = create_request_on_draft(
         username_label.identity,
         draft2_id,
         "publish_draft",
-        headers={"Accept": "application/vnd.inveniordm.v1+json"},
     )
-    resp_request_create_fullname = create_request_on_record(
+    resp_request_create_fullname = create_request_on_draft(
         fullname_label.identity,
         draft3_id,
         "publish_draft",
-        headers={"Accept": "application/vnd.inveniordm.v1+json"},
     )
 
     pprint(resp_request_create)
@@ -119,7 +118,7 @@ def test_user_serialization(
         headers={"Accept": "application/vnd.inveniordm.v1+json"},
     ).json
     ui_record_fullname = fullname_label_client.get(
-        f"{urls['BASE_URL']}{draft3._id}/draft?expand=true",
+        f"{urls['BASE_URL']}{draft3_id}/draft?expand=true",
         headers={"Accept": "application/vnd.inveniordm.v1+json"},
     ).json
 
@@ -140,7 +139,7 @@ def test_resolver_fallback(
     urls,
     ui_serialization_result,
     draft_factory,
-    create_request_on_record,
+    create_request_on_draft,
     logged_client,
     search_clear,
 ):
@@ -153,29 +152,32 @@ def test_resolver_fallback(
         creator_client = logged_client(creator)
 
         draft1 = draft_factory(creator.identity)
-        draft_id = draft1.json["id"]
+        draft_id = draft1["id"]
         ThesisRecord.index.refresh()
         ThesisDraft.index.refresh()
 
-        resp_request_create = create_request_on_record(
+        resp_request_create = create_request_on_draft(
             creator.identity,
             draft_id,
-            "publish_draft",
-            headers={"Accept": "application/vnd.inveniordm.v1+json"},
+            "publish_draft"
         )
-        assert resp_request_create["stateful_name"] == "Submit for review"
+        request_id = resp_request_create['id']
+        ui_serialization_read = creator_client.get(f"{urls['BASE_URL_REQUESTS']}{request_id}",
+                                                   headers={"Accept": "application/vnd.inveniordm.v1+json"}).json
+        assert ui_serialization_read["stateful_name"] == "Submit for review"
         assert (
-            resp_request_create["stateful_description"]
+            ui_serialization_read["stateful_description"]
             == "Submit for review. After submitting the draft for review, it will be locked and no further modifications will be possible."
         )
 
         resp_request_submit = creator_client.post(
-            link2testclient(resp_request_create["links"]["actions"]["submit"]),
-            headers={"Accept": "application/vnd.inveniordm.v1+json"},
+            link2testclient(resp_request_create["links"]["actions"]["submit"])
         )
-        assert resp_request_submit.json["stateful_name"] == "Submitted for review"
+        ui_serialization_read_submitted = creator_client.get(f"{urls['BASE_URL_REQUESTS']}{request_id}",
+                                                   headers={"Accept": "application/vnd.inveniordm.v1+json"}).json
+        assert ui_serialization_read_submitted["stateful_name"] == "Submitted for review"
         assert (
-            resp_request_submit.json["stateful_description"]
+            ui_serialization_read_submitted["stateful_description"]
             == "The draft has been submitted for review. It is now locked and no further changes are possible. You will be notified about the decision by email."
         )
 
@@ -221,7 +223,7 @@ def test_role(
     users,
     role,
     urls,
-    create_request_on_record,
+    create_request_on_draft,
     logged_client,
     role_ui_serialization,
     draft_factory,
@@ -241,19 +243,21 @@ def test_role(
         creator_client = logged_client(creator)
 
         draft1 = draft_factory(creator.identity)
-        draft_id = draft1.json["id"]
+        draft_id = draft1["id"]
         ThesisRecord.index.refresh()
         ThesisDraft.index.refresh()
 
-        resp_request_create = create_request_on_record(
+        resp_request_create = create_request_on_draft(
             creator.identity,
             draft_id,
             "publish_draft",
             headers={"Accept": "application/vnd.inveniordm.v1+json"},
         )
-        assert resp_request_create["stateful_name"] == "Submit for review"
+        ui_serialization_read = creator_client.get(f"{urls['BASE_URL_REQUESTS']}{resp_request_create['id']}",
+                                                   headers={"Accept": "application/vnd.inveniordm.v1+json"}).json
+        assert ui_serialization_read["stateful_name"] == "Submit for review"
         assert (
-            resp_request_create["stateful_description"]
+            ui_serialization_read["stateful_description"]
             == "Submit for review. After submitting the draft for review, it will be locked and no further modifications will be possible."
         )
 
