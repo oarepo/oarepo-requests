@@ -5,7 +5,7 @@
 # modify it under the terms of the MIT License; see LICENSE file for more
 # details.
 #
-from pytest_oarepo.functions import link2testclient
+
 from thesis.records.api import ThesisRecord
 
 
@@ -16,6 +16,7 @@ def test_record(
     users,
     urls,
     create_request_on_record,
+    link2testclient,
     search_clear,
 ):
     creator = users[0]
@@ -49,6 +50,7 @@ def test_draft(
     urls,
     draft_factory,
     create_request_on_draft,
+    link2testclient,
     search_clear,
 ):
     creator = users[0]

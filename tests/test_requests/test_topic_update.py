@@ -6,7 +6,6 @@
 # details.
 #
 
-from pytest_oarepo.functions import link2testclient
 
 
 def test_publish(
@@ -16,6 +15,7 @@ def test_publish(
     draft_factory,
     check_publish_topic_update,
     submit_request_on_draft,
+    link2testclient,
     search_clear,
 ):
     creator = users[0]

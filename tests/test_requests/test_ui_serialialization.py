@@ -9,7 +9,6 @@ import copy
 from pprint import pprint
 
 from deepdiff import DeepDiff
-from pytest_oarepo.functions import link2testclient
 from thesis.records.api import ThesisDraft, ThesisRecord
 
 from oarepo_requests.resolvers.ui import FallbackEntityReferenceUIResolver
@@ -23,6 +22,7 @@ def test_user_serialization(
     logged_client,
     user_links,
     create_request_on_draft,
+    link2testclient,
     search_clear,
 ):
     fallback_label = users[0]
@@ -141,6 +141,7 @@ def test_resolver_fallback(
     draft_factory,
     create_request_on_draft,
     logged_client,
+    link2testclient,
     search_clear,
 ):
     config_restore = copy.deepcopy(app.config["ENTITY_REFERENCE_UI_RESOLVERS"])

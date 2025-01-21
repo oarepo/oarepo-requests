@@ -5,7 +5,6 @@
 # modify it under the terms of the MIT License; see LICENSE file for more
 # details.
 #
-from pytest_oarepo.functions import link2testclient
 from thesis.records.api import ThesisDraft, ThesisRecord
 
 
@@ -64,6 +63,7 @@ def test_redirect_url(
     submit_request_on_record,
     submit_request_on_draft,
     record_factory,
+    link2testclient,
     search_clear,
 ):
     creator = users[0]

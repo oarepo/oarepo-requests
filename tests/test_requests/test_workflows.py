@@ -11,7 +11,6 @@ from invenio_records_resources.services.errors import PermissionDeniedError
 from invenio_records_resources.services.uow import RecordCommitOp, unit_of_work
 from invenio_requests.customizations.event_types import LogEventType
 from invenio_requests.records.api import RequestEvent
-from pytest_oarepo.functions import link2testclient
 from thesis.records.api import ThesisDraft, ThesisRecord
 
 from oarepo_requests.services.permissions.workflow_policies import (
@@ -71,6 +70,7 @@ def test_publish_with_workflows(
     create_request_on_draft,
     patch_requests_permissions,
     record_service,
+    link2testclient,
     search_clear,
 ):
     creator = users[0]
@@ -134,6 +134,7 @@ def test_autorequest(
     patch_requests_permissions,
     record_service,
     draft_factory,
+    link2testclient,
     search_clear,
 ):
     creator = users[0]
@@ -297,6 +298,7 @@ def test_workflow_events(
     events_resource_data,
     draft_factory,
     events_service,
+    link2testclient,
     search_clear,
 ):
     user1 = users[0]
@@ -380,6 +382,7 @@ def test_workflow_events_resource(
     events_resource_data,
     draft_factory,
     events_service,
+    link2testclient,
     search_clear,
 ):
     user1 = users[0]
@@ -452,6 +455,7 @@ def test_delete_log(
     urls,
     submit_request_on_record,
     record_factory,
+    link2testclient,
     search_clear,
 ):
     creator = users[0]
@@ -508,6 +512,7 @@ def test_cancel_transition(
     urls,
     submit_request_on_draft,
     draft_factory,
+    link2testclient,
     search_clear,
 ):
     creator = users[0]

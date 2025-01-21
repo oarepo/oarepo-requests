@@ -6,7 +6,6 @@
 # details.
 #
 from invenio_requests.records.api import RequestEvent
-from pytest_oarepo.functions import link2testclient
 
 from oarepo_requests.types.events import TopicDeleteEventType
 
@@ -19,6 +18,7 @@ def test_cascade_update(
     check_publish_topic_update,
     create_request_on_draft,
     submit_request_on_draft,
+    link2testclient,
     search_clear,
 ):
     creator = users[0]

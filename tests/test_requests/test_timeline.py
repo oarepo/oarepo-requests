@@ -6,7 +6,6 @@
 # details.
 #
 from invenio_requests.records.api import RequestEvent
-from pytest_oarepo.functions import link2testclient
 
 
 def test_timeline(
@@ -16,6 +15,7 @@ def test_timeline(
     draft_factory,
     submit_request_on_draft,
     user_links,
+    link2testclient,
     search_clear,
 ):
     creator = users[0]

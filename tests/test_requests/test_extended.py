@@ -6,7 +6,7 @@
 # details.
 #
 from invenio_requests.records.api import RequestEvent
-from pytest_oarepo.functions import is_valid_subdict, link2testclient
+from pytest_oarepo.functions import is_valid_subdict
 from thesis.records.api import ThesisDraft
 
 
@@ -83,6 +83,7 @@ def test_update_self_link(
     submit_request_on_draft,
     ui_serialization_result,
     draft_factory,
+    link2testclient,
     search_clear,
 ):
     creator = users[0]
@@ -127,6 +128,7 @@ def test_events_resource(
     ui_serialization_result,
     events_resource_data,
     draft_factory,
+    link2testclient,
     search_clear,
 ):
     creator = users[0]

@@ -7,7 +7,6 @@
 #
 import json
 
-from pytest_oarepo.functions import link2testclient
 
 
 def _init(users, logged_client, draft_factory, submit_request, urls):
@@ -89,6 +88,7 @@ def test_open_param_interpreter(
     draft_factory,
     create_request_on_draft,
     submit_request_on_draft,
+    link2testclient,
     search_clear,
 ):
     user1 = users[0]

@@ -8,7 +8,6 @@
 import json
 
 from invenio_access.permissions import system_identity
-from pytest_oarepo.functions import link2testclient
 from thesis.records.api import ThesisDraft, ThesisRecord
 
 
@@ -20,6 +19,7 @@ def test_resolve_topic(
     urls,
     submit_request_on_record,
     record_service,
+    link2testclient,
     search_clear,
 ):
     creator = users[0]
@@ -81,6 +81,7 @@ def test_ui_resolve_topic(
     urls,
     submit_request_on_record,
     record_service,
+    link2testclient,
     search_clear,
 ):
     creator = users[0]

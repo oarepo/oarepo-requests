@@ -6,7 +6,6 @@
 # details.
 #
 import pytest
-from pytest_oarepo.functions import link2testclient
 
 from oarepo_requests.errors import OpenRequestAlreadyExists
 
@@ -16,6 +15,7 @@ def test_can_create(
     users,
     urls,
     draft_factory,
+    link2testclient,
     search_clear,
 ):
     creator = users[0]
@@ -83,6 +83,7 @@ def test_can_possibly_create(
     users,
     urls,
     draft_factory,
+    link2testclient,
     search_clear,
 ):
     creator = users[0]

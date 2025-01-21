@@ -5,7 +5,7 @@
 # modify it under the terms of the MIT License; see LICENSE file for more
 # details.
 #
-from pytest_oarepo.functions import link2testclient
+
 
 
 def test_requests_field(
@@ -14,6 +14,7 @@ def test_requests_field(
     urls,
     draft_factory,
     create_request_on_draft,
+    link2testclient,
     search_clear,
 ):
     creator = users[0]

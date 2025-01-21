@@ -5,7 +5,6 @@
 # modify it under the terms of the MIT License; see LICENSE file for more
 # details.
 #
-from pytest_oarepo.functions import link2testclient
 
 
 def test_search(
@@ -14,6 +13,7 @@ def test_search(
     urls,
     create_request_on_draft,
     draft_factory,
+    link2testclient,
     search_clear,
 ):
     creator = users[0]

@@ -6,7 +6,6 @@
 # details.
 #
 from flask import current_app
-from pytest_oarepo.functions import link2testclient
 from thesis.ext import ThesisExt
 
 
@@ -54,6 +53,7 @@ def test_allowed_request_types_on_draft_resource(
     logged_client,
     users,
     draft_factory,
+    link2testclient,
     search_clear,
 ):
     creator = users[0]
@@ -95,6 +95,7 @@ def test_allowed_request_types_on_published_resource(
     logged_client,
     users,
     record_factory,
+    link2testclient,
     search_clear,
 ):
     creator = users[0]
@@ -148,6 +149,7 @@ def test_ui_serialization(
     users,
     draft_factory,
     record_factory,
+    link2testclient,
     search_clear,
 ):
     creator = users[0]
