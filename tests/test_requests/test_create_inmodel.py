@@ -71,9 +71,7 @@ def test_draft(
         f"{urls['BASE_URL']}{draft1_id}/draft?expand=true"
     ).json
     delete = receiver_client.post(
-        link2testclient(
-            record["expanded"]["requests"][0]["links"]["actions"]["accept"]
-        )
+        link2testclient(record["expanded"]["requests"][0]["links"]["actions"]["accept"])
     )
     ThesisRecord.index.refresh()
     lst = creator_client.get(urls["BASE_URL"]).json

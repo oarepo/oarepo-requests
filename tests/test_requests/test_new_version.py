@@ -28,7 +28,9 @@ def test_new_version_autoaccept(
     )
     assert new_version_direct.status_code == 403
 
-    resp_request_submit = submit_request_on_record(creator.identity, record1_id, "new_version")
+    resp_request_submit = submit_request_on_record(
+        creator.identity, record1_id, "new_version"
+    )
     # is request accepted and closed?
     request = creator_client.get(
         f'{urls["BASE_URL_REQUESTS"]}{resp_request_submit["id"]}',
@@ -123,7 +125,9 @@ def test_redirect_url(
     record1 = record_factory(creator.identity)
     record1_id = record1["id"]
 
-    resp_request_submit = submit_request_on_record(creator.identity, record1_id, "new_version")
+    resp_request_submit = submit_request_on_record(
+        creator.identity, record1_id, "new_version"
+    )
     original_request_id = resp_request_submit["id"]
     # is request accepted and closed?
 
@@ -146,7 +150,9 @@ def test_redirect_url(
     )
 
     new_draft = creator_client.get(f"{urls['BASE_URL']}{new_draft['id']}/draft").json
-    publish_request = submit_request_on_draft(creator.identity, new_draft['id'], "publish_draft")
+    publish_request = submit_request_on_draft(
+        creator.identity, new_draft["id"], "publish_draft"
+    )
     receiver_request = receiver_client.get(
         f"{urls['BASE_URL_REQUESTS']}{publish_request['id']}"
     )

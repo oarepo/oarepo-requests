@@ -108,7 +108,9 @@ def test_delete_draft(
 
     resp_request_create = creator_client.post(
         link2testclient(
-            create_request_from_link(read.json["expanded"]["request_types"], "delete_draft")
+            create_request_from_link(
+                read.json["expanded"]["request_types"], "delete_draft"
+            )
         )
     )
     resp_request_submit = creator_client.post(

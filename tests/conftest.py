@@ -59,12 +59,14 @@ pytest_plugins = [
     "pytest_oarepo.records",
     "pytest_oarepo.fixtures",
     "pytest_oarepo.users",
-    "pytest_oarepo.files"
+    "pytest_oarepo.files",
 ]
+
 
 @pytest.fixture()
 def record_service():
     return current_service
+
 
 @pytest.fixture(scope="module", autouse=True)
 def location(location):

@@ -21,9 +21,7 @@ def test_publish_service(
 
     creator = users[0]
     receiver = users[1]
-    draft = record_service.create(
-        creator.identity, default_record_with_workflow_json
-    )
+    draft = record_service.create(creator.identity, default_record_with_workflow_json)
     request = current_oarepo_requests_service.create(
         identity=creator.identity,
         data={"payload": {"version": "1.0"}},
@@ -86,9 +84,7 @@ def test_publish(
     ThesisRecord.index.refresh()
     ThesisDraft.index.refresh()
 
-    record = receiver_client.get(
-        f"{urls['BASE_URL']}{draft1_id}/draft?expand=true"
-    )
+    record = receiver_client.get(f"{urls['BASE_URL']}{draft1_id}/draft?expand=true")
     assert record.json["expanded"]["requests"][0]["links"]["actions"].keys() == {
         "accept",
         "decline",
@@ -102,9 +98,7 @@ def test_publish(
     assert "published_record:links:self" in publish.json["payload"]
     assert "published_record:links:self_html" in publish.json["payload"]
 
-    published_record = receiver_client.get(
-        f"{urls['BASE_URL']}{draft1_id}?expand=true"
-    )
+    published_record = receiver_client.get(f"{urls['BASE_URL']}{draft1_id}?expand=true")
 
     assert "version" in published_record.json["metadata"]
 
@@ -118,9 +112,7 @@ def test_publish(
     resp_request_submit = submit_request_on_draft(
         creator.identity, draft2_id, "publish_draft"
     )
-    record = receiver_client.get(
-        f"{urls['BASE_URL']}{draft2_id}/draft?expand=true"
-    )
+    record = receiver_client.get(f"{urls['BASE_URL']}{draft2_id}/draft?expand=true")
     decline = receiver_client.post(
         link2testclient(
             record.json["expanded"]["requests"][0]["links"]["actions"]["decline"]
@@ -134,9 +126,7 @@ def test_publish(
     resp_request_submit = submit_request_on_draft(
         creator.identity, draft3_id, "publish_draft"
     )
-    record = creator_client.get(
-        f"{urls['BASE_URL']}{draft3_id}/draft?expand=true"
-    )
+    record = creator_client.get(f"{urls['BASE_URL']}{draft3_id}/draft?expand=true")
     assert record.json["expanded"]["requests"][0]["links"]["actions"].keys() == {
         "cancel"
     }

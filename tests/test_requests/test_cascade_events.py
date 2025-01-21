@@ -86,7 +86,9 @@ def test_cascade_cancel(
     r2 = create_request_on_draft(creator.identity, draft1_id, "another_topic_updating")
     r3 = submit_request_on_draft(creator.identity, draft2_id, "publish_draft")
 
-    delete_request = submit_request_on_draft(creator.identity, draft1_id, "delete_draft")
+    delete_request = submit_request_on_draft(
+        creator.identity, draft1_id, "delete_draft"
+    )
 
     r1_read = receiver_client.get(f"{urls['BASE_URL_REQUESTS']}{r1['id']}").json
     r2_read = receiver_client.get(f"{urls['BASE_URL_REQUESTS']}{r2['id']}").json

@@ -102,7 +102,9 @@ def test_redirect_url(
     assert receiver_edit_accepted["links"]["ui_redirect_url"] == None
 
     draft = creator_client.get(f"{urls['BASE_URL']}{record_id}/draft").json
-    publish_request = submit_request_on_draft(creator.identity, draft["id"], "publish_draft")
+    publish_request = submit_request_on_draft(
+        creator.identity, draft["id"], "publish_draft"
+    )
     receiver_edit_request_after_publish_draft_submitted = receiver_client.get(
         f"{urls['BASE_URL_REQUESTS']}{edit_request_id}"
     ).json  # now receiver should have a right to view but not edit the topic

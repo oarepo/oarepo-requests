@@ -8,7 +8,6 @@
 import json
 
 
-
 def _init(users, logged_client, draft_factory, submit_request, urls):
     user1 = users[0]
     user2 = users[1]
@@ -110,7 +109,9 @@ def test_open_param_interpreter(
     submit_response_user2 = submit_request_on_draft(
         user1.identity, draft2_id, "publish_draft"
     )
-    create_response = create_request_on_draft(user2.identity, draft3_id, "publish_draft")
+    create_response = create_request_on_draft(
+        user2.identity, draft3_id, "publish_draft"
+    )
 
     read = user2_client.get(f'{urls["BASE_URL"]}{draft1_id}/draft?expand=true')
     publish = user2_client.post(

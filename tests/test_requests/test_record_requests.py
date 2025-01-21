@@ -35,9 +35,7 @@ def test_read_requests_on_draft(
     resp_request_submit = submit_request_on_draft(
         creator.identity, draft1_id, "publish_draft"
     )
-    record = receiver_client.get(
-        f"{urls['BASE_URL']}{draft1_id}/draft?expand=true"
-    )
+    record = receiver_client.get(f"{urls['BASE_URL']}{draft1_id}/draft?expand=true")
     decline = receiver_client.post(
         link2testclient(
             record.json["expanded"]["requests"][0]["links"]["actions"]["decline"]
@@ -47,15 +45,15 @@ def test_read_requests_on_draft(
     r2 = create_request_on_draft(creator.identity, draft1_id, "publish_draft")
     r3 = create_request_on_draft(creator.identity, draft2_id, "publish_draft")
 
-    resp1 = creator_client.get(
-        f"{urls['BASE_URL']}{draft1_id}/draft/requests"
-    ).json["hits"]["hits"]
-    resp2 = creator_client.get(
-        f"{urls['BASE_URL']}{draft2_id}/draft/requests"
-    ).json["hits"]["hits"]
-    resp3 = creator_client.get(
-        f"{urls['BASE_URL']}{draft3_id}/draft/requests"
-    ).json["hits"]["hits"]
+    resp1 = creator_client.get(f"{urls['BASE_URL']}{draft1_id}/draft/requests").json[
+        "hits"
+    ]["hits"]
+    resp2 = creator_client.get(f"{urls['BASE_URL']}{draft2_id}/draft/requests").json[
+        "hits"
+    ]["hits"]
+    resp3 = creator_client.get(f"{urls['BASE_URL']}{draft3_id}/draft/requests").json[
+        "hits"
+    ]["hits"]
 
     assert len(resp1) == 2
     assert len(resp2) == 1
@@ -94,18 +92,22 @@ def test_read_requests_on_record(
             record.json["expanded"]["requests"][0]["links"]["actions"]["decline"]
         ),
     )
-    r2 = create_request_on_record(creator.identity, record1_id, "delete_published_record")
-    r3 = create_request_on_record(creator.identity, record2_id, "delete_published_record")
+    r2 = create_request_on_record(
+        creator.identity, record1_id, "delete_published_record"
+    )
+    r3 = create_request_on_record(
+        creator.identity, record2_id, "delete_published_record"
+    )
 
-    resp1 = creator_client.get(f"{urls['BASE_URL']}{record1_id}/requests").json[
+    resp1 = creator_client.get(f"{urls['BASE_URL']}{record1_id}/requests").json["hits"][
         "hits"
-    ]["hits"]
-    resp2 = creator_client.get(f"{urls['BASE_URL']}{record2_id}/requests").json[
+    ]
+    resp2 = creator_client.get(f"{urls['BASE_URL']}{record2_id}/requests").json["hits"][
         "hits"
-    ]["hits"]
-    resp3 = creator_client.get(f"{urls['BASE_URL']}{record3_id}/requests").json[
+    ]
+    resp3 = creator_client.get(f"{urls['BASE_URL']}{record3_id}/requests").json["hits"][
         "hits"
-    ]["hits"]
+    ]
 
     assert len(resp1) == 2
     assert len(resp2) == 1

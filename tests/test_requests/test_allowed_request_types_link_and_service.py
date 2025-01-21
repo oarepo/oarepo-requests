@@ -33,7 +33,7 @@ def test_allowed_request_types_on_draft_service(
         {
             "links": {
                 "actions": {
-                    "create": f'https://127.0.0.1:5000/api/thesis/{draft1_id}/draft/requests/delete_draft'
+                    "create": f"https://127.0.0.1:5000/api/thesis/{draft1_id}/draft/requests/delete_draft"
                 }
             },
             "type_id": "delete_draft",
@@ -41,7 +41,7 @@ def test_allowed_request_types_on_draft_service(
         {
             "links": {
                 "actions": {
-                    "create": f'https://127.0.0.1:5000/api/thesis/{draft1_id}/draft/requests/publish_draft'
+                    "create": f"https://127.0.0.1:5000/api/thesis/{draft1_id}/draft/requests/publish_draft"
                 }
             },
             "type_id": "publish_draft",
@@ -65,7 +65,7 @@ def test_allowed_request_types_on_draft_resource(
     applicable_requests_link = draft1["links"]["applicable-requests"]
     assert (
         applicable_requests_link
-        == f'https://127.0.0.1:5000/api/thesis/{draft1_id}/draft/requests/applicable'
+        == f"https://127.0.0.1:5000/api/thesis/{draft1_id}/draft/requests/applicable"
     )
     allowed_request_types = creator_client.get(
         link2testclient(applicable_requests_link)
@@ -76,7 +76,7 @@ def test_allowed_request_types_on_draft_resource(
         {
             "links": {
                 "actions": {
-                    "create": f'https://127.0.0.1:5000/api/thesis/{draft1_id}/draft/requests/delete_draft'
+                    "create": f"https://127.0.0.1:5000/api/thesis/{draft1_id}/draft/requests/delete_draft"
                 }
             },
             "type_id": "delete_draft",
@@ -84,12 +84,13 @@ def test_allowed_request_types_on_draft_resource(
         {
             "links": {
                 "actions": {
-                    "create": f'https://127.0.0.1:5000/api/thesis/{draft1_id}/draft/requests/publish_draft'
+                    "create": f"https://127.0.0.1:5000/api/thesis/{draft1_id}/draft/requests/publish_draft"
                 }
             },
             "type_id": "publish_draft",
         },
     ]
+
 
 def test_allowed_request_types_on_published_resource(
     logged_client,
@@ -108,7 +109,7 @@ def test_allowed_request_types_on_published_resource(
     applicable_requests_link = published1["links"]["applicable-requests"]
     assert (
         applicable_requests_link
-        == f'https://127.0.0.1:5000/api/thesis/{published1_id}/requests/applicable'
+        == f"https://127.0.0.1:5000/api/thesis/{published1_id}/requests/applicable"
     )
     allowed_request_types = creator_client.get(
         link2testclient(applicable_requests_link)
@@ -120,7 +121,7 @@ def test_allowed_request_types_on_published_resource(
         {
             "links": {
                 "actions": {
-                    "create": f'https://127.0.0.1:5000/api/thesis/{published1_id}/requests/delete_published_record'
+                    "create": f"https://127.0.0.1:5000/api/thesis/{published1_id}/requests/delete_published_record"
                 }
             },
             "type_id": "delete_published_record",
@@ -128,7 +129,7 @@ def test_allowed_request_types_on_published_resource(
         {
             "links": {
                 "actions": {
-                    "create": f'https://127.0.0.1:5000/api/thesis/{published1_id}/requests/edit_published_record'
+                    "create": f"https://127.0.0.1:5000/api/thesis/{published1_id}/requests/edit_published_record"
                 }
             },
             "type_id": "edit_published_record",
@@ -136,7 +137,7 @@ def test_allowed_request_types_on_published_resource(
         {
             "links": {
                 "actions": {
-                    "create": f'https://127.0.0.1:5000/api/thesis/{published1_id}/requests/new_version'
+                    "create": f"https://127.0.0.1:5000/api/thesis/{published1_id}/requests/new_version"
                 }
             },
             "type_id": "new_version",

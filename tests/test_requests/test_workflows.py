@@ -199,7 +199,9 @@ def test_if_no_new_version_draft(
     requests = record["expanded"]["request_types"]
     assert "new_version" in {r["type_id"] for r in requests}
 
-    resp_request_submit = submit_request_on_record(creator.identity, record_id, "new_version")
+    resp_request_submit = submit_request_on_record(
+        creator.identity, record_id, "new_version"
+    )
 
     request = creator_client.get(
         f'{urls["BASE_URL_REQUESTS"]}{resp_request_submit["id"]}',
@@ -225,9 +227,7 @@ def test_if_no_new_version_draft(
         f"{urls['BASE_URL']}{record2_id}?expand=true",
     ).json
     requests = record["expanded"]["request_types"]
-    assert "new_version" in {
-        r["type_id"] for r in requests
-    }
+    assert "new_version" in {r["type_id"] for r in requests}
 
 
 def test_if_no_edit_draft(
@@ -271,7 +271,9 @@ def test_if_no_edit_draft(
         f"{urls['BASE_URL']}{id2_}?expand=true",
     )
     requests = record.json["expanded"]["request_types"]
-    resp_request_submit = submit_request_on_record(creator.identity, id2_, "new_version")
+    resp_request_submit = submit_request_on_record(
+        creator.identity, id2_, "new_version"
+    )
 
     request = creator_client.get(
         f'{urls["BASE_URL_REQUESTS"]}{resp_request_submit["id"]}',
@@ -310,7 +312,9 @@ def test_workflow_events(
     draft1 = draft_factory(user1.identity, custom_workflow="with_approve")
     record_id = draft1["id"]
 
-    resp_request_submit = submit_request_on_draft(user1.identity, record_id, "approve_draft")
+    resp_request_submit = submit_request_on_draft(
+        user1.identity, record_id, "approve_draft"
+    )
 
     read_from_record = user1_client.get(
         f"{urls['BASE_URL']}{record_id}/draft?expand=true",
@@ -394,7 +398,9 @@ def test_workflow_events_resource(
     draft1 = draft_factory(user1.identity, custom_workflow="with_approve")
     record_id = draft1["id"]
 
-    resp_request_submit = submit_request_on_draft(user1.identity, record_id, "approve_draft")
+    resp_request_submit = submit_request_on_draft(
+        user1.identity, record_id, "approve_draft"
+    )
 
     read_from_record = user1_client.get(
         f"{urls['BASE_URL']}{record_id}/draft?expand=true",
@@ -523,9 +529,7 @@ def test_cancel_transition(
     resp_request_submit = submit_request_on_draft(
         creator.identity, draft_id, "publish_draft"
     )
-    record = creator_client.get(
-        f"{urls['BASE_URL']}{draft_id}/draft?expand=true"
-    )
+    record = creator_client.get(f"{urls['BASE_URL']}{draft_id}/draft?expand=true")
     assert record.json["expanded"]["requests"][0]["links"]["actions"].keys() == {
         "cancel",
     }
@@ -536,7 +540,5 @@ def test_cancel_transition(
         ),
     )
 
-    record = creator_client.get(
-        f"{urls['BASE_URL']}{draft_id}/draft?expand=true"
-    )
+    record = creator_client.get(f"{urls['BASE_URL']}{draft_id}/draft?expand=true")
     assert record.json["state"] == "draft"

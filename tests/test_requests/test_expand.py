@@ -7,7 +7,6 @@
 #
 
 
-
 def test_requests_field(
     logged_client,
     users,

@@ -42,7 +42,6 @@ def test_conditional_receiver_creator_does_not_match(
     creator = users[1]
     assert creator.id != 1
 
-
     draft1 = draft_factory(creator.identity, custom_workflow="with_ct")
 
     resp_request_create = create_request_on_draft(
