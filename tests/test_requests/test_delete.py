@@ -5,7 +5,7 @@
 # modify it under the terms of the MIT License; see LICENSE file for more
 # details.
 #
-from pytest_oarepo.requests.functions import create_request_from_link
+from pytest_oarepo.requests.functions import get_request_create_link
 from thesis.records.api import ThesisDraft, ThesisRecord
 
 
@@ -108,7 +108,7 @@ def test_delete_draft(
 
     resp_request_create = creator_client.post(
         link2testclient(
-            create_request_from_link(
+            get_request_create_link(
                 read.json["expanded"]["request_types"], "delete_draft"
             )
         )
