@@ -5,9 +5,8 @@
 # modify it under the terms of the MIT License; see LICENSE file for more
 # details.
 #
-from thesis.records.api import ThesisRecord
 
-from tests.test_requests.utils import link2testclient
+from thesis.records.api import ThesisRecord
 
 
 # todo since inline is now the default way to create records, these might be redundant
@@ -16,7 +15,8 @@ def test_record(
     record_factory,
     users,
     urls,
-    create_request_by_link,
+    create_request_on_record,
+    link2testclient,
     search_clear,
 ):
     creator = users[0]
@@ -24,16 +24,16 @@ def test_record(
     creator_client = logged_client(creator)
     receiver_client = logged_client(receiver)
 
-    record1 = record_factory(creator_client)
-    resp_request_create = create_request_by_link(
-        creator_client, record1, "delete_published_record"
+    record1 = record_factory(creator.identity)
+    record1_id = record1["id"]
+    resp_request_create = create_request_on_record(
+        creator.identity, record1_id, "delete_published_record"
     )
-    assert resp_request_create.status_code == 201
     resp_request_submit = creator_client.post(
-        link2testclient(resp_request_create.json["links"]["actions"]["submit"]),
+        link2testclient(resp_request_create["links"]["actions"]["submit"]),
     )
 
-    record = receiver_client.get(f"{urls['BASE_URL']}{record1.json['id']}?expand=true")
+    record = receiver_client.get(f"{urls['BASE_URL']}{record1_id}?expand=true")
     delete = receiver_client.post(
         link2testclient(
             record.json["expanded"]["requests"][0]["links"]["actions"]["accept"]
@@ -48,8 +48,9 @@ def test_draft(
     logged_client,
     users,
     urls,
-    create_draft_via_resource,
-    create_request_by_link,
+    draft_factory,
+    create_request_on_draft,
+    link2testclient,
     search_clear,
 ):
     creator = users[0]
@@ -57,23 +58,21 @@ def test_draft(
     creator_client = logged_client(creator)
     receiver_client = logged_client(receiver)
 
-    draft1 = create_draft_via_resource(creator_client)
+    draft1 = draft_factory(creator.identity)
+    draft1_id = draft1["id"]
 
-    resp_request_create = create_request_by_link(
-        creator_client, draft1, "publish_draft"
+    resp_request_create = create_request_on_draft(
+        creator.identity, draft1_id, "publish_draft"
     )
-    assert resp_request_create.status_code == 201
     resp_request_submit = creator_client.post(
-        link2testclient(resp_request_create.json["links"]["actions"]["submit"]),
+        link2testclient(resp_request_create["links"]["actions"]["submit"]),
     )
     record = receiver_client.get(
-        f"{urls['BASE_URL']}{draft1.json['id']}/draft?expand=true"
-    )
+        f"{urls['BASE_URL']}{draft1_id}/draft?expand=true"
+    ).json
     delete = receiver_client.post(
-        link2testclient(
-            record.json["expanded"]["requests"][0]["links"]["actions"]["accept"]
-        )
+        link2testclient(record["expanded"]["requests"][0]["links"]["actions"]["accept"])
     )
     ThesisRecord.index.refresh()
-    lst = creator_client.get(urls["BASE_URL"])
-    assert len(lst.json["hits"]["hits"]) == 1
+    lst = creator_client.get(urls["BASE_URL"]).json
+    assert len(lst["hits"]["hits"]) == 1

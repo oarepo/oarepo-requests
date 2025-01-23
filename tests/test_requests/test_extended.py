@@ -6,27 +6,26 @@
 # details.
 #
 from invenio_requests.records.api import RequestEvent
+from pytest_oarepo.functions import is_valid_subdict
 from thesis.records.api import ThesisDraft
-
-from .utils import is_valid_subdict, link2testclient
 
 
 def test_listing(
     logged_client,
     users,
     urls,
-    create_request_by_link,
-    create_draft_via_resource,
+    create_request_on_draft,
+    draft_factory,
     search_clear,
 ):
     creator = users[0]
     creator_client = logged_client(creator)
 
-    draft1 = create_draft_via_resource(creator_client)
-    draft2 = create_draft_via_resource(creator_client)
+    draft1 = draft_factory(creator.identity)
+    draft2 = draft_factory(creator.identity)
 
-    create_request_by_link(creator_client, draft1, "publish_draft")
-    create_request_by_link(creator_client, draft2, "publish_draft")
+    create_request_on_draft(creator.identity, draft1["id"], "publish_draft")
+    create_request_on_draft(creator.identity, draft2["id"], "publish_draft")
 
     ThesisDraft.index.refresh()
     search = creator_client.get(
@@ -39,39 +38,39 @@ def test_read_extended(
     logged_client,
     users,
     urls,
-    submit_request_by_link,
+    submit_request_on_draft,
     serialization_result,
     ui_serialization_result,
-    create_draft_via_resource,
+    draft_factory,
     search_clear,
 ):
     creator = users[0]
     creator_client = logged_client(creator)
 
-    draft1 = create_draft_via_resource(creator_client)
-    draft_id = draft1.json["id"]
+    draft1 = draft_factory(creator.identity)
+    draft_id = draft1["id"]
 
-    resp_request_submit = submit_request_by_link(
-        creator_client, draft1, "publish_draft"
+    resp_request_submit = submit_request_on_draft(
+        creator.identity, draft_id, "publish_draft"
     )
 
     old_call = creator_client.get(
-        f"{urls['BASE_URL_REQUESTS']}{resp_request_submit.json['id']}"
+        f"{urls['BASE_URL_REQUESTS']}{resp_request_submit['id']}"
     )
     new_call = creator_client.get(
-        f"{urls['BASE_URL_REQUESTS']}extended/{resp_request_submit.json['id']}",
+        f"{urls['BASE_URL_REQUESTS']}extended/{resp_request_submit['id']}",
     )
     new_call2 = creator_client.get(
-        f"{urls['BASE_URL_REQUESTS']}extended/{resp_request_submit.json['id']}",
+        f"{urls['BASE_URL_REQUESTS']}extended/{resp_request_submit['id']}",
         headers={"Accept": "application/vnd.inveniordm.v1+json"},
     )
 
     assert is_valid_subdict(
-        serialization_result(draft_id, resp_request_submit.json["id"]),
+        serialization_result(draft_id, resp_request_submit["id"]),
         new_call.json,
     )
     assert is_valid_subdict(
-        ui_serialization_result(draft_id, resp_request_submit.json["id"]),
+        ui_serialization_result(draft_id, resp_request_submit["id"]),
         new_call2.json,
     )
 
@@ -81,25 +80,27 @@ def test_update_self_link(
     users,
     urls,
     serialization_result,
-    submit_request_by_link,
+    submit_request_on_draft,
     ui_serialization_result,
-    create_draft_via_resource,
+    draft_factory,
+    link2testclient,
     search_clear,
 ):
     creator = users[0]
     creator_client = logged_client(creator)
 
-    draft1 = create_draft_via_resource(creator_client)
+    draft1 = draft_factory(creator.identity)
+    draft1_id = draft1["id"]
 
-    resp_request_submit = submit_request_by_link(
-        creator_client, draft1, "publish_draft"
+    resp_request_submit = submit_request_on_draft(
+        creator.identity, draft1_id, "publish_draft"
     )
 
     read_before = creator_client.get(
-        link2testclient(resp_request_submit.json["links"]["self"]),
+        link2testclient(resp_request_submit["links"]["self"]),
     )
     read_from_record = creator_client.get(
-        f"{urls['BASE_URL']}{draft1.json['id']}/draft?expand=true",
+        f"{urls['BASE_URL']}{draft1_id}/draft?expand=true",
     )
     link_to_extended = link2testclient(
         read_from_record.json["expanded"]["requests"][0]["links"]["self"]
@@ -112,7 +113,7 @@ def test_update_self_link(
     )
     assert update_extended.status_code == 200
     read_after = creator_client.get(
-        link2testclient(resp_request_submit.json["links"]["self"]),
+        link2testclient(resp_request_submit["links"]["self"]),
     )
     assert read_before.json["title"] == ""
     assert read_after.json["title"] == "lalala"
@@ -122,27 +123,29 @@ def test_events_resource(
     logged_client,
     users,
     urls,
-    submit_request_by_link,
+    submit_request_on_draft,
     serialization_result,
     ui_serialization_result,
     events_resource_data,
-    create_draft_via_resource,
+    draft_factory,
+    link2testclient,
     search_clear,
 ):
     creator = users[0]
     creator_client = logged_client(creator)
-    draft1 = create_draft_via_resource(creator_client)
+    draft1 = draft_factory(creator.identity)
+    draft1_id = draft1["id"]
 
-    resp_request_submit = submit_request_by_link(
-        creator_client, draft1, "publish_draft"
+    resp_request_submit = submit_request_on_draft(
+        creator.identity, draft1_id, "publish_draft"
     )
 
     read_before = creator_client.get(
-        link2testclient(resp_request_submit.json["links"]["self"]),
+        link2testclient(resp_request_submit["links"]["self"]),
         headers={"Accept": "application/vnd.inveniordm.v1+json"},
     )
     read_from_record = creator_client.get(
-        f"{urls['BASE_URL']}{draft1.json['id']}/draft?expand=true",
+        f"{urls['BASE_URL']}{draft1_id}/draft?expand=true",
     )
 
     comments_link = link2testclient(

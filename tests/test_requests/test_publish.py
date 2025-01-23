@@ -9,10 +9,10 @@ import copy
 
 from thesis.records.api import ThesisDraft, ThesisRecord
 
-from .utils import link2testclient
 
-
-def test_publish_service(users, record_service, default_workflow_json, search_clear):
+def test_publish_service(
+    users, record_service, default_record_with_workflow_json, search_clear
+):
     from invenio_requests.proxies import (
         current_requests_service as current_invenio_requests_service,
     )
@@ -21,7 +21,7 @@ def test_publish_service(users, record_service, default_workflow_json, search_cl
 
     creator = users[0]
     receiver = users[1]
-    draft = record_service.create(creator.identity, default_workflow_json)
+    draft = record_service.create(creator.identity, default_record_with_workflow_json)
     request = current_oarepo_requests_service.create(
         identity=creator.identity,
         data={"payload": {"version": "1.0"}},
@@ -54,8 +54,9 @@ def test_publish(
     logged_client,
     users,
     urls,
-    create_draft_via_resource,
-    submit_request_by_link,
+    draft_factory,
+    submit_request_on_draft,
+    link2testclient,
     search_clear,
 ):
     creator = users[0]
@@ -64,9 +65,12 @@ def test_publish(
     creator_client = logged_client(creator)
     receiver_client = logged_client(receiver)
 
-    draft1 = create_draft_via_resource(creator_client)
-    draft2 = create_draft_via_resource(creator_client)
-    draft3 = create_draft_via_resource(creator_client)
+    draft1 = draft_factory(creator.identity)
+    draft2 = draft_factory(creator.identity)
+    draft3 = draft_factory(creator.identity)
+    draft1_id = draft1["id"]
+    draft2_id = draft2["id"]
+    draft3_id = draft3["id"]
     ThesisRecord.index.refresh()
     ThesisDraft.index.refresh()
     draft_lst = creator_client.get(f"/user{urls['BASE_URL']}")
@@ -74,15 +78,13 @@ def test_publish(
     assert len(draft_lst.json["hits"]["hits"]) == 3
     assert len(lst.json["hits"]["hits"]) == 0
 
-    resp_request_submit = submit_request_by_link(
-        creator_client, draft1, "publish_draft"
+    resp_request_submit = submit_request_on_draft(
+        creator.identity, draft1_id, "publish_draft"
     )
     ThesisRecord.index.refresh()
     ThesisDraft.index.refresh()
 
-    record = receiver_client.get(
-        f"{urls['BASE_URL']}{draft1.json['id']}/draft?expand=true"
-    )
+    record = receiver_client.get(f"{urls['BASE_URL']}{draft1_id}/draft?expand=true")
     assert record.json["expanded"]["requests"][0]["links"]["actions"].keys() == {
         "accept",
         "decline",
@@ -96,9 +98,7 @@ def test_publish(
     assert "published_record:links:self" in publish.json["payload"]
     assert "published_record:links:self_html" in publish.json["payload"]
 
-    published_record = receiver_client.get(
-        f"{urls['BASE_URL']}{draft1.json['id']}?expand=true"
-    )
+    published_record = receiver_client.get(f"{urls['BASE_URL']}{draft1_id}?expand=true")
 
     assert "version" in published_record.json["metadata"]
 
@@ -109,28 +109,24 @@ def test_publish(
     assert len(draft_lst.json["hits"]["hits"]) == 3
     assert len(lst.json["hits"]["hits"]) == 1
 
-    resp_request_submit = submit_request_by_link(
-        creator_client, draft2, "publish_draft"
+    resp_request_submit = submit_request_on_draft(
+        creator.identity, draft2_id, "publish_draft"
     )
-    record = receiver_client.get(
-        f"{urls['BASE_URL']}{draft2.json['id']}/draft?expand=true"
-    )
+    record = receiver_client.get(f"{urls['BASE_URL']}{draft2_id}/draft?expand=true")
     decline = receiver_client.post(
         link2testclient(
             record.json["expanded"]["requests"][0]["links"]["actions"]["decline"]
         ),
     )
     declined_request = creator_client.get(
-        f"{urls['BASE_URL_REQUESTS']}{resp_request_submit.json['id']}"
+        f"{urls['BASE_URL_REQUESTS']}{resp_request_submit['id']}"
     )
     assert declined_request.json["status"] == "declined"
 
-    resp_request_submit = submit_request_by_link(
-        creator_client, draft3, "publish_draft"
+    resp_request_submit = submit_request_on_draft(
+        creator.identity, draft3_id, "publish_draft"
     )
-    record = creator_client.get(
-        f"{urls['BASE_URL']}{draft3.json['id']}/draft?expand=true"
-    )
+    record = creator_client.get(f"{urls['BASE_URL']}{draft3_id}/draft?expand=true")
     assert record.json["expanded"]["requests"][0]["links"]["actions"].keys() == {
         "cancel"
     }
@@ -140,7 +136,7 @@ def test_publish(
         ),
     )
     canceled_request = logged_client(creator).get(
-        f"{urls['BASE_URL_REQUESTS']}{resp_request_submit.json['id']}"
+        f"{urls['BASE_URL_REQUESTS']}{resp_request_submit['id']}"
     )
     assert canceled_request.json["status"] == "cancelled"
 
@@ -149,8 +145,8 @@ def test_create_fails_if_draft_not_validated(
     logged_client,
     users,
     urls,
-    create_draft_via_resource,
-    default_workflow_json,
+    draft_factory,
+    default_record_with_workflow_json,
     search_clear,
 ):
     creator = users[0]
@@ -158,7 +154,7 @@ def test_create_fails_if_draft_not_validated(
 
     creator_client = logged_client(creator)
 
-    json = copy.deepcopy(default_workflow_json)
+    json = copy.deepcopy(default_record_with_workflow_json)
     del json["metadata"]["title"]
 
     draft = creator_client.post(f"{urls['BASE_URL']}?expand=true", json=json)

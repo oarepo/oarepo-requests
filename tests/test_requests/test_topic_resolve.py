@@ -10,8 +10,6 @@ import json
 from invenio_access.permissions import system_identity
 from thesis.records.api import ThesisDraft, ThesisRecord
 
-from .utils import link2testclient
-
 
 def test_resolve_topic(
     db,
@@ -19,8 +17,9 @@ def test_resolve_topic(
     record_factory,
     users,
     urls,
-    submit_request_by_link,
+    submit_request_on_record,
     record_service,
+    link2testclient,
     search_clear,
 ):
     creator = users[0]
@@ -28,22 +27,23 @@ def test_resolve_topic(
     creator_client = logged_client(creator)
     receiver_client = logged_client(receiver)
 
-    record1 = record_factory(creator_client)
+    record1 = record_factory(creator.identity)
+    record1_id = record1["id"]
     ThesisRecord.index.refresh()
     ThesisDraft.index.refresh()
 
-    resp_request_submit = submit_request_by_link(
-        creator_client, record1, "delete_published_record"
+    resp_request_submit = submit_request_on_record(
+        creator.identity, record1_id, "delete_published_record"
     )
-    assert resp_request_submit.json["status"] == "submitted"
+    assert resp_request_submit["status"] == "submitted"
 
     resp = creator_client.get(
-        link2testclient(resp_request_submit.json["links"]["self"]),
+        link2testclient(resp_request_submit["links"]["self"]),
         query_string={"expand": "true"},
     )
     assert resp.status_code == 200
     assert resp.json["expanded"]["topic"] == {
-        "id": record1.json["id"],
+        "id": record1_id,
         "metadata": {
             "contributors": ["Contributor 1"],
             "creators": ["Creator 1", "Creator 2"],
@@ -51,24 +51,24 @@ def test_resolve_topic(
         },
     }
 
-    record_service.delete(system_identity, record1.json["id"])
+    record_service.delete(system_identity, record1_id)
     ThesisRecord.index.refresh()
 
     resp = creator_client.get(
-        link2testclient(resp_request_submit.json["links"]["self"]),
+        link2testclient(resp_request_submit["links"]["self"]),
     )
     assert resp.status_code == 200
-    assert resp.json["topic"] == {"thesis": record1.json["id"]}
+    assert resp.json["topic"] == {"thesis": record1_id}
 
     resp = creator_client.get(
-        link2testclient(resp_request_submit.json["links"]["self"]),
+        link2testclient(resp_request_submit["links"]["self"]),
         query_string={"expand": "true"},
     )
     assert resp.status_code == 200
     print(json.dumps(resp.json, indent=2))
-    assert resp.json["topic"] == {"thesis": record1.json["id"]}
+    assert resp.json["topic"] == {"thesis": record1_id}
     assert resp.json["expanded"]["topic"] == {
-        "id": record1.json["id"],
+        "id": record1_id,
         "metadata": {"title": "Deleted record"},
     }
 
@@ -79,8 +79,9 @@ def test_ui_resolve_topic(
     record_factory,
     users,
     urls,
-    submit_request_by_link,
+    submit_request_on_record,
     record_service,
+    link2testclient,
     search_clear,
 ):
     creator = users[0]
@@ -88,24 +89,25 @@ def test_ui_resolve_topic(
     creator_client = logged_client(creator)
     receiver_client = logged_client(receiver)
 
-    record1 = record_factory(creator_client)
+    record1 = record_factory(creator.identity)
+    record1_id = record1["id"]
     ThesisRecord.index.refresh()
     ThesisDraft.index.refresh()
 
-    resp_request_submit = submit_request_by_link(
-        creator_client, record1, "delete_published_record"
+    resp_request_submit = submit_request_on_record(
+        creator.identity, record1_id, "delete_published_record"
     )
-    assert resp_request_submit.json["status"] == "submitted"
+    assert resp_request_submit["status"] == "submitted"
 
     resp = creator_client.get(
-        link2testclient(resp_request_submit.json["links"]["self"]),
+        link2testclient(resp_request_submit["links"]["self"]),
         headers={"Accept": "application/vnd.inveniordm.v1+json"},
     )
     assert resp.status_code == 200
     assert (
         resp.json["topic"].items()
         >= {
-            "reference": {"thesis": record1.json["id"]},
+            "reference": {"thesis": record1_id},
             "type": "thesis",
             "label": "blabla",
         }.items()
@@ -113,8 +115,8 @@ def test_ui_resolve_topic(
     assert (
         resp.json["topic"]["links"].items()
         >= {
-            "self": f"https://127.0.0.1:5000/api/thesis/{record1.json["id"]}",
-            "self_html": f"https://127.0.0.1:5000/thesis/{record1.json["id"]}",
+            "self": f"https://127.0.0.1:5000/api/thesis/{record1_id}",
+            "self_html": f"https://127.0.0.1:5000/thesis/{record1_id}",
         }.items()
     )
     assert resp.json["stateful_name"] == "Record deletion requested"
@@ -123,18 +125,18 @@ def test_ui_resolve_topic(
         "You will be notified about the decision by email."
     )
 
-    record_service.delete(system_identity, record1.json["id"])
+    record_service.delete(system_identity, record1_id)
     ThesisRecord.index.refresh()
 
     resp = creator_client.get(
-        link2testclient(resp_request_submit.json["links"]["self"]),
+        link2testclient(resp_request_submit["links"]["self"]),
         headers={"Accept": "application/vnd.inveniordm.v1+json"},
     )
     assert resp.status_code == 200
     print(json.dumps(resp.json, indent=2))
     assert resp.json["topic"] == {
         "reference": {
-            "thesis": record1.json["id"],
+            "thesis": record1_id,
         },
         "status": "deleted",
     }

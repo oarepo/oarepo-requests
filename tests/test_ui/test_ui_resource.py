@@ -12,11 +12,11 @@ def test_draft_publish_request_present(
     logged_client,
     users,
     record_ui_resource,
-    draft_factory_record_object,
+    draft_factory,
     fake_manifest,
 ):
     creator_client = logged_client(users[0])
-    draft = draft_factory_record_object(creator_client)
+    draft = draft_factory(users[0].identity)
     with creator_client.get(f"/thesis/{draft['id']}/edit") as c:
         assert c.status_code == 200
         data = json.loads(c.text)
@@ -37,11 +37,11 @@ def test_record_delete_request_present(
     record_ui_resource,
     logged_client,
     users,
-    record_factory_record_object,
+    record_factory,
     fake_manifest,
 ):
     creator_client = logged_client(users[0])
-    topic = record_factory_record_object(creator_client)
+    topic = record_factory(users[0].identity)
     with creator_client.get(f"/thesis/{topic['id']}") as c:
         assert c.status_code == 200
         print(c.text)
@@ -71,12 +71,12 @@ def test_record_delete_unauthorized(
     app,
     record_ui_resource,
     users,
-    record_factory_record_object,
+    record_factory,
     client,
     logged_client,
     fake_manifest,
 ):
-    topic = record_factory_record_object(logged_client(users[0]))
+    topic = record_factory(users[0].identity)
     with client.get(f"/thesis/{topic['id']}") as c:
         assert c.status_code == 200
         data = json.loads(c.text)
@@ -88,20 +88,23 @@ def test_request_detail_page(
     logged_client,
     record_ui_resource,
     users,
-    record_factory_record_object,
-    client,
+    record_factory,
+    record_service,
     fake_manifest,
     urls,
 ):
+    identity = users[0].identity
     creator_client = logged_client(users[0])
-    topic = record_factory_record_object(creator_client)
+
+    topic = record_factory(identity)
+    record = record_service.read(identity, id_=topic["id"])._obj
 
     creator_identity = users[0].identity
     request = current_requests_service.create(
         creator_identity,
         {},
         EditPublishedRecordRequestType,
-        topic=topic,
+        topic=record,
         receiver=users[1].user,
         creator=users[0].user,
     )

@@ -8,31 +8,32 @@
 
 from thesis.records.api import ThesisDraft, ThesisRecord
 
-from tests.test_requests.utils import link2testclient
-
 
 def test_new_version_autoaccept(
     logged_client,
     users,
     urls,
-    submit_request_by_link,
+    submit_request_on_record,
     record_factory,
     search_clear,
 ):
     creator = users[0]
     creator_client = logged_client(creator)
 
-    record1 = record_factory(creator_client)
+    record1 = record_factory(creator.identity)
+    record1_id = record1["id"]
 
     new_version_direct = creator_client.post(
-        f"{urls['BASE_URL']}{record1.json['id']}/versions",
+        f"{urls['BASE_URL']}{record1_id}/versions",
     )
     assert new_version_direct.status_code == 403
 
-    resp_request_submit = submit_request_by_link(creator_client, record1, "new_version")
+    resp_request_submit = submit_request_on_record(
+        creator.identity, record1_id, "new_version"
+    )
     # is request accepted and closed?
     request = creator_client.get(
-        f'{urls["BASE_URL_REQUESTS"]}{resp_request_submit.json["id"]}',
+        f'{urls["BASE_URL_REQUESTS"]}{resp_request_submit["id"]}',
     ).json
 
     assert request["status"] == "accepted"
@@ -59,23 +60,25 @@ def test_new_version_files(
     logged_client,
     users,
     urls,
-    submit_request_by_link,
+    submit_request_on_record,
     record_with_files_factory,
     search_clear,
 ):
     creator = users[0]
     creator_client = logged_client(creator)
 
-    record1 = record_with_files_factory(creator_client)
-    record2 = record_with_files_factory(creator_client)
+    record1 = record_with_files_factory(creator.identity)
+    record2 = record_with_files_factory(creator.identity)
+    record1_id = record1["id"]
+    record2_id = record2["id"]
 
-    submit1 = submit_request_by_link(
-        creator_client,
-        record1,
+    submit1 = submit_request_on_record(
+        creator.identity,
+        record1_id,
         "new_version",
         create_additional_data={"payload": {"keep_files": "yes"}},
     )
-    submit2 = submit_request_by_link(creator_client, record2, "new_version")
+    submit2 = submit_request_on_record(creator.identity, record2_id, "new_version")
 
     ThesisDraft.index.refresh()
     draft_search = creator_client.get(f"/user/thesis/").json["hits"][
@@ -84,12 +87,12 @@ def test_new_version_files(
     new_version_1 = [
         x
         for x in draft_search
-        if x["parent"]["id"] == record1.json["parent"]["id"] and x["state"] == "draft"
+        if x["parent"]["id"] == record1["parent"]["id"] and x["state"] == "draft"
     ]
     new_version_2 = [
         x
         for x in draft_search
-        if x["parent"]["id"] == record2.json["parent"]["id"] and x["state"] == "draft"
+        if x["parent"]["id"] == record2["parent"]["id"] and x["state"] == "draft"
     ]
 
     assert len(new_version_1) == 1
@@ -111,17 +114,21 @@ def test_redirect_url(
     users,
     urls,
     record_factory,
-    submit_request_by_link,
+    submit_request_on_record,
+    submit_request_on_draft,
+    link2testclient,
     search_clear,
 ):
     creator = users[0]
     creator_client = logged_client(creator)
     receiver_client = logged_client(users[1])
-    record1 = record_factory(creator_client)
-    original_id = record1.json["id"]
+    record1 = record_factory(creator.identity)
+    record1_id = record1["id"]
 
-    resp_request_submit = submit_request_by_link(creator_client, record1, "new_version")
-    original_request_id = resp_request_submit.json["id"]
+    resp_request_submit = submit_request_on_record(
+        creator.identity, record1_id, "new_version"
+    )
+    original_request_id = resp_request_submit["id"]
     # is request accepted and closed?
 
     request = creator_client.get(
@@ -135,17 +142,19 @@ def test_redirect_url(
     new_draft = [
         x
         for x in draft_search
-        if x["parent"]["id"] == record1.json["parent"]["id"] and x["state"] == "draft"
+        if x["parent"]["id"] == record1["parent"]["id"] and x["state"] == "draft"
     ][0]
     assert (
         link2testclient(request["links"]["ui_redirect_url"], ui=True)
         == f"/thesis/{new_draft['id']}/edit"
     )
 
-    new_draft = creator_client.get(f"{urls['BASE_URL']}{new_draft['id']}/draft")
-    publish_request = submit_request_by_link(creator_client, new_draft, "publish_draft")
+    new_draft = creator_client.get(f"{urls['BASE_URL']}{new_draft['id']}/draft").json
+    publish_request = submit_request_on_draft(
+        creator.identity, new_draft["id"], "publish_draft"
+    )
     receiver_request = receiver_client.get(
-        f"{urls['BASE_URL_REQUESTS']}{publish_request.json['id']}"
+        f"{urls['BASE_URL_REQUESTS']}{publish_request['id']}"
     )
     accept = receiver_client.post(
         link2testclient(receiver_request.json["links"]["actions"]["accept"])
@@ -155,5 +164,5 @@ def test_redirect_url(
         f'{urls["BASE_URL_REQUESTS"]}{original_request_id}',
     ).json
     assert original_request["topic"] == {
-        "thesis": original_id
+        "thesis": record1_id
     }  # check no weird topic kerfluffle happened here
