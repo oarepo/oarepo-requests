@@ -1,5 +1,4 @@
 from oarepo_requests.notifications.builders.publish import PublishDraftRequestAcceptNotificationBuilder
-from .utils import link2testclient
 
 def get_request_type(request_types_json, request_type):
     selected_entry = [
@@ -15,6 +14,7 @@ def test_publish_accept_notification(
     users,
     logged_client,
     create_draft_via_resource,
+    link2testclient,
     urls,
 ):
     """Test notification being built on review submit."""

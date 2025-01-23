@@ -54,7 +54,6 @@ from oarepo_requests.services.permissions.workflow_policies import (
 )
 from oarepo_requests.types import ModelRefTypes, NonDuplicableOARepoRequestType
 from oarepo_requests.types.events.topic_update import TopicUpdateEventType
-from tests.test_requests.utils import link2testclient
 from invenio_notifications.backends import EmailNotificationBackend
 from oarepo_requests.notifications.builders.publish import PublishDraftRequestAcceptNotificationBuilder, \
     PublishDraftRequestSubmitNotificationBuilder
