@@ -13,7 +13,8 @@ def test_publish_accept_notification(
     app,
     users,
     logged_client,
-    create_draft_via_resource,
+    draft_factory,
+    submit_request_on_draft,
     link2testclient,
     urls,
 ):
@@ -35,23 +36,15 @@ def test_publish_accept_notification(
     creator_client = logged_client(creator)
     receiver_client = logged_client(receiver)
 
-    draft1 = create_draft_via_resource(creator_client)
-    link = link2testclient(
-        get_request_type(draft1.json["expanded"]["request_types"], "publish_draft")[
-            "links"
-        ]["actions"]["create"]
-    )
-    resp_request_create = creator_client.post(
-        link, json={"payload": {"version": "1.0"}}
-    )
-    resp_request_submit = creator_client.post(
-        link2testclient(resp_request_create.json["links"]["actions"]["submit"]),
+    draft1 = draft_factory(creator.identity)
+
+    resp_request_submit = submit_request_on_draft(
+        creator.identity, draft1["id"], "publish_draft"
     )
 
     record = receiver_client.get(
-        f"{urls['BASE_URL']}{draft1.json['id']}/draft?expand=true"
+        f"{urls['BASE_URL']}{draft1['id']}/draft?expand=true"
     )
-
 
     with mail.record_messages() as outbox:
         # Validate that email was sent
