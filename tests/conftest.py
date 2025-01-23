@@ -44,7 +44,6 @@ from oarepo_requests.actions.generic import (
 )
 
 from oarepo_requests.receiver import default_workflow_receiver_function
-from oarepo_requests.services.notifications.builders.publish import PublishDraftRequestAcceptNotificationBuilder
 from oarepo_requests.services.permissions.generators.conditional import (
     IfNoEditDraft,
     IfNoNewVersionDraft,

@@ -1,3 +1,4 @@
+from invenio_notifications.backends import EmailNotificationBackend
 from invenio_notifications.services.builders import NotificationBuilder
 from invenio_notifications.models import Notification
 from invenio_notifications.registry import EntityResolverRegistry
@@ -7,8 +8,8 @@ from invenio_users_resources.notifications.generators import (
     EmailRecipient,
 )
 
-class OARepoNotificationBuilder(NotificationBuilder):
-    """"""
+class OARepoUserEmailBackend(UserEmailBackend):
+    backend_id = EmailNotificationBackend.id
 
 class OARepoRequestActionNotificationBuilder(NotificationBuilder):
 
@@ -18,20 +19,18 @@ class OARepoRequestActionNotificationBuilder(NotificationBuilder):
         return Notification(
             type=cls.type,
             context={
-                "request": EntityResolverRegistry.reference_entity(request)
+                "request": EntityResolverRegistry.reference_entity(request),
+                "backend_ids": [backend.backend_id for backend in cls.recipient_backends]
             },
         )
 
     context = [
         EntityResolve(key="request"),
-        EntityResolve(key="request.created_by"),
-        EntityResolve(key="request.receiver")
     ]
 
-    recipients = [
-        EmailRecipient(key="request.created_by.email"),  # email only
-    ]
+    recipient_backends = [OARepoUserEmailBackend()]
 
-    recipient_backends = [
-        UserEmailBackend(),
-    ]
+
+
+
+

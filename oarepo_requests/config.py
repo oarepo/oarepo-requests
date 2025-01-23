@@ -35,7 +35,7 @@ from oarepo_requests.types import (
 )
 from oarepo_requests.types.events import TopicDeleteEventType
 from oarepo_requests.types.events.topic_update import TopicUpdateEventType
-
+from oarepo_requests.notifications.generators import UserEmailRecipient
 REQUESTS_REGISTERED_TYPES = [
     DeletePublishedRecordRequestType(),
     EditPublishedRecordRequestType(),
@@ -95,4 +95,10 @@ REQUESTS_ACTION_COMPONENTS = {
         *workflow_action_components,
         RequestIdentityComponent,
     ],
+}
+
+NOTIFICATION_RECIPIENTS_RESOLVERS = {
+    "user": {
+        "email": UserEmailRecipient
+    }
 }

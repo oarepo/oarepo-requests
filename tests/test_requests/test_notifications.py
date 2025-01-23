@@ -1,6 +1,13 @@
 from oarepo_requests.notifications.builders.publish import PublishDraftRequestAcceptNotificationBuilder
-from .test_create_inmodel import pick_request_type
 from .utils import link2testclient
+
+def get_request_type(request_types_json, request_type):
+    selected_entry = [
+        entry for entry in request_types_json if entry["type_id"] == request_type
+    ]
+    if not selected_entry:
+        return None
+    return selected_entry[0]
 
 
 def test_publish_accept_notification(
@@ -30,7 +37,7 @@ def test_publish_accept_notification(
 
     draft1 = create_draft_via_resource(creator_client)
     link = link2testclient(
-        pick_request_type(draft1.json["expanded"]["request_types"], "publish_draft")[
+        get_request_type(draft1.json["expanded"]["request_types"], "publish_draft")[
             "links"
         ]["actions"]["create"]
     )
