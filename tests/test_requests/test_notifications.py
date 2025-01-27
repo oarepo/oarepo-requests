@@ -110,13 +110,10 @@ def test_group(
         draft1 = draft_factory(creator.identity)
 
         with mail.record_messages() as outbox:
-            submit_request_on_draft(
-                creator.identity, draft1["id"], "publish_draft"
-            )
+            submit_request_on_draft(creator.identity, draft1["id"], "publish_draft")
             assert len(outbox) == 2
             receivers = {m.recipients[0] for m in outbox}
-            assert receivers == {'user1@example.org', 'user2@example.org'}
-
+            assert receivers == {"user1@example.org", "user2@example.org"}
 
     finally:
         app.config["OAREPO_REQUESTS_DEFAULT_RECEIVER"] = config_restore

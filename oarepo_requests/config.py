@@ -22,7 +22,10 @@ from oarepo_requests.actions.components import (
     RequestIdentityComponent,
     WorkflowTransitionComponent,
 )
-from oarepo_requests.notifications.generators import UserEmailRecipient, GroupEmailRecipient
+from oarepo_requests.notifications.generators import (
+    GroupEmailRecipient,
+    UserEmailRecipient,
+)
 from oarepo_requests.resolvers.ui import (
     AutoApproveUIEntityResolver,
     FallbackEntityReferenceUIResolver,
@@ -98,4 +101,7 @@ REQUESTS_ACTION_COMPONENTS = {
     ],
 }
 
-NOTIFICATION_RECIPIENTS_RESOLVERS = {"user": {"email": UserEmailRecipient}, "group": {"email": GroupEmailRecipient}}
+NOTIFICATION_RECIPIENTS_RESOLVERS = {
+    "user": {"email": UserEmailRecipient},
+    "group": {"email": GroupEmailRecipient},
+}
