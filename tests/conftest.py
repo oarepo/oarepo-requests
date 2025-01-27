@@ -473,11 +473,6 @@ def app_config(app_config):
     return app_config
 
 
-@pytest.fixture(scope="module")
-def record_service():
-    return current_service
-
-
 @pytest.fixture
 def check_publish_topic_update():
     def _check_publish_topic_update(

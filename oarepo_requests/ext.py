@@ -97,8 +97,7 @@ class OARepoRequests:
         :param creator: Creator of the request.
         :param data: Payload of the request.
         """
-        # TODO: if the topic is one of the workflow topics, use the workflow to determine the receiver
-        # otherwise use the default receiver
+
         return obj_or_import_string(
             self.app.config["OAREPO_REQUESTS_DEFAULT_RECEIVER"]
         )(

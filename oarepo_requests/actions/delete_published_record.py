@@ -5,7 +5,7 @@
 # modify it under the terms of the MIT License; see LICENSE file for more
 # details.
 #
-"""Actions for delete published record requests."""
+"""Actions for delete published record request."""
 
 from __future__ import annotations
 

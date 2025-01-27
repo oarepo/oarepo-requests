@@ -35,7 +35,7 @@ class EntityRecipient(RecipientGenerator):
 class SpecificEntityRecipient(RecipientGenerator):
 
     def __init__(self, key):
-        self.key = key
+        self.key = key #todo this is entity_reference, not path to entity as EntityRecipient, might be confusing
 
     def _resolve_entity(self):
         entity_type = list(self.key)[0]
@@ -56,3 +56,16 @@ class UserEmailRecipient(SpecificEntityRecipient):
         user = self._resolve_entity()
         email = user.email
         recipients[email] = Recipient(data={"email": email})
+
+class GroupEmailRecipient(SpecificEntityRecipient):
+    """Recipient generator returning emails of the members of the recipient group"""
+
+    def __call__(self, notification: Notification, recipients: dict):
+        """Update required recipient information."""
+        group = self._resolve_entity()
+        users_query = group.users
+        users = users_query.all()
+        mails = [u.email for u in users]
+        for mail in mails:
+            recipients[mail] = Recipient(data={"email": mail})
+
