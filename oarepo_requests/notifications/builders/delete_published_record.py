@@ -2,17 +2,17 @@ from ..generators import EntityRecipient
 from .oarepo import OARepoRequestActionNotificationBuilder
 
 
-class PublishDraftRequestSubmitNotificationBuilder(
+class DeletePublishedRecordRequestSubmitNotificationBuilder(
     OARepoRequestActionNotificationBuilder
 ):
-    type = "publish-draft-request-event.submit"
+    type = "delete-published-record-request-event.submit"
 
     recipients = [EntityRecipient(key="request.receiver")]  # email only
 
 
-class PublishDraftRequestAcceptNotificationBuilder(
+class DeletePublishedRecordRequestAcceptNotificationBuilder(
     OARepoRequestActionNotificationBuilder
 ):
-    type = "publish-draft-request-event.accept"
+    type = "delete-published-record-request-event.accept"
 
     recipients = [EntityRecipient(key="request.created_by")]

@@ -7,13 +7,15 @@
 #
 import os
 from typing import Dict
-from invenio_records_resources.references.entity_resolvers import ServiceResultResolver
+
 import pytest
+from invenio_notifications.backends import EmailNotificationBackend
 from invenio_records_permissions.generators import (
     AnyUser,
     AuthenticatedUser,
     SystemProcess,
 )
+from invenio_records_resources.references.entity_resolvers import ServiceResultResolver
 from invenio_records_resources.services.uow import RecordCommitOp
 from invenio_requests.customizations import CommentEventType, LogEventType
 from invenio_requests.proxies import current_requests_service
@@ -42,7 +44,14 @@ from oarepo_requests.actions.generic import (
     OARepoDeclineAction,
     OARepoSubmitAction,
 )
-
+from oarepo_requests.notifications.builders.delete_published_record import (
+    DeletePublishedRecordRequestAcceptNotificationBuilder,
+    DeletePublishedRecordRequestSubmitNotificationBuilder,
+)
+from oarepo_requests.notifications.builders.publish import (
+    PublishDraftRequestAcceptNotificationBuilder,
+    PublishDraftRequestSubmitNotificationBuilder,
+)
 from oarepo_requests.receiver import default_workflow_receiver_function
 from oarepo_requests.services.permissions.generators.conditional import (
     IfNoEditDraft,
@@ -54,9 +63,6 @@ from oarepo_requests.services.permissions.workflow_policies import (
 )
 from oarepo_requests.types import ModelRefTypes, NonDuplicableOARepoRequestType
 from oarepo_requests.types.events.topic_update import TopicUpdateEventType
-from invenio_notifications.backends import EmailNotificationBackend
-from oarepo_requests.notifications.builders.publish import PublishDraftRequestAcceptNotificationBuilder, \
-    PublishDraftRequestSubmitNotificationBuilder
 
 pytest_plugins = [
     "pytest_oarepo.requests.fixtures",
@@ -445,24 +451,24 @@ def app_config(app_config):
     }
     app_config["FILES_REST_DEFAULT_STORAGE_CLASS"] = "L"
 
-
     app_config["NOTIFICATIONS_BACKENDS"] = {
         EmailNotificationBackend.id: EmailNotificationBackend(),
     }
     app_config["NOTIFICATIONS_BUILDERS"] = {
         PublishDraftRequestAcceptNotificationBuilder.type: PublishDraftRequestAcceptNotificationBuilder,
         PublishDraftRequestSubmitNotificationBuilder.type: PublishDraftRequestSubmitNotificationBuilder,
+        DeletePublishedRecordRequestSubmitNotificationBuilder.type: DeletePublishedRecordRequestSubmitNotificationBuilder,
+        DeletePublishedRecordRequestAcceptNotificationBuilder.type: DeletePublishedRecordRequestAcceptNotificationBuilder,
     }
     app_config["NOTIFICATIONS_ENTITY_RESOLVERS"] = [
-        #EmailResolver(),
-        #RDMRecordServiceResultResolver(),
+        # EmailResolver(),
+        # RDMRecordServiceResultResolver(),
         ServiceResultResolver(service_id="users", type_key="user"),
-        #ServiceResultResolver(service_id="communities", type_key="community"),
+        # ServiceResultResolver(service_id="communities", type_key="community"),
         ServiceResultResolver(service_id="requests", type_key="request"),
         ServiceResultResolver(service_id="request_events", type_key="request_event"),
     ]
     app_config["MAIL_DEFAULT_SENDER"] = "test@invenio-rdm-records.org"
-
 
     return app_config
 

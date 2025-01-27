@@ -1,15 +1,4 @@
-from oarepo_requests.notifications.builders.publish import PublishDraftRequestAcceptNotificationBuilder
-
-def get_request_type(request_types_json, request_type):
-    selected_entry = [
-        entry for entry in request_types_json if entry["type_id"] == request_type
-    ]
-    if not selected_entry:
-        return None
-    return selected_entry[0]
-
-
-def test_publish_accept_notification(
+def test_publish_notifications(
     app,
     users,
     logged_client,
@@ -20,31 +9,23 @@ def test_publish_accept_notification(
 ):
     """Test notification being built on review submit."""
 
-    original_builder = PublishDraftRequestAcceptNotificationBuilder
-    # mock build to observe calls
-    # mock_build = replace_notification_builder(original_builder)
-    # assert not mock_build.called
-
-    # inviter(curator.id, open_review_community.id, "curator")
-
     mail = app.extensions.get("mail")
     assert mail
 
     creator = users[0]
     receiver = users[1]
-
-    creator_client = logged_client(creator)
     receiver_client = logged_client(receiver)
-
     draft1 = draft_factory(creator.identity)
 
-    resp_request_submit = submit_request_on_draft(
-        creator.identity, draft1["id"], "publish_draft"
-    )
+    with mail.record_messages() as outbox:
+        resp_request_submit = submit_request_on_draft(
+            creator.identity, draft1["id"], "publish_draft"
+        )
+        # check notification is build on submit
+        assert len(outbox) == 1
+        sent_mail = outbox[0]
 
-    record = receiver_client.get(
-        f"{urls['BASE_URL']}{draft1['id']}/draft?expand=true"
-    )
+    record = receiver_client.get(f"{urls['BASE_URL']}{draft1['id']}/draft?expand=true")
 
     with mail.record_messages() as outbox:
         # Validate that email was sent
@@ -56,4 +37,99 @@ def test_publish_accept_notification(
         # check notification is build on submit
         assert len(outbox) == 1
         sent_mail = outbox[0]
-        print()
+
+
+def test_delete_published_notifications(
+    app,
+    users,
+    logged_client,
+    record_factory,
+    submit_request_on_record,
+    link2testclient,
+    urls,
+):
+    """Test notification being built on review submit."""
+
+    mail = app.extensions.get("mail")
+    assert mail
+
+    creator = users[0]
+    receiver = users[1]
+    receiver_client = logged_client(receiver)
+    record1 = record_factory(creator.identity)
+
+    with mail.record_messages() as outbox:
+        resp_request_submit = submit_request_on_record(
+            creator.identity, record1["id"], "delete_published_record"
+        )
+        # check notification is build on submit
+        assert len(outbox) == 1
+        sent_mail = outbox[0]
+
+    record = receiver_client.get(f"{urls['BASE_URL']}{record1['id']}?expand=true")
+
+    with mail.record_messages() as outbox:
+        # Validate that email was sent
+        publish = receiver_client.post(
+            link2testclient(
+                record.json["expanded"]["requests"][0]["links"]["actions"]["accept"]
+            ),
+        )
+        # check notification is build on submit
+        assert len(outbox) == 1
+        sent_mail = outbox[0]
+
+
+def test_for_group(
+    app,
+    users,
+    logged_client,
+    draft_factory,
+    submit_request_on_draft,
+    role,
+    link2testclient,
+    urls,
+):
+    """Test notification being built on review submit."""
+
+    mail = app.extensions.get("mail")
+    config_restore = app.config["OAREPO_REQUESTS_DEFAULT_RECEIVER"]
+
+    def current_receiver(record=None, request_type=None, **kwargs):
+        if request_type.type_id == "publish_draft":
+            return role
+        return config_restore(record, request_type, **kwargs)
+
+    try:
+        app.config["OAREPO_REQUESTS_DEFAULT_RECEIVER"] = current_receiver
+
+        creator = users[0]
+        receiver = users[1]
+        receiver_client = logged_client(receiver)
+        draft1 = draft_factory(creator.identity)
+
+        with mail.record_messages() as outbox:
+            resp_request_submit = submit_request_on_draft(
+                creator.identity, draft1["id"], "publish_draft"
+            )
+            # check notification is build on submit
+            assert len(outbox) == 1
+            sent_mail = outbox[0]
+
+        record = receiver_client.get(
+            f"{urls['BASE_URL']}{draft1['id']}/draft?expand=true"
+        )
+
+        with mail.record_messages() as outbox:
+            # Validate that email was sent
+            publish = receiver_client.post(
+                link2testclient(
+                    record.json["expanded"]["requests"][0]["links"]["actions"]["accept"]
+                ),
+            )
+            # check notification is build on submit
+            assert len(outbox) == 1
+            sent_mail = outbox[0]
+
+    finally:
+        app.config["OAREPO_REQUESTS_DEFAULT_RECEIVER"] = config_restore

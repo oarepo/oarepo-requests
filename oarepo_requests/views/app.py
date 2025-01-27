@@ -9,10 +9,11 @@
 
 from __future__ import annotations
 
+from pathlib import Path
 from typing import TYPE_CHECKING
 
 from flask import Blueprint
-from pathlib import Path
+
 if TYPE_CHECKING:
     from flask import Flask
 
@@ -35,6 +36,7 @@ def create_app_events_blueprint(app: Flask) -> Blueprint:
         "oarepo_requests_events_app", __name__, url_prefix="/requests/"
     )
     return blueprint
+
 
 def create_notifications(app: Flask) -> Blueprint:
     """Register blueprint routes on app."""

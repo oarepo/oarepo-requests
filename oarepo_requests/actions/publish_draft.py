@@ -12,10 +12,15 @@ from __future__ import annotations
 from typing import TYPE_CHECKING, Any
 
 from invenio_access.permissions import system_identity
+from invenio_notifications.services.uow import NotificationOp
 from invenio_records_resources.services.uow import RecordCommitOp, UnitOfWork
 from oarepo_runtime.datastreams.utils import get_record_service_for_record
 from oarepo_runtime.i18n import lazy_gettext as _
 
+from ..notifications.builders.publish import (
+    PublishDraftRequestAcceptNotificationBuilder,
+    PublishDraftRequestSubmitNotificationBuilder,
+)
 from .cascade_events import update_topic
 from .generic import (
     AddTopicLinksOnPayloadMixin,
@@ -23,10 +28,6 @@ from .generic import (
     OARepoDeclineAction,
     OARepoSubmitAction,
 )
-from invenio_notifications.services.uow import NotificationOp
-
-from ..notifications.builders.publish import PublishDraftRequestAcceptNotificationBuilder, \
-    PublishDraftRequestSubmitNotificationBuilder
 
 if TYPE_CHECKING:
     from flask_principal import Identity
@@ -55,6 +56,7 @@ class PublishMixin:
 
 class PublishDraftSubmitAction(PublishMixin, OARepoSubmitAction):
     """Submit action for publishing draft requests."""
+
     def apply(
         self,
         identity: Identity,
@@ -68,14 +70,10 @@ class PublishDraftSubmitAction(PublishMixin, OARepoSubmitAction):
 
         uow.register(
             NotificationOp(
-                PublishDraftRequestSubmitNotificationBuilder.build(
-                    request=self.request
-                )
+                PublishDraftRequestSubmitNotificationBuilder.build(request=self.request)
             )
         )
-        return super().apply(
-            identity, request_type, topic, uow, *args, **kwargs
-        )
+        return super().apply(identity, request_type, topic, uow, *args, **kwargs)
 
 
 class PublishDraftAcceptAction(
@@ -113,9 +111,7 @@ class PublishDraftAcceptAction(
         update_topic(self.request, topic, published_topic._record, uow)
         uow.register(
             NotificationOp(
-                PublishDraftRequestAcceptNotificationBuilder.build(
-                    request=self.request
-                )
+                PublishDraftRequestAcceptNotificationBuilder.build(request=self.request)
             )
         )
         return super().apply(

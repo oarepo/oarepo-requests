@@ -17,14 +17,12 @@ import importlib_metadata
 from invenio_base.utils import obj_or_import_string
 from invenio_requests.proxies import current_events_service
 
-from oarepo_requests.resolvers.user import OARepoUserResolver
 from oarepo_requests.resources.events.config import OARepoRequestsCommentsResourceConfig
 from oarepo_requests.resources.events.resource import OARepoRequestsCommentsResource
 from oarepo_requests.resources.oarepo.config import OARepoRequestsResourceConfig
 from oarepo_requests.resources.oarepo.resource import OARepoRequestsResource
 from oarepo_requests.services.oarepo.config import OARepoRequestsServiceConfig
 from oarepo_requests.services.oarepo.service import OARepoRequestsService
-from invenio_requests.registry import TypeRegistry
 
 if TYPE_CHECKING:
     from flask import Flask
@@ -212,7 +210,6 @@ class OARepoRequests:
         app_registered_event_types = app.config.setdefault(
             "REQUESTS_REGISTERED_EVENT_TYPES", []
         )
-
         for event_type in config.REQUESTS_REGISTERED_EVENT_TYPES:
             if event_type not in app_registered_event_types:
                 app_registered_event_types.append(event_type)
@@ -220,7 +217,9 @@ class OARepoRequests:
         app_registered_event_types = app.config.setdefault(
             "NOTIFICATION_RECIPIENTS_RESOLVERS", {}
         )
-        app.config["NOTIFICATION_RECIPIENTS_RESOLVERS"] |=  config.NOTIFICATION_RECIPIENTS_RESOLVERS
+        app.config[
+            "NOTIFICATION_RECIPIENTS_RESOLVERS"
+        ] |= config.NOTIFICATION_RECIPIENTS_RESOLVERS
 
 
 def api_finalize_app(app: Flask) -> None:
@@ -249,10 +248,6 @@ def finalize_app(app: Flask) -> None:
     for type in app.config["REQUESTS_REGISTERED_EVENT_TYPES"]:
         current_event_type_registry.register_type(type)
 
-    from invenio_requests.proxies import current_requests
-
-    registry = current_requests.entity_resolvers_registry
-    registered_resolvers = registry._registered_types
-    registered_resolvers["user"] = OARepoUserResolver()
-
-    ext.notification_recipients_resolvers_registry = app.config["NOTIFICATION_RECIPIENTS_RESOLVERS"]
+    ext.notification_recipients_resolvers_registry = app.config[
+        "NOTIFICATION_RECIPIENTS_RESOLVERS"
+    ]
