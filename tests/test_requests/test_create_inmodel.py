@@ -6,9 +6,7 @@
 # details.
 #
 
-from thesis.records.api import ThesisRecord
-
-from thesis.records.api import ThesisDraft
+from thesis.records.api import ThesisDraft, ThesisRecord
 
 
 # todo since inline is now the default way to create records, these might be redundant

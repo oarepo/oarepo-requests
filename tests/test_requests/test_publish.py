@@ -74,7 +74,9 @@ def test_publish(
     ThesisRecord.index.refresh()
     ThesisDraft.index.refresh()
     draft_lst = creator_client.get(f"/user{urls['BASE_URL']}")
-    lst = creator_client.get(urls["BASE_URL"], query_string={"record_status": "published"})
+    lst = creator_client.get(
+        urls["BASE_URL"], query_string={"record_status": "published"}
+    )
     assert len(draft_lst.json["hits"]["hits"]) == 3
     assert len(lst.json["hits"]["hits"]) == 0
 
@@ -105,7 +107,9 @@ def test_publish(
     ThesisRecord.index.refresh()
     ThesisDraft.index.refresh()
     draft_lst = creator_client.get(f"/user{urls['BASE_URL']}")
-    lst = creator_client.get(urls["BASE_URL"], query_string={"record_status": "published"})
+    lst = creator_client.get(
+        urls["BASE_URL"], query_string={"record_status": "published"}
+    )
     assert len(draft_lst.json["hits"]["hits"]) == 3
     assert len(lst.json["hits"]["hits"]) == 1
 
@@ -161,7 +165,7 @@ def test_create_fails_if_draft_not_validated(
 
     assert "publish_draft" not in draft.json["expanded"]["request_types"]
     resp_request_create = creator_client.post(
-        f"{urls["BASE_URL"]}{draft.json['id']}/draft/requests/publish_draft",
+        f"{urls['BASE_URL']}{draft.json['id']}/draft/requests/publish_draft",
     )
     assert resp_request_create.status_code == 400
     assert resp_request_create.json["message"] == "A validation error occurred."

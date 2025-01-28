@@ -11,11 +11,6 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING, Any, override
 
-from invenio_notifications.services.uow import NotificationOp
-from invenio_records_resources.services.uow import UnitOfWork
-from oarepo_runtime.datastreams.utils import get_record_service_for_record
-from oarepo_runtime.i18n import lazy_gettext as _
-
 from ..notifications.builders.delete_published_record import (
     DeletePublishedRecordRequestAcceptNotificationBuilder,
     DeletePublishedRecordRequestSubmitNotificationBuilder,
