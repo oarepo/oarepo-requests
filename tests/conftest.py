@@ -510,7 +510,7 @@ def user_links():
     def _user_links(user_id):
         return {
             "avatar": f"https://127.0.0.1:5000/api/users/{user_id}/avatar.svg",
-            "records_html": f"https://127.0.0.1:5000/search/records?q=user:{user_id}",
+            "records_html": f"https://127.0.0.1:5000/search/records?q=parent.access.owned_by.user:{user_id}",
             "self": f"https://127.0.0.1:5000/api/users/{user_id}",
         }
 

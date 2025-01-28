@@ -10,6 +10,9 @@ BUILDER_VENV=.venv-builder
 BUILD_TEST_DIR="tests"
 CODE_TEST_DIR="tests"
 
+export PIP_EXTRA_INDEX_URL=https://gitlab.cesnet.cz/api/v4/projects/1408/packages/pypi/simple
+export UV_EXTRA_INDEX_URL=https://gitlab.cesnet.cz/api/v4/projects/1408/packages/pypi/simple
+
 curl -L -o forked_install.sh https://github.com/oarepo/nrp-devtools/raw/main/tests/forked_install.sh
 
 if test -d $BUILDER_VENV ; then
@@ -41,7 +44,7 @@ fi
 "${PYTHON}" -m venv $MODEL_VENV
 . $MODEL_VENV/bin/activate
 pip install -U setuptools pip wheel
-pip install "oarepo[tests]==$OAREPO_VERSION.*"
+pip install "oarepo[tests,rdm]==$OAREPO_VERSION.*"
 pip install -e "./$BUILD_TEST_DIR/${MODEL}"
 
 # local development
@@ -54,12 +57,5 @@ done | python
 
 # now install the tests (might bring more dependencies, that's why we have checked the imports before)
 pip install -e ".[tests]"
-
-#sh forked_install.sh invenio-records-resources
-pip install -U --force-reinstall --no-deps https://github.com/oarepo/invenio-records-resources/archive/oarepo-5.10.1.zip
-sh forked_install.sh invenio-requests
-sh forked_install.sh invenio-drafts-resources
-pip install -U --force-reinstall --no-deps https://github.com/oarepo/invenio-rdm-records/archive/oarepo-10.9.1.zip
-pip install pytest-oarepo
 pytest $BUILD_TEST_DIR/test_requests
 pytest $BUILD_TEST_DIR/test_ui
