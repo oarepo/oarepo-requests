@@ -1,6 +1,6 @@
 #!/bin/bash
 set -e
-
+export PYTHONWARNINGS="ignore"
 OAREPO_VERSION=${OAREPO_VERSION:-12}
 PYTHON="${PYTHON:-python3.12}"
 
