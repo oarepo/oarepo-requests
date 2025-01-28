@@ -73,7 +73,7 @@ pytest_plugins = [
 ]
 
 
-@pytest.fixture()
+@pytest.fixture(scope="module")
 def record_service():
     return current_service
 
