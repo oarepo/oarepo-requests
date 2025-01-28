@@ -16,7 +16,7 @@ from typing import TYPE_CHECKING, Callable
 import importlib_metadata
 from invenio_base.utils import obj_or_import_string
 from invenio_requests.proxies import current_events_service
-
+from deepmerge import always_merger
 from oarepo_requests.resources.events.config import OARepoRequestsCommentsResourceConfig
 from oarepo_requests.resources.events.resource import OARepoRequestsCommentsResource
 from oarepo_requests.resources.oarepo.config import OARepoRequestsResourceConfig
@@ -218,7 +218,7 @@ class OARepoRequests:
         )
         app.config[
             "NOTIFICATION_RECIPIENTS_RESOLVERS"
-        ] |= config.NOTIFICATION_RECIPIENTS_RESOLVERS
+        ] = always_merger.merge(app_registered_event_types, config.NOTIFICATION_RECIPIENTS_RESOLVERS)
 
 
 def api_finalize_app(app: Flask) -> None:
