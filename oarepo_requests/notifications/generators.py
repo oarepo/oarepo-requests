@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from abc import abstractmethod
 from typing import TYPE_CHECKING
 
 from invenio_notifications.models import Recipient
@@ -10,6 +11,8 @@ from invenio_requests.proxies import current_requests
 from oarepo_requests.proxies import current_notification_recipients_resolvers_registry
 
 if TYPE_CHECKING:
+    from typing import Any
+
     from invenio_notifications.models import Notification
 
 
@@ -20,7 +23,7 @@ class EntityRecipient(RecipientGenerator):
 
         self.key = key
 
-    def __call__(self, notification: Notification, recipients: dict):
+    def __call__(self, notification: Notification, recipients: dict[Recipient]):
         """"""
         backend_ids = notification.context["backend_ids"]
         entity_ref = dict_lookup(notification.context, self.key)
@@ -33,11 +36,22 @@ class EntityRecipient(RecipientGenerator):
 
 
 class SpecificEntityRecipient(RecipientGenerator):
+    """Superclass for implementations of recipient generators for specific entities."""
 
     def __init__(self, key):
         self.key = key  # todo this is entity_reference, not path to entity as EntityRecipient, might be confusing
 
-    def _resolve_entity(self):
+    def __call__(self, notification: Notification, recipients: dict[Recipient]):
+        entity = self._resolve_entity()
+        return self._get_recipients(entity, recipients)
+
+    @abstractmethod
+    def _get_recipients(
+        self, entity: Any, recipients: dict[Recipient]
+    ) -> dict[Recipient]:
+        raise NotImplementedError
+
+    def _resolve_entity(self) -> Any:
         entity_type = list(self.key)[0]
         registry = current_requests.entity_resolvers_registry
 
@@ -51,21 +65,23 @@ class SpecificEntityRecipient(RecipientGenerator):
 class UserEmailRecipient(SpecificEntityRecipient):
     """User email recipient generator for a notification."""
 
-    def __call__(self, notification: Notification, recipients: dict):
-        """Update required recipient information."""
-        user = self._resolve_entity()
-        email = user.email
+    def _get_recipients(
+        self, entity: Any, recipients: dict[Recipient]
+    ) -> dict[Recipient]:
+        email = entity.email
         recipients[email] = Recipient(data={"email": email})
+        return recipients
 
 
 class GroupEmailRecipient(SpecificEntityRecipient):
     """Recipient generator returning emails of the members of the recipient group"""
 
-    def __call__(self, notification: Notification, recipients: dict):
-        """Update required recipient information."""
-        group = self._resolve_entity()
-        users_query = group.users
+    def _get_recipients(
+        self, entity: Any, recipients: dict[Recipient]
+    ) -> dict[Recipient]:
+        users_query = entity.users
         users = users_query.all()
         mails = [u.email for u in users]
         for mail in mails:
             recipients[mail] = Recipient(data={"email": mail})
+        return recipients

@@ -461,10 +461,7 @@ def app_config(app_config):
         DeletePublishedRecordRequestAcceptNotificationBuilder.type: DeletePublishedRecordRequestAcceptNotificationBuilder,
     }
     app_config["NOTIFICATIONS_ENTITY_RESOLVERS"] = [
-        # EmailResolver(),
-        # RDMRecordServiceResultResolver(),
         ServiceResultResolver(service_id="users", type_key="user"),
-        # ServiceResultResolver(service_id="communities", type_key="community"),
         ServiceResultResolver(service_id="requests", type_key="request"),
         ServiceResultResolver(service_id="request_events", type_key="request_event"),
     ]
