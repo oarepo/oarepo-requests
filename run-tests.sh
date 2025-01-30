@@ -48,6 +48,8 @@ find oarepo_requests -name '*.py' | grep -v '__init__.py' | sed 's/.py$//' | tr 
     echo "import $MODULE"
 done | python
 
+pip install -e ".[tests]"
+
 #sh forked_install.sh invenio-records-resources
 
 #sh forked_install.sh invenio-requests
