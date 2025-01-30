@@ -16,17 +16,17 @@ import { OverridableContext, overrideStore } from "react-overridable";
 const overriddenComponents = overrideStore.getAll();
 
 export const requestButtonsDefaultIconConfig = {
-  delete_published_record: { icon: "trash", labelPosition: "left" },
-  publish_draft: { icon: "upload", labelPosition: "left" },
-  new_version: { icon: "tag", labelPosition: "left" },
-  edit_published_record: { icon: "pencil", labelPosition: "left" },
-  assign_doi: { icon: "address card", labelPosition: "left" },
-  created: { icon: "paper plane", labelPosition: "left" },
-  initiate_community_migration: { icon: "exchange", labelPosition: "left" },
-  confirm_community_migration: { icon: "exchange", labelPosition: "left" },
-  secondary_community_submission: { icon: "users", labelPosition: "left" },
-  remove_secondary_community: { icon: "remove", labelPosition: "left" },
-  submitted: { icon: "clock", labelPosition: "left" },
+  delete_published_record: { icon: "trash" },
+  publish_draft: { icon: "upload" },
+  new_version: { icon: "tag" },
+  edit_published_record: { icon: "pencil" },
+  assign_doi: { icon: "address card" },
+  created: { icon: "paper plane" },
+  initiate_community_migration: { icon: "exchange" },
+  confirm_community_migration: { icon: "exchange" },
+  secondary_community_submission: { icon: "users" },
+  remove_secondary_community: { icon: "remove" },
+  submitted: { icon: "clock" },
 };
 
 const queryClient = new QueryClient();
