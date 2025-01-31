@@ -9,6 +9,7 @@
 
 from __future__ import annotations
 
+import importlib_metadata
 import marshmallow as ma
 from flask_resources import JSONSerializer, ResponseHandler
 from invenio_records_resources.resources import RecordResourceConfig
@@ -45,3 +46,16 @@ class RecordRequestsResourceConfig:
             ),
             "application/json": ResponseHandler(JSONSerializer(), headers=etag_headers),
         }
+
+    @property
+    def error_handlers(self):
+        entrypoint_error_handlers = {}
+        for x in importlib_metadata.entry_points(
+            group="oarepo_requests.error_handlers"
+        ):
+            entrypoint_error_handlers.update(x.load())
+        for x in importlib_metadata.entry_points(
+            group="oarepo_requests.record.error_handlers"
+        ):
+            entrypoint_error_handlers.update(x.load())
+        return {**super().error_handlers, **entrypoint_error_handlers}

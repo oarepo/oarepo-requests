@@ -24,16 +24,14 @@ class DraftRecordRequestsResourceConfig(RecordRequestsResourceConfig):
     }
 
     @property
-    def error_handlers(self) -> dict:
-        """Return error handlers loaded dynamically from entry points."""
-        parent_handlers = (
-            super().error_handlers if hasattr(super(), "error_handlers") else {}
-        )
-        handlers = parent_handlers.copy() if parent_handlers else {}
-
-        for entry_point in importlib_metadata.entry_points(
-            group="invenio.documents.error_handlers"
+    def error_handlers(self):
+        entrypoint_error_handlers = {}
+        for x in importlib_metadata.entry_points(
+            group="oarepo_requests.error_handlers"
         ):
-            exception_class, handler = entry_point.load()()
-            handlers[exception_class] = handler
-        return handlers
+            entrypoint_error_handlers.update(x.load())
+        for x in importlib_metadata.entry_points(
+            group="oarepo_requests.draft.error_handlers"
+        ):
+            entrypoint_error_handlers.update(x.load())
+        return {**super().error_handlers, **entrypoint_error_handlers}

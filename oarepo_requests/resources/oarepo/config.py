@@ -9,6 +9,7 @@
 
 from __future__ import annotations
 
+import importlib_metadata
 from flask_resources import ResponseHandler
 from invenio_records_resources.services.base.config import ConfiguratorMixin
 from invenio_requests.resources import RequestsResourceConfig
@@ -37,3 +38,16 @@ class OARepoRequestsResourceConfig(RequestsResourceConfig, ConfiguratorMixin):
             ),
             **super().response_handlers,
         }
+
+    @property
+    def error_handlers(self):
+        entrypoint_error_handlers = {}
+        for x in importlib_metadata.entry_points(
+            group="oarepo_requests.error_handlers"
+        ):
+            entrypoint_error_handlers.update(x.load())
+        for x in importlib_metadata.entry_points(
+            group="oarepo_requests.extended.error_handlers"
+        ):
+            entrypoint_error_handlers.update(x.load())
+        return {**super().error_handlers, **entrypoint_error_handlers}
