@@ -9,9 +9,6 @@
 
 from __future__ import annotations
 
-from flask_resources import route
-from copy import deepcopy
-
 from flask import g
 from flask_resources import (
     from_conf,
@@ -81,7 +78,6 @@ class OARepoRequestsCommentsResource(RequestCommentsResource, ErrorHandlersMixin
         """Search for comments."""
         return super().search()
 
-
     # list args parser in invenio parses request_id input through UUID instead of Str; does this have any relevance for us?
     @item_view_args_parser
     @request_extra_args
@@ -89,7 +85,9 @@ class OARepoRequestsCommentsResource(RequestCommentsResource, ErrorHandlersMixin
     @response_handler()
     def create_event(self):
         """Create a comment."""
-        type_ = current_event_type_registry.lookup(resource_requestctx.view_args["event_type"], quiet=True)
+        type_ = current_event_type_registry.lookup(
+            resource_requestctx.view_args["event_type"], quiet=True
+        )
         item = self.service.create(
             identity=g.identity,
             request_id=resource_requestctx.view_args["request_id"],

@@ -7,15 +7,12 @@
 #
 from thesis.records.api import ThesisDraft, ThesisRecord
 
-from tests.test_requests.utils import _create_request, link2testclient
-
 
 def test_edit_autoaccept(
-    vocab_cf,
     logged_client,
     users,
     urls,
-    edit_record_data_function,
+    submit_request_on_record,
     record_factory,
     search_clear,
 ):
@@ -31,16 +28,12 @@ def test_edit_autoaccept(
     )
     assert direct_edit.status_code == 403
 
-    resp_request_create = creator_client.post(
-        urls["BASE_URL_REQUESTS"],
-        json=edit_record_data_function(record1["id"]),
-    )
-    resp_request_submit = creator_client.post(
-        link2testclient(resp_request_create.json["links"]["actions"]["submit"]),
+    resp_request_submit = submit_request_on_record(
+        creator.identity, id_, "edit_published_record"
     )
     # is request accepted and closed?
     request = creator_client.get(
-        f'{urls["BASE_URL_REQUESTS"]}{resp_request_create.json["id"]}',
+        f'{urls["BASE_URL_REQUESTS"]}{resp_request_submit["id"]}',
     ).json
 
     assert request["status"] == "accepted"
@@ -64,12 +57,13 @@ def test_edit_autoaccept(
 
 
 def test_redirect_url(
-    vocab_cf,
     logged_client,
     users,
     urls,
-    edit_record_data_function,
+    submit_request_on_record,
+    submit_request_on_draft,
     record_factory,
+    link2testclient,
     search_clear,
 ):
     creator = users[0]
@@ -78,16 +72,13 @@ def test_redirect_url(
     receiver_client = logged_client(receiver)
 
     record1 = record_factory(creator.identity, custom_workflow="different_recipients")
-    id_ = record1["id"]
+    record_id = record1["id"]
 
-    resp_request_create = creator_client.post(
-        urls["BASE_URL_REQUESTS"],
-        json=edit_record_data_function(record1["id"]),
+    resp_request_submit = submit_request_on_record(
+        creator.identity, record_id, "edit_published_record"
     )
-    edit_request_id = resp_request_create.json["id"]
-    resp_request_submit = creator_client.post(
-        link2testclient(resp_request_create.json["links"]["actions"]["submit"]),
-    )
+    edit_request_id = resp_request_submit["id"]
+
     receiver_get = receiver_client.get(f"{urls['BASE_URL_REQUESTS']}{edit_request_id}")
     resp_request_accept = receiver_client.post(
         link2testclient(receiver_get.json["links"]["actions"]["accept"])
@@ -106,13 +97,13 @@ def test_redirect_url(
 
     assert (
         link2testclient(creator_edit_accepted["links"]["ui_redirect_url"], ui=True)
-        == f"/thesis/{record1['id']}/edit"
+        == f"/thesis/{record_id}/edit"
     )
     assert receiver_edit_accepted["links"]["ui_redirect_url"] == None
 
-    publish_request = _create_request(creator_client, id_, "publish_draft", urls)
-    creator_client.post(
-        link2testclient(publish_request.json["links"]["actions"]["submit"])
+    draft = creator_client.get(f"{urls['BASE_URL']}{record_id}/draft").json
+    publish_request = submit_request_on_draft(
+        creator.identity, draft["id"], "publish_draft"
     )
     receiver_edit_request_after_publish_draft_submitted = receiver_client.get(
         f"{urls['BASE_URL_REQUESTS']}{edit_request_id}"
@@ -124,11 +115,11 @@ def test_redirect_url(
             ],
             ui=True,
         )
-        == f"/thesis/{record1['id']}/preview"
+        == f"/thesis/{record_id}/preview"
     )
 
     receiver_publish_request = receiver_client.get(
-        f"{urls['BASE_URL_REQUESTS']}{publish_request.json['id']}"
+        f"{urls['BASE_URL_REQUESTS']}{publish_request['id']}"
     ).json
     receiver_client.post(
         link2testclient(receiver_publish_request["links"]["actions"]["accept"])

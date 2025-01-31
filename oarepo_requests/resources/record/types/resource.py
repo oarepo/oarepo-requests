@@ -25,8 +25,6 @@ if TYPE_CHECKING:
     from ....services.record.types.service import RecordRequestTypesService
     from .config import RecordRequestTypesResourceConfig
 
-# TODO: is this class used?
-
 
 class RecordRequestTypesResource(ErrorHandlersMixin, Resource):
     """API resource for applicable request types for a record."""

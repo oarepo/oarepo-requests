@@ -5,25 +5,24 @@
 # modify it under the terms of the MIT License; see LICENSE file for more
 # details.
 #
-from tests.test_requests.utils import link2testclient
 
 
 def test_search(
     logged_client,
     users,
     urls,
-    publish_request_data_function,
-    create_draft_via_resource,
+    create_request_on_draft,
+    draft_factory,
+    link2testclient,
     search_clear,
 ):
     creator = users[0]
     creator_client = logged_client(creator)
 
-    draft1 = create_draft_via_resource(creator_client)
+    draft1 = draft_factory(creator.identity)
 
-    resp_request_create = creator_client.post(
-        urls["BASE_URL_REQUESTS"],
-        json=publish_request_data_function(draft1.json["id"]),
+    resp_request_create = create_request_on_draft(
+        creator.identity, draft1["id"], "publish_draft"
     )
     # should work without refreshing requests index
     requests_search = creator_client.get(urls["BASE_URL_REQUESTS"]).json

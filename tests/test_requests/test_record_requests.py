@@ -7,15 +7,15 @@
 #
 from thesis.records.api import ThesisDraft, ThesisRecord
 
-from .utils import link2testclient
-
 
 def test_read_requests_on_draft(
     logged_client,
     users,
     urls,
-    publish_request_data_function,
-    create_draft_via_resource,
+    submit_request_on_draft,
+    create_request_on_draft,
+    draft_factory,
+    link2testclient,
     search_clear,
 ):
     creator = users[0]
@@ -23,50 +23,37 @@ def test_read_requests_on_draft(
     creator_client = logged_client(creator)
     receiver_client = logged_client(receiver)
 
-    draft1 = create_draft_via_resource(creator_client)
-    draft2 = create_draft_via_resource(creator_client)
-    draft3 = create_draft_via_resource(creator_client)
+    draft1 = draft_factory(creator.identity)
+    draft2 = draft_factory(creator.identity)
+    draft3 = draft_factory(creator.identity)
+    draft1_id = draft1["id"]
+    draft2_id = draft2["id"]
+    draft3_id = draft3["id"]
     ThesisRecord.index.refresh()
     ThesisDraft.index.refresh()
 
-    r1 = creator_client.post(
-        urls["BASE_URL_REQUESTS"],
-        json=publish_request_data_function(draft1.json["id"]),
+    resp_request_submit = submit_request_on_draft(
+        creator.identity, draft1_id, "publish_draft"
     )
-    resp_request_submit = creator_client.post(
-        link2testclient(r1.json["links"]["actions"]["submit"]),
-    )
-    record = receiver_client.get(
-        f"{urls['BASE_URL']}{draft1.json['id']}/draft?expand=true"
-    )
+    record = receiver_client.get(f"{urls['BASE_URL']}{draft1_id}/draft?expand=true")
     decline = receiver_client.post(
         link2testclient(
             record.json["expanded"]["requests"][0]["links"]["actions"]["decline"]
-        ),
+        )
     )
 
-    r2 = creator_client.post(
-        urls["BASE_URL_REQUESTS"],
-        json=publish_request_data_function(draft1.json["id"]),
-    )
-    r3 = creator_client.post(
-        urls["BASE_URL_REQUESTS"],
-        json=publish_request_data_function(draft2.json["id"]),
-    )
+    r2 = create_request_on_draft(creator.identity, draft1_id, "publish_draft")
+    r3 = create_request_on_draft(creator.identity, draft2_id, "publish_draft")
 
-    creator_client.get(link2testclient(r1.json["links"]["actions"]["submit"]))
-    creator_client.get(link2testclient(r2.json["links"]["actions"]["submit"]))
-    creator_client.get(link2testclient(r3.json["links"]["actions"]["submit"]))
-
-    resp1 = creator_client.get(
-        f"{urls['BASE_URL']}{draft1.json['id']}/draft/requests"
-    ).json["hits"]["hits"]
-    resp2 = creator_client.get(
-        f"{urls['BASE_URL']}{draft2.json['id']}/draft/requests"
-    ).json["hits"]["hits"]
-    resp3 = creator_client.get(
-        f"{urls['BASE_URL']}{draft3.json['id']}/draft/requests"
-    ).json["hits"]["hits"]
+    resp1 = creator_client.get(f"{urls['BASE_URL']}{draft1_id}/draft/requests").json[
+        "hits"
+    ]["hits"]
+    resp2 = creator_client.get(f"{urls['BASE_URL']}{draft2_id}/draft/requests").json[
+        "hits"
+    ]["hits"]
+    resp3 = creator_client.get(f"{urls['BASE_URL']}{draft3_id}/draft/requests").json[
+        "hits"
+    ]["hits"]
 
     assert len(resp1) == 2
     assert len(resp2) == 1
@@ -78,7 +65,9 @@ def test_read_requests_on_record(
     record_factory,
     users,
     urls,
-    delete_record_data_function,
+    submit_request_on_record,
+    create_request_on_record,
+    link2testclient,
     search_clear,
 ):
     creator = users[0]
@@ -89,44 +78,36 @@ def test_read_requests_on_record(
     record1 = record_factory(creator.identity)
     record2 = record_factory(creator.identity)
     record3 = record_factory(creator.identity)
+    record1_id = record1["id"]
+    record2_id = record2["id"]
+    record3_id = record3["id"]
     ThesisRecord.index.refresh()
     ThesisDraft.index.refresh()
-    r1 = creator_client.post(
-        urls["BASE_URL_REQUESTS"],
-        json=delete_record_data_function(record1["id"]),
+    resp_request_submit = submit_request_on_record(
+        creator.identity, record1_id, "delete_published_record"
     )
-    resp_request_submit = creator_client.post(
-        link2testclient(r1.json["links"]["actions"]["submit"]),
-    )
-    record = receiver_client.get(f"{urls['BASE_URL']}{record1['id']}?expand=true")
+    record = receiver_client.get(f"{urls['BASE_URL']}{record1_id}?expand=true")
     decline = receiver_client.post(
         link2testclient(
             record.json["expanded"]["requests"][0]["links"]["actions"]["decline"]
         ),
     )
-
-    r2 = creator_client.post(
-        urls["BASE_URL_REQUESTS"],
-        json=delete_record_data_function(record1["id"]),
+    r2 = create_request_on_record(
+        creator.identity, record1_id, "delete_published_record"
     )
-    r3 = creator_client.post(
-        urls["BASE_URL_REQUESTS"],
-        json=delete_record_data_function(record2["id"]),
+    r3 = create_request_on_record(
+        creator.identity, record2_id, "delete_published_record"
     )
 
-    creator_client.post(link2testclient(r1.json["links"]["actions"]["submit"]))
-    creator_client.post(link2testclient(r2.json["links"]["actions"]["submit"]))
-    creator_client.post(link2testclient(r3.json["links"]["actions"]["submit"]))
-
-    resp1 = creator_client.get(f"{urls['BASE_URL']}{record1['id']}/requests").json[
+    resp1 = creator_client.get(f"{urls['BASE_URL']}{record1_id}/requests").json["hits"][
         "hits"
-    ]["hits"]
-    resp2 = creator_client.get(f"{urls['BASE_URL']}{record2['id']}/requests").json[
+    ]
+    resp2 = creator_client.get(f"{urls['BASE_URL']}{record2_id}/requests").json["hits"][
         "hits"
-    ]["hits"]
-    resp3 = creator_client.get(f"{urls['BASE_URL']}{record3['id']}/requests").json[
+    ]
+    resp3 = creator_client.get(f"{urls['BASE_URL']}{record3_id}/requests").json["hits"][
         "hits"
-    ]["hits"]
+    ]
 
     assert len(resp1) == 2
     assert len(resp2) == 1

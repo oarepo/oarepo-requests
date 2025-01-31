@@ -12,10 +12,15 @@ from __future__ import annotations
 from typing import TYPE_CHECKING, Any
 
 from invenio_access.permissions import system_identity
+from invenio_notifications.services.uow import NotificationOp
 from invenio_records_resources.services.uow import RecordCommitOp, UnitOfWork
 from oarepo_runtime.datastreams.utils import get_record_service_for_record
 from oarepo_runtime.i18n import lazy_gettext as _
 
+from ..notifications.builders.publish import (
+    PublishDraftRequestAcceptNotificationBuilder,
+    PublishDraftRequestSubmitNotificationBuilder,
+)
 from .cascade_events import update_topic
 from .generic import (
     AddTopicLinksOnPayloadMixin,
@@ -52,6 +57,24 @@ class PublishMixin:
 class PublishDraftSubmitAction(PublishMixin, OARepoSubmitAction):
     """Submit action for publishing draft requests."""
 
+    def apply(
+        self,
+        identity: Identity,
+        request_type: RequestType,
+        topic: Record,
+        uow: UnitOfWork,
+        *args: Any,
+        **kwargs: Any,
+    ) -> Record:
+        """Publish the draft."""
+
+        uow.register(
+            NotificationOp(
+                PublishDraftRequestSubmitNotificationBuilder.build(request=self.request)
+            )
+        )
+        return super().apply(identity, request_type, topic, uow, *args, **kwargs)
+
 
 class PublishDraftAcceptAction(
     PublishMixin, AddTopicLinksOnPayloadMixin, OARepoAcceptAction
@@ -86,6 +109,11 @@ class PublishDraftAcceptAction(
             identity, id_, *args, uow=uow, expand=False, **kwargs
         )
         update_topic(self.request, topic, published_topic._record, uow)
+        uow.register(
+            NotificationOp(
+                PublishDraftRequestAcceptNotificationBuilder.build(request=self.request)
+            )
+        )
         return super().apply(
             identity, request_type, published_topic, uow, *args, **kwargs
         )
