@@ -20,10 +20,9 @@ class EntityRecipient(RecipientGenerator):
     """Recipient generator working as handler for generic entity."""
 
     def __init__(self, key: str):
-
         self.key = key
 
-    def __call__(self, notification: Notification, recipients: dict[Recipient]):
+    def __call__(self, notification: Notification, recipients: dict[str, Recipient]):
         """"""
         backend_ids = notification.context["backend_ids"]
         entity_ref = dict_lookup(notification.context, self.key)
@@ -41,15 +40,14 @@ class SpecificEntityRecipient(RecipientGenerator):
     def __init__(self, key):
         self.key = key  # todo this is entity_reference, not path to entity as EntityRecipient, might be confusing
 
-    def __call__(self, notification: Notification, recipients: dict[Recipient]):
+    def __call__(self, notification: Notification, recipients: dict[str, Recipient]):
         entity = self._resolve_entity()
-        return self._get_recipients(entity, recipients)
+        recipients.update(self._get_recipients(entity))
+        return recipients
 
     @abstractmethod
-    def _get_recipients(
-        self, entity: Any, recipients: dict[Recipient]
-    ) -> dict[Recipient]:
-        raise NotImplementedError
+    def _get_recipients(self, entity: Any) -> dict[str, Recipient]:
+        raise NotImplementedError()
 
     def _resolve_entity(self) -> Any:
         entity_type = list(self.key)[0]
@@ -65,23 +63,15 @@ class SpecificEntityRecipient(RecipientGenerator):
 class UserEmailRecipient(SpecificEntityRecipient):
     """User email recipient generator for a notification."""
 
-    def _get_recipients(
-        self, entity: Any, recipients: dict[Recipient]
-    ) -> dict[Recipient]:
-        email = entity.email
-        recipients[email] = Recipient(data={"email": email})
-        return recipients
+    def _get_recipients(self, entity: Any) -> dict[str, Recipient]:
+        return {entity.email: Recipient(data={"email": entity.email})}
 
 
 class GroupEmailRecipient(SpecificEntityRecipient):
     """Recipient generator returning emails of the members of the recipient group"""
 
-    def _get_recipients(
-        self, entity: Any, recipients: dict[Recipient]
-    ) -> dict[Recipient]:
-        users_query = entity.users
-        users = users_query.all()
-        mails = [u.email for u in users]
-        for mail in mails:
-            recipients[mail] = Recipient(data={"email": mail})
-        return recipients
+    def _get_recipients(self, entity: Any) -> dict[str, Recipient]:
+        return {
+            user.email: Recipient(data={"email": user.email})
+            for user in entity.users.all()
+        }
