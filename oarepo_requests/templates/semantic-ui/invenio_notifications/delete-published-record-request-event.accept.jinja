@@ -1,0 +1,20 @@
+{% set access_request = notification.context.request %}
+{% set topic = notification.context.request.topic %}
+{% set topic_id = notification.context.request.topic.thesis %}
+
+{%- block subject -%}
+    {{ _("❗️Delete published request for topic '{topic_id}' accepted").format(topic_id=topic_id) }}
+{%- endblock subject -%}
+
+{%- block html_body -%}
+    <table style="font-family:'Lato',Helvetica,Arial,sans-serif;border-spacing:15px">
+        <tr>
+            <td style="font-size:smaller">{{ _("This is an auto-generated message. To manage notifications, visit your")}} <a href="{{account_settings_link}}">{{ _("account settings")}}</a>.</td>
+        </tr>
+    </table>
+{%- endblock html_body -%}
+
+{%- block plain_body -%}
+{{ _("Request for deleting your record '%(topic_id)s' has been accepted.", topic_id=topic_id) }}
+
+{%- endblock plain_body -%}

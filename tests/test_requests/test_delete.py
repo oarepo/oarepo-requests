@@ -5,18 +5,17 @@
 # modify it under the terms of the MIT License; see LICENSE file for more
 # details.
 #
+from pytest_oarepo.requests.functions import get_request_create_link
 from thesis.records.api import ThesisDraft, ThesisRecord
-
-from .utils import link2testclient
 
 
 def test_delete(
-    vocab_cf,
     logged_client,
     record_factory,
     users,
     urls,
-    delete_record_data_function,
+    submit_request_on_record,
+    link2testclient,
     search_clear,
 ):
     creator = users[0]
@@ -27,20 +26,19 @@ def test_delete(
     record1 = record_factory(creator.identity)
     record2 = record_factory(creator.identity)
     record3 = record_factory(creator.identity)
+    record1_id = record1["id"]
+    record2_id = record2["id"]
+    record3_id = record3["id"]
     ThesisRecord.index.refresh()
     ThesisDraft.index.refresh()
     lst = creator_client.get(urls["BASE_URL"])
     assert len(lst.json["hits"]["hits"]) == 3
 
-    resp_request_create = creator_client.post(
-        urls["BASE_URL_REQUESTS"],
-        json=delete_record_data_function(record1["id"]),
-    )
-    resp_request_submit = creator_client.post(
-        link2testclient(resp_request_create.json["links"]["actions"]["submit"]),
+    resp_request_submit = submit_request_on_record(
+        creator.identity, record1_id, "delete_published_record"
     )
 
-    record = receiver_client.get(f"{urls['BASE_URL']}{record1['id']}?expand=true")
+    record = receiver_client.get(f"{urls['BASE_URL']}{record1_id}?expand=true")
     assert record.json["expanded"]["requests"][0]["links"]["actions"].keys() == {
         "accept",
         "decline",
@@ -59,32 +57,24 @@ def test_delete(
     lst = creator_client.get(urls["BASE_URL"])
     assert len(lst.json["hits"]["hits"]) == 2
 
-    resp_request_create = creator_client.post(
-        urls["BASE_URL_REQUESTS"],
-        json=delete_record_data_function(record2["id"]),
+    resp_request_submit = submit_request_on_record(
+        creator.identity, record2_id, "delete_published_record"
     )
-    resp_request_submit = creator_client.post(
-        link2testclient(resp_request_create.json["links"]["actions"]["submit"]),
-    )
-    record = receiver_client.get(f"{urls['BASE_URL']}{record2['id']}?expand=true")
+    record = receiver_client.get(f"{urls['BASE_URL']}{record2_id}?expand=true")
     decline = receiver_client.post(
         link2testclient(
             record.json["expanded"]["requests"][0]["links"]["actions"]["decline"]
         )
     )
     declined_request = creator_client.get(
-        f"{urls['BASE_URL_REQUESTS']}{resp_request_create.json['id']}"
+        f"{urls['BASE_URL_REQUESTS']}{resp_request_submit['id']}"
     )
     assert declined_request.json["status"] == "declined"
 
-    resp_request_create = creator_client.post(
-        urls["BASE_URL_REQUESTS"],
-        json=delete_record_data_function(record3["id"]),
+    resp_request_submit = submit_request_on_record(
+        creator.identity, record3_id, "delete_published_record"
     )
-    resp_request_submit = creator_client.post(
-        link2testclient(resp_request_create.json["links"]["actions"]["submit"]),
-    )
-    record = creator_client.get(f"{urls['BASE_URL']}{record3['id']}?expand=true")
+    record = creator_client.get(f"{urls['BASE_URL']}{record3_id}?expand=true")
     assert record.json["expanded"]["requests"][0]["links"]["actions"].keys() == {
         "cancel"
     }
@@ -94,32 +84,33 @@ def test_delete(
         ),
     )
     canceled_request = creator_client.get(
-        f"{urls['BASE_URL_REQUESTS']}{resp_request_create.json['id']}"
+        f"{urls['BASE_URL_REQUESTS']}{resp_request_submit['id']}"
     )
     assert canceled_request.json["status"] == "cancelled"
 
 
 def test_delete_draft(
-    vocab_cf,
     logged_client,
-    create_draft_via_resource,
+    draft_factory,
     users,
     urls,
-    delete_draft_function,
-    get_request_link,
+    link2testclient,
     search_clear,
 ):
-    creator_client = logged_client(users[0])
+    creator = users[0]
+    creator_client = logged_client(creator)
 
-    draft1 = create_draft_via_resource(creator_client)
-    draft_id = draft1.json["id"]
+    draft1 = draft_factory(creator.identity)
+    draft_id = draft1["id"]
 
     read = creator_client.get(f"{urls['BASE_URL']}{draft_id}/draft?expand=true")
     assert read.status_code == 200
 
     resp_request_create = creator_client.post(
         link2testclient(
-            get_request_link(read.json["expanded"]["request_types"], "delete_draft")
+            get_request_create_link(
+                read.json["expanded"]["request_types"], "delete_draft"
+            )
         )
     )
     resp_request_submit = creator_client.post(

@@ -14,6 +14,7 @@ from functools import cached_property
 from typing import TYPE_CHECKING, Callable
 
 import importlib_metadata
+from deepmerge import conservative_merger
 from invenio_base.utils import obj_or_import_string
 from invenio_requests.proxies import current_events_service
 
@@ -97,8 +98,7 @@ class OARepoRequests:
         :param creator: Creator of the request.
         :param data: Payload of the request.
         """
-        # TODO: if the topic is one of the workflow topics, use the workflow to determine the receiver
-        # otherwise use the default receiver
+
         return obj_or_import_string(
             self.app.config["OAREPO_REQUESTS_DEFAULT_RECEIVER"]
         )(
@@ -214,6 +214,13 @@ class OARepoRequests:
             if event_type not in app_registered_event_types:
                 app_registered_event_types.append(event_type)
 
+        app_registered_event_types = app.config.setdefault(
+            "NOTIFICATION_RECIPIENTS_RESOLVERS", {}
+        )
+        app.config["NOTIFICATION_RECIPIENTS_RESOLVERS"] = conservative_merger.merge(
+            app_registered_event_types, config.NOTIFICATION_RECIPIENTS_RESOLVERS
+        )
+
 
 def api_finalize_app(app: Flask) -> None:
     """Finalize app."""
@@ -240,3 +247,7 @@ def finalize_app(app: Flask) -> None:
     # but imo this is better than entrypoints
     for type in app.config["REQUESTS_REGISTERED_EVENT_TYPES"]:
         current_event_type_registry.register_type(type)
+
+    ext.notification_recipients_resolvers_registry = app.config[
+        "NOTIFICATION_RECIPIENTS_RESOLVERS"
+    ]
