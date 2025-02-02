@@ -18,6 +18,7 @@ from typing_extensions import override
 from oarepo_requests.actions.delete_published_record import (
     DeletePublishedRecordAcceptAction,
     DeletePublishedRecordDeclineAction,
+    DeletePublishedRecordSubmitAction,
 )
 
 from ..utils import classproperty, is_auto_approved, request_identity_matches
@@ -51,6 +52,7 @@ class DeletePublishedRecordRequestType(NonDuplicableOARepoRequestType):
         """Return available actions for the request type."""
         return {
             **super().available_actions,
+            "submit": DeletePublishedRecordSubmitAction,
             "accept": DeletePublishedRecordAcceptAction,
             "decline": DeletePublishedRecordDeclineAction,
         }

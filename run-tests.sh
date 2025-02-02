@@ -1,6 +1,6 @@
 #!/bin/bash
 set -e
-
+export PYTHONWARNINGS="ignore"
 OAREPO_VERSION=${OAREPO_VERSION:-12}
 PYTHON="${PYTHON:-python3.12}"
 
@@ -11,6 +11,8 @@ MODEL="thesis"
 BUILDER_VENV=".venv-builder"
 BUILD_TEST_DIR="tests"
 CODE_TEST_DIR="tests"
+
+curl -L -o forked_install.sh https://github.com/oarepo/nrp-devtools/raw/main/tests/forked_install.sh
 
 if test -d $BUILDER_VENV ; then
 	rm -rf $BUILDER_VENV
@@ -40,7 +42,7 @@ fi
 "${PYTHON}" -m venv $MODEL_VENV
 . $MODEL_VENV/bin/activate
 pip install -U setuptools pip wheel
-pip install "oarepo[tests, rdm]==$OAREPO_VERSION.*"
+pip install "oarepo[tests]==$OAREPO_VERSION.*"
 pip install -e "./$BUILD_TEST_DIR/${MODEL}"
 
 # Check if we can import all the sources
@@ -50,14 +52,8 @@ done | python
 
 pip install -e ".[tests]"
 
-#sh forked_install.sh invenio-records-resources
-
-#sh forked_install.sh invenio-requests
-
-#sh forked_install.sh invenio-drafts-resources
-
-#sh forked_install.sh invenio-rdm-records
-
-#pip install -U --force-reinstall --no-deps https://github.com/oarepo/invenio-rdm-records/archive/oarepo-10.8.0.zip
+sh forked_install.sh invenio-records-resources
+sh forked_install.sh invenio-requests
+sh forked_install.sh invenio-drafts-resources
 pytest $BUILD_TEST_DIR/test_requests
 pytest $BUILD_TEST_DIR/test_ui

@@ -64,16 +64,14 @@ def resolve(identity: Identity, reference: dict[str, str]) -> UIResolvedReferenc
 
     entity_resolvers = current_oarepo_requests.entity_reference_ui_resolvers
 
-    if reference_type == 'multiple':
+    if reference_type == "multiple":
         # TODO(mirekys): add test coverage
         resolved = []
         reference_values_list = list(json.loads(reference_value))
 
         for reference_values_item in reference_values_list:
             for key, value in reference_values_item.items():
-                resolved.append(entity_resolvers[key].resolve_one(
-                    identity, value
-                ))
+                resolved.append(entity_resolvers[key].resolve_one(identity, value))
     elif reference_type in entity_resolvers:
         resolved = entity_resolvers[reference_type].resolve_one(
             identity, reference_value
