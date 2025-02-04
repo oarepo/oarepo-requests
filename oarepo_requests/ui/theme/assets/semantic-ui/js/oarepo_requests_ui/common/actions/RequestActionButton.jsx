@@ -3,10 +3,11 @@ import { Button, Icon } from "semantic-ui-react";
 import PropTypes from "prop-types";
 import { useFormikContext } from "formik";
 import {
-  useConfirmModalContext,
   useModalControlContext,
   useAction,
+  ConfirmationModal,
 } from "@js/oarepo_requests_common";
+import { useConfirmationModal } from "@js/oarepo_ui";
 
 export const RequestActionButton = ({
   requestOrRequestType,
@@ -20,11 +21,13 @@ export const RequestActionButton = ({
   ...uiProps
 }) => {
   const formik = useFormikContext();
-  const { confirmAction } = useConfirmModalContext();
+
+  const { isOpen, close, open } = useConfirmationModal();
+
   const modalControl = useModalControlContext();
   const { isLoading, mutate: requestAction } = useAction({
     action,
-    requestOrRequestType: requestOrRequestType,
+    requestOrRequestType,
     formik,
     modalControl,
     requestActionName,
@@ -32,30 +35,38 @@ export const RequestActionButton = ({
 
   const handleClick = () => {
     if (requireConfirmation) {
-      confirmAction(
-        (value) => requestAction(value),
-        requestActionName,
-        extraData
-      );
+      open();
     } else {
       requestAction();
     }
   };
 
   return (
-    <Button
-      title={buttonLabel}
-      onClick={() => handleClick()}
-      className="requests request-accept-button"
-      icon
-      labelPosition="left"
-      loading={isLoading}
-      disabled={isMutating > 0}
-      {...uiProps}
-    >
-      <Icon name={iconName} />
-      {buttonLabel}
-    </Button>
+    <>
+      <Button
+        title={buttonLabel}
+        onClick={handleClick}
+        className="requests request-action-button"
+        icon
+        labelPosition="left"
+        loading={isLoading}
+        disabled={isMutating > 0}
+        {...uiProps}
+      >
+        <Icon name={iconName} />
+        {buttonLabel}
+      </Button>
+      <ConfirmationModal
+        requestActionName={requestActionName}
+        requestOrRequestType={requestOrRequestType}
+        requestExtraData={extraData}
+        onConfirmAction={(comment) => {
+          requestAction(comment);
+        }}
+        isOpen={isOpen}
+        close={close}
+      />
+    </>
   );
 };
 

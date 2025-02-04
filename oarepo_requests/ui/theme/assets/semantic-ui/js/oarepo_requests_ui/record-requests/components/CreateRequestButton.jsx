@@ -1,10 +1,7 @@
 import React from "react";
-import { Button, Confirm } from "semantic-ui-react";
+import { Button } from "semantic-ui-react";
 import { RequestModal, CreateRequestModalContent } from ".";
-import {
-  DirectCreateAndSubmit,
-  ConfirmModalContextProvider,
-} from "@js/oarepo_requests_common";
+import { DirectCreateAndSubmit } from "@js/oarepo_requests_common";
 import PropTypes from "prop-types";
 
 export const CreateRequestButton = ({
@@ -18,41 +15,21 @@ export const CreateRequestButton = ({
 
   if (!hasForm && dangerous) {
     return (
-      <ConfirmModalContextProvider requestOrRequestType={requestType}>
-        {({ confirmDialogProps }) => (
-          <>
-            <DirectCreateAndSubmit
-              requestType={requestType}
-              requireConfirmation={dangerous}
-              isMutating={isMutating}
-            />
-            <Confirm
-              {...confirmDialogProps}
-              className="requests dangerous-action-confirmation-modal"
-            />
-          </>
-        )}
-      </ConfirmModalContextProvider>
+      <DirectCreateAndSubmit
+        requestType={requestType}
+        requireConfirmation={dangerous}
+        isMutating={isMutating}
+      />
     );
   }
 
   if (!hasForm && !dangerous) {
     return (
-      <ConfirmModalContextProvider requestOrRequestType={requestType}>
-        {({ confirmDialogProps }) => (
-          <>
-            <DirectCreateAndSubmit
-              requestType={requestType}
-              requireConfirmation={false}
-              isMutating={isMutating}
-            />
-            <Confirm
-              {...confirmDialogProps}
-              className="requests dangerous-action-confirmation-modal"
-            />
-          </>
-        )}
-      </ConfirmModalContextProvider>
+      <DirectCreateAndSubmit
+        requestType={requestType}
+        requireConfirmation={false}
+        isMutating={isMutating}
+      />
     );
   }
 
