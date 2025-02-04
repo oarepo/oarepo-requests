@@ -13,21 +13,11 @@ export const CreateRequestButton = ({
   const { dangerous, has_form: hasForm } = requestType;
   const needsDialog = dangerous || hasForm;
 
-  if (!hasForm && dangerous) {
+  if (!hasForm) {
     return (
       <DirectCreateAndSubmit
         requestType={requestType}
         requireConfirmation={dangerous}
-        isMutating={isMutating}
-      />
-    );
-  }
-
-  if (!hasForm && !dangerous) {
-    return (
-      <DirectCreateAndSubmit
-        requestType={requestType}
-        requireConfirmation={false}
         isMutating={isMutating}
       />
     );
