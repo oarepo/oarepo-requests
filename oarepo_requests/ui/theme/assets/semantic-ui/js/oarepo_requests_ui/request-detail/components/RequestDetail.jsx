@@ -8,7 +8,6 @@ import {
   TransitionablePortal,
   Icon,
   Menu,
-  Confirm,
   Loader,
   Message,
 } from "semantic-ui-react";
@@ -16,7 +15,6 @@ import PropTypes from "prop-types";
 import { useQuery, useIsMutating } from "@tanstack/react-query";
 import {
   mapLinksToActions,
-  ConfirmModalContextProvider,
   RequestCustomFields,
   SideRequestInfo,
   Timeline,
@@ -87,121 +85,111 @@ export const RequestDetail = ({
     >
       <Formik initialValues={formikInitialValues}>
         {({ errors }) => (
-          <ConfirmModalContextProvider requestOrRequestType={request}>
-            {({ confirmDialogProps }) => (
-              <Grid relaxed>
-                <Grid.Row columns={2}>
-                  <Grid.Column>
-                    <Button
-                      as="a"
-                      compact
-                      href="/me/requests/"
-                      icon
-                      labelPosition="left"
-                    >
-                      <Icon name="arrow left" />
-                      {i18next.t("Back to requests")}
-                    </Button>
-                  </Grid.Column>
-                  <Grid.Column floated="right" textAlign="right">
-                    {actions.map(({ name, component: ActionComponent }) => (
-                      <React.Fragment key={name}>
-                        <ActionComponent
-                          request={request}
-                          extraData={requestTypeProperties}
-                          isMutating={isMutating}
-                        />
-                      </React.Fragment>
-                    ))}
-                  </Grid.Column>
-                </Grid.Row>
-                <Confirm
-                  {...confirmDialogProps}
-                  className="requests dangerous-action-confirmation-modal"
-                />
-                {errors?.api && (
-                  <Grid.Row>
-                    <Grid.Column>
-                      <Message negative>
-                        <Message.Header>{errors.api}</Message.Header>
-                      </Message>
-                    </Grid.Column>
-                  </Grid.Row>
-                )}
-                <Grid.Row>
-                  <Grid.Column>
-                    <Header as="h1">{requestHeader}</Header>
-                    {description && (
-                      <p
-                        dangerouslySetInnerHTML={{
-                          __html: sanitizedDescription,
-                        }}
-                      ></p>
-                    )}
-                    <SideRequestInfo request={request} />
-                  </Grid.Column>
-                </Grid.Row>
-                <React.Fragment>
-                  <RequestCustomFields
-                    request={request}
-                    customFields={customFields}
-                    actions={actions}
-                  />
-                  <Loader active={isLoading} />
-                </React.Fragment>
-                <Grid.Row>
-                  <Grid.Column>
-                    <Menu tabular attached>
-                      <Menu.Item
-                        name="timeline"
-                        content={i18next.t("Timeline")}
-                        active={activeTab === "timeline"}
-                        onClick={() => setActiveTab("timeline")}
-                      />
-                      {request?.links?.topic?.self_html && (
-                        <Menu.Item
-                          name="topic"
-                          content={i18next.t("Record preview")}
-                          active={activeTab === "topic"}
-                          onClick={() => setActiveTab("topic")}
-                        />
-                      )}
-                    </Menu>
-                  </Grid.Column>
-                </Grid.Row>
-                <Grid.Row>
-                  <Grid.Column>
-                    {activeTab === "timeline" && (
-                      <Timeline
-                        request={request}
-                        timelinePageSize={timelinePageSize}
-                      />
-                    )}
-                    {activeTab === "topic" && (
-                      <TopicPreview request={request} />
-                    )}
-                  </Grid.Column>
-                </Grid.Row>
-                <TransitionablePortal
-                  open={scrollToTopVisible}
-                  transition={{ animation: "fade up", duration: 300 }}
+          <Grid relaxed>
+            <Grid.Row columns={2}>
+              <Grid.Column>
+                <Button
+                  as="a"
+                  compact
+                  href="/me/requests/"
+                  icon
+                  labelPosition="left"
                 >
-                  <Button
-                    onClick={scrollTop}
-                    id="scroll-top-button"
-                    secondary
-                    circular
-                    basic
-                  >
-                    <Icon size="large" name="chevron up" />
-                    <div className="scroll-top-text">
-                      {i18next.t("to top").toUpperCase()}
-                    </div>
-                  </Button>
-                </TransitionablePortal>
-              </Grid>
+                  <Icon name="arrow left" />
+                  {i18next.t("Back to requests")}
+                </Button>
+              </Grid.Column>
+              <Grid.Column floated="right" textAlign="right">
+                {actions.map(({ name, component: ActionComponent }) => (
+                  <React.Fragment key={name}>
+                    <ActionComponent
+                      request={request}
+                      requestType={request}
+                      extraData={requestTypeProperties}
+                      isMutating={isMutating}
+                    />
+                  </React.Fragment>
+                ))}
+              </Grid.Column>
+            </Grid.Row>
+            {errors?.api && (
+              <Grid.Row>
+                <Grid.Column>
+                  <Message negative>
+                    <Message.Header>{errors.api}</Message.Header>
+                  </Message>
+                </Grid.Column>
+              </Grid.Row>
             )}
-          </ConfirmModalContextProvider>
+            <Grid.Row>
+              <Grid.Column>
+                <Header as="h1">{requestHeader}</Header>
+                {description && (
+                  <p
+                    dangerouslySetInnerHTML={{
+                      __html: sanitizedDescription,
+                    }}
+                  ></p>
+                )}
+                <SideRequestInfo request={request} />
+              </Grid.Column>
+            </Grid.Row>
+            <React.Fragment>
+              <RequestCustomFields
+                request={request}
+                customFields={customFields}
+              />
+              <Loader active={isLoading} />
+            </React.Fragment>
+            <Grid.Row>
+              <Grid.Column>
+                <Menu tabular attached>
+                  <Menu.Item
+                    name="timeline"
+                    content={i18next.t("Timeline")}
+                    active={activeTab === "timeline"}
+                    onClick={() => setActiveTab("timeline")}
+                  />
+                  {request?.links?.topic?.self_html && (
+                    <Menu.Item
+                      name="topic"
+                      content={i18next.t("Record preview")}
+                      active={activeTab === "topic"}
+                      onClick={() => setActiveTab("topic")}
+                    />
+                  )}
+                </Menu>
+              </Grid.Column>
+            </Grid.Row>
+            <Grid.Row>
+              <Grid.Column>
+                {activeTab === "timeline" && (
+                  <Timeline
+                    request={request}
+                    timelinePageSize={timelinePageSize}
+                  />
+                )}
+                {activeTab === "topic" && <TopicPreview request={request} />}
+              </Grid.Column>
+            </Grid.Row>
+            <TransitionablePortal
+              open={scrollToTopVisible}
+              transition={{ animation: "fade up", duration: 300 }}
+            >
+              <Button
+                onClick={scrollTop}
+                id="scroll-top-button"
+                secondary
+                circular
+                basic
+              >
+                <Icon size="large" name="chevron up" />
+                <div className="scroll-top-text">
+                  {i18next.t("to top").toUpperCase()}
+                </div>
+              </Button>
+            </TransitionablePortal>
+          </Grid>
         )}
       </Formik>
     </CallbackContextProvider>

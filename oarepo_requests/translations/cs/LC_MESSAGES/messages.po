@@ -746,3 +746,13 @@ msgstr "Chybí nahrané soubory."
 #: /home/dusanst/Projects/oarepo-requests/oarepo_requests/types/new_version.py:78
 msgid "Yes or no"
 msgstr "Ano nebo ne"
+
+#: /home/dusanst/Projects/oarepo-requests/oarepo_requests/types/new_version.py:91
+msgid "Keep files"
+msgstr "Ponechat soubory"
+
+msgid "commentTooLong"
+msgid_plural "commentTooLong"
+msgstr[0] "Váš komentář překročil povolenou délku. Odeberte {{count}} znak."
+msgstr[1] "Váš komentář překročil povolenou délku. Odeberte {{count}} znaky."
+msgstr[2] "Váš komentář překročil povolenou délku. Odeberte {{count}} znaků."

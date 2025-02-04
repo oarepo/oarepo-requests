@@ -714,5 +714,12 @@ msgstr ""
 msgid "Yes or no"
 msgstr ""
 
+msgid "commentTooLong"
+msgid_plural "commentTooLong"
+msgstr[0] ""
+"Your comment is over the allowed length. Please remove {{count}} character."
+msgstr[1] ""
+"Your comment is over the allowed length. Please remove {{count}} characters."
+
 #~ msgid "No status"
 #~ msgstr ""

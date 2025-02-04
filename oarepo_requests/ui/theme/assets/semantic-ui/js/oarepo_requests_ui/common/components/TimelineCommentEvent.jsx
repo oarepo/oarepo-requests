@@ -9,6 +9,7 @@ import {
   ConfirmationModalCancelButton,
   ConfirmationModalConfirmButton,
   RequestCommentInput,
+  MAX_COMMENT_LENGTH,
 } from "@js/oarepo_requests_common";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { httpApplicationJson } from "@js/oarepo_ui";
@@ -20,6 +21,8 @@ const TimelineCommentEvent = ({ event, requestId, page }) => {
   const [editMode, setEditMode] = useState(false);
   const [deleteMode, setDeleteMode] = useState(false);
   const [comment, setComment] = useState(event.payload.content);
+  const [length, setLength] = useState(comment.length);
+  const handleLengthChange = (length) => setLength(length);
   const toggleEditMode = () => setEditMode(!editMode);
   const toggleDeleteMode = () => setDeleteMode(!deleteMode);
   const canUpdate = event?.permissions?.can_update_comment;
@@ -148,8 +151,10 @@ const TimelineCommentEvent = ({ event, requestId, page }) => {
   };
 
   const editButtonDisabled =
-    editLoading || comment === event.payload.content || !comment;
-
+    editLoading ||
+    comment === event.payload.content ||
+    !comment ||
+    length > MAX_COMMENT_LENGTH;
   return (
     <div className="requests comment-event-container">
       <Feed.Event key={event.id}>
@@ -205,6 +210,9 @@ const TimelineCommentEvent = ({ event, requestId, page }) => {
                 comment={comment}
                 initialValue={event?.payload?.content}
                 handleChange={handleCommentChange}
+                length={length}
+                setLength={handleLengthChange}
+                maxCommentLength={MAX_COMMENT_LENGTH}
               />
               <div className="requests edit-comment-buttons">
                 <Button

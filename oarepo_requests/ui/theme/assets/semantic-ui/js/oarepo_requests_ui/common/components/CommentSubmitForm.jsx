@@ -2,7 +2,10 @@ import React, { useState } from "react";
 import PropTypes from "prop-types";
 import { i18next } from "@translations/oarepo_requests_ui/i18next";
 import { Button, Message, Form } from "semantic-ui-react";
-import { RequestCommentInput } from "@js/oarepo_requests_common";
+import {
+  RequestCommentInput,
+  MAX_COMMENT_LENGTH,
+} from "@js/oarepo_requests_common";
 
 export const CommentSubmitForm = ({ commentSubmitMutation }) => {
   const {
@@ -15,6 +18,10 @@ export const CommentSubmitForm = ({ commentSubmitMutation }) => {
   const [comment, setComment] = useState({
     payload: { content: "", format: "html" },
   });
+
+  const [length, setLength] = useState(comment.payload.content.length);
+
+  const handleLengthChange = (length) => setLength(length);
 
   const handleCommentChange = (event, value) => {
     setComment({
@@ -47,6 +54,9 @@ export const CommentSubmitForm = ({ commentSubmitMutation }) => {
       <RequestCommentInput
         comment={comment.payload.content}
         handleChange={handleCommentChange}
+        length={length}
+        setLength={handleLengthChange}
+        maxCommentLength={MAX_COMMENT_LENGTH}
       />
       {isError && (
         <Message negative>
@@ -66,7 +76,9 @@ export const CommentSubmitForm = ({ commentSubmitMutation }) => {
         className="rel-mt-1"
         labelPosition="left"
         loading={isLoading}
-        disabled={isLoading || !comment.payload.content}
+        disabled={
+          isLoading || !comment.payload.content || length > MAX_COMMENT_LENGTH
+        }
         content={i18next.t("Leave comment")}
         onClick={handleCommentSubmit}
       />
