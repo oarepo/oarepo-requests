@@ -32,6 +32,7 @@ export const RequestList = ({ requests }) => {
             title={header}
             content={header}
             disabled={isMutating > 0}
+            labelPosition="left"
             {...buttonIconProps}
           />
         }
