@@ -61,6 +61,7 @@ const DirectCreateAndSubmit = ({
         loading={isLoading}
         disabled={isMutating > 0}
         onClick={() => handleClick()}
+        labelPosition="left"
         {...buttonIconProps}
       />
       {isError && (
