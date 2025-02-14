@@ -91,6 +91,8 @@ tests/thesis
 thesis
 thesis_workflows/
 
+test-repositories/
+
 todo.md
 node_modules
 
