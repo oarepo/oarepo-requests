@@ -7,6 +7,7 @@
 #
 
 from thesis.records.api import ThesisDraft, ThesisRecord
+from invenio_records_resources.proxies import current_service_registry
 
 
 def test_new_version_autoaccept(
@@ -47,10 +48,8 @@ def test_new_version_autoaccept(
     ThesisDraft.index.refresh()
     # new_version action worked?
     search = creator_client.get(
-        f'user{urls["BASE_URL"]}',
-    ).json[
-        "hits"
-    ]["hits"]
+        f'user{urls["BASE_URL"]}?allversions=true',
+    ).json['hits']['hits']
     assert len(search) == 2
     assert search[0]["id"] != search[1]["id"]
     assert search[0]["parent"]["id"] == search[1]["parent"]["id"]
