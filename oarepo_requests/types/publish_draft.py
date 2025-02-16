@@ -52,17 +52,6 @@ class PublishDraftRequestType(NonDuplicableOARepoRequestType):
             attribute="published_record:links:self_html",
             data_key="published_record:links:self_html",
         ),
-        "version": ma.fields.Str(),
-    }
-
-    form = {
-        "field": "version",
-        "ui_widget": "Input",
-        "props": {
-            "label": _("Resource version"),
-            "placeholder": _("Write down the version (first, second…)."),
-            "required": False,
-        },
     }
 
     @classproperty
