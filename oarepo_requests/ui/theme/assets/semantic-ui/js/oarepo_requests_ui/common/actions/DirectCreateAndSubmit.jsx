@@ -30,7 +30,9 @@ const DirectCreateAndSubmit = ({
     requestOrRequestType: requestType,
   });
   const { requestButtonsIconsConfig } = useRequestContext();
-  const buttonIconProps = requestButtonsIconsConfig[requestType.type_id];
+  const buttonIconProps =
+    requestButtonsIconsConfig[requestType.type_id] ||
+    requestButtonsIconsConfig?.default;
   const buttonContent =
     requestType?.stateful_name || requestType?.name || requestType?.type_id;
 

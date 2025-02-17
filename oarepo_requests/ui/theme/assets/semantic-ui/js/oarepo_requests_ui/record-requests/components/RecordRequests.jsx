@@ -18,6 +18,7 @@ const overriddenComponents = overrideStore.getAll();
 export const requestButtonsDefaultIconConfig = {
   delete_published_record: { icon: "trash" },
   publish_draft: { icon: "upload" },
+  publish_new_version: { icon: "upload" },
   new_version: { icon: "tag" },
   edit_published_record: { icon: "pencil" },
   assign_doi: { icon: "address card" },
@@ -27,6 +28,7 @@ export const requestButtonsDefaultIconConfig = {
   secondary_community_submission: { icon: "users" },
   remove_secondary_community: { icon: "remove" },
   submitted: { icon: "clock" },
+  default: { icon: "plus" },
 };
 
 const queryClient = new QueryClient();

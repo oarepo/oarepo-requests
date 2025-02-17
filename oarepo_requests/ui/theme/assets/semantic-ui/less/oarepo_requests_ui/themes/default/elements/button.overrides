@@ -8,7 +8,11 @@
       color: @white;
     }
     &.publish_draft {
-      color: white;
+      color: @white;
+      background-color: @green;
+    }
+    &.publish_new_version {
+      color: @white;
       background-color: @green;
     }
   }
@@ -16,6 +20,10 @@
     display: block;
     margin-bottom: 10px;
     &.publish_draft {
+      color: white;
+      background-color: @green;
+    }
+    &.publish_new_version {
       color: white;
       background-color: @green;
     }
