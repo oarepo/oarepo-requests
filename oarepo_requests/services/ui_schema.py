@@ -14,7 +14,10 @@ from types import SimpleNamespace
 from typing import TYPE_CHECKING, Any, cast
 
 import marshmallow as ma
-from invenio_pidstore.errors import PersistentIdentifierError, PIDDeletedError
+from invenio_pidstore.errors import (
+    PersistentIdentifierError,
+    PIDDeletedError,
+)
 from invenio_requests.proxies import current_request_type_registry, current_requests
 from invenio_requests.resolvers.registry import ResolverRegistry
 from invenio_requests.services.schemas import (
@@ -69,7 +72,10 @@ class UIReferenceSchema(ma.Schema):
             except PersistentIdentifierError:
                 return {**data, "status": "invalid"}
         resolved_cache = self.context["resolved"]
-        return resolved_cache.dereference(data["reference"])
+        try:
+            return resolved_cache.dereference(data["reference"])
+        except PersistentIdentifierError:
+            return {**data, "status": "invalid"}
 
 
 class UIRequestSchemaMixin:
