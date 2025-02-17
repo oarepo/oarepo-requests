@@ -102,7 +102,8 @@ def test_publish(
 
     published_record = receiver_client.get(f"{urls['BASE_URL']}{draft1_id}?expand=true")
 
-    assert "version" in published_record.json["metadata"]
+    # version is no more on "publish_draft" request
+    # assert "version" in published_record.json["metadata"]
 
     ThesisRecord.index.refresh()
     ThesisDraft.index.refresh()

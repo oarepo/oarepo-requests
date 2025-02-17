@@ -177,7 +177,7 @@ def test_ui_serialization(
 
     sorted_draft_list = allowed_request_types_draft.json["hits"]["hits"]
     sorted_draft_list.sort(key=lambda serialized_rt: serialized_rt["type_id"])
-
+    print(sorted_draft_list)
     assert sorted_draft_list == [
         {
             "dangerous": True,
@@ -205,7 +205,7 @@ def test_ui_serialization(
             "type_id": "publish_draft",
             "dangerous": False,
             "editable": False,
-            "has_form": True,
+            "has_form": False,
             "stateful_description": "By submitting the draft for review you are "
             "requesting the publication of the draft. The draft "
             "will become locked and no further changes will be "

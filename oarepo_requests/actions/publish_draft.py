@@ -13,7 +13,7 @@ from typing import TYPE_CHECKING, Any
 
 from invenio_access.permissions import system_identity
 from invenio_notifications.services.uow import NotificationOp
-from invenio_records_resources.services.uow import RecordCommitOp, UnitOfWork
+from invenio_records_resources.services.uow import UnitOfWork
 from oarepo_runtime.datastreams.utils import get_record_service_for_record
 from oarepo_runtime.i18n import lazy_gettext as _
 
@@ -67,7 +67,6 @@ class PublishDraftSubmitAction(PublishMixin, OARepoSubmitAction):
         **kwargs: Any,
     ) -> Record:
         """Publish the draft."""
-
         uow.register(
             NotificationOp(
                 PublishDraftRequestSubmitNotificationBuilder.build(request=self.request)
@@ -100,10 +99,6 @@ class PublishDraftAcceptAction(
         if not topic_service:
             raise KeyError(f"topic {topic} service not found")
         id_ = topic["id"]
-
-        if "payload" in self.request and "version" in self.request["payload"]:
-            topic.metadata["version"] = self.request["payload"]["version"]
-            uow.register(RecordCommitOp(topic, indexer=topic_service.indexer))
 
         published_topic = topic_service.publish(
             identity, id_, *args, uow=uow, expand=False, **kwargs

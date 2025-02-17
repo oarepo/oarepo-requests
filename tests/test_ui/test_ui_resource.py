@@ -116,7 +116,7 @@ def test_request_detail_page(
 
 
 def test_form_config(app, client, record_ui_resource, fake_manifest):
-    with client.get("/requests/configs/publish_draft") as c:
+    with client.get("/requests/configs/publish_new_version") as c:
         assert c.json == {
             "allowedHtmlAttrs": {
                 "*": ["class"],
