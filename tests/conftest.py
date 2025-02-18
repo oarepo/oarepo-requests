@@ -6,6 +6,7 @@
 # details.
 #
 import os
+from datetime import timedelta
 from typing import Dict
 
 import pytest
@@ -33,6 +34,7 @@ from oarepo_workflows import (
     WorkflowRequest,
     WorkflowRequestPolicy,
     WorkflowTransitions,
+    WorkflowRequestEscalation,
 )
 from oarepo_workflows.base import Workflow
 from oarepo_workflows.requests.events import WorkflowEvent
@@ -115,6 +117,12 @@ class DefaultRequests(WorkflowRequestPolicy):
             declined="draft",
             cancelled="draft",
         ),
+        escalations=[WorkflowRequestEscalation(
+            after=timedelta(seconds=1),
+            recipients=[
+                UserGenerator(4),
+            ],
+        )]
     )
     delete_published_record = WorkflowRequest(
         requesters=[IfInState("published", [RecordOwners()])],
