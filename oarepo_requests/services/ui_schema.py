@@ -35,6 +35,7 @@ from oarepo_requests.services.schema import (
     RequestTypeSchema,
     get_links_schema,
 )
+from sqlalchemy.orm.exc import NoResultFound
 
 if TYPE_CHECKING:
     from invenio_requests.customizations.request_types import RequestType
@@ -172,7 +173,7 @@ class UIRequestSchemaMixin:
                         # not very nice, but we need to pass the request object to the stateful_description function
                         request=SimpleNamespace(**data),
                     )
-        except PersistentIdentifierError:
+        except (PersistentIdentifierError, NoResultFound):
             pass
 
         return stateful_name, stateful_description
