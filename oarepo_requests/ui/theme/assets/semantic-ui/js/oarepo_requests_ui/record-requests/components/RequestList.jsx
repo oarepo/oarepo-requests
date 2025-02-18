@@ -16,7 +16,9 @@ export const RequestList = ({ requests }) => {
   const { requestButtonsIconsConfig } = useRequestContext();
   const isMutating = useIsMutating();
   return requests.map((request) => {
-    const buttonIconProps = requestButtonsIconsConfig[request.status_code];
+    const buttonIconProps =
+      requestButtonsIconsConfig[request.status_code] ||
+      requestButtonsIconsConfig?.default;
     const header = request?.stateful_name || request?.name;
     return (
       <RequestModal
