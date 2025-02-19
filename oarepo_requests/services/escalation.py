@@ -12,6 +12,7 @@ from invenio_db import db
 
 @unit_of_work()
 def escalate_request(request, escalation, uow=None) -> None:
+    """Escalate single request and commit the change to the database."""
     receiver = RecipientEntityReference(request=escalation)
     request.receiver = receiver
     request.commit()
@@ -19,7 +20,7 @@ def escalate_request(request, escalation, uow=None) -> None:
 
 
 def check_escalations() -> None:
-    """Escalate all stale requests, if after time delta is reached."""
+    """Check and escalate all stale requests, if after time delta is reached."""
     for request, escalation in stale_requests():
         escalate_request(request, escalation)
 
