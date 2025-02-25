@@ -39,6 +39,7 @@ from oarepo_requests.types import (
 )
 from oarepo_requests.types.events import TopicDeleteEventType
 from oarepo_requests.types.events.topic_update import TopicUpdateEventType
+from oarepo_requests.types.events.escalation import EscalationEventType
 
 REQUESTS_REGISTERED_TYPES = [
     DeletePublishedRecordRequestType(),
@@ -49,6 +50,7 @@ REQUESTS_REGISTERED_TYPES = [
 REQUESTS_REGISTERED_EVENT_TYPES = [
     TopicUpdateEventType(),
     TopicDeleteEventType(),
+    EscalationEventType(),
 ] + invenio_requests.config.REQUESTS_REGISTERED_EVENT_TYPES
 
 REQUESTS_ALLOWED_RECEIVERS = ["user", "group", "auto_approve"]
@@ -63,6 +65,9 @@ DEFAULT_WORKFLOW_EVENTS = {
     TopicUpdateEventType.type_id: WorkflowEvent(
         submitters=InvenioRequestsPermissionPolicy.can_create_comment
     ),
+    EscalationEventType.type_id : WorkflowEvent(
+        submitters=InvenioRequestsPermissionPolicy.can_create_comment
+    )
 }
 
 
