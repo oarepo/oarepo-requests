@@ -11,6 +11,7 @@ import {
   cfValidationErrorPlugin,
   recordValidationErrorsPlugin,
   defaultErrorHandlingPlugin,
+  BeforeActionError,
 } from "./error-plugins";
 
 export const useAction = ({
@@ -70,8 +71,7 @@ export const useAction = ({
           actionExtraContext,
         });
         if (!shouldProceed) {
-          modalControl?.closeModal();
-          throw new Error("Could not proceed with the action.");
+          throw new BeforeActionError("Could not proceed with the action.");
         }
       }
       const formValues = { ...formik?.values };

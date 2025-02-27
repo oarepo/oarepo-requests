@@ -8,10 +8,7 @@
 import React from "react";
 import ReactDOM from "react-dom";
 import { RecordRequests } from "./components";
-import {
-  cfValidationErrorPlugin,
-  handleRedirectToEditFormPlugin,
-} from "@js/oarepo_requests_common";
+import { handleRedirectToEditFormPlugin } from "@js/oarepo_requests_common";
 
 const recordRequestsAppDiv = document.getElementById("record-requests");
 
@@ -20,7 +17,7 @@ if (recordRequestsAppDiv) {
   ReactDOM.render(
     <RecordRequests
       record={record}
-      onErrorPlugins={[cfValidationErrorPlugin, handleRedirectToEditFormPlugin]}
+      onErrorPlugins={[handleRedirectToEditFormPlugin]}
       actionExtraContext={{ record }}
     />,
     recordRequestsAppDiv

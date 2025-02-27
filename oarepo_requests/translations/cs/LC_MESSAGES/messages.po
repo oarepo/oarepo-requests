@@ -756,3 +756,72 @@ msgid_plural "commentTooLong"
 msgstr[0] "Váš komentář překročil povolenou délku. Odeberte {{count}} znak."
 msgstr[1] "Váš komentář překročil povolenou délku. Odeberte {{count}} znaky."
 msgstr[2] "Váš komentář překročil povolenou délku. Odeberte {{count}} znaků."
+
+#: /home/dusanst/Projects/oarepo-requests/oarepo_requests/templates/semantic-ui/invenio_notifications/delete-published-record-request-event.accept.jinja:6
+#, python-brace-format
+msgid "❗️Delete published request for topic '{topic_id}' accepted"
+msgstr ""
+
+#: /home/dusanst/Projects/oarepo-requests/oarepo_requests/templates/semantic-ui/invenio_notifications/delete-published-record-request-event.accept.jinja:12
+#: /home/dusanst/Projects/oarepo-requests/oarepo_requests/templates/semantic-ui/invenio_notifications/delete-published-record-request-event.submit.jinja:12
+#: /home/dusanst/Projects/oarepo-requests/oarepo_requests/templates/semantic-ui/invenio_notifications/publish-draft-request-event.accept.jinja:12
+#: /home/dusanst/Projects/oarepo-requests/oarepo_requests/templates/semantic-ui/invenio_notifications/publish-draft-request-event.submit.jinja:12
+msgid "This is an auto-generated message. To manage notifications, visit your"
+msgstr ""
+
+#: /home/dusanst/Projects/oarepo-requests/oarepo_requests/templates/semantic-ui/invenio_notifications/delete-published-record-request-event.accept.jinja:12
+#: /home/dusanst/Projects/oarepo-requests/oarepo_requests/templates/semantic-ui/invenio_notifications/delete-published-record-request-event.submit.jinja:12
+#: /home/dusanst/Projects/oarepo-requests/oarepo_requests/templates/semantic-ui/invenio_notifications/publish-draft-request-event.accept.jinja:12
+#: /home/dusanst/Projects/oarepo-requests/oarepo_requests/templates/semantic-ui/invenio_notifications/publish-draft-request-event.submit.jinja:12
+msgid "account settings"
+msgstr ""
+
+#: /home/dusanst/Projects/oarepo-requests/oarepo_requests/templates/semantic-ui/invenio_notifications/delete-published-record-request-event.accept.jinja:18
+#, python-format
+msgid "Request for deleting your record '%(topic_id)s' has been accepted."
+msgstr ""
+
+#: /home/dusanst/Projects/oarepo-requests/oarepo_requests/templates/semantic-ui/invenio_notifications/delete-published-record-request-event.submit.jinja:6
+#, python-brace-format
+msgid "❗️Request for deletion of topic '{topic_id}' waits for your approval"
+msgstr ""
+
+#: /home/dusanst/Projects/oarepo-requests/oarepo_requests/templates/semantic-ui/invenio_notifications/delete-published-record-request-event.submit.jinja:18
+#, python-format
+msgid "Request for deletion of record '%(topic_id)s' waits for your approval."
+msgstr ""
+
+#: /home/dusanst/Projects/oarepo-requests/oarepo_requests/templates/semantic-ui/invenio_notifications/publish-draft-request-event.accept.jinja:6
+#, python-brace-format
+msgid "❗️Publish request for topic '{topic_id}' accepted"
+msgstr ""
+
+#: /home/dusanst/Projects/oarepo-requests/oarepo_requests/templates/semantic-ui/invenio_notifications/publish-draft-request-event.accept.jinja:18
+#, python-format
+msgid ""
+"Request for publishing of your record '%(topic_id)s' has been accepted."
+msgstr ""
+
+#: /home/dusanst/Projects/oarepo-requests/oarepo_requests/templates/semantic-ui/invenio_notifications/publish-draft-request-event.submit.jinja:6
+#, python-brace-format
+msgid "❗️Publish request for topic '{topic_id}' waits for your approval"
+msgstr ""
+
+#: /home/dusanst/Projects/oarepo-requests/oarepo_requests/templates/semantic-ui/invenio_notifications/publish-draft-request-event.submit.jinja:18
+#, python-format
+msgid "Publish request for record '%(topic_id)s' waits for your approval."
+msgstr ""
+
+#: /home/dusanst/Projects/oarepo-requests/oarepo_requests/types/publish_new_version.py:36
+msgid "Publish new version"
+msgstr ""
+
+msgid "Request could not be executed."
+msgstr "Žádost se nepodařilo provést."
+
+msgid ""
+"The request ({{requestType}}) could not be made due to validation errors. "
+"Please fix them and try again:"
+msgstr ""
+"Požadavek ({{requestType}}) nemohl být proveden kvůli chybám validace. "
+"Prosím, opravte je a zkuste to znovu:"

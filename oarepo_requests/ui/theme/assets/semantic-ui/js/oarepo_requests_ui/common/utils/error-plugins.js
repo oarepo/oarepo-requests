@@ -3,6 +3,8 @@ import { serializeErrors } from "@js/oarepo_ui/forms";
 import { i18next } from "@translations/oarepo_requests_ui/i18next";
 import { encodeUnicodeBase64 } from "@js/oarepo_ui";
 
+export class BeforeActionError extends Error {}
+
 export const cfValidationErrorPlugin = (e, { formik }) => {
   if (
     e?.response?.data?.error_type === "cf_validation_error" &&
@@ -20,15 +22,21 @@ export const cfValidationErrorPlugin = (e, { formik }) => {
 
 export const recordValidationErrorsPlugin = (
   e,
-  { modalControl, actionExtraContext: { setErrors } }
+  { modalControl, actionExtraContext, requestOrRequestType }
 ) => {
+  const { setErrors } = actionExtraContext;
   if (e?.response?.data?.errors?.length > 0) {
     const errors = serializeErrors(
       e?.response?.data?.errors,
       i18next.t(
-        "Action failed due to validation errors. Please correct the errors and try again:"
+        "The request ({{requestType}}) could not be made due to validation errors. Please fix them and try again:",
+        {
+          requestType:
+            requestOrRequestType?.stateful_name || requestOrRequestType.name,
+        }
       )
     );
+    e.customMessage = i18next.t("Request could not be executed.");
     setErrors(errors);
     modalControl?.closeModal();
     return true;
@@ -38,10 +46,20 @@ export const recordValidationErrorsPlugin = (
 
 export const handleRedirectToEditFormPlugin = (
   e,
-  { formik, modalControl, actionExtraContext: { record } }
+  { formik, modalControl, requestOrRequestType, actionExtraContext: { record } }
 ) => {
   if (e?.response?.data?.errors && record?.links?.edit_html) {
-    const errorData = e.response.data;
+    const errorData = {
+      errors: e.response.data.errors,
+      errorMessage: i18next.t(
+        "The request ({{requestType}}) could not be made due to validation errors. Please fix them and try again:",
+        {
+          requestType:
+            requestOrRequestType?.stateful_name || requestOrRequestType.name,
+        }
+      ),
+    };
+
     const jsonErrors = JSON.stringify(errorData);
     const base64EncodedErrors = encodeUnicodeBase64(jsonErrors);
 
@@ -49,12 +67,22 @@ export const handleRedirectToEditFormPlugin = (
       "api",
       i18next.t("Record has validation errors. Redirecting to form...")
     );
-
+    e.customMessage = i18next.t(
+      "Record has validation errors. Redirecting to form..."
+    );
     setTimeout(() => {
       window.location.href = record.links.edit_html + `#${base64EncodedErrors}`;
       modalControl?.closeModal();
     }, 2500);
 
+    return true;
+  }
+  return null;
+};
+
+export const beforeActionFormErrorPlugin = (e, { modalControl }) => {
+  if (e instanceof BeforeActionError) {
+    modalControl?.closeModal();
     return true;
   }
   return null;
