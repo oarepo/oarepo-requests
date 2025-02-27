@@ -38,8 +38,9 @@ const RecordRequests = ({
   ContainerComponent,
   onBeforeAction,
   onAfterAction,
-  onActionError,
+  onErrorPlugins,
   requestButtonsIconsConfig,
+  actionExtraContext,
 }) => {
   const queryClient = useQueryClient();
 
@@ -86,20 +87,23 @@ const RecordRequests = ({
         value={{
           onBeforeAction,
           onAfterAction,
-          onActionError,
+          onErrorPlugins,
           fetchNewRequests,
+          actionExtraContext,
         }}
       >
-        <ContainerComponent>
-          <CreateRequestButtonGroup
-            applicableRequestsLoading={applicableRequestTypesLoading}
-            applicableRequestsLoadingError={applicableRequestsLoadingError}
-          />
-          <RequestListContainer
-            requestsLoading={requestsLoading}
-            requestsLoadingError={requestsLoadingError}
-          />
-        </ContainerComponent>
+        {initialRecord?.id && (
+          <ContainerComponent>
+            <CreateRequestButtonGroup
+              applicableRequestsLoading={applicableRequestTypesLoading}
+              applicableRequestsLoadingError={applicableRequestsLoadingError}
+            />
+            <RequestListContainer
+              requestsLoading={requestsLoading}
+              requestsLoadingError={requestsLoadingError}
+            />
+          </ContainerComponent>
+        )}
       </CallbackContextProvider>
     </RequestContextProvider>
   );
@@ -110,8 +114,9 @@ RecordRequests.propTypes = {
   ContainerComponent: PropTypes.func,
   onBeforeAction: PropTypes.func,
   onAfterAction: PropTypes.func,
-  onActionError: PropTypes.func,
+  onErrorPlugins: PropTypes.array,
   requestButtonsIconsConfig: PropTypes.object,
+  actionExtraContext: PropTypes.object,
 };
 
 const RecordRequestsWithQueryClient = ({
@@ -119,8 +124,9 @@ const RecordRequestsWithQueryClient = ({
   ContainerComponent,
   onBeforeAction,
   onAfterAction,
-  onActionError,
+  onErrorPlugins,
   requestButtonsIconsConfig,
+  actionExtraContext,
 }) => {
   return (
     <OverridableContext.Provider value={overriddenComponents}>
@@ -130,8 +136,9 @@ const RecordRequestsWithQueryClient = ({
           ContainerComponent={ContainerComponent}
           onBeforeAction={onBeforeAction}
           onAfterAction={onAfterAction}
-          onActionError={onActionError}
+          onErrorPlugins={onErrorPlugins}
           requestButtonsIconsConfig={requestButtonsIconsConfig}
+          actionExtraContext={actionExtraContext}
         />
       </QueryClientProvider>
     </OverridableContext.Provider>
@@ -143,8 +150,9 @@ RecordRequestsWithQueryClient.propTypes = {
   ContainerComponent: PropTypes.func,
   onBeforeAction: PropTypes.func,
   onAfterAction: PropTypes.func,
-  onActionError: PropTypes.func,
+  onErrorPlugins: PropTypes.array,
   requestButtonsIconsConfig: PropTypes.object,
+  actionExtraContext: PropTypes.object,
 };
 
 const ContainerComponent = ({ children }) => (
@@ -159,7 +167,7 @@ RecordRequestsWithQueryClient.defaultProps = {
   ContainerComponent: ContainerComponent,
   onBeforeAction: undefined,
   onAfterAction: undefined,
-  onActionError: undefined,
+  onErrorPlugins: [],
 };
 
 export { RecordRequestsWithQueryClient as RecordRequests };
