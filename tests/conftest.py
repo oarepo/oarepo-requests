@@ -587,10 +587,10 @@ def user_links():
     return _user_links
 
 @pytest.fixture
-def more_users(app, db, UserFixture): # noqa
+def more_users(app, db, UserFixture):
     user1 = UserFixture(
         email="user1@example.org",
-        password="password",
+        password="password", # NOSONAR
         active=True,
         confirmed=True,
     )
@@ -598,7 +598,7 @@ def more_users(app, db, UserFixture): # noqa
 
     user2 = UserFixture(
         email="user2@example.org",
-        password="beetlesmasher",
+        password="beetlesmasher", # NOSONAR
         active=True,
         confirmed=True,
     )
@@ -606,7 +606,7 @@ def more_users(app, db, UserFixture): # noqa
 
     user3 = UserFixture(
         email="user3@example.org",
-        password="beetlesmasher",
+        password="beetlesmasher", # NOSONAR
         user_profile={
             "full_name": "Maxipes Fik",
             "affiliations": "CERN",
@@ -618,7 +618,7 @@ def more_users(app, db, UserFixture): # noqa
 
     user4 = UserFixture(
         email="user4@example.org",
-        password="password",
+        password="password", # NOSONAR
         active=True,
         confirmed=True,
     )
@@ -626,7 +626,7 @@ def more_users(app, db, UserFixture): # noqa
 
     user5 = UserFixture(
         email="user5@example.org",
-        password="password",
+        password="password", # NOSONAR
         active=True,
         confirmed=True,
     )
@@ -634,7 +634,7 @@ def more_users(app, db, UserFixture): # noqa
 
     user6 = UserFixture(
         email="user6@example.org",
-        password="password",
+        password="password", # NOSONAR
         active=True,
         confirmed=True,
     )
@@ -642,7 +642,7 @@ def more_users(app, db, UserFixture): # noqa
 
     user7 = UserFixture(
         email="user7@example.org",
-        password="password",
+        password="password", # NOSONAR
         active=True,
         confirmed=True,
     )
