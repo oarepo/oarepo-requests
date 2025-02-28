@@ -1,5 +1,3 @@
-# SONARQUBE-SKIP
-# sonarcloud-ignore-all
 import time
 
 from oarepo_requests.services.escalation import check_escalations
