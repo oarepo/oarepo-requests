@@ -75,3 +75,24 @@ class GroupEmailRecipient(SpecificEntityRecipient):
             user.email: Recipient(data={"email": user.email})
             for user in entity.users.all()
         }
+
+class MultipleRecipientsEmailRecipients(SpecificEntityRecipient):
+    """Recipient generator returning emails of the members of the recipient group"""
+
+    def __call__(self, notification: Notification, recipients: dict[str, Recipient]):
+
+        entity = self._resolve_entity()
+        print(f'blahblahblah3, {type(entity)=}')
+
+        print(f'{type(entity)=}')
+        print(f'blahblahblah2')
+        print(f'{entity.entities=}')
+        for current_entity in entity.entities:
+            print(f'{type(current_entity)=}')
+
+
+        raise ValueError()
+        return {
+            user.email: Recipient(data={"email": user.email})
+            for user in entity.users.all()
+        }
