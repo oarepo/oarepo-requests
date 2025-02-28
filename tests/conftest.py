@@ -587,7 +587,7 @@ def user_links():
     return _user_links
 
 @pytest.fixture
-def more_users(app, db, UserFixture):
+def more_users(app, db, UserFixture): # noqa
     user1 = UserFixture(
         email="user1@example.org",
         password="password",
