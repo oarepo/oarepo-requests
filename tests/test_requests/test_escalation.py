@@ -111,19 +111,20 @@ def test_escalate_request_most_recent_multiple_recipients(
     assert request.data['receiver'] == {'multiple': '[{"user": "2"}, {"user": "1"}, {"user": "10"}]'}
 
     # wait until escalation time, should take the most recent
-    time.sleep(3)
-    check_escalations()
+    with mail.record_messages() as outbox:
+        time.sleep(3)
+        check_escalations()
 
-    # check again
-    request = current_oarepo_requests_service.read(identity=creator.identity, id_=id_)
-    assert request.data['receiver'] == {'multiple': '[{"user": "3"}, {"user": "7"}]'}
+        # check again
+        request = current_oarepo_requests_service.read(identity=creator.identity, id_=id_)
+        assert request.data['receiver'] == {'multiple': '[{"user": "3"}, {"user": "7"}]'}
 
-    # assert event exist
-    results = db.session.query(RequestEventModel).filter(
-        RequestEventModel.request_id == id_,
-        RequestEventModel.type == "E",
-    ).all()
-    assert len(results) == 1
+        # assert event exist
+        results = db.session.query(RequestEventModel).filter(
+            RequestEventModel.request_id == id_,
+            RequestEventModel.type == "E",
+        ).all()
+        assert len(results) == 1
 
 def test_escalate_request_most_recent_2(
         app, more_users, record_service, default_record_with_workflow_json, search_clear
