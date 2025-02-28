@@ -93,7 +93,11 @@ def stale_requests() -> Iterator[Request]:
                             continue # already processed
 
                         # take the most recent one
-                        if r.updated + escalation.after <= (datetime.now()): # for some reason request is not timezone aware
+                        utc_now_naive = datetime.now(timezone.utc).replace(tzinfo=None)
+                        print(f'{datetime.now()=}')
+                        print(f'{utc_now_naive=}')
+                        print(f'{r.updated}')
+                        if r.updated + escalation.after <= utc_now_naive: # for some reason request is not timezone aware
                             most_recent_escalation = escalation
                         else:
                             break

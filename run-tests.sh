@@ -49,5 +49,5 @@ find oarepo_requests -name '*.py' | grep -v '__init__.py' | sed 's/.py$//' | tr 
 done | python
 
 pip install -e ".[tests]"
-pytest tests/test_requests
+pytest tests/test_requests -v -s
 pytest tests/test_ui
