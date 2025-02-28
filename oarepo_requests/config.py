@@ -24,7 +24,7 @@ from oarepo_requests.actions.components import (
 )
 from oarepo_requests.notifications.generators import (
     GroupEmailRecipient,
-    UserEmailRecipient,
+    UserEmailRecipient, MultipleRecipientsEmailRecipients,
 )
 from oarepo_requests.resolvers.ui import (
     AutoApproveUIEntityResolver,
@@ -109,4 +109,5 @@ REQUESTS_ACTION_COMPONENTS = {
 NOTIFICATION_RECIPIENTS_RESOLVERS = {
     "user": {"email": UserEmailRecipient},
     "group": {"email": GroupEmailRecipient},
+    "multiple": {"email": MultipleRecipientsEmailRecipients},
 }
