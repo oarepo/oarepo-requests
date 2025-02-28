@@ -1,3 +1,4 @@
+# SONARQUBE-SKIP
 import time
 
 from oarepo_requests.services.escalation import check_escalations
