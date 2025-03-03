@@ -99,16 +99,30 @@ def test_escalate_request_most_recent_multiple_recipients(
 
     # check before escalation
     request = current_oarepo_requests_service.read(identity=creator.identity, id_=id_)
-    assert request.data['receiver'] == {'multiple': '[{"user": "2"}, {"user": "1"}, {"user": "10"}]'}
+    assert request.data['receiver'] == {'multiple': '[{"user": "2"}, {"user": "1"}]'}
 
     with mail.record_messages() as outbox:
         # escalate
         check_escalations()
         assert len(outbox) == 0 # nothing should be sent, escalation did not happen
 
+    # no escalation -> no event in database
+    results = db.session.query(RequestEventModel).filter(
+        RequestEventModel.request_id == id_,
+        RequestEventModel.type == "E",
+    ).all()
+    assert len(results) == 0
+
     # nothing should change, first escalation period is 2 seconds
     request = current_oarepo_requests_service.read(identity=creator.identity, id_=id_)
-    assert request.data['receiver'] == {'multiple': '[{"user": "2"}, {"user": "1"}, {"user": "10"}]'}
+    assert request.data['receiver'] == {'multiple': '[{"user": "2"}, {"user": "1"}]'}
+
+    # no escalation -> no event in database
+    results = db.session.query(RequestEventModel).filter(
+        RequestEventModel.request_id == id_,
+        RequestEventModel.type == "E",
+    ).all()
+    assert len(results) == 0
 
     # wait until escalation time, should take the most recent
     with mail.record_messages() as outbox:
@@ -125,6 +139,14 @@ def test_escalate_request_most_recent_multiple_recipients(
             RequestEventModel.type == "E",
         ).all()
         assert len(results) == 1
+        assert len(outbox) == 2
+        print(f'{outbox[0].recipients=}')
+        print(f'{outbox[1].recipients=}')
+
+        # OR in case of first notification is slower than other, dont know if this can happen, but to be sure
+        assert outbox[0].recipients[0] == "user3@example.org" or outbox[0].recipients[0] == "user7@example.org"
+        assert outbox[1].recipients[0] == "user3@example.org" or outbox[1].recipients[0] == "user7@example.org"
+
 
 def test_escalate_request_most_recent_2(
         app, more_users, record_service, default_record_with_workflow_json, search_clear
@@ -215,30 +237,55 @@ def test_escalate_request_most_recent_2_multiple_recipients(
     )
     id_ = request.id
 
+    # sanity check, no escalation -> no event in database
+    results = db.session.query(RequestEventModel).filter(
+        RequestEventModel.request_id == id_,
+        RequestEventModel.type == "E",
+    ).all()
+    assert len(results) == 0
+
     with mail.record_messages() as outbox:
         # escalate
         check_escalations()
         assert len(outbox) == 0 # escalation didnt happen
 
-    # check before escalation
-    request = current_oarepo_requests_service.read(identity=creator.identity, id_=id_)
-    assert request.data['receiver'] == {'multiple': '[{"user": "2"}, {"user": "1"}, {"user": "10"}]'}
-
-    # wait until escalation time
-    time.sleep(8)
-    check_escalations()
-
-    # check again
-    request = current_oarepo_requests_service.read(identity=creator.identity, id_=id_)
-    assert request.data['receiver'] == {'user': '4'}
-
-    # assert event exist
+    # no escalation -> no event in database
     results = db.session.query(RequestEventModel).filter(
         RequestEventModel.request_id == id_,
         RequestEventModel.type == "E",
     ).all()
+    assert len(results) == 0
 
-    assert len(results) == 1
+    # check before escalation
+    request = current_oarepo_requests_service.read(identity=creator.identity, id_=id_)
+    assert request.data['receiver'] == {'multiple': '[{"user": "2"}, {"user": "1"}]'}
+
+    # no escalation -> no event in database
+    results = db.session.query(RequestEventModel).filter(
+        RequestEventModel.request_id == id_,
+        RequestEventModel.type == "E",
+    ).all()
+    assert len(results) == 0
+
+    with mail.record_messages() as outbox:
+        # wait until escalation time
+        time.sleep(8)
+        check_escalations()
+
+        # check again
+        request = current_oarepo_requests_service.read(identity=creator.identity, id_=id_)
+        assert request.data['receiver'] == {'user': '4'}
+
+        # assert event exist
+        results = db.session.query(RequestEventModel).filter(
+            RequestEventModel.request_id == id_,
+            RequestEventModel.type == "E",
+        ).all()
+
+        assert len(results) == 1
+        assert len(outbox) == 1
+        assert outbox[0].recipients[0] == "user4@example.org"
+        assert outbox[-1].body.endswith("Request was escalated to you since the original recipient did not approve the request in time.")
 
 
 def test_escalate_request_most_recent_3(
@@ -338,23 +385,35 @@ def test_escalate_request_most_recent_3_multiple_recipients(
 
     # check before escalation
     request = current_oarepo_requests_service.read(identity=creator.identity, id_=id_)
-    assert request.data['receiver'] == {'multiple': '[{"user": "2"}, {"user": "1"}, {"user": "10"}]'}
+    assert request.data['receiver'] == {'multiple': '[{"user": "2"}, {"user": "1"}]'}
 
-    # wait until escalation time
-    time.sleep(12)
-    check_escalations()
-
-    # check again
-    request = current_oarepo_requests_service.read(identity=creator.identity, id_=id_)
-    assert request.data['receiver'] == {'user': '5'}
-
-    # assert event exist
+    # sanity check
     results = db.session.query(RequestEventModel).filter(
         RequestEventModel.request_id == id_,
         RequestEventModel.type == "E",
     ).all()
 
-    assert len(results) == 1
+    assert len(results) == 0
+
+    with mail.record_messages() as outbox:
+        # wait until escalation time
+        time.sleep(12)
+        check_escalations()
+
+        # check again
+        request = current_oarepo_requests_service.read(identity=creator.identity, id_=id_)
+        assert request.data['receiver'] == {'user': '5'}
+
+        # assert event exist
+        results = db.session.query(RequestEventModel).filter(
+            RequestEventModel.request_id == id_,
+            RequestEventModel.type == "E",
+        ).all()
+
+        assert len(results) == 1
+        assert len(outbox) == 1
+        assert outbox[-1].body.endswith("Request was escalated to you since the original recipient did not approve the request in time.")
+        assert outbox[-1].recipients[0] == "user5@example.org"
 
 def test_escalate_request_already_processed(
        app, more_users, record_service, default_record_with_workflow_json, search_clear
@@ -411,7 +470,7 @@ def test_escalate_request_already_processed(
 
 
 def test_escalate_request_already_processed_multiple_recipients(
-     more_users, record_service, default_record_json, search_clear
+     app, more_users, record_service, default_record_json, search_clear
 ):
     from invenio_requests.proxies import (
         current_requests_service as current_invenio_requests_service,
@@ -421,6 +480,8 @@ def test_escalate_request_already_processed_multiple_recipients(
 
     creator = more_users[0]
     receiver = more_users[1]
+    mail = app.extensions.get("mail")
+    assert mail
 
     record_multiple_recipients = {
         **default_record_json,
@@ -439,26 +500,48 @@ def test_escalate_request_already_processed_multiple_recipients(
     )
     id_ = request.id
 
-    time.sleep(16)
-    check_escalations()
-
-    # check before escalation
-    request = current_oarepo_requests_service.read(identity=creator.identity, id_=id_)
-    assert request.data['receiver'] == {'multiple': '[{"user": "5"}, {"user": "6"}]'}
-
-    # nothing should change
-    check_escalations()
-    request = current_oarepo_requests_service.read(identity=creator.identity, id_=id_)
-    assert request.data['receiver'] == {'multiple': '[{"user": "5"}, {"user": "6"}]'}
-
-
     # assert event exist
     results = db.session.query(RequestEventModel).filter(
         RequestEventModel.request_id == id_,
         RequestEventModel.type == "E",
     ).all()
+    assert len(results) == 0
 
-    assert len(results) == 1
+    with mail.record_messages() as outbox:
+        time.sleep(16)
+        check_escalations()
+
+        # check after escalation
+        request = current_oarepo_requests_service.read(identity=creator.identity, id_=id_)
+        assert request.data['receiver'] == {'multiple': '[{"user": "5"}, {"user": "6"}]'}
+
+        # assert event exist
+        results = db.session.query(RequestEventModel).filter(
+            RequestEventModel.request_id == id_,
+            RequestEventModel.type == "E",
+        ).all()
+        assert len(results) == 1
+        assert len(outbox) == 2
+        assert outbox[0].recipients[0] == "user5@example.org" or outbox[0].recipients[6]
+        assert outbox[0].body.endswith(
+            "Request was escalated to you since the original recipient did not approve the request in time.")
+
+        # nothing should change
+        check_escalations()
+        request = current_oarepo_requests_service.read(identity=creator.identity, id_=id_)
+        assert request.data['receiver'] == {'multiple': '[{"user": "5"}, {"user": "6"}]'}
+
+        results = db.session.query(RequestEventModel).filter(
+            RequestEventModel.request_id == id_,
+            RequestEventModel.type == "E",
+        ).all()
+
+        assert len(results) == 1
+        assert len(outbox) == 2
+        assert outbox[0].recipients[0] == "user5@example.org" or outbox[0].recipients[6]
+        assert outbox[0].body.endswith(
+            "Request was escalated to you since the original recipient did not approve the request in time.")
+
 
 def test_escalate_request_already_processed_2(
        app, more_users, record_service, default_record_with_workflow_json, search_clear

@@ -176,7 +176,7 @@ class DefaultRequests(WorkflowRequestPolicy):
 class RequestWithMultipleRecipients(WorkflowRequestPolicy):
     publish_draft = WorkflowRequest(
         requesters=[IfInState("draft", [RecordOwners()])],
-        recipients=[UserGenerator(2), UserGenerator(1), UserGenerator(10)],
+        recipients=[UserGenerator(2), UserGenerator(1)],
         transitions=WorkflowTransitions(
             submitted="publishing",
             accepted="published",
@@ -648,8 +648,16 @@ def more_users(app, db, UserFixture):
     )
     user7.create(app, db)
 
+    user10 = UserFixture(
+        email="user10@example.org",
+        password="password", # NOSONAR
+        active=True,
+        confirmed=True,
+    )
+    user10.create(app, db)
+
     db.session.commit()
     UserAggregate.index.refresh()
-    return [user1, user2, user3, user4, user5, user6, user7]
+    return [user1, user2, user3, user4, user5, user6, user7, user10 ]
 
 
