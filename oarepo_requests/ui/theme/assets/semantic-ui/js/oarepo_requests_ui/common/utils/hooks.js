@@ -27,6 +27,7 @@ export const useAction = ({
     onErrorPlugins = [],
     actionExtraContext,
   } = useCallbackContext();
+
   const handleActionError = (e, variables) => {
     const context = {
       e,
@@ -38,19 +39,11 @@ export const useAction = ({
       actionExtraContext,
     };
 
-    for (const plugin of onErrorPlugins) {
-      const handled = plugin(e, context);
-      if (handled) {
-        return;
-      }
-    }
-
-    const defaultPlugins = [
+    for (const plugin of [
+      ...onErrorPlugins,
       cfValidationErrorPlugin,
       recordValidationErrorsPlugin,
-    ];
-
-    for (const plugin of defaultPlugins) {
+    ]) {
       const handled = plugin(e, context);
       if (handled) {
         return;
