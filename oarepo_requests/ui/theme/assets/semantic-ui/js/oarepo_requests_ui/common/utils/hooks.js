@@ -5,9 +5,14 @@
  * modify it under the terms of the MIT License; see LICENSE file for more
  * details.
  */
-import { i18next } from "@translations/oarepo_requests_ui/i18next";
 import { useMutation } from "@tanstack/react-query";
 import { useCallbackContext } from "@js/oarepo_requests_common";
+import {
+  cfValidationErrorPlugin,
+  recordValidationErrorsPlugin,
+  defaultErrorHandlingPlugin,
+  BeforeActionError,
+} from "./error-plugins";
 
 export const useAction = ({
   action,
@@ -16,7 +21,38 @@ export const useAction = ({
   modalControl,
   requestActionName,
 } = {}) => {
-  const { onBeforeAction, onAfterAction, onActionError } = useCallbackContext();
+  const {
+    onBeforeAction,
+    onAfterAction,
+    onErrorPlugins = [],
+    actionExtraContext,
+  } = useCallbackContext();
+
+  const handleActionError = (e, variables) => {
+    const context = {
+      e,
+      variables,
+      formik,
+      modalControl,
+      requestOrRequestType,
+      requestActionName,
+      actionExtraContext,
+    };
+
+    for (const plugin of [
+      ...onErrorPlugins,
+      cfValidationErrorPlugin,
+      recordValidationErrorsPlugin,
+    ]) {
+      const handled = plugin(e, context);
+      if (handled) {
+        return;
+      }
+    }
+
+    defaultErrorHandlingPlugin(e, context);
+  };
+
   return useMutation(
     async (values) => {
       if (onBeforeAction) {
@@ -25,10 +61,10 @@ export const useAction = ({
           modalControl,
           requestOrRequestType,
           requestActionName,
+          actionExtraContext,
         });
         if (!shouldProceed) {
-          modalControl?.closeModal();
-          throw new Error("Could not proceed with the action.");
+          throw new BeforeActionError("Could not proceed with the action.");
         }
       }
       const formValues = { ...formik?.values };
@@ -38,38 +74,7 @@ export const useAction = ({
       return action(requestOrRequestType, formValues);
     },
     {
-      onError: (e, variables) => {
-        if (onActionError) {
-          onActionError({
-            e,
-            variables,
-            formik,
-            modalControl,
-            requestOrRequestType,
-            requestActionName,
-          });
-        } else if (e?.response?.data?.errors) {
-          formik?.setFieldError(
-            "api",
-            i18next.t(
-              "The request could not be created due to validation errors. Please correct the errors and try again."
-            )
-          );
-          setTimeout(() => {
-            modalControl?.closeModal();
-          }, 2500);
-        } else {
-          formik?.setFieldError(
-            "api",
-            i18next.t(
-              "The action could not be executed. Please try again in a moment."
-            )
-          );
-          setTimeout(() => {
-            modalControl?.closeModal();
-          }, 2500);
-        }
-      },
+      onError: handleActionError,
       onSuccess: (data, variables) => {
         if (onAfterAction) {
           onAfterAction({
@@ -79,6 +84,7 @@ export const useAction = ({
             modalControl,
             requestOrRequestType,
             requestActionName,
+            actionExtraContext,
           });
         }
         const redirectionURL =

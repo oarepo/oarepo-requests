@@ -38,9 +38,9 @@ export const RequestModal = ({
   const isMutating = useIsMutating();
 
   const onClose = () => {
-    closeModal();
     setErrors({});
     resetForm();
+    closeModal();
   };
   return (
     <FormikProvider value={formik}>
