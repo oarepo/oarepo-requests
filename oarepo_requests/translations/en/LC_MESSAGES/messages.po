@@ -721,5 +721,75 @@ msgstr[0] ""
 msgstr[1] ""
 "Your comment is over the allowed length. Please remove {{count}} characters."
 
+#: /home/senyaaa/Work/oarepo-requests/oarepo_requests/templates/semantic-ui/invenio_notifications/delete-published-record-request-event.accept.jinja:6
+#, python-brace-format
+msgid "❗️Delete published request for topic '{topic_id}' accepted"
+msgstr ""
+
+#: /home/senyaaa/Work/oarepo-requests/oarepo_requests/templates/semantic-ui/invenio_notifications/delete-published-record-request-event.accept.jinja:12
+#: /home/senyaaa/Work/oarepo-requests/oarepo_requests/templates/semantic-ui/invenio_notifications/delete-published-record-request-event.submit.jinja:12
+#: /home/senyaaa/Work/oarepo-requests/oarepo_requests/templates/semantic-ui/invenio_notifications/escalate-request-event.submit.jinja:15
+#: /home/senyaaa/Work/oarepo-requests/oarepo_requests/templates/semantic-ui/invenio_notifications/publish-draft-request-event.accept.jinja:12
+#: /home/senyaaa/Work/oarepo-requests/oarepo_requests/templates/semantic-ui/invenio_notifications/publish-draft-request-event.submit.jinja:12
+msgid "This is an auto-generated message. To manage notifications, visit your"
+msgstr ""
+
+#: /home/senyaaa/Work/oarepo-requests/oarepo_requests/templates/semantic-ui/invenio_notifications/delete-published-record-request-event.accept.jinja:12
+#: /home/senyaaa/Work/oarepo-requests/oarepo_requests/templates/semantic-ui/invenio_notifications/delete-published-record-request-event.submit.jinja:12
+#: /home/senyaaa/Work/oarepo-requests/oarepo_requests/templates/semantic-ui/invenio_notifications/escalate-request-event.submit.jinja:15
+#: /home/senyaaa/Work/oarepo-requests/oarepo_requests/templates/semantic-ui/invenio_notifications/publish-draft-request-event.accept.jinja:12
+#: /home/senyaaa/Work/oarepo-requests/oarepo_requests/templates/semantic-ui/invenio_notifications/publish-draft-request-event.submit.jinja:12
+msgid "account settings"
+msgstr ""
+
+#: /home/senyaaa/Work/oarepo-requests/oarepo_requests/templates/semantic-ui/invenio_notifications/delete-published-record-request-event.accept.jinja:18
+#, python-format
+msgid "Request for deleting your record '%(topic_id)s' has been accepted."
+msgstr ""
+
+#: /home/senyaaa/Work/oarepo-requests/oarepo_requests/templates/semantic-ui/invenio_notifications/delete-published-record-request-event.submit.jinja:6
+#, python-brace-format
+msgid "❗️Request for deletion of topic '{topic_id}' waits for your approval"
+msgstr ""
+
+#: /home/senyaaa/Work/oarepo-requests/oarepo_requests/templates/semantic-ui/invenio_notifications/delete-published-record-request-event.submit.jinja:18
+#, python-format
+msgid "Request for deletion of record '%(topic_id)s' waits for your approval."
+msgstr ""
+
+#: /home/senyaaa/Work/oarepo-requests/oarepo_requests/templates/semantic-ui/invenio_notifications/escalate-request-event.submit.jinja:6
+#: /home/senyaaa/Work/oarepo-requests/oarepo_requests/templates/semantic-ui/invenio_notifications/publish-draft-request-event.submit.jinja:6
+#, python-brace-format
+msgid "❗️Publish request for topic '{topic_id}' waits for your approval"
+msgstr ""
+
+#: /home/senyaaa/Work/oarepo-requests/oarepo_requests/templates/semantic-ui/invenio_notifications/escalate-request-event.submit.jinja:12
+#: /home/senyaaa/Work/oarepo-requests/oarepo_requests/templates/semantic-ui/invenio_notifications/escalate-request-event.submit.jinja:23
+msgid ""
+"Request was escalated to you since the original recipient did not approve "
+"the request in time."
+msgstr ""
+
+#: /home/senyaaa/Work/oarepo-requests/oarepo_requests/templates/semantic-ui/invenio_notifications/escalate-request-event.submit.jinja:21
+#: /home/senyaaa/Work/oarepo-requests/oarepo_requests/templates/semantic-ui/invenio_notifications/publish-draft-request-event.submit.jinja:18
+#, python-format
+msgid "Publish request for record '%(topic_id)s' waits for your approval."
+msgstr ""
+
+#: /home/senyaaa/Work/oarepo-requests/oarepo_requests/templates/semantic-ui/invenio_notifications/publish-draft-request-event.accept.jinja:6
+#, python-brace-format
+msgid "❗️Publish request for topic '{topic_id}' accepted"
+msgstr ""
+
+#: /home/senyaaa/Work/oarepo-requests/oarepo_requests/templates/semantic-ui/invenio_notifications/publish-draft-request-event.accept.jinja:18
+#, python-format
+msgid ""
+"Request for publishing of your record '%(topic_id)s' has been accepted."
+msgstr ""
+
+#: /home/senyaaa/Work/oarepo-requests/oarepo_requests/types/publish_new_version.py:36
+msgid "Publish new version"
+msgstr ""
+
 #~ msgid "No status"
 #~ msgstr ""
