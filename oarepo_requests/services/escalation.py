@@ -31,7 +31,7 @@ def escalate_request(request: Request, escalation: WorkflowRequestEscalation, uo
     old_receiver_str = json.dumps(request['receiver'],sort_keys=True)
     new_receiver_str = json.dumps(receiver,sort_keys=True)
     if new_receiver_str != old_receiver_str:
-        logging.info(f"Request {request.id} receiver changed from {new_receiver_str} to {old_receiver_str}")
+        logging.info(f"Request {request.id} receiver changed from {old_receiver_str} to {new_receiver_str}")
 
         data = {
             "payload":
