@@ -1,0 +1,25 @@
+{% set access_request = notification.context.request %}
+{% set topic = notification.context.request.topic %}
+{% set topic_id = notification.context.request.topic.thesis %}
+
+{%- block subject -%}
+    {{ _("❗️Publish request for topic '{topic_id}' waits for your approval").format(topic_id=topic_id) }}
+{%- endblock subject -%}
+
+{%- block html_body -%}
+    <table style="font-family:'Lato',Helvetica,Arial,sans-serif;border-spacing:15px">
+        <tr>
+            <td>{{ _("Request was escalated to you since the original recipient did not approve the request in time.") }}</td>
+        </tr>
+        <tr>
+            <td style="font-size:smaller">{{ _("This is an auto-generated message. To manage notifications, visit your")}} <a href="{{account_settings_link}}">{{ _("account settings")}}</a>.</td>
+        </tr>
+    </table>
+{%- endblock html_body -%}
+
+{%- block plain_body -%}
+{{ _("Publish request for record '%(topic_id)s' waits for your approval.", topic_id=topic_id) }}
+
+{{ _("Request was escalated to you since the original recipient did not approve the request in time.") }}
+
+{%- endblock plain_body -%}

@@ -6,6 +6,7 @@
 # details.
 #
 import os
+from datetime import timedelta
 from typing import Dict
 
 import pytest
@@ -15,6 +16,7 @@ from invenio_records_permissions.generators import (
     AuthenticatedUser,
     SystemProcess,
 )
+from invenio_users_resources.records import UserAggregate
 from invenio_records_resources.references.entity_resolvers import ServiceResultResolver
 from invenio_records_resources.services.uow import RecordCommitOp
 from invenio_requests.customizations import CommentEventType, LogEventType
@@ -33,6 +35,7 @@ from oarepo_workflows import (
     WorkflowRequest,
     WorkflowRequestPolicy,
     WorkflowTransitions,
+    WorkflowRequestEscalation,
 )
 from oarepo_workflows.base import Workflow
 from oarepo_workflows.requests.events import WorkflowEvent
@@ -52,6 +55,11 @@ from oarepo_requests.notifications.builders.publish import (
     PublishDraftRequestAcceptNotificationBuilder,
     PublishDraftRequestSubmitNotificationBuilder,
 )
+
+from oarepo_requests.notifications.builders.escalate import (
+    EscalateRequestSubmitNotificationBuilder
+)
+
 from oarepo_requests.receiver import default_workflow_receiver_function
 from oarepo_requests.services.permissions.generators.conditional import (
     IfNoEditDraft,
@@ -115,6 +123,26 @@ class DefaultRequests(WorkflowRequestPolicy):
             declined="draft",
             cancelled="draft",
         ),
+        escalations=[
+            WorkflowRequestEscalation(
+                after=timedelta(seconds=2),
+                recipients=[
+                    UserGenerator(3),
+                ],
+            ),
+            WorkflowRequestEscalation(
+                after=timedelta(seconds=6),
+                recipients=[
+                    UserGenerator(4),
+                ],
+            ),
+            WorkflowRequestEscalation(
+                after=timedelta(seconds=10),
+                recipients=[
+                    UserGenerator(5),
+                ],
+            ),
+        ]
     )
     delete_published_record = WorkflowRequest(
         requesters=[IfInState("published", [RecordOwners()])],
@@ -145,6 +173,45 @@ class DefaultRequests(WorkflowRequestPolicy):
         transitions=WorkflowTransitions(),
     )
 
+class RequestWithMultipleRecipients(WorkflowRequestPolicy):
+    publish_draft = WorkflowRequest(
+        requesters=[IfInState("draft", [RecordOwners()])],
+        recipients=[UserGenerator(2), UserGenerator(1)],
+        transitions=WorkflowTransitions(
+            submitted="publishing",
+            accepted="published",
+            declined="draft",
+            cancelled="draft",
+        ),
+        escalations=[
+            WorkflowRequestEscalation(
+                after=timedelta(seconds=2),
+                recipients=[
+                    UserGenerator(3),
+                    UserGenerator(7)
+                ],
+            ),
+            WorkflowRequestEscalation(
+                after=timedelta(seconds=6),
+                recipients=[
+                    UserGenerator(4),
+                ],
+            ),
+            WorkflowRequestEscalation(
+                after=timedelta(seconds=10),
+                recipients=[
+                    UserGenerator(5),
+                ],
+            ),
+            WorkflowRequestEscalation(
+                after=timedelta(seconds=14),
+                recipients=[
+                    UserGenerator(5),
+                    UserGenerator(6),
+                ],
+            ),
+        ]
+    )
 
 class RequestsWithDifferentRecipients(DefaultRequests):
     another_topic_updating = WorkflowRequest(
@@ -323,6 +390,11 @@ WORKFLOWS = {
         permission_policy_cls=TestWorkflowPermissions,
         request_policy_cls=RequestsWithDifferentRecipients,
     ),
+    "multiple_recipients": Workflow(
+        label=_("Workflow with multiple recipient to test escalation of the request"),
+        permission_policy_cls=TestWorkflowPermissions,
+        request_policy_cls=RequestWithMultipleRecipients,
+    )
 }
 
 """
@@ -459,6 +531,7 @@ def app_config(app_config):
         PublishDraftRequestSubmitNotificationBuilder.type: PublishDraftRequestSubmitNotificationBuilder,
         DeletePublishedRecordRequestSubmitNotificationBuilder.type: DeletePublishedRecordRequestSubmitNotificationBuilder,
         DeletePublishedRecordRequestAcceptNotificationBuilder.type: DeletePublishedRecordRequestAcceptNotificationBuilder,
+        EscalateRequestSubmitNotificationBuilder.type: EscalateRequestSubmitNotificationBuilder
     }
     app_config["NOTIFICATIONS_ENTITY_RESOLVERS"] = [
         ServiceResultResolver(service_id="users", type_key="user"),
@@ -512,3 +585,79 @@ def user_links():
         }
 
     return _user_links
+
+@pytest.fixture
+def more_users(app, db, UserFixture):
+    user1 = UserFixture(
+        email="user1@example.org",
+        password="password", # NOSONAR
+        active=True,
+        confirmed=True,
+    )
+    user1.create(app, db)
+
+    user2 = UserFixture(
+        email="user2@example.org",
+        password="beetlesmasher", # NOSONAR
+        active=True,
+        confirmed=True,
+    )
+    user2.create(app, db)
+
+    user3 = UserFixture(
+        email="user3@example.org",
+        password="beetlesmasher", # NOSONAR
+        user_profile={
+            "full_name": "Maxipes Fik",
+            "affiliations": "CERN",
+        },
+        active=True,
+        confirmed=True,
+    )
+    user3.create(app, db)
+
+    user4 = UserFixture(
+        email="user4@example.org",
+        password="password", # NOSONAR
+        active=True,
+        confirmed=True,
+    )
+    user4.create(app, db)
+
+    user5 = UserFixture(
+        email="user5@example.org",
+        password="password", # NOSONAR
+        active=True,
+        confirmed=True,
+    )
+    user5.create(app, db)
+
+    user6 = UserFixture(
+        email="user6@example.org",
+        password="password", # NOSONAR
+        active=True,
+        confirmed=True,
+    )
+    user6.create(app, db)
+
+    user7 = UserFixture(
+        email="user7@example.org",
+        password="password", # NOSONAR
+        active=True,
+        confirmed=True,
+    )
+    user7.create(app, db)
+
+    user10 = UserFixture(
+        email="user10@example.org",
+        password="password", # NOSONAR
+        active=True,
+        confirmed=True,
+    )
+    user10.create(app, db)
+
+    db.session.commit()
+    UserAggregate.index.refresh()
+    return [user1, user2, user3, user4, user5, user6, user7, user10 ]
+
+
