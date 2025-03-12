@@ -12,7 +12,7 @@ from __future__ import annotations
 from typing import TYPE_CHECKING, Any
 
 from oarepo_runtime.datastreams.utils import get_record_service_for_record
-from oarepo_requests.types.record_snapshot_mixin import RecordSnapshotMixin
+from oarepo_requests.actions.record_snapshot_mixin import RecordSnapshotMixin
 from .generic import AddTopicLinksOnPayloadMixin, OARepoAcceptAction
 
 if TYPE_CHECKING:

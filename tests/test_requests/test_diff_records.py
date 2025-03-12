@@ -180,6 +180,14 @@ def test_new_version_diff(
 
     assert creator_client.put(f"{urls['BASE_URL']}{new_draft['id']}/draft", json=new_draft).status_code == 200
 
+
+    results = db.session.query(RecordSnapshot).all()
+    assert len(results) == 1
+
+    results = db.session.query(RequestEventModel).filter_by(type='S').all()
+    assert len(results) == 0
+
+
     publish_request = submit_request_on_draft(
         creator.identity, new_draft["id"], "publish_draft"
     )
@@ -259,20 +267,20 @@ def test_edited_metadata_diff(
     assert creator_client.put(f"{urls['BASE_URL']}{new_draft['id']}/draft", json=new_draft).status_code == 200
 
     results = db.session.query(RecordSnapshot).all()
-    assert len(results) == 2
+    assert len(results) == 1
 
     results = db.session.query(RequestEventModel).filter_by(type='S').all()
-    assert len(results) == 1
+    assert len(results) == 0
 
     publish_request = submit_request_on_draft(
         creator.identity, new_draft["id"], "publish_draft"
     )
 
     results = db.session.query(RecordSnapshot).all()
-    assert len(results) == 3
+    assert len(results) == 2
 
     results = db.session.query(RequestEventModel).filter_by(type='S').all()
-    assert len(results) == 2
+    assert len(results) == 1
 
     event = results[0].json
 
