@@ -12,10 +12,11 @@ from __future__ import annotations
 from functools import cached_property
 from typing import TYPE_CHECKING, Any
 
+from invenio_access.permissions import system_identity
 from invenio_pidstore.errors import PersistentIdentifierError
 from invenio_requests.customizations import actions
 from oarepo_runtime.i18n import lazy_gettext as _
-
+from oarepo_runtime.datastreams.utils import get_record_service_for_record
 from oarepo_requests.proxies import current_oarepo_requests
 
 if TYPE_CHECKING:
@@ -47,7 +48,7 @@ class OARepoGenericActionMixin:
         self,
         identity: Identity,
         request_type: RequestType,
-        topic: Any,
+        topic: Record,
         uow: UnitOfWork,
         *args: Any,
         **kwargs: Any,
@@ -59,7 +60,7 @@ class OARepoGenericActionMixin:
         components: list[RequestActionComponent],
         identity: Identity,
         request_type: RequestType,
-        topic: Any,
+        topic: Record,
         uow: UnitOfWork,
         *args: Any,
         **kwargs: Any,
@@ -114,13 +115,23 @@ class AddTopicLinksOnPayloadMixin:
         self,
         identity: Identity,
         request_type: RequestType,
-        topic: Any,
+        topic: Record,
         uow: UnitOfWork,
         *args: Any,
         **kwargs: Any,
     ) -> Record:
         """Apply the action to the topic."""
-        topic_dict = topic.to_dict()
+        super().apply(identity, request_type, topic, uow, *args, **kwargs)
+
+        service = get_record_service_for_record(topic)
+
+        # TODO the same consideration is below about: this happens if receiver doesn't have read rights to the topic, like after a draft is created after edit
+        if not topic.is_draft:
+            ret = service.read(system_identity, topic.pid.pid_value)
+        else:
+            ret = service.read_draft(system_identity, topic.pid.pid_value)
+    
+        topic_dict = ret.to_dict()
 
         request: Request = self.request  # type: ignore
 
@@ -137,7 +148,7 @@ class AddTopicLinksOnPayloadMixin:
             request["payload"][self.self_link] = topic_dict["links"]["self"]
         if "self_html" in topic_dict["links"]:
             request["payload"][self.self_html_link] = topic_dict["links"]["self_html"]
-        return topic._record
+        return topic
 
 
 class OARepoSubmitAction(OARepoGenericActionMixin, actions.SubmitAction):
