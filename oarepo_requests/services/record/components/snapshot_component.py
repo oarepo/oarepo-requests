@@ -1,6 +1,5 @@
 from invenio_records_resources.services.records.components import ServiceComponent
 from opensearch_dsl.query import Bool, Term, Terms
-from oarepo_requests.actions.record_snapshot_mixin import create_snapshot_and_possible_event
 from invenio_requests.proxies import current_requests_service
 from invenio_access.permissions import system_identity
 from invenio_requests.resolvers.registry import ResolverRegistry
@@ -20,6 +19,7 @@ class RecordSnapshotComponent(ServiceComponent):
                                                         sort='newest', size=1).hits)
 
         if requests:
+            from oarepo_requests.actions.record_snapshot_mixin import create_snapshot_and_possible_event
             create_snapshot_and_possible_event(record, record['metadata'], UUID(requests[0]['id']))
 
     def update(self, identity, *, record, **kwargs):
