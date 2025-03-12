@@ -125,7 +125,6 @@ class AddTopicLinksOnPayloadMixin:
 
         service = get_record_service_for_record(topic)
 
-        # TODO the same consideration is below about: this happens if receiver doesn't have read rights to the topic, like after a draft is created after edit
         if not topic.is_draft:
             ret = service.read(system_identity, topic.pid.pid_value)
         else:

@@ -9,10 +9,11 @@
 
 from alembic import op
 import sqlalchemy as sa
+from sqlalchemy.dialects import postgresql
 import sqlalchemy_utils
 
 # revision identifiers, used by Alembic.
-revision = '1ebe56f98fc7'
+revision = '57aebe908bcb'
 down_revision = '985368490c5b'
 branch_labels = ()
 depends_on = None
@@ -24,8 +25,10 @@ def upgrade():
     op.create_table('record_snapshots',
     sa.Column('id', sa.Integer(), nullable=False),
     sa.Column('record_uuid', sqlalchemy_utils.types.uuid.UUIDType(), nullable=False),
-    sa.Column('json', sa.Text(), nullable=True),
+    sa.Column('json', sa.JSON().with_variant(sqlalchemy_utils.types.json.JSONType(), 'mysql').with_variant(postgresql.JSONB(none_as_null=True, astext_type=sa.Text()), 'postgresql').with_variant(sqlalchemy_utils.types.json.JSONType(), 'sqlite'), nullable=False),
+    sa.Column('request_id', sqlalchemy_utils.types.uuid.UUIDType(), nullable=True),
     sa.Column('created', sa.DateTime(), nullable=False),
+    sa.ForeignKeyConstraint(['request_id'], ['request_metadata.id'], name=op.f('fk_record_snapshots_request_id_request_metadata'), ondelete='cascade'),
     sa.PrimaryKeyConstraint('id', name=op.f('pk_record_snapshots'))
     )
     # ### end Alembic commands ###

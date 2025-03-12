@@ -28,7 +28,7 @@ from .generic import (
     OARepoDeclineAction,
     OARepoSubmitAction,
 )
-from ..types.record_snapshot_mixin import RecordSnapshotMixin
+from .record_snapshot_mixin import RecordSnapshotMixin
 
 if TYPE_CHECKING:
     from flask_principal import Identity

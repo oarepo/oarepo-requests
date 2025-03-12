@@ -196,6 +196,8 @@ class OARepoRequests:
         )
         app.config.setdefault("SNAPSHOT_CLEANUP_DAYS", config.SNAPSHOT_CLEANUP_DAYS)
 
+        app.config.setdefault("PUBLISH_REQUEST_TYPES", config.PUBLISH_REQUEST_TYPES)
+
         # do not overwrite user's stuff
         app_default_workflow_events = app.config.setdefault(
             "DEFAULT_WORKFLOW_EVENTS", {}

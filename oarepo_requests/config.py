@@ -118,3 +118,5 @@ NOTIFICATION_RECIPIENTS_RESOLVERS = {
 }
 
 SNAPSHOT_CLEANUP_DAYS = 365
+
+PUBLISH_REQUEST_TYPES = ['publish_draft', 'publish_new_version']
