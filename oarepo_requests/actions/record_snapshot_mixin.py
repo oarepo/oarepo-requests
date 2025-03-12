@@ -4,7 +4,6 @@ from typing import Any, TYPE_CHECKING
 
 
 from oarepo_runtime.datastreams.utils import get_record_service_for_record
-from oarepo_requests.snapshots import create_snapshot_and_possible_event
 from flask_principal import PermissionDenied
 from contextlib import suppress
 
@@ -37,6 +36,7 @@ class RecordSnapshotMixin:
             else:
                 ret = service.read_draft(identity, topic.pid.pid_value)
 
+            from oarepo_requests.snapshots import create_snapshot_and_possible_event
             create_snapshot_and_possible_event(topic, ret.to_dict()['metadata'], self.request.id)
 
         return super_apply    
