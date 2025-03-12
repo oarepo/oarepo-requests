@@ -19,7 +19,7 @@ class RecordSnapshotComponent(ServiceComponent):
                                                         sort='newest', size=1).hits)
 
         if requests:
-            from oarepo_requests.actions.record_snapshot_mixin import create_snapshot_and_possible_event
+            from oarepo_requests.snapshots import create_snapshot_and_possible_event
             create_snapshot_and_possible_event(record, record['metadata'], UUID(requests[0]['id']))
 
     def update(self, identity, *, record, **kwargs):

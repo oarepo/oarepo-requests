@@ -4,6 +4,10 @@ record:
   module:
     qualified: thesis
 
+  service-config:
+    components: 
+      - "{{oarepo_requests.services.record.components.snapshot_component.RecordSnapshotComponent}}"
+
   properties:
     metadata:
       properties:
