@@ -25,7 +25,7 @@ from oarepo_requests.utils import create_query_term_for_reference
 if TYPE_CHECKING:
     from invenio_records_resources.services.uow import UnitOfWork
     from invenio_requests.customizations import EventType
-
+    from invenio_records_resources.records import Record
     from oarepo_requests.typing import EntityReference
 
 
@@ -60,7 +60,7 @@ def _create_event(
 
 
 def update_topic(
-    request: Request, old_topic: Any, new_topic: Any, uow: UnitOfWork
+    request: Request, old_topic: Record, new_topic: Record, uow: UnitOfWork
 ) -> None:
     """Update topic on all requests with the old topic to the new topic.
 
@@ -101,7 +101,7 @@ def update_topic(
 
 
 def cancel_requests_on_topic_delete(
-    request: Request, topic: Any, uow: UnitOfWork
+    request: Request, topic: Record, uow: UnitOfWork
 ) -> None:
     """Cancel all requests with the topic that is being deleted."""
     from oarepo_requests.types.events import TopicDeleteEventType

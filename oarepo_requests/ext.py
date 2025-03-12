@@ -194,6 +194,8 @@ class OARepoRequests:
         app.config.setdefault("REQUESTS_UI_SERIALIZATION_REFERENCED_FIELDS", []).extend(
             config.REQUESTS_UI_SERIALIZATION_REFERENCED_FIELDS
         )
+        app.config.setdefault("SNAPSHOT_CLEANUP_DAYS", config.SNAPSHOT_CLEANUP_DAYS)
+
         # do not overwrite user's stuff
         app_default_workflow_events = app.config.setdefault(
             "DEFAULT_WORKFLOW_EVENTS", {}

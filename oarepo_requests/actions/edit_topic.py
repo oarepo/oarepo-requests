@@ -12,7 +12,7 @@ from __future__ import annotations
 from typing import TYPE_CHECKING, Any, override
 
 from oarepo_runtime.datastreams.utils import get_record_service_for_record
-
+from oarepo_requests.types.record_snapshot_mixin import RecordSnapshotMixin
 from .generic import AddTopicLinksOnPayloadMixin, OARepoAcceptAction
 
 if TYPE_CHECKING:
@@ -22,7 +22,7 @@ if TYPE_CHECKING:
     from invenio_requests.customizations import RequestType
 
 
-class EditTopicAcceptAction(AddTopicLinksOnPayloadMixin, OARepoAcceptAction):
+class EditTopicAcceptAction(AddTopicLinksOnPayloadMixin, RecordSnapshotMixin, OARepoAcceptAction):
     """Accept creation of a draft of a published record for editing metadata."""
 
     self_link = "draft_record:links:self"
@@ -43,4 +43,4 @@ class EditTopicAcceptAction(AddTopicLinksOnPayloadMixin, OARepoAcceptAction):
         if not topic_service:
             raise KeyError(f"topic {topic} service not found")
         edit_topic = topic_service.edit(identity, topic["id"], uow=uow)
-        super().apply(identity, request_type, edit_topic, uow, *args, **kwargs)
+        super().apply(identity, request_type, edit_topic._record, uow, *args, **kwargs)
