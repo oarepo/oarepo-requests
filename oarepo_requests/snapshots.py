@@ -32,21 +32,21 @@ def create_snapshot_and_possible_event(topic: Record, record_metadata: dict, req
     # go through table, filter latest two
     # if two -> create event
     results = (db.session.query(RecordSnapshot)
-                .filter_by(record_uuid=topic.id)
-                .order_by(RecordSnapshot.created.desc())
-                .limit(2)
-                .all())
-
+               .filter_by(record_uuid=topic.id)
+               .order_by(RecordSnapshot.created.desc())
+               .limit(2)
+               .all())
 
     if len(results) == 2:
         old_version = results[1].json
         new_version = record_metadata
         diff = jsonpatch.JsonPatch.from_diff(old_version, new_version).patch
+        diff = [op for op in diff if '@v' not in op['path']]
 
         for op in diff:
             if op['op'] == 'remove' or op['op'] == 'replace':
-                op['old_value'] = resolve_pointer(old_version, op['path'])  
-    
+                op['old_value'] = resolve_pointer(old_version, op['path'])
+
         data = {
             'payload': {
                 'old_version': json.dumps(old_version),
