@@ -49,11 +49,11 @@ from oarepo_requests.actions.generic import (
 )
 from oarepo_requests.notifications.builders.delete_published_record import (
     DeletePublishedRecordRequestAcceptNotificationBuilder,
-    DeletePublishedRecordRequestSubmitNotificationBuilder,
+    DeletePublishedRecordRequestSubmitNotificationBuilder, DeletePublishedRecordRequestDeclineNotificationBuilder,
 )
 from oarepo_requests.notifications.builders.publish import (
     PublishDraftRequestAcceptNotificationBuilder,
-    PublishDraftRequestSubmitNotificationBuilder,
+    PublishDraftRequestSubmitNotificationBuilder, PublishDraftRequestDeclineNotificationBuilder,
 )
 
 from oarepo_requests.notifications.builders.escalate import (
@@ -531,9 +531,11 @@ def app_config(app_config):
     app_config["NOTIFICATIONS_BUILDERS"] = {
         PublishDraftRequestAcceptNotificationBuilder.type: PublishDraftRequestAcceptNotificationBuilder,
         PublishDraftRequestSubmitNotificationBuilder.type: PublishDraftRequestSubmitNotificationBuilder,
+        PublishDraftRequestDeclineNotificationBuilder.type: PublishDraftRequestDeclineNotificationBuilder,
         DeletePublishedRecordRequestSubmitNotificationBuilder.type: DeletePublishedRecordRequestSubmitNotificationBuilder,
         DeletePublishedRecordRequestAcceptNotificationBuilder.type: DeletePublishedRecordRequestAcceptNotificationBuilder,
         EscalateRequestSubmitNotificationBuilder.type: EscalateRequestSubmitNotificationBuilder,
+        DeletePublishedRecordRequestDeclineNotificationBuilder.type: DeletePublishedRecordRequestDeclineNotificationBuilder,
     }
     app_config["NOTIFICATIONS_ENTITY_RESOLVERS"] = [
         ServiceResultResolver(service_id="users", type_key="user"),

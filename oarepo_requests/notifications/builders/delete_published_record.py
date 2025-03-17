@@ -22,3 +22,10 @@ class DeletePublishedRecordRequestAcceptNotificationBuilder(
     context = [
         EntityResolve(key="request"),
     ]
+
+class DeletePublishedRecordRequestDeclineNotificationBuilder(
+    OARepoRequestActionNotificationBuilder
+):
+    type = "delete-published-record-request-event.decline"
+
+    recipients = [EntityRecipient(key="request.created_by")]
