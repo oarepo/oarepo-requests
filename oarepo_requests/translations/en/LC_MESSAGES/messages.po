@@ -791,5 +791,130 @@ msgstr ""
 msgid "Publish new version"
 msgstr ""
 
+#: /Users/m/w/cesnet/oarepo-requests/oarepo_requests/templates/semantic-ui/invenio_notifications/delete-published-record-request-event.accept.jinja:7
+msgid "❗️ Published record has been deleted"
+msgstr ""
+
+#: /Users/m/w/cesnet/oarepo-requests/oarepo_requests/templates/semantic-ui/invenio_notifications/delete-published-record-request-event.accept.jinja:11
+#: /Users/m/w/cesnet/oarepo-requests/oarepo_requests/templates/semantic-ui/invenio_notifications/delete-published-record-request-event.accept.jinja:21
+msgid "The published record has been deleted."
+msgstr ""
+
+#: /Users/m/w/cesnet/oarepo-requests/oarepo_requests/templates/semantic-ui/invenio_notifications/delete-published-record-request-event.accept.jinja:12
+#, python-format
+msgid "For more information head to the <a href='%(link)s'>request page</a>."
+msgstr ""
+
+#: /Users/m/w/cesnet/oarepo-requests/oarepo_requests/templates/semantic-ui/invenio_notifications/delete-published-record-request-event.accept.jinja:22
+#, python-format
+msgid "For more information head to the %(link)s"
+msgstr ""
+
+#: /Users/m/w/cesnet/oarepo-requests/oarepo_requests/templates/semantic-ui/invenio_notifications/delete-published-record-request-event.accept.jinja:24
+#: /Users/m/w/cesnet/oarepo-requests/oarepo_requests/templates/semantic-ui/invenio_notifications/escalate-request-event.submit.jinja:29
+msgid ""
+"This is an auto-generated message. To manage notifications, visit your "
+"account settings"
+msgstr ""
+
+#: /Users/m/w/cesnet/oarepo-requests/oarepo_requests/templates/semantic-ui/invenio_notifications/delete-published-record-request-event.submit.jinja:8
+#, python-brace-format
+msgid "❗️ Request to delete published record {topic_title}"
+msgstr ""
+
+#: /Users/m/w/cesnet/oarepo-requests/oarepo_requests/templates/semantic-ui/invenio_notifications/delete-published-record-request-event.submit.jinja:13
+#, python-format
+msgid ""
+"\n"
+"    <p>\n"
+"    You have been asked to approve deletion of a published record \"%(topic_title)s\".\n"
+"    </p>\n"
+"    <p>\n"
+"        <a type=\"button\" href='%(link)s'>Accept or Decline the request</a>\n"
+"    </p>\n"
+"    "
+msgstr ""
+
+#: /Users/m/w/cesnet/oarepo-requests/oarepo_requests/templates/semantic-ui/invenio_notifications/delete-published-record-request-event.submit.jinja:29
+#, python-format
+msgid ""
+"\n"
+"    You have been asked to approve deletion of a published record \"%(topic_title)s\".\n"
+"    Accept or Decline the request at %(link)s\n"
+"    "
+msgstr ""
+
+#: /Users/m/w/cesnet/oarepo-requests/oarepo_requests/templates/semantic-ui/invenio_notifications/escalate-request-event.submit.jinja:6
+msgid "❗️ A request has been escalated to you"
+msgstr ""
+
+#: /Users/m/w/cesnet/oarepo-requests/oarepo_requests/templates/semantic-ui/invenio_notifications/escalate-request-event.submit.jinja:15
+msgid "You can approve or decline the request by visiting the"
+msgstr ""
+
+#: /Users/m/w/cesnet/oarepo-requests/oarepo_requests/templates/semantic-ui/invenio_notifications/escalate-request-event.submit.jinja:15
+msgid "request page"
+msgstr ""
+
+#: /Users/m/w/cesnet/oarepo-requests/oarepo_requests/templates/semantic-ui/invenio_notifications/escalate-request-event.submit.jinja:24
+#, python-format
+msgid ""
+"\n"
+"Request was escalated to you since the original recipient did not approve the request in time.\n"
+"You can approve or decline the request by visiting the request page at %(link)s.\n"
+msgstr ""
+
+#: /Users/m/w/cesnet/oarepo-requests/oarepo_requests/templates/semantic-ui/invenio_notifications/publish-draft-request-event.accept.jinja:9
+#, python-brace-format
+msgid "Record '{topic_title}' has been published"
+msgstr ""
+
+#: /Users/m/w/cesnet/oarepo-requests/oarepo_requests/templates/semantic-ui/invenio_notifications/publish-draft-request-event.accept.jinja:13
+#, python-format
+msgid ""
+"\n"
+"<p>\n"
+"Your record \"%(topic_title)s\" has been published. You can see the record at\n"
+"<a href=\"%(link)s\">%(link)s</a>\n"
+"</p>\n"
+"    "
+msgstr ""
+
+#: /Users/m/w/cesnet/oarepo-requests/oarepo_requests/templates/semantic-ui/invenio_notifications/publish-draft-request-event.accept.jinja:27
+#, python-format
+msgid ""
+"\n"
+"Your record \"%(topic_title)s\" has been published. You can see the record at\n"
+"%(link)s\n"
+"    "
+msgstr ""
+
+#: /Users/m/w/cesnet/oarepo-requests/oarepo_requests/templates/semantic-ui/invenio_notifications/publish-draft-request-event.submit.jinja:8
+#, python-brace-format
+msgid "Request to publish record {topic_title}"
+msgstr ""
+
+#: /Users/m/w/cesnet/oarepo-requests/oarepo_requests/templates/semantic-ui/invenio_notifications/publish-draft-request-event.submit.jinja:12
+#, python-format
+msgid ""
+"\n"
+"    <p>\n"
+"    You have been asked to publish record \"%(topic_title)s\".\n"
+"    </p>\n"
+"    <p>\n"
+"        <a type=\"button\" href='%(link)s'>Accept or Decline the request</a>\n"
+"    </p>\n"
+"    "
+msgstr ""
+
+#: /Users/m/w/cesnet/oarepo-requests/oarepo_requests/templates/semantic-ui/invenio_notifications/publish-draft-request-event.submit.jinja:29
+#, python-format
+msgid ""
+"\n"
+"    You have been asked to publish record \"%(topic_title)s\".\n"
+"    Accept or Decline the request at %(link)s\n"
+"    "
+msgstr ""
+
 #~ msgid "No status"
 #~ msgstr ""
