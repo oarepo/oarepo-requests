@@ -64,7 +64,7 @@ def test_escalate_request_most_recent(
 
         # check sent mail
         assert len(outbox) == 1
-        assert outbox[-1].body.endswith("Request was escalated to you since the original recipient did not approve the request in time.")
+        assert outbox[-1].body.startswith("Request was escalated to you since the original recipient did not approve the request in time.")
         assert outbox[-1].recipients[0] == "user3@example.org"
 
 def test_escalate_request_most_recent_multiple_recipients(
@@ -201,7 +201,7 @@ def test_escalate_request_most_recent_2(
 
         assert len(results) == 1
         assert len(outbox) == 1
-        assert outbox[-1].body.endswith("Request was escalated to you since the original recipient did not approve the request in time.")
+        assert outbox[-1].body.startswith("Request was escalated to you since the original recipient did not approve the request in time.")
         assert outbox[-1].recipients[0] == "user4@example.org"
 
 
@@ -285,7 +285,7 @@ def test_escalate_request_most_recent_2_multiple_recipients(
         assert len(results) == 1
         assert len(outbox) == 1
         assert outbox[0].recipients[0] == "user4@example.org"
-        assert outbox[-1].body.endswith("Request was escalated to you since the original recipient did not approve the request in time.")
+        assert outbox[-1].body.startswith("Request was escalated to you since the original recipient did not approve the request in time.")
 
 
 def test_escalate_request_most_recent_3(
@@ -342,7 +342,7 @@ def test_escalate_request_most_recent_3(
         assert len(results) == 1
 
         assert len(outbox) == 1
-        assert outbox[-1].body.endswith(
+        assert outbox[-1].body.startswith(
             "Request was escalated to you since the original recipient did not approve the request in time.")
         assert outbox[-1].recipients[0] == "user5@example.org"
 
@@ -412,7 +412,7 @@ def test_escalate_request_most_recent_3_multiple_recipients(
 
         assert len(results) == 1
         assert len(outbox) == 1
-        assert outbox[-1].body.endswith("Request was escalated to you since the original recipient did not approve the request in time.")
+        assert outbox[-1].body.startswith("Request was escalated to you since the original recipient did not approve the request in time.")
         assert outbox[-1].recipients[0] == "user5@example.org"
 
 def test_escalate_request_already_processed(
@@ -464,7 +464,7 @@ def test_escalate_request_already_processed(
         assert len(results) == 1
 
         assert len(outbox) == 1 # only 1 sent mail
-        assert outbox[-1].body.endswith(
+        assert outbox[-1].body.startswith(
             "Request was escalated to you since the original recipient did not approve the request in time.")
         assert outbox[-1].recipients[0] == "user5@example.org"
 
@@ -523,7 +523,7 @@ def test_escalate_request_already_processed_multiple_recipients(
         assert len(results) == 1
         assert len(outbox) == 2
         assert outbox[0].recipients[0] == "user5@example.org" or outbox[0].recipients[6]
-        assert outbox[0].body.endswith(
+        assert outbox[0].body.startswith(
             "Request was escalated to you since the original recipient did not approve the request in time.")
 
         # nothing should change
@@ -539,7 +539,7 @@ def test_escalate_request_already_processed_multiple_recipients(
         assert len(results) == 1
         assert len(outbox) == 2
         assert outbox[0].recipients[0] == "user5@example.org" or outbox[0].recipients[6]
-        assert outbox[0].body.endswith(
+        assert outbox[0].body.startswith(
             "Request was escalated to you since the original recipient did not approve the request in time.")
 
 
@@ -588,7 +588,7 @@ def test_escalate_request_already_processed_2(
         assert len(results) == 1
 
         assert len(outbox) == 1
-        assert outbox[-1].body.endswith(
+        assert outbox[-1].body.startswith(
             "Request was escalated to you since the original recipient did not approve the request in time.")
         assert outbox[-1].recipients[0] == "user3@example.org"
 
@@ -607,7 +607,7 @@ def test_escalate_request_already_processed_2(
 
         assert len(results) == 2
         assert len(outbox) == 2 # first escalation mail + second escalation mail
-        assert outbox[-1].body.endswith(
+        assert outbox[-1].body.startswith(
             "Request was escalated to you since the original recipient did not approve the request in time.")
         assert outbox[-1].recipients[0] == "user4@example.org"
 
