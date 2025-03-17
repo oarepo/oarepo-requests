@@ -1,16 +1,19 @@
 {% set access_request = notification.context.request %}
 {% set topic = notification.context.request.topic %}
-{% set request_html_page = notification.context.request.links.self_html %}
-{% set topic_title = notification.context.request.topic.get("metadata", {}).get("title", topic.id) %}
+{% set request_link = topic.links["self_html"] %}
 
 {%- block subject -%}
-    {{ _("❗️ Published record has been deleted") }}
+    {{ _("❗️ A request has been escalated to you") }}
 {%- endblock subject -%}
 
 {%- block html_body -%}
-    {{ _("The published record has been deleted.") }}
-    {{ _("For more information head to the <a href='%(link)s'>request page</a>.", link=request_html_page)}}
     <table style="font-family:'Lato',Helvetica,Arial,sans-serif;border-spacing:15px">
+        <tr>
+            <td>{{ _("Request was escalated to you since the original recipient did not approve the request in time.") }}</td>
+        </tr>
+        <tr>
+            <td>{{ _("You can approve or decline the request by visiting the") }} <a href="{{request_link}}">{{ _("request page") }}</a>.</td>
+        </tr>
         <tr>
             <td style="font-size:smaller">{{ _("This is an auto-generated message. To manage notifications, visit your")}} <a href="{{account_settings_link}}">{{ _("account settings")}}</a>.</td>
         </tr>
@@ -18,8 +21,10 @@
 {%- endblock html_body -%}
 
 {%- block plain_body -%}
-{{ _("The published record has been deleted.") }}
-{{ _("For more information head to the %(link)s", link=request_html_page)}} 
+{% trans link=request_link %}
+Request was escalated to you since the original recipient did not approve the request in time.
+You can approve or decline the request by visiting the request page at {{link}}.
+{% endtrans %}
 
 {{ _("This is an auto-generated message. To manage notifications, visit your account settings") }}.
 {%- endblock plain_body -%}

@@ -24,6 +24,7 @@ from oarepo_requests.resources.oarepo.config import OARepoRequestsResourceConfig
 from oarepo_requests.resources.oarepo.resource import OARepoRequestsResource
 from oarepo_requests.services.oarepo.config import OARepoRequestsServiceConfig
 from oarepo_requests.services.oarepo.service import OARepoRequestsService
+from oarepo_requests.cli import oarepo_requests # noqa
 
 if TYPE_CHECKING:
     from flask import Flask
@@ -193,6 +194,10 @@ class OARepoRequests:
         app.config.setdefault("REQUESTS_UI_SERIALIZATION_REFERENCED_FIELDS", []).extend(
             config.REQUESTS_UI_SERIALIZATION_REFERENCED_FIELDS
         )
+        app.config.setdefault("SNAPSHOT_CLEANUP_DAYS", config.SNAPSHOT_CLEANUP_DAYS)
+
+        app.config.setdefault("PUBLISH_REQUEST_TYPES", config.PUBLISH_REQUEST_TYPES)
+
         # do not overwrite user's stuff
         app_default_workflow_events = app.config.setdefault(
             "DEFAULT_WORKFLOW_EVENTS", {}
