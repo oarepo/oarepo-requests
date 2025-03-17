@@ -1,12 +1,21 @@
-{% set access_request = notification.context.request %}
-{% set topic = notification.context.request.topic %}
-{% set topic_id = notification.context.request.topic.thesis %}
+{% set request = notification.context.request %}
+{% set topic = request.topic %}
+{% set topic_id = request.topic.id %}
+{% set topic_title = topic.get("metadata", {}).get("title", topic_id) %}
+{% set request_html_page = request.links.self_html %}
+{% set topic_html_page = topic.get("links", {}).get("self_html") %}
 
 {%- block subject -%}
-    {{ _("❗️Publish request for topic '{topic_id}' accepted").format(topic_id=topic_id) }}
+    {{ _("Record '{topic_title}' has been published").format(topic_title=topic_title) }}
 {%- endblock subject -%}
 
 {%- block html_body -%}
+    {% trans topic_title=topic_title, link=topic_html_page %}
+<p>
+Your record "{{topic_title}}" has been published. You can see the record at
+<a href="{{link}}">{{link}}</a>
+</p>
+    {% endtrans %}
     <table style="font-family:'Lato',Helvetica,Arial,sans-serif;border-spacing:15px">
         <tr>
             <td style="font-size:smaller">{{ _("This is an auto-generated message. To manage notifications, visit your")}} <a href="{{account_settings_link}}">{{ _("account settings")}}</a>.</td>
@@ -15,6 +24,9 @@
 {%- endblock html_body -%}
 
 {%- block plain_body -%}
-{{ _("Request for publishing of your record '%(topic_id)s' has been accepted.", topic_id=topic_id) }}
+    {% trans topic_title=topic_title, link=topic_html_page %}
+Your record "{{topic_title}}" has been published. You can see the record at
+{{link}}
+    {% endtrans %}
 
 {%- endblock plain_body -%}
