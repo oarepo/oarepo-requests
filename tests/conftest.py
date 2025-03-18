@@ -537,18 +537,6 @@ def app_config(app_config):
         EscalateRequestSubmitNotificationBuilder.type: EscalateRequestSubmitNotificationBuilder,
         DeletePublishedRecordRequestDeclineNotificationBuilder.type: DeletePublishedRecordRequestDeclineNotificationBuilder,
     }
-    app_config["NOTIFICATIONS_ENTITY_RESOLVERS"] = [
-        ServiceResultResolver(service_id="users", type_key="user"),
-        ServiceResultResolver(service_id="requests", type_key="request"),
-        ServiceResultResolver(service_id="request_events", type_key="request_event"),
-        ServiceResultResolver(service_id="thesis", type_key="thesis"),
-        # note: have a look at RDMRecordServiceResultResolver, it seems to do additional stuff
-        ServiceResultResolver(
-            service_id="thesis",
-            type_key="thesis_draft",
-            proxy_cls=RDMRecordServiceResultProxy,
-        ),
-    ]
     app_config["MAIL_DEFAULT_SENDER"] = "test@invenio-rdm-records.org"
 
     return app_config
