@@ -28,6 +28,7 @@ from .generic import (
     OARepoDeclineAction,
     OARepoSubmitAction,
 )
+from .record_snapshot_mixin import RecordSnapshotMixin
 
 if TYPE_CHECKING:
     from flask_principal import Identity
@@ -54,7 +55,7 @@ class PublishMixin:
             return False
 
 
-class PublishDraftSubmitAction(PublishMixin, OARepoSubmitAction):
+class PublishDraftSubmitAction(PublishMixin, RecordSnapshotMixin, OARepoSubmitAction):
     """Submit action for publishing draft requests."""
 
     def apply(
@@ -110,7 +111,7 @@ class PublishDraftAcceptAction(
             )
         )
         return super().apply(
-            identity, request_type, published_topic, uow, *args, **kwargs
+            identity, request_type, published_topic._record, uow, *args, **kwargs
         )
 
 

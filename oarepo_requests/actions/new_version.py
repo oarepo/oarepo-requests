@@ -12,7 +12,7 @@ from __future__ import annotations
 from typing import TYPE_CHECKING, Any
 
 from oarepo_runtime.datastreams.utils import get_record_service_for_record
-
+from oarepo_requests.actions.record_snapshot_mixin import RecordSnapshotMixin
 from .generic import AddTopicLinksOnPayloadMixin, OARepoAcceptAction
 
 if TYPE_CHECKING:
@@ -22,7 +22,7 @@ if TYPE_CHECKING:
     from invenio_requests.customizations import RequestType
 
 
-class NewVersionAcceptAction(AddTopicLinksOnPayloadMixin, OARepoAcceptAction):
+class NewVersionAcceptAction(AddTopicLinksOnPayloadMixin, RecordSnapshotMixin, OARepoAcceptAction):
     """Accept creation of a new version of a published record."""
 
     self_link = "draft_record:links:self"
@@ -55,5 +55,5 @@ class NewVersionAcceptAction(AddTopicLinksOnPayloadMixin, OARepoAcceptAction):
         self.request["payload"]["draft_record:id"] = new_version_topic["id"]
 
         return super().apply(
-            identity, request_type, new_version_topic, uow, *args, **kwargs
+            identity, request_type, new_version_topic._record, uow, *args, **kwargs
         )

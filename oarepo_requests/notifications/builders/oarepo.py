@@ -33,6 +33,8 @@ class OARepoRequestActionNotificationBuilder(NotificationBuilder):
 
     context = [
         EntityResolve(key="request"),
+        EntityResolve(key="request.topic"),
+        EntityResolve(key="request.created_by"),
     ]
 
     recipient_backends = [OARepoUserEmailBackend()]

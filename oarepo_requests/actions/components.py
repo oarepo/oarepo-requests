@@ -27,7 +27,7 @@ if TYPE_CHECKING:
     from flask_principal import Identity
     from invenio_records_resources.services.uow import UnitOfWork
     from invenio_requests.records.api import Request
-
+    from invenio_records_resources.records import Record
     from .generic import OARepoGenericActionMixin
 
 type ActionType = (
@@ -44,7 +44,7 @@ class RequestActionComponent(abc.ABC):
         identity: Identity,
         request_type: RequestType,
         action: ActionType,
-        topic: Any,
+        topic: Record,
         uow: UnitOfWork,
         *args: Any,
         **kwargs: Any,
@@ -73,7 +73,7 @@ class RequestIdentityComponent(RequestActionComponent):
         identity: Identity,
         request_type: RequestType,
         action: ActionType,
-        topic: Any,
+        topic: Record,
         uow: UnitOfWork,
         *args: Any,
         **kwargs: Any,
@@ -101,7 +101,7 @@ class WorkflowTransitionComponent(RequestActionComponent):
         identity: Identity,
         request_type: RequestType,
         action: ActionType,
-        topic: Any,
+        topic: Record,
         uow: UnitOfWork,
         *args: Any,
         **kwargs: Any,
@@ -147,7 +147,7 @@ class AutoAcceptComponent(RequestActionComponent):
         identity: Identity,
         request_type: RequestType,
         action: ActionType,
-        topic: Any,
+        topic: Record,
         uow: UnitOfWork,
         *args: Any,
         **kwargs: Any,

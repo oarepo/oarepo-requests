@@ -1,12 +1,23 @@
-{% set access_request = notification.context.request %}
-{% set topic = notification.context.request.topic %}
-{% set topic_id = notification.context.request.topic.thesis %}
+{% set request = notification.context.request %}
+{% set topic = request.topic %}
+{% set topic_id = request.topic.id %}
+{% set topic_title = topic.get("metadata", {}).get("title", topic_id) %}
+{% set request_html_page = request.links.self_html %}
 
 {%- block subject -%}
-    {{ _("❗️Publish request for topic '{topic_id}' waits for your approval").format(topic_id=topic_id) }}
+    {{ _("Request to publish record {topic_title}").format(topic_title=topic_title) }}
 {%- endblock subject -%}
 
 {%- block html_body -%}
+    {% trans topic_title=topic_title, link=request_html_page %}
+    <p>
+    You have been asked to publish record "{{topic_title}}".
+    </p>
+    <p>
+        <a type="button" href='{{link}}'>Accept or Decline the request</a>
+    </p>
+    {% endtrans %}
+
     <table style="font-family:'Lato',Helvetica,Arial,sans-serif;border-spacing:15px">
         <tr>
             <td style="font-size:smaller">{{ _("This is an auto-generated message. To manage notifications, visit your")}} <a href="{{account_settings_link}}">{{ _("account settings")}}</a>.</td>
@@ -15,6 +26,8 @@
 {%- endblock html_body -%}
 
 {%- block plain_body -%}
-{{ _("Publish request for record '%(topic_id)s' waits for your approval.", topic_id=topic_id) }}
-
+    {% trans topic_title=topic_title, link=request_html_page %}
+    You have been asked to publish record "{{topic_title}}".
+    Accept or Decline the request at {{link}}
+    {% endtrans %}
 {%- endblock plain_body -%}
