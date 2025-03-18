@@ -18,9 +18,8 @@ from .generic import OARepoAcceptAction
 
 if TYPE_CHECKING:
     from flask_principal import Identity
-    from invenio_drafts_resources.records import Record
+    from .components import RequestActionState
     from invenio_records_resources.services.uow import UnitOfWork
-    from invenio_requests.customizations import RequestType
 
 
 class DeleteDraftAcceptAction(OARepoAcceptAction):
@@ -30,14 +29,13 @@ class DeleteDraftAcceptAction(OARepoAcceptAction):
     def apply(
         self,
         identity: Identity,
-        request_type: RequestType,
-        topic: Record,
+        state: RequestActionState,
         uow: UnitOfWork,
         *args: Any,
         **kwargs: Any,
     ) -> None:
-        topic_service = get_record_service_for_record(topic)
+        topic_service = get_record_service_for_record(state.topic)
         if not topic_service:
-            raise KeyError(f"topic {topic} service not found")
-        topic_service.delete_draft(identity, topic["id"], *args, uow=uow, **kwargs)
-        cancel_requests_on_topic_delete(self.request, topic, uow)
+            raise KeyError(f"topic {state.topic} service not found")
+        topic_service.delete_draft(identity, state.topic["id"], *args, uow=uow, **kwargs)
+        cancel_requests_on_topic_delete(self.request, state.topic, uow)
