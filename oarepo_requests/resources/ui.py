@@ -15,6 +15,7 @@ from typing import TYPE_CHECKING, Any, cast
 from flask import g
 from flask_resources import BaseListSchema
 from flask_resources.serializers import JSONSerializer
+from invenio_records_resources.services.errors import RecordPermissionDeniedError
 from invenio_pidstore.errors import PIDDeletedError
 from oarepo_runtime.resources import LocalizedUIJSONSerializer
 
@@ -111,6 +112,8 @@ class CachedReferenceResolver:
                 return cast(dict, resolve(self._identity, reference))
             except PIDDeletedError:
                 return {"reference": reference, "status": "deleted"}
+            except RecordPermissionDeniedError:
+                return {"reference": reference, "status": "denied"}
 
 
 class OARepoRequestsUIJSONSerializer(LocalizedUIJSONSerializer):

@@ -21,7 +21,8 @@ from invenio_requests.customizations import RequestAction, RequestActions, Reque
 from invenio_requests.errors import CannotExecuteActionError
 
 from oarepo_requests.services.permissions.identity import request_active
-
+from .generic import OARepoGenericActionMixin
+import logging
 if TYPE_CHECKING:
     from collections.abc import Generator
     from invenio_drafts_resources.records import Record
@@ -29,30 +30,9 @@ if TYPE_CHECKING:
     from invenio_records_resources.services.uow import UnitOfWork
     from invenio_requests.records.api import Request
 
-    from .generic import OARepoGenericActionMixin
-
-type ActionType = (
-    OARepoGenericActionMixin | RequestAction
-)  # should be a type intersection, not yet in python
+from .generic import RequestActionState
 
 
-@dataclass
-class RequestActionState:
-    """RequestActionState dataclass to update possibly changed record between actions steps."""
-    
-    request: Request
-    request_type: RequestType
-    topic: Record
-    created_by: Any
-    action: ActionType
-    
-    def __post__init__(self):
-        """Assert correct types after initializing."""
-        assert isinstance(self.request, Request), f"self.request is not instance of Request, got {type(self.request)=}"
-        assert isinstance(self.request_type, RequestType), f"self.request_type is not instance of Request, got {type(self.request_type)=}"
-        assert isinstance(self.topic, Record), f"self.topic is not instance of Record, got {type(self.topic)=}"
-        # assert isinstance(self.action, ActionType), f"self.action is not instance of ActionType, got {type(self.action)=}"
-    
 
 class RequestActionComponent(abc.ABC):
     """Abstract request action component."""
@@ -175,4 +155,23 @@ class AutoAcceptComponent(RequestActionComponent):
         action_obj = RequestActions.get_action(request, "accept")
         if not action_obj.can_execute():
             raise CannotExecuteActionError("accept")
-        action_obj.execute(identity, uow, *args, **kwargs)
+        if isinstance(action_obj, OARepoGenericActionMixin):
+            # it is our action, just execute with components right away
+            current_action_obj = None
+            try:
+                current_action_obj = state.action
+                state.action = action_obj
+                action_obj.execute_with_components(identity, state, uow, *args, **kwargs)
+            finally:
+                state.action = current_action_obj
+        else:
+            action_obj.execute(identity, uow, *args, **kwargs)
+            # we dont know if request/topic was changed, retrieve actual data
+            new_request: Request = Request.get_record(request.id)
+            state.request = new_request
+            try:
+                new_topic = new_request.topic.resolve()
+                state.topic = new_topic
+            except Exception as e:
+                logging.error(e)
+                state.topic = None    

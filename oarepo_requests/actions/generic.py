@@ -16,9 +16,9 @@ from invenio_pidstore.errors import PersistentIdentifierError
 from invenio_requests.customizations import actions
 from oarepo_runtime.i18n import lazy_gettext as _
 from oarepo_runtime.datastreams.utils import get_record_service_for_record
+from dataclasses import dataclass
 
 from oarepo_requests.proxies import current_oarepo_requests
-from .components import RequestActionState
 from invenio_access.permissions import system_identity
 
 if TYPE_CHECKING:
@@ -29,6 +29,32 @@ if TYPE_CHECKING:
     from invenio_requests.records.api import Request
 
     from oarepo_requests.actions.components import RequestActionComponent
+
+from invenio_requests.customizations import RequestAction, RequestActions, RequestType
+
+type ActionType = (
+    OARepoGenericActionMixin | RequestAction
+)  # should be a type intersection, not yet in python
+
+
+
+@dataclass
+class RequestActionState:
+    """RequestActionState dataclass to update possibly changed record between actions steps."""
+    
+    request: Request
+    request_type: RequestType
+    topic: Record
+    created_by: Any
+    action: ActionType
+    
+    def __post__init__(self):
+        """Assert correct types after initializing."""
+        assert isinstance(self.request, Request), f"self.request is not instance of Request, got {type(self.request)=}"
+        assert isinstance(self.request_type, RequestType), f"self.request_type is not instance of Request, got {type(self.request_type)=}"
+        assert isinstance(self.topic, Record), f"self.topic is not instance of Record, got {type(self.topic)=}"
+        # assert isinstance(self.action, ActionType), f"self.action is not instance of ActionType, got {type(self.action)=}"
+    
 
 
 class OARepoGenericActionMixin:
@@ -55,6 +81,17 @@ class OARepoGenericActionMixin:
     ) -> None:
         """Apply the action to the topic."""
 
+    def execute_with_components(
+        self,
+        identity: Identity, 
+        state: RequestActionState,
+        uow: UnitOfWork,
+        *args: Any,
+        **kwargs: Any
+    ) -> None:
+        """Execute action with components."""
+        self._execute_with_components(self.components, identity, state, uow, *args, **kwargs)
+    
     def _execute_with_components(
         self,
         components: list[RequestActionComponent],
@@ -99,14 +136,16 @@ class OARepoGenericActionMixin:
             topic = request.topic.resolve()
         except PersistentIdentifierError:
             topic = None
-            
+
+        # create a shared state between different actions to track changes in topic/requests etc.
         state: RequestActionState = RequestActionState(
-            request=request,
-            request_type=request_type, 
-            topic=topic,
-            created_by=request.created_by,
-            action=self
-        )   
+                request=request,
+                request_type=request_type, 
+                topic=topic,
+                created_by=request.created_by,
+                action=self
+        )
+
         self._execute_with_components(
             self.components, identity, state, uow, *args, **kwargs
         )
