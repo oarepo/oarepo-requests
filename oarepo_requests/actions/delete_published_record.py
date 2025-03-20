@@ -90,7 +90,7 @@ class DeletePublishedRecordAcceptAction(OARepoAcceptAction):
         if hasattr(topic_service, "delete_record"):
             data = {
                 'removal_reason': {'id': self.request["payload"]["removal_reason"]},
-                'citation_text': "placeholder_citation_text",
+                'citation_text': "placeholder_citation_text", # TODO
                 'note': self.request['payload'].get("note",""),
                 'is_visible': True
             }
@@ -118,8 +118,7 @@ class DeletePublishedRecordDeclineAction(OARepoDeclineAction):
     def apply(
         self,
         identity: Identity,
-        request_type: RequestType,
-        topic: Record,
+        state: RequestActionState,
         uow: UnitOfWork,
         *args: Any,
         **kwargs: Any,
@@ -133,4 +132,4 @@ class DeletePublishedRecordDeclineAction(OARepoDeclineAction):
                 )
             )
         )
-        return super().apply(identity, request_type, topic, uow, *args, **kwargs)
+        return super().apply(identity, state, uow, *args, **kwargs)

@@ -122,8 +122,7 @@ class PublishDraftDeclineAction(OARepoDeclineAction):
     def apply(
         self,
         identity: Identity,
-        request_type: RequestType,
-        topic: Record,
+        state: RequestActionState,
         uow: UnitOfWork,
         *args: Any,
         **kwargs: Any,
@@ -134,4 +133,4 @@ class PublishDraftDeclineAction(OARepoDeclineAction):
                 PublishDraftRequestDeclineNotificationBuilder.build(request=self.request)
             )
         )
-        return super().apply(identity, request_type, topic, uow, *args, **kwargs)
+        return super().apply(identity, state, uow, *args, **kwargs)
