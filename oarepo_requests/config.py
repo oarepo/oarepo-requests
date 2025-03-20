@@ -9,6 +9,7 @@
 
 from __future__ import annotations
 
+from invenio_records_resources.references.entity_resolvers import ServiceResultResolver
 import invenio_requests.config
 import oarepo_workflows  # noqa
 from invenio_requests.customizations import CommentEventType, LogEventType
@@ -120,3 +121,9 @@ NOTIFICATION_RECIPIENTS_RESOLVERS = {
 SNAPSHOT_CLEANUP_DAYS = 365
 
 PUBLISH_REQUEST_TYPES = ['publish_draft', 'publish_new_version']
+
+NOTIFICATIONS_ENTITY_RESOLVERS = [
+        ServiceResultResolver(service_id="users", type_key="user"),
+        ServiceResultResolver(service_id="requests", type_key="request"),
+        ServiceResultResolver(service_id="request_events", type_key="request_event")
+]

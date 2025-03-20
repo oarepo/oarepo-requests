@@ -13,7 +13,7 @@ from typing import TYPE_CHECKING, Any, override
 
 from ..notifications.builders.delete_published_record import (
     DeletePublishedRecordRequestAcceptNotificationBuilder,
-    DeletePublishedRecordRequestSubmitNotificationBuilder,
+    DeletePublishedRecordRequestSubmitNotificationBuilder, DeletePublishedRecordRequestDeclineNotificationBuilder,
 )
 from .cascade_events import cancel_requests_on_topic_delete
 from .generic import OARepoAcceptAction, OARepoDeclineAction, OARepoSubmitAction
@@ -102,3 +102,23 @@ class DeletePublishedRecordDeclineAction(OARepoDeclineAction):
     """Decline request for deletion of a published record."""
 
     name = _("Keep the record")
+
+    def apply(
+        self,
+        identity: Identity,
+        request_type: RequestType,
+        topic: Record,
+        uow: UnitOfWork,
+        *args: Any,
+        **kwargs: Any,
+    ) -> Record:
+        """Publish the draft."""
+
+        uow.register(
+            NotificationOp(
+                DeletePublishedRecordRequestDeclineNotificationBuilder.build(
+                    request=self.request
+                )
+            )
+        )
+        return super().apply(identity, request_type, topic, uow, *args, **kwargs)

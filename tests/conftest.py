@@ -49,11 +49,11 @@ from oarepo_requests.actions.generic import (
 )
 from oarepo_requests.notifications.builders.delete_published_record import (
     DeletePublishedRecordRequestAcceptNotificationBuilder,
-    DeletePublishedRecordRequestSubmitNotificationBuilder,
+    DeletePublishedRecordRequestSubmitNotificationBuilder, DeletePublishedRecordRequestDeclineNotificationBuilder,
 )
 from oarepo_requests.notifications.builders.publish import (
     PublishDraftRequestAcceptNotificationBuilder,
-    PublishDraftRequestSubmitNotificationBuilder,
+    PublishDraftRequestSubmitNotificationBuilder, PublishDraftRequestDeclineNotificationBuilder,
 )
 
 from oarepo_requests.notifications.builders.escalate import (
@@ -531,22 +531,12 @@ def app_config(app_config):
     app_config["NOTIFICATIONS_BUILDERS"] = {
         PublishDraftRequestAcceptNotificationBuilder.type: PublishDraftRequestAcceptNotificationBuilder,
         PublishDraftRequestSubmitNotificationBuilder.type: PublishDraftRequestSubmitNotificationBuilder,
+        PublishDraftRequestDeclineNotificationBuilder.type: PublishDraftRequestDeclineNotificationBuilder,
         DeletePublishedRecordRequestSubmitNotificationBuilder.type: DeletePublishedRecordRequestSubmitNotificationBuilder,
         DeletePublishedRecordRequestAcceptNotificationBuilder.type: DeletePublishedRecordRequestAcceptNotificationBuilder,
         EscalateRequestSubmitNotificationBuilder.type: EscalateRequestSubmitNotificationBuilder,
+        DeletePublishedRecordRequestDeclineNotificationBuilder.type: DeletePublishedRecordRequestDeclineNotificationBuilder,
     }
-    app_config["NOTIFICATIONS_ENTITY_RESOLVERS"] = [
-        ServiceResultResolver(service_id="users", type_key="user"),
-        ServiceResultResolver(service_id="requests", type_key="request"),
-        ServiceResultResolver(service_id="request_events", type_key="request_event"),
-        ServiceResultResolver(service_id="thesis", type_key="thesis"),
-        # note: have a look at RDMRecordServiceResultResolver, it seems to do additional stuff
-        ServiceResultResolver(
-            service_id="thesis",
-            type_key="thesis_draft",
-            proxy_cls=RDMRecordServiceResultProxy,
-        ),
-    ]
     app_config["MAIL_DEFAULT_SENDER"] = "test@invenio-rdm-records.org"
 
     return app_config

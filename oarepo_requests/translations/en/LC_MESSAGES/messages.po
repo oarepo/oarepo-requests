@@ -916,5 +916,55 @@ msgid ""
 "    "
 msgstr ""
 
+#: /Users/m/w/cesnet/oarepo-requests/oarepo_requests/templates/semantic-ui/invenio_notifications/delete-published-record-request-event.decline.jinja:9
+#, python-brace-format
+msgid "Request for deletion of record '{topic_title}' was declined"
+msgstr ""
+
+#: /Users/m/w/cesnet/oarepo-requests/oarepo_requests/templates/semantic-ui/invenio_notifications/delete-published-record-request-event.decline.jinja:13
+#, python-format
+msgid ""
+"\n"
+"<p>\n"
+"Request for deletion of record \"%(topic_title)s\" was declined. You can see the request at\n"
+"<a href=\"%(link)s\">%(link)s</a>\n"
+"</p>\n"
+"    "
+msgstr ""
+
+#: /Users/m/w/cesnet/oarepo-requests/oarepo_requests/templates/semantic-ui/invenio_notifications/delete-published-record-request-event.decline.jinja:27
+#, python-format
+msgid ""
+"\n"
+"Request for deletion of record \"%(topic_title)s\" was declined. You can see the request at\n"
+"%(link)s\n"
+"    "
+msgstr ""
+
+#: /Users/m/w/cesnet/oarepo-requests/oarepo_requests/templates/semantic-ui/invenio_notifications/publish-draft-request-event.decline.jinja:9
+#, python-brace-format
+msgid "Request for publishing of record '{topic_title}' was declined"
+msgstr ""
+
+#: /Users/m/w/cesnet/oarepo-requests/oarepo_requests/templates/semantic-ui/invenio_notifications/publish-draft-request-event.decline.jinja:13
+#, python-format
+msgid ""
+"\n"
+"<p>\n"
+"Request for publishing of record \"%(topic_title)s\" was declined. You can see the request at\n"
+"<a href=\"%(link)s\">%(link)s</a>\n"
+"</p>\n"
+"    "
+msgstr ""
+
+#: /Users/m/w/cesnet/oarepo-requests/oarepo_requests/templates/semantic-ui/invenio_notifications/publish-draft-request-event.decline.jinja:27
+#, python-format
+msgid ""
+"\n"
+"Request for publishing of record \"%(topic_title)s\" was declined. You can see the request at\n"
+"%(link)s\n"
+"    "
+msgstr ""
+
 #~ msgid "No status"
 #~ msgstr ""
