@@ -19,7 +19,7 @@ from oarepo_runtime.i18n import lazy_gettext as _
 
 from ..notifications.builders.publish import (
     PublishDraftRequestAcceptNotificationBuilder,
-    PublishDraftRequestSubmitNotificationBuilder,
+    PublishDraftRequestSubmitNotificationBuilder, PublishDraftRequestDeclineNotificationBuilder,
 )
 from .cascade_events import update_topic
 from .generic import (
@@ -118,3 +118,20 @@ class PublishDraftDeclineAction(OARepoDeclineAction):
     """Decline action for publishing draft requests."""
 
     name = _("Return for correction")
+
+    def apply(
+        self,
+        identity: Identity,
+        request_type: RequestType,
+        topic: Record,
+        uow: UnitOfWork,
+        *args: Any,
+        **kwargs: Any,
+    ) -> Record:
+        """Publish the draft."""
+        uow.register(
+            NotificationOp(
+                PublishDraftRequestDeclineNotificationBuilder.build(request=self.request)
+            )
+        )
+        return super().apply(identity, request_type, topic, uow, *args, **kwargs)

@@ -226,6 +226,9 @@ class OARepoRequests:
             app_registered_event_types, config.NOTIFICATION_RECIPIENTS_RESOLVERS
         )
 
+        app.config.setdefault("NOTIFICATIONS_ENTITY_RESOLVERS", [])
+        app.config["NOTIFICATIONS_ENTITY_RESOLVERS"] += config.NOTIFICATIONS_ENTITY_RESOLVERS
+
 
 def api_finalize_app(app: Flask) -> None:
     """Finalize app."""
@@ -256,3 +259,10 @@ def finalize_app(app: Flask) -> None:
     ext.notification_recipients_resolvers_registry = app.config[
         "NOTIFICATION_RECIPIENTS_RESOLVERS"
     ]
+
+    invenio_notifications = app.extensions["invenio-notifications"] # initialized during ext in invenio notifications, our config might not be loaded
+    notification_resolvers = {
+        er.type_key: er for er in app.config["NOTIFICATIONS_ENTITY_RESOLVERS"]
+    }
+    invenio_notifications.entity_resolvers = notification_resolvers
+
