@@ -227,7 +227,7 @@ def test_ui_serialization(
             "description": "Request deletion of published record",
             "name": "Delete record",
             "dangerous": True,
-            "editable": True, # idk why this changed to True, could be because of form 
+            "editable": False,
             "has_form": True, # now there is form for record delete
             "stateful_description": "Request permission to delete the record.",
             "stateful_name": "Request record deletion",

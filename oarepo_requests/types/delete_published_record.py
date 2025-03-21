@@ -72,7 +72,7 @@ class DeletePublishedRecordRequestType(NonDuplicableOARepoRequestType):
         }
     ]
     
-    
+    editable = False
         
     def get_ui_redirect_url(self, request: Request, context: dict) -> str:
         if request.status == "accepted":
@@ -148,8 +148,3 @@ class DeletePublishedRecordRequestType(NonDuplicableOARepoRequestType):
                 if request_identity_matches(request.created_by, identity):
                     return _("Submit request to get permission to delete the record.")
                 return _("You do not have permission to delete the record.")
-
-
-#payload_schmema (removal_reason, note)
-
-#node: Input stejne jako PublishNewVersionRequesttype form{'field':version}
