@@ -22,6 +22,7 @@ export const requestButtonsDefaultIconConfig = {
   new_version: { icon: "tag" },
   edit_published_record: { icon: "pencil" },
   assign_doi: { icon: "address card" },
+  delete_doi: { icon: "remove" },
   created: { icon: "paper plane" },
   initiate_community_migration: { icon: "exchange" },
   confirm_community_migration: { icon: "exchange" },

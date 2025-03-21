@@ -757,65 +757,6 @@ msgstr[0] "Váš komentář překročil povolenou délku. Odeberte {{count}} zna
 msgstr[1] "Váš komentář překročil povolenou délku. Odeberte {{count}} znaky."
 msgstr[2] "Váš komentář překročil povolenou délku. Odeberte {{count}} znaků."
 
-#: /home/dusanst/Projects/oarepo-requests/oarepo_requests/templates/semantic-ui/invenio_notifications/delete-published-record-request-event.accept.jinja:6
-#, python-brace-format
-msgid "❗️Delete published request for topic '{topic_id}' accepted"
-msgstr ""
-
-#: /home/dusanst/Projects/oarepo-requests/oarepo_requests/templates/semantic-ui/invenio_notifications/delete-published-record-request-event.accept.jinja:12
-#: /home/dusanst/Projects/oarepo-requests/oarepo_requests/templates/semantic-ui/invenio_notifications/delete-published-record-request-event.submit.jinja:12
-#: /home/dusanst/Projects/oarepo-requests/oarepo_requests/templates/semantic-ui/invenio_notifications/publish-draft-request-event.accept.jinja:12
-#: /home/dusanst/Projects/oarepo-requests/oarepo_requests/templates/semantic-ui/invenio_notifications/publish-draft-request-event.submit.jinja:12
-msgid "This is an auto-generated message. To manage notifications, visit your"
-msgstr ""
-
-#: /home/dusanst/Projects/oarepo-requests/oarepo_requests/templates/semantic-ui/invenio_notifications/delete-published-record-request-event.accept.jinja:12
-#: /home/dusanst/Projects/oarepo-requests/oarepo_requests/templates/semantic-ui/invenio_notifications/delete-published-record-request-event.submit.jinja:12
-#: /home/dusanst/Projects/oarepo-requests/oarepo_requests/templates/semantic-ui/invenio_notifications/publish-draft-request-event.accept.jinja:12
-#: /home/dusanst/Projects/oarepo-requests/oarepo_requests/templates/semantic-ui/invenio_notifications/publish-draft-request-event.submit.jinja:12
-msgid "account settings"
-msgstr ""
-
-#: /home/dusanst/Projects/oarepo-requests/oarepo_requests/templates/semantic-ui/invenio_notifications/delete-published-record-request-event.accept.jinja:18
-#, python-format
-msgid "Request for deleting your record '%(topic_id)s' has been accepted."
-msgstr ""
-
-#: /home/dusanst/Projects/oarepo-requests/oarepo_requests/templates/semantic-ui/invenio_notifications/delete-published-record-request-event.submit.jinja:6
-#, python-brace-format
-msgid "❗️Request for deletion of topic '{topic_id}' waits for your approval"
-msgstr ""
-
-#: /home/dusanst/Projects/oarepo-requests/oarepo_requests/templates/semantic-ui/invenio_notifications/delete-published-record-request-event.submit.jinja:18
-#, python-format
-msgid "Request for deletion of record '%(topic_id)s' waits for your approval."
-msgstr ""
-
-#: /home/dusanst/Projects/oarepo-requests/oarepo_requests/templates/semantic-ui/invenio_notifications/publish-draft-request-event.accept.jinja:6
-#, python-brace-format
-msgid "❗️Publish request for topic '{topic_id}' accepted"
-msgstr ""
-
-#: /home/dusanst/Projects/oarepo-requests/oarepo_requests/templates/semantic-ui/invenio_notifications/publish-draft-request-event.accept.jinja:18
-#, python-format
-msgid ""
-"Request for publishing of your record '%(topic_id)s' has been accepted."
-msgstr ""
-
-#: /home/dusanst/Projects/oarepo-requests/oarepo_requests/templates/semantic-ui/invenio_notifications/publish-draft-request-event.submit.jinja:6
-#, python-brace-format
-msgid "❗️Publish request for topic '{topic_id}' waits for your approval"
-msgstr ""
-
-#: /home/dusanst/Projects/oarepo-requests/oarepo_requests/templates/semantic-ui/invenio_notifications/publish-draft-request-event.submit.jinja:18
-#, python-format
-msgid "Publish request for record '%(topic_id)s' waits for your approval."
-msgstr ""
-
-#: /home/dusanst/Projects/oarepo-requests/oarepo_requests/types/publish_new_version.py:36
-msgid "Publish new version"
-msgstr ""
-
 msgid "Request could not be executed."
 msgstr "Žádost se nepodařilo provést."
 
@@ -825,3 +766,306 @@ msgid ""
 msgstr ""
 "Požadavek ({{requestType}}) nemohl být proveden kvůli chybám validace. "
 "Prosím, opravte je a zkuste to znovu:"
+
+#: /home/senyaaa/Work/oarepo-requests/oarepo_requests/templates/semantic-ui/invenio_notifications/delete-published-record-request-event.accept.jinja:6
+#, python-brace-format
+msgid "❗️Delete published request for topic '{topic_id}' accepted"
+msgstr "❗️Žádost o smazání publikovaného tématu '{topic_id}' byla přijata"
+
+#: /home/senyaaa/Work/oarepo-requests/oarepo_requests/templates/semantic-ui/invenio_notifications/delete-published-record-request-event.accept.jinja:12
+#: /home/senyaaa/Work/oarepo-requests/oarepo_requests/templates/semantic-ui/invenio_notifications/delete-published-record-request-event.submit.jinja:12
+#: /home/senyaaa/Work/oarepo-requests/oarepo_requests/templates/semantic-ui/invenio_notifications/escalate-request-event.submit.jinja:15
+#: /home/senyaaa/Work/oarepo-requests/oarepo_requests/templates/semantic-ui/invenio_notifications/publish-draft-request-event.accept.jinja:12
+#: /home/senyaaa/Work/oarepo-requests/oarepo_requests/templates/semantic-ui/invenio_notifications/publish-draft-request-event.submit.jinja:12
+msgid "This is an auto-generated message. To manage notifications, visit your"
+msgstr ""
+"Toto je automaticky generovaná zpráva. Pro správu oznámení navštivte své"
+
+#: /home/senyaaa/Work/oarepo-requests/oarepo_requests/templates/semantic-ui/invenio_notifications/delete-published-record-request-event.accept.jinja:12
+#: /home/senyaaa/Work/oarepo-requests/oarepo_requests/templates/semantic-ui/invenio_notifications/delete-published-record-request-event.submit.jinja:12
+#: /home/senyaaa/Work/oarepo-requests/oarepo_requests/templates/semantic-ui/invenio_notifications/escalate-request-event.submit.jinja:15
+#: /home/senyaaa/Work/oarepo-requests/oarepo_requests/templates/semantic-ui/invenio_notifications/publish-draft-request-event.accept.jinja:12
+#: /home/senyaaa/Work/oarepo-requests/oarepo_requests/templates/semantic-ui/invenio_notifications/publish-draft-request-event.submit.jinja:12
+msgid "account settings"
+msgstr "nastavení účtu"
+
+#: /home/senyaaa/Work/oarepo-requests/oarepo_requests/templates/semantic-ui/invenio_notifications/delete-published-record-request-event.accept.jinja:18
+#, python-format
+msgid "Request for deleting your record '%(topic_id)s' has been accepted."
+msgstr "Žádost o smazání vašeho záznamu '%(topic_id)s' byla přijata."
+
+#: /home/senyaaa/Work/oarepo-requests/oarepo_requests/templates/semantic-ui/invenio_notifications/delete-published-record-request-event.submit.jinja:6
+#, python-brace-format
+msgid "❗️Request for deletion of topic '{topic_id}' waits for your approval"
+msgstr "❗️Žádost o smazání tématu '{topic_id}' čeká na váš souhlas"
+
+#: /home/senyaaa/Work/oarepo-requests/oarepo_requests/templates/semantic-ui/invenio_notifications/delete-published-record-request-event.submit.jinja:18
+#, python-format
+msgid "Request for deletion of record '%(topic_id)s' waits for your approval."
+msgstr "Žádost o smazání záznamu '%(topic_id)s' čeká na váš souhlas."
+
+#: /home/senyaaa/Work/oarepo-requests/oarepo_requests/templates/semantic-ui/invenio_notifications/escalate-request-event.submit.jinja:6
+#: /home/senyaaa/Work/oarepo-requests/oarepo_requests/templates/semantic-ui/invenio_notifications/publish-draft-request-event.submit.jinja:6
+#, python-brace-format
+msgid "❗️Publish request for topic '{topic_id}' waits for your approval"
+msgstr "❗️Žádost o publikování tématu '{topic_id}' čeká na váš souhlas"
+
+#: /home/senyaaa/Work/oarepo-requests/oarepo_requests/templates/semantic-ui/invenio_notifications/escalate-request-event.submit.jinja:12
+#: /home/senyaaa/Work/oarepo-requests/oarepo_requests/templates/semantic-ui/invenio_notifications/escalate-request-event.submit.jinja:23
+msgid ""
+"Request was escalated to you since the original recipient did not approve "
+"the request in time."
+msgstr ""
+"Žádost byla eskalována k vám, protože původní příjemce neschválil žádost "
+"včas."
+
+#: /home/senyaaa/Work/oarepo-requests/oarepo_requests/templates/semantic-ui/invenio_notifications/escalate-request-event.submit.jinja:21
+#: /home/senyaaa/Work/oarepo-requests/oarepo_requests/templates/semantic-ui/invenio_notifications/publish-draft-request-event.submit.jinja:18
+#, python-format
+msgid "Publish request for record '%(topic_id)s' waits for your approval."
+msgstr "Žádost o publikování záznamu '%(topic_id)s' čeká na váš souhlas."
+
+#: /home/senyaaa/Work/oarepo-requests/oarepo_requests/templates/semantic-ui/invenio_notifications/publish-draft-request-event.accept.jinja:6
+#, python-brace-format
+msgid "❗️Publish request for topic '{topic_id}' accepted"
+msgstr "❗️Žádost o publikování tématu '{topic_id}' byla přijata"
+
+#: /home/senyaaa/Work/oarepo-requests/oarepo_requests/templates/semantic-ui/invenio_notifications/publish-draft-request-event.accept.jinja:18
+#, python-format
+msgid ""
+"Request for publishing of your record '%(topic_id)s' has been accepted."
+msgstr "Žádost o publikování vašeho záznamu '%(topic_id)s' byla přijata."
+
+#: /home/senyaaa/Work/oarepo-requests/oarepo_requests/types/publish_new_version.py:36
+msgid "Publish new version"
+msgstr "Publikovat novou verzi"
+
+#: /Users/m/w/cesnet/oarepo-requests/oarepo_requests/templates/semantic-ui/invenio_notifications/delete-published-record-request-event.accept.jinja:7
+msgid "❗️ Published record has been deleted"
+msgstr "❗️ Vypublikovaný záznam byl smazán"
+
+#: /Users/m/w/cesnet/oarepo-requests/oarepo_requests/templates/semantic-ui/invenio_notifications/delete-published-record-request-event.accept.jinja:11
+#: /Users/m/w/cesnet/oarepo-requests/oarepo_requests/templates/semantic-ui/invenio_notifications/delete-published-record-request-event.accept.jinja:21
+msgid "The published record has been deleted."
+msgstr "Vypublikovaný záznam byl smazán"
+
+#: /Users/m/w/cesnet/oarepo-requests/oarepo_requests/templates/semantic-ui/invenio_notifications/delete-published-record-request-event.accept.jinja:12
+#, python-format
+msgid "For more information head to the <a href='%(link)s'>request page</a>."
+msgstr "Více informací naleznete <a href='%(link)s'>na stránce žádosti</a>."
+
+#: /Users/m/w/cesnet/oarepo-requests/oarepo_requests/templates/semantic-ui/invenio_notifications/delete-published-record-request-event.accept.jinja:22
+#, python-format
+msgid "For more information head to the %(link)s"
+msgstr "Více informací naleznete <a href='%(link)s'>na stránce žádosti</a>."
+
+#: /Users/m/w/cesnet/oarepo-requests/oarepo_requests/templates/semantic-ui/invenio_notifications/delete-published-record-request-event.accept.jinja:24
+#: /Users/m/w/cesnet/oarepo-requests/oarepo_requests/templates/semantic-ui/invenio_notifications/escalate-request-event.submit.jinja:29
+msgid ""
+"This is an auto-generated message. To manage notifications, visit your "
+"account settings"
+msgstr ""
+"Toto je automaticky generovaná zpráva. Pokud tyto zprávy nechcete nadále "
+"dostávat, změňte si nastavení ve svém profilu."
+
+#: /Users/m/w/cesnet/oarepo-requests/oarepo_requests/templates/semantic-ui/invenio_notifications/delete-published-record-request-event.submit.jinja:8
+#, python-brace-format
+msgid "❗️ Request to delete published record {topic_title}"
+msgstr "❗️ Žádost o smazání vypublikovaného záznamu {topic_title}"
+
+#: /Users/m/w/cesnet/oarepo-requests/oarepo_requests/templates/semantic-ui/invenio_notifications/delete-published-record-request-event.submit.jinja:13
+#, python-format
+msgid ""
+"\n"
+"    <p>\n"
+"    You have been asked to approve deletion of a published record \"%(topic_title)s\".\n"
+"    </p>\n"
+"    <p>\n"
+"        <a type=\"button\" href='%(link)s'>Accept or Decline the request</a>\n"
+"    </p>\n"
+"    "
+msgstr ""
+"\n"
+"    <p>\n"
+"    Byl/a jste požádán/a o smazání vypublikovaného záznamu \"%(topic_title)s\".\n"
+"    </p>\n"
+"    <p>\n"
+"        <a type=\"button\" href='%(link)s'>Potvrdit či zamítnout žádost</a>\n"
+"    </p>\n"
+"    "
+
+#: /Users/m/w/cesnet/oarepo-requests/oarepo_requests/templates/semantic-ui/invenio_notifications/delete-published-record-request-event.submit.jinja:29
+#, python-format
+msgid ""
+"\n"
+"    You have been asked to approve deletion of a published record \"%(topic_title)s\".\n"
+"    Accept or Decline the request at %(link)s\n"
+"    "
+msgstr ""
+"\n"
+"    Byl/a jste požádán/a o smazání vypublikovaného záznamu \"%(topic_title)s\"\n"
+"    Potvrďte či zamítněte žádost na %(link)s\n"
+"    "
+
+#: /Users/m/w/cesnet/oarepo-requests/oarepo_requests/templates/semantic-ui/invenio_notifications/escalate-request-event.submit.jinja:6
+msgid "❗️ A request has been escalated to you"
+msgstr "❗️ Byla Vám eskalována žádost."
+
+#: /Users/m/w/cesnet/oarepo-requests/oarepo_requests/templates/semantic-ui/invenio_notifications/escalate-request-event.submit.jinja:15
+msgid "You can approve or decline the request by visiting the"
+msgstr "Můžete zamítnout či potvrdit žádost na "
+
+#: /Users/m/w/cesnet/oarepo-requests/oarepo_requests/templates/semantic-ui/invenio_notifications/escalate-request-event.submit.jinja:15
+msgid "request page"
+msgstr "stránce žádosti"
+
+#: /Users/m/w/cesnet/oarepo-requests/oarepo_requests/templates/semantic-ui/invenio_notifications/escalate-request-event.submit.jinja:24
+#, python-format
+msgid ""
+"\n"
+"Request was escalated to you since the original recipient did not approve the request in time.\n"
+"You can approve or decline the request by visiting the request page at %(link)s.\n"
+msgstr ""
+"\n"
+"Žádost vám byla přiřazena protože původní schvalovatel žádosti včas nezareagoval.\n"
+"Prosím potvrďte či zamítněte žádost na %(link)s.\n"
+
+#: /Users/m/w/cesnet/oarepo-requests/oarepo_requests/templates/semantic-ui/invenio_notifications/publish-draft-request-event.accept.jinja:9
+#, python-brace-format
+msgid "Record '{topic_title}' has been published"
+msgstr "Záznam '{topic_title}' byl publikován"
+
+#: /Users/m/w/cesnet/oarepo-requests/oarepo_requests/templates/semantic-ui/invenio_notifications/publish-draft-request-event.accept.jinja:13
+#, python-format
+msgid ""
+"\n"
+"<p>\n"
+"Your record \"%(topic_title)s\" has been published. You can see the record at\n"
+"<a href=\"%(link)s\">%(link)s</a>\n"
+"</p>\n"
+"    "
+msgstr ""
+"\n"
+"<p>\n"
+"Váš záznam \"%(topic_title)s\" byl publikován na adrese\n"
+"<a href=\"%(link)s\">%(link)s</a>\n"
+"</p>\n"
+"    "
+
+#: /Users/m/w/cesnet/oarepo-requests/oarepo_requests/templates/semantic-ui/invenio_notifications/publish-draft-request-event.accept.jinja:27
+#, python-format
+msgid ""
+"\n"
+"Your record \"%(topic_title)s\" has been published. You can see the record at\n"
+"%(link)s\n"
+"    "
+msgstr ""
+"\n"
+"Váš záznam \"%(topic_title)s\" byl publikován na adrese\n"
+"%(link)s\n"
+"\n"
+
+#: /Users/m/w/cesnet/oarepo-requests/oarepo_requests/templates/semantic-ui/invenio_notifications/publish-draft-request-event.submit.jinja:8
+#, python-brace-format
+msgid "Request to publish record {topic_title}"
+msgstr "Žádost o publikování záznamu {topic_title}"
+
+#: /Users/m/w/cesnet/oarepo-requests/oarepo_requests/templates/semantic-ui/invenio_notifications/publish-draft-request-event.submit.jinja:12
+#, python-format
+msgid ""
+"\n"
+"    <p>\n"
+"    You have been asked to publish record \"%(topic_title)s\".\n"
+"    </p>\n"
+"    <p>\n"
+"        <a type=\"button\" href='%(link)s'>Accept or Decline the request</a>\n"
+"    </p>\n"
+"    "
+msgstr ""
+"\n"
+"    <p>\n"
+"    Byl/a jste požádán/a o publikování záznamu \"%(topic_title)s\".\n"
+"    </p>\n"
+"    <p>\n"
+"        <a type=\"button\" href='%(link)s'>Přijmout nebo zamítnout žádost</a>\n"
+"    </p>\n"
+"    "
+
+#: /Users/m/w/cesnet/oarepo-requests/oarepo_requests/templates/semantic-ui/invenio_notifications/publish-draft-request-event.submit.jinja:29
+#, python-format
+msgid ""
+"\n"
+"    You have been asked to publish record \"%(topic_title)s\".\n"
+"    Accept or Decline the request at %(link)s\n"
+"    "
+msgstr ""
+"\n"
+"    Byl/a jste požádán/a o publikování záznamu \"%(topic_title)s\".\n"
+"    Přijmout nebo zamítnout žádost na odkazu %(link)s\n"
+"    "
+
+#: /Users/m/w/cesnet/oarepo-requests/oarepo_requests/templates/semantic-ui/invenio_notifications/delete-published-record-request-event.decline.jinja:9
+#, python-brace-format
+msgid "Request for deletion of record '{topic_title}' was declined"
+msgstr "Žádost o smazání záznamu '{topic_title}' byla zamítnuta"
+
+#: /Users/m/w/cesnet/oarepo-requests/oarepo_requests/templates/semantic-ui/invenio_notifications/delete-published-record-request-event.decline.jinja:13
+#, python-format
+msgid ""
+"\n"
+"<p>\n"
+"Request for deletion of record \"%(topic_title)s\" was declined. You can see the request at\n"
+"<a href=\"%(link)s\">%(link)s</a>\n"
+"</p>\n"
+"    "
+msgstr ""
+"\n"
+"<p>\n"
+"Žádost o smazání záznamu \"%(topic_title)s\" byla zamítnuta. Žádost můžete zobrazit na\n"
+"<a href=\"%(link)s\">%(link)s</a>\n"
+"</p>\n"
+"    "
+
+#: /Users/m/w/cesnet/oarepo-requests/oarepo_requests/templates/semantic-ui/invenio_notifications/delete-published-record-request-event.decline.jinja:27
+#, python-format
+msgid ""
+"\n"
+"Request for deletion of record \"%(topic_title)s\" was declined. You can see the request at\n"
+"%(link)s\n"
+"    "
+msgstr ""
+"Žádost o publikování záznamu \"%(topic_title)s\" byla zamítnuta. Žádost můžete zobrazit na\n"
+"%(link)s\n"
+
+#: /Users/m/w/cesnet/oarepo-requests/oarepo_requests/templates/semantic-ui/invenio_notifications/publish-draft-request-event.decline.jinja:9
+#, python-brace-format
+msgid "Request for publishing of record '{topic_title}' was declined"
+msgstr "Žádost o publikování záznamu '{topic_title}' byla zamítnuta"
+
+#: /Users/m/w/cesnet/oarepo-requests/oarepo_requests/templates/semantic-ui/invenio_notifications/publish-draft-request-event.decline.jinja:13
+#, python-format
+msgid ""
+"\n"
+"<p>\n"
+"Request for publishing of record \"%(topic_title)s\" was declined. You can see the request at\n"
+"<a href=\"%(link)s\">%(link)s</a>\n"
+"</p>\n"
+"    "
+msgstr ""
+"\n"
+"<p>\n"
+"Žádost o publikování záznamu \"%(topic_title)s\" byla zamítnuta. Žádost můžete zobrazit na\n"
+"<a href=\"%(link)s\">%(link)s</a>\n"
+"</p>\n"
+"    "
+
+#: /Users/m/w/cesnet/oarepo-requests/oarepo_requests/templates/semantic-ui/invenio_notifications/publish-draft-request-event.decline.jinja:27
+#, python-format
+msgid ""
+"\n"
+"Request for publishing of record \"%(topic_title)s\" was declined. You can see the request at\n"
+"%(link)s\n"
+"    "
+msgstr ""
+"Žádost o publikování záznamu \"%(topic_title)s\" byla zamítnuta. Žádost můžete zobrazit na\n"
+"%(link)s\n"

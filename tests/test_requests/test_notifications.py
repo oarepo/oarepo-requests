@@ -24,6 +24,9 @@ def test_publish_notifications(
         # check notification is build on submit
         assert len(outbox) == 1
         sent_mail = outbox[0]
+        assert "Request to publish record blabla" in sent_mail.subject
+        assert 'You have been asked to publish record "blabla".' in sent_mail.body
+        assert 'You have been asked to publish record "blabla".' in sent_mail.html
 
     record = receiver_client.get(f"{urls['BASE_URL']}{draft1['id']}/draft?expand=true")
 
@@ -37,6 +40,35 @@ def test_publish_notifications(
         # check notification is build on submit
         assert len(outbox) == 1
         sent_mail = outbox[0]
+        assert "Record 'blabla' has been published" in sent_mail.subject
+        assert (
+            'Your record "blabla" has been published. You can see the record at'
+            in sent_mail.body
+        )
+        assert (
+            'Your record "blabla" has been published. You can see the record at'
+            in sent_mail.html
+        )
+
+    draft1 = draft_factory(creator.identity)
+    resp_request_submit = submit_request_on_draft(
+        creator.identity, draft1["id"], "publish_draft"
+    )
+    record = receiver_client.get(f"{urls['BASE_URL']}{draft1['id']}/draft?expand=true")
+    with mail.record_messages() as outbox:
+        # Validate that email was sent
+        request_html_link = record.json["expanded"]["requests"][0]["links"]["self_html"]
+        decline = receiver_client.post(
+            link2testclient(
+                record.json["expanded"]["requests"][0]["links"]["actions"]["decline"]
+            ),
+        )
+        # check notification is build on submit
+        assert len(outbox) == 1
+        sent_mail = outbox[0]
+        assert "Request for publishing of record 'blabla' was declined" in sent_mail.subject
+        assert request_html_link in sent_mail.html
+        assert request_html_link in sent_mail.body
 
 
 def test_delete_published_notifications(
@@ -65,11 +97,16 @@ def test_delete_published_notifications(
         # check notification is build on submit
         assert len(outbox) == 1
         sent_mail = outbox[0]
+        print(sent_mail)
+        assert "Request to delete published record blabla" in sent_mail.subject
 
-    record = receiver_client.get(f"{urls['BASE_URL']}{record1['id']}?expand=true")
+    with mail.record_messages() as outbox:
+        record = receiver_client.get(f"{urls['BASE_URL']}{record1['id']}?expand=true")
+        assert len(outbox) == 0
 
     with mail.record_messages() as outbox:
         # Validate that email was sent
+        request_html_link = record.json["expanded"]["requests"][0]["links"]["self_html"]
         publish = receiver_client.post(
             link2testclient(
                 record.json["expanded"]["requests"][0]["links"]["actions"]["accept"]
@@ -78,6 +115,32 @@ def test_delete_published_notifications(
         # check notification is build on submit
         assert len(outbox) == 1
         sent_mail = outbox[0]
+        print(sent_mail)
+        assert "Published record has been deleted" in sent_mail.subject
+        assert request_html_link in sent_mail.html
+        assert request_html_link in sent_mail.body
+
+    record1 = record_factory(creator.identity)
+    resp_request_submit = submit_request_on_record(
+        creator.identity, record1["id"], "delete_published_record"
+    )
+    record = receiver_client.get(f"{urls['BASE_URL']}{record1['id']}?expand=true")
+
+    with mail.record_messages() as outbox:
+        # Validate that email was sent
+        request_html_link = record.json["expanded"]["requests"][0]["links"]["self_html"]
+        decline = receiver_client.post(
+            link2testclient(
+                record.json["expanded"]["requests"][0]["links"]["actions"]["decline"]
+            ),
+        )
+        # check notification is build on submit
+        assert len(outbox) == 1
+        sent_mail = outbox[0]
+
+        assert "Request for deletion of record 'blabla' was declined" in sent_mail.subject
+        assert request_html_link in sent_mail.html
+        assert request_html_link in sent_mail.body
 
 
 def test_group(

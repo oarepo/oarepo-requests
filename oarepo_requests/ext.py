@@ -24,6 +24,7 @@ from oarepo_requests.resources.oarepo.config import OARepoRequestsResourceConfig
 from oarepo_requests.resources.oarepo.resource import OARepoRequestsResource
 from oarepo_requests.services.oarepo.config import OARepoRequestsServiceConfig
 from oarepo_requests.services.oarepo.service import OARepoRequestsService
+from oarepo_requests.cli import oarepo_requests # noqa
 
 if TYPE_CHECKING:
     from flask import Flask
@@ -193,6 +194,10 @@ class OARepoRequests:
         app.config.setdefault("REQUESTS_UI_SERIALIZATION_REFERENCED_FIELDS", []).extend(
             config.REQUESTS_UI_SERIALIZATION_REFERENCED_FIELDS
         )
+        app.config.setdefault("SNAPSHOT_CLEANUP_DAYS", config.SNAPSHOT_CLEANUP_DAYS)
+
+        app.config.setdefault("PUBLISH_REQUEST_TYPES", config.PUBLISH_REQUEST_TYPES)
+
         # do not overwrite user's stuff
         app_default_workflow_events = app.config.setdefault(
             "DEFAULT_WORKFLOW_EVENTS", {}
@@ -220,6 +225,9 @@ class OARepoRequests:
         app.config["NOTIFICATION_RECIPIENTS_RESOLVERS"] = conservative_merger.merge(
             app_registered_event_types, config.NOTIFICATION_RECIPIENTS_RESOLVERS
         )
+
+        app.config.setdefault("NOTIFICATIONS_ENTITY_RESOLVERS", [])
+        app.config["NOTIFICATIONS_ENTITY_RESOLVERS"] += config.NOTIFICATIONS_ENTITY_RESOLVERS
 
 
 def api_finalize_app(app: Flask) -> None:
@@ -251,3 +259,10 @@ def finalize_app(app: Flask) -> None:
     ext.notification_recipients_resolvers_registry = app.config[
         "NOTIFICATION_RECIPIENTS_RESOLVERS"
     ]
+
+    invenio_notifications = app.extensions["invenio-notifications"] # initialized during ext in invenio notifications, our config might not be loaded
+    notification_resolvers = {
+        er.type_key: er for er in app.config["NOTIFICATIONS_ENTITY_RESOLVERS"]
+    }
+    invenio_notifications.entity_resolvers = notification_resolvers
+

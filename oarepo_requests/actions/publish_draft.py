@@ -19,7 +19,7 @@ from oarepo_runtime.i18n import lazy_gettext as _
 
 from ..notifications.builders.publish import (
     PublishDraftRequestAcceptNotificationBuilder,
-    PublishDraftRequestSubmitNotificationBuilder,
+    PublishDraftRequestSubmitNotificationBuilder, PublishDraftRequestDeclineNotificationBuilder,
 )
 from .cascade_events import update_topic
 from .generic import (
@@ -28,6 +28,7 @@ from .generic import (
     OARepoDeclineAction,
     OARepoSubmitAction,
 )
+from .record_snapshot_mixin import RecordSnapshotMixin
 
 if TYPE_CHECKING:
     from flask_principal import Identity
@@ -54,7 +55,7 @@ class PublishMixin:
             return False
 
 
-class PublishDraftSubmitAction(PublishMixin, OARepoSubmitAction):
+class PublishDraftSubmitAction(PublishMixin, RecordSnapshotMixin, OARepoSubmitAction):
     """Submit action for publishing draft requests."""
 
     def apply(
@@ -110,7 +111,7 @@ class PublishDraftAcceptAction(
             )
         )
         return super().apply(
-            identity, request_type, published_topic, uow, *args, **kwargs
+            identity, request_type, published_topic._record, uow, *args, **kwargs
         )
 
 
@@ -118,3 +119,20 @@ class PublishDraftDeclineAction(OARepoDeclineAction):
     """Decline action for publishing draft requests."""
 
     name = _("Return for correction")
+
+    def apply(
+        self,
+        identity: Identity,
+        request_type: RequestType,
+        topic: Record,
+        uow: UnitOfWork,
+        *args: Any,
+        **kwargs: Any,
+    ) -> Record:
+        """Publish the draft."""
+        uow.register(
+            NotificationOp(
+                PublishDraftRequestDeclineNotificationBuilder.build(request=self.request)
+            )
+        )
+        return super().apply(identity, request_type, topic, uow, *args, **kwargs)

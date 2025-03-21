@@ -11,5 +11,6 @@ from __future__ import annotations
 
 from .topic_delete import TopicDeleteEventType
 from .topic_update import TopicUpdateEventType
+from .escalation import EscalationEventType
 
-__all__ = ["TopicUpdateEventType", "TopicDeleteEventType"]
+__all__ = ["TopicUpdateEventType", "TopicDeleteEventType", "EscalationEventType"]

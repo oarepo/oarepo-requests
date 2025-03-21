@@ -16,3 +16,10 @@ class PublishDraftRequestAcceptNotificationBuilder(
     type = "publish-draft-request-event.accept"
 
     recipients = [EntityRecipient(key="request.created_by")]
+
+class PublishDraftRequestDeclineNotificationBuilder(
+    OARepoRequestActionNotificationBuilder
+):
+    type = "publish-draft-request-event.decline"
+
+    recipients = [EntityRecipient(key="request.created_by")]
