@@ -36,7 +36,7 @@ export const recordValidationErrorsPlugin = (
         }
       )
     );
-    e.customMessage = i18next.t("Request could not be executed.");
+    e.directSubmitMessage = i18next.t("Request could not be executed.");
     setErrors(errors);
     modalControl?.closeModal();
     return true;
@@ -48,6 +48,8 @@ export const handleRedirectToEditFormPlugin = (
   e,
   { formik, modalControl, requestOrRequestType, actionExtraContext: { record } }
 ) => {
+  console.log(e.response.data.errors);
+  console.log(record.links);
   if (e?.response?.data?.errors && record?.links?.edit_html) {
     const errorData = {
       errors: e.response.data.errors,
@@ -67,7 +69,7 @@ export const handleRedirectToEditFormPlugin = (
       "api",
       i18next.t("Record has validation errors. Redirecting to form...")
     );
-    e.customMessage = i18next.t(
+    e.directSubmitMessage = i18next.t(
       "Record has validation errors. Redirecting to form..."
     );
     setTimeout(() => {
@@ -75,6 +77,17 @@ export const handleRedirectToEditFormPlugin = (
       modalControl?.closeModal();
     }, 2500);
 
+    return true;
+  } else if (e?.response?.data?.errors) {
+    formik?.setFieldError(
+      "api",
+      i18next.t(
+        "Record has validation errors. You will have to modify record's metadata and try to make the request again."
+      )
+    );
+    e.directSubmitMessage = i18next.t(
+      "Record has validation errors. You will have to modify record's metadata and try to make the request again."
+    );
     return true;
   }
   return null;

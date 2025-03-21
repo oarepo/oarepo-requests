@@ -73,7 +73,7 @@ const DirectCreateAndSubmit = ({
         <Message negative>
           <Message.Header>
             {(error?.response?.data?.errors?.length > 0 &&
-              error.customMessage) ||
+              error.directSubmitMessage) ||
               i18next.t("Request could not be executed.")}
           </Message.Header>
         </Message>
