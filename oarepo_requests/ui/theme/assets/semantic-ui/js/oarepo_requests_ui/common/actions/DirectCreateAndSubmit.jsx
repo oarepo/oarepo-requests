@@ -8,8 +8,8 @@ import {
   ConfirmationModal,
   REQUEST_TYPE,
 } from "@js/oarepo_requests_common";
-import { i18next } from "@translations/oarepo_requests_ui/i18next";
 import { useConfirmationModal } from "@js/oarepo_ui";
+import { i18next } from "@translations/oarepo_requests_ui/i18next";
 
 // Directly create and submit request without modal
 const DirectCreateAndSubmit = ({
@@ -44,12 +44,15 @@ const DirectCreateAndSubmit = ({
     }
   };
   useEffect(() => {
+    let timeoutId;
     if (isError) {
-      setTimeout(() => {
+      timeoutId = setTimeout(() => {
         reset();
       }, 2500);
     }
-    return () => isError && reset();
+    return () => {
+      clearTimeout(timeoutId);
+    };
   }, [isError, reset]);
 
   return (
@@ -69,13 +72,9 @@ const DirectCreateAndSubmit = ({
       {isError && (
         <Message negative>
           <Message.Header>
-            {error?.response?.data?.errors?.length > 0
-              ? i18next.t(
-                  "Record has validation errors. Redirecting to form..."
-                )
-              : i18next.t(
-                  "Request not created successfully. Please try again in a moment."
-                )}
+            {(error?.response?.data?.errors?.length > 0 &&
+              error.directSubmitMessage) ||
+              i18next.t("Request could not be executed.")}
           </Message.Header>
         </Message>
       )}

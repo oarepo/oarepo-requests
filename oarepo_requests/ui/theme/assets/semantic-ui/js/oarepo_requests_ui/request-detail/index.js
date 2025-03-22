@@ -10,7 +10,10 @@ import ReactDOM from "react-dom";
 import { FormConfigProvider } from "@js/oarepo_ui";
 import { RequestDetail } from "./components";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { OverridableContext, overrideStore } from "react-overridable";
+import Overridable, {
+  OverridableContext,
+  overrideStore,
+} from "react-overridable";
 
 const recordRequestsAppDiv = document.getElementById("request-detail");
 
@@ -28,7 +31,12 @@ ReactDOM.render(
   <OverridableContext.Provider value={overriddenComponents}>
     <FormConfigProvider value={{ formConfig }}>
       <QueryClientProvider client={queryClient}>
-        <RequestDetail request={request} />
+        <Overridable
+          id="OarepoRequests.RequestDetail.container"
+          request={request}
+        >
+          <RequestDetail request={request} />
+        </Overridable>
       </QueryClientProvider>
     </FormConfigProvider>
   </OverridableContext.Provider>,

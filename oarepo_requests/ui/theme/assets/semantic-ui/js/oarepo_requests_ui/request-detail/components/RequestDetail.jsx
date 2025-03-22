@@ -30,7 +30,7 @@ export const RequestDetail = ({
   timelinePageSize,
   onBeforeAction,
   onAfterAction,
-  onActionError,
+  onErrorPlugins,
 }) => {
   const [activeTab, setActiveTab] = useState("timeline");
   const [scrollToTopVisible, setScrollToTopVisible] = useState(false);
@@ -81,7 +81,7 @@ export const RequestDetail = ({
 
   return (
     <CallbackContextProvider
-      value={{ onBeforeAction, onAfterAction, onActionError }}
+      value={{ onBeforeAction, onAfterAction, onErrorPlugins }}
     >
       <Formik initialValues={formikInitialValues}>
         {({ errors }) => (
@@ -200,13 +200,13 @@ RequestDetail.propTypes = {
   request: PropTypes.object,
   onBeforeAction: PropTypes.func,
   onAfterAction: PropTypes.func,
-  onActionError: PropTypes.func,
+  onErrorPlugins: PropTypes.array,
   timelinePageSize: PropTypes.number,
 };
 
 RequestDetail.defaultProps = {
   onBeforeAction: undefined,
   onAfterAction: undefined,
-  onActionError: undefined,
+  onErrorPlugins: [],
   timelinePageSize: 25,
 };

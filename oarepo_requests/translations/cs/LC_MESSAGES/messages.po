@@ -757,6 +757,16 @@ msgstr[0] "Váš komentář překročil povolenou délku. Odeberte {{count}} zna
 msgstr[1] "Váš komentář překročil povolenou délku. Odeberte {{count}} znaky."
 msgstr[2] "Váš komentář překročil povolenou délku. Odeberte {{count}} znaků."
 
+msgid "Request could not be executed."
+msgstr "Žádost se nepodařilo provést."
+
+msgid ""
+"The request ({{requestType}}) could not be made due to validation errors. "
+"Please fix them and try again:"
+msgstr ""
+"Požadavek ({{requestType}}) nemohl být proveden kvůli chybám validace. "
+"Prosím, opravte je a zkuste to znovu:"
+
 #: /home/senyaaa/Work/oarepo-requests/oarepo_requests/templates/semantic-ui/invenio_notifications/delete-published-record-request-event.accept.jinja:6
 #, python-brace-format
 msgid "❗️Delete published request for topic '{topic_id}' accepted"

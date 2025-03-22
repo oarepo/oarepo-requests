@@ -787,6 +787,13 @@ msgid ""
 "Request for publishing of your record '%(topic_id)s' has been accepted."
 msgstr ""
 
+#: /home/dusanst/Projects/oarepo-requests/oarepo_requests/types/publish_new_version.py:36
+msgid "Publish new version"
+msgstr ""
+
+msgid "Request could not be executed."
+msgstr ""
+
 #: /home/senyaaa/Work/oarepo-requests/oarepo_requests/types/publish_new_version.py:36
 msgid "Publish new version"
 msgstr ""
@@ -964,6 +971,11 @@ msgid ""
 "Request for publishing of record \"%(topic_title)s\" was declined. You can see the request at\n"
 "%(link)s\n"
 "    "
+msgstr ""
+
+msgid ""
+"The request ({{requestType}}) could not be made due to validation errors. "
+"Please fix them and try again:"
 msgstr ""
 
 #~ msgid "No status"
