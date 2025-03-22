@@ -228,7 +228,7 @@ def test_ui_serialization(
             "name": "Delete record",
             "dangerous": True,
             "editable": False,
-            "has_form": False,
+            "has_form": True, # now there is form for record delete
             "stateful_description": "Request permission to delete the record.",
             "stateful_name": "Request record deletion",
         },

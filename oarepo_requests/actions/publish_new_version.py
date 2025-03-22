@@ -17,6 +17,7 @@ from oarepo_runtime.i18n import lazy_gettext as _
 
 if TYPE_CHECKING:
     from flask_principal import Identity
+    from .components import RequestActionState
     from invenio_drafts_resources.records import Record
     from invenio_requests.customizations import RequestType
 
@@ -34,19 +35,18 @@ class PublishNewVersionAcceptAction(PublishDraftAcceptAction):
     def apply(
         self,
         identity: Identity,
-        request_type: RequestType,
-        topic: Record,
+        state: RequestActionState,
         uow: UnitOfWork,
         *args: Any,
         **kwargs: Any,
     ) -> Record:
         """Publish the draft."""
-        topic_service = get_record_service_for_record(topic)
+        topic_service = get_record_service_for_record(state.topic)
         if not topic_service:
-            raise KeyError(f"topic {topic} service not found")
+            raise KeyError(f"topic {state.topic} service not found")
 
         if "payload" in self.request and "version" in self.request["payload"]:
-            topic.metadata["version"] = self.request["payload"]["version"]
-            uow.register(RecordCommitOp(topic, indexer=topic_service.indexer))
+            state.topic.metadata["version"] = self.request["payload"]["version"]
+            uow.register(RecordCommitOp(state.topic, indexer=topic_service.indexer))
 
-        return super().apply(identity, request_type, topic, uow, *args, **kwargs)
+        return super().apply(identity, state, uow, *args, **kwargs)

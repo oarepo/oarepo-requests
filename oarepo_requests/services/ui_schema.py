@@ -18,6 +18,7 @@ from invenio_pidstore.errors import (
     PersistentIdentifierError,
     PIDDeletedError,
 )
+from invenio_rdm_records.services.errors import RecordDeletedException
 from invenio_requests.proxies import current_request_type_registry, current_requests
 from invenio_requests.resolvers.registry import ResolverRegistry
 from invenio_requests.services.schemas import (
@@ -72,11 +73,15 @@ class UIReferenceSchema(ma.Schema):
                 return {**data, "status": "removed"}
             except PersistentIdentifierError:
                 return {**data, "status": "invalid"}
+            except RecordDeletedException:
+                return {**data, "status": "removed"}
         resolved_cache = self.context["resolved"]
         try:
             return resolved_cache.dereference(data["reference"])
         except PersistentIdentifierError:
             return {**data, "status": "invalid"}
+        except RecordDeletedException:
+            return {**data, "status": "deleted"}
 
 
 class UIRequestSchemaMixin:

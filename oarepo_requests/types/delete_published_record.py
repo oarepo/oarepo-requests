@@ -11,6 +11,7 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING, Any
 
+import marshmallow as ma
 from oarepo_runtime.datastreams.utils import get_record_service_for_record_class
 from oarepo_runtime.i18n import lazy_gettext as _
 from typing_extensions import override
@@ -38,7 +39,41 @@ class DeletePublishedRecordRequestType(NonDuplicableOARepoRequestType):
 
     type_id = "delete_published_record"
     name = _("Delete record")
+    
+    payload_schema = {
+        "removal_reason": ma.fields.Str(),
+        "note": ma.fields.Str()
+    }
 
+    form = [
+        {
+            'section': "",
+            "fields": [
+                {
+                    "field": "removal_reason",
+                    "ui_widget": "Input",
+                    "props": {
+                        "label": _("Removal Reason"),
+                        "placeholder": _("Write down the removal reason."),
+                        "required": True,
+                    },
+                },
+                {
+                    "section": "",
+                    "field": "note",
+                    "ui_widget": "Input",
+                    "props": {
+                        "label": _("Note"),
+                        "placeholder": _("Write down the additional note."),
+                        "required": False,
+                    },
+                }, 
+            ]
+        }
+    ]
+    
+    editable = False
+        
     def get_ui_redirect_url(self, request: Request, context: dict) -> str:
         if request.status == "accepted":
             topic_cls = request.topic.record_cls

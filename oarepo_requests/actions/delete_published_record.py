@@ -10,6 +10,7 @@
 from __future__ import annotations
 
 from typing import TYPE_CHECKING, Any, override
+from datetime import datetime
 
 from ..notifications.builders.delete_published_record import (
     DeletePublishedRecordRequestAcceptNotificationBuilder,
@@ -25,6 +26,7 @@ if TYPE_CHECKING:
 
 from typing import TYPE_CHECKING, Any
 
+from invenio_db import db
 from invenio_notifications.services.uow import NotificationOp
 from invenio_records_resources.services.uow import UnitOfWork
 from oarepo_runtime.datastreams.utils import get_record_service_for_record
@@ -35,11 +37,11 @@ from .generic import OARepoAcceptAction, OARepoDeclineAction, OARepoSubmitAction
 if TYPE_CHECKING:
     from flask_principal import Identity
     from invenio_drafts_resources.records import Record
-    from invenio_requests.customizations import RequestType
 
 
 if TYPE_CHECKING:
     from flask_principal import Identity
+    from .components import RequestActionState
     from invenio_drafts_resources.records import Record
     from invenio_records_resources.services.uow import UnitOfWork
     from invenio_requests.customizations import RequestType
@@ -51,8 +53,7 @@ class DeletePublishedRecordSubmitAction(OARepoSubmitAction):
     def apply(
         self,
         identity: Identity,
-        request_type: RequestType,
-        topic: Record,
+        state: RequestActionState,
         uow: UnitOfWork,
         *args: Any,
         **kwargs: Any,
@@ -66,7 +67,7 @@ class DeletePublishedRecordSubmitAction(OARepoSubmitAction):
                 )
             )
         )
-        return super().apply(identity, request_type, topic, uow, *args, **kwargs)
+        return super().apply(identity, state, uow, *args, **kwargs)
 
 
 class DeletePublishedRecordAcceptAction(OARepoAcceptAction):
@@ -78,16 +79,27 @@ class DeletePublishedRecordAcceptAction(OARepoAcceptAction):
     def apply(
         self,
         identity: Identity,
-        request_type: RequestType,
-        topic: Record,
+        state: RequestActionState,
         uow: UnitOfWork,
         *args: Any,
         **kwargs: Any,
     ) -> None:
-        topic_service = get_record_service_for_record(topic)
+        topic_service = get_record_service_for_record(state.topic)
         if not topic_service:
-            raise KeyError(f"topic {topic} service not found")
-        topic_service.delete(identity, topic["id"], *args, uow=uow, **kwargs)
+            raise KeyError(f"topic {state.topic} service not found")
+        if hasattr(topic_service, "delete_record"):
+            data = {
+                'removal_reason': {'id': self.request["payload"]["removal_reason"]},
+                'citation_text': "placeholder_citation_text", # TODO
+                'note': self.request['payload'].get("note",""),
+                'is_visible': True
+            }
+            deleted_topic = topic_service.delete_record(identity, state.topic["id"], data)._record
+            db.session.commit()
+            state.topic = deleted_topic
+        else:
+            topic_service.delete(identity, state.topic["id"], *args, uow=uow, **kwargs)
+        
         uow.register(
             NotificationOp(
                 DeletePublishedRecordRequestAcceptNotificationBuilder.build(
@@ -95,7 +107,7 @@ class DeletePublishedRecordAcceptAction(OARepoAcceptAction):
                 )
             )
         )
-        cancel_requests_on_topic_delete(self.request, topic, uow)
+        cancel_requests_on_topic_delete(self.request, state.topic, uow)
 
 
 class DeletePublishedRecordDeclineAction(OARepoDeclineAction):
@@ -106,8 +118,7 @@ class DeletePublishedRecordDeclineAction(OARepoDeclineAction):
     def apply(
         self,
         identity: Identity,
-        request_type: RequestType,
-        topic: Record,
+        state: RequestActionState,
         uow: UnitOfWork,
         *args: Any,
         **kwargs: Any,
@@ -121,4 +132,4 @@ class DeletePublishedRecordDeclineAction(OARepoDeclineAction):
                 )
             )
         )
-        return super().apply(identity, request_type, topic, uow, *args, **kwargs)
+        return super().apply(identity, state, uow, *args, **kwargs)

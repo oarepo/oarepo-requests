@@ -407,7 +407,7 @@ class RecordEntityReferenceUIResolver(OARepoUIResolver):
             raise ValueError(
                 f"No service found for handling reference type {self.reference_type}"
             )
-        return service.read(identity, _id).data
+        return service.read(identity, _id, include_deleted=True).data
 
     @override
     def _get_entity_ui_representation(

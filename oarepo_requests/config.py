@@ -94,8 +94,8 @@ REQUESTS_ACTION_COMPONENTS = {
         RequestIdentityComponent,
     ],
     "submitted": [
+        AutoAcceptComponent, # AutoAcceptComponent must always be first, so that auto accept is called as the last step in action handling
         *workflow_action_components,
-        AutoAcceptComponent,
         RequestIdentityComponent,
     ],
     "declined": [

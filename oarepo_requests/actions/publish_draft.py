@@ -32,8 +32,8 @@ from .record_snapshot_mixin import RecordSnapshotMixin
 
 if TYPE_CHECKING:
     from flask_principal import Identity
+    from .components import RequestActionState
     from invenio_drafts_resources.records import Record
-    from invenio_requests.customizations import RequestType
     from invenio_requests.customizations.actions import RequestAction
 
 
@@ -61,8 +61,7 @@ class PublishDraftSubmitAction(PublishMixin, RecordSnapshotMixin, OARepoSubmitAc
     def apply(
         self,
         identity: Identity,
-        request_type: RequestType,
-        topic: Record,
+        state: RequestActionState,
         uow: UnitOfWork,
         *args: Any,
         **kwargs: Any,
@@ -73,7 +72,7 @@ class PublishDraftSubmitAction(PublishMixin, RecordSnapshotMixin, OARepoSubmitAc
                 PublishDraftRequestSubmitNotificationBuilder.build(request=self.request)
             )
         )
-        return super().apply(identity, request_type, topic, uow, *args, **kwargs)
+        return super().apply(identity, state, uow, *args, **kwargs)
 
 
 class PublishDraftAcceptAction(
@@ -89,29 +88,29 @@ class PublishDraftAcceptAction(
     def apply(
         self,
         identity: Identity,
-        request_type: RequestType,
-        topic: Record,
+        state: RequestActionState,
         uow: UnitOfWork,
         *args: Any,
         **kwargs: Any,
     ) -> Record:
         """Publish the draft."""
-        topic_service = get_record_service_for_record(topic)
+        topic_service = get_record_service_for_record(state.topic)
         if not topic_service:
-            raise KeyError(f"topic {topic} service not found")
-        id_ = topic["id"]
+            raise KeyError(f"topic {state.topic} service not found")
+        id_ = state.topic["id"]
 
         published_topic = topic_service.publish(
             identity, id_, *args, uow=uow, expand=False, **kwargs
         )
-        update_topic(self.request, topic, published_topic._record, uow)
+        update_topic(self.request, state.topic, published_topic._record, uow)
+        state.topic = published_topic._record
         uow.register(
             NotificationOp(
                 PublishDraftRequestAcceptNotificationBuilder.build(request=self.request)
             )
         )
         return super().apply(
-            identity, request_type, published_topic._record, uow, *args, **kwargs
+            identity, state, uow, *args, **kwargs
         )
 
 
@@ -123,8 +122,7 @@ class PublishDraftDeclineAction(OARepoDeclineAction):
     def apply(
         self,
         identity: Identity,
-        request_type: RequestType,
-        topic: Record,
+        state: RequestActionState,
         uow: UnitOfWork,
         *args: Any,
         **kwargs: Any,
@@ -135,4 +133,4 @@ class PublishDraftDeclineAction(OARepoDeclineAction):
                 PublishDraftRequestDeclineNotificationBuilder.build(request=self.request)
             )
         )
-        return super().apply(identity, request_type, topic, uow, *args, **kwargs)
+        return super().apply(identity, state, uow, *args, **kwargs)

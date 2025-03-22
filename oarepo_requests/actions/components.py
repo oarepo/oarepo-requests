@@ -15,36 +15,33 @@ from __future__ import annotations
 import abc
 import contextlib
 from typing import TYPE_CHECKING, Any, override
+from dataclasses import dataclass
 
 from invenio_requests.customizations import RequestAction, RequestActions, RequestType
 from invenio_requests.errors import CannotExecuteActionError
 
 from oarepo_requests.services.permissions.identity import request_active
-
+from .generic import OARepoGenericActionMixin
+import logging
 if TYPE_CHECKING:
     from collections.abc import Generator
-
+    from invenio_drafts_resources.records import Record
     from flask_principal import Identity
     from invenio_records_resources.services.uow import UnitOfWork
     from invenio_requests.records.api import Request
-    from invenio_records_resources.records import Record
-    from .generic import OARepoGenericActionMixin
 
-type ActionType = (
-    OARepoGenericActionMixin | RequestAction
-)  # should be a type intersection, not yet in python
+from .generic import RequestActionState
+
 
 
 class RequestActionComponent(abc.ABC):
     """Abstract request action component."""
-
+    
     @abc.abstractmethod
     def apply(
         self,
         identity: Identity,
-        request_type: RequestType,
-        action: ActionType,
-        topic: Record,
+        state: RequestActionState,
         uow: UnitOfWork,
         *args: Any,
         **kwargs: Any,
@@ -71,9 +68,7 @@ class RequestIdentityComponent(RequestActionComponent):
     def apply(
         self,
         identity: Identity,
-        request_type: RequestType,
-        action: ActionType,
-        topic: Record,
+        state: RequestActionState,
         uow: UnitOfWork,
         *args: Any,
         **kwargs: Any,
@@ -99,9 +94,7 @@ class WorkflowTransitionComponent(RequestActionComponent):
     def apply(
         self,
         identity: Identity,
-        request_type: RequestType,
-        action: ActionType,
-        topic: Record,
+        state: RequestActionState,
         uow: UnitOfWork,
         *args: Any,
         **kwargs: Any,
@@ -111,28 +104,29 @@ class WorkflowTransitionComponent(RequestActionComponent):
 
         yield
         if (
-            not topic
+            not state.topic
         ):  # for example if we are cancelling requests after deleting draft, it does not make sense to attempt changing the state of the draft
             return
         try:
             transitions = (
-                current_oarepo_workflows.get_workflow(topic)
-                .requests()[request_type.type_id]
+                current_oarepo_workflows.get_workflow(state.topic)
+                .requests()[state.request_type.type_id]
                 .transitions
             )
         except (
             NoResultFound
         ):  # parent might be deleted - this is the case for delete_draft request type
             return
-        target_state = transitions[action.status_to]  # type: ignore
+        target_state = transitions[state.action.status_to]  # type: ignore
+        
         if (
-            target_state and not topic.model.is_deleted
+            target_state and not state.topic.is_deleted
         ):  # commit doesn't work on deleted record?
             current_oarepo_workflows.set_state(
                 identity,
-                topic,
+                state.topic,
                 target_state,
-                request=action.request,  # type: ignore
+                request=state.action.request,  # type: ignore
                 uow=uow,
             )
 
@@ -145,22 +139,39 @@ class AutoAcceptComponent(RequestActionComponent):
     def apply(
         self,
         identity: Identity,
-        request_type: RequestType,
-        action: ActionType,
-        topic: Record,
+        state: RequestActionState,
         uow: UnitOfWork,
         *args: Any,
         **kwargs: Any,
     ) -> Generator[None, None, None]:
         yield
-        request: Request = action.request  # type: ignore
+        request: Request = state.action.request  # type: ignore
         if request.status != "submitted":
             return
-        receiver_ref = request.receiver  # this is <x>proxy, not dict
+        receiver_ref = state.request.receiver  # this is <x>proxy, not dict
         if not receiver_ref.reference_dict.get("auto_approve"):
             return
 
         action_obj = RequestActions.get_action(request, "accept")
         if not action_obj.can_execute():
             raise CannotExecuteActionError("accept")
-        action_obj.execute(identity, uow, *args, **kwargs)
+        if isinstance(action_obj, OARepoGenericActionMixin):
+            # it is our action, just execute with components right away
+            current_action_obj = None
+            try:
+                current_action_obj = state.action
+                state.action = action_obj
+                action_obj.execute_with_components(identity, state, uow, *args, **kwargs)
+            finally:
+                state.action = current_action_obj
+        else:
+            action_obj.execute(identity, uow, *args, **kwargs)
+            # we dont know if request/topic was changed, retrieve actual data
+            new_request: Request = Request.get_record(request.id)
+            state.request = new_request
+            try:
+                new_topic = new_request.topic.resolve()
+                state.topic = new_topic
+            except Exception as e:
+                logging.error(e)
+                state.topic = None    

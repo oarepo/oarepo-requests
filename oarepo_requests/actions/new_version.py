@@ -17,6 +17,7 @@ from .generic import AddTopicLinksOnPayloadMixin, OARepoAcceptAction
 
 if TYPE_CHECKING:
     from flask_principal import Identity
+    from .components import RequestActionState
     from invenio_drafts_resources.records import Record
     from invenio_records_resources.services.uow import UnitOfWork
     from invenio_requests.customizations import RequestType
@@ -31,18 +32,18 @@ class NewVersionAcceptAction(AddTopicLinksOnPayloadMixin, RecordSnapshotMixin, O
     def apply(
         self,
         identity: Identity,
-        request_type: RequestType,
-        topic: Record,
+        state: RequestActionState,
         uow: UnitOfWork,
         *args: Any,
         **kwargs: Any,
     ) -> Record:
         """Apply the action, creating a new version of the record."""
-        topic_service = get_record_service_for_record(topic)
+        topic_service = get_record_service_for_record(state.topic)
         if not topic_service:
-            raise KeyError(f"topic {topic} service not found")
+            raise KeyError(f"topic {state.topic} service not found")
 
-        new_version_topic = topic_service.new_version(identity, topic["id"], uow=uow)
+        new_version_topic = topic_service.new_version(identity, state.topic["id"], uow=uow)
+        state.topic = new_version_topic._record
         if (
             "payload" in self.request
             and "keep_files" in self.request["payload"]
@@ -55,5 +56,5 @@ class NewVersionAcceptAction(AddTopicLinksOnPayloadMixin, RecordSnapshotMixin, O
         self.request["payload"]["draft_record:id"] = new_version_topic["id"]
 
         return super().apply(
-            identity, request_type, new_version_topic._record, uow, *args, **kwargs
+            identity, state, uow, *args, **kwargs
         )

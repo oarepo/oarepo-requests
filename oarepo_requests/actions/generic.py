@@ -12,22 +12,49 @@ from __future__ import annotations
 from functools import cached_property
 from typing import TYPE_CHECKING, Any
 
-from invenio_access.permissions import system_identity
 from invenio_pidstore.errors import PersistentIdentifierError
 from invenio_requests.customizations import actions
 from oarepo_runtime.i18n import lazy_gettext as _
 from oarepo_runtime.datastreams.utils import get_record_service_for_record
+from dataclasses import dataclass
+
 from oarepo_requests.proxies import current_oarepo_requests
+from invenio_access.permissions import system_identity
 
 if TYPE_CHECKING:
     from flask_babel.speaklater import LazyString
     from flask_principal import Identity
     from invenio_records_resources.records import Record
     from invenio_records_resources.services.uow import UnitOfWork
-    from invenio_requests.customizations import RequestType
     from invenio_requests.records.api import Request
 
     from oarepo_requests.actions.components import RequestActionComponent
+
+from invenio_requests.customizations import RequestAction, RequestActions, RequestType
+
+type ActionType = (
+    OARepoGenericActionMixin | RequestAction
+)  # should be a type intersection, not yet in python
+
+
+
+@dataclass
+class RequestActionState:
+    """RequestActionState dataclass to update possibly changed record between actions steps."""
+    
+    request: Request
+    request_type: RequestType
+    topic: Record
+    created_by: Any
+    action: ActionType
+    
+    def __post__init__(self):
+        """Assert correct types after initializing."""
+        assert isinstance(self.request, Request), f"self.request is not instance of Request, got {type(self.request)=}"
+        assert isinstance(self.request_type, RequestType), f"self.request_type is not instance of Request, got {type(self.request_type)=}"
+        assert isinstance(self.topic, Record), f"self.topic is not instance of Record, got {type(self.topic)=}"
+        # assert isinstance(self.action, ActionType), f"self.action is not instance of ActionType, got {type(self.action)=}"
+    
 
 
 class OARepoGenericActionMixin:
@@ -47,20 +74,29 @@ class OARepoGenericActionMixin:
     def apply(
         self,
         identity: Identity,
-        request_type: RequestType,
-        topic: Record,
+        state: RequestActionState,
         uow: UnitOfWork,
         *args: Any,
         **kwargs: Any,
     ) -> None:
         """Apply the action to the topic."""
 
+    def execute_with_components(
+        self,
+        identity: Identity, 
+        state: RequestActionState,
+        uow: UnitOfWork,
+        *args: Any,
+        **kwargs: Any
+    ) -> None:
+        """Execute action with components."""
+        self._execute_with_components(self.components, identity, state, uow, *args, **kwargs)
+    
     def _execute_with_components(
         self,
         components: list[RequestActionComponent],
         identity: Identity,
-        request_type: RequestType,
-        topic: Record,
+        state: RequestActionState,
         uow: UnitOfWork,
         *args: Any,
         **kwargs: Any,
@@ -72,14 +108,14 @@ class OARepoGenericActionMixin:
         and the action is executed inside the most inner context manager.
         """
         if not components:
-            self.apply(identity, request_type, topic, uow, *args, **kwargs)
+            self.apply(identity, state, uow, *args, **kwargs)
             super().execute(identity, uow, *args, **kwargs)  # type: ignore
         else:
             with components[0].apply(
-                identity, request_type, self, topic, uow, *args, **kwargs
+                identity, state, uow, *args, **kwargs
             ):
                 self._execute_with_components(
-                    components[1:], identity, request_type, topic, uow, *args, **kwargs
+                    components[1:], identity, state, uow, *args, **kwargs
                 )
 
     @cached_property
@@ -100,8 +136,18 @@ class OARepoGenericActionMixin:
             topic = request.topic.resolve()
         except PersistentIdentifierError:
             topic = None
+
+        # create a shared state between different actions to track changes in topic/requests etc.
+        state: RequestActionState = RequestActionState(
+                request=request,
+                request_type=request_type, 
+                topic=topic,
+                created_by=request.created_by,
+                action=self
+        )
+
         self._execute_with_components(
-            self.components, identity, request_type, topic, uow, *args, **kwargs
+            self.components, identity, state, uow, *args, **kwargs
         )
 
 
@@ -114,22 +160,20 @@ class AddTopicLinksOnPayloadMixin:
     def apply(
         self,
         identity: Identity,
-        request_type: RequestType,
-        topic: Record,
+        state: RequestActionState,
         uow: UnitOfWork,
         *args: Any,
         **kwargs: Any,
     ) -> Record:
         """Apply the action to the topic."""
-        super().apply(identity, request_type, topic, uow, *args, **kwargs)
+        super().apply(identity, state, uow, *args, **kwargs)
+            
+        service = get_record_service_for_record(state.topic)
 
-        service = get_record_service_for_record(topic)
-
-        if not topic.is_draft:
-            ret = service.read(system_identity, topic.pid.pid_value)
+        if not state.topic.is_draft:
+            ret = service.read(system_identity, state.topic.pid.pid_value)
         else:
-            ret = service.read_draft(system_identity, topic.pid.pid_value)
-    
+            ret = service.read_draft(system_identity, state.topic.pid.pid_value)
         topic_dict = ret.to_dict()
 
         request: Request = self.request  # type: ignore
@@ -147,7 +191,7 @@ class AddTopicLinksOnPayloadMixin:
             request["payload"][self.self_link] = topic_dict["links"]["self"]
         if "self_html" in topic_dict["links"]:
             request["payload"][self.self_html_link] = topic_dict["links"]["self_html"]
-        return topic
+        return state.topic
 
 
 class OARepoSubmitAction(OARepoGenericActionMixin, actions.SubmitAction):

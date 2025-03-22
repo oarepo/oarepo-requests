@@ -17,9 +17,8 @@ from .generic import AddTopicLinksOnPayloadMixin, OARepoAcceptAction
 
 if TYPE_CHECKING:
     from flask_principal import Identity
-    from invenio_drafts_resources.records import Record
+    from .components import RequestActionState
     from invenio_records_resources.services.uow import UnitOfWork
-    from invenio_requests.customizations import RequestType
 
 
 class EditTopicAcceptAction(AddTopicLinksOnPayloadMixin, RecordSnapshotMixin, OARepoAcceptAction):
@@ -32,15 +31,14 @@ class EditTopicAcceptAction(AddTopicLinksOnPayloadMixin, RecordSnapshotMixin, OA
     def apply(
         self,
         identity: Identity,
-        request_type: RequestType,
-        topic: Record,
+        state: RequestActionState,
         uow: UnitOfWork,
         *args: Any,
         **kwargs: Any,
     ) -> None:
         """Apply the action, creating a draft of the record for editing metadata."""
-        topic_service = get_record_service_for_record(topic)
+        topic_service = get_record_service_for_record(state.topic)
         if not topic_service:
-            raise KeyError(f"topic {topic} service not found")
-        edit_topic = topic_service.edit(identity, topic["id"], uow=uow)
-        super().apply(identity, request_type, edit_topic._record, uow, *args, **kwargs)
+            raise KeyError(f"topic {state.topic} service not found")
+        state.topic = topic_service.edit(identity, state.topic["id"], uow=uow)._record
+        super().apply(identity, state, uow, *args, **kwargs)
