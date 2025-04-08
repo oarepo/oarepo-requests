@@ -17,7 +17,7 @@ from invenio_records_resources.services.errors import PermissionDeniedError
 from invenio_records_resources.services.uow import RecordCommitOp, UnitOfWork
 from invenio_requests.proxies import current_requests_service
 from marshmallow.validate import OneOf
-from oarepo_runtime.datastreams.utils import get_record_service_for_record_class
+from oarepo_runtime.datastreams.utils import get_record_service_for_record_class, get_record_service_for_record
 from oarepo_runtime.i18n import lazy_gettext as _
 from typing_extensions import override
 
@@ -107,6 +107,19 @@ class NewVersionRequestType(NonDuplicableOARepoRequestType):
         """Check if the request type is applicable to the topic."""
         if topic.is_draft:
             return False
+        
+        service = get_record_service_for_record(topic)
+        next_draft_id = topic.versions.next_draft_id
+        if next_draft_id:
+            next_draft = service.draft_cls.get_record(next_draft_id)
+            
+            try:
+                ret = service.read_draft(identity, next_draft.pid.pid_value)
+                if ret:
+                    return False
+            except DraftNotCreatedError:
+                pass       
+     
         return super().is_applicable_to(identity, topic, *args, **kwargs)
 
     def can_create(
