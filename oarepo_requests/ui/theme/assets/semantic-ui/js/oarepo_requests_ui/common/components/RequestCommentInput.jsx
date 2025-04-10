@@ -53,6 +53,7 @@ const CommentInput = ({
             auto_focus: true,
             min_height: 100,
             width: "100%",
+            entity_encoding: "raw",
             toolbar:
               "blocks | bold italic | bullist numlist | outdent indent | undo redo",
             setup: (editor) => {
@@ -74,10 +75,9 @@ const CommentInput = ({
             });
             const textContent = editor.getContent({ format: "text" });
             const textLength = textContent.length;
-
             handleChange(event, cleanedContent);
             // querky  behavior of the editor, when the content is empty, the length is 1
-            if (textContent.trim().length === 0) {
+            if (textContent.trim().length === 0 && textContent.length <= 1) {
               setLength(0);
             } else {
               setLength(textLength);

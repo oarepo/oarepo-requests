@@ -37,17 +37,5 @@ class ModelUIResourceConfig(RecordsUIResourceConfig):
 
 
 class ModelUIResource(RecordsUIResource):
-    def _get_record(self, resource_requestctx, allow_draft=False):
-        try:
-            if allow_draft:
-                read_method = (
-                    getattr(self.api_service, "read_draft") or self.api_service.read
-                )
-            else:
-                read_method = self.api_service.read
-
-            return read_method(
-                g.identity, resource_requestctx.view_args["pid_value"], expand=True
-            )
-        except PermissionDenied as e:
-            raise Forbidden() from e
+    def _exportable_handlers(self):
+        return []

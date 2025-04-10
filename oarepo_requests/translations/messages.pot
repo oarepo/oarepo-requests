@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2025-03-21 08:53+0100\n"
+"POT-Creation-Date: 2025-04-08 11:31+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -45,40 +45,40 @@ msgstr ""
 msgid "Type"
 msgstr ""
 
-#: /home/dusanst/Projects/oarepo-requests/oarepo_requests/actions/delete_published_record.py:75
+#: /home/dusanst/Projects/oarepo-requests/oarepo_requests/actions/delete_published_record.py:76
 msgid "Permanently delete"
 msgstr ""
 
-#: /home/dusanst/Projects/oarepo-requests/oarepo_requests/actions/delete_published_record.py:104
+#: /home/dusanst/Projects/oarepo-requests/oarepo_requests/actions/delete_published_record.py:116
 msgid "Keep the record"
 msgstr ""
 
-#: /home/dusanst/Projects/oarepo-requests/oarepo_requests/actions/generic.py:156
+#: /home/dusanst/Projects/oarepo-requests/oarepo_requests/actions/generic.py:200
 #: /home/dusanst/Projects/oarepo-requests/oarepo_requests/translations/_only_for_translations.py:30
 msgid "Submit"
 msgstr ""
 
-#: /home/dusanst/Projects/oarepo-requests/oarepo_requests/actions/generic.py:162
+#: /home/dusanst/Projects/oarepo-requests/oarepo_requests/actions/generic.py:206
 #: /home/dusanst/Projects/oarepo-requests/oarepo_requests/translations/_only_for_translations.py:26
 msgid "Decline"
 msgstr ""
 
-#: /home/dusanst/Projects/oarepo-requests/oarepo_requests/actions/generic.py:168
+#: /home/dusanst/Projects/oarepo-requests/oarepo_requests/actions/generic.py:212
 #: /home/dusanst/Projects/oarepo-requests/oarepo_requests/translations/_only_for_translations.py:24
 msgid "Accept"
 msgstr ""
 
-#: /home/dusanst/Projects/oarepo-requests/oarepo_requests/actions/generic.py:174
+#: /home/dusanst/Projects/oarepo-requests/oarepo_requests/actions/generic.py:218
 #: /home/dusanst/Projects/oarepo-requests/oarepo_requests/translations/_only_for_translations.py:17
 msgid "Cancel"
 msgstr ""
 
-#: /home/dusanst/Projects/oarepo-requests/oarepo_requests/actions/publish_draft.py:87
-#: /home/dusanst/Projects/oarepo-requests/oarepo_requests/actions/publish_new_version.py:32
+#: /home/dusanst/Projects/oarepo-requests/oarepo_requests/actions/publish_draft.py:86
+#: /home/dusanst/Projects/oarepo-requests/oarepo_requests/actions/publish_new_version.py:33
 msgid "Publish"
 msgstr ""
 
-#: /home/dusanst/Projects/oarepo-requests/oarepo_requests/actions/publish_draft.py:121
+#: /home/dusanst/Projects/oarepo-requests/oarepo_requests/actions/publish_draft.py:120
 msgid "Return for correction"
 msgstr ""
 
@@ -90,7 +90,7 @@ msgstr ""
 msgid "Auto approve"
 msgstr ""
 
-#: /home/dusanst/Projects/oarepo-requests/oarepo_requests/services/ui_schema.py:184
+#: /home/dusanst/Projects/oarepo-requests/oarepo_requests/services/ui_schema.py:189
 msgid "status"
 msgstr ""
 
@@ -452,52 +452,68 @@ msgstr ""
 msgid "You do not have permission to delete the draft."
 msgstr ""
 
-#: /home/dusanst/Projects/oarepo-requests/oarepo_requests/types/delete_published_record.py:40
+#: /home/dusanst/Projects/oarepo-requests/oarepo_requests/types/delete_published_record.py:41
 msgid "Delete record"
 msgstr ""
 
-#: /home/dusanst/Projects/oarepo-requests/oarepo_requests/types/delete_published_record.py:60
-msgid "Request deletion of published record"
+#: /home/dusanst/Projects/oarepo-requests/oarepo_requests/types/delete_published_record.py:56
+msgid "Removal Reason"
 msgstr ""
 
-#: /home/dusanst/Projects/oarepo-requests/oarepo_requests/types/delete_published_record.py:77
-#: /home/dusanst/Projects/oarepo-requests/oarepo_requests/types/delete_published_record.py:82
-msgid "Request record deletion"
+#: /home/dusanst/Projects/oarepo-requests/oarepo_requests/types/delete_published_record.py:57
+msgid "Write down the removal reason."
 msgstr ""
 
-#: /home/dusanst/Projects/oarepo-requests/oarepo_requests/types/delete_published_record.py:80
-msgid "Record deletion requested"
+#: /home/dusanst/Projects/oarepo-requests/oarepo_requests/types/delete_published_record.py:66
+msgid "Note"
+msgstr ""
+
+#: /home/dusanst/Projects/oarepo-requests/oarepo_requests/types/delete_published_record.py:67
+msgid "Write down the additional note."
 msgstr ""
 
 #: /home/dusanst/Projects/oarepo-requests/oarepo_requests/types/delete_published_record.py:95
+msgid "Request deletion of published record"
+msgstr ""
+
+#: /home/dusanst/Projects/oarepo-requests/oarepo_requests/types/delete_published_record.py:112
+#: /home/dusanst/Projects/oarepo-requests/oarepo_requests/types/delete_published_record.py:117
+msgid "Request record deletion"
+msgstr ""
+
+#: /home/dusanst/Projects/oarepo-requests/oarepo_requests/types/delete_published_record.py:115
+msgid "Record deletion requested"
+msgstr ""
+
+#: /home/dusanst/Projects/oarepo-requests/oarepo_requests/types/delete_published_record.py:130
 msgid "Click to permanently delete the record."
 msgstr ""
 
-#: /home/dusanst/Projects/oarepo-requests/oarepo_requests/types/delete_published_record.py:98
+#: /home/dusanst/Projects/oarepo-requests/oarepo_requests/types/delete_published_record.py:133
 msgid "Request permission to delete the record."
 msgstr ""
 
-#: /home/dusanst/Projects/oarepo-requests/oarepo_requests/types/delete_published_record.py:103
+#: /home/dusanst/Projects/oarepo-requests/oarepo_requests/types/delete_published_record.py:138
 msgid ""
 "Permission to delete record requested. You will be notified about the "
 "decision by email."
 msgstr ""
 
-#: /home/dusanst/Projects/oarepo-requests/oarepo_requests/types/delete_published_record.py:108
+#: /home/dusanst/Projects/oarepo-requests/oarepo_requests/types/delete_published_record.py:143
 msgid ""
 "You have been asked to approve the request to permanently delete the record."
 " You can approve or reject the request."
 msgstr ""
 
-#: /home/dusanst/Projects/oarepo-requests/oarepo_requests/types/delete_published_record.py:111
+#: /home/dusanst/Projects/oarepo-requests/oarepo_requests/types/delete_published_record.py:146
 msgid "Permission to delete record (including files) requested. "
 msgstr ""
 
-#: /home/dusanst/Projects/oarepo-requests/oarepo_requests/types/delete_published_record.py:114
+#: /home/dusanst/Projects/oarepo-requests/oarepo_requests/types/delete_published_record.py:149
 msgid "Submit request to get permission to delete the record."
 msgstr ""
 
-#: /home/dusanst/Projects/oarepo-requests/oarepo_requests/types/delete_published_record.py:115
+#: /home/dusanst/Projects/oarepo-requests/oarepo_requests/types/delete_published_record.py:150
 msgid "You do not have permission to delete the record."
 msgstr ""
 
@@ -751,7 +767,7 @@ msgstr ""
 msgid "Status"
 msgstr ""
 
-msgid "Topic"
+msgid "Title"
 msgstr ""
 
 msgid "Request topic"
@@ -804,6 +820,11 @@ msgid ""
 msgstr ""
 
 msgid "Record has validation errors. Redirecting to form..."
+msgstr ""
+
+msgid ""
+"Record has validation errors. You will have to modify record's metadata and "
+"try to make the request again."
 msgstr ""
 
 msgid ""

@@ -978,5 +978,29 @@ msgid ""
 "Please fix them and try again:"
 msgstr ""
 
+#: /home/dusanst/Projects/oarepo-requests/oarepo_requests/types/delete_published_record.py:56
+msgid "Removal Reason"
+msgstr ""
+
+#: /home/dusanst/Projects/oarepo-requests/oarepo_requests/types/delete_published_record.py:57
+msgid "Write down the removal reason."
+msgstr ""
+
+#: /home/dusanst/Projects/oarepo-requests/oarepo_requests/types/delete_published_record.py:66
+msgid "Note"
+msgstr ""
+
+#: /home/dusanst/Projects/oarepo-requests/oarepo_requests/types/delete_published_record.py:67
+msgid "Write down the additional note."
+msgstr ""
+
+msgid "Title"
+msgstr ""
+
+msgid ""
+"Record has validation errors. You will have to modify record's metadata and "
+"try to make the request again."
+msgstr ""
+
 #~ msgid "No status"
 #~ msgstr ""

@@ -93,7 +93,7 @@ export const SideRequestInfo = ({ request }) => {
       </List.Item>
       {request?.links?.topic?.self_html && (
         <List.Item>
-          <List.Header as="h3">{i18next.t("Topic")}</List.Header>
+          <List.Header as="h3">{i18next.t("Title")}</List.Header>
           <List.Content>
             <a
               href={request.links.topic.self_html}
