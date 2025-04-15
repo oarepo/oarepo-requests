@@ -92,12 +92,12 @@ class DeletePublishedRecordAcceptAction(OARepoAcceptAction):
             from invenio_base.utils import obj_or_import_string
             
             citation_text = ""
+            # TODO wait for the oarepo-rdm pull request so i can get model with 1 function easily
             if 'RDM_MODELS' in current_app.config:
                 for model_dict in current_app.config['RDM_MODELS']:
                     config_cls = obj_or_import_string(model_dict['api_resource_config'])()
-                    # application/vnd.citationstyles.csl+json return CSL json but we need just string
-                    if 'text/x-bibliography+plain' in config_cls.response_handlers and not citation_text: 
-                        citation_text = config_cls.response_handlers['text/x-bibliography+plain'].serializer.serialize_object(state.topic)
+                    if 'text/x-iso-690+plain' in config_cls.response_handlers and not citation_text: 
+                        citation_text = config_cls.response_handlers['text/x-iso-690+plain'].serializer.serialize_object(state.topic)
                         break
             
             data = {
