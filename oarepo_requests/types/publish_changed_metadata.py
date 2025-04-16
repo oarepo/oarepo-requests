@@ -35,18 +35,9 @@ class PublishChangedMetadataRequestType(PublishRequestType):
         cls, identity: Identity, topic: Record, *args: Any, **kwargs: Any
     ) -> bool:
         """Check if the request type is applicable to the topic."""
-        if not topic.is_draft:
+        if cls.topic_type(topic) != "metadata":
             return False
 
-        index = topic.versions.index
-        is_latest = topic.versions.is_latest
-
-        if index == 1 and not is_latest:
-            # initial draft
-            return False
-        elif index > 1 and not is_latest:
-            # new version
-            return False
         return super().is_applicable_to(identity, topic, *args, **kwargs)
 
     @override

@@ -51,13 +51,7 @@ class PublishDraftRequestType(PublishRequestType):
         cls, identity: Identity, topic: Record, *args: Any, **kwargs: Any
     ) -> bool:
         """Check if the request type is applicable to the topic."""
-        if not topic.is_draft:
-            return False
-
-        index = topic.versions.index
-        is_latest = topic.versions.is_latest
-
-        if not (index == 1 and not is_latest):
+        if cls.topic_type(topic) != "initial":
             return False
 
         return super().is_applicable_to(identity, topic, *args, **kwargs)

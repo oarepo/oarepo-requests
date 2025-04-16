@@ -22,7 +22,7 @@ def test_draft_publish_request_present(
         data = json.loads(c.text)
         print(data)
         assert data["creatable_request_types"]["publish_draft"] == {
-            "description": "Request publishing of a draft",
+            "description": "Request to publish a draft",
             "links": {
                 "actions": {
                     "create": f"https://127.0.0.1:5000/api/thesis/{draft['id']}/draft/requests/publish_draft"

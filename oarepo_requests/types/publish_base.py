@@ -9,7 +9,7 @@
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Any
+from typing import TYPE_CHECKING, Any, Literal
 
 import marshmallow as ma
 from invenio_records_resources.services.uow import RecordCommitOp, UnitOfWork
@@ -60,7 +60,7 @@ class PublishRequestType(NonDuplicableOARepoRequestType):
             "decline": PublishDraftDeclineAction,
         }
 
-    description = _("Request publishing of a draft")
+    description = _("Request to publish a draft")
     receiver_can_be_none = True
     allowed_topic_ref_types = ModelRefTypes(published=True, draft=True)
 
@@ -124,3 +124,25 @@ class PublishRequestType(NonDuplicableOARepoRequestType):
         """Change the topic of the request."""
         request.topic = new_topic
         uow.register(RecordCommitOp(request, indexer=current_requests_service.indexer))
+
+    @classmethod
+    def topic_type(
+        cls, topic: Record
+    ) -> (
+        Literal["initial"]
+        | Literal["new_version"]
+        | Literal["metadata"]
+        | Literal["published"]
+    ):
+        index = topic.versions.index
+        is_latest = topic.versions.is_latest
+        is_draft = topic.is_draft
+
+        if not is_draft:
+            return "published"
+
+        if index == 1 and not is_latest:
+            return "initial"
+        elif index > 1 and not is_latest:
+            return "new_version"
+        return "metadata"

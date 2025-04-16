@@ -49,11 +49,13 @@ from oarepo_requests.actions.generic import (
 )
 from oarepo_requests.notifications.builders.delete_published_record import (
     DeletePublishedRecordRequestAcceptNotificationBuilder,
-    DeletePublishedRecordRequestSubmitNotificationBuilder, DeletePublishedRecordRequestDeclineNotificationBuilder,
+    DeletePublishedRecordRequestSubmitNotificationBuilder,
+    DeletePublishedRecordRequestDeclineNotificationBuilder,
 )
 from oarepo_requests.notifications.builders.publish import (
     PublishDraftRequestAcceptNotificationBuilder,
-    PublishDraftRequestSubmitNotificationBuilder, PublishDraftRequestDeclineNotificationBuilder,
+    PublishDraftRequestSubmitNotificationBuilder,
+    PublishDraftRequestDeclineNotificationBuilder,
 )
 
 from oarepo_requests.notifications.builders.escalate import (
@@ -454,7 +456,7 @@ def ui_serialization_result():
                 "reference": {"user": "1"},
                 "type": "user",
             },
-            "description": "Request publishing of a draft",
+            "description": "Request to publish a draft",
             "expires_at": None,
             "id": request_id,
             "is_closed": False,

@@ -195,7 +195,7 @@ def test_ui_serialization(
             "type_id": "delete_draft",
         },
         {
-            "description": "Request publishing of a draft",
+            "description": "Request to publish a draft",
             "links": {
                 "actions": {
                     "create": f"https://127.0.0.1:5000/api/thesis/{draft_id}/draft/requests/publish_draft"
@@ -205,7 +205,7 @@ def test_ui_serialization(
             "type_id": "publish_draft",
             "dangerous": False,
             "editable": False,
-            "has_form": False,
+            "has_form": True,
             "stateful_description": "By submitting the draft for review you are "
             "requesting the publication of the draft. The draft "
             "will become locked and no further changes will be "
@@ -228,7 +228,7 @@ def test_ui_serialization(
             "name": "Delete record",
             "dangerous": True,
             "editable": False,
-            "has_form": True, # now there is form for record delete
+            "has_form": True,  # now there is form for record delete
             "stateful_description": "Request permission to delete the record.",
             "stateful_name": "Request record deletion",
         },
