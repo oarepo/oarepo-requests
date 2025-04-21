@@ -1002,5 +1002,196 @@ msgid ""
 "try to make the request again."
 msgstr ""
 
+#: /Users/m/w/cesnet/oarepo-requests/oarepo_requests/types/publish_base.py:63
+msgid "Request to publish a draft"
+msgstr ""
+
+#: /Users/m/w/cesnet/oarepo-requests/oarepo_requests/types/publish_changed_metadata.py:30
+#: /Users/m/w/cesnet/oarepo-requests/oarepo_requests/types/publish_changed_metadata.py:57
+msgid "Publish changed metadata"
+msgstr ""
+
+#: /Users/m/w/cesnet/oarepo-requests/oarepo_requests/types/publish_changed_metadata.py:59
+msgid "Review and publish changed metadata"
+msgstr ""
+
+#: /Users/m/w/cesnet/oarepo-requests/oarepo_requests/types/publish_changed_metadata.py:60
+#: /Users/m/w/cesnet/oarepo-requests/oarepo_requests/types/publish_changed_metadata.py:61
+msgid "Changed metadata submitted for review"
+msgstr ""
+
+#: /Users/m/w/cesnet/oarepo-requests/oarepo_requests/types/publish_changed_metadata.py:62
+#: /Users/m/w/cesnet/oarepo-requests/oarepo_requests/types/publish_changed_metadata.py:108
+msgid "Accepted changed metadata publication"
+msgstr ""
+
+#: /Users/m/w/cesnet/oarepo-requests/oarepo_requests/types/publish_changed_metadata.py:63
+#: /Users/m/w/cesnet/oarepo-requests/oarepo_requests/types/publish_changed_metadata.py:109
+msgid "Declined changed metadata publication"
+msgstr ""
+
+#: /Users/m/w/cesnet/oarepo-requests/oarepo_requests/types/publish_changed_metadata.py:64
+#: /Users/m/w/cesnet/oarepo-requests/oarepo_requests/types/publish_changed_metadata.py:110
+msgid "Cancelled changed metadata publication"
+msgstr ""
+
+#: /Users/m/w/cesnet/oarepo-requests/oarepo_requests/types/publish_changed_metadata.py:83
+msgid ""
+"By submitting the changed metadata for review you are requesting the "
+"publication of the changed metadata. The draft will become locked and no "
+"further changes will be possible until the request is accepted or declined. "
+"You will be notified about the decision by email."
+msgstr ""
+
+#: /Users/m/w/cesnet/oarepo-requests/oarepo_requests/types/publish_changed_metadata.py:88
+msgid ""
+"Click to immediately publish the changed metadata. The draft will be a "
+"subject to embargo as requested in the side panel. Note: The action is "
+"irreversible."
+msgstr ""
+
+#: /Users/m/w/cesnet/oarepo-requests/oarepo_requests/types/publish_changed_metadata.py:93
+msgid ""
+"Submit for review. After submitting the changed metadata for review, it will"
+" be locked and no further modifications will be possible."
+msgstr ""
+
+#: /Users/m/w/cesnet/oarepo-requests/oarepo_requests/types/publish_changed_metadata.py:97
+msgid ""
+"The record with changed metadata has been submitted for review. You can now "
+"accept or decline the request."
+msgstr ""
+
+#: /Users/m/w/cesnet/oarepo-requests/oarepo_requests/types/publish_changed_metadata.py:101
+msgid ""
+"The record with changed metadata has been submitted for review. It is now "
+"locked and no further changes are possible. You will be notified about the "
+"decision by email."
+msgstr ""
+
+#: /Users/m/w/cesnet/oarepo-requests/oarepo_requests/types/publish_changed_metadata.py:106
+msgid "The record with changed metadata has been submitted for review. "
+msgstr ""
+
+#: /Users/m/w/cesnet/oarepo-requests/oarepo_requests/types/publish_changed_metadata.py:112
+msgid "Waiting for finishing the changed metadata publication request."
+msgstr ""
+
+#: /Users/m/w/cesnet/oarepo-requests/oarepo_requests/types/publish_draft.py:75
+msgid "Review and publish draft"
+msgstr ""
+
+#: /Users/m/w/cesnet/oarepo-requests/oarepo_requests/types/publish_draft.py:76
+#: /Users/m/w/cesnet/oarepo-requests/oarepo_requests/types/publish_draft.py:77
+msgid "Draft submitted for review"
+msgstr ""
+
+#: /Users/m/w/cesnet/oarepo-requests/oarepo_requests/types/publish_draft.py:78
+msgid "Draft published"
+msgstr ""
+
+#: /Users/m/w/cesnet/oarepo-requests/oarepo_requests/types/publish_draft.py:79
+msgid "Draft publication declined"
+msgstr ""
+
+#: /Users/m/w/cesnet/oarepo-requests/oarepo_requests/types/publish_draft.py:80
+msgid "Draft publication cancelled"
+msgstr ""
+
+#: /Users/m/w/cesnet/oarepo-requests/oarepo_requests/types/publish_draft.py:121
+msgid "The draft has been submitted for review. "
+msgstr ""
+
+#: /Users/m/w/cesnet/oarepo-requests/oarepo_requests/types/publish_draft.py:122
+msgid "The draft has been published. "
+msgstr ""
+
+#: /Users/m/w/cesnet/oarepo-requests/oarepo_requests/types/publish_draft.py:123
+msgid "Publication of the draft has been declined."
+msgstr ""
+
+#: /Users/m/w/cesnet/oarepo-requests/oarepo_requests/types/publish_draft.py:124
+msgid "The draft has been cancelled. "
+msgstr ""
+
+#: /Users/m/w/cesnet/oarepo-requests/oarepo_requests/types/publish_draft.py:125
+msgid "Waiting for finishing the draft publication request."
+msgstr ""
+
+#: /Users/m/w/cesnet/oarepo-requests/oarepo_requests/types/publish_new_version.py:103
+msgid "Review and publish new version"
+msgstr ""
+
+#: /Users/m/w/cesnet/oarepo-requests/oarepo_requests/types/publish_new_version.py:104
+#: /Users/m/w/cesnet/oarepo-requests/oarepo_requests/types/publish_new_version.py:105
+msgid "New version submitted for review"
+msgstr ""
+
+#: /Users/m/w/cesnet/oarepo-requests/oarepo_requests/types/publish_new_version.py:106
+msgid "New version published"
+msgstr ""
+
+#: /Users/m/w/cesnet/oarepo-requests/oarepo_requests/types/publish_new_version.py:107
+msgid "New version publication declined"
+msgstr ""
+
+#: /Users/m/w/cesnet/oarepo-requests/oarepo_requests/types/publish_new_version.py:108
+msgid "New version publication cancelled"
+msgstr ""
+
+#: /Users/m/w/cesnet/oarepo-requests/oarepo_requests/types/publish_new_version.py:127
+msgid ""
+"By submitting the new version for review you are requesting the publication "
+"of the new version. The draft will become locked and no further changes will"
+" be possible until the request is accepted or declined. You will be notified"
+" about the decision by email."
+msgstr ""
+
+#: /Users/m/w/cesnet/oarepo-requests/oarepo_requests/types/publish_new_version.py:132
+msgid ""
+"Click to immediately publish the new version. The new version will be a "
+"subject to embargo as requested in the side panel. Note: The action is "
+"irreversible."
+msgstr ""
+
+#: /Users/m/w/cesnet/oarepo-requests/oarepo_requests/types/publish_new_version.py:137
+msgid ""
+"Submit for review. After submitting the new version for review, it will be "
+"locked and no further modifications will be possible."
+msgstr ""
+
+#: /Users/m/w/cesnet/oarepo-requests/oarepo_requests/types/publish_new_version.py:141
+msgid ""
+"The new version has been submitted for review. You can now accept or decline"
+" the request."
+msgstr ""
+
+#: /Users/m/w/cesnet/oarepo-requests/oarepo_requests/types/publish_new_version.py:145
+msgid ""
+"The new version has been submitted for review. It is now locked and no "
+"further changes are possible. You will be notified about the decision by "
+"email."
+msgstr ""
+
+#: /Users/m/w/cesnet/oarepo-requests/oarepo_requests/types/publish_new_version.py:149
+msgid "The new version has been submitted for review. "
+msgstr ""
+
+#: /Users/m/w/cesnet/oarepo-requests/oarepo_requests/types/publish_new_version.py:150
+msgid "The new version has been published. "
+msgstr ""
+
+#: /Users/m/w/cesnet/oarepo-requests/oarepo_requests/types/publish_new_version.py:151
+msgid "Publication of the new version has been declined."
+msgstr ""
+
+#: /Users/m/w/cesnet/oarepo-requests/oarepo_requests/types/publish_new_version.py:152
+msgid "The new version has been cancelled. "
+msgstr ""
+
+#: /Users/m/w/cesnet/oarepo-requests/oarepo_requests/types/publish_new_version.py:153
+msgid "Waiting for finishing the new version publication request."
+msgstr ""
+
 #~ msgid "No status"
 #~ msgstr ""
