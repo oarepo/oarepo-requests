@@ -88,9 +88,18 @@ class DeletePublishedRecordAcceptAction(OARepoAcceptAction):
         if not topic_service:
             raise KeyError(f"topic {state.topic} service not found")
         if hasattr(topic_service, "delete_record"):
+            from flask import current_app
+            
+            oarepo_rdm = current_app.extensions['oarepo-rdm']
+            resource_config = oarepo_rdm.get_api_resource_config(topic_service.id)
+
+            citation_text = ""
+            if resource_config and 'text/x-iso-690+plain' in resource_config.response_handlers:
+                citation_text = resource_config.response_handlers['text/x-iso-690+plain'].serializer.serialize_object(state.topic)
+                    
             data = {
                 'removal_reason': {'id': self.request["payload"]["removal_reason"]},
-                'citation_text': "placeholder_citation_text", # TODO
+                'citation_text': citation_text,
                 'note': self.request['payload'].get("note",""),
                 'is_visible': True
             }
