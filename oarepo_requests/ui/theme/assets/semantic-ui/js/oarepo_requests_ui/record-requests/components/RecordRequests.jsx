@@ -19,6 +19,7 @@ export const requestButtonsDefaultIconConfig = {
   delete_published_record: { icon: "trash" },
   publish_draft: { icon: "upload" },
   publish_new_version: { icon: "upload" },
+  publish_changed_metadata: { icon: "upload" },
   new_version: { icon: "tag" },
   edit_published_record: { icon: "pencil" },
   assign_doi: { icon: "address card" },
