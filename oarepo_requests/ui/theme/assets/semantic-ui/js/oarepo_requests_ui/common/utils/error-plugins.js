@@ -48,8 +48,6 @@ export const handleRedirectToEditFormPlugin = (
   e,
   { formik, modalControl, requestOrRequestType, actionExtraContext: { record } }
 ) => {
-  console.log(e.response.data.errors);
-  console.log(record.links);
   if (e?.response?.data?.errors && record?.links?.edit_html) {
     const errorData = {
       errors: e.response.data.errors,
