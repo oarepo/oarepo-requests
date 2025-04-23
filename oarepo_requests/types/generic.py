@@ -9,7 +9,7 @@
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Any
+from typing import TYPE_CHECKING, Any, Callable
 
 from invenio_access.permissions import system_identity
 from invenio_records_resources.services.errors import PermissionDeniedError
@@ -25,6 +25,12 @@ from ..actions.generic import (
     OARepoCancelAction,
     OARepoDeclineAction,
     OARepoSubmitAction,
+)
+from ..utils import (
+    has_rights_to_accept_request,
+    has_rights_to_submit_request,
+    is_auto_approved,
+    request_identity_matches,
 )
 from .ref_types import ModelRefTypes, ReceiverRefTypes
 
@@ -165,6 +171,111 @@ class OARepoRequestType(RequestType):
         :param topic:           resolved request's topic
         """
         return self.description
+
+    def string_by_state(
+        self,
+        identity: Identity,
+        *,
+        topic: Record,
+        request: Request | None = None,
+        # strings
+        create: (
+            str
+            | LazyString
+            | Callable[[Identity, Record, Request | None], str | LazyString]
+        ),
+        create_autoapproved: (
+            str
+            | LazyString
+            | Callable[[Identity, Record, Request | None], str | LazyString]
+        ),
+        submit: (
+            str
+            | LazyString
+            | Callable[[Identity, Record, Request | None], str | LazyString]
+        ),
+        submitted_receiver: (
+            str
+            | LazyString
+            | Callable[[Identity, Record, Request | None], str | LazyString]
+        ),
+        submitted_creator: (
+            str
+            | LazyString
+            | Callable[[Identity, Record, Request | None], str | LazyString]
+        ),
+        submitted_others: (
+            str
+            | LazyString
+            | Callable[[Identity, Record, Request | None], str | LazyString]
+        ),
+        accepted: (
+            str
+            | LazyString
+            | Callable[[Identity, Record, Request | None], str | LazyString]
+        ),
+        declined: (
+            str
+            | LazyString
+            | Callable[[Identity, Record, Request | None], str | LazyString]
+        ),
+        cancelled: (
+            str
+            | LazyString
+            | Callable[[Identity, Record, Request | None], str | LazyString]
+        ),
+        created: (
+            str
+            | LazyString
+            | Callable[[Identity, Record, Request | None], str | LazyString]
+        ),
+    ) -> str | LazyString:
+        """Return a string that varies by the state of the request.
+
+        :param create:        string to be used on request type if user can create a request
+        :param create_autoapproved: string to be used on request type if user can create a request
+                                    and the request is auto approved
+        :param submit:        string to be used on request type if user can submit a request
+        :param accept_decline: string to be used on request type if user can accept or decline a request
+        :param view:          string to be used on request type if user can view a request
+        """
+
+        def get_string(
+            string: str | LazyString,
+            identity: Identity,
+            topic: Record,
+            request: Request | None = None,
+        ) -> str | LazyString:
+            if callable(string):
+                return string(identity, topic, request)
+            return string
+
+        if request:
+            match request.status:
+                case "submitted":
+                    if has_rights_to_accept_request(request, identity):
+                        return get_string(submitted_receiver, identity, topic, request)
+                    if request_identity_matches(request.created_by, identity):
+                        return get_string(submitted_creator, identity, topic, request)
+                    return get_string(submitted_others, identity, topic, request)
+                case "accepted":
+                    return get_string(accepted, identity, topic, request)
+                case "declined":
+                    return get_string(declined, identity, topic, request)
+                case "cancelled":
+                    return get_string(cancelled, identity, topic, request)
+                case "created":
+                    if has_rights_to_submit_request(request, identity):
+                        return get_string(submit, identity, topic, request)
+                    return get_string(created, identity, topic, request)
+                case _:
+                    return (
+                        f'Unknown label for status "{request.status}" in "{__file__}"'
+                    )
+
+        if is_auto_approved(self, identity=identity, topic=topic):
+            return get_string(create_autoapproved, identity, topic, request)
+        return get_string(create, identity, topic, request)
 
 
 class NonDuplicableOARepoRequestType(OARepoRequestType):

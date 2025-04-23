@@ -518,7 +518,7 @@ msgid ""
 "You can approve or reject the request."
 msgstr ""
 "Byli jste požádáni o schválení žádosti o trvalé smazání konceptu. Můžete "
-"žádost schválit nebo odmítnout."
+"žádost schválit nebo zamítnout."
 
 #: /home/dusanst/Projects/oarepo-requests/oarepo_requests/types/delete_draft.py:59
 msgid "Permission to delete draft (including files) requested. "
@@ -614,7 +614,7 @@ msgid "requestAccepted"
 msgstr "přijal(a) tuto žádost"
 
 msgid "requestDeclined"
-msgstr "odmítl(a) tuto žádost"
+msgstr "zamítl(a) tuto žádost"
 
 msgid "Request expired."
 msgstr "Žádost vypršela"
@@ -659,7 +659,7 @@ msgstr "Ponechat soubory v nové verzi?"
 
 #: /Users/m/w/cesnet/oarepo-requests/oarepo_requests/types/delete_draft.py:101
 msgid "You do not have permission to delete the draft."
-msgstr "Nemáte právo smazat rozpracovaný záznam."
+msgstr "Nemáte právo smazat koncept."
 
 #: /Users/m/w/cesnet/oarepo-requests/oarepo_requests/types/delete_published_record.py:106
 msgid "You do not have permission to delete the record."
@@ -764,7 +764,7 @@ msgid ""
 "The request ({{requestType}}) could not be made due to validation errors. "
 "Please fix them and try again:"
 msgstr ""
-"Požadavek ({{requestType}}) nemohl být proveden kvůli chybám validace. "
+"Validační chyby znemožnily odeslání žádosti ({{requestType}}). "
 "Prosím, opravte je a zkuste to znovu:"
 
 #: /home/senyaaa/Work/oarepo-requests/oarepo_requests/templates/semantic-ui/invenio_notifications/delete-published-record-request-event.accept.jinja:6
@@ -887,7 +887,7 @@ msgid ""
 msgstr ""
 "\n"
 "    <p>\n"
-"    Byl/a jste požádán/a o smazání vypublikovaného záznamu \"%(topic_title)s\".\n"
+"    Byli jste požádáni o smazání vypublikovaného záznamu \"%(topic_title)s\".\n"
 "    </p>\n"
 "    <p>\n"
 "        <a type=\"button\" href='%(link)s'>Potvrdit či zamítnout žádost</a>\n"
@@ -903,7 +903,7 @@ msgid ""
 "    "
 msgstr ""
 "\n"
-"    Byl/a jste požádán/a o smazání vypublikovaného záznamu \"%(topic_title)s\"\n"
+"    Byli jste požádáni o smazání vypublikovaného záznamu \"%(topic_title)s\"\n"
 "    Potvrďte či zamítněte žádost na %(link)s\n"
 "    "
 
@@ -984,7 +984,7 @@ msgid ""
 msgstr ""
 "\n"
 "    <p>\n"
-"    Byl/a jste požádán/a o publikování záznamu \"%(topic_title)s\".\n"
+"    Byli jste požádáni o publikování záznamu \"%(topic_title)s\".\n"
 "    </p>\n"
 "    <p>\n"
 "        <a type=\"button\" href='%(link)s'>Přijmout nebo zamítnout žádost</a>\n"
@@ -1000,7 +1000,7 @@ msgid ""
 "    "
 msgstr ""
 "\n"
-"    Byl/a jste požádán/a o publikování záznamu \"%(topic_title)s\".\n"
+"    Byli jste požádáni o publikování záznamu \"%(topic_title)s\".\n"
 "    Přijmout nebo zamítnout žádost na odkazu %(link)s\n"
 "    "
 
@@ -1072,19 +1072,19 @@ msgstr ""
 
 #: /home/dusanst/Projects/oarepo-requests/oarepo_requests/types/delete_published_record.py:56
 msgid "Removal Reason"
-msgstr ""
+msgstr "Důvod smazání"
 
 #: /home/dusanst/Projects/oarepo-requests/oarepo_requests/types/delete_published_record.py:57
 msgid "Write down the removal reason."
-msgstr ""
+msgstr "Napište důvod smazání"
 
 #: /home/dusanst/Projects/oarepo-requests/oarepo_requests/types/delete_published_record.py:66
 msgid "Note"
-msgstr ""
+msgstr "Poznámka"
 
 #: /home/dusanst/Projects/oarepo-requests/oarepo_requests/types/delete_published_record.py:67
 msgid "Write down the additional note."
-msgstr ""
+msgstr "Sem můžete napsat poznámku ke smazání"
 
 msgid "Title"
 msgstr "Název"
@@ -1093,5 +1093,221 @@ msgid ""
 "Record has validation errors. You will have to modify record's metadata and "
 "try to make the request again."
 msgstr ""
-"Záznam obsahuje chyby ověření. Budete muset upravit metadata záznamu a "
+"Záznam obsahuje validační chyby. Budete muset upravit metadata záznamu a "
 "zkusit požadavek znovu."
+
+#: /Users/m/w/cesnet/oarepo-requests/oarepo_requests/types/publish_base.py:63
+msgid "Request to publish a draft"
+msgstr "Zažádat o zveřejnění konceptu"
+
+#: /Users/m/w/cesnet/oarepo-requests/oarepo_requests/types/publish_changed_metadata.py:30
+#: /Users/m/w/cesnet/oarepo-requests/oarepo_requests/types/publish_changed_metadata.py:57
+msgid "Publish changed metadata"
+msgstr "Zveřejnit změněná metadata"
+
+#: /Users/m/w/cesnet/oarepo-requests/oarepo_requests/types/publish_changed_metadata.py:59
+msgid "Review and publish changed metadata"
+msgstr "Zkontrolovat a zveřejnit změněná metadata"
+
+#: /Users/m/w/cesnet/oarepo-requests/oarepo_requests/types/publish_changed_metadata.py:60
+#: /Users/m/w/cesnet/oarepo-requests/oarepo_requests/types/publish_changed_metadata.py:61
+msgid "Changed metadata submitted for review"
+msgstr "Změněná metadata odeslána ke kontrole"
+
+#: /Users/m/w/cesnet/oarepo-requests/oarepo_requests/types/publish_changed_metadata.py:62
+#: /Users/m/w/cesnet/oarepo-requests/oarepo_requests/types/publish_changed_metadata.py:108
+msgid "Accepted changed metadata publication"
+msgstr "Změněná metadata přijata k publikování"
+
+#: /Users/m/w/cesnet/oarepo-requests/oarepo_requests/types/publish_changed_metadata.py:63
+#: /Users/m/w/cesnet/oarepo-requests/oarepo_requests/types/publish_changed_metadata.py:109
+msgid "Declined changed metadata publication"
+msgstr "Odepřeno publikování změněných metadat"
+
+#: /Users/m/w/cesnet/oarepo-requests/oarepo_requests/types/publish_changed_metadata.py:64
+#: /Users/m/w/cesnet/oarepo-requests/oarepo_requests/types/publish_changed_metadata.py:110
+msgid "Cancelled changed metadata publication"
+msgstr "Zrušeno publikování změněných metadat"
+
+#: /Users/m/w/cesnet/oarepo-requests/oarepo_requests/types/publish_changed_metadata.py:83
+msgid ""
+"By submitting the changed metadata for review you are requesting the "
+"publication of the changed metadata. The draft will become locked and no "
+"further changes will be possible until the request is accepted or declined. "
+"You will be notified about the decision by email."
+msgstr ""
+"Odesláním změněných metadat ke kontrole žádáte o jejich publikování. Koncept "
+"bude uzamčen a nebude možné provádět další změny, dokud nebude žádost "
+"schválena nebo zamítnuta. O rozhodnutí budete informováni e-mailem."
+
+#: /Users/m/w/cesnet/oarepo-requests/oarepo_requests/types/publish_changed_metadata.py:88
+msgid ""
+"Click to immediately publish the changed metadata. The draft will be a "
+"subject to embargo as requested in the side panel. Note: The action is "
+"irreversible."
+msgstr ""
+"Kliknutím okamžitě publikujete změněná metadata. Koncept bude podléhat "
+"embargu podle nastavení v postranním panelu. Poznámka: Tato akce je "
+"nevratná."
+
+#: /Users/m/w/cesnet/oarepo-requests/oarepo_requests/types/publish_changed_metadata.py:93
+msgid ""
+"Submit for review. After submitting the changed metadata for review, it will"
+" be locked and no further modifications will be possible."
+msgstr ""
+"Odeslat ke kontrole. Po odeslání bude záznam uzamčen a "
+"nebude možné jej dále upravovat."
+
+#: /Users/m/w/cesnet/oarepo-requests/oarepo_requests/types/publish_changed_metadata.py:97
+msgid ""
+"The record with changed metadata has been submitted for review. You can now "
+"accept or decline the request."
+msgstr ""
+"Záznam se změněnými metadaty byl odeslán ke kontrole. Nyní můžete žádost "
+"schválit nebo zamítnout."
+
+#: /Users/m/w/cesnet/oarepo-requests/oarepo_requests/types/publish_changed_metadata.py:101
+msgid ""
+"The record with changed metadata has been submitted for review. It is now "
+"locked and no further changes are possible. You will be notified about the "
+"decision by email."
+msgstr ""
+"Záznam se změněnými metadaty byl odeslán ke kontrole. Nyní je uzamčen a není "
+"možné provádět další změny. O rozhodnutí budete informováni e-mailem."
+
+#: /Users/m/w/cesnet/oarepo-requests/oarepo_requests/types/publish_changed_metadata.py:106
+msgid "The record with changed metadata has been submitted for review. "
+msgstr "Záznam se změněnými metadaty byl odeslán ke kontrole. "
+
+
+#: /Users/m/w/cesnet/oarepo-requests/oarepo_requests/types/publish_changed_metadata.py:112
+msgid "Waiting for finishing the changed metadata publication request."
+msgstr "Čeká se na vyřízení žádosti o publikaci změněných metadat."
+
+#: /Users/m/w/cesnet/oarepo-requests/oarepo_requests/types/publish_draft.py:75
+msgid "Review and publish draft"
+msgstr "Zkontrolovat a publikovat koncept"
+
+#: /Users/m/w/cesnet/oarepo-requests/oarepo_requests/types/publish_draft.py:76
+#: /Users/m/w/cesnet/oarepo-requests/oarepo_requests/types/publish_draft.py:77
+msgid "Draft submitted for review"
+msgstr "Koncept odeslán ke kontrole"
+
+#: /Users/m/w/cesnet/oarepo-requests/oarepo_requests/types/publish_draft.py:78
+msgid "Draft published"
+msgstr "Koncept publikován"
+
+#: /Users/m/w/cesnet/oarepo-requests/oarepo_requests/types/publish_draft.py:79
+msgid "Draft publication declined"
+msgstr "Publikace konceptu zamítnuta"
+
+#: /Users/m/w/cesnet/oarepo-requests/oarepo_requests/types/publish_draft.py:80
+msgid "Draft publication cancelled"
+msgstr "Publikace konceptu zrušena"
+
+#: /Users/m/w/cesnet/oarepo-requests/oarepo_requests/types/publish_draft.py:121
+msgid "The draft has been submitted for review. "
+msgstr "Koncept byl odeslán ke kontrole. "
+
+#: /Users/m/w/cesnet/oarepo-requests/oarepo_requests/types/publish_draft.py:122
+msgid "The draft has been published. "
+msgstr "Koncept byl publikován. "
+
+#: /Users/m/w/cesnet/oarepo-requests/oarepo_requests/types/publish_draft.py:123
+msgid "Publication of the draft has been declined."
+msgstr "Publikace konceptu byla zamítnuta."
+
+#: /Users/m/w/cesnet/oarepo-requests/oarepo_requests/types/publish_draft.py:124
+msgid "The draft has been cancelled. "
+msgstr "Koncept byl zrušen. "
+
+#: /Users/m/w/cesnet/oarepo-requests/oarepo_requests/types/publish_draft.py:125
+msgid "Waiting for finishing the draft publication request."
+msgstr "Čeká se na vyřízení žádosti o publikaci konceptu."
+
+#: /Users/m/w/cesnet/oarepo-requests/oarepo_requests/types/publish_new_version.py:103
+msgid "Review and publish new version"
+msgstr "Zkontrolovat a publikovat novou verzi"
+
+#: /Users/m/w/cesnet/oarepo-requests/oarepo_requests/types/publish_new_version.py:104
+#: /Users/m/w/cesnet/oarepo-requests/oarepo_requests/types/publish_new_version.py:105
+msgid "New version submitted for review"
+msgstr "Nová verze odeslána ke kontrole"
+
+#: /Users/m/w/cesnet/oarepo-requests/oarepo_requests/types/publish_new_version.py:106
+msgid "New version published"
+msgstr "Nová verze publikována"
+
+#: /Users/m/w/cesnet/oarepo-requests/oarepo_requests/types/publish_new_version.py:107
+msgid "New version publication declined"
+msgstr "Publikace nové verze zamítnuta"
+
+#: /Users/m/w/cesnet/oarepo-requests/oarepo_requests/types/publish_new_version.py:108
+msgid "New version publication cancelled"
+msgstr "Publikace nové verze zrušena"
+
+#: /Users/m/w/cesnet/oarepo-requests/oarepo_requests/types/publish_new_version.py:127
+msgid ""
+"By submitting the new version for review you are requesting the publication "
+"of the new version. The draft will become locked and no further changes will"
+" be possible until the request is accepted or declined. You will be notified"
+" about the decision by email."
+msgstr ""
+"Odesláním nové verze ke kontrole žádáte o její publikování. Koncept bude "
+"uzamčen a nebude možné provádět další změny, dokud nebude žádost schválena "
+"nebo zamítnuta. O rozhodnutí budete informováni e-mailem."
+
+#: /Users/m/w/cesnet/oarepo-requests/oarepo_requests/types/publish_new_version.py:132
+msgid ""
+"Click to immediately publish the new version. The new version will be a "
+"subject to embargo as requested in the side panel. Note: The action is "
+"irreversible."
+msgstr ""
+"Kliknutím okamžitě publikujete novou verzi. Nová verze bude podléhat embargu "
+"podle nastavení v postranním panelu. Poznámka: Tato akce je nevratná."
+
+#: /Users/m/w/cesnet/oarepo-requests/oarepo_requests/types/publish_new_version.py:137
+msgid ""
+"Submit for review. After submitting the new version for review, it will be "
+"locked and no further modifications will be possible."
+msgstr ""
+"Odeslat ke kontrole. Po odeslání nové verze ke kontrole bude uzamčena a nebude "
+"možné ji dále upravovat."
+
+
+#: /Users/m/w/cesnet/oarepo-requests/oarepo_requests/types/publish_new_version.py:141
+msgid ""
+"The new version has been submitted for review. You can now accept or decline"
+" the request."
+msgstr ""
+"Nová verze byla odeslána ke kontrole. Nyní můžete žádost schválit nebo "
+"zamítnout."
+
+#: /Users/m/w/cesnet/oarepo-requests/oarepo_requests/types/publish_new_version.py:145
+msgid ""
+"The new version has been submitted for review. It is now locked and no "
+"further changes are possible. You will be notified about the decision by "
+"email."
+msgstr ""
+"Nová verze byla odeslána ke kontrole. Nyní je uzamčena a není možné provádět "
+"další změny. O rozhodnutí budete informováni e-mailem."
+
+#: /Users/m/w/cesnet/oarepo-requests/oarepo_requests/types/publish_new_version.py:149
+msgid "The new version has been submitted for review. "
+msgstr "Nová verze byla odeslána ke kontrole. "
+
+#: /Users/m/w/cesnet/oarepo-requests/oarepo_requests/types/publish_new_version.py:150
+msgid "The new version has been published. "
+msgstr "Nová verze byla publikována. "
+
+#: /Users/m/w/cesnet/oarepo-requests/oarepo_requests/types/publish_new_version.py:151
+msgid "Publication of the new version has been declined."
+msgstr "Publikace nové verze byla zamítnuta."
+
+#: /Users/m/w/cesnet/oarepo-requests/oarepo_requests/types/publish_new_version.py:152
+msgid "The new version has been cancelled. "
+msgstr "Nová verze byla zrušena. "
+
+#: /Users/m/w/cesnet/oarepo-requests/oarepo_requests/types/publish_new_version.py:153
+msgid "Waiting for finishing the new version publication request."
+msgstr "Čeká se na vyřízení žádosti o publikaci nové verze."

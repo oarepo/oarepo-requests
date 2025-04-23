@@ -35,6 +35,7 @@ if TYPE_CHECKING:
     from invenio_records_resources.records import Record
     from invenio_records_resources.services import RecordService
     from invenio_requests.customizations.request_types import RequestType
+    from invenio_requests.records.api import Request
     from opensearch_dsl.query import Query
 
     from oarepo_requests.typing import EntityReference
@@ -154,7 +155,8 @@ def open_request_exists(
     results = current_requests_service.search(
         system_identity, extra_filter=base_filter
     ).hits
-    return bool(list(results))
+    request_exists = bool(list(results))
+    return request_exists
 
 
 def resolve_reference_dict(reference_dict: EntityReference) -> Record:
@@ -307,7 +309,10 @@ def request_identity_matches(
         return False
 
     try:
-        entity = ResolverRegistry.resolve_entity_proxy(entity_reference)
+        if isinstance(entity_reference, dict):
+            entity = ResolverRegistry.resolve_entity_proxy(entity_reference)
+        else:
+            entity = entity_reference
         if entity:
             needs = entity.get_needs()
             return bool(identity.provides.intersection(needs))
@@ -330,3 +335,33 @@ def merge_resource_configs[T](config_to_merge_in: T, original_config: Any) -> T:
             getattr(original_config, copy_from_original_key),
         )
     return actual_config
+
+
+def has_rights_to_accept_request(request: Request, identity: Identity) -> bool:
+    """Check if the identity has rights to accept the request.
+
+    :param request: Request to check.
+    :param identity: Identity to check.
+    """
+    return current_requests_service.check_permission(
+        identity,
+        "action_accept",
+        request=request,
+        record=request.topic,
+        request_type=request.type,
+    )
+
+
+def has_rights_to_submit_request(request: Request, identity: Identity) -> bool:
+    """Check if the identity has rights to submit the request.
+
+    :param request: Request to check.
+    :param identity: Identity to check.
+    """
+    return current_requests_service.check_permission(
+        identity,
+        "action_submit",
+        request=request,
+        record=request.topic,
+        request_type=request.type,
+    )

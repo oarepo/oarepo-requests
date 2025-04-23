@@ -7,11 +7,9 @@
       background-color: @red;
       color: @white;
     }
-    &.publish_draft {
-      color: @white;
-      background-color: @green;
-    }
-    &.publish_new_version {
+    &.publish_draft,
+    &.publish_new_version,
+    &.publish_changed_metadata {
       color: @white;
       background-color: @green;
     }

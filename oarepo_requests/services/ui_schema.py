@@ -10,7 +10,6 @@
 from __future__ import annotations
 
 import datetime
-from types import SimpleNamespace
 from typing import TYPE_CHECKING, Any, cast
 
 import marshmallow as ma
@@ -20,6 +19,7 @@ from invenio_pidstore.errors import (
 )
 from invenio_rdm_records.services.errors import RecordDeletedException
 from invenio_requests.proxies import current_request_type_registry, current_requests
+from invenio_requests.records import Request
 from invenio_requests.resolvers.registry import ResolverRegistry
 from invenio_requests.services.schemas import (
     CommentEventType,
@@ -29,6 +29,7 @@ from marshmallow import validate
 from oarepo_runtime.i18n import lazy_gettext as _
 from oarepo_runtime.services.schema.marshmallow import BaseRecordSchema
 from oarepo_runtime.services.schema.ui import LocalizedDateTime
+from sqlalchemy.orm.exc import NoResultFound
 
 from oarepo_requests.resolvers.ui import resolve
 from oarepo_requests.services.schema import (
@@ -36,7 +37,6 @@ from oarepo_requests.services.schema import (
     RequestTypeSchema,
     get_links_schema,
 )
-from sqlalchemy.orm.exc import NoResultFound
 
 if TYPE_CHECKING:
     from invenio_requests.customizations.request_types import RequestType
@@ -68,7 +68,9 @@ class UIReferenceSchema(ma.Schema):
     def _dereference(self, data: dict, **kwargs: Any) -> dict[str, Any]:
         if "resolved" not in self.context:
             try:
-                return cast(dict, resolve(self.context["identity"], data["reference"]))
+                return cast(
+                    "dict", resolve(self.context["identity"], data["reference"])
+                )
             except PIDDeletedError:
                 return {**data, "status": "removed"}
             except PersistentIdentifierError:
@@ -164,19 +166,21 @@ class UIRequestSchemaMixin:
         try:
             topic = ResolverRegistry.resolve_entity(data["topic"], False)
             if topic:
+                request_obj = None
                 if hasattr(type_obj, "stateful_name"):
+                    request_obj = Request.get_record(data["id"])
                     stateful_name = type_obj.stateful_name(
                         identity=self.context["identity"],  # type: ignore
                         topic=topic,
-                        # not very nice, but we need to pass the request object to the stateful_name function
-                        request=SimpleNamespace(**data),
+                        request=request_obj,
                     )
                 if hasattr(type_obj, "stateful_description"):
+                    if request_obj is None:
+                        request_obj = Request.get_record(data["id"])
                     stateful_description = type_obj.stateful_description(
                         identity=self.context["identity"],  # type: ignore
                         topic=topic,
-                        # not very nice, but we need to pass the request object to the stateful_description function
-                        request=SimpleNamespace(**data),
+                        request=request_obj,
                     )
         except (PersistentIdentifierError, NoResultFound):
             pass

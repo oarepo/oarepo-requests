@@ -74,7 +74,7 @@ def test_user_serialization(
         headers={"Accept": "application/vnd.inveniordm.v1+json"},
     )
     pprint(resp_request_submit.json)
-    assert resp_request_submit.json["stateful_name"] == "Submitted for review"
+    assert resp_request_submit.json["stateful_name"] == "Draft submitted for review"
     assert (
         resp_request_submit.json["stateful_description"]
         == "The draft has been submitted for review. It is now locked and no further changes are possible. You will be notified about the decision by email."
@@ -179,7 +179,8 @@ def test_resolver_fallback(
             headers={"Accept": "application/vnd.inveniordm.v1+json"},
         ).json
         assert (
-            ui_serialization_read_submitted["stateful_name"] == "Submitted for review"
+            ui_serialization_read_submitted["stateful_name"]
+            == "Draft submitted for review"
         )
         assert (
             ui_serialization_read_submitted["stateful_description"]
