@@ -343,7 +343,6 @@ def has_rights_to_accept_request(request: Request, identity: Identity) -> bool:
     :param request: Request to check.
     :param identity: Identity to check.
     """
-    print("Request type", type(request), request.type, type(request.type))
     return current_requests_service.check_permission(
         identity,
         "action_accept",
