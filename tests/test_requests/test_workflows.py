@@ -223,11 +223,15 @@ def test_if_no_new_version_draft(
     ).json  # request is autoaccepted
     assert request["status"] == "accepted"
 
+    # the new version is still not available, as there is an already existing draft
+
     record = creator_client.get(
         f"{urls['BASE_URL']}{record2_id}?expand=true",
     ).json
     requests = record["expanded"]["request_types"]
-    assert "new_version" in {r["type_id"] for r in requests}
+    assert "new_version" not in {r["type_id"] for r in requests}
+
+    # TODO: publish and check?
 
 
 def test_if_no_edit_draft(
@@ -283,9 +287,8 @@ def test_if_no_edit_draft(
         f"{urls['BASE_URL']}{id2_}?expand=true",
     )
     requests = record.json["expanded"]["request_types"]
-    assert "edit_published_record" in {
-        r["type_id"] for r in requests
-    }  # new version created, should edit be allowed with new version?
+    # edit record is in progress, so edit_published_record is not available
+    assert "edit_published_record" not in {r["type_id"] for r in requests}
 
 
 def test_workflow_events(
