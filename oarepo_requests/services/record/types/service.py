@@ -67,7 +67,12 @@ class RecordRequestTypesService:
         self, identity: Identity, record: Record
     ) -> RequestTypesList:
         """Get applicable request types for a record."""
-        self.record_service.require_permission(identity, "read", record=record)
+        if not getattr(record, "is_draft", False):
+            self.record_service.require_permission(identity, "read", record=record)
+        else:
+            self.record_service.require_permission(
+                identity, "read_draft", record=record
+            )
         allowed_request_types = allowed_request_types_for_record(identity, record)
         return RequestTypesList(
             service=self.record_service,

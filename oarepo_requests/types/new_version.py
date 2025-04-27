@@ -19,6 +19,7 @@ from invenio_requests.proxies import current_requests_service
 from marshmallow.validate import OneOf
 from oarepo_runtime.datastreams.utils import get_record_service_for_record_class
 from oarepo_runtime.i18n import lazy_gettext as _
+from oarepo_runtime.records.drafts import has_draft
 from typing_extensions import override
 
 from ..actions.new_version import NewVersionAcceptAction
@@ -107,6 +108,9 @@ class NewVersionRequestType(NonDuplicableOARepoRequestType):
         """Check if the request type is applicable to the topic."""
         if topic.is_draft:
             return False
+        # if already editing metadata or a new version, we don't want to create a new request
+        if has_draft(topic):
+            return False
         return super().is_applicable_to(identity, topic, *args, **kwargs)
 
     def can_create(
@@ -121,9 +125,9 @@ class NewVersionRequestType(NonDuplicableOARepoRequestType):
     ) -> None:
         """Check if the request can be created."""
         if topic.is_draft:
-            raise ValueError(
-                "Trying to create new version request on draft record"
-            )  # todo - if we want the active topic thing, we have to allow published as allowed topic and have to check this somewhere else
+            raise ValueError("Trying to create new version request on draft record")
+        if has_draft(topic):
+            raise ValueError("Trying to create edit request on record with draft")
         super().can_create(identity, data, receiver, topic, creator, *args, **kwargs)
 
     def topic_change(self, request: Request, new_topic: dict, uow: UnitOfWork) -> None:
