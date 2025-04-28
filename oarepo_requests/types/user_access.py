@@ -5,9 +5,10 @@ from typing import TYPE_CHECKING, Any
 from invenio_rdm_records.requests.access.requests import UserAccessRequest
 from .generic import OARepoRequestType
 from typing_extensions import override
+from invenio_requests.records.api import RequestMetadata
 
 from oarepo_runtime.i18n import lazy_gettext as _
-
+from .ref_types import ModelRefTypes, ReceiverRefTypes
 from oarepo_runtime.datastreams.utils import get_record_service_for_record
 
 if TYPE_CHECKING:
@@ -22,6 +23,9 @@ class OARepoUserAccessRequestType(UserAccessRequest, OARepoRequestType):
 
     type_id = "request_user_access"
 
+    allowed_topic_ref_types = ModelRefTypes(published=True, draft=True)
+    allowed_receiver_ref_types = ReceiverRefTypes()
+    
     form = [
         {
             "section": "",
@@ -57,9 +61,18 @@ class OARepoUserAccessRequestType(UserAccessRequest, OARepoRequestType):
     def is_applicable_to(
         cls, identity: Identity, topic: Record, *args: Any, **kwargs: Any
     ) -> bool:
-        """Check if the request type is applicable to the topic."""
+        """Check if the request type is applicable to the topic."""        
         if topic.access.status.value == "restricted":
             topic_service = get_record_service_for_record(topic)
+            res = RequestMetadata.query.filter(
+                        RequestMetadata.json["type"].as_string() == "request_user_access",
+                        RequestMetadata.json["topic"][topic_service.id].as_string() == str(topic["id"]),
+                        RequestMetadata.json["created_by"]["user"].as_string() == str(identity.id),
+                        RequestMetadata.json['status'].as_string() != 'cancelled'
+            ).all()
+            if res:
+                return False
+            
             return not topic_service.check_permission(
                 identity, "read_files", record=topic
             )
