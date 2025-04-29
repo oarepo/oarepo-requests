@@ -46,7 +46,7 @@ def test_user_access_request_is_applicable(
     assert 'submit' not in response['expanded']['requests'][0]['links']['actions']
 
 
-def test_user_access_request_accept(
+def test_user_access_request_submit(
     logged_client,
     users,
     urls,
@@ -93,20 +93,10 @@ def test_user_access_request_accept(
     ).json
     
     assert request["status"] == "submitted"
-    ThesisRecord.index.refresh()
-    ThesisDraft.index.refresh()
+
+    # accept is tested in invenio
+    # there is no changes in our implementation
     
-    record = creator_client.get(f"{urls['BASE_URL']}{record1_id}?expand=true").json
-    accept = creator_client.post(
-        link2testclient(
-            record["expanded"]["requests"][0]["links"]["actions"]["accept"]
-        ),
-    )
-    
-    request = requester_client.get(
-        f'{urls["BASE_URL_REQUESTS"]}{resp_request_submit["id"]}',
-    ).json
-    assert request['status'] == "accepted"
     
 def test_user_access_request_cancel(
     logged_client,
@@ -123,19 +113,7 @@ def test_user_access_request_cancel(
     
     requester = users[1]
     requester_client = logged_client(requester)
-    
-    additional_data = {
-        "access": {
-            "files": "restricted",
-            "record": "public",
-            "embargo": {
-                "until": "",
-                "active": False,
-                "reason": ""
-                }
-        },
-    }
-    
+
     record1 = record_factory(creator.identity, additional_data=additional_data)
     record1_id = record1["id"]
 
