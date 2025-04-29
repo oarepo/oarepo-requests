@@ -61,20 +61,8 @@ def test_user_access_request_submit(
     
     requester = users[1]
     requester_client = logged_client(requester)
-    
-    additional_data = {
-        "access": {
-            "files": "restricted",
-            "record": "public",
-            "embargo": {
-                "until": "",
-                "active": False,
-                "reason": ""
-                }
-        },
-    }
-    
-    record1 = record_factory(creator.identity, additional_data=additional_data)
+
+    record1 = record_factory(creator.identity)
     record1_id = record1["id"]
 
     create_additional_data = {
@@ -114,7 +102,7 @@ def test_user_access_request_cancel(
     requester = users[1]
     requester_client = logged_client(requester)
 
-    record1 = record_factory(creator.identity, additional_data=additional_data)
+    record1 = record_factory(creator.identity)
     record1_id = record1["id"]
 
     create_additional_data = {
