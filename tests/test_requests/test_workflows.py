@@ -12,12 +12,12 @@ from invenio_records_resources.services.uow import RecordCommitOp, unit_of_work
 from invenio_requests.customizations.event_types import LogEventType
 from invenio_requests.records.api import RequestEvent
 from thesis.records.api import ThesisDraft, ThesisRecord
-
+from invenio_requests.proxies import current_requests_service
 from oarepo_requests.services.permissions.workflow_policies import (
     CreatorsFromWorkflowRequestsPermissionPolicy,
 )
 from tests.conftest import TestEventType
-
+from invenio_requests.records.api import Request
 
 @unit_of_work()
 def change_workflow(identity, service, record, function, uow=None):
@@ -144,6 +144,7 @@ def test_autorequest(
     receiver_client = logged_client(receiver)
 
     draft1 = draft_factory(creator.identity, custom_workflow="with_approve")
+
     record_id = draft1["id"]
 
     approve_request_data = {
@@ -174,6 +175,24 @@ def test_autorequest(
     # the publish request should be created automatically
     publishing_record = record_service.read_draft(creator.identity, record_id)._record
     assert publishing_record["state"] == "publishing"
+
+def test_autorequest_create_draft(
+    db,
+    logged_client,
+    users,
+    urls,
+    patch_requests_permissions,
+    record_service,
+    draft_factory,
+    link2testclient,
+    search_clear,
+):
+    creator = users[0]
+    draft_factory(creator.identity, custom_workflow="with_approve")
+    Request.index.refresh()
+    requests = list(current_requests_service.search(creator.identity).hits)
+    generic_requests = [request for request in requests if request["type"] == "generic"]
+    assert len(generic_requests) == 1
 
 
 def test_if_no_new_version_draft(
