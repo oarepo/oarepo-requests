@@ -3,6 +3,7 @@ import Overridable from "react-overridable";
 import {
   TimelineCommentEvent,
   TimelineActionEvent,
+  TimelineEscalationEvent,
 } from "@js/oarepo_requests_common";
 import PropTypes from "prop-types";
 
@@ -19,6 +20,14 @@ export const TimelineEvent = ({ event, requestId, page }) => (
         event={event}
       >
         <TimelineActionEvent event={event} />
+      </Overridable>
+    )}
+    {event.type === "E" && (
+      <Overridable
+        id={`OarepoRequests.TimelineEscalationEvent.${event.payload.event}`}
+        event={event}
+      >
+        <TimelineEscalationEvent event={event} />
       </Overridable>
     )}
   </React.Fragment>

@@ -21,4 +21,5 @@ export { default as TimelineCommentEvent } from "./TimelineCommentEvent";
 export { CommentSubmitForm } from "./CommentSubmitForm";
 export { TimelineActionEvent } from "./TimelineActionEvent";
 export { TimelineEvent } from "./TimelineEvent";
+export { TimelineEscalationEvent } from "./TimelineEscalationEvent";
 export * from "./ConfirmationModal";
