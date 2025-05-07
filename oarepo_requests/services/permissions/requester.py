@@ -32,24 +32,10 @@ if TYPE_CHECKING:
 
 # TODO: move this to a more appropriate place
 
-
-@unit_of_work()
-def auto_request_state_change_notifier(
-    identity: Identity,
+def create_autorequests(identity: Identity,
     record: Record,
-    prev_state: str,
-    new_state: str,
-    uow: UnitOfWork | None = None,
-    **kwargs: Any,
-) -> None:
-    """Create requests that should be created automatically on state change.
-
-    For each of the WorkflowRequest definition in the workflow of the record,
-    take the needs from the generators of possible creators. If any of those
-    needs is an auto_request_need, create a request for it automatically.
-    """
-    assert uow is not None
-
+    uow: UnitOfWork,
+    **kwargs: Any,)-> None:
     record_workflow = current_oarepo_workflows.get_workflow(record)
     for request_type_id, workflow_request in record_workflow.requests().items():
         needs = workflow_request.requester_generator.needs(
@@ -76,3 +62,22 @@ def auto_request_state_change_notifier(
                     request_item._record, indexer=current_requests_service.indexer
                 )
             )
+
+
+@unit_of_work()
+def auto_request_state_change_notifier(
+    identity: Identity,
+    record: Record,
+    prev_state: str,
+    new_state: str,
+    uow: UnitOfWork | None = None,
+    **kwargs: Any,
+) -> None:
+    """Create requests that should be created automatically on state change.
+
+    For each of the WorkflowRequest definition in the workflow of the record,
+    take the needs from the generators of possible creators. If any of those
+    needs is an auto_request_need, create a request for it automatically.
+    """
+    assert uow is not None
+    create_autorequests(identity, record, uow, **kwargs)
