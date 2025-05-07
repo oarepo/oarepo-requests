@@ -14,10 +14,14 @@ import Overridable, {
   OverridableContext,
   overrideStore,
 } from "react-overridable";
+import RequestsOverrides from "@js/oarepo_requests_common/RequestsOverrides";
 
 const recordRequestsAppDiv = document.getElementById("request-detail");
 
-const overriddenComponents = overrideStore.getAll();
+const overriddenComponents = {
+  ...RequestsOverrides,
+  ...overrideStore.getAll(),
+};
 
 const request = recordRequestsAppDiv.dataset?.request
   ? JSON.parse(recordRequestsAppDiv.dataset.request)

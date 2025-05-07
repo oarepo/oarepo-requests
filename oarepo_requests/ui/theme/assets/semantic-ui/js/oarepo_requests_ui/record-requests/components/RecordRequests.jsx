@@ -13,7 +13,12 @@ import {
 } from "@tanstack/react-query";
 import { httpVnd } from "@js/oarepo_ui";
 import { OverridableContext, overrideStore } from "react-overridable";
-const overriddenComponents = overrideStore.getAll();
+import RequestsOverrides from "@js/oarepo_requests_common/RequestsOverrides";
+
+const overriddenComponents = {
+  ...RequestsOverrides,
+  ...overrideStore.getAll(),
+};
 
 export const requestButtonsDefaultIconConfig = {
   delete_published_record: { icon: "trash" },

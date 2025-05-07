@@ -22,3 +22,4 @@ export { CommentSubmitForm } from "./CommentSubmitForm";
 export { TimelineActionEvent } from "./TimelineActionEvent";
 export { TimelineEvent } from "./TimelineEvent";
 export * from "./ConfirmationModal";
+export * from "./TimelineEscalationEvent";
