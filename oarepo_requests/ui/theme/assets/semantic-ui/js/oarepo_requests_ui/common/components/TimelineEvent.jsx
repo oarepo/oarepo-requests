@@ -1,6 +1,7 @@
 import React from "react";
 import Overridable from "react-overridable";
 import PropTypes from "prop-types";
+import { GenericActionEvent } from "./GenericActionEvent";
 
 export const TimelineEvent = ({ event, requestId, page }) => (
   <Overridable
@@ -9,7 +10,11 @@ export const TimelineEvent = ({ event, requestId, page }) => (
     requestId={requestId}
     page={page}
   >
-    <div>{`you have not provided UI for event type ${event.type}`}</div>
+    <GenericActionEvent
+      event={event}
+      eventIcon={{ name: "info" }}
+      feedMessage={`No UI component for event type ${event.type}`}
+    />
   </Overridable>
 );
 
