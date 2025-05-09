@@ -764,8 +764,8 @@ msgid ""
 "The request ({{requestType}}) could not be made due to validation errors. "
 "Please fix them and try again:"
 msgstr ""
-"Validační chyby znemožnily odeslání žádosti ({{requestType}}). "
-"Prosím, opravte je a zkuste to znovu:"
+"Validační chyby znemožnily odeslání žádosti ({{requestType}}). Prosím, "
+"opravte je a zkuste to znovu:"
 
 #: /home/senyaaa/Work/oarepo-requests/oarepo_requests/templates/semantic-ui/invenio_notifications/delete-published-record-request-event.accept.jinja:6
 #, python-brace-format
@@ -1136,8 +1136,8 @@ msgid ""
 "further changes will be possible until the request is accepted or declined. "
 "You will be notified about the decision by email."
 msgstr ""
-"Odesláním změněných metadat ke kontrole žádáte o jejich publikování. Koncept "
-"bude uzamčen a nebude možné provádět další změny, dokud nebude žádost "
+"Odesláním změněných metadat ke kontrole žádáte o jejich publikování. Koncept"
+" bude uzamčen a nebude možné provádět další změny, dokud nebude žádost "
 "schválena nebo zamítnuta. O rozhodnutí budete informováni e-mailem."
 
 #: /Users/m/w/cesnet/oarepo-requests/oarepo_requests/types/publish_changed_metadata.py:88
@@ -1155,8 +1155,8 @@ msgid ""
 "Submit for review. After submitting the changed metadata for review, it will"
 " be locked and no further modifications will be possible."
 msgstr ""
-"Odeslat ke kontrole. Po odeslání bude záznam uzamčen a "
-"nebude možné jej dále upravovat."
+"Odeslat ke kontrole. Po odeslání bude záznam uzamčen a nebude možné jej dále"
+" upravovat."
 
 #: /Users/m/w/cesnet/oarepo-requests/oarepo_requests/types/publish_changed_metadata.py:97
 msgid ""
@@ -1172,13 +1172,12 @@ msgid ""
 "locked and no further changes are possible. You will be notified about the "
 "decision by email."
 msgstr ""
-"Záznam se změněnými metadaty byl odeslán ke kontrole. Nyní je uzamčen a není "
-"možné provádět další změny. O rozhodnutí budete informováni e-mailem."
+"Záznam se změněnými metadaty byl odeslán ke kontrole. Nyní je uzamčen a není"
+" možné provádět další změny. O rozhodnutí budete informováni e-mailem."
 
 #: /Users/m/w/cesnet/oarepo-requests/oarepo_requests/types/publish_changed_metadata.py:106
 msgid "The record with changed metadata has been submitted for review. "
 msgstr "Záznam se změněnými metadaty byl odeslán ke kontrole. "
-
 
 #: /Users/m/w/cesnet/oarepo-requests/oarepo_requests/types/publish_changed_metadata.py:112
 msgid "Waiting for finishing the changed metadata publication request."
@@ -1263,17 +1262,16 @@ msgid ""
 "subject to embargo as requested in the side panel. Note: The action is "
 "irreversible."
 msgstr ""
-"Kliknutím okamžitě publikujete novou verzi. Nová verze bude podléhat embargu "
-"podle nastavení v postranním panelu. Poznámka: Tato akce je nevratná."
+"Kliknutím okamžitě publikujete novou verzi. Nová verze bude podléhat embargu"
+" podle nastavení v postranním panelu. Poznámka: Tato akce je nevratná."
 
 #: /Users/m/w/cesnet/oarepo-requests/oarepo_requests/types/publish_new_version.py:137
 msgid ""
 "Submit for review. After submitting the new version for review, it will be "
 "locked and no further modifications will be possible."
 msgstr ""
-"Odeslat ke kontrole. Po odeslání nové verze ke kontrole bude uzamčena a nebude "
-"možné ji dále upravovat."
-
+"Odeslat ke kontrole. Po odeslání nové verze ke kontrole bude uzamčena a "
+"nebude možné ji dále upravovat."
 
 #: /Users/m/w/cesnet/oarepo-requests/oarepo_requests/types/publish_new_version.py:141
 msgid ""
@@ -1289,8 +1287,8 @@ msgid ""
 "further changes are possible. You will be notified about the decision by "
 "email."
 msgstr ""
-"Nová verze byla odeslána ke kontrole. Nyní je uzamčena a není možné provádět "
-"další změny. O rozhodnutí budete informováni e-mailem."
+"Nová verze byla odeslána ke kontrole. Nyní je uzamčena a není možné provádět"
+" další změny. O rozhodnutí budete informováni e-mailem."
 
 #: /Users/m/w/cesnet/oarepo-requests/oarepo_requests/types/publish_new_version.py:149
 msgid "The new version has been submitted for review. "
@@ -1311,3 +1309,6 @@ msgstr "Nová verze byla zrušena. "
 #: /Users/m/w/cesnet/oarepo-requests/oarepo_requests/types/publish_new_version.py:153
 msgid "Waiting for finishing the new version publication request."
 msgstr "Čeká se na vyřízení žádosti o publikaci nové verze."
+
+msgid "escalated"
+msgstr "eskaloval(a)"

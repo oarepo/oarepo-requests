@@ -1193,5 +1193,8 @@ msgstr ""
 msgid "Waiting for finishing the new version publication request."
 msgstr ""
 
+msgid "escalated"
+msgstr ""
+
 #~ msgid "No status"
 #~ msgstr ""
