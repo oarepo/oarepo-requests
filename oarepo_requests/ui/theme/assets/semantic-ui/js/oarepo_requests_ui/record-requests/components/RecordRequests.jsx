@@ -13,10 +13,10 @@ import {
 } from "@tanstack/react-query";
 import { httpVnd } from "@js/oarepo_ui";
 import { OverridableContext, overrideStore } from "react-overridable";
-import RequestsOverrides from "@js/oarepo_requests_common/RequestsOverrides";
+import overrides from "@js/oarepo_requests_common/overrides";
 
 const overriddenComponents = {
-  ...RequestsOverrides,
+  ...overrides,
   ...overrideStore.getAll(),
 };
 
