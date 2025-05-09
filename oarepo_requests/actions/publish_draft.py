@@ -14,6 +14,8 @@ from typing import TYPE_CHECKING, Any
 from invenio_access.permissions import system_identity
 from invenio_notifications.services.uow import NotificationOp
 from invenio_records_resources.services.uow import UnitOfWork
+from invenio_requests.errors import CannotExecuteActionError
+
 from oarepo_runtime.datastreams.utils import get_record_service_for_record
 from oarepo_runtime.i18n import lazy_gettext as _
 
@@ -67,13 +69,25 @@ class PublishDraftSubmitAction(PublishMixin, RecordSnapshotMixin, OARepoSubmitAc
         **kwargs: Any,
     ) -> Record:
         """Publish the draft."""
+        if (
+                "payload" in self.request
+                and "version" in self.request["payload"]
+        ):
+            topic_service = get_record_service_for_record(state.topic)
+            versions = topic_service.search_versions(identity, state.topic.pid.pid_value)
+            versions_hits = versions.to_dict()["hits"]["hits"]
+            for rec in versions_hits:
+                if "version" in rec["metadata"]:
+                    version = rec["metadata"]["version"]
+                    if version == self.request["payload"]["version"]:
+                        raise CannotExecuteActionError("submit", reason=_("This version tag already exists"))
+            state.topic.metadata["version"] = self.request["payload"]["version"]
         uow.register(
             NotificationOp(
                 PublishDraftRequestSubmitNotificationBuilder.build(request=self.request)
             )
         )
         return super().apply(identity, state, uow, *args, **kwargs)
-
 
 class PublishDraftAcceptAction(
     PublishMixin, AddTopicLinksOnPayloadMixin, OARepoAcceptAction

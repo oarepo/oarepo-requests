@@ -246,6 +246,10 @@ class RequestsWithApprove(WorkflowRequestPolicy):
         ),
         events=events_only_receiver_can_comment,
     )
+    generic = WorkflowRequest(
+        requesters=[IfInState("draft", [AutoRequest()])],
+        recipients=[UserGenerator(1)],
+    )
     approve_draft = WorkflowRequest(
         requesters=[IfInState("draft", [RecordOwners()])],
         recipients=[UserGenerator(2)],
@@ -295,6 +299,19 @@ class RequestsWithAnotherTopicUpdatingRequestType(DefaultRequests):
         recipients=[UserGenerator(2)],
     )
 
+class GenericTestableRequestType(NonDuplicableOARepoRequestType):
+    type_id = "generic"
+    name = _("Generic")
+
+    available_actions = {
+        **NonDuplicableOARepoRequestType.available_actions,
+        "accept": OARepoAcceptAction,
+        "submit": OARepoSubmitAction,
+        "decline": OARepoDeclineAction,
+    }
+    description = _("Generic request that doesn't do anything")
+    receiver_can_be_none = False
+    allowed_topic_ref_types = ModelRefTypes(published=True, draft=True)
 
 class ApproveRequestType(NonDuplicableOARepoRequestType):
     type_id = "approve_draft"
@@ -519,6 +536,7 @@ def app_config(app_config):
         ApproveRequestType(),
         ConditionalRecipientRequestType(),
         AnotherTopicUpdatingRequestType(),
+        GenericTestableRequestType(),
     ]
     app_config["FILES_REST_STORAGE_CLASS_LIST"] = {
         "L": "Local",
