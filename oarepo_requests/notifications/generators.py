@@ -105,18 +105,22 @@ class MultipleRecipientsEmailRecipients(SpecificEntityRecipient):
         """Get recipient emails of entity with multiple recipients.."""
         final_recipients = {}
         for current_entity in entity.entities:
-            current_user = current_entity.resolve()
-            if not hasattr(current_user, "email"):
+            recipient_entity = current_entity.resolve()
+            if hasattr(recipient_entity, "email"):
+                current_user_email = recipient_entity.email
+                final_recipients[current_user_email] = Recipient(
+                    data={"email": recipient_entity.email}
+                )
+            elif hasattr(recipient_entity, "emails"):
+                for email in recipient_entity.emails:
+                    final_recipients[email] = Recipient(data={"email": email})
+            else:
                 log.error(
-                    "Entity %s %s does not have email attribute, skipping.",
-                    type(current_user),
-                    current_user,
+                    "Entity %s %s does not have email/emails attribute, skipping.",
+                    type(recipient_entity),
+                    recipient_entity,
                 )
                 continue
-            current_user_email = current_user.email
-            final_recipients[current_user_email] = Recipient(
-                data={"email": current_user.email}
-            )
 
         return final_recipients
 
