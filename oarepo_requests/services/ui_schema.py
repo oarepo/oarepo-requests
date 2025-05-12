@@ -164,10 +164,11 @@ class UIRequestSchemaMixin:
         stateful_name = None
         stateful_description = None
         try:
-            if not data["topic"]:
+            topic_dict = data.get("topic")
+            if not topic_dict:
                 return stateful_name, stateful_description
 
-            topic = ResolverRegistry.resolve_entity(data["topic"], False)
+            topic = ResolverRegistry.resolve_entity(topic_dict, False)
             if topic:
                 request_obj = None
                 if hasattr(type_obj, "stateful_name"):
