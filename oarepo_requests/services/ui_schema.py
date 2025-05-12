@@ -164,6 +164,9 @@ class UIRequestSchemaMixin:
         stateful_name = None
         stateful_description = None
         try:
+            if not data["topic"]:
+                return stateful_name, stateful_description
+
             topic = ResolverRegistry.resolve_entity(data["topic"], False)
             if topic:
                 request_obj = None
@@ -182,7 +185,7 @@ class UIRequestSchemaMixin:
                         topic=topic,
                         request=request_obj,
                     )
-        except (PersistentIdentifierError, NoResultFound):
+        except (PersistentIdentifierError, NoResultFound, ValueError):
             pass
 
         return stateful_name, stateful_description
