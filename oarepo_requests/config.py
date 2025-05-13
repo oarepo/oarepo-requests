@@ -16,7 +16,6 @@ from invenio_requests.customizations import CommentEventType, LogEventType
 from invenio_requests.services.permissions import (
     PermissionPolicy as InvenioRequestsPermissionPolicy,
 )
-from invenio_users_resources.entity_resolvers import GroupResolver, UserResolver
 from oarepo_workflows.requests.events import WorkflowEvent
 
 from oarepo_requests.actions.components import (
@@ -34,6 +33,9 @@ from oarepo_requests.resolvers.ui import (
     FallbackEntityReferenceUIResolver,
     GroupEntityReferenceUIResolver,
     UserEntityReferenceUIResolver,
+)
+from oarepo_requests.resolvers.user_notification_resolver import (
+    UserNotificationResolver,
 )
 from oarepo_requests.types import (
     DeletePublishedRecordRequestType,
@@ -125,8 +127,7 @@ SNAPSHOT_CLEANUP_DAYS = 365
 PUBLISH_REQUEST_TYPES = ["publish_draft", "publish_new_version"]
 
 NOTIFICATIONS_ENTITY_RESOLVERS = [
-    UserResolver(),
-    GroupResolver(),
+    UserNotificationResolver(),
     ServiceResultResolver(service_id="requests", type_key="request"),
     ServiceResultResolver(service_id="request_events", type_key="request_event"),
 ]
