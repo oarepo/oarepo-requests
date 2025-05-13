@@ -299,6 +299,14 @@ class RequestsWithAnotherTopicUpdatingRequestType(DefaultRequests):
         recipients=[UserGenerator(2)],
     )
 
+
+class RequestsWithSystemIdentity(WorkflowRequestPolicy):
+    publish_draft = WorkflowRequest(
+        requesters=[AnyUser()],
+        recipients=[UserGenerator("system")],
+    )
+
+
 class GenericTestableRequestType(NonDuplicableOARepoRequestType):
     type_id = "generic"
     name = _("Generic")
@@ -312,6 +320,7 @@ class GenericTestableRequestType(NonDuplicableOARepoRequestType):
     description = _("Generic request that doesn't do anything")
     receiver_can_be_none = False
     allowed_topic_ref_types = ModelRefTypes(published=True, draft=True)
+
 
 class ApproveRequestType(NonDuplicableOARepoRequestType):
     type_id = "approve_draft"
@@ -415,6 +424,11 @@ WORKFLOWS = {
         label=_("Workflow with multiple recipient to test escalation of the request"),
         permission_policy_cls=TestWorkflowPermissions,
         request_policy_cls=RequestWithMultipleRecipients,
+    ),
+    "system_identity": Workflow(
+        label=_("Workflow with system identity"),
+        permission_policy_cls=TestWorkflowPermissions,
+        request_policy_cls=RequestsWithSystemIdentity,
     ),
 }
 

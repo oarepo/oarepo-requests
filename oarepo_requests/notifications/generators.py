@@ -8,6 +8,7 @@ from invenio_notifications.models import Recipient
 from invenio_notifications.services.generators import RecipientGenerator
 from invenio_records.dictutils import dict_lookup
 from invenio_requests.proxies import current_requests
+from invenio_requests.records.api import Request
 
 from oarepo_requests.proxies import current_notification_recipients_resolvers_registry
 
@@ -29,30 +30,34 @@ class EntityRecipient(RecipientGenerator):
         """"""
         backend_ids = notification.context["backend_ids"]
         entity_ref_or_entity = dict_lookup(notification.context, self.key)
-        if len(entity_ref_or_entity) == 1:
-            # it is entity reference
-            entity_type = list(entity_ref_or_entity.keys())[0]
-        else:
-            # it is a resolved entity converted to a string - we have just a dictionary
-            # The entity has been resolved for example when resolving created_by in
-            # oarepo_requests/notifications/builders/oarepo.py - and we want to have
-            # the resolver there as we want to use the identity of the user inside
-            # the notification email.
-            #
-            # TODO: this is a nasty hack that should be done better
-            if "email" in entity_ref_or_entity:
-                # ok, looks like a user
-                entity_ref_or_entity = {"user": entity_ref_or_entity["id"]}
-                entity_type = "user"
-            else:
-                raise NotImplementedError(
-                    f"Entity {entity_ref_or_entity} is not supported"
-                )
+
+        if len(entity_ref_or_entity) != 1:
+            # a hack - we need to have the original entity reference, not the resolved one
+            entity_ref_or_entity = self._get_unresolved_entity_from_resolved(
+                notification.context, self.key
+            )
+        if not entity_ref_or_entity:
+            return
+
+        entity_type = list(entity_ref_or_entity.keys())[0]
+
         for backend_id in backend_ids:
             generator = current_notification_recipients_resolvers_registry[entity_type][
                 backend_id
             ](entity_ref_or_entity)
             generator(notification, recipients)
+
+    def _get_unresolved_entity_from_resolved(self, context, key):
+        """Get the unresolved entity from the resolved one."""
+        match key.split(".", maxsplit=1):
+            case "request", field:
+                req = Request.get_record(context["request"]["id"])
+                field_value = getattr(req, field)
+                if field_value is not None:
+                    return field_value.reference_dict
+                return None
+            case _:
+                raise NotImplementedError(f"Can not resolve entity from key: {key}")
 
 
 class SpecificEntityRecipient(RecipientGenerator):
@@ -85,7 +90,13 @@ class UserEmailRecipient(SpecificEntityRecipient):
     """User email recipient generator for a notification."""
 
     def _get_recipients(self, entity: Any) -> dict[str, Recipient]:
-        return {entity.email: Recipient(data={"email": entity.email})}
+        """Get user email of the entity."""
+        # might be a system identity or a ghost user
+        email = getattr(entity, "email", None)
+        if email:
+            return {email: Recipient(data={"email": email})}
+        else:
+            return {}
 
 
 class GroupEmailRecipient(SpecificEntityRecipient):
@@ -95,6 +106,7 @@ class GroupEmailRecipient(SpecificEntityRecipient):
         return {
             user.email: Recipient(data={"email": user.email})
             for user in entity.users.all()
+            if getattr(user, "email", None)
         }
 
 

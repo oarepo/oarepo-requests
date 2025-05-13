@@ -9,9 +9,9 @@
 
 from __future__ import annotations
 
-from invenio_records_resources.references.entity_resolvers import ServiceResultResolver
 import invenio_requests.config
 import oarepo_workflows  # noqa
+from invenio_records_resources.references.entity_resolvers import ServiceResultResolver
 from invenio_requests.customizations import CommentEventType, LogEventType
 from invenio_requests.services.permissions import (
     PermissionPolicy as InvenioRequestsPermissionPolicy,
@@ -25,7 +25,8 @@ from oarepo_requests.actions.components import (
 )
 from oarepo_requests.notifications.generators import (
     GroupEmailRecipient,
-    UserEmailRecipient, MultipleRecipientsEmailRecipients,
+    MultipleRecipientsEmailRecipients,
+    UserEmailRecipient,
 )
 from oarepo_requests.resolvers.ui import (
     AutoApproveUIEntityResolver,
@@ -33,15 +34,18 @@ from oarepo_requests.resolvers.ui import (
     GroupEntityReferenceUIResolver,
     UserEntityReferenceUIResolver,
 )
+from oarepo_requests.resolvers.user_notification_resolver import (
+    UserNotificationResolver,
+)
 from oarepo_requests.types import (
     DeletePublishedRecordRequestType,
     EditPublishedRecordRequestType,
     PublishDraftRequestType,
 )
 from oarepo_requests.types.events import TopicDeleteEventType
+from oarepo_requests.types.events.escalation import EscalationEventType
 from oarepo_requests.types.events.record_snapshot import RecordSnapshotEventType
 from oarepo_requests.types.events.topic_update import TopicUpdateEventType
-from oarepo_requests.types.events.escalation import EscalationEventType
 
 REQUESTS_REGISTERED_TYPES = [
     DeletePublishedRecordRequestType(),
@@ -53,7 +57,7 @@ REQUESTS_REGISTERED_EVENT_TYPES = [
     TopicUpdateEventType(),
     TopicDeleteEventType(),
     EscalationEventType(),
-    RecordSnapshotEventType()
+    RecordSnapshotEventType(),
 ] + invenio_requests.config.REQUESTS_REGISTERED_EVENT_TYPES
 
 REQUESTS_ALLOWED_RECEIVERS = ["user", "group", "auto_approve"]
@@ -68,12 +72,12 @@ DEFAULT_WORKFLOW_EVENTS = {
     TopicUpdateEventType.type_id: WorkflowEvent(
         submitters=InvenioRequestsPermissionPolicy.can_create_comment
     ),
-    EscalationEventType.type_id : WorkflowEvent(
+    EscalationEventType.type_id: WorkflowEvent(
         submitters=InvenioRequestsPermissionPolicy.can_create_comment
     ),
     RecordSnapshotEventType.type_id: WorkflowEvent(
         submitters=InvenioRequestsPermissionPolicy.can_create_comment
-    )
+    ),
 }
 
 
@@ -94,7 +98,7 @@ REQUESTS_ACTION_COMPONENTS = {
         RequestIdentityComponent,
     ],
     "submitted": [
-        AutoAcceptComponent, # AutoAcceptComponent must always be first, so that auto accept is called as the last step in action handling
+        AutoAcceptComponent,  # AutoAcceptComponent must always be first, so that auto accept is called as the last step in action handling
         *workflow_action_components,
         RequestIdentityComponent,
     ],
@@ -120,10 +124,10 @@ NOTIFICATION_RECIPIENTS_RESOLVERS = {
 
 SNAPSHOT_CLEANUP_DAYS = 365
 
-PUBLISH_REQUEST_TYPES = ['publish_draft', 'publish_new_version']
+PUBLISH_REQUEST_TYPES = ["publish_draft", "publish_new_version"]
 
 NOTIFICATIONS_ENTITY_RESOLVERS = [
-        ServiceResultResolver(service_id="users", type_key="user"),
-        ServiceResultResolver(service_id="requests", type_key="request"),
-        ServiceResultResolver(service_id="request_events", type_key="request_event")
+    UserNotificationResolver(),
+    ServiceResultResolver(service_id="requests", type_key="request"),
+    ServiceResultResolver(service_id="request_events", type_key="request_event"),
 ]
