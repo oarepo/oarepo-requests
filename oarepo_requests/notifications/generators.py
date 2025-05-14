@@ -42,10 +42,12 @@ class EntityRecipient(RecipientGenerator):
         entity_type = list(entity_ref_or_entity.keys())[0]
 
         for backend_id in backend_ids:
-            generator = current_notification_recipients_resolvers_registry[entity_type][
-                backend_id
-            ](entity_ref_or_entity)
-            generator(notification, recipients)
+            generator_cls = current_notification_recipients_resolvers_registry.get(
+                entity_type, {}
+            ).get(backend_id)
+            if generator_cls:
+                generator = generator_cls(entity_ref_or_entity)
+                generator(notification, recipients)
 
     def _get_unresolved_entity_from_resolved(self, context, key):
         """Get the unresolved entity from the resolved one."""
