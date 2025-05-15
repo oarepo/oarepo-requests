@@ -9,6 +9,7 @@ import {
 } from "@js/oarepo_requests_common";
 import PropTypes from "prop-types";
 import { useIsMutating } from "@tanstack/react-query";
+import { useCallbackContext } from "../contexts";
 
 /**
  * @typedef {import("../../record-requests/types").Request} Request
@@ -27,6 +28,7 @@ export const RequestModal = ({
   requestCreationModal,
 }) => {
   const { isOpen, close: closeModal, open: openModal } = useConfirmationModal();
+  const { setActionsLocked } = useCallbackContext();
 
   const formik = useFormik({
     initialValues: !_isEmpty(request?.payload)
@@ -41,6 +43,7 @@ export const RequestModal = ({
     setErrors({});
     resetForm();
     closeModal();
+    setActionsLocked(false);
   };
   return (
     <FormikProvider value={formik}>

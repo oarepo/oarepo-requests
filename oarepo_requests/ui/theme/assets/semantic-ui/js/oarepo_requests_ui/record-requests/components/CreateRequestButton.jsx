@@ -3,6 +3,7 @@ import { Button } from "semantic-ui-react";
 import { RequestModal, CreateRequestModalContent } from ".";
 import { DirectCreateAndSubmit } from "@js/oarepo_requests_common";
 import PropTypes from "prop-types";
+import { useCallbackContext } from "../../common";
 
 export const CreateRequestButton = ({
   requestType,
@@ -10,6 +11,7 @@ export const CreateRequestButton = ({
   buttonIconProps,
   header,
 }) => {
+  const { actionsLocked, setActionsLocked } = useCallbackContext();
   const { dangerous, has_form: hasForm } = requestType;
   const needsDialog = dangerous || hasForm;
 
@@ -35,7 +37,8 @@ export const CreateRequestButton = ({
             fluid
             title={header}
             content={header}
-            disabled={isMutating > 0}
+            onClick={() => setActionsLocked(true)}
+            disabled={actionsLocked || isMutating > 0}
             labelPosition="left"
             {...buttonIconProps}
           />
