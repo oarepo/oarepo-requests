@@ -26,6 +26,7 @@ from ..actions.new_version import NewVersionAcceptAction
 from ..utils import classproperty, is_auto_approved, request_identity_matches
 from .generic import NonDuplicableOARepoRequestType
 from .ref_types import ModelRefTypes
+from invenio_pidstore.errors import PIDDoesNotExistError
 
 if TYPE_CHECKING:
     from flask_babel.speaklater import LazyString
@@ -65,7 +66,7 @@ class NewVersionRequestType(NonDuplicableOARepoRequestType):
                 result_item = service.read_draft(
                     ctx["identity"], request["payload"]["draft_record:id"]
                 )
-            except (PermissionDeniedError, DraftNotCreatedError):
+            except (PermissionDeniedError, DraftNotCreatedError, PIDDoesNotExistError):
                 return None
 
             if "edit_html" in result_item["links"]:
