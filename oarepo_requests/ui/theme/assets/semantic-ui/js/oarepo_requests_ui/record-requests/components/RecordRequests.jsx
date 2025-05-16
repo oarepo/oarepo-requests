@@ -50,7 +50,7 @@ const RecordRequests = ({
   actionExtraContext,
 }) => {
   const queryClient = useQueryClient();
-
+  const [actionsLocked, setActionsLocked] = React.useState(false);
   const {
     data: requestTypes,
     error: applicableRequestsLoadingError,
@@ -97,6 +97,8 @@ const RecordRequests = ({
           onErrorPlugins,
           fetchNewRequests,
           actionExtraContext,
+          actionsLocked,
+          setActionsLocked,
         }}
       >
         {initialRecord?.id && (
