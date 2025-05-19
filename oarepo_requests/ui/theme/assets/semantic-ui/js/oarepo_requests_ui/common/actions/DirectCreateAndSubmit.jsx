@@ -74,7 +74,7 @@ const DirectCreateAndSubmit = ({
         {...buttonIconProps}
       />
       {isError && (
-        <Message negative>
+        <Message negative className="rel-mb-1">
           <Message.Header>
             {(error?.response?.data?.errors?.length > 0 &&
               error.directSubmitMessage) ||

@@ -1,4 +1,4 @@
-import React, { useCallback } from "react";
+import React, { useCallback, useEffect } from "react";
 import PropTypes from "prop-types";
 import { CreateRequestButtonGroup, RequestListContainer } from ".";
 import {
@@ -78,6 +78,18 @@ const RecordRequests = ({
     queryClient.invalidateQueries(["applicableRequestTypes"]);
     queryClient.invalidateQueries(["requests"]);
   }, [queryClient]);
+
+  useEffect(() => {
+    const handleBeforeUnload = () => {
+      setActionsLocked(false);
+    };
+
+    window.addEventListener("unload", handleBeforeUnload);
+
+    return () => {
+      window.removeEventListener("unload", handleBeforeUnload);
+    };
+  }, [setActionsLocked]);
   return (
     <RequestContextProvider
       value={{
