@@ -4,6 +4,7 @@ import { Button } from "semantic-ui-react";
 import { RequestModal, RequestModalContent } from ".";
 import { useRequestContext } from "@js/oarepo_requests_common";
 import { useIsMutating } from "@tanstack/react-query";
+import { useCallbackContext } from "../../common";
 
 /**
  * @typedef {import("../types").Request} Request
@@ -13,6 +14,7 @@ import { useIsMutating } from "@tanstack/react-query";
  * @param {{ requests: Request[] }} props
  */
 export const RequestList = ({ requests }) => {
+  const { actionsLocked, setActionsLocked } = useCallbackContext();
   const { requestButtonsIconsConfig } = useRequestContext();
   const isMutating = useIsMutating();
   return requests.map((request) => {
@@ -33,7 +35,8 @@ export const RequestList = ({ requests }) => {
             fluid
             title={header}
             content={header}
-            disabled={isMutating > 0}
+            onClick={() => setActionsLocked(true)}
+            disabled={actionsLocked || isMutating > 0}
             labelPosition="left"
             {...buttonIconProps}
           />

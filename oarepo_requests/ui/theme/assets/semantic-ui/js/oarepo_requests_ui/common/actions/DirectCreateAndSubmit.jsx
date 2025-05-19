@@ -10,6 +10,7 @@ import {
 } from "@js/oarepo_requests_common";
 import { useConfirmationModal } from "@js/oarepo_ui";
 import { i18next } from "@translations/oarepo_requests_ui/i18next";
+import { useCallbackContext } from "../contexts";
 
 // Directly create and submit request without modal
 const DirectCreateAndSubmit = ({
@@ -18,6 +19,7 @@ const DirectCreateAndSubmit = ({
   isMutating,
 }) => {
   const { isOpen, close, open } = useConfirmationModal();
+  const { actionsLocked, setActionsLocked } = useCallbackContext();
 
   const {
     isLoading,
@@ -37,6 +39,7 @@ const DirectCreateAndSubmit = ({
     requestType?.stateful_name || requestType?.name || requestType?.type_id;
 
   const handleClick = () => {
+    setActionsLocked(true);
     if (requireConfirmation) {
       open();
     } else {
@@ -49,6 +52,7 @@ const DirectCreateAndSubmit = ({
       timeoutId = setTimeout(() => {
         reset();
       }, 2500);
+      setActionsLocked(false);
     }
     return () => {
       clearTimeout(timeoutId);
@@ -64,13 +68,13 @@ const DirectCreateAndSubmit = ({
         title={buttonContent}
         content={buttonContent}
         loading={isLoading}
-        disabled={isMutating > 0}
+        disabled={actionsLocked || isMutating > 0}
         onClick={() => handleClick()}
         labelPosition="left"
         {...buttonIconProps}
       />
       {isError && (
-        <Message negative>
+        <Message negative className="rel-mb-1">
           <Message.Header>
             {(error?.response?.data?.errors?.length > 0 &&
               error.directSubmitMessage) ||

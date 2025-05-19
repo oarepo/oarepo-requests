@@ -17,11 +17,9 @@
   &.request-reply-button {
     display: block;
     margin-bottom: 10px;
-    &.publish_draft {
-      color: white;
-      background-color: @green;
-    }
-    &.publish_new_version {
+    &.publish_draft,
+    &.publish_new_version,
+    &.publish_changed_metadata {
       color: white;
       background-color: @green;
     }
