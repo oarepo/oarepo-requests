@@ -1,22 +1,21 @@
 import React from "react";
-import Overridable from "react-overridable";
+import Overridable, { overrideStore } from "react-overridable";
 import PropTypes from "prop-types";
-import { GenericActionEvent } from "./GenericActionEvent";
 
-export const TimelineEvent = ({ event, requestId, page }) => (
-  <Overridable
-    id={`OarepoRequests.TimelineEvent.${event.type}`}
-    event={event}
-    requestId={requestId}
-    page={page}
-  >
-    <GenericActionEvent
+export const TimelineEvent = ({ event, requestId, page }) => {
+  const overridableId = `OarepoRequests.TimelineEvent.${event.type}`;
+  if (!(overridableId in overrideStore.getAll())) {
+    console.warn(`No UI component for event type ${event.type}`);
+  }
+  return (
+    <Overridable
+      id={overridableId}
       event={event}
-      eventIcon={{ name: "info" }}
-      feedMessage={`No UI component for event type ${event.type}`}
-    />
-  </Overridable>
-);
+      requestId={requestId}
+      page={page}
+    ></Overridable>
+  );
+};
 
 TimelineEvent.propTypes = {
   event: PropTypes.object.isRequired,
