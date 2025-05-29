@@ -26,6 +26,7 @@ from oarepo_runtime.i18n import gettext as _
 
 from ..proxies import current_oarepo_requests
 from ..utils import get_matching_service_for_refdict
+from invenio_rdm_records.services.errors import RecordDeletedException
 
 if TYPE_CHECKING:
     from flask_babel.speaklater import LazyString
@@ -407,7 +408,10 @@ class RecordEntityReferenceUIResolver(OARepoUIResolver):
             raise ValueError(
                 f"No service found for handling reference type {self.reference_type}"
             )
-        return service.read(identity, _id, include_deleted=True).data
+        try:
+            return service.read(identity, _id, include_deleted=True).data
+        except RecordDeletedException as e:
+            return e.record
 
     @override
     def _get_entity_ui_representation(
