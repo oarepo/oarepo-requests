@@ -1,16 +1,14 @@
 {% set access_request = notification.context.request %}
 {% set topic = notification.context.request.topic %}
-{% set topic_id = request.topic.id %}
-{% set topic_title = topic.get("metadata", {}).get("title", topic_id) %}
 {% set request_html_page = notification.context.request.links.self_html %}
 {% set topic_title = notification.context.request.topic.get("metadata", {}).get("title", topic.id) %}
 
 {%- block subject -%}
-    {{ _("❗️ Published record '{topic_title}' has been deleted").format(topic_title=topic_title) }}
+    {{ _("❗️ Published record has been deleted") }}
 {%- endblock subject -%}
 
 {%- block html_body -%}
-    {{ _("The published record '{topic_title}' has been deleted.") }}
+    {{ _("The published record has been deleted.") }}
     {{ _("For more information head to the <a href='%(link)s'>request page</a>.", link=request_html_page)}}
     <table style="font-family:'Lato',Helvetica,Arial,sans-serif;border-spacing:15px">
         <tr>
@@ -20,7 +18,7 @@
 {%- endblock html_body -%}
 
 {%- block plain_body -%}
-{{ _("The published record '{topic_title}' has been deleted.") }}
+{{ _("The published record has been deleted.") }}
 {{ _("For more information head to the %(link)s", link=request_html_page)}} 
 
 {{ _("This is an auto-generated message. To manage notifications, visit your account settings") }}.
