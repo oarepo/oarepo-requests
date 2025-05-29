@@ -22,7 +22,11 @@ if TYPE_CHECKING:
     from flask_principal import Identity
     from invenio_drafts_resources.records import Record
     from invenio_requests.records.api import Request
-
+from oarepo_requests.typing import EntityReference
+from invenio_access.permissions import system_identity
+from oarepo_runtime.datastreams.utils import get_record_service_for_record
+from oarepo_requests.utils import get_requests_service_for_records_service
+from invenio_requests.errors import CannotExecuteActionError
 
 class PublishDraftRequestType(PublishRequestType):
     """Publish draft request type."""
@@ -124,3 +128,25 @@ class PublishDraftRequestType(PublishRequestType):
             cancelled=_("The draft has been cancelled. "),
             created=_("Waiting for finishing the draft publication request."),
         )
+
+    def can_create(
+            self,
+            identity: Identity,
+            data: dict,
+            receiver: EntityReference,
+            topic: Record,
+            creator: EntityReference,
+            *args: Any,
+            **kwargs: Any,
+    ) -> None:
+        """Check if the request can be created."""
+        topic_service = get_record_service_for_record(topic)
+
+        request_service = get_requests_service_for_records_service(topic_service)
+        requests = request_service.search_requests_for_draft(system_identity,  topic.pid.pid_value)
+
+        for result in requests._results:
+            if result.is_open:
+                raise CannotExecuteActionError(str(self.name), reason=_("All open requests need to be closed."))
+        super().can_create(identity, data, receiver, topic, creator, *args, **kwargs)
+
