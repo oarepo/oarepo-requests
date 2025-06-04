@@ -35,8 +35,16 @@ def test_cascade_update(
     publish_request_create = submit_request_on_draft(
         creator.identity, draft1_id, "publish_draft"
     )
-    another_request_create = create_request_on_draft(
+    another_request_create = submit_request_on_draft(
         creator.identity, draft1_id, "another_topic_updating"
+    )
+    record = receiver_client.get(
+        f"{urls['BASE_URL']}{draft1_id}/draft?expand=true"
+    ).json
+    accept_another_request = receiver_client.post(
+        link2testclient(
+            record["expanded"]["requests"][0]["links"]["actions"]["accept"]
+        ),
     )
     publish_request_on_second_draft = create_request_on_draft(
         creator.identity, draft2_id, "publish_draft"
@@ -47,12 +55,12 @@ def test_cascade_update(
     ).json
     publish = receiver_client.post(
         link2testclient(
-            record["expanded"]["requests"][0]["links"]["actions"]["accept"]
+            record["expanded"]["requests"][1]["links"]["actions"]["accept"]
         ),
     )
 
     check_publish_topic_update(creator_client, urls, record, publish_request_create)
-    check_publish_topic_update(creator_client, urls, record, another_request_create)
+    check_publish_topic_update(creator_client, urls, draft1, another_request_create)
 
     second_draft_request = creator_client.get(
         f"{urls['BASE_URL_REQUESTS']}{publish_request_on_second_draft['id']}"

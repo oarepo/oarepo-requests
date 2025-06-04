@@ -8,6 +8,7 @@
 import pytest
 
 from oarepo_requests.errors import OpenRequestAlreadyExists
+from invenio_requests.errors import CannotExecuteActionError
 
 
 def test_can_create(
@@ -34,7 +35,7 @@ def test_can_create(
         f"{urls['BASE_URL']}{draft1_id}/draft/requests/publish_draft"
     ).json
 
-    with pytest.raises(OpenRequestAlreadyExists):
+    with pytest.raises(CannotExecuteActionError):
         creator_client.post(  # create request after create
             f"{urls['BASE_URL']}{draft1_id}/draft/requests/publish_draft"
         )
@@ -43,7 +44,7 @@ def test_can_create(
         link2testclient(resp_request_create["links"]["actions"]["submit"]),
     )
 
-    with pytest.raises(OpenRequestAlreadyExists):
+    with pytest.raises(CannotExecuteActionError):
         creator_client.post(  # create request after submit
             f"{urls['BASE_URL']}{draft1_id}/draft/requests/publish_draft"
         )
@@ -59,7 +60,7 @@ def test_can_create(
         link2testclient(create_for_request_draft2.json["links"]["actions"]["submit"]),
     )
 
-    with pytest.raises(OpenRequestAlreadyExists):
+    with pytest.raises(CannotExecuteActionError):
         create_for_request_draft2 = creator_client.post(
             f"{urls['BASE_URL']}{draft2_id}/draft/requests/publish_draft"
         )

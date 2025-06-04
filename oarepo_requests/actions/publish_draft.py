@@ -32,6 +32,7 @@ from .generic import (
     OARepoSubmitAction,
 )
 from .record_snapshot_mixin import RecordSnapshotMixin
+from invenio_requests.records.api import Request
 
 if TYPE_CHECKING:
     from flask_principal import Identity
@@ -117,7 +118,8 @@ class PublishDraftAcceptAction(
 
         for result in requests._results:
             if result.type != "publish_draft" and result.is_open:
-                raise CannotExecuteActionError(str(self.name), reason=_("All open requests need to be closed."))
+                if Request.get_record(result.uuid)["status"] in ("submitted", "created"):
+                    raise CannotExecuteActionError(str(self.name), reason=_("All open requests need to be closed."))
         id_ = state.topic["id"]
 
         published_topic = topic_service.publish(

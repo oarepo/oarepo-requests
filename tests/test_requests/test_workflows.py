@@ -143,7 +143,7 @@ def test_autorequest(
     creator_client = logged_client(creator)
     receiver_client = logged_client(receiver)
 
-    draft1 = draft_factory(creator.identity, custom_workflow="with_approve")
+    draft1 = draft_factory(creator.identity, custom_workflow="with_approve_without_generic")
 
     record_id = draft1["id"]
 
@@ -331,7 +331,7 @@ def test_workflow_events(
     user1_client = logged_client(user1)
     user2_client = logged_client(user2)
 
-    draft1 = draft_factory(user1.identity, custom_workflow="with_approve")
+    draft1 = draft_factory(user1.identity, custom_workflow="with_approve_without_generic")
     record_id = draft1["id"]
 
     resp_request_submit = submit_request_on_draft(
@@ -373,6 +373,7 @@ def test_workflow_events(
     read_from_record = user2_client.get(
         f"{urls['BASE_URL']}{record_id}/draft?expand=true",
     )
+
     publish_request = [
         request
         for request in read_from_record.json["expanded"]["requests"]
@@ -417,7 +418,7 @@ def test_workflow_events_resource(
     user1_client = logged_client(user1)
     user2_client = logged_client(user2)
 
-    draft1 = draft_factory(user1.identity, custom_workflow="with_approve")
+    draft1 = draft_factory(user1.identity, custom_workflow="with_approve_without_generic")
     record_id = draft1["id"]
 
     resp_request_submit = submit_request_on_draft(
