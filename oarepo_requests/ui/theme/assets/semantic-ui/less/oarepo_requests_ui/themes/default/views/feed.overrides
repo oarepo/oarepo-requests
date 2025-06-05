@@ -43,6 +43,11 @@
             @commentEventBorderWidth
         );
       }
+      .extra {
+        margin-left: calc(
+          @verticalLineLeftMargin + @actionEventIconSize / 2
+        );
+      }
     }
     .requests.action-event-icon {
       font-size: @actionEventIconSize;

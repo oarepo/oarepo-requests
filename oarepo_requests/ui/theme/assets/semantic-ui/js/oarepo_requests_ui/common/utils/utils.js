@@ -43,6 +43,8 @@ export const getRequestStatusIcon = (requestStatus) => {
       return { name: "thrash", color: "black" };
     case "comment_deleted":
       return { name: "eraser", color: "grey" };
+    case "edited":
+      return { name: "pencil", color: "grey" };
     default:
       return null;
   }
@@ -66,6 +68,8 @@ export const getFeedMessage = (eventStatus) => {
       return i18next.t("requestDeleted");
     case "comment_deleted":
       return i18next.t("deleted comment");
+    case "edited":
+      return i18next.t("requestEdited");
     default:
       return i18next.t("requestCommented");
   }
