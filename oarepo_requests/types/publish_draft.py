@@ -148,6 +148,8 @@ class PublishDraftRequestType(PublishRequestType):
 
         for result in requests._results:
             if result.is_open and result.type != "approve_draft":
+                # note: we can not use solely the result.is_open because changes may not be committed yet
+                # to opensearch index. That's why we need to get the record from DB and re-check.
                 if Request.get_record(result.uuid)["status"] in ("submitted", "created"):
                     raise CannotExecuteActionError(str(self.name), reason=_("All open requests need to be closed."))
         super().can_create(identity, data, receiver, topic, creator, *args, **kwargs)
