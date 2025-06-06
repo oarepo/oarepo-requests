@@ -233,6 +233,47 @@ class RequestsWithDifferentRecipients(DefaultRequests):
         transitions=WorkflowTransitions(),
     )
 
+class RequestsWithApproveWithoutGeneric(WorkflowRequestPolicy):
+    publish_draft = WorkflowRequest(
+        requesters=[IfInState("approved", [AutoRequest()])],
+        recipients=[UserGenerator(1)],
+        transitions=WorkflowTransitions(
+            submitted="publishing",
+            accepted="published",
+            declined="approved",
+            cancelled="approved",
+        ),
+        events=events_only_receiver_can_comment,
+    )
+
+    approve_draft = WorkflowRequest(
+        requesters=[IfInState("draft", [RecordOwners()])],
+        recipients=[UserGenerator(2)],
+        transitions=WorkflowTransitions(
+            submitted="approving",
+            accepted="approved",
+            declined="draft",
+            cancelled="draft",
+        ),
+        events=events_only_receiver_can_comment,
+    )
+    delete_published_record = WorkflowRequest(
+        requesters=[IfInState("published", [RecordOwners()])],
+        recipients=[UserGenerator(2)],
+        transitions=WorkflowTransitions(
+            submitted="deleting",
+            accepted="deleted",
+            declined="published",
+            cancelled="published",
+        ),
+        events=events_only_receiver_can_comment,
+    )
+    edit_published_record = WorkflowRequest(
+        requesters=[IfInState("published", [RecordOwners()])],
+        recipients=[AutoApprove()],
+        transitions=WorkflowTransitions(),
+        events=events_only_receiver_can_comment,
+    )
 
 class RequestsWithApprove(WorkflowRequestPolicy):
     publish_draft = WorkflowRequest(
@@ -402,6 +443,11 @@ WORKFLOWS = {
         label=_("Workflow with approval process"),
         permission_policy_cls=WithApprovalPermissions,
         request_policy_cls=RequestsWithApprove,
+    ),
+    "with_approve_without_generic": Workflow(
+        label=_("Workflow with approval process"),
+        permission_policy_cls=WithApprovalPermissions,
+        request_policy_cls=RequestsWithApproveWithoutGeneric,
     ),
     "with_ct": Workflow(
         label=_("Workflow with approval process"),
