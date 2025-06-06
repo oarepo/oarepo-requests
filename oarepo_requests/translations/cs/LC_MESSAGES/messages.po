@@ -1312,3 +1312,19 @@ msgstr "Čeká se na vyřízení žádosti o publikaci nové verze."
 
 msgid "escalated"
 msgstr "eskaloval(a)"
+
+#: /home/dusanst/Projects/oarepo-requests/oarepo_requests/actions/publish_draft.py:85
+msgid "This version tag already exists"
+msgstr ""
+
+#: /home/dusanst/Projects/oarepo-requests/oarepo_requests/actions/publish_draft.py:124
+#: /home/dusanst/Projects/oarepo-requests/oarepo_requests/types/publish_draft.py:154
+msgid "All open requests need to be closed."
+msgstr ""
+
+msgid ""
+"Record has validation errors. Please click the 'Edit metadata' button and "
+"then make the request ({{requestType}}) again."
+msgstr ""
+"Záznam obsahuje chyby validace. Klikněte na tlačítko 'Upravit metadata' a "
+"poté proveďte požadavek ({{requestType}}) znovu."
