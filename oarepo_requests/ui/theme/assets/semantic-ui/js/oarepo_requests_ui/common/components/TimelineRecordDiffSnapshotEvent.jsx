@@ -1,8 +1,10 @@
 import React from "react";
 import PropTypes from "prop-types";
-import { Icon, Feed, Table, Label } from "semantic-ui-react";
+import { Icon, Feed, Table, Label, Message } from "semantic-ui-react";
 import { i18next } from "@translations/oarepo_requests_ui/i18next";
 import { toRelativeTime, Image } from "react-invenio-forms";
+import _isArray from "lodash/isArray";
+import _isObjectLike from "lodash/isObject";
 import {
   getRequestStatusIcon,
   getFeedMessage,
@@ -23,7 +25,7 @@ export const TimelineRecordDiffSnapshotEvent = ({ event }) => {
     try {
       const diffOperations = JSON.parse(event.payload.diff);
 
-      if (!Array.isArray(diffOperations)) {
+      if (!_isArray(diffOperations)) {
         return null;
       }
 
@@ -32,7 +34,7 @@ export const TimelineRecordDiffSnapshotEvent = ({ event }) => {
         return (
           <div>
             <Icon name="info circle" />
-            No changes detected between versions
+            {i18next.t("No changes detected between versions")}
           </div>
         );
       }
@@ -48,34 +50,42 @@ export const TimelineRecordDiffSnapshotEvent = ({ event }) => {
       }, {});
 
       return (
-        <Table basic collapsing celled className="borderless">
+        <Table basic collapsing celled className="requests record-diff-table">
           <Table.Header>
             <Table.Row>
-              <Table.HeaderCell width={3}>Field</Table.HeaderCell>
-              <Table.HeaderCell width={2}>Operation</Table.HeaderCell>
-              <Table.HeaderCell width={5}>Old Value</Table.HeaderCell>
-              <Table.HeaderCell width={5}>New Value</Table.HeaderCell>
+              <Table.HeaderCell width={3}>{i18next.t("Field")}</Table.HeaderCell>
+              <Table.HeaderCell width={2}>{i18next.t("Operation")}</Table.HeaderCell>
+              <Table.HeaderCell width={5}>{i18next.t("Old Value")}</Table.HeaderCell>
+              <Table.HeaderCell width={5}>{i18next.t("New Value")}</Table.HeaderCell>
             </Table.Row>
           </Table.Header>
           <Table.Body>
             {Object.entries(groupedOperations).map(([basePath, operations]) =>
               operations.map((op, index) => {
-                const fieldPath = op.path
+                // Convert 0-based array indices to 1-based for human readability
+                const humanReadablePath = op.path
                   .replace(/^\//, "")
+                  .replace(/\/(\d+)\//g, (match, arrayIndex) => {
+                    return `/${parseInt(arrayIndex) + 1}/`;
+                  })
+                  .replace(/\/(\d+)$/, (match, arrayIndex) => {
+                    return `/${parseInt(arrayIndex) + 1}`;
+                  })
                   .replace(/\//g, " › ");
-                const operationType = op.op;
+                
+                const operationType = op.op.toLowerCase();
 
                 // Format values for display
                 const formatValue = (value) => {
                   if (value === null || value === undefined) return "—";
-                  if (Array.isArray(value)) return value.join(", ");
-                  if (typeof value === "object")
+                  if (_isArray(value)) return value.join(", ");
+                  if (_isObjectLike(value))
                     return JSON.stringify(value, null, 2);
                   return String(value);
                 };
 
                 const getOperationColor = (operation) => {
-                  switch (operation) {
+                  switch (operation.toLowerCase()) {
                     case "add":
                       return "green";
                     case "remove":
@@ -90,42 +100,30 @@ export const TimelineRecordDiffSnapshotEvent = ({ event }) => {
                 return (
                   <Table.Row key={`${basePath}-${index}`}>
                     <Table.Cell>
-                      <code>{fieldPath}</code>
+                      <code>{humanReadablePath}</code>
                     </Table.Cell>
                     <Table.Cell>
                       <Label
                         color={getOperationColor(operationType)}
                         size="small"
                       >
-                        {operationType.toUpperCase()}
+                        {i18next.t(operationType).toUpperCase()}
                       </Label>
                     </Table.Cell>
                     <Table.Cell>
                       {operationType === "add" ? (
-                        <em style={{ color: "#999" }}>None</em>
+                        <em>{i18next.t("None")}</em>
                       ) : (
-                        <pre
-                          style={{
-                            margin: 0,
-                            whiteSpace: "pre-wrap",
-                            fontSize: "0.9em",
-                          }}
-                        >
+                        <pre>
                           {formatValue(op.old_value)}
                         </pre>
                       )}
                     </Table.Cell>
                     <Table.Cell>
                       {operationType === "remove" ? (
-                        <em style={{ color: "#999" }}>Removed</em>
+                        <em>{i18next.t("Removed")}</em>
                       ) : (
-                        <pre
-                          style={{
-                            margin: 0,
-                            whiteSpace: "pre-wrap",
-                            fontSize: "0.9em",
-                          }}
-                        >
+                        <pre>
                           {formatValue(op.value)}
                         </pre>
                       )}
@@ -138,11 +136,14 @@ export const TimelineRecordDiffSnapshotEvent = ({ event }) => {
         </Table>
       );
     } catch (error) {
-      console.error("Error parsing diff data:", error);
       return (
-        <div style={{ color: "#999", fontStyle: "italic" }}>
-          Unable to parse diff data
-        </div>
+        <Message negative>
+          <Message.Header>
+            {i18next.t("Unable to parse diff data")}
+          </Message.Header>
+          <p>{i18next.t("There was an error processing the diff data.")}</p>
+          {error?.message && <pre>{error.message}</pre>}
+        </Message>
       );
     }
   };
