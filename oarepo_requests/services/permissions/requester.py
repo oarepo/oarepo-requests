@@ -63,7 +63,6 @@ def create_autorequests(identity: Identity,
                 )
             )
 
-
 @unit_of_work()
 def auto_request_state_change_notifier(
     identity: Identity,
@@ -79,5 +78,4 @@ def auto_request_state_change_notifier(
     take the needs from the generators of possible creators. If any of those
     needs is an auto_request_need, create a request for it automatically.
     """
-    assert uow is not None
     create_autorequests(identity, record, uow, **kwargs)
