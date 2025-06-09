@@ -1196,5 +1196,20 @@ msgstr ""
 msgid "escalated"
 msgstr ""
 
+#: /home/dusanst/Projects/oarepo-requests/oarepo_requests/errors.py:137
+msgid "There is already a record version with this version tag."
+msgstr ""
+
+#: /home/dusanst/Projects/oarepo-requests/oarepo_requests/errors.py:143
+msgid ""
+"There is already a record version with this version tag. Please use a "
+"different version tag."
+msgstr ""
+
+#: /home/dusanst/Projects/oarepo-requests/oarepo_requests/actions/publish_draft.py:132
+#: /home/dusanst/Projects/oarepo-requests/oarepo_requests/types/publish_draft.py:154
+msgid "All open requests need to be closed."
+msgstr ""
+
 #~ msgid "No status"
 #~ msgstr ""

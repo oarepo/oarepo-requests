@@ -1312,3 +1312,20 @@ msgstr "Čeká se na vyřízení žádosti o publikaci nové verze."
 
 msgid "escalated"
 msgstr "eskaloval(a)"
+
+#: /home/dusanst/Projects/oarepo-requests/oarepo_requests/errors.py:137
+msgid "There is already a record version with this version tag."
+msgstr "Verze záznamu s tímto štítkem verze již existuje."
+
+#: /home/dusanst/Projects/oarepo-requests/oarepo_requests/errors.py:143
+msgid ""
+"There is already a record version with this version tag. Please use a "
+"different version tag."
+msgstr ""
+"Verze záznamu s tímto štítkem verze již existuje. Použijte prosím jiný "
+"štítek verze."
+
+#: /home/dusanst/Projects/oarepo-requests/oarepo_requests/actions/publish_draft.py:132
+#: /home/dusanst/Projects/oarepo-requests/oarepo_requests/types/publish_draft.py:154
+msgid "All open requests need to be closed."
+msgstr "Všechny otevřené žádosti musí být uzavřeny."

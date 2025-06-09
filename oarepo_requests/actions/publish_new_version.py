@@ -17,9 +17,9 @@ from oarepo_runtime.i18n import lazy_gettext as _
 
 if TYPE_CHECKING:
     from flask_principal import Identity
-    from .components import RequestActionState
     from invenio_drafts_resources.records import Record
-    from invenio_requests.customizations import RequestType
+
+    from .components import RequestActionState
 
 from .publish_draft import PublishDraftAcceptAction
 
