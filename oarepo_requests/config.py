@@ -72,6 +72,9 @@ DEFAULT_WORKFLOW_EVENTS = {
     TopicUpdateEventType.type_id: WorkflowEvent(
         submitters=InvenioRequestsPermissionPolicy.can_create_comment
     ),
+    TopicDeleteEventType.type_id: WorkflowEvent(
+        submitters=InvenioRequestsPermissionPolicy.can_create_comment
+    ),
     EscalationEventType.type_id: WorkflowEvent(
         submitters=InvenioRequestsPermissionPolicy.can_create_comment
     ),
