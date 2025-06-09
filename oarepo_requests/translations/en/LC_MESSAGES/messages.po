@@ -1232,17 +1232,23 @@ msgstr ""
 msgid "There was an error processing the diff data."
 msgstr ""
 
-msgid "add"
+msgid "Add"
 msgstr ""
 
-msgid "remove"
+msgid "Remove"
 msgstr ""
 
-msgid "replace"
+msgid "Replace"
 msgstr ""
 
 msgid "requestEdited"
 msgstr "edited record"
+
+msgid "Unknown operation"
+msgstr ""
+
+msgid "View changes"
+msgstr ""
 
 #~ msgid "No status"
 #~ msgstr ""

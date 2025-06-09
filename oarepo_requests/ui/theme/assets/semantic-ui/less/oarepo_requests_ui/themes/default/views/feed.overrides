@@ -47,16 +47,22 @@
         margin-left: calc(
           @verticalLineLeftMargin + @actionEventIconSize / 1.5
         );
-
-        .requests.record-diff-table {
-          border: none;
+        .record-diff-table {
+          width: 100%;
+          border: none !important;
+          word-break: normal;
+          code {
+            padding: 0;
+            overflow-wrap: normal;
+          }
           em {
             color: #999;
           }
           pre {
             margin: 0;
-            white-space: "pre-wrap";
-            font-size: "0.9em";
+            font-size: 0.9em;
+            white-space: pre-wrap;
+            overflow-wrap: anywhere;
           }
         }
       }

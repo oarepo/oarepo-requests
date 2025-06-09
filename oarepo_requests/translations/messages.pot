@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2025-06-06 18:40+0200\n"
+"POT-Creation-Date: 2025-06-09 16:38+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -91,11 +91,11 @@ msgstr ""
 msgid "Return for correction"
 msgstr ""
 
-#: /home/martin/Projects/CESNET/OARepo/oarepo-requests/oarepo_requests/resolvers/ui.py:339
+#: /home/martin/Projects/CESNET/OARepo/oarepo-requests/oarepo_requests/resolvers/ui.py:340
 msgid "System user"
 msgstr ""
 
-#: /home/martin/Projects/CESNET/OARepo/oarepo-requests/oarepo_requests/resolvers/ui.py:614
+#: /home/martin/Projects/CESNET/OARepo/oarepo-requests/oarepo_requests/resolvers/ui.py:618
 msgid "Auto approve"
 msgstr ""
 
@@ -1012,16 +1012,28 @@ msgstr ""
 msgid "No changes detected between versions"
 msgstr ""
 
-msgid "Field"
+msgid "Operation"
 msgstr ""
 
-msgid "Operation"
+msgid "Field"
 msgstr ""
 
 msgid "Old Value"
 msgstr ""
 
 msgid "New Value"
+msgstr ""
+
+msgid "Add"
+msgstr ""
+
+msgid "Remove"
+msgstr ""
+
+msgid "Replace"
+msgstr ""
+
+msgid "Unknown operation"
 msgstr ""
 
 msgid "None"
@@ -1034,6 +1046,9 @@ msgid "Unable to parse diff data"
 msgstr ""
 
 msgid "There was an error processing the diff data."
+msgstr ""
+
+msgid "View changes"
 msgstr ""
 
 msgid ""

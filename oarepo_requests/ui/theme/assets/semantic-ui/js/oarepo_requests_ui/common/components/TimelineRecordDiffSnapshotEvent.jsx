@@ -1,16 +1,20 @@
-import React from "react";
+import React, { useState } from "react";
 import PropTypes from "prop-types";
-import { Icon, Feed, Table, Label, Message } from "semantic-ui-react";
+import { Icon, Feed, Table, Message, Accordion } from "semantic-ui-react";
 import { i18next } from "@translations/oarepo_requests_ui/i18next";
 import { toRelativeTime, Image } from "react-invenio-forms";
 import _isArray from "lodash/isArray";
 import _isObjectLike from "lodash/isObject";
+import _every from "lodash/every";
+import _isString from "lodash/isString";
 import {
   getRequestStatusIcon,
   getFeedMessage,
 } from "@js/oarepo_requests_common";
 
 export const TimelineRecordDiffSnapshotEvent = ({ event }) => {
+  const [accordionVisible, setAccordionVisible] = useState(false);
+
   const eventIcon = getRequestStatusIcon("edited");
   const feedMessage = getFeedMessage("edited");
 
@@ -50,13 +54,13 @@ export const TimelineRecordDiffSnapshotEvent = ({ event }) => {
       }, {});
 
       return (
-        <Table basic collapsing celled className="requests record-diff-table">
+        <Table basic collapsing celled stackable className="record-diff-table requests">
           <Table.Header>
             <Table.Row>
-              <Table.HeaderCell width={3}>{i18next.t("Field")}</Table.HeaderCell>
-              <Table.HeaderCell width={2}>{i18next.t("Operation")}</Table.HeaderCell>
-              <Table.HeaderCell width={5}>{i18next.t("Old Value")}</Table.HeaderCell>
-              <Table.HeaderCell width={5}>{i18next.t("New Value")}</Table.HeaderCell>
+              <Table.HeaderCell title={i18next.t("Operation")} />
+              <Table.HeaderCell>{i18next.t("Field")}</Table.HeaderCell>
+              <Table.HeaderCell>{i18next.t("Old Value")}</Table.HeaderCell>
+              <Table.HeaderCell>{i18next.t("New Value")}</Table.HeaderCell>
             </Table.Row>
           </Table.Header>
           <Table.Body>
@@ -78,37 +82,32 @@ export const TimelineRecordDiffSnapshotEvent = ({ event }) => {
                 // Format values for display
                 const formatValue = (value) => {
                   if (value === null || value === undefined) return "—";
-                  if (_isArray(value)) return value.join(", ");
+                  if (_isArray(value) && _every(value, _isString)) return value.join(", ");
                   if (_isObjectLike(value))
                     return JSON.stringify(value, null, 2);
                   return String(value);
                 };
 
-                const getOperationColor = (operation) => {
+                const getOperationColorIcon = (operation) => {
                   switch (operation.toLowerCase()) {
                     case "add":
-                      return "green";
+                      return {name: "add", color: "green", title: i18next.t("Add")};
                     case "remove":
-                      return "red";
+                      return {name: "remove", color: "red", title: i18next.t("Remove")};
                     case "replace":
-                      return "orange";
+                      return {name: "edit", color: "orange", title: i18next.t("Replace")};
                     default:
-                      return "grey";
+                      return {name: "pencil", color: "grey", title: i18next.t("Unknown operation")};
                   }
                 };
 
                 return (
                   <Table.Row key={`${basePath}-${index}`}>
                     <Table.Cell>
-                      <code>{humanReadablePath}</code>
+                      <Icon {...getOperationColorIcon(operationType)} />
                     </Table.Cell>
                     <Table.Cell>
-                      <Label
-                        color={getOperationColor(operationType)}
-                        size="small"
-                      >
-                        {i18next.t(operationType).toUpperCase()}
-                      </Label>
+                      <code>{humanReadablePath}</code>
                     </Table.Cell>
                     <Table.Cell>
                       {operationType === "add" ? (
@@ -172,7 +171,20 @@ export const TimelineRecordDiffSnapshotEvent = ({ event }) => {
               {feedMessage} {toRelativeTime(event.updated, i18next.language)}
             </Feed.Date>
           </Feed.Summary>
-          <Feed.Extra>{renderDiffTable()}</Feed.Extra>
+          <Feed.Extra>
+            <Accordion fluid>
+              <Accordion.Title
+                active={accordionVisible}
+                onClick={() => setAccordionVisible(!accordionVisible)}
+              >
+                <Icon name="dropdown" />
+                {i18next.t("View changes")}
+              </Accordion.Title>
+              <Accordion.Content active={accordionVisible}>
+                {renderDiffTable()}
+              </Accordion.Content>
+            </Accordion>
+          </Feed.Extra>
         </Feed.Content>
       </Feed.Event>
     </div>
@@ -180,7 +192,5 @@ export const TimelineRecordDiffSnapshotEvent = ({ event }) => {
 };
 
 TimelineRecordDiffSnapshotEvent.propTypes = {
-  event: PropTypes.object,
-  eventIcon: PropTypes.object,
-  feedMessage: PropTypes.string,
+  event: PropTypes.object.isRequired,
 };

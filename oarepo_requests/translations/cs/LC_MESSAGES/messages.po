@@ -1349,14 +1349,20 @@ msgstr "Nelze analyzovat rozdíly mezi verzemi"
 msgid "There was an error processing the diff data."
 msgstr "Při zpracování rozdílů mezi verzemi došlo k chybě."
 
-msgid "add"
-msgstr "přidáno"
+msgid "Add"
+msgstr "Přidáno"
 
-msgid "remove"
-msgstr "odstraněno"
+msgid "Remove"
+msgstr "Odstraněno"
 
-msgid "replace"
-msgstr "nahrazeno"
+msgid "Replace"
+msgstr "Nahrazeno"
 
 msgid "requestEdited"
 msgstr "upravil(a) záznam"
+
+msgid "Unknown operation"
+msgstr "Neznámá operace"
+
+msgid "View changes"
+msgstr "Zobrazit změny"
