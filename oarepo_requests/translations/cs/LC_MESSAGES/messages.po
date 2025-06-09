@@ -841,13 +841,13 @@ msgid "Publish new version"
 msgstr "Publikovat novou verzi"
 
 #: /Users/m/w/cesnet/oarepo-requests/oarepo_requests/templates/semantic-ui/invenio_notifications/delete-published-record-request-event.accept.jinja:7
-msgid "❗️ Published record '{topic_title}' has been deleted"
-msgstr "❗️ Vypublikovaný záznam '{topic_title}' byl smazán"
+msgid "❗️ Published record has been deleted"
+msgstr "❗️ Vypublikovaný záznam byl smazán"
 
 #: /Users/m/w/cesnet/oarepo-requests/oarepo_requests/templates/semantic-ui/invenio_notifications/delete-published-record-request-event.accept.jinja:11
 #: /Users/m/w/cesnet/oarepo-requests/oarepo_requests/templates/semantic-ui/invenio_notifications/delete-published-record-request-event.accept.jinja:21
-msgid "The published record '{topic_title}' has been deleted."
-msgstr "Vypublikovaný záznam '{topic_title}' byl smazán"
+msgid "The published record has been deleted."
+msgstr "Vypublikovaný záznam byl smazán"
 
 #: /Users/m/w/cesnet/oarepo-requests/oarepo_requests/templates/semantic-ui/invenio_notifications/delete-published-record-request-event.accept.jinja:12
 #, python-format
