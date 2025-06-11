@@ -36,7 +36,8 @@ export const recordValidationErrorsPlugin = (
         }
       )
     );
-    e.directSubmitMessage = i18next.t("Request could not be executed.");
+    e.directSubmitMessage =
+      e?.response?.data?.message ?? i18next.t("Request could not be executed.");
     setErrors(errors);
     modalControl?.closeModal();
     return true;
@@ -110,9 +111,10 @@ export const defaultErrorHandlingPlugin = (e, { formik }) => {
   } else {
     formik?.setFieldError(
       "api",
-      i18next.t(
-        "The action could not be executed. Please try again in a moment."
-      )
+      e?.response?.data?.message ??
+        i18next.t(
+          "The action could not be executed. Please try again in a moment."
+        )
     );
   }
 };

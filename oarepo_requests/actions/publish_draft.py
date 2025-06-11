@@ -122,7 +122,7 @@ class PublishDraftAcceptAction(
         )
 
         for result in requests._results:
-            if result.type != "publish_draft" and result.is_open:
+            if result.type not in ["publish_draft","publish_new_version", "publish_changed_metadata"] and result.is_open:
                 # note: we can not use solely the result.is_open because changes may not be committed yet
                 # to opensearch index. That's why we need to get the record from DB and re-check.
                 if Request.get_record(result.uuid)["status"] in (
