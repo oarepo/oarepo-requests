@@ -3,6 +3,7 @@ import { Confirm, Message, Icon } from "semantic-ui-react";
 import {
   WarningMessage,
   ConfirmationModalConfirmButton,
+  ConfirmationModalCancelButton,
   RequestCommentInput,
   REQUEST_TYPE,
   MAX_COMMENT_LENGTH,
@@ -39,6 +40,7 @@ export const ConfirmationModal = ({
       close();
       setComment("");
     },
+    cancelButton: <ConfirmationModalCancelButton />,
     open: isOpen,
   };
   switch (requestActionName) {
