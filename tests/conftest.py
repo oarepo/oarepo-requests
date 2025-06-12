@@ -543,7 +543,7 @@ def ui_serialization_result():
         return {
             # 'created': '2024-01-26T10:06:17.945916',
             "created_by": {
-                "label": "id: 1",
+                "label": "user 1",
                 "links": {"self": "https://127.0.0.1:5000/api/users/1"},
                 "reference": {"user": "1"},
                 "type": "user",

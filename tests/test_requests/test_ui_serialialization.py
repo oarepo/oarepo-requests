@@ -94,7 +94,7 @@ def test_user_serialization(
     assert "dictionary_item_changed" not in diff
 
     creator_serialization = {
-        "label": "id: 1",
+        "label": "user 1",
         "links": user_links(1),
         "reference": {"user": "1"},
         "type": "user",
