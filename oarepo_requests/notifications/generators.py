@@ -19,6 +19,23 @@ if TYPE_CHECKING:
 
     from invenio_notifications.models import Notification
 
+def _extract_entity_email_data(entity: Any)->dict[str, Any]:
+    preferences = getattr(entity, "preferences", None) # todo - MultipleRecipients
+    if hasattr(entity, "email"):
+        current_user_email = entity.email
+    else:
+        log.error(
+            "Entity %s %s does not have email/emails attribute, skipping.",
+            type(entity),
+            entity,
+        )
+        return {}
+    ret = {"email": current_user_email}
+    if preferences:
+        ret["preferences"] = dict(preferences)
+    return ret
+
+
 
 class EntityRecipient(RecipientGenerator):
     """Recipient generator working as handler for generic entity."""
@@ -96,17 +113,16 @@ class UserEmailRecipient(SpecificEntityRecipient):
         # might be a system identity or a ghost user
         email = getattr(entity, "email", None)
         if email:
-            return {email: Recipient(data={"email": email})}
+            return {email: Recipient(data=_extract_entity_email_data(entity))}
         else:
             return {}
-
 
 class GroupEmailRecipient(SpecificEntityRecipient):
     """Recipient generator returning emails of the members of the recipient group."""
 
     def _get_recipients(self, entity: Any) -> dict[str, Recipient]:
         return {
-            user.email: Recipient(data={"email": user.email})
+            user.email: Recipient(data=_extract_entity_email_data(user))
             for user in entity.users.all()
             if getattr(user, "email", None)
         }
