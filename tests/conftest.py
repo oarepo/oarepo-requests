@@ -10,12 +10,12 @@ from datetime import timedelta
 from typing import Dict
 
 import pytest
-from invenio_notifications.backends import EmailNotificationBackend
 from invenio_records_permissions.generators import (
     AnyUser,
     AuthenticatedUser,
     SystemProcess,
 )
+from invenio_users_resources.records import UserAggregate
 from invenio_records_resources.services.uow import RecordCommitOp
 from invenio_requests.customizations import CommentEventType, LogEventType
 from invenio_requests.notifications.builders import (
@@ -55,17 +55,19 @@ from oarepo_requests.actions.generic import (
 )
 from oarepo_requests.notifications.builders.delete_published_record import (
     DeletePublishedRecordRequestAcceptNotificationBuilder,
-    DeletePublishedRecordRequestDeclineNotificationBuilder,
     DeletePublishedRecordRequestSubmitNotificationBuilder,
-)
-from oarepo_requests.notifications.builders.escalate import (
-    EscalateRequestSubmitNotificationBuilder,
+    DeletePublishedRecordRequestDeclineNotificationBuilder,
 )
 from oarepo_requests.notifications.builders.publish import (
     PublishDraftRequestAcceptNotificationBuilder,
-    PublishDraftRequestDeclineNotificationBuilder,
     PublishDraftRequestSubmitNotificationBuilder,
+    PublishDraftRequestDeclineNotificationBuilder,
 )
+
+from oarepo_requests.notifications.builders.escalate import (
+    EscalateRequestSubmitNotificationBuilder,
+)
+
 from oarepo_requests.receiver import default_workflow_receiver_function
 from oarepo_requests.services.permissions.generators.conditional import (
     IfNoEditDraft,
@@ -647,20 +649,6 @@ def app_config(app_config):
         "R": "Remote",
     }
     app_config["FILES_REST_DEFAULT_STORAGE_CLASS"] = "L"
-
-    app_config["NOTIFICATIONS_BACKENDS"] = {
-        EmailNotificationBackend.id: EmailNotificationBackend(),
-    }
-    app_config["NOTIFICATIONS_BUILDERS"] = {
-        PublishDraftRequestAcceptNotificationBuilder.type: PublishDraftRequestAcceptNotificationBuilder,
-        PublishDraftRequestSubmitNotificationBuilder.type: PublishDraftRequestSubmitNotificationBuilder,
-        PublishDraftRequestDeclineNotificationBuilder.type: PublishDraftRequestDeclineNotificationBuilder,
-        DeletePublishedRecordRequestSubmitNotificationBuilder.type: DeletePublishedRecordRequestSubmitNotificationBuilder,
-        DeletePublishedRecordRequestAcceptNotificationBuilder.type: DeletePublishedRecordRequestAcceptNotificationBuilder,
-        EscalateRequestSubmitNotificationBuilder.type: EscalateRequestSubmitNotificationBuilder,
-        DeletePublishedRecordRequestDeclineNotificationBuilder.type: DeletePublishedRecordRequestDeclineNotificationBuilder,
-        CommentRequestEventCreateNotificationBuilder.type: CommentRequestEventCreateNotificationBuilder,
-    }
     app_config["MAIL_DEFAULT_SENDER"] = "test@invenio-rdm-records.org"
 
     app_config["I18N_LANGUAGES"] = [("cs", "Czech")]
