@@ -6,7 +6,7 @@
 # details.
 #
 from invenio_requests.records.api import RequestEvent
-
+from pytest_oarepo.functions import clear_babel_context
 
 def test_timeline(
     logged_client,
@@ -18,6 +18,7 @@ def test_timeline(
     link2testclient,
     search_clear,
 ):
+    clear_babel_context()
     creator = users[0]
     creator_client = logged_client(creator)
 
@@ -55,7 +56,7 @@ def test_timeline(
             "created_by": {
                 "reference": {"user": "1"},
                 "type": "user",
-                "label": "id: 1",
+                "label": "user 1",
                 "links": user_links(1),
             },
             "permissions": {},

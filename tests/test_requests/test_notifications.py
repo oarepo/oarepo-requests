@@ -180,3 +180,55 @@ def test_group(
 
     finally:
         app.config["OAREPO_REQUESTS_DEFAULT_RECEIVER"] = config_restore
+
+def test_locale(
+    app,
+    users,
+    logged_client,
+    draft_factory,
+    submit_request_on_draft,
+    link2testclient,
+    urls,
+):
+    """Test notification being built on review submit."""
+
+    mail = app.extensions.get("mail")
+    assert mail
+
+    en_creator = users[1]
+    cs_receiver = users[2]
+    receiver_client = logged_client(cs_receiver)
+    draft1 = draft_factory(en_creator.identity, custom_workflow="different_locales")
+
+    with mail.record_messages() as outbox:
+        resp_request_submit = submit_request_on_draft(
+            en_creator.identity, draft1["id"], "publish_draft"
+        )
+        # check notification is build on submit
+        assert len(outbox) == 1
+        sent_mail = outbox[0]
+        assert "Žádost o publikování záznamu blabla" in sent_mail.subject
+        assert 'Byli jste požádáni o publikování záznamu "blabla".' in sent_mail.body
+        assert 'Byli jste požádáni o publikování záznamu "blabla".' in sent_mail.body
+
+    record = receiver_client.get(f"{urls['BASE_URL']}{draft1['id']}/draft?expand=true")
+
+    with mail.record_messages() as outbox:
+        # Validate that email was sent
+        publish = receiver_client.post(
+            link2testclient(
+                record.json["expanded"]["requests"][0]["links"]["actions"]["accept"]
+            ),
+        )
+        # check notification is build on submit
+        assert len(outbox) == 1
+        sent_mail = outbox[0]
+        assert "Record 'blabla' has been published" in sent_mail.subject
+        assert (
+            'Your record "blabla" has been published. You can see the record at'
+            in sent_mail.body
+        )
+        assert (
+            'Your record "blabla" has been published. You can see the record at'
+            in sent_mail.html
+        )

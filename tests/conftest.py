@@ -17,7 +17,6 @@ from invenio_records_permissions.generators import (
     SystemProcess,
 )
 from invenio_users_resources.records import UserAggregate
-from invenio_records_resources.references.entity_resolvers import ServiceResultResolver
 from invenio_records_resources.services.uow import RecordCommitOp
 from invenio_requests.customizations import CommentEventType, LogEventType
 from invenio_requests.proxies import current_requests_service
@@ -73,8 +72,6 @@ from oarepo_requests.services.permissions.workflow_policies import (
 )
 from oarepo_requests.types import ModelRefTypes, NonDuplicableOARepoRequestType
 from oarepo_requests.types.events.topic_update import TopicUpdateEventType
-
-from invenio_rdm_records.requests.entity_resolvers import RDMRecordServiceResultProxy
 
 
 pytest_plugins = [
@@ -178,6 +175,17 @@ class DefaultRequests(WorkflowRequestPolicy):
         transitions=WorkflowTransitions(),
     )
 
+class DifferentLocalesPublish(WorkflowRequestPolicy):
+    publish_draft = WorkflowRequest(
+        requesters=[IfInState("draft", [RecordOwners()])],
+        recipients=[UserGenerator(3)],
+        transitions=WorkflowTransitions(
+            submitted="publishing",
+            accepted="published",
+            declined="draft",
+            cancelled="draft",
+        ),
+    )
 
 class RequestWithMultipleRecipients(WorkflowRequestPolicy):
     publish_draft = WorkflowRequest(
@@ -432,6 +440,15 @@ class WithApprovalPermissions(RequestBasedWorkflowPermissions):
         IfInState("deleting", [AuthenticatedUser()]),
     ]
 
+class DifferentLocalesPermissions(RequestBasedWorkflowPermissions):
+    can_read = [
+        IfInState("draft", [RecordOwners()]),
+        IfInState("publishing", [RecordOwners(), UserGenerator(3)]),
+        IfInState("published", [AnyUser()]),
+        IfInState("published", [AuthenticatedUser()]),
+        IfInState("deleting", [AnyUser()]),
+    ]
+
 
 WORKFLOWS = {
     "default": Workflow(
@@ -476,14 +493,12 @@ WORKFLOWS = {
         permission_policy_cls=TestWorkflowPermissions,
         request_policy_cls=RequestsWithSystemIdentity,
     ),
+    "different_locales": Workflow(
+        label=_("User with id 3 prefers cs locale."),
+        permission_policy_cls=DifferentLocalesPermissions,
+        request_policy_cls=DifferentLocalesPublish,
+    )
 }
-
-"""
-@pytest.fixture(scope="module")
-def create_app(instance_path, entry_points):
-    return create_api
-"""
-
 
 @pytest.fixture()
 def urls():
@@ -618,6 +633,9 @@ def app_config(app_config):
         DeletePublishedRecordRequestDeclineNotificationBuilder.type: DeletePublishedRecordRequestDeclineNotificationBuilder,
     }
     app_config["MAIL_DEFAULT_SENDER"] = "test@invenio-rdm-records.org"
+
+    app_config["I18N_LANGUAGES"] = [("cs", "Czech")]
+    app_config["BABEL_DEFAULT_LOCALE"] = "en"
 
     return app_config
 

@@ -7,7 +7,7 @@
 #
 from flask import current_app
 from thesis.ext import ThesisExt
-
+from pytest_oarepo.functions import clear_babel_context
 
 def test_allowed_request_types_on_draft_service(
     users,
@@ -144,15 +144,16 @@ def test_allowed_request_types_on_published_resource(
         },
     ]
 
-
 def test_ui_serialization(
     logged_client,
     users,
     draft_factory,
     record_factory,
     link2testclient,
+    app,
     search_clear,
 ):
+    clear_babel_context()
     creator = users[0]
     creator_client = logged_client(creator)
 
@@ -165,14 +166,15 @@ def test_ui_serialization(
     applicable_requests_link_draft = draft1["links"]["applicable-requests"]
     applicable_requests_link_published = published1["links"]["applicable-requests"]
 
+    # with app.test_request_context(headers=[("Accept-Language", "en")]):
     allowed_request_types_draft = creator_client.get(
         link2testclient(applicable_requests_link_draft),
-        headers={"Accept": "application/vnd.inveniordm.v1+json"},
+        headers={"Accept": "application/vnd.inveniordm.v1+json"}
     )
 
     allowed_request_types_published = creator_client.get(
         link2testclient(applicable_requests_link_published),
-        headers={"Accept": "application/vnd.inveniordm.v1+json"},
+        headers={"Accept": "application/vnd.inveniordm.v1+json"}
     )
 
     sorted_draft_list = allowed_request_types_draft.json["hits"]["hits"]
