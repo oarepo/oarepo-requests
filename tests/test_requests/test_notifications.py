@@ -184,6 +184,7 @@ def test_group(
 def test_locale(
     app,
     users,
+    user_with_cs_locale,
     logged_client,
     draft_factory,
     submit_request_on_draft,
@@ -196,7 +197,7 @@ def test_locale(
     assert mail
 
     en_creator = users[1]
-    cs_receiver = users[2]
+    cs_receiver = user_with_cs_locale
     receiver_client = logged_client(cs_receiver)
     draft1 = draft_factory(en_creator.identity, custom_workflow="different_locales")
 

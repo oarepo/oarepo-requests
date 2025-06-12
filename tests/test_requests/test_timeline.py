@@ -56,7 +56,7 @@ def test_timeline(
             "created_by": {
                 "reference": {"user": "1"},
                 "type": "user",
-                "label": "user 1",
+                "label": "id: 1",
                 "links": user_links(1),
             },
             "permissions": {},

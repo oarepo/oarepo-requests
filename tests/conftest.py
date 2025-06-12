@@ -72,7 +72,7 @@ from oarepo_requests.services.permissions.workflow_policies import (
 )
 from oarepo_requests.types import ModelRefTypes, NonDuplicableOARepoRequestType
 from oarepo_requests.types.events.topic_update import TopicUpdateEventType
-
+from pytest_oarepo.requests.classes import CSLocaleUserGenerator
 
 pytest_plugins = [
     "pytest_oarepo.requests.fixtures",
@@ -178,7 +178,7 @@ class DefaultRequests(WorkflowRequestPolicy):
 class DifferentLocalesPublish(WorkflowRequestPolicy):
     publish_draft = WorkflowRequest(
         requesters=[IfInState("draft", [RecordOwners()])],
-        recipients=[UserGenerator(3)],
+        recipients=[CSLocaleUserGenerator()],
         transitions=WorkflowTransitions(
             submitted="publishing",
             accepted="published",
@@ -443,7 +443,7 @@ class WithApprovalPermissions(RequestBasedWorkflowPermissions):
 class DifferentLocalesPermissions(RequestBasedWorkflowPermissions):
     can_read = [
         IfInState("draft", [RecordOwners()]),
-        IfInState("publishing", [RecordOwners(), UserGenerator(3)]),
+        IfInState("publishing", [RecordOwners(), CSLocaleUserGenerator()]),
         IfInState("published", [AnyUser()]),
         IfInState("published", [AuthenticatedUser()]),
         IfInState("deleting", [AnyUser()]),
@@ -543,7 +543,7 @@ def ui_serialization_result():
         return {
             # 'created': '2024-01-26T10:06:17.945916',
             "created_by": {
-                "label": "user 1",
+                "label": "id: 1",
                 "links": {"self": "https://127.0.0.1:5000/api/users/1"},
                 "reference": {"user": "1"},
                 "type": "user",
