@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2025-06-09 16:38+0200\n"
+"POT-Creation-Date: 2025-06-09 14:17+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -17,7 +17,17 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 2.17.0\n"
 
-#: /home/martin/Projects/CESNET/OARepo/oarepo-requests/oarepo_requests/invenio_patches.py:181
+#: /home/dusanst/Projects/oarepo-requests/oarepo_requests/errors.py:137
+msgid "There is already a record version with this version tag."
+msgstr ""
+
+#: /home/dusanst/Projects/oarepo-requests/oarepo_requests/errors.py:143
+msgid ""
+"There is already a record version with this version tag. Please use a "
+"different version tag."
+msgstr ""
+
+#: /home/dusanst/Projects/oarepo-requests/oarepo_requests/invenio_patches.py:181
 msgid "Submitted"
 msgstr ""
 
@@ -73,33 +83,29 @@ msgstr ""
 msgid "Cancel"
 msgstr ""
 
-#: /home/martin/Projects/CESNET/OARepo/oarepo-requests/oarepo_requests/actions/publish_draft.py:85
-msgid "This version tag already exists"
-msgstr ""
-
-#: /home/martin/Projects/CESNET/OARepo/oarepo-requests/oarepo_requests/actions/publish_draft.py:102
-#: /home/martin/Projects/CESNET/OARepo/oarepo-requests/oarepo_requests/actions/publish_new_version.py:33
+#: /home/dusanst/Projects/oarepo-requests/oarepo_requests/actions/publish_draft.py:104
+#: /home/dusanst/Projects/oarepo-requests/oarepo_requests/actions/publish_new_version.py:33
 msgid "Publish"
 msgstr ""
 
-#: /home/martin/Projects/CESNET/OARepo/oarepo-requests/oarepo_requests/actions/publish_draft.py:124
-#: /home/martin/Projects/CESNET/OARepo/oarepo-requests/oarepo_requests/types/publish_draft.py:154
+#: /home/dusanst/Projects/oarepo-requests/oarepo_requests/actions/publish_draft.py:132
+#: /home/dusanst/Projects/oarepo-requests/oarepo_requests/types/publish_draft.py:154
 msgid "All open requests need to be closed."
 msgstr ""
 
-#: /home/martin/Projects/CESNET/OARepo/oarepo-requests/oarepo_requests/actions/publish_draft.py:145
+#: /home/dusanst/Projects/oarepo-requests/oarepo_requests/actions/publish_draft.py:152
 msgid "Return for correction"
 msgstr ""
 
-#: /home/martin/Projects/CESNET/OARepo/oarepo-requests/oarepo_requests/resolvers/ui.py:340
+#: /home/dusanst/Projects/oarepo-requests/oarepo_requests/resolvers/ui.py:340
 msgid "System user"
 msgstr ""
 
-#: /home/martin/Projects/CESNET/OARepo/oarepo-requests/oarepo_requests/resolvers/ui.py:618
+#: /home/dusanst/Projects/oarepo-requests/oarepo_requests/resolvers/ui.py:618
 msgid "Auto approve"
 msgstr ""
 
-#: /home/martin/Projects/CESNET/OARepo/oarepo-requests/oarepo_requests/services/ui_schema.py:197
+#: /home/dusanst/Projects/oarepo-requests/oarepo_requests/services/ui_schema.py:197
 msgid "status"
 msgstr ""
 
@@ -567,77 +573,77 @@ msgstr ""
 msgid "Edit access requested."
 msgstr ""
 
-#: /home/martin/Projects/CESNET/OARepo/oarepo-requests/oarepo_requests/types/new_version.py:45
+#: /home/dusanst/Projects/oarepo-requests/oarepo_requests/types/new_version.py:45
 msgid "New Version"
 msgstr ""
 
-#: /home/martin/Projects/CESNET/OARepo/oarepo-requests/oarepo_requests/types/new_version.py:85
+#: /home/dusanst/Projects/oarepo-requests/oarepo_requests/types/new_version.py:85
 msgid "Request requesting creation of new version of a published record."
 msgstr ""
 
-#: /home/martin/Projects/CESNET/OARepo/oarepo-requests/oarepo_requests/types/new_version.py:93
+#: /home/dusanst/Projects/oarepo-requests/oarepo_requests/types/new_version.py:93
 msgid "Keep files"
 msgstr ""
 
-#: /home/martin/Projects/CESNET/OARepo/oarepo-requests/oarepo_requests/types/new_version.py:94
+#: /home/dusanst/Projects/oarepo-requests/oarepo_requests/types/new_version.py:94
 msgid "Yes or no"
 msgstr ""
 
-#: /home/martin/Projects/CESNET/OARepo/oarepo-requests/oarepo_requests/types/new_version.py:96
+#: /home/dusanst/Projects/oarepo-requests/oarepo_requests/types/new_version.py:96
 msgid ""
 "If you choose yes, the current record's files will be linked to the new "
 "version of the record. Then you will be able to add/remove files in the "
 "form."
 msgstr ""
 
-#: /home/martin/Projects/CESNET/OARepo/oarepo-requests/oarepo_requests/types/new_version.py:99
+#: /home/dusanst/Projects/oarepo-requests/oarepo_requests/types/new_version.py:99
 msgid "Yes"
 msgstr ""
 
-#: /home/martin/Projects/CESNET/OARepo/oarepo-requests/oarepo_requests/types/new_version.py:100
+#: /home/dusanst/Projects/oarepo-requests/oarepo_requests/types/new_version.py:100
 msgid "No"
 msgstr ""
 
-#: /home/martin/Projects/CESNET/OARepo/oarepo-requests/oarepo_requests/types/new_version.py:152
-#: /home/martin/Projects/CESNET/OARepo/oarepo-requests/oarepo_requests/types/new_version.py:157
+#: /home/dusanst/Projects/oarepo-requests/oarepo_requests/types/new_version.py:152
+#: /home/dusanst/Projects/oarepo-requests/oarepo_requests/types/new_version.py:157
 msgid "Request new version access"
 msgstr ""
 
-#: /home/martin/Projects/CESNET/OARepo/oarepo-requests/oarepo_requests/types/new_version.py:155
+#: /home/dusanst/Projects/oarepo-requests/oarepo_requests/types/new_version.py:155
 msgid "New version access requested"
 msgstr ""
 
-#: /home/martin/Projects/CESNET/OARepo/oarepo-requests/oarepo_requests/types/new_version.py:170
+#: /home/dusanst/Projects/oarepo-requests/oarepo_requests/types/new_version.py:170
 msgid "Click to start creating a new version of the record."
 msgstr ""
 
-#: /home/martin/Projects/CESNET/OARepo/oarepo-requests/oarepo_requests/types/new_version.py:174
+#: /home/dusanst/Projects/oarepo-requests/oarepo_requests/types/new_version.py:174
 msgid ""
 "Request permission to update record (including files). You will be notified "
 "about the decision by email."
 msgstr ""
 
-#: /home/martin/Projects/CESNET/OARepo/oarepo-requests/oarepo_requests/types/new_version.py:181
+#: /home/dusanst/Projects/oarepo-requests/oarepo_requests/types/new_version.py:181
 msgid ""
 "Permission to update record (including files) requested. You will be "
 "notified about the decision by email."
 msgstr ""
 
-#: /home/martin/Projects/CESNET/OARepo/oarepo-requests/oarepo_requests/types/new_version.py:186
+#: /home/dusanst/Projects/oarepo-requests/oarepo_requests/types/new_version.py:186
 msgid ""
 "You have been asked to approve the request to update the record. You can "
 "approve or reject the request."
 msgstr ""
 
-#: /home/martin/Projects/CESNET/OARepo/oarepo-requests/oarepo_requests/types/new_version.py:189
+#: /home/dusanst/Projects/oarepo-requests/oarepo_requests/types/new_version.py:189
 msgid "Permission to update record (including files) requested. "
 msgstr ""
 
-#: /home/martin/Projects/CESNET/OARepo/oarepo-requests/oarepo_requests/types/new_version.py:192
+#: /home/dusanst/Projects/oarepo-requests/oarepo_requests/types/new_version.py:192
 msgid "Submit request to get edit access to the record."
 msgstr ""
 
-#: /home/martin/Projects/CESNET/OARepo/oarepo-requests/oarepo_requests/types/new_version.py:193
+#: /home/dusanst/Projects/oarepo-requests/oarepo_requests/types/new_version.py:193
 msgid "You do not have permission to update the record."
 msgstr ""
 
@@ -660,15 +666,15 @@ msgstr ""
 msgid "Publish changed metadata"
 msgstr ""
 
-#: /home/martin/Projects/CESNET/OARepo/oarepo-requests/oarepo_requests/types/publish_changed_metadata.py:56
-#: /home/martin/Projects/CESNET/OARepo/oarepo-requests/oarepo_requests/types/publish_changed_metadata.py:58
-#: /home/martin/Projects/CESNET/OARepo/oarepo-requests/oarepo_requests/types/publish_changed_metadata.py:65
-#: /home/martin/Projects/CESNET/OARepo/oarepo-requests/oarepo_requests/types/publish_draft.py:77
-#: /home/martin/Projects/CESNET/OARepo/oarepo-requests/oarepo_requests/types/publish_draft.py:79
-#: /home/martin/Projects/CESNET/OARepo/oarepo-requests/oarepo_requests/types/publish_draft.py:86
-#: /home/martin/Projects/CESNET/OARepo/oarepo-requests/oarepo_requests/types/publish_new_version.py:100
-#: /home/martin/Projects/CESNET/OARepo/oarepo-requests/oarepo_requests/types/publish_new_version.py:102
-#: /home/martin/Projects/CESNET/OARepo/oarepo-requests/oarepo_requests/types/publish_new_version.py:109
+#: /home/dusanst/Projects/oarepo-requests/oarepo_requests/types/publish_changed_metadata.py:56
+#: /home/dusanst/Projects/oarepo-requests/oarepo_requests/types/publish_changed_metadata.py:58
+#: /home/dusanst/Projects/oarepo-requests/oarepo_requests/types/publish_changed_metadata.py:65
+#: /home/dusanst/Projects/oarepo-requests/oarepo_requests/types/publish_draft.py:77
+#: /home/dusanst/Projects/oarepo-requests/oarepo_requests/types/publish_draft.py:79
+#: /home/dusanst/Projects/oarepo-requests/oarepo_requests/types/publish_draft.py:86
+#: /home/dusanst/Projects/oarepo-requests/oarepo_requests/types/publish_new_version.py:100
+#: /home/dusanst/Projects/oarepo-requests/oarepo_requests/types/publish_new_version.py:102
+#: /home/dusanst/Projects/oarepo-requests/oarepo_requests/types/publish_new_version.py:109
 msgid "Submit for review"
 msgstr ""
 
@@ -738,43 +744,43 @@ msgstr ""
 msgid "Waiting for finishing the changed metadata publication request."
 msgstr ""
 
-#: /home/martin/Projects/CESNET/OARepo/oarepo-requests/oarepo_requests/types/publish_draft.py:36
-#: /home/martin/Projects/CESNET/OARepo/oarepo-requests/oarepo_requests/types/publish_draft.py:78
+#: /home/dusanst/Projects/oarepo-requests/oarepo_requests/types/publish_draft.py:36
+#: /home/dusanst/Projects/oarepo-requests/oarepo_requests/types/publish_draft.py:78
 msgid "Publish draft"
 msgstr ""
 
-#: /home/martin/Projects/CESNET/OARepo/oarepo-requests/oarepo_requests/types/publish_draft.py:47
-#: /home/martin/Projects/CESNET/OARepo/oarepo-requests/oarepo_requests/types/publish_new_version.py:54
+#: /home/dusanst/Projects/oarepo-requests/oarepo_requests/types/publish_draft.py:47
+#: /home/dusanst/Projects/oarepo-requests/oarepo_requests/types/publish_new_version.py:54
 msgid "Resource version"
 msgstr ""
 
-#: /home/martin/Projects/CESNET/OARepo/oarepo-requests/oarepo_requests/types/publish_draft.py:48
-#: /home/martin/Projects/CESNET/OARepo/oarepo-requests/oarepo_requests/types/publish_new_version.py:55
+#: /home/dusanst/Projects/oarepo-requests/oarepo_requests/types/publish_draft.py:48
+#: /home/dusanst/Projects/oarepo-requests/oarepo_requests/types/publish_new_version.py:55
 msgid "Write down the version (first, second…)."
 msgstr ""
 
-#: /home/martin/Projects/CESNET/OARepo/oarepo-requests/oarepo_requests/types/publish_draft.py:80
+#: /home/dusanst/Projects/oarepo-requests/oarepo_requests/types/publish_draft.py:80
 msgid "Review and publish draft"
 msgstr ""
 
-#: /home/martin/Projects/CESNET/OARepo/oarepo-requests/oarepo_requests/types/publish_draft.py:81
-#: /home/martin/Projects/CESNET/OARepo/oarepo-requests/oarepo_requests/types/publish_draft.py:82
+#: /home/dusanst/Projects/oarepo-requests/oarepo_requests/types/publish_draft.py:81
+#: /home/dusanst/Projects/oarepo-requests/oarepo_requests/types/publish_draft.py:82
 msgid "Draft submitted for review"
 msgstr ""
 
-#: /home/martin/Projects/CESNET/OARepo/oarepo-requests/oarepo_requests/types/publish_draft.py:83
+#: /home/dusanst/Projects/oarepo-requests/oarepo_requests/types/publish_draft.py:83
 msgid "Draft published"
 msgstr ""
 
-#: /home/martin/Projects/CESNET/OARepo/oarepo-requests/oarepo_requests/types/publish_draft.py:84
+#: /home/dusanst/Projects/oarepo-requests/oarepo_requests/types/publish_draft.py:84
 msgid "Draft publication declined"
 msgstr ""
 
-#: /home/martin/Projects/CESNET/OARepo/oarepo-requests/oarepo_requests/types/publish_draft.py:85
+#: /home/dusanst/Projects/oarepo-requests/oarepo_requests/types/publish_draft.py:85
 msgid "Draft publication cancelled"
 msgstr ""
 
-#: /home/martin/Projects/CESNET/OARepo/oarepo-requests/oarepo_requests/types/publish_draft.py:104
+#: /home/dusanst/Projects/oarepo-requests/oarepo_requests/types/publish_draft.py:104
 msgid ""
 "By submitting the draft for review you are requesting the publication of the"
 " draft. The draft will become locked and no further changes will be possible"
@@ -782,47 +788,47 @@ msgid ""
 "decision by email."
 msgstr ""
 
-#: /home/martin/Projects/CESNET/OARepo/oarepo-requests/oarepo_requests/types/publish_draft.py:109
+#: /home/dusanst/Projects/oarepo-requests/oarepo_requests/types/publish_draft.py:109
 msgid ""
 "Click to immediately publish the draft. The draft will be a subject to "
 "embargo as requested in the side panel. Note: The action is irreversible."
 msgstr ""
 
-#: /home/martin/Projects/CESNET/OARepo/oarepo-requests/oarepo_requests/types/publish_draft.py:114
+#: /home/dusanst/Projects/oarepo-requests/oarepo_requests/types/publish_draft.py:114
 msgid ""
 "Submit for review. After submitting the draft for review, it will be locked "
 "and no further modifications will be possible."
 msgstr ""
 
-#: /home/martin/Projects/CESNET/OARepo/oarepo-requests/oarepo_requests/types/publish_draft.py:118
+#: /home/dusanst/Projects/oarepo-requests/oarepo_requests/types/publish_draft.py:118
 msgid ""
 "The draft has been submitted for review. You can now accept or decline the "
 "request."
 msgstr ""
 
-#: /home/martin/Projects/CESNET/OARepo/oarepo-requests/oarepo_requests/types/publish_draft.py:122
+#: /home/dusanst/Projects/oarepo-requests/oarepo_requests/types/publish_draft.py:122
 msgid ""
 "The draft has been submitted for review. It is now locked and no further "
 "changes are possible. You will be notified about the decision by email."
 msgstr ""
 
-#: /home/martin/Projects/CESNET/OARepo/oarepo-requests/oarepo_requests/types/publish_draft.py:126
+#: /home/dusanst/Projects/oarepo-requests/oarepo_requests/types/publish_draft.py:126
 msgid "The draft has been submitted for review. "
 msgstr ""
 
-#: /home/martin/Projects/CESNET/OARepo/oarepo-requests/oarepo_requests/types/publish_draft.py:127
+#: /home/dusanst/Projects/oarepo-requests/oarepo_requests/types/publish_draft.py:127
 msgid "The draft has been published. "
 msgstr ""
 
-#: /home/martin/Projects/CESNET/OARepo/oarepo-requests/oarepo_requests/types/publish_draft.py:128
+#: /home/dusanst/Projects/oarepo-requests/oarepo_requests/types/publish_draft.py:128
 msgid "Publication of the draft has been declined."
 msgstr ""
 
-#: /home/martin/Projects/CESNET/OARepo/oarepo-requests/oarepo_requests/types/publish_draft.py:129
+#: /home/dusanst/Projects/oarepo-requests/oarepo_requests/types/publish_draft.py:129
 msgid "The draft has been cancelled. "
 msgstr ""
 
-#: /home/martin/Projects/CESNET/OARepo/oarepo-requests/oarepo_requests/types/publish_draft.py:130
+#: /home/dusanst/Projects/oarepo-requests/oarepo_requests/types/publish_draft.py:130
 msgid "Waiting for finishing the draft publication request."
 msgstr ""
 
