@@ -47,22 +47,27 @@
         margin-left: calc(
           @verticalLineLeftMargin + @actionEventIconSize / 1.5
         );
-        .record-diff-table {
-          width: 100%;
-          border: none !important;
-          word-break: normal;
-          code {
-            padding: 0;
-            overflow-wrap: normal;
+        .ui.accordion {
+          .active.title {
+            display: unset;
           }
-          em {
-            color: #999;
-          }
-          pre {
-            margin: 0;
-            font-size: 0.9em;
-            white-space: pre-wrap;
-            overflow-wrap: anywhere;
+          .record-diff-table {
+            width: 100%;
+            border: none !important;
+            word-break: normal;
+            code {
+              padding: 0;
+              overflow-wrap: normal;
+            }
+            em {
+              color: #999;
+            }
+            pre {
+              margin: 0;
+              font-size: 0.9em;
+              white-space: pre-wrap;
+              overflow-wrap: anywhere;
+            }
           }
         }
       }

@@ -57,8 +57,7 @@ export const TimelineRecordDiffSnapshotEvent = ({ event }) => {
         <Table basic collapsing celled stackable className="record-diff-table requests">
           <Table.Header>
             <Table.Row>
-              <Table.HeaderCell title={i18next.t("Operation")} />
-              <Table.HeaderCell>{i18next.t("Field")}</Table.HeaderCell>
+              <Table.HeaderCell>{`${i18next.t("Operation")}/${i18next.t("Field")}`}</Table.HeaderCell>
               <Table.HeaderCell>{i18next.t("Old Value")}</Table.HeaderCell>
               <Table.HeaderCell>{i18next.t("New Value")}</Table.HeaderCell>
             </Table.Row>
@@ -103,10 +102,8 @@ export const TimelineRecordDiffSnapshotEvent = ({ event }) => {
 
                 return (
                   <Table.Row key={`${basePath}-${index}`}>
-                    <Table.Cell>
+                    <Table.Cell className="flex align-items-top">
                       <Icon {...getOperationColorIcon(operationType)} />
-                    </Table.Cell>
-                    <Table.Cell>
                       <code>{humanReadablePath}</code>
                     </Table.Cell>
                     <Table.Cell>
