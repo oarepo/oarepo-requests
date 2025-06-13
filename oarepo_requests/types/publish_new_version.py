@@ -12,18 +12,16 @@ from __future__ import annotations
 from typing import TYPE_CHECKING, Any, override
 
 import marshmallow as ma
+from invenio_requests.records.api import Request
+from oarepo_runtime.datastreams.utils import get_record_service_for_record
 from oarepo_runtime.i18n import lazy_gettext as _
-from typing_extensions import override
 
 from oarepo_requests.actions.publish_draft import (
     PublishDraftDeclineAction,
     PublishDraftSubmitAction,
 )
+from oarepo_requests.errors import VersionAlreadyExists
 
-from ..actions.publish_draft import (
-    PublishDraftDeclineAction,
-    PublishDraftSubmitAction,
-)
 from ..actions.publish_new_version import PublishNewVersionAcceptAction
 from ..utils import classproperty
 from .publish_base import PublishRequestType
@@ -35,6 +33,8 @@ if TYPE_CHECKING:
     from invenio_drafts_resources.records import Record
     from invenio_requests.customizations.actions import RequestAction
     from invenio_requests.records.api import Request
+
+    from oarepo_requests.typing import EntityReference
 
 
 class PublishNewVersionRequestType(PublishRequestType):
@@ -152,3 +152,29 @@ class PublishNewVersionRequestType(PublishRequestType):
             cancelled=_("The new version has been cancelled. "),
             created=_("Waiting for finishing the new version publication request."),
         )
+
+    def can_create(
+        self,
+        identity: Identity,
+        data: dict,
+        receiver: EntityReference,
+        topic: Record,
+        creator: EntityReference,
+        *args: Any,
+        **kwargs: Any,
+    ) -> None:
+        """Check if the request can be created."""
+        topic_service = get_record_service_for_record(topic)
+        # Only needed in case of new version as when you are publishing
+        # draft for the first time, there are no previous versions with
+        # which you can have collision
+        if "payload" in data and "version" in data["payload"]:
+            versions = topic_service.search_versions(identity, topic.pid.pid_value)
+            versions_hits = versions.to_dict()["hits"]["hits"]
+            for rec in versions_hits:
+                if "version" in rec["metadata"]:
+                    version = rec["metadata"]["version"]
+                    if version == data["payload"]["version"]:
+                        raise VersionAlreadyExists()
+
+        super().can_create(identity, data, receiver, topic, creator, *args, **kwargs)

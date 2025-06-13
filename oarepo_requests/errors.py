@@ -9,8 +9,15 @@
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Any
+import json
+from typing import TYPE_CHECKING, Any, Optional, Union
 
+from flask import g
+from flask_resources import (
+    HTTPJSONException,
+)
+from flask_resources.serializers.json import JSONEncoder
+from oarepo_runtime.i18n import lazy_gettext as _
 from oarepo_workflows.errors import (
     EventTypeNotInWorkflow as WorkflowEventTypeNotInWorkflow,
 )
@@ -40,6 +47,38 @@ class RequestTypeNotInWorkflow(WorkflowRequestTypeNotInWorkflow):
     """Raised when a request type is not in the workflow."""
 
     ...
+
+
+class CustomHTTPJSONException(HTTPJSONException):
+    """Custom HTTP Exception delivering JSON error responses with an error_type."""
+
+    def __init__(
+        self,
+        code: Optional[int] = None,
+        errors: Optional[Union[dict[str, any], list]] = None,
+        error_type: Optional[str] = None,
+        **kwargs: Any,
+    ) -> None:
+        """Initialize CustomHTTPJSONException."""
+        super().__init__(code=code, errors=errors, **kwargs)
+        self.error_type = error_type  # Save the error_type passed in the constructor
+
+    def get_body(self, environ: any = None, scope: any = None) -> str:
+        """Get the request body."""
+        body = {"status": self.code, "message": self.get_description(environ)}
+
+        errors = self.get_errors()
+        if errors:
+            body["errors"] = errors
+
+        # Add error_type to the response body
+        if self.error_type:
+            body["error_type"] = self.error_type
+
+        if self.code and (self.code >= 500) and hasattr(g, "sentry_event_id"):
+            body["error_id"] = str(g.sentry_event_id)
+
+        return json.dumps(body, cls=JSONEncoder)
 
 
 class OpenRequestAlreadyExists(Exception):
@@ -88,3 +127,27 @@ class ReceiverNonReferencable(Exception):
             message += "\n Additional keyword arguments:"
             message += f"\n{', '.join(self.kwargs)}"
         return message
+
+
+class VersionAlreadyExists(CustomHTTPJSONException):
+    """Exception raised when a version tag already exists."""
+
+    def __init__(self) -> None:
+        """Initialize the exception."""
+        description = _("There is already a record version with this version tag.")
+        errors = [
+            {
+                "field": "payload.version",
+                "messages": [
+                    _(
+                        "There is already a record version with this version tag. Please use a different version tag."
+                    )
+                ],
+            }
+        ]
+        super().__init__(
+            code=400,
+            description=description,
+            errors=errors,
+            error_type="cf_validation_error",
+        )
