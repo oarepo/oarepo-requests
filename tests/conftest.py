@@ -10,14 +10,12 @@ from datetime import timedelta
 from typing import Dict
 
 import pytest
-from invenio_notifications.backends import EmailNotificationBackend
 from invenio_records_permissions.generators import (
     AnyUser,
     AuthenticatedUser,
     SystemProcess,
 )
 from invenio_users_resources.records import UserAggregate
-from invenio_records_resources.references.entity_resolvers import ServiceResultResolver
 from invenio_records_resources.services.uow import RecordCommitOp
 from invenio_requests.customizations import CommentEventType, LogEventType
 from invenio_requests.proxies import current_requests_service
@@ -47,21 +45,6 @@ from oarepo_requests.actions.generic import (
     OARepoDeclineAction,
     OARepoSubmitAction,
 )
-from oarepo_requests.notifications.builders.delete_published_record import (
-    DeletePublishedRecordRequestAcceptNotificationBuilder,
-    DeletePublishedRecordRequestSubmitNotificationBuilder,
-    DeletePublishedRecordRequestDeclineNotificationBuilder,
-)
-from oarepo_requests.notifications.builders.publish import (
-    PublishDraftRequestAcceptNotificationBuilder,
-    PublishDraftRequestSubmitNotificationBuilder,
-    PublishDraftRequestDeclineNotificationBuilder,
-)
-
-from oarepo_requests.notifications.builders.escalate import (
-    EscalateRequestSubmitNotificationBuilder,
-)
-
 from oarepo_requests.receiver import default_workflow_receiver_function
 from oarepo_requests.services.permissions.generators.conditional import (
     IfNoEditDraft,
@@ -74,8 +57,6 @@ from oarepo_requests.services.permissions.workflow_policies import (
 from oarepo_requests.types import ModelRefTypes, NonDuplicableOARepoRequestType
 from oarepo_requests.types.events.topic_update import TopicUpdateEventType
 
-from invenio_rdm_records.requests.entity_resolvers import RDMRecordServiceResultProxy
-
 
 pytest_plugins = [
     "pytest_oarepo.requests.fixtures",
@@ -85,21 +66,23 @@ pytest_plugins = [
     "pytest_oarepo.files",
 ]
 
-
 @pytest.fixture(scope="module")
 def record_service():
     return current_service
 
+@pytest.fixture
+def events_service():
+    from invenio_requests.proxies import current_events_service
+
+    return current_events_service
 
 @pytest.fixture(scope="module", autouse=True)
 def location(location):
     return location
 
-
 @pytest.fixture(autouse=True)
 def vocab_cf(vocab_cf):
     return vocab_cf
-
 
 can_comment_only_receiver = [
     Receiver(),
@@ -215,7 +198,6 @@ class RequestWithMultipleRecipients(WorkflowRequestPolicy):
             ),
         ],
     )
-
 
 class RequestsWithDifferentRecipients(DefaultRequests):
     another_topic_updating = WorkflowRequest(
@@ -604,19 +586,6 @@ def app_config(app_config):
         "R": "Remote",
     }
     app_config["FILES_REST_DEFAULT_STORAGE_CLASS"] = "L"
-
-    app_config["NOTIFICATIONS_BACKENDS"] = {
-        EmailNotificationBackend.id: EmailNotificationBackend(),
-    }
-    app_config["NOTIFICATIONS_BUILDERS"] = {
-        PublishDraftRequestAcceptNotificationBuilder.type: PublishDraftRequestAcceptNotificationBuilder,
-        PublishDraftRequestSubmitNotificationBuilder.type: PublishDraftRequestSubmitNotificationBuilder,
-        PublishDraftRequestDeclineNotificationBuilder.type: PublishDraftRequestDeclineNotificationBuilder,
-        DeletePublishedRecordRequestSubmitNotificationBuilder.type: DeletePublishedRecordRequestSubmitNotificationBuilder,
-        DeletePublishedRecordRequestAcceptNotificationBuilder.type: DeletePublishedRecordRequestAcceptNotificationBuilder,
-        EscalateRequestSubmitNotificationBuilder.type: EscalateRequestSubmitNotificationBuilder,
-        DeletePublishedRecordRequestDeclineNotificationBuilder.type: DeletePublishedRecordRequestDeclineNotificationBuilder,
-    }
     app_config["MAIL_DEFAULT_SENDER"] = "test@invenio-rdm-records.org"
 
     return app_config

@@ -54,14 +54,6 @@ def patch_requests_permissions(
     setattr(requests_service_config, "permission_policy_cls", scenario_permissions)
     setattr(events_service_config, "permission_policy_cls", scenario_permissions)
 
-
-@pytest.fixture
-def events_service():
-    from invenio_requests.proxies import current_events_service
-
-    return current_events_service
-
-
 def test_publish_with_workflows(
     logged_client,
     users,
