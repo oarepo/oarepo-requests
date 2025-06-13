@@ -43,6 +43,34 @@
             @commentEventBorderWidth
         );
       }
+      .extra {
+        margin-left: calc(
+          @verticalLineLeftMargin + @actionEventIconSize / 1.5
+        );
+        .ui.accordion {
+          .active.title {
+            display: unset;
+          }
+          .record-diff-table {
+            width: 100%;
+            border: none !important;
+            word-break: normal;
+            code {
+              padding: 0;
+              overflow-wrap: normal;
+            }
+            em {
+              color: #999;
+            }
+            pre {
+              margin: 0;
+              font-size: 0.9em;
+              white-space: pre-wrap;
+              overflow-wrap: anywhere;
+            }
+          }
+        }
+      }
     }
     .requests.action-event-icon {
       font-size: @actionEventIconSize;
