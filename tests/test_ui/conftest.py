@@ -24,8 +24,6 @@ def extra_entry_points():
 
 @pytest.fixture(scope="module")
 def app_config(app_config):
-    app_config["I18N_LANGUAGES"] = [("cs", "Czech")]
-    app_config["BABEL_DEFAULT_LOCALE"] = "en"
     app_config["SEARCH_HOSTS"] = [
         {
             "host": os.environ.get("OPENSEARCH_HOST", "localhost"),
