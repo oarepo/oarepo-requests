@@ -78,7 +78,7 @@ class PublishRequestType(NonDuplicableOARepoRequestType):
     ) -> None:
         """Check if the request can be created."""
         if not topic.is_draft:
-            raise ValueError("Trying to create publish request on published record")
+            raise ValueError(_("Trying to create publish request on published record"))
         super().can_create(identity, data, receiver, topic, creator, *args, **kwargs)
         self.validate_topic(identity, topic)
 

@@ -1211,6 +1211,56 @@ msgstr ""
 msgid "All open requests need to be closed."
 msgstr ""
 
+
+#: /Users/miroslavbauer/Code/github.com/oarepo/oarepo-requests/oarepo_requests/errors.py:104
+msgid "All open requests must be closed first."
+msgstr ""
+
+#: /Users/miroslavbauer/Code/github.com/oarepo/oarepo-requests/oarepo_requests/errors.py:108
+#, python-format
+msgid "Cannot %(action)s: %(reason)s"
+msgstr ""
+
+#: /Users/miroslavbauer/Code/github.com/oarepo/oarepo-requests/oarepo_requests/errors.py:96
+#, python-format
+msgid "There is already an open request of %(request_type)s on %(record_id)s."
+msgstr ""
+
+#: /Users/miroslavbauer/Code/github.com/oarepo/oarepo-requests/oarepo_requests/errors.py:129
+#, python-format
+msgid "Unknown request type %(request_type)s."
+msgstr ""
+
+#: /Users/miroslavbauer/Code/github.com/oarepo/oarepo-requests/oarepo_requests/errors.py:148
+#, python-format
+msgid ""
+"Receiver for request type %(request_type)s is required but wasn't "
+"successfully referenced on record %(record_id)s."
+msgstr ""
+
+#: /Users/miroslavbauer/Code/github.com/oarepo/oarepo-requests/oarepo_requests/errors.py:155
+msgid ""
+"\n"
+" Additional keyword arguments:"
+msgstr ""
+
+#: /Users/miroslavbauer/Code/github.com/oarepo/oarepo-requests/oarepo_requests/types/edit_record.py:121
+msgid "Trying to create edit request on draft record"
+msgstr ""
+
+#: /Users/miroslavbauer/Code/github.com/oarepo/oarepo-requests/oarepo_requests/types/edit_record.py:123
+#: /Users/miroslavbauer/Code/github.com/oarepo/oarepo-requests/oarepo_requests/types/new_version.py:131
+msgid "Trying to create edit request on record with draft"
+msgstr ""
+
+#: /Users/miroslavbauer/Code/github.com/oarepo/oarepo-requests/oarepo_requests/types/new_version.py:129
+msgid "Trying to create new version request on draft record"
+msgstr ""
+
+#: /Users/miroslavbauer/Code/github.com/oarepo/oarepo-requests/oarepo_requests/types/publish_base.py:81
+msgid "Trying to create publish request on published record"
+msgstr ""
+
 #: /Users/m/w/cesnet/oarepo-requests/oarepo_requests/templates/oarepo/invenio_notifications/comment-request-event.create.jinja:24
 #, python-brace-format
 msgid "💬 New comment on on '{request_title}' for '{topic_title}'"

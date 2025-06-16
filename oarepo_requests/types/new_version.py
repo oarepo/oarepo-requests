@@ -126,9 +126,9 @@ class NewVersionRequestType(NonDuplicableOARepoRequestType):
     ) -> None:
         """Check if the request can be created."""
         if topic.is_draft:
-            raise ValueError("Trying to create new version request on draft record")
+            raise ValueError(_("Trying to create new version request on draft record"))
         if has_draft(topic):
-            raise ValueError("Trying to create edit request on record with draft")
+            raise ValueError(_("Trying to create edit request on record with draft"))
         super().can_create(identity, data, receiver, topic, creator, *args, **kwargs)
 
     def topic_change(self, request: Request, new_topic: dict, uow: UnitOfWork) -> None:

@@ -11,6 +11,7 @@ from __future__ import annotations
 
 import importlib_metadata
 import marshmallow as ma
+from invenio_requests.proxies import current_requests_resource
 from flask_resources import JSONSerializer, ResponseHandler
 from invenio_records_resources.resources import RecordResourceConfig
 from invenio_records_resources.resources.records.headers import etag_headers
@@ -50,7 +51,7 @@ class RecordRequestsResourceConfig:
     @property
     def error_handlers(self) -> dict:
         """Get error handlers."""
-        entrypoint_error_handlers = {}
+        entrypoint_error_handlers = {**current_requests_resource.config.error_handlers}
         for x in importlib_metadata.entry_points(
             group="oarepo_requests.error_handlers"
         ):

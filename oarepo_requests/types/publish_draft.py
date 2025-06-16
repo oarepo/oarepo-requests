@@ -17,6 +17,7 @@ from oarepo_runtime.i18n import lazy_gettext as _
 from typing_extensions import override
 
 from .publish_base import PublishRequestType
+from ..errors import UnresolvedRequestsError
 
 if TYPE_CHECKING:
     from flask_babel.speaklater import LazyString
@@ -27,7 +28,6 @@ from oarepo_requests.typing import EntityReference
 from invenio_access.permissions import system_identity
 from oarepo_runtime.datastreams.utils import get_record_service_for_record
 from oarepo_requests.utils import get_requests_service_for_records_service
-from invenio_requests.errors import CannotExecuteActionError
 from invenio_requests.records.api import Request
 class PublishDraftRequestType(PublishRequestType):
     """Publish draft request type."""
@@ -151,6 +151,6 @@ class PublishDraftRequestType(PublishRequestType):
                 # note: we can not use solely the result.is_open because changes may not be committed yet
                 # to opensearch index. That's why we need to get the record from DB and re-check.
                 if Request.get_record(result.uuid)["status"] in ("submitted", "created"):
-                    raise CannotExecuteActionError(str(self.name), reason=_("All open requests need to be closed."))
+                    raise UnresolvedRequestsError(action=str(self.name))
         super().can_create(identity, data, receiver, topic, creator, *args, **kwargs)
 
