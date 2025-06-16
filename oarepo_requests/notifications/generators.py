@@ -145,7 +145,7 @@ class MultipleRecipientsEmailRecipients(SpecificEntityRecipient):
                 )
             elif hasattr(recipient_entity, "emails"):
                 for email_data in recipient_entity.emails:
-                    final_recipients[email_data["email"]] = Recipient(_extract_entity_email_data(recipient_entity))
+                    final_recipients[email_data["email"]] = Recipient(_extract_entity_email_data(email_data))
             else:
                 log.error(
                     "Entity %s %s does not have email/emails attribute, skipping.",
