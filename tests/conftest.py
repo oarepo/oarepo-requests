@@ -186,6 +186,17 @@ class DifferentLocalesPublish(WorkflowRequestPolicy):
             cancelled="draft",
         ),
     )
+    delete_published_record = WorkflowRequest(
+        requesters=[AnyUser()],
+        recipients=[UserGenerator(1), CSLocaleUserGenerator()],
+        transitions=WorkflowTransitions(
+            submitted="deleting",
+            accepted="deleted",
+            declined="published",
+            cancelled="published",
+        ),
+        events=events_only_receiver_can_comment,
+    )
 
 class RequestWithMultipleRecipients(WorkflowRequestPolicy):
     publish_draft = WorkflowRequest(

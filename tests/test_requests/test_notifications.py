@@ -233,3 +233,34 @@ def test_locale(
             'Your record "blabla" has been published. You can see the record at'
             in sent_mail.html
         )
+
+def test_locale_multiple_recipients(
+    app,
+    users,
+    user_with_cs_locale,
+    logged_client,
+    record_factory,
+    submit_request_on_record,
+    link2testclient,
+    urls,
+):
+    """Test notification being built on review submit."""
+
+    mail = app.extensions.get("mail")
+    assert mail
+
+    en_creator = users[1]
+    cs_receiver = user_with_cs_locale
+    record1 = record_factory(en_creator.identity, custom_workflow="different_locales")
+
+    with mail.record_messages() as outbox:
+        submit_request_on_record(
+            en_creator.identity, record1["id"], "delete_published_record"
+        )
+        # check notification is build on submit
+        assert len(outbox) == 2
+        sent_mail_cz = [mail for mail in outbox if mail.recipients[0] == cs_receiver.user.email]
+        sent_mail_en = [mail for mail in outbox if mail.recipients[0] == users[0].user.email]
+        assert len(sent_mail_cz) == len(sent_mail_en) == 1
+        assert sent_mail_cz[0].subject == "❗️ Žádost o smazání vypublikovaného záznamu blabla"
+        assert sent_mail_en[0].subject == "❗️ Request to delete published record blabla"

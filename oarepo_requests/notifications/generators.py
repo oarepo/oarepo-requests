@@ -20,9 +20,14 @@ if TYPE_CHECKING:
     from invenio_notifications.models import Notification
 
 def _extract_entity_email_data(entity: Any)->dict[str, Any]:
-    preferences = getattr(entity, "preferences", None) # todo - MultipleRecipients
+    if isinstance(entity, dict):
+        preferences = entity.get("preferences", None)
+    else:
+        preferences = getattr(entity, "preferences", None)
     if hasattr(entity, "email"):
         current_user_email = entity.email
+    elif "email" in entity:
+        current_user_email = entity["email"]
     else:
         log.error(
             "Entity %s %s does not have email/emails attribute, skipping.",
@@ -34,8 +39,6 @@ def _extract_entity_email_data(entity: Any)->dict[str, Any]:
     if preferences:
         ret["preferences"] = dict(preferences)
     return ret
-
-
 
 class EntityRecipient(RecipientGenerator):
     """Recipient generator working as handler for generic entity."""
@@ -137,13 +140,12 @@ class MultipleRecipientsEmailRecipients(SpecificEntityRecipient):
         for current_entity in entity.entities:
             recipient_entity = current_entity.resolve()
             if hasattr(recipient_entity, "email"):
-                current_user_email = recipient_entity.email
-                final_recipients[current_user_email] = Recipient(
-                    data={"email": recipient_entity.email}
+                final_recipients[recipient_entity.email] = Recipient(
+                    data=_extract_entity_email_data(recipient_entity)
                 )
             elif hasattr(recipient_entity, "emails"):
-                for email in recipient_entity.emails:
-                    final_recipients[email] = Recipient(data={"email": email})
+                for email_data in recipient_entity.emails:
+                    final_recipients[email_data["email"]] = Recipient(_extract_entity_email_data(recipient_entity))
             else:
                 log.error(
                     "Entity %s %s does not have email/emails attribute, skipping.",
@@ -151,7 +153,6 @@ class MultipleRecipientsEmailRecipients(SpecificEntityRecipient):
                     recipient_entity,
                 )
                 continue
-
         return final_recipients
 
     def __call__(self, notification: Notification, recipients: dict[str, Recipient]):
