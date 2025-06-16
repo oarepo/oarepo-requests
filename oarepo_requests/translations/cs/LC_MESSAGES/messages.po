@@ -292,7 +292,7 @@ msgstr "Stav žádosti"
 #: /Users/m/w/cesnet/oarepo-requests/oarepo_requests/types/delete_record.py:32
 #: /Users/m/w/cesnet/oarepo-requests/oarepo_requests/types/delete_record.py:37
 msgid "Request record deletion"
-msgstr "Zažádat smazání záznamu"
+msgstr "Zažádat o smazání záznamu"
 
 #: /Users/m/w/cesnet/oarepo-requests/oarepo_requests/types/delete_record.py:35
 msgid "Record deletion requested"
