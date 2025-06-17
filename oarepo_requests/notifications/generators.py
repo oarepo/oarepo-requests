@@ -26,7 +26,7 @@ def _extract_entity_email_data(entity: Any)->dict[str, Any]:
         preferences = getattr(entity, "preferences", None)
     if hasattr(entity, "email"):
         current_user_email = entity.email
-    elif "email" in entity:
+    elif isinstance(entity, dict) and "email" in entity:
         current_user_email = entity["email"]
     else:
         log.error(
