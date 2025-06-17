@@ -500,7 +500,7 @@ def test_delete_log(
     )
 
     request = submit_request_on_record(
-        creator.identity, record_id, "delete_published_record"
+        creator.identity, record_id, "delete_published_record", create_additional_data={"payload": {"removal_reason": "test reason"}}
     )
     request_id = request["id"]
 
