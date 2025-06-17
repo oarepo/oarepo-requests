@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2025-06-13 14:09+0200\n"
+"POT-Creation-Date: 2025-06-17 13:43+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -17,11 +17,11 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 2.17.0\n"
 
-#: /home/dusanst/Projects/oarepo-requests/oarepo_requests/errors.py:137
+#: /home/dusanst/Projects/oarepo-requests/oarepo_requests/errors.py:142
 msgid "There is already a record version with this version tag."
 msgstr ""
 
-#: /home/dusanst/Projects/oarepo-requests/oarepo_requests/errors.py:143
+#: /home/dusanst/Projects/oarepo-requests/oarepo_requests/errors.py:148
 msgid ""
 "There is already a record version with this version tag. Please use a "
 "different version tag."
@@ -107,6 +107,12 @@ msgstr ""
 
 #: /home/dusanst/Projects/oarepo-requests/oarepo_requests/services/ui_schema.py:197
 msgid "status"
+msgstr ""
+
+#: /home/dusanst/Projects/oarepo-requests/oarepo_requests/services/oarepo/service.py:88
+msgid ""
+"Action could not be performed due to validation request fields validation "
+"errors."
 msgstr ""
 
 #: /home/dusanst/Projects/oarepo-requests/oarepo_requests/templates/semantic-ui/invenio_notifications/delete-published-record-request-event.accept.jinja:7

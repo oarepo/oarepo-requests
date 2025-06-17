@@ -1211,5 +1211,11 @@ msgstr ""
 msgid "All open requests need to be closed."
 msgstr ""
 
+#: /home/dusanst/Projects/oarepo-requests/oarepo_requests/services/oarepo/service.py:88
+msgid ""
+"Action could not be performed due to validation request fields validation "
+"errors."
+msgstr ""
+
 #~ msgid "No status"
 #~ msgstr ""

@@ -1329,3 +1329,9 @@ msgstr ""
 #: /home/dusanst/Projects/oarepo-requests/oarepo_requests/types/publish_draft.py:154
 msgid "All open requests need to be closed."
 msgstr "Všechny otevřené žádosti musí být uzavřeny."
+
+#: /home/dusanst/Projects/oarepo-requests/oarepo_requests/services/oarepo/service.py:88
+msgid ""
+"Action could not be performed due to validation request fields validation "
+"errors."
+msgstr "Akci nelze provést kvůli chybám při validaci polí požadavku."
