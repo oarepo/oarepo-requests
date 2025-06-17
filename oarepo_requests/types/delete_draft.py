@@ -13,6 +13,7 @@ from typing import TYPE_CHECKING, Any
 
 from oarepo_runtime.datastreams.utils import get_record_service_for_record_class
 from oarepo_runtime.i18n import lazy_gettext as _
+from invenio_i18n import gettext
 from typing_extensions import override
 
 from ..actions.delete_draft import DeleteDraftAcceptAction
@@ -67,12 +68,12 @@ class DeleteDraftRequestType(NonDuplicableOARepoRequestType):
         if is_auto_approved(self, identity=identity, topic=topic):
             return self.name
         if not request:
-            return _("Request draft deletion")
+            return gettext("Request draft deletion")
         match request.status:
             case "submitted":
-                return _("Draft deletion requested")
+                return gettext("Draft deletion requested")
             case _:
-                return _("Request draft deletion")
+                return gettext("Request draft deletion")
 
     @override
     def stateful_description(
@@ -85,24 +86,24 @@ class DeleteDraftRequestType(NonDuplicableOARepoRequestType):
     ) -> str | LazyString:
         """Return the stateful description of the request."""
         if is_auto_approved(self, identity=identity, topic=topic):
-            return _("Click to permanently delete the draft.")
+            return gettext("Click to permanently delete the draft.")
 
         if not request:
-            return _("Request permission to delete the draft.")
+            return gettext("Request permission to delete the draft.")
         match request.status:
             case "submitted":
                 if request_identity_matches(request.created_by, identity):
-                    return _(
+                    return gettext(
                         "Permission to delete draft requested. "
                         "You will be notified about the decision by email."
                     )
                 if request_identity_matches(request.receiver, identity):
-                    return _(
+                    return gettext(
                         "You have been asked to approve the request to permanently delete the draft. "
                         "You can approve or reject the request."
                     )
-                return _("Permission to delete draft (including files) requested. ")
+                return gettext("Permission to delete draft (including files) requested. ")
             case _:
                 if request_identity_matches(request.created_by, identity):
-                    return _("Submit request to get permission to delete the draft.")
-                return _("You do not have permission to delete the draft.")
+                    return gettext("Submit request to get permission to delete the draft.")
+                return gettext("You do not have permission to delete the draft.")

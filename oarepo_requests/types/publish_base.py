@@ -16,7 +16,7 @@ from invenio_records_resources.services.uow import RecordCommitOp, UnitOfWork
 from invenio_requests.proxies import current_requests_service
 from oarepo_runtime.datastreams.utils import get_record_service_for_record
 from oarepo_runtime.i18n import lazy_gettext as _
-
+from invenio_i18n import gettext
 from oarepo_requests.actions.publish_draft import (
     PublishDraftAcceptAction,
     PublishDraftDeclineAction,
@@ -78,7 +78,7 @@ class PublishRequestType(NonDuplicableOARepoRequestType):
     ) -> None:
         """Check if the request can be created."""
         if not topic.is_draft:
-            raise ValueError(_("Trying to create publish request on published record"))
+            raise ValueError(gettext("Trying to create publish request on published record"))
         super().can_create(identity, data, receiver, topic, creator, *args, **kwargs)
         self.validate_topic(identity, topic)
 
@@ -102,11 +102,11 @@ class PublishRequestType(NonDuplicableOARepoRequestType):
             draft_files = topic.files  # type: ignore
             if draft_files.enabled and not draft_files.items():
                 if can_toggle_files:
-                    my_message = _(
+                    my_message = gettext(
                         "Missing uploaded files. To disable files for this record please mark it as metadata-only."
                     )
                 else:
-                    my_message = _("Missing uploaded files.")
+                    my_message = gettext("Missing uploaded files.")
 
                 raise ma.ValidationError({"files.enabled": [my_message]})
 

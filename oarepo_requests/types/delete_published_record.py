@@ -14,6 +14,7 @@ from typing import TYPE_CHECKING, Any
 import marshmallow as ma
 from oarepo_runtime.datastreams.utils import get_record_service_for_record_class
 from oarepo_runtime.i18n import lazy_gettext as _
+from invenio_i18n import gettext
 from typing_extensions import override
 
 from oarepo_requests.actions.delete_published_record import (
@@ -109,12 +110,12 @@ class DeletePublishedRecordRequestType(NonDuplicableOARepoRequestType):
         if is_auto_approved(self, identity=identity, topic=topic):
             return self.name
         if not request:
-            return _("Request record deletion")
+            return gettext("Request record deletion")
         match request.status:
             case "submitted":
-                return _("Record deletion requested")
+                return gettext("Record deletion requested")
             case _:
-                return _("Request record deletion")
+                return gettext("Request record deletion")
 
     @override
     def stateful_description(
@@ -127,24 +128,24 @@ class DeletePublishedRecordRequestType(NonDuplicableOARepoRequestType):
     ) -> str | LazyString:
         """Return the stateful description of the request."""
         if is_auto_approved(self, identity=identity, topic=topic):
-            return _("Click to permanently delete the record.")
+            return gettext("Click to permanently delete the record.")
 
         if not request:
-            return _("Request permission to delete the record.")
+            return gettext("Request permission to delete the record.")
         match request.status:
             case "submitted":
                 if request_identity_matches(request.created_by, identity):
-                    return _(
+                    return gettext(
                         "Permission to delete record requested. "
                         "You will be notified about the decision by email."
                     )
                 if request_identity_matches(request.receiver, identity):
-                    return _(
+                    return gettext(
                         "You have been asked to approve the request to permanently delete the record. "
                         "You can approve or reject the request."
                     )
-                return _("Permission to delete record (including files) requested. ")
+                return gettext("Permission to delete record (including files) requested. ")
             case _:
                 if request_identity_matches(request.created_by, identity):
-                    return _("Submit request to get permission to delete the record.")
-                return _("You do not have permission to delete the record.")
+                    return gettext("Submit request to get permission to delete the record.")
+                return gettext("You do not have permission to delete the record.")
