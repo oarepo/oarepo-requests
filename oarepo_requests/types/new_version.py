@@ -18,8 +18,7 @@ from invenio_records_resources.services.uow import RecordCommitOp, UnitOfWork
 from invenio_requests.proxies import current_requests_service
 from marshmallow.validate import OneOf
 from oarepo_runtime.datastreams.utils import get_record_service_for_record_class
-from invenio_i18n import gettext as _
-from invenio_i18n import gettext
+from invenio_i18n import gettext, lazy_gettext as _
 from oarepo_runtime.records.drafts import has_draft
 from typing_extensions import override
 

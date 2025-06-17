@@ -18,7 +18,7 @@ from flask_resources import (
 )
 from invenio_requests.errors import CannotExecuteActionError
 from flask_resources.serializers.json import JSONEncoder
-from invenio_i18n import gettext as _
+from invenio_i18n import gettext, lazy_gettext as _
 from oarepo_workflows.errors import (
     EventTypeNotInWorkflow as WorkflowEventTypeNotInWorkflow,
 )
@@ -93,7 +93,7 @@ class OpenRequestAlreadyExists(Exception):
     @property
     def description(self):
         """Exception's description."""
-        return _(
+        return gettext(
             "There is already an open request of %(request_type)s on %(record_id)s."
         ) % {
             "request_type": self.request_type.name,
@@ -110,7 +110,7 @@ class UnresolvedRequestsError(CannotExecuteActionError):
 
     def __str__(self):
         """Return str(self)."""
-        return _("Cannot %(action)s: %(reason)s") % {
+        return gettext("Cannot %(action)s: %(reason)s") % {
             "action": self.action.lower(),
             "reason": self.reason,
         }
@@ -126,7 +126,7 @@ class UnknownRequestType(Exception):
     @property
     def description(self) -> str:
         """Exception's description."""
-        return _("Unknown request type %(request_type)s.") % {
+        return gettext("Unknown request type %(request_type)s.") % {
             "request_type": self.request_type,
         }
 
@@ -145,14 +145,14 @@ class ReceiverNonReferencable(Exception):
     @property
     def description(self) -> str:
         """Exception's description."""
-        message = _(
+        message = gettext(
             "Receiver for request type %(request_type)s is required but wasn't successfully referenced on record %(record_id)s."
         ) % {
             "request_type": self.request_type,
             "record_id": self.record["id"],
         }
         if self.kwargs:
-            message += _("\n Additional keyword arguments:")
+            message += gettext("\n Additional keyword arguments:")
             message += f"\n{', '.join(self.kwargs)}"
         return message
 
@@ -162,12 +162,12 @@ class VersionAlreadyExists(CustomHTTPJSONException):
 
     def __init__(self) -> None:
         """Initialize the exception."""
-        description = _("There is already a record version with this version tag.")
+        description = gettext("There is already a record version with this version tag.")
         errors = [
             {
                 "field": "payload.version",
                 "messages": [
-                    _(
+                    gettext(
                         "There is already a record version with this version tag. Please use a different version tag."
                     )
                 ],

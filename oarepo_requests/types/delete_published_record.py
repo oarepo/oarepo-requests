@@ -13,8 +13,7 @@ from typing import TYPE_CHECKING, Any
 
 import marshmallow as ma
 from oarepo_runtime.datastreams.utils import get_record_service_for_record_class
-from oarepo_runtime.i18n import lazy_gettext as _
-from invenio_i18n import gettext
+from invenio_i18n import gettext, lazy_gettext as _
 from typing_extensions import override
 
 from oarepo_requests.actions.delete_published_record import (

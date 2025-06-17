@@ -14,8 +14,7 @@ from typing import TYPE_CHECKING, Any, override
 import marshmallow as ma
 from invenio_requests.records.api import Request
 from oarepo_runtime.datastreams.utils import get_record_service_for_record
-from oarepo_runtime.i18n import lazy_gettext as _
-from invenio_i18n import gettext
+from invenio_i18n import gettext, lazy_gettext as _
 
 from oarepo_requests.actions.publish_draft import (
     PublishDraftDeclineAction,
