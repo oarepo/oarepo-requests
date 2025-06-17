@@ -18,7 +18,7 @@ from flask_resources import (
 )
 from invenio_requests.errors import CannotExecuteActionError
 from flask_resources.serializers.json import JSONEncoder
-from oarepo_runtime.i18n import lazy_gettext as _
+from invenio_i18n import gettext as _
 from oarepo_workflows.errors import (
     EventTypeNotInWorkflow as WorkflowEventTypeNotInWorkflow,
 )
