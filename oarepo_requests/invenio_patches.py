@@ -204,7 +204,7 @@ def override_invenio_notifications(
             CommentRequestEventCreateNotificationBuilder,
         )
 
-        from oarepo_requests.resolvers.generators import RequestEntityResolve
+        from oarepo_requests.notifications.generators import RequestEntityResolve
 
         for r in CommentRequestEventCreateNotificationBuilder.context:
             if isinstance(r, EntityResolve) and r.key == "request.topic":
