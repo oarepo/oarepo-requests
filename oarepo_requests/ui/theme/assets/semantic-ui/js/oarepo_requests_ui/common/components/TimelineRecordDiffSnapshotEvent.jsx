@@ -13,7 +13,7 @@ import {
 } from "@js/oarepo_requests_common";
 
 export const TimelineRecordDiffSnapshotEvent = ({ event }) => {
-  const [accordionVisible, setAccordionVisible] = useState(false);
+  const [visibleAccordions, setVisibleAccordions] = useState({});
 
   const eventIcon = getRequestStatusIcon("edited");
   const feedMessage = getFeedMessage("edited");
@@ -22,8 +22,15 @@ export const TimelineRecordDiffSnapshotEvent = ({ event }) => {
   const creatorLabel =
     createdBy?.profile?.full_name || createdBy?.username || createdBy?.email;
 
+  const toggleAccordion = (operationType) => {
+    setVisibleAccordions(prev => ({
+      ...prev,
+      [operationType]: !prev[operationType]
+    }));
+  };
+
   // Parse and process diff data
-  const renderDiffTable = () => {
+  const renderDiffTables = () => {
     if (!event.payload?.diff) return null;
 
     try {
@@ -43,93 +50,126 @@ export const TimelineRecordDiffSnapshotEvent = ({ event }) => {
         );
       }
 
-      // Group operations by base path for better organization
-      const groupedOperations = diffOperations.reduce((groups, op) => {
-        const basePath = op.path.split("/")[1] || op.path; // Get first level path
-        if (!groups[basePath]) {
-          groups[basePath] = [];
+      // Group operations by type
+      const operationsByType = diffOperations.reduce((groups, op) => {
+        const operationType = op.op.toLowerCase();
+        if (!groups[operationType]) {
+          groups[operationType] = [];
         }
-        groups[basePath].push(op);
+        groups[operationType].push(op);
         return groups;
       }, {});
 
-      return (
-        <Table basic collapsing celled stackable className="record-diff-table requests">
-          <Table.Header>
-            <Table.Row>
-              <Table.HeaderCell>{`${i18next.t("Operation")}/${i18next.t("Field")}`}</Table.HeaderCell>
-              <Table.HeaderCell>{i18next.t("Old Value")}</Table.HeaderCell>
-              <Table.HeaderCell>{i18next.t("New Value")}</Table.HeaderCell>
-            </Table.Row>
-          </Table.Header>
-          <Table.Body>
-            {Object.entries(groupedOperations).map(([basePath, operations]) =>
-              operations.map((op, index) => {
-                // Convert 0-based array indices to 1-based for human readability
-                const humanReadablePath = op.path
-                  .replace(/^\//, "")
-                  .replace(/\/(\d+)\//g, (match, arrayIndex) => {
-                    return `/${parseInt(arrayIndex) + 1}/`;
-                  })
-                  .replace(/\/(\d+)$/, (match, arrayIndex) => {
-                    return `/${parseInt(arrayIndex) + 1}`;
-                  })
-                  .replace(/\//g, " › ");
-                
-                const operationType = op.op.toLowerCase();
+      // Format values for display
+      const formatValue = (value) => {
+        if (value === null || value === undefined) return "—";
+        if (_isArray(value) && _every(value, _isString)) return value.join(", ");
+        if (_isObjectLike(value))
+          return JSON.stringify(value, null, 2);
+        return String(value);
+      };
 
-                // Format values for display
-                const formatValue = (value) => {
-                  if (value === null || value === undefined) return "—";
-                  if (_isArray(value) && _every(value, _isString)) return value.join(", ");
-                  if (_isObjectLike(value))
-                    return JSON.stringify(value, null, 2);
-                  return String(value);
-                };
+      // Convert path to human readable format
+      const formatPath = (path) => {
+        return path
+          .replace(/^\//, "")
+          .replace(/\/(\d+)\//g, (match, arrayIndex) => {
+            return ` › ${parseInt(arrayIndex) + 1} › `;
+          })
+          .replace(/\/(\d+)$/, (match, arrayIndex) => {
+            return ` › ${parseInt(arrayIndex) + 1}`;
+          })
+          .replace(/\//g, " › ");
+      };
 
-                const getOperationColorIcon = (operation) => {
-                  switch (operation.toLowerCase()) {
-                    case "add":
-                      return {name: "add", color: "green", title: i18next.t("Add")};
-                    case "remove":
-                      return {name: "remove", color: "red", title: i18next.t("Remove")};
-                    case "replace":
-                      return {name: "edit", color: "orange", title: i18next.t("Replace")};
-                    default:
-                      return {name: "pencil", color: "grey", title: i18next.t("Unknown operation")};
-                  }
-                };
+      const renderOperationTable = (operations, operationType) => {
+        const operationConfig = {
+          add: {
+            title: i18next.t("Added"),
+            icon: "add",
+            color: "green"
+          },
+          remove: {
+            title: i18next.t("Removed"),
+            icon: "remove",
+            color: "red"
+          },
+          replace: {
+            title: i18next.t("Changed"),
+            icon: "pencil",
+            color: "orange"
+          }
+        };
 
-                return (
-                  <Table.Row key={`${basePath}-${index}`}>
-                    <Table.Cell className="flex align-items-top">
-                      <Icon {...getOperationColorIcon(operationType)} />
-                      <code>{humanReadablePath}</code>
-                    </Table.Cell>
-                    <Table.Cell>
-                      {operationType === "add" ? (
-                        <em>{i18next.t("None")}</em>
-                      ) : (
-                        <pre>
-                          {formatValue(op.old_value)}
-                        </pre>
-                      )}
-                    </Table.Cell>
-                    <Table.Cell>
-                      {operationType === "remove" ? (
-                        <em>{i18next.t("Removed")}</em>
-                      ) : (
-                        <pre>
-                          {formatValue(op.value)}
-                        </pre>
-                      )}
-                    </Table.Cell>
+        const config = operationConfig[operationType];
+        if (!config || operations.length === 0) return null;
+
+        const isVisible = visibleAccordions[operationType] || false;
+
+        return (
+          <Accordion key={operationType} fluid className={`operation-accordion ${operationType}`}>
+            <Accordion.Title
+              active={isVisible}
+              onClick={() => toggleAccordion(operationType)}
+              className={`operation-title ${operationType}`}
+            >
+              <Icon name="dropdown" />
+              <span>
+                <Icon name={config.icon} className="operation-icon" />
+                {config.title}
+                <span className="operation-count">({operations.length})</span>
+              </span>
+            </Accordion.Title>
+            <Accordion.Content active={isVisible}>
+              <Table basic celled stackable className={`record-diff-table requests ${operationType}`}>
+                <Table.Header>
+                  <Table.Row>
+                    <Table.HeaderCell>{i18next.t("Field")}</Table.HeaderCell>
+                    {operationType === "replace" ? (
+                      <>
+                        <Table.HeaderCell>{i18next.t("Old Value")}</Table.HeaderCell>
+                        <Table.HeaderCell>{i18next.t("New Value")}</Table.HeaderCell>
+                      </>
+                    ) : (
+                      <Table.HeaderCell>{i18next.t("Value")}</Table.HeaderCell>
+                    )}
                   </Table.Row>
-                );
-              })
-            )}
-          </Table.Body>
-        </Table>
+                </Table.Header>
+                <Table.Body>
+                  {operations.map((op, index) => (
+                    <Table.Row key={`${operationType}-${index}`}>
+                      <Table.Cell>
+                        <code>{formatPath(op.path)}</code>
+                      </Table.Cell>
+                      {operationType === "replace" ? (
+                        <>
+                          <Table.Cell>
+                            <pre>{formatValue(op.old_value)}</pre>
+                          </Table.Cell>
+                          <Table.Cell>
+                            <pre>{formatValue(op.value)}</pre>
+                          </Table.Cell>
+                        </>
+                      ) : (
+                        <Table.Cell>
+                          <pre>{formatValue(operationType === "remove" ? op.old_value : op.value)}</pre>
+                        </Table.Cell>
+                      )}
+                    </Table.Row>
+                  ))}
+                </Table.Body>
+              </Table>
+            </Accordion.Content>
+          </Accordion>
+        );
+      };
+
+      return (
+        <div className="diff-tables-container">
+          {renderOperationTable(operationsByType.add || [], "add")}
+          {renderOperationTable(operationsByType.remove || [], "remove")}
+          {renderOperationTable(operationsByType.replace || [], "replace")}
+        </div>
       );
     } catch (error) {
       return (
@@ -169,18 +209,7 @@ export const TimelineRecordDiffSnapshotEvent = ({ event }) => {
             </Feed.Date>
           </Feed.Summary>
           <Feed.Extra>
-            <Accordion fluid>
-              <Accordion.Title
-                active={accordionVisible}
-                onClick={() => setAccordionVisible(!accordionVisible)}
-              >
-                <Icon name="dropdown" />
-                {i18next.t("View changes")}
-              </Accordion.Title>
-              <Accordion.Content active={accordionVisible}>
-                {renderDiffTable()}
-              </Accordion.Content>
-            </Accordion>
+            {renderDiffTables()}
           </Feed.Extra>
         </Feed.Content>
       </Feed.Event>

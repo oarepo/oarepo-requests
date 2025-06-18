@@ -1265,5 +1265,14 @@ msgstr ""
 msgid "View changes"
 msgstr ""
 
+msgid "Added"
+msgstr ""
+
+msgid "Changed"
+msgstr ""
+
+msgid "Value"
+msgstr ""
+
 #~ msgid "No status"
 #~ msgstr ""

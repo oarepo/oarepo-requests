@@ -47,26 +47,91 @@
         margin-left: calc(
           @verticalLineLeftMargin + @actionEventIconSize / 1.5
         );
-        .ui.accordion {
-          .active.title {
-            display: unset;
-          }
-          .record-diff-table {
-            width: 100%;
-            border: none !important;
-            word-break: normal;
-            code {
-              padding: 0;
-              overflow-wrap: normal;
+
+        .diff-tables-container {
+          margin-left: 0.2rem;
+          
+          .ui.accordion.operation-accordion {
+            margin-bottom: 1rem;
+            
+            &:last-child {
+              margin-bottom: 0;
             }
-            em {
-              color: #999;
+            
+            .operation-title {
+              padding: 0.2rem 1rem !important;
+              font-weight: 600;
+              display: flex !important;
+              align-items: center;
+
+              &.active.title {
+                display: unset;
+
+                .icon:not(.dropdown) {
+                  transform: unset;
+                }
+              }
+              
+              .operation-icon {
+                margin-left: 0.2rem;
+              }
+              
+              .operation-count {
+                margin-left: 0.5rem;
+                font-weight: normal;
+                color: #666;
+                font-size: 0.9em;
+              }
+              
+              &.add {
+                color: #21ba45;
+                border-left: 3px solid #21ba45;
+              }
+              
+              &.remove {
+                color: #db2828;
+                border-left: 3px solid #db2828;
+              }
+              
+              &.replace {
+                color: #f2711c;
+                border-left: 3px solid #f2711c;
+              }
             }
-            pre {
-              margin: 0;
-              font-size: 0.9em;
-              white-space: pre-wrap;
-              overflow-wrap: anywhere;
+            
+            .record-diff-table {
+              margin-top: 0;
+              width: 100%;
+              border: none !important;
+              word-break: normal;
+
+              code {
+                padding: 0;
+                overflow-wrap: normal;
+              }
+
+              em {
+                color: #999;
+              }
+              
+              pre {
+                margin: 0;
+                font-size: 0.9em;
+                white-space: pre-wrap;
+                overflow-wrap: anywhere;
+              }
+              
+              &.add {
+                border-left: 3px solid #21ba45 !important;
+              }
+              
+              &.remove {
+                border-left: 3px solid #db2828 !important;
+              }
+              
+              &.replace {
+                border-left: 3px solid #f2711c !important;
+              }
             }
           }
         }
