@@ -38,6 +38,7 @@ from oarepo_workflows import (
 )
 from oarepo_workflows.base import Workflow
 from oarepo_workflows.requests.events import WorkflowEvent
+from oarepo_workflows.requests.generators.conditionals import PrivilegedRole
 from pytest_oarepo.requests.classes import TestEventType, UserGenerator
 from thesis.proxies import current_service
 
@@ -196,6 +197,19 @@ class DifferentLocalesPublish(WorkflowRequestPolicy):
             cancelled="published",
         ),
         events=events_only_receiver_can_comment,
+    )
+
+class PrivilegedAccessRequests(DefaultRequests):
+    publish_draft = WorkflowRequest(
+        requesters=[IfInState("draft", [RecordOwners()])],
+        recipients=[UserGenerator(2)],
+        transitions=WorkflowTransitions(
+            submitted="publishing",
+            accepted="published",
+            declined="draft",
+            cancelled="draft",
+        ),
+        privileged=[PrivilegedRole(UserGenerator(3), read=True, action_accept=True, events=[LogEventType.type_id])] #specify necessary events on request type?
     )
 
 class RequestWithMultipleRecipients(WorkflowRequestPolicy):
@@ -508,7 +522,12 @@ WORKFLOWS = {
         label=_("User with id 3 prefers cs locale."),
         permission_policy_cls=DifferentLocalesPermissions,
         request_policy_cls=DifferentLocalesPublish,
-    )
+    ),
+    "privileged_access": Workflow(
+        label=_("Workflow with privileged access"),
+        permission_policy_cls=TestWorkflowPermissions,
+        request_policy_cls=PrivilegedAccessRequests,
+    ),
 }
 
 @pytest.fixture()
