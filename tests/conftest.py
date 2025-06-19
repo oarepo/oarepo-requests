@@ -38,7 +38,7 @@ from oarepo_workflows import (
 )
 from oarepo_workflows.base import Workflow
 from oarepo_workflows.requests.events import WorkflowEvent
-from oarepo_workflows.requests.generators.conditionals import PrivilegedRole
+from oarepo_workflows.requests.generators.conditionals import RequestPrivilegedRole, EventPrivilegedRole
 from pytest_oarepo.requests.classes import TestEventType, UserGenerator
 from thesis.proxies import current_service
 
@@ -209,7 +209,18 @@ class PrivilegedAccessRequests(DefaultRequests):
             declined="draft",
             cancelled="draft",
         ),
-        privileged=[PrivilegedRole(UserGenerator(3), read=True, action_accept=True, events=[LogEventType.type_id])] #specify necessary events on request type?
+        privileged=[RequestPrivilegedRole(UserGenerator(3), read=True, accept=True)], #specify necessary events on request type?
+        events={
+                    CommentEventType.type_id: WorkflowEvent(submitters=can_comment_only_receiver),
+                    LogEventType.type_id: WorkflowEvent(
+                        submitters=InvenioRequestsPermissionPolicy.can_create_comment,
+                        privileged=[EventPrivilegedRole(UserGenerator(3), create=True)]
+                    ),
+                    TopicUpdateEventType.type_id: WorkflowEvent(
+                        submitters=InvenioRequestsPermissionPolicy.can_create_comment
+                    ),
+                    TestEventType.type_id: WorkflowEvent(submitters=can_comment_only_receiver),
+                }
     )
 
 class RequestWithMultipleRecipients(WorkflowRequestPolicy):
