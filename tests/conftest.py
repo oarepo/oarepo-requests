@@ -38,6 +38,7 @@ from oarepo_workflows import (
 )
 from oarepo_workflows.base import Workflow
 from oarepo_workflows.requests.events import WorkflowEvent
+from oarepo_workflows.requests.generators.conditionals import RequestPrivilegedRole, EventPrivilegedRole
 from pytest_oarepo.requests.classes import TestEventType, UserGenerator
 from thesis.proxies import current_service
 
@@ -196,6 +197,30 @@ class DifferentLocalesPublish(WorkflowRequestPolicy):
             cancelled="published",
         ),
         events=events_only_receiver_can_comment,
+    )
+
+class PrivilegedAccessRequests(DefaultRequests):
+    publish_draft = WorkflowRequest(
+        requesters=[IfInState("draft", [RecordOwners()])],
+        recipients=[UserGenerator(2)],
+        transitions=WorkflowTransitions(
+            submitted="publishing",
+            accepted="published",
+            declined="draft",
+            cancelled="draft",
+        ),
+        privileged=[RequestPrivilegedRole(UserGenerator(3), read=True, accept=True)], #specify necessary events on request type?
+        events={
+                    CommentEventType.type_id: WorkflowEvent(submitters=can_comment_only_receiver),
+                    LogEventType.type_id: WorkflowEvent(
+                        submitters=InvenioRequestsPermissionPolicy.can_create_comment,
+                        privileged=[EventPrivilegedRole(UserGenerator(3), create=True)]
+                    ),
+                    TopicUpdateEventType.type_id: WorkflowEvent(
+                        submitters=InvenioRequestsPermissionPolicy.can_create_comment
+                    ),
+                    TestEventType.type_id: WorkflowEvent(submitters=can_comment_only_receiver),
+                }
     )
 
 class RequestWithMultipleRecipients(WorkflowRequestPolicy):
@@ -508,7 +533,12 @@ WORKFLOWS = {
         label=_("User with id 3 prefers cs locale."),
         permission_policy_cls=DifferentLocalesPermissions,
         request_policy_cls=DifferentLocalesPublish,
-    )
+    ),
+    "privileged_access": Workflow(
+        label=_("Workflow with privileged access"),
+        permission_policy_cls=TestWorkflowPermissions,
+        request_policy_cls=PrivilegedAccessRequests,
+    ),
 }
 
 @pytest.fixture()
