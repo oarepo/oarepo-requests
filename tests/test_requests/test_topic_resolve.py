@@ -33,7 +33,7 @@ def test_resolve_topic(
     ThesisDraft.index.refresh()
 
     resp_request_submit = submit_request_on_record(
-        creator.identity, record1_id, "delete_published_record"
+        creator.identity, record1_id, "delete_published_record", create_additional_data={"payload": {"removal_reason": "test reason"}}
     )
     assert resp_request_submit["status"] == "submitted"
 
@@ -96,7 +96,7 @@ def test_ui_resolve_topic(
     ThesisDraft.index.refresh()
 
     resp_request_submit = submit_request_on_record(
-        creator.identity, record1_id, "delete_published_record"
+        creator.identity, record1_id, "delete_published_record", create_additional_data={"payload": {"removal_reason": "test reason"}}
     )
     assert resp_request_submit["status"] == "submitted"
 

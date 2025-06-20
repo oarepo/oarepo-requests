@@ -45,5 +45,11 @@ def create_notifications(app: Flask) -> Blueprint:
         __name__,
         template_folder=Path(__file__).parent.parent / "templates",
     )
+    from oarepo_requests.invenio_patches import (
+        override_invenio_notifications,
+    )
+
+    # adding notification patches for celery
+    blueprint.record_once(override_invenio_notifications)
 
     return blueprint

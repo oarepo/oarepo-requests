@@ -4,8 +4,9 @@ import logging
 from abc import abstractmethod
 from typing import TYPE_CHECKING
 
+from invenio_access.permissions import system_identity
 from invenio_notifications.models import Recipient
-from invenio_notifications.services.generators import RecipientGenerator
+from invenio_notifications.services.generators import EntityResolve, RecipientGenerator
 from invenio_records.dictutils import dict_lookup
 from invenio_requests.proxies import current_requests
 from invenio_requests.records.api import Request
@@ -19,7 +20,8 @@ if TYPE_CHECKING:
 
     from invenio_notifications.models import Notification
 
-def _extract_entity_email_data(entity: Any)->dict[str, Any]:
+
+def _extract_entity_email_data(entity: Any) -> dict[str, Any]:
     if isinstance(entity, dict):
         preferences = entity.get("preferences", None)
     else:
@@ -39,6 +41,7 @@ def _extract_entity_email_data(entity: Any)->dict[str, Any]:
     if preferences:
         ret["preferences"] = dict(preferences)
     return ret
+
 
 class EntityRecipient(RecipientGenerator):
     """Recipient generator working as handler for generic entity."""
@@ -120,6 +123,7 @@ class UserEmailRecipient(SpecificEntityRecipient):
         else:
             return {}
 
+
 class GroupEmailRecipient(SpecificEntityRecipient):
     """Recipient generator returning emails of the members of the recipient group."""
 
@@ -145,7 +149,9 @@ class MultipleRecipientsEmailRecipients(SpecificEntityRecipient):
                 )
             elif hasattr(recipient_entity, "emails"):
                 for email_data in recipient_entity.emails:
-                    final_recipients[email_data["email"]] = Recipient(_extract_entity_email_data(email_data))
+                    final_recipients[email_data["email"]] = Recipient(
+                        _extract_entity_email_data(email_data)
+                    )
             else:
                 log.error(
                     "Entity %s %s does not have email/emails attribute, skipping.",
@@ -160,3 +166,23 @@ class MultipleRecipientsEmailRecipients(SpecificEntityRecipient):
         entity = self._resolve_entity()
         recipients.update(self._get_recipients(entity))
         return recipients
+
+
+class RequestEntityResolve(EntityResolve):
+    """Entity resolver that adds the correct title if it is missing."""
+
+    def __call__(self, notification):
+        notification = super().__call__(notification)
+        request_dict = notification.context["request"]
+        if request_dict.get("title"):
+            return request_dict
+
+        request = Request.get_record(request_dict["id"])
+        if hasattr(request.type, "stateful_name"):
+            # If the request type has a stateful name, use it
+            # note: do not have better identity here, so using system_identity
+            # as a fallback
+            request_dict["title"] = request.type.stateful_name(
+                system_identity, topic=None
+            )
+        return notification

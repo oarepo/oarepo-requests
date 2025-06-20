@@ -1250,6 +1250,67 @@ msgstr ""
 msgid "Recepient: {{receiver}}."
 msgstr ""
 
+#: /home/dusanst/Projects/oarepo-requests/oarepo_requests/services/oarepo/service.py:88
+#: /Users/m/w/cesnet/oarepo-requests/oarepo_requests/templates/oarepo/invenio_notifications/comment-request-event.create.jinja:24
+#, python-brace-format
+msgid "💬 New comment on on '{request_title}' for '{topic_title}'"
+msgstr ""
+
+#: /Users/m/w/cesnet/oarepo-requests/oarepo_requests/templates/oarepo/invenio_notifications/comment-request-event.create.jinja:26
+#, python-brace-format
+msgid "💬 New comment on on '{request_title}'"
+msgstr ""
+
+#: /Users/m/w/cesnet/oarepo-requests/oarepo_requests/templates/oarepo/invenio_notifications/comment-request-event.create.jinja:28
+msgid "💬 New comment"
+msgstr ""
+
+#: /Users/m/w/cesnet/oarepo-requests/oarepo_requests/templates/oarepo/invenio_notifications/comment-request-event.create.jinja:36
+#, python-brace-format
+msgid "'{user_name}' commented on '{request_title}' for '{topic_title}':"
+msgstr ""
+
+#: /Users/m/w/cesnet/oarepo-requests/oarepo_requests/templates/oarepo/invenio_notifications/comment-request-event.create.jinja:38
+#, python-brace-format
+msgid "'{user_name}' commented on '{request_title}':"
+msgstr ""
+
+#: /Users/m/w/cesnet/oarepo-requests/oarepo_requests/templates/oarepo/invenio_notifications/comment-request-event.create.jinja:40
+#, python-brace-format
+msgid "'{user_name}' commented:"
+msgstr ""
+
+#: /Users/m/w/cesnet/oarepo-requests/oarepo_requests/templates/oarepo/invenio_notifications/comment-request-event.create.jinja:47
+#: /Users/m/w/cesnet/oarepo-requests/oarepo_requests/templates/oarepo/invenio_notifications/comment-request-event.create.jinja:73
+msgid "Check out the request"
+msgstr ""
+
+#: /Users/m/w/cesnet/oarepo-requests/oarepo_requests/templates/oarepo/invenio_notifications/comment-request-event.create.jinja:59
+#, python-brace-format
+msgid "@{user_name} commented on '{request_title}'"
+msgstr ""
+
+#: /Users/m/w/cesnet/oarepo-requests/oarepo_requests/templates/oarepo/invenio_notifications/comment-request-event.create.jinja:63
+#, python-brace-format
+msgid "Check out the request: {request_link}"
+msgstr ""
+
+#: /Users/m/w/cesnet/oarepo-requests/oarepo_requests/templates/oarepo/invenio_notifications/comment-request-event.create.jinja:69
+#, python-brace-format
+msgid "*@{user_name}* commented on *{request_title}*"
+msgstr ""
+
+#: /home/dusanst/Projects/oarepo-requests/oarepo_requests/services/oarepo/service.py:88
+msgid ""
+"Action could not be performed due to validation request fields validation "
+"errors."
+msgstr ""
+
+msgid ""
+"Record has validation errors. Please click the 'Edit metadata' button and "
+"then try again."
+msgstr ""
+
 msgid "Recepient:"
 msgstr ""
 
