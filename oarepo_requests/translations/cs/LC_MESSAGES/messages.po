@@ -1310,6 +1310,10 @@ msgstr "Čeká se na vyřízení žádosti o zveřejnění nové verze."
 msgid "escalated"
 msgstr "eskaloval(a)"
 
+#: /home/dusanst/Projects/oarepo-requests/oarepo_requests/actions/publish_draft.py:85
+msgid "This version tag already exists"
+msgstr "Tento štítek verze již existuje."
+
 #: /home/dusanst/Projects/oarepo-requests/oarepo_requests/errors.py:137
 msgid "There is already a record version with this version tag."
 msgstr "Verze záznamu s tímto štítkem verze již existuje."
@@ -1426,3 +1430,15 @@ msgstr "*@{user_name}* komentoval(a) žádost *{request_title}*"
 #, python-brace-format
 msgid "*@{user_name}* commented on *{request_title}*"
 msgstr "*@{user_name}* komentoval(a) žádost *{request_title}*"
+
+msgid ""
+"Record has validation errors. Please click the 'Edit metadata' button and "
+"then try again."
+msgstr ""
+
+msgid ""
+"Record has validation errors. Please click the 'Edit metadata' button and "
+"then try again."
+msgstr ""
+"Záznam obsahuje chyby validace. Prosím, klikněte na tlačítko 'Upravit "
+"metadata' a poté to zkuste znovu."

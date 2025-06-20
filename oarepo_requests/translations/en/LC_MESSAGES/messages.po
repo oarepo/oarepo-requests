@@ -1316,5 +1316,10 @@ msgid ""
 "errors."
 msgstr ""
 
+msgid ""
+"Record has validation errors. Please click the 'Edit metadata' button and "
+"then try again."
+msgstr ""
+
 #~ msgid "No status"
 #~ msgstr ""
