@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2025-06-13 14:09+0200\n"
+"POT-Creation-Date: 2025-06-20 12:45+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -47,11 +47,16 @@ msgstr ""
 msgid "Cancelled"
 msgstr ""
 
-#: /home/dusanst/Projects/oarepo-requests/oarepo_requests/invenio_patches.py:187
+#: /home/dusanst/Projects/oarepo-requests/oarepo_requests/invenio_patches.py:186
+#: /home/dusanst/Projects/oarepo-requests/oarepo_requests/translations/_only_for_translations.py:37
+msgid "Created"
+msgstr ""
+
+#: /home/dusanst/Projects/oarepo-requests/oarepo_requests/invenio_patches.py:188
 msgid "Request status"
 msgstr ""
 
-#: /home/dusanst/Projects/oarepo-requests/oarepo_requests/invenio_patches.py:193
+#: /home/dusanst/Projects/oarepo-requests/oarepo_requests/invenio_patches.py:194
 msgid "Type"
 msgstr ""
 
@@ -392,10 +397,6 @@ msgstr ""
 
 #: /home/dusanst/Projects/oarepo-requests/oarepo_requests/translations/_only_for_translations.py:36
 msgid "Request type"
-msgstr ""
-
-#: /home/dusanst/Projects/oarepo-requests/oarepo_requests/translations/_only_for_translations.py:37
-msgid "Created"
 msgstr ""
 
 #: /home/dusanst/Projects/oarepo-requests/oarepo_requests/translations/_only_for_translations.py:38
@@ -953,6 +954,33 @@ msgstr ""
 msgid "User avatar"
 msgstr ""
 
+msgid "Newest"
+msgstr ""
+
+msgid "Oldest"
+msgstr ""
+
+msgid "Search record's requests"
+msgstr ""
+
+msgid "Record's requests"
+msgstr ""
+
+msgid "Request history of the record."
+msgstr ""
+
+msgid "Search record's requests..."
+msgstr ""
+
+msgid "Typ"
+msgstr ""
+
+msgid "Stav žádosti"
+msgstr ""
+
+msgid "Close"
+msgstr ""
+
 msgid "Remaining characters: "
 msgstr ""
 
@@ -965,9 +993,6 @@ msgid "Request details"
 msgstr ""
 
 msgid "Form fields could not be fetched."
-msgstr ""
-
-msgid "Close"
 msgstr ""
 
 msgid "Status"
@@ -1018,6 +1043,24 @@ msgstr ""
 msgid ""
 "Are you sure you want to proceed? Once the action is completed, it will not "
 "be possible to undo it."
+msgstr ""
+
+msgid "No description"
+msgstr ""
+
+msgid "Opened by {{creatorName}} on {{created}}."
+msgstr ""
+
+msgid "Expires at: {{- expiringDate}}"
+msgstr ""
+
+msgid "Not submitted"
+msgstr ""
+
+msgid "Recepient: {{receiver}}."
+msgstr ""
+
+msgid "Recepient:"
 msgstr ""
 
 msgid ""

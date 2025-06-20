@@ -1329,3 +1329,45 @@ msgstr ""
 #: /home/dusanst/Projects/oarepo-requests/oarepo_requests/types/publish_draft.py:154
 msgid "All open requests need to be closed."
 msgstr "Všechny otevřené žádosti musí být uzavřeny."
+
+msgid "Newest"
+msgstr "Nejnovější"
+
+msgid "Oldest"
+msgstr "Nejstarší"
+
+msgid "Search record's requests"
+msgstr "Hledat žádosti k záznamu"
+
+msgid "Record's requests"
+msgstr "Žádosti k záznamu"
+
+msgid "Request history of the record."
+msgstr "Historie žádostí o daný záznam."
+
+msgid "Search record's requests..."
+msgstr "Hledat žádosti k záznamu..."
+
+msgid "Typ"
+msgstr "Typ"
+
+msgid "Stav žádosti"
+msgstr "Stav žádosti"
+
+msgid "No description"
+msgstr "Žádný popis"
+
+msgid "Opened by {{creatorName}} on {{created}}."
+msgstr "Otevřeno uživatelem {{creatorName}} dne {{created}}."
+
+msgid "Expires at: {{- expiringDate}}"
+msgstr "Platnost do: {{- expiringDate}}"
+
+msgid "Not submitted"
+msgstr "Nepodáno"
+
+msgid "Recepient: {{receiver}}."
+msgstr "Příjemce: {{receiver}}."
+
+msgid "Recepient:"
+msgstr "Příjemce:"

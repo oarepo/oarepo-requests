@@ -48,6 +48,10 @@ function RequestsResultsItem({ result }) {
   );
 }
 
+RequestsResultsItem.propTypes = {
+  result: PropTypes.object.isRequired,
+};
+
 export class Results extends Component {
   constructor(props) {
     super(props);
@@ -126,7 +130,11 @@ const resultsPerPageValues = [
   { text: "50", value: 50 },
 ];
 
-export const RecordRequestsListModal = ({ endpointUrl, trigger }) => {
+export const RecordRequestsListModal = ({
+  endpointUrl,
+  trigger,
+  recordTitle,
+}) => {
   const [modalOpen, setModalOpen] = useState(false);
 
   const searchApi = new InvenioSearchApi({
@@ -154,7 +162,7 @@ export const RecordRequestsListModal = ({ endpointUrl, trigger }) => {
       trigger={
         trigger || (
           <Button
-            title={i18next.t("Search Record Requests")}
+            title={i18next.t("Search record's requests")}
             className="transparent"
             icon="eye"
             onClick={() => setModalOpen(true)}
@@ -163,7 +171,8 @@ export const RecordRequestsListModal = ({ endpointUrl, trigger }) => {
       }
     >
       <Modal.Header>
-        {i18next.t("Record requests")}{" "}
+        {i18next.t("Record's requests")}{" "}
+        {recordTitle && <span>({recordTitle})</span>}
         <Popup
           position="top center"
           content={
@@ -192,7 +201,7 @@ export const RecordRequestsListModal = ({ endpointUrl, trigger }) => {
                 <Grid.Row>
                   <Grid.Column width={16}>
                     <SearchappSearchbarElement
-                      placeholder={i18next.t("Search record requests...")}
+                      placeholder={i18next.t("Search record's requests...")}
                     />
                   </Grid.Column>
                 </Grid.Row>
@@ -257,7 +266,7 @@ export const RecordRequestsListModal = ({ endpointUrl, trigger }) => {
 RecordRequestsListModal.propTypes = {
   endpointUrl: PropTypes.string.isRequired,
   trigger: PropTypes.node,
-  componentOverrides: PropTypes.object,
+  recordTitle: PropTypes.string,
 };
 
 export default RecordRequestsListModal;

@@ -1,6 +1,10 @@
 import { i18next } from "@translations/oarepo_dashboard";
 import React from "react";
 
+export const getUserIcon = (receiver) => {
+  return receiver?.is_ghost ? "user secret" : "users";
+};
+
 export const getReceiver = (request) => {
   if (request?.receiver?.reference?.auto_approve) return null;
   if (!Array.isArray(request.receiver)) {
