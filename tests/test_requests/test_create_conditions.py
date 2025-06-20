@@ -34,19 +34,21 @@ def test_can_create(
         f"{urls['BASE_URL']}{draft1_id}/draft/requests/publish_draft"
     ).json
 
-    with pytest.raises(OpenRequestAlreadyExists):
-        creator_client.post(  # create request after create
-            f"{urls['BASE_URL']}{draft1_id}/draft/requests/publish_draft"
-        )
+    resp = creator_client.post(  # create request after create
+        f"{urls['BASE_URL']}{draft1_id}/draft/requests/publish_draft"
+    )
+    assert resp.status_code == 400
+    assert "There is already an open request of Publish draft" in resp.json["message"]
 
     resp_request_submit = creator_client.post(
         link2testclient(resp_request_create["links"]["actions"]["submit"]),
     )
 
-    with pytest.raises(OpenRequestAlreadyExists):
-        creator_client.post(  # create request after submit
-            f"{urls['BASE_URL']}{draft1_id}/draft/requests/publish_draft"
-        )
+    resp = creator_client.post(  # create request after submit
+        f"{urls['BASE_URL']}{draft1_id}/draft/requests/publish_draft"
+    )
+    assert resp.status_code == 400
+    assert "There is already an open request of Publish draft" in resp.json["message"]
 
     # should still be creatable for draft2
     create_for_request_draft2 = creator_client.post(
@@ -59,10 +61,15 @@ def test_can_create(
         link2testclient(create_for_request_draft2.json["links"]["actions"]["submit"]),
     )
 
-    with pytest.raises(OpenRequestAlreadyExists):
-        create_for_request_draft2 = creator_client.post(
-            f"{urls['BASE_URL']}{draft2_id}/draft/requests/publish_draft"
-        )
+    create_for_request_draft2 = creator_client.post(
+        f"{urls['BASE_URL']}{draft2_id}/draft/requests/publish_draft"
+    )
+    assert create_for_request_draft2.status_code == 400
+    assert (
+        "There is already an open request of Publish draft"
+        in create_for_request_draft2.json["message"]
+    )
+
     record = receiver_client.get(
         f"{urls['BASE_URL']}{draft2_id}/draft?expand=true"
     ).json
