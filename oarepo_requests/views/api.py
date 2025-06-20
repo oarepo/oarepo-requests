@@ -23,9 +23,15 @@ def create_oarepo_requests(app: Flask) -> Blueprint:
     ext = app.extensions["oarepo-requests"]
     blueprint = ext.requests_resource.as_blueprint()
 
-    from oarepo_requests.invenio_patches import override_invenio_requests_config
+    from oarepo_requests.invenio_patches import (
+        override_invenio_notifications,
+        override_invenio_requests_config,
+    )
 
     blueprint.record_once(override_invenio_requests_config)
+    # notification patches need to be added separately because this part
+    # is not called in celery. See app.py which is called in celery
+    blueprint.record_once(override_invenio_notifications)
 
     return blueprint
 
