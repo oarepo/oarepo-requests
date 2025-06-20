@@ -1269,7 +1269,7 @@ msgstr ""
 
 msgid ""
 "Record has validation errors. Please click the 'Edit metadata' button and "
-"then make the request ({{requestType}}) again."
+"then try again."
 msgstr ""
 
 #~ msgid "No status"
