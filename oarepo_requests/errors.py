@@ -16,8 +16,9 @@ from flask import g
 from flask_resources import (
     HTTPJSONException,
 )
+from invenio_requests.errors import CannotExecuteActionError
 from flask_resources.serializers.json import JSONEncoder
-from oarepo_runtime.i18n import lazy_gettext as _
+from invenio_i18n import gettext, lazy_gettext as _
 from oarepo_workflows.errors import (
     EventTypeNotInWorkflow as WorkflowEventTypeNotInWorkflow,
 )
@@ -86,7 +87,7 @@ class CustomHTTPJSONException(HTTPJSONException):
         return json.dumps(body, cls=JSONEncoder)
 
 
-class OpenRequestAlreadyExists(Exception):
+class OpenRequestAlreadyExists(CannotExecuteActionError):
     """An open request already exists."""
 
     def __init__(self, request_type: RequestType, record: Record) -> None:
@@ -94,10 +95,33 @@ class OpenRequestAlreadyExists(Exception):
         self.request_type = request_type
         self.record = record
 
+    def __str__(self):
+        return self.description
+
     @property
-    def description(self) -> str:
+    def description(self):
         """Exception's description."""
-        return f"There is already an open request of {self.request_type.name} on {self.record.id}."
+        return gettext(
+            "There is already an open request of %(request_type)s on %(record_id)s."
+        ) % {
+            "request_type": self.request_type.name,
+            "record_id": self.record.id,
+        }
+
+
+class UnresolvedRequestsError(CannotExecuteActionError):
+    """There were unresolved requests before an action could proceed."""
+
+    def __init__(self, action: str, reason: str = None) -> None:
+        self.action = action
+        self.reason = reason or _("All open requests must be closed first.")
+
+    def __str__(self):
+        """Return str(self)."""
+        return gettext("Cannot %(action)s: %(reason)s") % {
+            "action": self.action.lower(),
+            "reason": self.reason,
+        }
 
 
 class UnknownRequestType(Exception):
@@ -110,7 +134,9 @@ class UnknownRequestType(Exception):
     @property
     def description(self) -> str:
         """Exception's description."""
-        return f"Unknown request type {self.request_type}."
+        return gettext("Unknown request type %(request_type)s.") % {
+            "request_type": self.request_type,
+        }
 
 
 class ReceiverNonReferencable(Exception):
@@ -127,9 +153,14 @@ class ReceiverNonReferencable(Exception):
     @property
     def description(self) -> str:
         """Exception's description."""
-        message = f"Receiver for request type {self.request_type} is required but wasn't successfully referenced on record {self.record['id']}."
+        message = gettext(
+            "Receiver for request type %(request_type)s is required but wasn't successfully referenced on record %(record_id)s."
+        ) % {
+            "request_type": self.request_type,
+            "record_id": self.record["id"],
+        }
         if self.kwargs:
-            message += "\n Additional keyword arguments:"
+            message += gettext("\n Additional keyword arguments:")
             message += f"\n{', '.join(self.kwargs)}"
         return message
 
@@ -139,12 +170,12 @@ class VersionAlreadyExists(CustomHTTPJSONException):
 
     def __init__(self) -> None:
         """Initialize the exception."""
-        description = _("There is already a record version with this version tag.")
+        description = gettext("There is already a record version with this version tag.")
         request_payload_errors = [
             {
                 "field": "payload.version",
                 "messages": [
-                    _(
+                    gettext(
                         "There is already a record version with this version tag. Please use a different version tag."
                     )
                 ],

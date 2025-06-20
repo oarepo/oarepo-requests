@@ -18,7 +18,7 @@ from invenio_records_resources.services.uow import RecordCommitOp, UnitOfWork
 from invenio_requests.proxies import current_requests_service
 from marshmallow.validate import OneOf
 from oarepo_runtime.datastreams.utils import get_record_service_for_record_class
-from oarepo_runtime.i18n import lazy_gettext as _
+from invenio_i18n import gettext, lazy_gettext as _
 from oarepo_runtime.records.drafts import has_draft
 from typing_extensions import override
 
@@ -126,9 +126,9 @@ class NewVersionRequestType(NonDuplicableOARepoRequestType):
     ) -> None:
         """Check if the request can be created."""
         if topic.is_draft:
-            raise ValueError("Trying to create new version request on draft record")
+            raise ValueError(gettext("Trying to create new version request on draft record"))
         if has_draft(topic):
-            raise ValueError("Trying to create edit request on record with draft")
+            raise ValueError(gettext("Trying to create edit request on record with draft"))
         super().can_create(identity, data, receiver, topic, creator, *args, **kwargs)
 
     def topic_change(self, request: Request, new_topic: dict, uow: UnitOfWork) -> None:
@@ -149,12 +149,12 @@ class NewVersionRequestType(NonDuplicableOARepoRequestType):
         if is_auto_approved(self, identity=identity, topic=topic):
             return self.name
         if not request:
-            return _("Request new version access")
+            return gettext("Request new version access")
         match request.status:
             case "submitted":
-                return _("New version access requested")
+                return gettext("New version access requested")
             case _:
-                return _("Request new version access")
+                return gettext("Request new version access")
 
     @override
     def stateful_description(
@@ -167,27 +167,27 @@ class NewVersionRequestType(NonDuplicableOARepoRequestType):
     ) -> str | LazyString:
         """Return the stateful description of the request."""
         if is_auto_approved(self, identity=identity, topic=topic):
-            return _("Click to start creating a new version of the record.")
+            return gettext("Click to start creating a new version of the record.")
 
         if not request:
-            return _(
+            return gettext(
                 "Request permission to update record (including files). "
                 "You will be notified about the decision by email."
             )
         match request.status:
             case "submitted":
                 if request_identity_matches(request.created_by, identity):
-                    return _(
+                    return gettext(
                         "Permission to update record (including files) requested. "
                         "You will be notified about the decision by email."
                     )
                 if request_identity_matches(request.receiver, identity):
-                    return _(
+                    return gettext(
                         "You have been asked to approve the request to update the record. "
                         "You can approve or reject the request."
                     )
-                return _("Permission to update record (including files) requested. ")
+                return gettext("Permission to update record (including files) requested. ")
             case _:
                 if request_identity_matches(request.created_by, identity):
-                    return _("Submit request to get edit access to the record.")
-                return _("You do not have permission to update the record.")
+                    return gettext("Submit request to get edit access to the record.")
+                return gettext("You do not have permission to update the record.")
