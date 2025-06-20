@@ -7,8 +7,7 @@
 #
 import pytest
 
-from oarepo_requests.errors import OpenRequestAlreadyExists, UnresolvedRequestsError
-from invenio_requests.errors import CannotExecuteActionError
+from oarepo_requests.errors import UnresolvedRequestsError
 
 
 def test_can_create(
