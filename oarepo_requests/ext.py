@@ -229,6 +229,20 @@ class OARepoRequests:
         app.config.setdefault("NOTIFICATIONS_ENTITY_RESOLVERS", [])
         app.config["NOTIFICATIONS_ENTITY_RESOLVERS"] += config.NOTIFICATIONS_ENTITY_RESOLVERS
 
+        app_notification_builders = app.config.setdefault( # can't set default config directly because it might be initialized to {} in invenio-notifications
+            "NOTIFICATIONS_BUILDERS", {}
+        )
+        app_notification_backends = app.config.setdefault(
+            "NOTIFICATIONS_BACKENDS", {}
+        )
+
+        app.config["NOTIFICATIONS_BUILDERS"] = conservative_merger.merge(
+            app_notification_builders, config.NOTIFICATIONS_BUILDERS
+        )
+        app.config["NOTIFICATIONS_BACKENDS"] = conservative_merger.merge(
+            app_notification_backends, config.NOTIFICATIONS_BACKENDS
+        )
+
 
 def api_finalize_app(app: Flask) -> None:
     """Finalize app."""
@@ -265,4 +279,5 @@ def finalize_app(app: Flask) -> None:
         er.type_key: er for er in app.config["NOTIFICATIONS_ENTITY_RESOLVERS"]
     }
     invenio_notifications.entity_resolvers = notification_resolvers
+    invenio_notifications.init_manager(app) # race condition between config init and original init_manager
 
