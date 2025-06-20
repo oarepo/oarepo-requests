@@ -87,11 +87,11 @@ export const handleRedirectToEditFormPlugin = (
     formik?.setFieldError(
       "api",
       i18next.t(
-        "Record has validation errors. You will have to modify record's metadata and try to make the request again."
+        "Record has validation errors. Please click the 'Edit metadata' button and then try again."
       )
     );
     e.directSubmitMessage = i18next.t(
-      "Record has validation errors. You will have to modify record's metadata and try to make the request again."
+      "Record has validation errors. Please click the 'Edit metadata' button and then try again."
     );
     return true;
   }
