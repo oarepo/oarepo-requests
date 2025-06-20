@@ -314,34 +314,3 @@ def test_comment_notifications(
         receivers = outbox[0].recipients
         assert set(receivers) == {"user2@example.org"}
         assert content in outbox[0].body
-
-
-def test_events(
-    app,
-    users,
-    logged_client,
-    draft_factory,
-    submit_request_on_draft,
-    add_user_in_role,
-    role,
-    events_service,
-    link2testclient,
-    urls,
-):
-    """Test notification being built on review submit."""
-    mail = app.extensions.get("mail")
-    creator = users[0]
-    # receiver = users[2]
-    draft1 = draft_factory(creator.identity)  # so i don't have to create a new workflow
-    submit = submit_request_on_draft(creator.identity, draft1["id"], "publish_draft")
-
-    with mail.record_messages() as outbox:
-        events_service.create(
-            creator.identity,
-            submit["id"],
-            {"payload": {"content": "ceci nes pa une comment"}},
-            CommentEventType,
-        )
-        assert len(outbox) == 1
-        receivers = {m.recipients[0] for m in outbox}
-        assert receivers == {"user2@example.org"}

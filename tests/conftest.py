@@ -15,12 +15,8 @@ from invenio_records_permissions.generators import (
     AuthenticatedUser,
     SystemProcess,
 )
-from invenio_users_resources.records import UserAggregate
 from invenio_records_resources.services.uow import RecordCommitOp
 from invenio_requests.customizations import CommentEventType, LogEventType
-from invenio_requests.notifications.builders import (
-    CommentRequestEventCreateNotificationBuilder,
-)
 from invenio_requests.proxies import current_requests_service
 from invenio_requests.records.api import Request, RequestEvent
 from invenio_requests.services.generators import Receiver
@@ -53,21 +49,6 @@ from oarepo_requests.actions.generic import (
     OARepoDeclineAction,
     OARepoSubmitAction,
 )
-from oarepo_requests.notifications.builders.delete_published_record import (
-    DeletePublishedRecordRequestAcceptNotificationBuilder,
-    DeletePublishedRecordRequestSubmitNotificationBuilder,
-    DeletePublishedRecordRequestDeclineNotificationBuilder,
-)
-from oarepo_requests.notifications.builders.publish import (
-    PublishDraftRequestAcceptNotificationBuilder,
-    PublishDraftRequestSubmitNotificationBuilder,
-    PublishDraftRequestDeclineNotificationBuilder,
-)
-
-from oarepo_requests.notifications.builders.escalate import (
-    EscalateRequestSubmitNotificationBuilder,
-)
-
 from oarepo_requests.receiver import default_workflow_receiver_function
 from oarepo_requests.services.permissions.generators.conditional import (
     IfNoEditDraft,
