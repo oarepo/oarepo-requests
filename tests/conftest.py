@@ -209,7 +209,7 @@ class PrivilegedAccessRequests(DefaultRequests):
             declined="draft",
             cancelled="draft",
         ),
-        privileged=[RequestPrivilegedRole(UserGenerator(3), read=True, accept=True)], #specify necessary events on request type?
+        privileged=[RequestPrivilegedRole(UserGenerator(3), accept=True)], #specify necessary events on request type?
         events={
                     CommentEventType.type_id: WorkflowEvent(submitters=can_comment_only_receiver),
                     LogEventType.type_id: WorkflowEvent(
