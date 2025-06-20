@@ -183,6 +183,7 @@ def override_invenio_requests_config(
             "accepted": _("Accepted"),
             "declined": _("Declined"),
             "cancelled": _("Cancelled"),
+            "created": _("Created"),
         }
         status._label = _("Request status")
 

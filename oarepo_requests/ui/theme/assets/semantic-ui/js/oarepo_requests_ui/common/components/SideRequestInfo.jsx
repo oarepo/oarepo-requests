@@ -32,8 +32,7 @@ export const SideRequestInfo = ({ request }) => {
           </List.Content>
         </List.Item>
       )}
-      {(request?.receiver &&
-          !_isArray(request.receiver)) ? (
+      {request?.receiver && !_isArray(request.receiver) ? (
         <List.Item>
           <List.Header as="h3">{i18next.t("Receiver")}</List.Header>
           <List.Content>
@@ -52,11 +51,13 @@ export const SideRequestInfo = ({ request }) => {
               )}
             </span>
           </List.Content>
-        </List.Item>) : (_isArray(request.receiver)) && (
-            <List.Item>
-          <List.Header as="h3">{i18next.t("Receiver")}</List.Header>
-          <List.Content>
-            <Icon name="mail outline" />
+        </List.Item>
+      ) : (
+        _isArray(request.receiver) && (
+          <List.Item>
+            <List.Header as="h3">{i18next.t("Receiver")}</List.Header>
+            <List.Content>
+              <Icon name="mail outline" />
               {request.receiver.map((receiverItem, index) => (
                 <span key={receiverItem.label}>
                   {receiverItem.links.self_html ? (
@@ -70,14 +71,13 @@ export const SideRequestInfo = ({ request }) => {
                   ) : (
                     receiverItem.label
                   )}
-                    { request.receiver.length - 1 !== index && ', ' }
+                  {request.receiver.length - 1 !== index && ", "}
                 </span>
-
               ))}
-          </List.Content>
-        </List.Item>
-      )
-      }
+            </List.Content>
+          </List.Item>
+        )
+      )}
       <List.Item>
         <List.Header as="h3">{i18next.t("Status")}</List.Header>
         <List.Content>

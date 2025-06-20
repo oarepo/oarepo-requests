@@ -121,7 +121,7 @@ msgstr "Typ žádosti"
 
 #: oarepo_requests/translations/_only_for_translations.py:28
 msgid "Created"
-msgstr "Vytvořeno"
+msgstr "Vytvořena"
 
 #: oarepo_requests/translations/_only_for_translations.py:29
 msgid "Timeline"

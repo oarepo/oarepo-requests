@@ -24,3 +24,4 @@ export { TimelineEvent } from "./TimelineEvent";
 export * from "./ConfirmationModal";
 export * from "./TimelineEscalationEvent";
 export * from "./GenericActionEvent";
+export * from "./RecordRequestsListModal";
