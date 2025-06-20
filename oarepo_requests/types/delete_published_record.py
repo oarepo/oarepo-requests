@@ -39,15 +39,15 @@ class DeletePublishedRecordRequestType(NonDuplicableOARepoRequestType):
 
     type_id = "delete_published_record"
     name = _("Delete record")
-    
+
     payload_schema = {
-        "removal_reason": ma.fields.Str(),
-        "note": ma.fields.Str()
+        "removal_reason": ma.fields.Str(required=True),
+        "note": ma.fields.Str(),
     }
 
     form = [
         {
-            'section': "",
+            "section": "",
             "fields": [
                 {
                     "field": "removal_reason",
@@ -67,13 +67,13 @@ class DeletePublishedRecordRequestType(NonDuplicableOARepoRequestType):
                         "placeholder": _("Write down the additional note."),
                         "required": False,
                     },
-                }, 
-            ]
+                },
+            ],
         }
     ]
-    
+
     editable = False
-        
+
     def get_ui_redirect_url(self, request: Request, context: dict) -> str:
         if request.status == "accepted":
             topic_cls = request.topic.record_cls

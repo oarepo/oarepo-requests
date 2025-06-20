@@ -57,12 +57,15 @@ class CustomHTTPJSONException(HTTPJSONException):
         self,
         code: Optional[int] = None,
         errors: Optional[Union[dict[str, any], list]] = None,
-        error_type: Optional[str] = None,
+        topic_errors: Optional[Union[dict[str, any], list]] = None,
+        request_payload_errors: Optional[Union[dict[str, any], list]] = None,
         **kwargs: Any,
     ) -> None:
         """Initialize CustomHTTPJSONException."""
         super().__init__(code=code, errors=errors, **kwargs)
-        self.error_type = error_type  # Save the error_type passed in the constructor
+        self.topic_errors = topic_errors or []
+        self.request_payload_errors = request_payload_errors or []
+        self.extra_kwargs = kwargs  # Save all kwargs
 
     def get_body(self, environ: any = None, scope: any = None) -> str:
         """Get the request body."""
@@ -72,9 +75,11 @@ class CustomHTTPJSONException(HTTPJSONException):
         if errors:
             body["errors"] = errors
 
-        # Add error_type to the response body
-        if self.error_type:
-            body["error_type"] = self.error_type
+        if self.topic_errors:
+            body["topic_errors"] = self.topic_errors
+
+        if self.request_payload_errors:
+            body["request_payload_errors"] = self.request_payload_errors
 
         if self.code and (self.code >= 500) and hasattr(g, "sentry_event_id"):
             body["error_id"] = str(g.sentry_event_id)
@@ -166,7 +171,7 @@ class VersionAlreadyExists(CustomHTTPJSONException):
     def __init__(self) -> None:
         """Initialize the exception."""
         description = gettext("There is already a record version with this version tag.")
-        errors = [
+        request_payload_errors = [
             {
                 "field": "payload.version",
                 "messages": [
@@ -179,6 +184,5 @@ class VersionAlreadyExists(CustomHTTPJSONException):
         super().__init__(
             code=400,
             description=description,
-            errors=errors,
-            error_type="cf_validation_error",
+            request_payload_errors=request_payload_errors,
         )

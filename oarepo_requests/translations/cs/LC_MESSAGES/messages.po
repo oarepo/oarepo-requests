@@ -1367,6 +1367,12 @@ msgstr "Pokus o vytvoření žádosti o novou verzi pro koncept záznamu"
 msgid "Trying to create publish request on published record"
 msgstr "Pokus o vytvoření žádosti o zveřejnění již zveřejněného záznamu"
 
+#: /home/dusanst/Projects/oarepo-requests/oarepo_requests/services/oarepo/service.py:88
+msgid ""
+"Action could not be performed due to validation request fields validation "
+"errors."
+msgstr "Akci nelze provést kvůli chybám při validaci polí požadavku."
+
 #: /Users/m/w/cesnet/oarepo-requests/oarepo_requests/templates/oarepo/invenio_notifications/comment-request-event.create.jinja:24
 #, python-brace-format
 msgid "💬 New comment on on '{request_title}' for '{topic_title}'"
