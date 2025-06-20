@@ -82,13 +82,16 @@ class CustomHTTPJSONException(HTTPJSONException):
         return json.dumps(body, cls=JSONEncoder)
 
 
-class OpenRequestAlreadyExists(Exception):
+class OpenRequestAlreadyExists(CannotExecuteActionError):
     """An open request already exists."""
 
     def __init__(self, request_type: RequestType, record: Record) -> None:
         """Initialize the exception."""
         self.request_type = request_type
         self.record = record
+
+    def __str__(self):
+        return self.description
 
     @property
     def description(self):
