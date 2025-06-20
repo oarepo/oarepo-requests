@@ -84,7 +84,7 @@ def test_read_requests_on_record(
     ThesisRecord.index.refresh()
     ThesisDraft.index.refresh()
     resp_request_submit = submit_request_on_record(
-        creator.identity, record1_id, "delete_published_record"
+        creator.identity, record1_id, "delete_published_record", create_additional_data={"payload": {"removal_reason": "test reason"}}
     )
     record = receiver_client.get(f"{urls['BASE_URL']}{record1_id}?expand=true")
     decline = receiver_client.post(
@@ -93,10 +93,10 @@ def test_read_requests_on_record(
         ),
     )
     r2 = create_request_on_record(
-        creator.identity, record1_id, "delete_published_record"
+        creator.identity, record1_id, "delete_published_record", additional_data={"payload": {"removal_reason": "test reason"}}
     )
     r3 = create_request_on_record(
-        creator.identity, record2_id, "delete_published_record"
+        creator.identity, record2_id, "delete_published_record", additional_data={"payload": {"removal_reason": "test reason"}}
     )
 
     resp1 = creator_client.get(f"{urls['BASE_URL']}{record1_id}/requests").json["hits"][

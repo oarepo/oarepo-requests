@@ -1211,6 +1211,7 @@ msgstr ""
 msgid "All open requests need to be closed."
 msgstr ""
 
+#: /home/dusanst/Projects/oarepo-requests/oarepo_requests/services/oarepo/service.py:88
 #: /Users/m/w/cesnet/oarepo-requests/oarepo_requests/templates/oarepo/invenio_notifications/comment-request-event.create.jinja:24
 #, python-brace-format
 msgid "💬 New comment on on '{request_title}' for '{topic_title}'"
@@ -1258,6 +1259,12 @@ msgstr ""
 #: /Users/m/w/cesnet/oarepo-requests/oarepo_requests/templates/oarepo/invenio_notifications/comment-request-event.create.jinja:69
 #, python-brace-format
 msgid "*@{user_name}* commented on *{request_title}*"
+msgstr ""
+
+#: /home/dusanst/Projects/oarepo-requests/oarepo_requests/services/oarepo/service.py:88
+msgid ""
+"Action could not be performed due to validation request fields validation "
+"errors."
 msgstr ""
 
 #~ msgid "No status"

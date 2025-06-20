@@ -98,7 +98,7 @@ def test_delete_published_notifications(
 
     with mail.record_messages() as outbox:
         resp_request_submit = submit_request_on_record(
-            creator.identity, record1["id"], "delete_published_record"
+            creator.identity, record1["id"], "delete_published_record", create_additional_data={"payload": {"removal_reason": "test reason"}}
         )
         # check notification is build on submit
         assert len(outbox) == 1
@@ -128,7 +128,7 @@ def test_delete_published_notifications(
 
     record1 = record_factory(creator.identity)
     resp_request_submit = submit_request_on_record(
-        creator.identity, record1["id"], "delete_published_record"
+        creator.identity, record1["id"], "delete_published_record", create_additional_data={"payload": {"removal_reason": "test reason"}}
     )
     record = receiver_client.get(f"{urls['BASE_URL']}{record1['id']}?expand=true")
 
@@ -265,7 +265,7 @@ def test_locale_multiple_recipients(
 
     with mail.record_messages() as outbox:
         submit_request_on_record(
-            en_creator.identity, record1["id"], "delete_published_record"
+            en_creator.identity, record1["id"], "delete_published_record", create_additional_data={"payload": {"removal_reason": "test reason"}}
         )
         # check notification is build on submit
         assert len(outbox) == 2

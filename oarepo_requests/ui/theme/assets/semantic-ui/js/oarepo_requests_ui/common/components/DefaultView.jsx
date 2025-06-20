@@ -6,9 +6,9 @@ export const DefaultView = ({ fieldPath, label }) => {
   const { values } = useFormikContext();
   const value = getIn(values, fieldPath, "");
   return value ? (
-    <span>
+    <div>
       <strong>{label}</strong>: <span>{value}</span>
-    </span>
+    </div>
   ) : null;
 };
 
