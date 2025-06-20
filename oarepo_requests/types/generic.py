@@ -82,6 +82,19 @@ class OARepoRequestType(RequestType):
             return cls.editable
         return cls.has_form  # noqa
 
+    @classmethod
+    def _create_marshmallow_schema(cls):
+        """Create a marshmallow schema for this request type with required payload field."""
+        schema = super()._create_marshmallow_schema()
+        if (
+            cls.payload_schema is not None
+            and hasattr(schema, "fields")
+            and "payload" in schema.fields
+        ):
+            schema.fields["payload"].required = True
+
+        return schema
+
     def can_create(
         self,
         identity: Identity,

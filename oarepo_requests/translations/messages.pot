@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2025-06-06 11:26+0200\n"
+"POT-Creation-Date: 2025-06-20 10:52+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -17,31 +17,41 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 2.17.0\n"
 
-#: /home/dusanst/Projects/oarepo-requests/oarepo_requests/invenio_patches.py:181
-msgid "Submitted"
+#: /home/dusanst/Projects/oarepo-requests/oarepo_requests/errors.py:142
+msgid "There is already a record version with this version tag."
 msgstr ""
 
-#: /home/dusanst/Projects/oarepo-requests/oarepo_requests/invenio_patches.py:182
-msgid "Expired"
+#: /home/dusanst/Projects/oarepo-requests/oarepo_requests/errors.py:148
+msgid ""
+"There is already a record version with this version tag. Please use a "
+"different version tag."
 msgstr ""
 
 #: /home/dusanst/Projects/oarepo-requests/oarepo_requests/invenio_patches.py:183
-msgid "Accepted"
+msgid "Submitted"
 msgstr ""
 
 #: /home/dusanst/Projects/oarepo-requests/oarepo_requests/invenio_patches.py:184
-msgid "Declined"
+msgid "Expired"
 msgstr ""
 
 #: /home/dusanst/Projects/oarepo-requests/oarepo_requests/invenio_patches.py:185
-msgid "Cancelled"
+msgid "Accepted"
+msgstr ""
+
+#: /home/dusanst/Projects/oarepo-requests/oarepo_requests/invenio_patches.py:186
+msgid "Declined"
 msgstr ""
 
 #: /home/dusanst/Projects/oarepo-requests/oarepo_requests/invenio_patches.py:187
+msgid "Cancelled"
+msgstr ""
+
+#: /home/dusanst/Projects/oarepo-requests/oarepo_requests/invenio_patches.py:189
 msgid "Request status"
 msgstr ""
 
-#: /home/dusanst/Projects/oarepo-requests/oarepo_requests/invenio_patches.py:193
+#: /home/dusanst/Projects/oarepo-requests/oarepo_requests/invenio_patches.py:195
 msgid "Type"
 msgstr ""
 
@@ -73,34 +83,107 @@ msgstr ""
 msgid "Cancel"
 msgstr ""
 
-#: /home/dusanst/Projects/oarepo-requests/oarepo_requests/actions/publish_draft.py:85
-msgid "This version tag already exists"
-msgstr ""
-
-#: /home/dusanst/Projects/oarepo-requests/oarepo_requests/actions/publish_draft.py:102
+#: /home/dusanst/Projects/oarepo-requests/oarepo_requests/actions/publish_draft.py:105
 #: /home/dusanst/Projects/oarepo-requests/oarepo_requests/actions/publish_new_version.py:33
 msgid "Publish"
 msgstr ""
 
-#: /home/dusanst/Projects/oarepo-requests/oarepo_requests/actions/publish_draft.py:124
+#: /home/dusanst/Projects/oarepo-requests/oarepo_requests/actions/publish_draft.py:133
 #: /home/dusanst/Projects/oarepo-requests/oarepo_requests/types/publish_draft.py:154
 msgid "All open requests need to be closed."
 msgstr ""
 
-#: /home/dusanst/Projects/oarepo-requests/oarepo_requests/actions/publish_draft.py:145
+#: /home/dusanst/Projects/oarepo-requests/oarepo_requests/actions/publish_draft.py:153
 msgid "Return for correction"
 msgstr ""
 
-#: /home/dusanst/Projects/oarepo-requests/oarepo_requests/resolvers/ui.py:339
+#: /home/dusanst/Projects/oarepo-requests/oarepo_requests/resolvers/ui.py:340
 msgid "System user"
 msgstr ""
 
-#: /home/dusanst/Projects/oarepo-requests/oarepo_requests/resolvers/ui.py:614
+#: /home/dusanst/Projects/oarepo-requests/oarepo_requests/resolvers/ui.py:618
 msgid "Auto approve"
 msgstr ""
 
 #: /home/dusanst/Projects/oarepo-requests/oarepo_requests/services/ui_schema.py:197
 msgid "status"
+msgstr ""
+
+#: /home/dusanst/Projects/oarepo-requests/oarepo_requests/services/oarepo/service.py:88
+msgid ""
+"Action could not be performed due to validation request fields validation "
+"errors."
+msgstr ""
+
+#: /home/dusanst/Projects/oarepo-requests/oarepo_requests/templates/oarepo/invenio_notifications/comment-request-event.create.jinja:24
+#, python-brace-format
+msgid "💬 New comment on on '{request_title}' for '{topic_title}'"
+msgstr ""
+
+#: /home/dusanst/Projects/oarepo-requests/oarepo_requests/templates/oarepo/invenio_notifications/comment-request-event.create.jinja:26
+#, python-brace-format
+msgid "💬 New comment on on '{request_title}'"
+msgstr ""
+
+#: /home/dusanst/Projects/oarepo-requests/oarepo_requests/templates/oarepo/invenio_notifications/comment-request-event.create.jinja:28
+msgid "💬 New comment"
+msgstr ""
+
+#: /home/dusanst/Projects/oarepo-requests/oarepo_requests/templates/oarepo/invenio_notifications/comment-request-event.create.jinja:36
+#, python-brace-format
+msgid "'{user_name}' commented on '{request_title}' for '{topic_title}':"
+msgstr ""
+
+#: /home/dusanst/Projects/oarepo-requests/oarepo_requests/templates/oarepo/invenio_notifications/comment-request-event.create.jinja:38
+#, python-brace-format
+msgid "'{user_name}' commented on '{request_title}':"
+msgstr ""
+
+#: /home/dusanst/Projects/oarepo-requests/oarepo_requests/templates/oarepo/invenio_notifications/comment-request-event.create.jinja:40
+#, python-brace-format
+msgid "'{user_name}' commented:"
+msgstr ""
+
+#: /home/dusanst/Projects/oarepo-requests/oarepo_requests/templates/oarepo/invenio_notifications/comment-request-event.create.jinja:47
+#: /home/dusanst/Projects/oarepo-requests/oarepo_requests/templates/oarepo/invenio_notifications/comment-request-event.create.jinja:73
+msgid "Check out the request"
+msgstr ""
+
+#: /home/dusanst/Projects/oarepo-requests/oarepo_requests/templates/oarepo/invenio_notifications/comment-request-event.create.jinja:53
+#: /home/dusanst/Projects/oarepo-requests/oarepo_requests/templates/semantic-ui/invenio_notifications/delete-published-record-request-event.accept.jinja:15
+#: /home/dusanst/Projects/oarepo-requests/oarepo_requests/templates/semantic-ui/invenio_notifications/delete-published-record-request-event.decline.jinja:21
+#: /home/dusanst/Projects/oarepo-requests/oarepo_requests/templates/semantic-ui/invenio_notifications/delete-published-record-request-event.submit.jinja:23
+#: /home/dusanst/Projects/oarepo-requests/oarepo_requests/templates/semantic-ui/invenio_notifications/escalate-request-event.submit.jinja:18
+#: /home/dusanst/Projects/oarepo-requests/oarepo_requests/templates/semantic-ui/invenio_notifications/publish-draft-request-event.accept.jinja:21
+#: /home/dusanst/Projects/oarepo-requests/oarepo_requests/templates/semantic-ui/invenio_notifications/publish-draft-request-event.decline.jinja:21
+#: /home/dusanst/Projects/oarepo-requests/oarepo_requests/templates/semantic-ui/invenio_notifications/publish-draft-request-event.submit.jinja:23
+msgid "This is an auto-generated message. To manage notifications, visit your"
+msgstr ""
+
+#: /home/dusanst/Projects/oarepo-requests/oarepo_requests/templates/oarepo/invenio_notifications/comment-request-event.create.jinja:53
+#: /home/dusanst/Projects/oarepo-requests/oarepo_requests/templates/semantic-ui/invenio_notifications/delete-published-record-request-event.accept.jinja:15
+#: /home/dusanst/Projects/oarepo-requests/oarepo_requests/templates/semantic-ui/invenio_notifications/delete-published-record-request-event.decline.jinja:21
+#: /home/dusanst/Projects/oarepo-requests/oarepo_requests/templates/semantic-ui/invenio_notifications/delete-published-record-request-event.submit.jinja:23
+#: /home/dusanst/Projects/oarepo-requests/oarepo_requests/templates/semantic-ui/invenio_notifications/escalate-request-event.submit.jinja:18
+#: /home/dusanst/Projects/oarepo-requests/oarepo_requests/templates/semantic-ui/invenio_notifications/publish-draft-request-event.accept.jinja:21
+#: /home/dusanst/Projects/oarepo-requests/oarepo_requests/templates/semantic-ui/invenio_notifications/publish-draft-request-event.decline.jinja:21
+#: /home/dusanst/Projects/oarepo-requests/oarepo_requests/templates/semantic-ui/invenio_notifications/publish-draft-request-event.submit.jinja:23
+msgid "account settings"
+msgstr ""
+
+#: /home/dusanst/Projects/oarepo-requests/oarepo_requests/templates/oarepo/invenio_notifications/comment-request-event.create.jinja:59
+#, python-brace-format
+msgid "@{user_name} commented on '{request_title}'"
+msgstr ""
+
+#: /home/dusanst/Projects/oarepo-requests/oarepo_requests/templates/oarepo/invenio_notifications/comment-request-event.create.jinja:63
+#, python-brace-format
+msgid "Check out the request: {request_link}"
+msgstr ""
+
+#: /home/dusanst/Projects/oarepo-requests/oarepo_requests/templates/oarepo/invenio_notifications/comment-request-event.create.jinja:69
+#, python-brace-format
+msgid "*@{user_name}* commented on *{request_title}*"
 msgstr ""
 
 #: /home/dusanst/Projects/oarepo-requests/oarepo_requests/templates/semantic-ui/invenio_notifications/delete-published-record-request-event.accept.jinja:7
@@ -115,26 +198,6 @@ msgstr ""
 #: /home/dusanst/Projects/oarepo-requests/oarepo_requests/templates/semantic-ui/invenio_notifications/delete-published-record-request-event.accept.jinja:12
 #, python-format
 msgid "For more information head to the <a href='%(link)s'>request page</a>."
-msgstr ""
-
-#: /home/dusanst/Projects/oarepo-requests/oarepo_requests/templates/semantic-ui/invenio_notifications/delete-published-record-request-event.accept.jinja:15
-#: /home/dusanst/Projects/oarepo-requests/oarepo_requests/templates/semantic-ui/invenio_notifications/delete-published-record-request-event.decline.jinja:21
-#: /home/dusanst/Projects/oarepo-requests/oarepo_requests/templates/semantic-ui/invenio_notifications/delete-published-record-request-event.submit.jinja:23
-#: /home/dusanst/Projects/oarepo-requests/oarepo_requests/templates/semantic-ui/invenio_notifications/escalate-request-event.submit.jinja:18
-#: /home/dusanst/Projects/oarepo-requests/oarepo_requests/templates/semantic-ui/invenio_notifications/publish-draft-request-event.accept.jinja:21
-#: /home/dusanst/Projects/oarepo-requests/oarepo_requests/templates/semantic-ui/invenio_notifications/publish-draft-request-event.decline.jinja:21
-#: /home/dusanst/Projects/oarepo-requests/oarepo_requests/templates/semantic-ui/invenio_notifications/publish-draft-request-event.submit.jinja:23
-msgid "This is an auto-generated message. To manage notifications, visit your"
-msgstr ""
-
-#: /home/dusanst/Projects/oarepo-requests/oarepo_requests/templates/semantic-ui/invenio_notifications/delete-published-record-request-event.accept.jinja:15
-#: /home/dusanst/Projects/oarepo-requests/oarepo_requests/templates/semantic-ui/invenio_notifications/delete-published-record-request-event.decline.jinja:21
-#: /home/dusanst/Projects/oarepo-requests/oarepo_requests/templates/semantic-ui/invenio_notifications/delete-published-record-request-event.submit.jinja:23
-#: /home/dusanst/Projects/oarepo-requests/oarepo_requests/templates/semantic-ui/invenio_notifications/escalate-request-event.submit.jinja:18
-#: /home/dusanst/Projects/oarepo-requests/oarepo_requests/templates/semantic-ui/invenio_notifications/publish-draft-request-event.accept.jinja:21
-#: /home/dusanst/Projects/oarepo-requests/oarepo_requests/templates/semantic-ui/invenio_notifications/publish-draft-request-event.decline.jinja:21
-#: /home/dusanst/Projects/oarepo-requests/oarepo_requests/templates/semantic-ui/invenio_notifications/publish-draft-request-event.submit.jinja:23
-msgid "account settings"
 msgstr ""
 
 #: /home/dusanst/Projects/oarepo-requests/oarepo_requests/templates/semantic-ui/invenio_notifications/delete-published-record-request-event.accept.jinja:22

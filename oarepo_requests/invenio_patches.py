@@ -12,6 +12,8 @@ from __future__ import annotations
 from functools import cached_property, partial
 from typing import TYPE_CHECKING, Any, Callable
 
+from flask import current_app
+from flask_babel import LazyString, force_locale
 from flask_resources import JSONSerializer, ResponseHandler
 from invenio_records_resources.resources.records.headers import etag_headers
 from invenio_records_resources.services.records.params import FilterParam
@@ -191,3 +193,63 @@ def override_invenio_requests_config(
             rt.type_id: rt.name for rt in iter(current_request_type_registry)
         }
         type._label = _("Type")
+
+
+def override_invenio_notifications(
+    state: BlueprintSetupState, *args: Any, **kwargs: Any
+) -> None:
+    with state.app.app_context():
+        from invenio_notifications.services.generators import EntityResolve
+        from invenio_requests.notifications.builders import (
+            CommentRequestEventCreateNotificationBuilder,
+        )
+
+        from oarepo_requests.notifications.generators import RequestEntityResolve
+
+        for r in CommentRequestEventCreateNotificationBuilder.context:
+            if isinstance(r, EntityResolve) and r.key == "request.topic":
+                break
+        else:
+            CommentRequestEventCreateNotificationBuilder.context.append(
+                EntityResolve(key="request.topic"),
+            )
+
+        for idx, r in list(
+            enumerate(CommentRequestEventCreateNotificationBuilder.context)
+        ):
+            if isinstance(r, EntityResolve) and r.key == "request":
+                CommentRequestEventCreateNotificationBuilder.context[idx] = (
+                    # entity resolver that adds the correct title if it is missing
+                    RequestEntityResolve(
+                        key="request",
+                    )
+                )
+
+        from invenio_notifications.tasks import (
+            dispatch_notification,
+        )
+
+        original_delay = dispatch_notification.delay
+
+        def i18n_enabled_notification_delay(backend, recipient, notification):
+            """Delay can not handle lazy strings, so we need to resolve them before calling the delay."""
+            locale = None
+            if isinstance(recipient, dict):
+                locale = recipient.get("data", {}).get("preferences", {}).get("locale")
+            locale = locale or current_app.config.get("BABEL_DEFAULT_LOCALE", "en")
+            with force_locale(locale):
+                notification = resolve_lazy_strings(notification)
+            return original_delay(backend, recipient, notification)
+
+        dispatch_notification.delay = i18n_enabled_notification_delay
+
+
+def resolve_lazy_strings(data):
+    if isinstance(data, dict):
+        return {key: resolve_lazy_strings(value) for key, value in data.items()}
+    elif isinstance(data, list):
+        return [resolve_lazy_strings(item) for item in data]
+    elif isinstance(data, LazyString):
+        return str(data)
+    else:
+        return data

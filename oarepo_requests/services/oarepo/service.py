@@ -14,8 +14,9 @@ from typing import TYPE_CHECKING, Any
 from invenio_records_resources.services.uow import IndexRefreshOp, unit_of_work
 from invenio_requests import current_request_type_registry
 from invenio_requests.services import RequestsService
+from oarepo_runtime.i18n import lazy_gettext as _
 
-from oarepo_requests.errors import UnknownRequestType
+from oarepo_requests.errors import CustomHTTPJSONException, UnknownRequestType
 from oarepo_requests.proxies import current_oarepo_requests
 
 if TYPE_CHECKING:
@@ -73,6 +74,23 @@ class OARepoRequestsService(RequestsService):
 
         if data is None:
             data = {}
+        if "payload" not in data and type_.payload_schema:
+            data["payload"] = {}
+        schema = self._wrap_schema(type_.marshmallow_schema())
+        data, errors = schema.load(
+            data,
+            context={"identity": identity},
+            raise_errors=False,
+        )
+        if errors:
+            raise CustomHTTPJSONException(
+                description=_(
+                    "Action could not be performed due to validation request fields validation errors."
+                ),
+                request_payload_errors=errors,
+                code=400,
+            )
+
         if hasattr(type_, "can_create"):
             error = type_.can_create(identity, data, receiver, topic, creator)
         else:

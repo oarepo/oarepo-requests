@@ -26,6 +26,7 @@ export const useAction = ({
     onAfterAction,
     onErrorPlugins = [],
     actionExtraContext,
+    setActionsLocked,
   } = useCallbackContext();
 
   const handleActionError = (e, variables) => {
@@ -51,6 +52,9 @@ export const useAction = ({
     }
 
     defaultErrorHandlingPlugin(e, context);
+    // if you get an error and you stay on the same page, the actions should
+    // be unlocked again, so the user can try again
+    setActionsLocked(false);
   };
 
   return useMutation(
