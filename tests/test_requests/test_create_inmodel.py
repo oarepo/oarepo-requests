@@ -27,7 +27,7 @@ def test_record(
     record1 = record_factory(creator.identity)
     record1_id = record1["id"]
     resp_request_create = create_request_on_record(
-        creator.identity, record1_id, "delete_published_record"
+        creator.identity, record1_id, "delete_published_record", additional_data={"payload": {"removal_reason": "test reason"}}
     )
     resp_request_submit = creator_client.post(
         link2testclient(resp_request_create["links"]["actions"]["submit"]),
