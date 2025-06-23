@@ -1211,6 +1211,116 @@ msgstr ""
 msgid "All open requests need to be closed."
 msgstr ""
 
+#: /Users/miroslavbauer/Code/github.com/oarepo/oarepo-requests/oarepo_requests/errors.py:104
+msgid "All open requests must be closed first."
+msgstr ""
+
+#: /Users/miroslavbauer/Code/github.com/oarepo/oarepo-requests/oarepo_requests/errors.py:108
+#, python-format
+msgid "Cannot %(action)s: %(reason)s"
+msgstr ""
+
+#: /Users/miroslavbauer/Code/github.com/oarepo/oarepo-requests/oarepo_requests/errors.py:96
+#, python-format
+msgid "There is already an open request of %(request_type)s on %(record_id)s."
+msgstr ""
+
+#: /Users/miroslavbauer/Code/github.com/oarepo/oarepo-requests/oarepo_requests/errors.py:129
+#, python-format
+msgid "Unknown request type %(request_type)s."
+msgstr ""
+
+#: /Users/miroslavbauer/Code/github.com/oarepo/oarepo-requests/oarepo_requests/errors.py:148
+#, python-format
+msgid ""
+"Receiver for request type %(request_type)s is required but wasn't "
+"successfully referenced on record %(record_id)s."
+msgstr ""
+
+#: /Users/miroslavbauer/Code/github.com/oarepo/oarepo-requests/oarepo_requests/errors.py:155
+msgid ""
+"\n"
+" Additional keyword arguments:"
+msgstr ""
+
+#: /Users/miroslavbauer/Code/github.com/oarepo/oarepo-requests/oarepo_requests/types/edit_record.py:121
+msgid "Trying to create edit request on draft record"
+msgstr ""
+
+#: /Users/miroslavbauer/Code/github.com/oarepo/oarepo-requests/oarepo_requests/types/edit_record.py:123
+#: /Users/miroslavbauer/Code/github.com/oarepo/oarepo-requests/oarepo_requests/types/new_version.py:131
+msgid "Trying to create edit request on record with draft"
+msgstr ""
+
+#: /Users/miroslavbauer/Code/github.com/oarepo/oarepo-requests/oarepo_requests/types/new_version.py:129
+msgid "Trying to create new version request on draft record"
+msgstr ""
+
+#: /Users/miroslavbauer/Code/github.com/oarepo/oarepo-requests/oarepo_requests/types/publish_base.py:81
+msgid "Trying to create publish request on published record"
+msgstr ""
+
+#: /home/dusanst/Projects/oarepo-requests/oarepo_requests/services/oarepo/service.py:88
+#: /Users/m/w/cesnet/oarepo-requests/oarepo_requests/templates/oarepo/invenio_notifications/comment-request-event.create.jinja:24
+#, python-brace-format
+msgid "💬 New comment on on '{request_title}' for '{topic_title}'"
+msgstr ""
+
+#: /Users/m/w/cesnet/oarepo-requests/oarepo_requests/templates/oarepo/invenio_notifications/comment-request-event.create.jinja:26
+#, python-brace-format
+msgid "💬 New comment on on '{request_title}'"
+msgstr ""
+
+#: /Users/m/w/cesnet/oarepo-requests/oarepo_requests/templates/oarepo/invenio_notifications/comment-request-event.create.jinja:28
+msgid "💬 New comment"
+msgstr ""
+
+#: /Users/m/w/cesnet/oarepo-requests/oarepo_requests/templates/oarepo/invenio_notifications/comment-request-event.create.jinja:36
+#, python-brace-format
+msgid "'{user_name}' commented on '{request_title}' for '{topic_title}':"
+msgstr ""
+
+#: /Users/m/w/cesnet/oarepo-requests/oarepo_requests/templates/oarepo/invenio_notifications/comment-request-event.create.jinja:38
+#, python-brace-format
+msgid "'{user_name}' commented on '{request_title}':"
+msgstr ""
+
+#: /Users/m/w/cesnet/oarepo-requests/oarepo_requests/templates/oarepo/invenio_notifications/comment-request-event.create.jinja:40
+#, python-brace-format
+msgid "'{user_name}' commented:"
+msgstr ""
+
+#: /Users/m/w/cesnet/oarepo-requests/oarepo_requests/templates/oarepo/invenio_notifications/comment-request-event.create.jinja:47
+#: /Users/m/w/cesnet/oarepo-requests/oarepo_requests/templates/oarepo/invenio_notifications/comment-request-event.create.jinja:73
+msgid "Check out the request"
+msgstr ""
+
+#: /Users/m/w/cesnet/oarepo-requests/oarepo_requests/templates/oarepo/invenio_notifications/comment-request-event.create.jinja:59
+#, python-brace-format
+msgid "@{user_name} commented on '{request_title}'"
+msgstr ""
+
+#: /Users/m/w/cesnet/oarepo-requests/oarepo_requests/templates/oarepo/invenio_notifications/comment-request-event.create.jinja:63
+#, python-brace-format
+msgid "Check out the request: {request_link}"
+msgstr ""
+
+#: /Users/m/w/cesnet/oarepo-requests/oarepo_requests/templates/oarepo/invenio_notifications/comment-request-event.create.jinja:69
+#, python-brace-format
+msgid "*@{user_name}* commented on *{request_title}*"
+msgstr ""
+
+#: /home/dusanst/Projects/oarepo-requests/oarepo_requests/services/oarepo/service.py:88
+msgid ""
+"Action could not be performed due to validation request fields validation "
+"errors."
+msgstr ""
+
+msgid ""
+"Record has validation errors. Please click the 'Edit metadata' button and "
+"then try again."
+msgstr ""
+
 #: /home/martin/Projects/CESNET/OARepo/oarepo-requests/oarepo_requests/actions/publish_draft.py:85
 msgid "This version tag already exists"
 msgstr ""

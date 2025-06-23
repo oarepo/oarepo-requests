@@ -14,7 +14,7 @@ from typing import TYPE_CHECKING, Any, override
 import marshmallow as ma
 from invenio_requests.records.api import Request
 from oarepo_runtime.datastreams.utils import get_record_service_for_record
-from oarepo_runtime.i18n import lazy_gettext as _
+from invenio_i18n import gettext, lazy_gettext as _
 
 from oarepo_requests.actions.publish_draft import (
     PublishDraftDeclineAction,
@@ -97,16 +97,16 @@ class PublishNewVersionRequestType(PublishRequestType):
             identity=identity,
             topic=topic,
             request=request,
-            create=_("Submit for review"),
-            create_autoapproved=_("Publish new version"),
-            submit=_("Submit for review"),
-            submitted_receiver=_("Review and publish new version"),
-            submitted_creator=_("New version submitted for review"),
-            submitted_others=_("New version submitted for review"),
-            accepted=_("New version published"),
-            declined=_("New version publication declined"),
-            cancelled=_("New version publication cancelled"),
-            created=_("Submit for review"),
+            create=gettext("Submit for review"),
+            create_autoapproved=gettext("Publish new version"),
+            submit=gettext("Submit for review"),
+            submitted_receiver=gettext("Review and publish new version"),
+            submitted_creator=gettext("New version submitted for review"),
+            submitted_others=gettext("New version submitted for review"),
+            accepted=gettext("New version published"),
+            declined=gettext("New version publication declined"),
+            cancelled=gettext("New version publication cancelled"),
+            created=gettext("Submit for review"),
         )
 
     @override
@@ -123,34 +123,34 @@ class PublishNewVersionRequestType(PublishRequestType):
             identity=identity,
             topic=topic,
             request=request,
-            create=_(
+            create=gettext(
                 "By submitting the new version for review you are requesting the publication of the new version. "
                 "The draft will become locked and no further changes will be possible until the request "
                 "is accepted or declined. You will be notified about the decision by email."
             ),
-            create_autoapproved=_(
+            create_autoapproved=gettext(
                 "Click to immediately publish the new version. "
                 "The new version will be a subject to embargo as requested in the side panel. "
                 "Note: The action is irreversible."
             ),
-            submit=_(
+            submit=gettext(
                 "Submit for review. After submitting the new version for review, "
                 "it will be locked and no further modifications will be possible."
             ),
-            submitted_receiver=_(
+            submitted_receiver=gettext(
                 "The new version has been submitted for review. "
                 "You can now accept or decline the request."
             ),
-            submitted_creator=_(
+            submitted_creator=gettext(
                 "The new version has been submitted for review. "
                 "It is now locked and no further changes are possible. "
                 "You will be notified about the decision by email."
             ),
-            submitted_others=_("The new version has been submitted for review. "),
-            accepted=_("The new version has been published. "),
-            declined=_("Publication of the new version has been declined."),
-            cancelled=_("The new version has been cancelled. "),
-            created=_("Waiting for finishing the new version publication request."),
+            submitted_others=gettext("The new version has been submitted for review. "),
+            accepted=gettext("The new version has been published. "),
+            declined=gettext("Publication of the new version has been declined."),
+            cancelled=gettext("The new version has been cancelled. "),
+            created=gettext("Waiting for finishing the new version publication request."),
         )
 
     def can_create(

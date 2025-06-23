@@ -13,12 +13,11 @@ from typing import TYPE_CHECKING, Any
 
 from invenio_access.permissions import system_identity
 from invenio_notifications.services.uow import NotificationOp
-from invenio_requests.errors import CannotExecuteActionError
 from invenio_requests.records.api import Request
 from oarepo_runtime.datastreams.utils import get_record_service_for_record
 from oarepo_runtime.i18n import lazy_gettext as _
 
-from oarepo_requests.errors import VersionAlreadyExists
+from oarepo_requests.errors import VersionAlreadyExists, UnresolvedRequestsError
 from oarepo_requests.utils import get_requests_service_for_records_service
 
 from ..notifications.builders.publish import (
@@ -129,9 +128,7 @@ class PublishDraftAcceptAction(
                     "submitted",
                     "created",
                 ):
-                    raise CannotExecuteActionError(
-                        str(self.name), reason=_("All open requests need to be closed.")
-                    )
+                    raise UnresolvedRequestsError(action=str(self.name))
         id_ = state.topic["id"]
 
         published_topic = topic_service.publish(

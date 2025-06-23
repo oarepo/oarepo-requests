@@ -35,7 +35,7 @@ def test_delete(
     assert len(lst.json["hits"]["hits"]) == 3
 
     resp_request_submit = submit_request_on_record(
-        creator.identity, record1_id, "delete_published_record"
+        creator.identity, record1_id, "delete_published_record", create_additional_data={"payload": {"removal_reason": "test reason"}}
     )
 
     record = receiver_client.get(f"{urls['BASE_URL']}{record1_id}?expand=true")
@@ -58,7 +58,7 @@ def test_delete(
     assert len(lst.json["hits"]["hits"]) == 2
 
     resp_request_submit = submit_request_on_record(
-        creator.identity, record2_id, "delete_published_record"
+        creator.identity, record2_id, "delete_published_record", create_additional_data={"payload": {"removal_reason": "test reason"}}
     )
     record = receiver_client.get(f"{urls['BASE_URL']}{record2_id}?expand=true")
     decline = receiver_client.post(
@@ -72,7 +72,7 @@ def test_delete(
     assert declined_request.json["status"] == "declined"
 
     resp_request_submit = submit_request_on_record(
-        creator.identity, record3_id, "delete_published_record"
+        creator.identity, record3_id, "delete_published_record", create_additional_data={"payload": {"removal_reason": "test reason"}}
     )
     record = creator_client.get(f"{urls['BASE_URL']}{record3_id}?expand=true")
     assert record.json["expanded"]["requests"][0]["links"]["actions"].keys() == {
