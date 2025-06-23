@@ -14,13 +14,13 @@ export const getReceiver = (request) => {
         target="_blank"
         rel="noopener noreferrer"
       >
-        {i18next.t("Recepient: {{receiver}}.", {
+        {i18next.t("Recipient: {{receiver}}.", {
           receiver: request.receiver.label,
           interpolation: { escapeValue: false },
         })}
       </a>
     ) : (
-      i18next.t("Recepient: {{receiver}}.", {
+      i18next.t("Recipient: {{receiver}}.", {
         receiver: request.receiver.label,
         interpolation: { escapeValue: false },
       })
@@ -28,7 +28,7 @@ export const getReceiver = (request) => {
   } else {
     return (
       <span>
-        {i18next.t("Recepient:")}{" "}
+        {i18next.t("Recipient:")}{" "}
         {request.receiver.map((receiver, index) => {
           const label =
             index === request.receiver.length - 1

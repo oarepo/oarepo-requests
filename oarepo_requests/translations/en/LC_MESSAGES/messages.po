@@ -1247,9 +1247,6 @@ msgstr ""
 msgid "Not submitted"
 msgstr ""
 
-msgid "Recepient: {{receiver}}."
-msgstr ""
-
 #: /home/dusanst/Projects/oarepo-requests/oarepo_requests/services/oarepo/service.py:88
 #: /Users/m/w/cesnet/oarepo-requests/oarepo_requests/templates/oarepo/invenio_notifications/comment-request-event.create.jinja:24
 #, python-brace-format
@@ -1311,7 +1308,10 @@ msgid ""
 "then try again."
 msgstr ""
 
-msgid "Recepient:"
+msgid "Recipient: {{receiver}}."
+msgstr ""
+
+msgid "Recipient:"
 msgstr ""
 
 #~ msgid "No status"
