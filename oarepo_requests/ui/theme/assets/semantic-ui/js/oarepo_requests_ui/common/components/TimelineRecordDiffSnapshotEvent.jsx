@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import PropTypes from "prop-types";
 import { Icon, Table, Message, Accordion } from "semantic-ui-react";
 import { i18next } from "@translations/oarepo_requests_ui/i18next";
+import { ErrorBoundary } from "react-error-boundary";
 import _isArray from "lodash/isArray";
 import _isObjectLike from "lodash/isObject";
 import _every from "lodash/every";
@@ -29,156 +30,156 @@ export const TimelineRecordDiffSnapshotEvent = ({ event }) => {
   const renderDiffTables = () => {
     if (!event.payload?.diff) return null;
 
-    try {
-      const diffOperations = JSON.parse(event.payload.diff);
+    const diffOperations = JSON.parse(event.payload.diff);
 
-      if (!_isArray(diffOperations)) {
-        return null;
+    if (!_isArray(diffOperations)) {
+      return null;
+    }
+
+    // Handle case where there are no changes
+    if (diffOperations.length === 0) {
+      return (
+        <div>
+          <Icon name="info circle" />
+          {i18next.t("No changes detected between versions")}
+        </div>
+      );
+    }
+
+    // Group operations by type
+    const operationsByType = diffOperations.reduce((groups, op) => {
+      const operationType = op.op.toLowerCase();
+      if (!groups[operationType]) {
+        groups[operationType] = [];
       }
+      groups[operationType].push(op);
+      return groups;
+    }, {});
 
-      // Handle case where there are no changes
-      if (diffOperations.length === 0) {
-        return (
-          <div>
-            <Icon name="info circle" />
-            {i18next.t("No changes detected between versions")}
-          </div>
-        );
-      }
+    // Format values for display
+    const formatValue = (value) => {
+      if (value === null || value === undefined) return "—";
+      if (_isArray(value) && _every(value, _isString)) return value.join(", ");
+      if (_isObjectLike(value))
+        return JSON.stringify(value, null, 2);
+      return String(value);
+    };
 
-      // Group operations by type
-      const operationsByType = diffOperations.reduce((groups, op) => {
-        const operationType = op.op.toLowerCase();
-        if (!groups[operationType]) {
-          groups[operationType] = [];
+    // Convert path to human readable format
+    const formatPath = (path) => {
+      return path
+        .replace(/^\//, "")
+        .replace(/\/(\d+)\//g, (match, arrayIndex) => {
+          return ` › ${parseInt(arrayIndex) + 1} › `;
+        })
+        .replace(/\/(\d+)$/, (match, arrayIndex) => {
+          return ` › ${parseInt(arrayIndex) + 1}`;
+        })
+        .replace(/\//g, " › ");
+    };
+
+    const renderOperationTable = (operations, operationType) => {
+      const operationConfig = {
+        add: {
+          title: i18next.t("Added"),
+          icon: "add",
+          color: "green"
+        },
+        remove: {
+          title: i18next.t("Removed"),
+          icon: "remove",
+          color: "red"
+        },
+        replace: {
+          title: i18next.t("Changed"),
+          icon: "pencil",
+          color: "orange"
         }
-        groups[operationType].push(op);
-        return groups;
-      }, {});
-
-      // Format values for display
-      const formatValue = (value) => {
-        if (value === null || value === undefined) return "—";
-        if (_isArray(value) && _every(value, _isString)) return value.join(", ");
-        if (_isObjectLike(value))
-          return JSON.stringify(value, null, 2);
-        return String(value);
       };
 
-      // Convert path to human readable format
-      const formatPath = (path) => {
-        return path
-          .replace(/^\//, "")
-          .replace(/\/(\d+)\//g, (match, arrayIndex) => {
-            return ` › ${parseInt(arrayIndex) + 1} › `;
-          })
-          .replace(/\/(\d+)$/, (match, arrayIndex) => {
-            return ` › ${parseInt(arrayIndex) + 1}`;
-          })
-          .replace(/\//g, " › ");
-      };
+      const config = operationConfig[operationType];
+      if (!config || operations.length === 0) return null;
 
-      const renderOperationTable = (operations, operationType) => {
-        const operationConfig = {
-          add: {
-            title: i18next.t("Added"),
-            icon: "add",
-            color: "green"
-          },
-          remove: {
-            title: i18next.t("Removed"),
-            icon: "remove",
-            color: "red"
-          },
-          replace: {
-            title: i18next.t("Changed"),
-            icon: "pencil",
-            color: "orange"
-          }
-        };
-
-        const config = operationConfig[operationType];
-        if (!config || operations.length === 0) return null;
-
-        const isVisible = visibleAccordions[operationType] || false;
-
-        return (
-          <Accordion key={operationType} fluid className={`operation-accordion ${operationType} rel-mb-1`}>
-            <Accordion.Title
-              active={isVisible}
-              onClick={() => toggleAccordion(operationType)}
-              className={`operation-title ${operationType} flex align-items-center`}
-            >
-              <Icon name="dropdown" />
-              <span>
-                <Icon name={config.icon} className="operation-icon" />
-                {config.title}
-                <span className="operation-count">({operations.length})</span>
-              </span>
-            </Accordion.Title>
-            <Accordion.Content active={isVisible}>
-              <Table basic celled stackable className={`record-diff-table requests ${operationType} borderless`}>
-                <Table.Header>
-                  <Table.Row>
-                    <Table.HeaderCell>{i18next.t("Field")}</Table.HeaderCell>
-                    {operationType === "replace" ? (
-                      <>
-                        <Table.HeaderCell>{i18next.t("Old Value")}</Table.HeaderCell>
-                        <Table.HeaderCell>{i18next.t("New Value")}</Table.HeaderCell>
-                      </>
-                    ) : (
-                      <Table.HeaderCell>{i18next.t("Value")}</Table.HeaderCell>
-                    )}
-                  </Table.Row>
-                </Table.Header>
-                <Table.Body>
-                  {operations.map((op, index) => (
-                    <Table.Row key={`${operationType}-${index}`}>
-                      <Table.Cell>
-                        <code>{formatPath(op.path)}</code>
-                      </Table.Cell>
-                      {operationType === "replace" ? (
-                        <>
-                          <Table.Cell>
-                            <pre>{formatValue(op.old_value)}</pre>
-                          </Table.Cell>
-                          <Table.Cell>
-                            <pre>{formatValue(op.value)}</pre>
-                          </Table.Cell>
-                        </>
-                      ) : (
-                        <Table.Cell>
-                          <pre>{formatValue(operationType === "remove" ? op.old_value : op.value)}</pre>
-                        </Table.Cell>
-                      )}
-                    </Table.Row>
-                  ))}
-                </Table.Body>
-              </Table>
-            </Accordion.Content>
-          </Accordion>
-        );
-      };
+      const isVisible = visibleAccordions[operationType] || false;
 
       return (
+        <Accordion key={operationType} fluid className={`operation-accordion ${operationType} rel-mb-1`}>
+          <Accordion.Title
+            active={isVisible}
+            onClick={() => toggleAccordion(operationType)}
+            className={`operation-title ${operationType} flex align-items-center`}
+          >
+            <Icon name="dropdown" />
+            <span>
+              <Icon name={config.icon} className="operation-icon" />
+              {config.title}
+              <span className="operation-count">({operations.length})</span>
+            </span>
+          </Accordion.Title>
+          <Accordion.Content active={isVisible}>
+            <Table basic celled stackable className={`record-diff-table requests ${operationType} borderless`}>
+              <Table.Header>
+                <Table.Row>
+                  <Table.HeaderCell>{i18next.t("Field")}</Table.HeaderCell>
+                  {operationType === "replace" ? (
+                    <>
+                      <Table.HeaderCell>{i18next.t("Old Value")}</Table.HeaderCell>
+                      <Table.HeaderCell>{i18next.t("New Value")}</Table.HeaderCell>
+                    </>
+                  ) : (
+                    <Table.HeaderCell>{i18next.t("Value")}</Table.HeaderCell>
+                  )}
+                </Table.Row>
+              </Table.Header>
+              <Table.Body>
+                {operations.map((op, index) => (
+                  <Table.Row key={`${operationType}-${index}`}>
+                    <Table.Cell>
+                      <code>{formatPath(op.path)}</code>
+                    </Table.Cell>
+                    {operationType === "replace" ? (
+                      <>
+                        <Table.Cell>
+                          <pre>{formatValue(op.old_value)}</pre>
+                        </Table.Cell>
+                        <Table.Cell>
+                          <pre>{formatValue(op.value)}</pre>
+                        </Table.Cell>
+                      </>
+                    ) : (
+                      <Table.Cell>
+                        <pre>{formatValue(operationType === "remove" ? op.old_value : op.value)}</pre>
+                      </Table.Cell>
+                    )}
+                  </Table.Row>
+                ))}
+              </Table.Body>
+            </Table>
+          </Accordion.Content>
+        </Accordion>
+      );
+    };
+
+    return (
+      <ErrorBoundary FallbackComponent={DiffFallbackMessage}>
         <div className="diff-tables-container ml-5">
           {renderOperationTable(operationsByType.add || [], "add")}
           {renderOperationTable(operationsByType.remove || [], "remove")}
           {renderOperationTable(operationsByType.replace || [], "replace")}
         </div>
-      );
-    } catch (error) {
-      return (
-        <Message negative>
-          <Message.Header>
-            {i18next.t("Unable to parse diff data")}
-          </Message.Header>
-          <p>{i18next.t("There was an error processing the diff data.")}</p>
-          {error?.message && <pre>{error.message}</pre>}
-        </Message>
-      );
-    }
+      </ErrorBoundary>
+    );
   };
+
+  const DiffFallbackMessage = ({ error }) => (
+    <Message negative>
+      <Message.Header>
+        {i18next.t("Unable to parse diff data")}
+      </Message.Header>
+      <p>{i18next.t("There was an error processing the diff data.")}</p>
+      {error?.message && <pre>{error.message}</pre>}
+    </Message>
+  );
 
   return (
     <GenericActionEvent
