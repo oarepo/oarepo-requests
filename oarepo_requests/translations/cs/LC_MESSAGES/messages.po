@@ -1467,9 +1467,6 @@ msgstr "Stará hodnota"
 msgid "New Value"
 msgstr "Nová hodnota"
 
-msgid "None"
-msgstr "Žádná"
-
 msgid "Removed"
 msgstr "Odstraněno"
 
@@ -1482,17 +1479,8 @@ msgstr "Při zpracování rozdílů mezi verzemi došlo k chybě."
 msgid "Added"
 msgstr "Přidáno"
 
-msgid "Replaced"
-msgstr "Nahrazeno"
-
 msgid "requestEdited"
 msgstr "upravil(a) záznam"
-
-msgid "Unknown operation"
-msgstr "Neznámá operace"
-
-msgid "View changes"
-msgstr "Zobrazit změny"
 
 msgid "Changed"
 msgstr "Změněno"

@@ -1345,9 +1345,6 @@ msgstr ""
 msgid "New Value"
 msgstr ""
 
-msgid "None"
-msgstr ""
-
 msgid "Removed"
 msgstr ""
 
@@ -1357,23 +1354,8 @@ msgstr ""
 msgid "There was an error processing the diff data."
 msgstr ""
 
-msgid "Add"
-msgstr ""
-
-msgid "Remove"
-msgstr ""
-
-msgid "Replace"
-msgstr ""
-
 msgid "requestEdited"
 msgstr "edited record"
-
-msgid "Unknown operation"
-msgstr ""
-
-msgid "View changes"
-msgstr ""
 
 msgid "Added"
 msgstr ""
