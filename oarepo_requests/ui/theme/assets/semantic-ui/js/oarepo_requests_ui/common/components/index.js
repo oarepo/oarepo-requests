@@ -25,3 +25,4 @@ export * from "./ConfirmationModal";
 export * from "./TimelineEscalationEvent";
 export * from "./GenericActionEvent";
 export * from "./TimelineRecordDiffSnapshotEvent";
+export * from "./DiffOperationAccordionTable";

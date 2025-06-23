@@ -9,6 +9,10 @@ import _isEmpty from "lodash/isEmpty";
 import { httpVnd } from "@js/oarepo_ui";
 import _set from "lodash/set";
 import _has from "lodash/has";
+import _isArray from "lodash/isArray";
+import _isObjectLike from "lodash/isObject";
+import _every from "lodash/every";
+import _isString from "lodash/isString";
 import { i18next } from "@translations/oarepo_requests_ui/i18next";
 import * as Yup from "yup";
 
@@ -148,4 +152,26 @@ const serializeDataForInvenioApi = (formData) => {
     _set(serializedData, "payload.content", formData.payload.content);
   }
   return serializedData;
+};
+
+// Format complex object values for string-like format
+export const formatValueToStringLikeFormat = (value) => {
+  if (value === null || value === undefined) return "—";
+  if (_isArray(value) && _every(value, _isString)) return value.join(", ");
+  if (_isObjectLike(value))
+    return JSON.stringify(value, null, 2);
+  return String(value);
+};
+
+// Convert (nested) record field path to human readable format
+export const formatNestedRecordFieldPath = (path) => {
+  return path
+    .replace(/^\//, "")
+    .replace(/\/(\d+)\//g, (match, arrayIndex) => {
+      return ` › ${parseInt(arrayIndex) + 1} › `;
+    })
+    .replace(/\/(\d+)$/, (match, arrayIndex) => {
+      return ` › ${parseInt(arrayIndex) + 1}`;
+    })
+    .replace(/\//g, " › ");
 };
