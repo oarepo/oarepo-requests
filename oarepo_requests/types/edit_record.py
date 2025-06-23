@@ -18,7 +18,7 @@ from invenio_records_resources.services.uow import RecordCommitOp, UnitOfWork
 from invenio_requests.proxies import current_requests_service
 from invenio_requests.records.api import Request
 from oarepo_runtime.datastreams.utils import get_record_service_for_record_class
-from oarepo_runtime.i18n import lazy_gettext as _
+from invenio_i18n import gettext, lazy_gettext as _
 from oarepo_runtime.records.drafts import has_draft
 from typing_extensions import override
 
@@ -118,9 +118,9 @@ class EditPublishedRecordRequestType(NonDuplicableOARepoRequestType):
         :param kwargs:          additional keyword arguments
         """
         if topic.is_draft:
-            raise ValueError("Trying to create edit request on draft record")
+            raise ValueError(gettext("Trying to create edit request on draft record"))
         if has_draft(topic):
-            raise ValueError("Trying to create edit request on record with draft")
+            raise ValueError(gettext("Trying to create edit request on record with draft"))
         super().can_create(identity, data, receiver, topic, creator, *args, **kwargs)
 
     def topic_change(self, request: Request, new_topic: dict, uow: UnitOfWork) -> None:
@@ -141,12 +141,12 @@ class EditPublishedRecordRequestType(NonDuplicableOARepoRequestType):
         if is_auto_approved(self, identity=identity, topic=topic):
             return self.name
         if not request:
-            return _("Request edit access")
+            return gettext("Request edit access")
         match request.status:
             case "submitted":
-                return _("Edit access requested")
+                return gettext("Edit access requested")
             case _:
-                return _("Request edit access")
+                return gettext("Request edit access")
 
     @override
     def stateful_description(
@@ -159,27 +159,27 @@ class EditPublishedRecordRequestType(NonDuplicableOARepoRequestType):
     ) -> str | LazyString:
         """Return the stateful description of the request."""
         if is_auto_approved(self, identity=identity, topic=topic):
-            return _("Click to start editing the metadata of the record.")
+            return gettext("Click to start editing the metadata of the record.")
 
         if not request:
-            return _(
+            return gettext(
                 "Request edit access to the record. "
                 "You will be notified about the decision by email."
             )
         match request.status:
             case "submitted":
                 if request_identity_matches(request.created_by, identity):
-                    return _(
+                    return gettext(
                         "Edit access requested. You will be notified about "
                         "the decision by email."
                     )
                 if request_identity_matches(request.receiver, identity):
-                    return _(
+                    return gettext(
                         "You have been requested to grant edit access to the record."
                     )
-                return _("Edit access requested.")
+                return gettext("Edit access requested.")
             case _:
-                return _(
+                return gettext(
                     "Request edit access to the record. "
                     "You will be notified about the decision by email."
                 )

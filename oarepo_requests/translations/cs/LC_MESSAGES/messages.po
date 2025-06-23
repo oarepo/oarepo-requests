@@ -1367,6 +1367,46 @@ msgstr "Platnost do: {{- expiringDate}}"
 msgid "Not submitted"
 msgstr "Nepodáno"
 
+msgid "All open requests must be closed first."
+msgstr "Nejprve musí být uzavřeny všechny otevřené žádosti."
+
+msgid "Cannot %(action)s: %(reason)s"
+msgstr "Nelze %(action)s: %(reason)s"
+
+msgid "There is already an open request of %(request_type)s on %(record_id)s."
+msgstr ""
+"Na záznamu %(record_id)s již existuje otevřená žádost typu %(request_type)s."
+
+msgid "Unknown request type %(request_type)s."
+msgstr "Neznámý typ žádosti: %(request_type)s."
+
+msgid ""
+"Receiver for request type %(request_type)s is required but wasn't "
+"successfully referenced on record %(record_id)s."
+msgstr ""
+"Příjemce pro žádost typu %(request_type)s je vyžadován, ale nebyl úspěšně "
+"uveden u záznamu %(record_id)s."
+
+msgid ""
+"\n"
+" Additional keyword arguments:"
+msgstr ""
+"\n"
+" Další pojmenované argumenty:"
+
+msgid "Trying to create edit request on draft record"
+msgstr "Pokus o vytvoření žádosti o úpravu konceptu záznamu"
+
+msgid "Trying to create edit request on record with draft"
+msgstr ""
+"Pokus o vytvoření žádosti o úpravu záznamu, ke kterému již existuje koncept"
+
+msgid "Trying to create new version request on draft record"
+msgstr "Pokus o vytvoření žádosti o novou verzi pro koncept záznamu"
+
+msgid "Trying to create publish request on published record"
+msgstr "Pokus o vytvoření žádosti o zveřejnění již zveřejněného záznamu"
+
 #: /home/dusanst/Projects/oarepo-requests/oarepo_requests/services/oarepo/service.py:88
 msgid ""
 "Action could not be performed due to validation request fields validation "
