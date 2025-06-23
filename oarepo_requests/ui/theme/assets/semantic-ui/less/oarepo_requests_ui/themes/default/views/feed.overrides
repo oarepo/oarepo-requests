@@ -48,21 +48,36 @@
           @verticalLineLeftMargin + @actionEventIconSize / 1.5
         );
 
-        .diff-tables-container {
-          margin-left: 0.2rem;
-          
-          .ui.accordion.operation-accordion {
-            margin-bottom: 1rem;
-            
+        .diff-tables-container {          
+          .ui.accordion.operation-accordion {            
             &:last-child {
               margin-bottom: 0;
             }
+
+            &.add {
+              border-left: 3px solid @green;
+              .operation-title {
+                color: @green;
+              }
+            }
+            
+            &.remove {
+              border-left: 3px solid @red;
+              .operation-title {
+                color: @red;
+              }
+            }
+            
+            &.replace {
+              border-left: 3px solid @orange;
+              .operation-title {
+                color: @orange;
+              }
+            }
             
             .operation-title {
-              padding: 0.2rem 1rem !important;
+              padding: 0.2rem 0.5rem !important;
               font-weight: 600;
-              display: flex !important;
-              align-items: center;
 
               &.active.title {
                 display: unset;
@@ -79,30 +94,15 @@
               .operation-count {
                 margin-left: 0.5rem;
                 font-weight: normal;
-                color: #666;
+                color: lighten(@grey, 10%);
                 font-size: 0.9em;
               }
-              
-              &.add {
-                color: #21ba45;
-                border-left: 3px solid #21ba45;
-              }
-              
-              &.remove {
-                color: #db2828;
-                border-left: 3px solid #db2828;
-              }
-              
-              &.replace {
-                color: #f2711c;
-                border-left: 3px solid #f2711c;
-              }
             }
-            
+                        
             .record-diff-table {
               margin-top: 0;
+              margin-left: 0.5rem;
               width: 100%;
-              border: none !important;
               word-break: normal;
 
               code {
@@ -111,7 +111,7 @@
               }
 
               em {
-                color: #999;
+                color: lighten(@grey, 10%);
               }
               
               pre {
@@ -119,18 +119,6 @@
                 font-size: 0.9em;
                 white-space: pre-wrap;
                 overflow-wrap: anywhere;
-              }
-              
-              &.add {
-                border-left: 3px solid #21ba45 !important;
-              }
-              
-              &.remove {
-                border-left: 3px solid #db2828 !important;
-              }
-              
-              &.replace {
-                border-left: 3px solid #f2711c !important;
               }
             }
           }

@@ -1,8 +1,7 @@
 import React, { useState } from "react";
 import PropTypes from "prop-types";
-import { Icon, Feed, Table, Message, Accordion } from "semantic-ui-react";
+import { Icon, Table, Message, Accordion } from "semantic-ui-react";
 import { i18next } from "@translations/oarepo_requests_ui/i18next";
-import { toRelativeTime, Image } from "react-invenio-forms";
 import _isArray from "lodash/isArray";
 import _isObjectLike from "lodash/isObject";
 import _every from "lodash/every";
@@ -10,6 +9,7 @@ import _isString from "lodash/isString";
 import {
   getRequestStatusIcon,
   getFeedMessage,
+  GenericActionEvent,
 } from "@js/oarepo_requests_common";
 
 export const TimelineRecordDiffSnapshotEvent = ({ event }) => {
@@ -17,10 +17,6 @@ export const TimelineRecordDiffSnapshotEvent = ({ event }) => {
 
   const eventIcon = getRequestStatusIcon("edited");
   const feedMessage = getFeedMessage("edited");
-
-  const createdBy = event?.expanded?.created_by;
-  const creatorLabel =
-    createdBy?.profile?.full_name || createdBy?.username || createdBy?.email;
 
   const toggleAccordion = (operationType) => {
     setVisibleAccordions(prev => ({
@@ -107,11 +103,11 @@ export const TimelineRecordDiffSnapshotEvent = ({ event }) => {
         const isVisible = visibleAccordions[operationType] || false;
 
         return (
-          <Accordion key={operationType} fluid className={`operation-accordion ${operationType}`}>
+          <Accordion key={operationType} fluid className={`operation-accordion ${operationType} rel-mb-1`}>
             <Accordion.Title
               active={isVisible}
               onClick={() => toggleAccordion(operationType)}
-              className={`operation-title ${operationType}`}
+              className={`operation-title ${operationType} flex align-items-center`}
             >
               <Icon name="dropdown" />
               <span>
@@ -121,7 +117,7 @@ export const TimelineRecordDiffSnapshotEvent = ({ event }) => {
               </span>
             </Accordion.Title>
             <Accordion.Content active={isVisible}>
-              <Table basic celled stackable className={`record-diff-table requests ${operationType}`}>
+              <Table basic celled stackable className={`record-diff-table requests ${operationType} borderless`}>
                 <Table.Header>
                   <Table.Row>
                     <Table.HeaderCell>{i18next.t("Field")}</Table.HeaderCell>
@@ -165,7 +161,7 @@ export const TimelineRecordDiffSnapshotEvent = ({ event }) => {
       };
 
       return (
-        <div className="diff-tables-container">
+        <div className="diff-tables-container ml-5">
           {renderOperationTable(operationsByType.add || [], "add")}
           {renderOperationTable(operationsByType.remove || [], "remove")}
           {renderOperationTable(operationsByType.replace || [], "replace")}
@@ -185,35 +181,12 @@ export const TimelineRecordDiffSnapshotEvent = ({ event }) => {
   };
 
   return (
-    <div className="requests action-event-container">
-      <Feed.Event>
-        <div className="action-event-vertical-line"></div>
-        <Feed.Content>
-          <Feed.Summary className="flex align-items-center">
-            <div className="flex align-items-center justify-center">
-              <Icon
-                className="requests action-event-icon"
-                name={eventIcon?.name}
-                color={eventIcon?.color}
-              />
-            </div>
-            <div className="requests action-event-avatar inline-block">
-              <Image
-                src={createdBy?.links?.avatar}
-                alt={i18next.t("User avatar")}
-              />
-            </div>
-            <b className="ml-5">{creatorLabel}</b>
-            <Feed.Date>
-              {feedMessage} {toRelativeTime(event.updated, i18next.language)}
-            </Feed.Date>
-          </Feed.Summary>
-          <Feed.Extra>
-            {renderDiffTables()}
-          </Feed.Extra>
-        </Feed.Content>
-      </Feed.Event>
-    </div>
+    <GenericActionEvent
+      event={event}
+      eventIcon={eventIcon}
+      feedMessage={feedMessage}
+      ExtraContent={renderDiffTables()}
+    />
   );
 };
 
