@@ -17,11 +17,7 @@ import {
   ResultsPerPage,
   Sort,
 } from "react-searchkit";
-import {
-  CountElement,
-  SearchappSearchbarElement,
-  ResultsPerPageLabel,
-} from "@js/oarepo_ui/search";
+import { CountElement, ResultsPerPageLabel } from "@js/oarepo_ui/search";
 import { ComputerTabletRequestsListItem } from "@js/oarepo_requests_common/search/ComputerTabletRequestsListItem";
 import { MobileRequestsListItem } from "@js/oarepo_requests_common/search/MobileRequestsListItem";
 import { defaultContribComponents } from "@js/invenio_requests/contrib";
@@ -146,8 +142,7 @@ export const RecordRequestsListModal = ({
   });
 
   const initialState = {
-    sortBy: "bestmatch",
-    sortOrder: "asc",
+    sortBy: "newest",
     layout: "list",
     page: 1,
     size: 10,
@@ -197,15 +192,6 @@ export const RecordRequestsListModal = ({
             urlHandlerApi={{ enabled: false }}
           >
             <React.Fragment>
-              <Grid>
-                <Grid.Row>
-                  <Grid.Column width={16}>
-                    <SearchappSearchbarElement
-                      placeholder={i18next.t("Search record's requests...")}
-                    />
-                  </Grid.Column>
-                </Grid.Row>
-              </Grid>
               <Grid relaxed className="computer tablet only">
                 <Grid.Row columns={2}>
                   <Grid.Column width={6}>
