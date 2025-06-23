@@ -1331,30 +1331,6 @@ msgstr ""
 msgid "All open requests need to be closed."
 msgstr "Všechny otevřené žádosti musí být uzavřeny."
 
-msgid "Newest"
-msgstr "Nejnovější"
-
-msgid "Oldest"
-msgstr "Nejstarší"
-
-msgid "Search record's requests"
-msgstr "Hledat žádosti k záznamu"
-
-msgid "Record's requests"
-msgstr "Žádosti k záznamu"
-
-msgid "Request history of the record."
-msgstr "Historie žádostí u zaznamu."
-
-msgid "Search record's requests..."
-msgstr "Hledat žádosti k záznamu..."
-
-msgid "Typ"
-msgstr "Typ"
-
-msgid "Stav žádosti"
-msgstr "Stav žádosti"
-
 msgid "No description"
 msgstr "Žádný popis"
 

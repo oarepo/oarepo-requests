@@ -1211,30 +1211,6 @@ msgstr ""
 msgid "All open requests need to be closed."
 msgstr ""
 
-msgid "Newest"
-msgstr ""
-
-msgid "Oldest"
-msgstr ""
-
-msgid "Search record's requests"
-msgstr ""
-
-msgid "Record's requests"
-msgstr ""
-
-msgid "Request history of the record."
-msgstr ""
-
-msgid "Search record's requests..."
-msgstr ""
-
-msgid "Typ"
-msgstr ""
-
-msgid "Stav žádosti"
-msgstr ""
-
 msgid "No description"
 msgstr ""
 

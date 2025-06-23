@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2025-06-23 09:59+0200\n"
+"POT-Creation-Date: 2025-06-23 12:44+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -1055,33 +1055,6 @@ msgstr ""
 msgid "User avatar"
 msgstr ""
 
-msgid "Newest"
-msgstr ""
-
-msgid "Oldest"
-msgstr ""
-
-msgid "Search record's requests"
-msgstr ""
-
-msgid "Record's requests"
-msgstr ""
-
-msgid "Request history of the record."
-msgstr ""
-
-msgid "Search record's requests..."
-msgstr ""
-
-msgid "Typ"
-msgstr ""
-
-msgid "Stav žádosti"
-msgstr ""
-
-msgid "Close"
-msgstr ""
-
 msgid "Remaining characters: "
 msgstr ""
 
@@ -1094,6 +1067,9 @@ msgid "Request details"
 msgstr ""
 
 msgid "Form fields could not be fetched."
+msgstr ""
+
+msgid "Close"
 msgstr ""
 
 msgid "Status"
