@@ -4,7 +4,7 @@ msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
 "POT-Creation-Date: 2024-03-27 11:31+0100\n"
-"PO-Revision-Date: 2024-06-19 14:40+0200\n"
+"PO-Revision-Date: 2025-06-06 18:39+0200\n"
 "Last-Translator: \n"
 "Language-Team: cs <LL@li.org>\n"
 "Language: cs\n"
@@ -13,7 +13,7 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=3; plural=((n==1) ? 0 : (n>=2 && n<=4) ? 1 : 2);\n"
 "Generated-By: Babel 2.14.0\n"
-"X-Generator: Poedit 3.4.4\n"
+"X-Generator: Poedit 3.6\n"
 
 #: oarepo_requests/services/ui_schema.py:71
 msgid "status"
@@ -1460,3 +1460,48 @@ msgstr "Příjemce: {{receiver}}."
 
 msgid "Recipient:"
 msgstr "Příjemce:"
+
+#: /home/martin/Projects/CESNET/OARepo/oarepo-requests/oarepo_requests/actions/publish_draft.py:85
+msgid "This version tag already exists"
+msgstr "Tato značka verze již existuje"
+
+#: /home/martin/Projects/CESNET/OARepo/oarepo-requests/oarepo_requests/actions/publish_draft.py:124
+#: /home/martin/Projects/CESNET/OARepo/oarepo-requests/oarepo_requests/types/publish_draft.py:154
+msgid "All open requests need to be closed."
+msgstr "Všechny otevřené žádosti je třeba uzavřít."
+
+msgid "No changes detected between versions"
+msgstr "Mezi verzemi nebyly zjištěny žádné změny"
+
+msgid "Field"
+msgstr "Pole"
+
+msgid "Operation"
+msgstr "Operace"
+
+msgid "Old Value"
+msgstr "Stará hodnota"
+
+msgid "New Value"
+msgstr "Nová hodnota"
+
+msgid "Removed"
+msgstr "Odstraněno"
+
+msgid "Unable to parse diff data"
+msgstr "Nelze analyzovat rozdíly mezi verzemi"
+
+msgid "There was an error processing the diff data."
+msgstr "Při zpracování rozdílů mezi verzemi došlo k chybě."
+
+msgid "Added"
+msgstr "Přidáno"
+
+msgid "requestEdited"
+msgstr "upravil(a) záznam"
+
+msgid "Changed"
+msgstr "Změněno"
+
+msgid "Value"
+msgstr "Hodnota"

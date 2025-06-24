@@ -4,7 +4,7 @@ import { Icon, Feed } from "semantic-ui-react";
 import { i18next } from "@translations/oarepo_requests_ui/i18next";
 import { toRelativeTime, Image } from "react-invenio-forms";
 
-export const GenericActionEvent = ({ event, eventIcon, feedMessage }) => {
+export const GenericActionEvent = ({ event, eventIcon, feedMessage, ExtraContent }) => {
   const createdBy = event?.expanded?.created_by;
   const creatorLabel =
     createdBy?.profile?.full_name || createdBy?.username || createdBy?.email;
@@ -33,6 +33,11 @@ export const GenericActionEvent = ({ event, eventIcon, feedMessage }) => {
               {feedMessage} {toRelativeTime(event.updated, i18next.language)}
             </Feed.Date>
           </Feed.Summary>
+          {ExtraContent && 
+            <Feed.Extra>
+              {ExtraContent}
+            </Feed.Extra>
+          }
         </Feed.Content>
       </Feed.Event>
     </div>
@@ -43,4 +48,5 @@ GenericActionEvent.propTypes = {
   event: PropTypes.object,
   eventIcon: PropTypes.object,
   feedMessage: PropTypes.string,
+  ExtraContent: PropTypes.element,
 };

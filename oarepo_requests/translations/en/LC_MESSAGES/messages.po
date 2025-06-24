@@ -1336,6 +1336,51 @@ msgstr ""
 msgid "Recipient:"
 msgstr ""
 
+#: /home/martin/Projects/CESNET/OARepo/oarepo-requests/oarepo_requests/actions/publish_draft.py:85
+msgid "This version tag already exists"
+msgstr ""
+
+#: /home/martin/Projects/CESNET/OARepo/oarepo-requests/oarepo_requests/actions/publish_draft.py:124
+#: /home/martin/Projects/CESNET/OARepo/oarepo-requests/oarepo_requests/types/publish_draft.py:154
+msgid "All open requests need to be closed."
+msgstr ""
+
+msgid "No changes detected between versions"
+msgstr ""
+
+msgid "Field"
+msgstr ""
+
+msgid "Operation"
+msgstr ""
+
+msgid "Old Value"
+msgstr ""
+
+msgid "New Value"
+msgstr ""
+
+msgid "Removed"
+msgstr ""
+
+msgid "Unable to parse diff data"
+msgstr ""
+
+msgid "There was an error processing the diff data."
+msgstr ""
+
+msgid "requestEdited"
+msgstr "edited record"
+
+msgid "Added"
+msgstr ""
+
+msgid "Changed"
+msgstr ""
+
+msgid "Value"
+msgstr ""
+
 msgid "Not submitted"
 msgstr ""
 
