@@ -32,7 +32,7 @@ export const getRequestStatusIcon = (requestStatus) => {
     case "submitted":
       return { name: "clock", color: "grey" };
     case "cancelled":
-      return { name: "square", color: "black" };
+      return { name: "ban", color: "black" };
     case "accepted":
       return { name: "check circle", color: "green" };
     case "declined":
@@ -40,7 +40,7 @@ export const getRequestStatusIcon = (requestStatus) => {
     case "expired":
       return { name: "hourglass end", color: "orange" };
     case "deleted":
-      return { name: "thrash", color: "black" };
+      return { name: "trash", color: "black" };
     case "comment_deleted":
       return { name: "eraser", color: "grey" };
     default:
