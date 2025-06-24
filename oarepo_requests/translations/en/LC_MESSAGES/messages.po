@@ -1211,6 +1211,15 @@ msgstr ""
 msgid "All open requests need to be closed."
 msgstr ""
 
+msgid "No description"
+msgstr ""
+
+msgid "Opened by {{creatorName}} on {{created}}."
+msgstr ""
+
+msgid "Expires at: {{- expiringDate}}"
+msgstr ""
+
 #: /Users/miroslavbauer/Code/github.com/oarepo/oarepo-requests/oarepo_requests/errors.py:104
 msgid "All open requests must be closed first."
 msgstr ""
@@ -1321,6 +1330,12 @@ msgid ""
 "then try again."
 msgstr ""
 
+msgid "Recipient: {{receiver}}."
+msgstr ""
+
+msgid "Recipient:"
+msgstr ""
+
 #: /home/martin/Projects/CESNET/OARepo/oarepo-requests/oarepo_requests/actions/publish_draft.py:85
 msgid "This version tag already exists"
 msgstr ""
@@ -1364,6 +1379,9 @@ msgid "Changed"
 msgstr ""
 
 msgid "Value"
+msgstr ""
+
+msgid "Not submitted"
 msgstr ""
 
 #~ msgid "No status"

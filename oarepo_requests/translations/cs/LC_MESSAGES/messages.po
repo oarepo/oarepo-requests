@@ -121,7 +121,7 @@ msgstr "Typ žádosti"
 
 #: oarepo_requests/translations/_only_for_translations.py:28
 msgid "Created"
-msgstr "Vytvořeno"
+msgstr "Vytvořena"
 
 #: oarepo_requests/translations/_only_for_translations.py:29
 msgid "Timeline"
@@ -1331,6 +1331,18 @@ msgstr ""
 msgid "All open requests need to be closed."
 msgstr "Všechny otevřené žádosti musí být uzavřeny."
 
+msgid "No description"
+msgstr "Žádný popis"
+
+msgid "Opened by {{creatorName}} on {{created}}."
+msgstr "Otevřeno uživatelem {{creatorName}} dne {{created}}."
+
+msgid "Expires at: {{- expiringDate}}"
+msgstr "Platnost do: {{- expiringDate}}"
+
+msgid "Not submitted"
+msgstr "Nepodáno"
+
 msgid "All open requests must be closed first."
 msgstr "Nejprve musí být uzavřeny všechny otevřené žádosti."
 
@@ -1442,6 +1454,12 @@ msgid ""
 msgstr ""
 "Záznam obsahuje chyby validace. Prosím, klikněte na tlačítko 'Upravit "
 "metadata' a poté to zkuste znovu."
+
+msgid "Recipient: {{receiver}}."
+msgstr "Příjemce: {{receiver}}."
+
+msgid "Recipient:"
+msgstr "Příjemce:"
 
 #: /home/martin/Projects/CESNET/OARepo/oarepo-requests/oarepo_requests/actions/publish_draft.py:85
 msgid "This version tag already exists"
