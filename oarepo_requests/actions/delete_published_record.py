@@ -93,7 +93,7 @@ class DeletePublishedRecordAcceptAction(OARepoAcceptAction):
             oarepo_rdm = current_app.extensions['oarepo-rdm']
             resource_config = oarepo_rdm.get_api_resource_config(topic_service.id)
 
-            citation_text = ""
+            citation_text = "Citation unavailable."
             if resource_config and 'text/x-iso-690+plain' in resource_config.response_handlers:
                 citation_text = resource_config.response_handlers['text/x-iso-690+plain'].serializer.serialize_object(state.topic)
                     
