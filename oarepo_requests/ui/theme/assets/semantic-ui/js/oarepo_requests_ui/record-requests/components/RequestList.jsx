@@ -17,11 +17,13 @@ export const RequestList = ({ requests }) => {
   const { actionsLocked, setActionsLocked } = useCallbackContext();
   const { requestButtonsIconsConfig } = useRequestContext();
   const isMutating = useIsMutating();
+  
   return requests.map((request) => {
     const buttonIconProps =
       requestButtonsIconsConfig[request.status_code] ||
       requestButtonsIconsConfig?.default;
     const header = request?.stateful_name || request?.name;
+    const description = request?.stateful_description || request?.description;
     return (
       <RequestModal
         key={request.id}
@@ -33,11 +35,11 @@ export const RequestList = ({ requests }) => {
           <Button
             className={`requests request-reply-button ${request.type} ${request.type}-${request.status_code}`}
             fluid
-            title={header}
+            title={description}
             content={header}
             onClick={() => setActionsLocked(true)}
             disabled={actionsLocked || isMutating > 0}
-            labelPosition="left"
+            labelPosition="right center"
             {...buttonIconProps}
           />
         }
