@@ -13,11 +13,9 @@ import { CreateRequestButton } from "./CreateRequestButton";
 export const CreateRequestButtonGroup = ({
   applicableRequestsLoading,
   applicableRequestsLoadingError,
+  createRequests,
 }) => {
-  const { requestTypes, requestButtonsIconsConfig } = useRequestContext();
-  const createRequests = requestTypes?.filter(
-    (requestType) => requestType.links.actions?.create
-  );
+  const { requestButtonsIconsConfig } = useRequestContext();
   const isMutating = useIsMutating();
 
   let content;
@@ -41,8 +39,6 @@ export const CreateRequestButtonGroup = ({
         </Message.Header>
       </Message>
     );
-  } else if (_isEmpty(createRequests)) {
-    return null; // No need to render anything if there are no requests
   } else {
     content = createRequests.map((requestType) => {
       const header =
@@ -71,4 +67,5 @@ export const CreateRequestButtonGroup = ({
 CreateRequestButtonGroup.propTypes = {
   applicableRequestsLoading: PropTypes.bool,
   applicableRequestsLoadingError: PropTypes.object,
+  createRequests: PropTypes.array,
 };
