@@ -100,6 +100,9 @@ class UIRequestSchemaMixin:
 
     description = ma.fields.String()
     """Description of the request."""
+    
+    category = ma.fields.String()
+    """Category of the request, as given by the request type."""
 
     stateful_name = ma.fields.String(dump_only=True)
     """Stateful name of the request, as given by the request type."""
@@ -151,6 +154,8 @@ class UIRequestSchemaMixin:
             data["description"] = type_obj.description
         if hasattr(type_obj, "name"):
             data["name"] = type_obj.name
+        if hasattr(type_obj, "category"):
+            data["category"] = type_obj.category
 
         stateful_name, stateful_description = self._get_stateful_labels(type_obj, data)
         data["stateful_name"] = stateful_name or data["name"]
@@ -211,6 +216,9 @@ class UIRequestTypeSchema(RequestTypeSchema):
     description = ma.fields.String()
     """Description of the request type."""
 
+    category = ma.fields.String()
+    """Category of the request type."""
+
     fast_approve = ma.fields.Boolean()
     """Whether the request type can be fast approved."""
 
@@ -241,6 +249,8 @@ class UIRequestTypeSchema(RequestTypeSchema):
             data["description"] = type_obj.description
         if hasattr(type_obj, "name"):
             data["name"] = type_obj.name
+        if hasattr(type_obj, "category"):
+            data["category"] = type_obj.category
         if hasattr(type_obj, "dangerous"):
             data["dangerous"] = type_obj.dangerous
         if hasattr(type_obj, "is_editable"):

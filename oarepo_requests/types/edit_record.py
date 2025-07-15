@@ -47,6 +47,8 @@ class EditPublishedRecordRequestType(NonDuplicableOARepoRequestType):
 
     type_id = "edit_published_record"
     name = _("Edit metadata")
+    category = _("Modification")
+    
     payload_schema = {
         "draft_record.links.self": ma.fields.Str(
             attribute="draft_record:links:self",

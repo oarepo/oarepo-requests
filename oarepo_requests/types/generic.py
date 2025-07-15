@@ -49,6 +49,8 @@ class OARepoRequestType(RequestType):
 
     description = None
 
+    category = None
+
     dangerous = False
 
     def on_topic_delete(self, request: Request, topic: Record) -> None:
