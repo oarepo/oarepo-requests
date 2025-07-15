@@ -1,9 +1,11 @@
-import React from "react";
+import React, { useCallback } from "react";
 import PropTypes from "prop-types";
+
 import { Button } from "semantic-ui-react";
-import { RequestModal, RequestModalContent } from ".";
-import { useRequestContext } from "@js/oarepo_requests_common";
 import { useIsMutating } from "@tanstack/react-query";
+
+import { RequestModal, RequestModalContent, RequestsPerCategory } from ".";
+import { useRequestContext } from "@js/oarepo_requests_common";
 import { useCallbackContext } from "../../common";
 
 /**
@@ -17,13 +19,14 @@ export const RequestList = ({ requests }) => {
   const { actionsLocked, setActionsLocked } = useCallbackContext();
   const { requestButtonsIconsConfig } = useRequestContext();
   const isMutating = useIsMutating();
-  
-  return requests.map((request) => {
+
+  const mapRequestToModalComponent = useCallback((request) => {
     const buttonIconProps =
       requestButtonsIconsConfig[request.status_code] ||
       requestButtonsIconsConfig?.default;
     const header = request?.stateful_name || request?.name;
     const description = request?.stateful_description || request?.description;
+
     return (
       <RequestModal
         key={request.id}
@@ -46,7 +49,14 @@ export const RequestList = ({ requests }) => {
         ContentComponent={RequestModalContent}
       />
     );
-  });
+  }, [requestButtonsIconsConfig, actionsLocked, isMutating, setActionsLocked]);
+
+  return (
+    <RequestsPerCategory
+      requests={requests}
+      mapRequestToModalComponent={mapRequestToModalComponent}
+    />
+  );
 };
 
 RequestList.propTypes = {

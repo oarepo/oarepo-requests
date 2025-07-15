@@ -1,11 +1,12 @@
-import React from "react";
-import { i18next } from "@translations/oarepo_requests_ui/i18next";
-import { Placeholder, Message } from "semantic-ui-react";
-import _isEmpty from "lodash/isEmpty";
-import { useRequestContext } from "@js/oarepo_requests_common";
+import React, { useCallback } from "react";
 import PropTypes from "prop-types";
+
+import { Placeholder, Message } from "semantic-ui-react";
 import { useIsMutating } from "@tanstack/react-query";
-import { CreateRequestButton } from "./CreateRequestButton";
+
+import { useRequestContext } from "@js/oarepo_requests_common";
+import { i18next } from "@translations/oarepo_requests_ui/i18next";
+import { CreateRequestButton, RequestsPerCategory } from ".";
 
 /**
  * @param {{  applicableRequestsLoading: boolean, applicableRequestsLoadingError: Error }} props
@@ -17,6 +18,24 @@ export const CreateRequestButtonGroup = ({
 }) => {
   const { requestButtonsIconsConfig } = useRequestContext();
   const isMutating = useIsMutating();
+
+  const mapRequestTypeToModal = useCallback((requestType) => {
+    const header =
+      requestType.stateful_name || requestType.name || requestType.type_id;
+    const buttonIconProps =
+      requestButtonsIconsConfig[requestType.type_id] ||
+      requestButtonsIconsConfig?.default;
+
+    return (
+      <CreateRequestButton
+        key={requestType.type_id}
+        requestType={requestType}
+        isMutating={isMutating}
+        buttonIconProps={buttonIconProps}
+        header={header}
+      />
+    );
+  }, [requestButtonsIconsConfig, isMutating]);
 
   let content;
 
@@ -40,23 +59,7 @@ export const CreateRequestButtonGroup = ({
       </Message>
     );
   } else {
-    content = createRequests.map((requestType) => {
-      const header =
-        requestType.stateful_name || requestType.name || requestType.type_id;
-      const buttonIconProps =
-        requestButtonsIconsConfig[requestType.type_id] ||
-        requestButtonsIconsConfig?.default;
-
-      return (
-        <CreateRequestButton
-          key={requestType.type_id}
-          requestType={requestType}
-          isMutating={isMutating}
-          buttonIconProps={buttonIconProps}
-          header={header}
-        />
-      );
-    });
+    content = <RequestsPerCategory requests={createRequests} mapRequestToModalComponent={mapRequestTypeToModal} />;
   }
 
   return (
