@@ -153,7 +153,7 @@ const RecordRequests = ({
         {initialRecord?.id && (
           <ContainerComponent>
             <Accordion fluid exclusive={false}>
-              {!_isEmpty(createRequests) && (
+              {(!_isEmpty(createRequests) || applicableRequestTypesLoading || applicableRequestsLoadingError) &&  (
                 <Accordion.Panel
                   active={visibleAccordions.includes(0)}
                   onTitleClick={handleAccordionClick}
@@ -172,7 +172,7 @@ const RecordRequests = ({
                   }}
                 />
               )}
-              {!_isEmpty(openRequests) && (
+              {(!_isEmpty(openRequests) || requestsLoading || requestsLoadingError) && (
                 <Accordion.Panel
                   active={visibleAccordions.includes(1)}
                   onTitleClick={handleAccordionClick}

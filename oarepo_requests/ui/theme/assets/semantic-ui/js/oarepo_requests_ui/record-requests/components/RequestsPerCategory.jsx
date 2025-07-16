@@ -26,7 +26,7 @@ export const RequestsPerCategory = ({ requests, mapRequestToModalComponent }) =>
           {
             key: category,
             title: {
-              content: category.toUpperCase(),
+              content: category,
             },
             content: {
               content: (
