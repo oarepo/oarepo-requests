@@ -79,12 +79,6 @@ def events_service():
 
     return current_events_service
 
-@pytest.fixture
-def events_service():
-    from invenio_requests.proxies import current_events_service
-
-    return current_events_service
-
 
 @pytest.fixture(scope="module", autouse=True)
 def location(location):
@@ -232,6 +226,7 @@ class RequestWithMultipleRecipients(WorkflowRequestPolicy):
             ),
         ],
     )
+
 
 class RequestsWithDifferentRecipients(DefaultRequests):
     another_topic_updating = WorkflowRequest(

@@ -3,14 +3,15 @@ from __future__ import annotations
 import logging
 from abc import abstractmethod
 from typing import TYPE_CHECKING
-
-from invenio_access.permissions import system_identity
-from invenio_notifications.models import Recipient
 from invenio_notifications.services.generators import EntityResolve, RecipientGenerator
-from invenio_records.dictutils import dict_lookup
 from invenio_requests.proxies import current_requests
 from invenio_requests.records.api import Request
-
+from invenio_access.permissions import system_identity
+from invenio_notifications.models import Recipient
+from invenio_records.dictutils import dict_lookup
+from invenio_search.engine import dsl
+from invenio_users_resources.proxies import current_users_service
+from invenio_requests.proxies import current_events_service
 from oarepo_requests.proxies import current_notification_recipients_resolvers_registry
 
 log = logging.getLogger("oarepo_requests.notifications.generators")
@@ -22,24 +23,30 @@ if TYPE_CHECKING:
 
 
 def _extract_entity_email_data(entity: Any) -> dict[str, Any]:
-    if isinstance(entity, dict):
-        preferences = entity.get("preferences", None)
-    else:
-        preferences = getattr(entity, "preferences", None)
-    if hasattr(entity, "email"):
-        current_user_email = entity.email
-    elif isinstance(entity, dict) and "email" in entity:
-        current_user_email = entity["email"]
-    else:
-        log.error(
-            "Entity %s %s does not have email/emails attribute, skipping.",
-            type(entity),
-            entity,
-        )
-        return {}
-    ret = {"email": current_user_email}
-    if preferences:
-        ret["preferences"] = dict(preferences)
+    def _get(entity, key):
+        if isinstance(entity, dict) and key in dict:
+            return entity.get(key, None)
+        else:
+            return getattr(entity, key, None)
+
+    def _add(entity, key, res, error=False, transform=lambda x: x):
+        v = _get(entity, key)
+        if error and not v:
+            log.error(
+                "Entity %s %s does not have %s attribute, skipping.",
+                type(entity),
+                entity,
+                key
+            )
+            return {}
+        if v:
+            res[key] = transform(v)
+
+    ret = {}
+    _add(entity, "email", ret, error=True)
+    _add(entity, "preferences", ret, transform=lambda x: dict(x))
+    _add(entity, "id", ret)
+
     return ret
 
 
@@ -49,9 +56,9 @@ class EntityRecipient(RecipientGenerator):
     def __init__(self, key: str):
         self.key = key
 
-    def __call__(self, notification: Notification, recipients: dict[str, Recipient]):
+    def __call__(self, notification: Notification, recipients: dict[str, Recipient], backend_ids: list[str] = None):
         """"""
-        backend_ids = notification.context["backend_ids"]
+        backend_ids = notification.context["backend_ids"] if not backend_ids else backend_ids
         entity_ref_or_entity = dict_lookup(notification.context, self.key)
 
         if len(entity_ref_or_entity) != 1:
@@ -186,3 +193,44 @@ class RequestEntityResolve(EntityResolve):
                 system_identity, topic=None
             )
         return notification
+
+class OARepoRequestParticipantsRecipient(RecipientGenerator):
+    """Recipient generator based on request and it's events."""
+
+    def __init__(self, key: str):
+        """Ctor."""
+        self.key = key
+
+    def __call__(self, notification: Notification, recipients: dict[str, Recipient]):
+        """Fetch users involved in request and add as recipients."""
+        request = dict_lookup(notification.context, self.key)
+
+
+        # hack for invenio compatibility
+        before_keys = set(recipients.keys())
+        EntityRecipient("request.created_by")(notification, recipients, backend_ids=["email"])
+        EntityRecipient("request.receiver")(notification, recipients, backend_ids=["email"])
+        # can't replace the dict due to invenio pattern
+        for id_ in set(recipients.keys()) - before_keys:
+            recipients[str(recipients[id_].data["id"])] = recipients[id_]
+            del recipients[id_]
+
+        # assume events can only be done by users
+        # fetching all request events to get involved users
+        request_events = current_events_service.scan(
+            identity=system_identity,
+            extra_filter=dsl.Q("term", request_id=request["id"]),
+        )
+        # assume commenters can only be users
+        user_ids =             {
+                re["created_by"]["user"]
+                for re in request_events
+                if re["created_by"].get("user")
+            }
+
+        filter_ = dsl.Q("terms", **{"id": list(user_ids)})
+        users = current_users_service.scan(system_identity, extra_filter=filter_)
+        for u in users:
+            recipients[u["id"]] = Recipient(data=u)
+
+        return recipients

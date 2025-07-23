@@ -31,7 +31,8 @@ from invenio_requests.services.requests.params import IsOpenParam
 from invenio_search.engine import dsl
 from marshmallow import fields
 from opensearch_dsl.query import Bool
-
+from invenio_requests.notifications.generators import RequestParticipantsRecipient
+from oarepo_requests.notifications.generators import OARepoRequestParticipantsRecipient
 from oarepo_requests.resources.ui import (
     OARepoRequestEventsUIJSONSerializer,
     OARepoRequestsUIJSONSerializer,
@@ -214,6 +215,13 @@ def override_invenio_notifications(
             CommentRequestEventCreateNotificationBuilder.context.append(
                 EntityResolve(key="request.topic"),
             )
+
+
+        for r in CommentRequestEventCreateNotificationBuilder.recipients:
+            if isinstance(r, RequestParticipantsRecipient):
+                CommentRequestEventCreateNotificationBuilder.recipients.remove(r)
+                CommentRequestEventCreateNotificationBuilder.recipients.append(OARepoRequestParticipantsRecipient(key="request"))
+                break
 
         for idx, r in list(
             enumerate(CommentRequestEventCreateNotificationBuilder.context)
