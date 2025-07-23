@@ -9,6 +9,10 @@ import _isEmpty from "lodash/isEmpty";
 import { httpVnd } from "@js/oarepo_ui";
 import _set from "lodash/set";
 import _has from "lodash/has";
+import _isArray from "lodash/isArray";
+import _isObjectLike from "lodash/isObject";
+import _every from "lodash/every";
+import _isString from "lodash/isString";
 import { i18next } from "@translations/oarepo_requests_ui/i18next";
 import * as Yup from "yup";
 
@@ -32,7 +36,7 @@ export const getRequestStatusIcon = (requestStatus) => {
     case "submitted":
       return { name: "clock", color: "grey" };
     case "cancelled":
-      return { name: "square", color: "black" };
+      return { name: "ban", color: "black" };
     case "accepted":
       return { name: "check circle", color: "green" };
     case "declined":
@@ -40,9 +44,11 @@ export const getRequestStatusIcon = (requestStatus) => {
     case "expired":
       return { name: "hourglass end", color: "orange" };
     case "deleted":
-      return { name: "thrash", color: "black" };
+      return { name: "trash", color: "black" };
     case "comment_deleted":
       return { name: "eraser", color: "grey" };
+    case "edited":
+      return { name: "pencil", color: "grey" };
     default:
       return null;
   }
@@ -66,6 +72,8 @@ export const getFeedMessage = (eventStatus) => {
       return i18next.t("requestDeleted");
     case "comment_deleted":
       return i18next.t("deleted comment");
+    case "edited":
+      return i18next.t("requestEdited");
     default:
       return i18next.t("requestCommented");
   }
@@ -144,4 +152,26 @@ const serializeDataForInvenioApi = (formData) => {
     _set(serializedData, "payload.content", formData.payload.content);
   }
   return serializedData;
+};
+
+// Format complex object values for string-like format
+export const formatValueToStringLikeFormat = (value) => {
+  if (value === null || value === undefined) return "—";
+  if (_isArray(value) && _every(value, _isString)) return value.join(", ");
+  if (_isObjectLike(value))
+    return JSON.stringify(value, null, 2);
+  return String(value);
+};
+
+// Convert (nested) record field path to human readable format
+export const formatNestedRecordFieldPath = (path) => {
+  return path
+    .replace(/^\//, "")
+    .replace(/\/(\d+)\//g, (match, arrayIndex) => {
+      return ` › ${parseInt(arrayIndex) + 1} › `;
+    })
+    .replace(/\/(\d+)$/, (match, arrayIndex) => {
+      return ` › ${parseInt(arrayIndex) + 1}`;
+    })
+    .replace(/\//g, " › ");
 };

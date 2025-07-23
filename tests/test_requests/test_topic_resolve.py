@@ -9,7 +9,7 @@ import json
 
 from invenio_access.permissions import system_identity
 from thesis.records.api import ThesisDraft, ThesisRecord
-
+from pytest_oarepo.functions import clear_babel_context
 
 def test_resolve_topic(
     db,
@@ -33,7 +33,7 @@ def test_resolve_topic(
     ThesisDraft.index.refresh()
 
     resp_request_submit = submit_request_on_record(
-        creator.identity, record1_id, "delete_published_record"
+        creator.identity, record1_id, "delete_published_record", create_additional_data={"payload": {"removal_reason": "test reason"}}
     )
     assert resp_request_submit["status"] == "submitted"
 
@@ -84,6 +84,7 @@ def test_ui_resolve_topic(
     link2testclient,
     search_clear,
 ):
+    clear_babel_context()
     creator = users[0]
     receiver = users[1]
     creator_client = logged_client(creator)
@@ -95,7 +96,7 @@ def test_ui_resolve_topic(
     ThesisDraft.index.refresh()
 
     resp_request_submit = submit_request_on_record(
-        creator.identity, record1_id, "delete_published_record"
+        creator.identity, record1_id, "delete_published_record", create_additional_data={"payload": {"removal_reason": "test reason"}}
     )
     assert resp_request_submit["status"] == "submitted"
 

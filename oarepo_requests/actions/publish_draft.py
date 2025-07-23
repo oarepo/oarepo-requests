@@ -13,16 +13,17 @@ from typing import TYPE_CHECKING, Any
 
 from invenio_access.permissions import system_identity
 from invenio_notifications.services.uow import NotificationOp
-from invenio_records_resources.services.uow import UnitOfWork
-from invenio_requests.errors import CannotExecuteActionError
-from oarepo_requests.utils import get_requests_service_for_records_service
-
+from invenio_requests.records.api import Request
 from oarepo_runtime.datastreams.utils import get_record_service_for_record
 from oarepo_runtime.i18n import lazy_gettext as _
 
+from oarepo_requests.errors import VersionAlreadyExists, UnresolvedRequestsError
+from oarepo_requests.utils import get_requests_service_for_records_service
+
 from ..notifications.builders.publish import (
     PublishDraftRequestAcceptNotificationBuilder,
-    PublishDraftRequestSubmitNotificationBuilder, PublishDraftRequestDeclineNotificationBuilder,
+    PublishDraftRequestDeclineNotificationBuilder,
+    PublishDraftRequestSubmitNotificationBuilder,
 )
 from .cascade_events import update_topic
 from .generic import (
@@ -32,13 +33,14 @@ from .generic import (
     OARepoSubmitAction,
 )
 from .record_snapshot_mixin import RecordSnapshotMixin
-from invenio_requests.records.api import Request
 
 if TYPE_CHECKING:
     from flask_principal import Identity
-    from .components import RequestActionState
     from invenio_drafts_resources.records import Record
+    from invenio_records_resources.services.uow import UnitOfWork
     from invenio_requests.customizations.actions import RequestAction
+
+    from .components import RequestActionState
 
 
 class PublishMixin:
@@ -71,18 +73,17 @@ class PublishDraftSubmitAction(PublishMixin, RecordSnapshotMixin, OARepoSubmitAc
         **kwargs: Any,
     ) -> Record:
         """Publish the draft."""
-        if (
-                "payload" in self.request
-                and "version" in self.request["payload"]
-        ):
+        if "payload" in self.request and "version" in self.request["payload"]:
             topic_service = get_record_service_for_record(state.topic)
-            versions = topic_service.search_versions(identity, state.topic.pid.pid_value)
+            versions = topic_service.search_versions(
+                identity, state.topic.pid.pid_value
+            )
             versions_hits = versions.to_dict()["hits"]["hits"]
             for rec in versions_hits:
                 if "version" in rec["metadata"]:
                     version = rec["metadata"]["version"]
                     if version == self.request["payload"]["version"]:
-                        raise CannotExecuteActionError("submit", reason=_("This version tag already exists"))
+                        raise VersionAlreadyExists()
             state.topic.metadata["version"] = self.request["payload"]["version"]
         uow.register(
             NotificationOp(
@@ -90,6 +91,7 @@ class PublishDraftSubmitAction(PublishMixin, RecordSnapshotMixin, OARepoSubmitAc
             )
         )
         return super().apply(identity, state, uow, *args, **kwargs)
+
 
 class PublishDraftAcceptAction(
     PublishMixin, AddTopicLinksOnPayloadMixin, OARepoAcceptAction
@@ -114,14 +116,19 @@ class PublishDraftAcceptAction(
         if not topic_service:
             raise KeyError(f"topic {state.topic} service not found")
         request_service = get_requests_service_for_records_service(topic_service)
-        requests = request_service.search_requests_for_draft(system_identity, state.topic.pid.pid_value)
+        requests = request_service.search_requests_for_draft(
+            system_identity, state.topic.pid.pid_value
+        )
 
         for result in requests._results:
             if result.type not in ["publish_draft","publish_new_version", "publish_changed_metadata"] and result.is_open:
                 # note: we can not use solely the result.is_open because changes may not be committed yet
                 # to opensearch index. That's why we need to get the record from DB and re-check.
-                if Request.get_record(result.uuid)["status"] in ("submitted", "created"):
-                    raise CannotExecuteActionError(str(self.name), reason=_("All open requests need to be closed."))
+                if Request.get_record(result.uuid)["status"] in (
+                    "submitted",
+                    "created",
+                ):
+                    raise UnresolvedRequestsError(action=str(self.name))
         id_ = state.topic["id"]
 
         published_topic = topic_service.publish(
@@ -134,9 +141,7 @@ class PublishDraftAcceptAction(
                 PublishDraftRequestAcceptNotificationBuilder.build(request=self.request)
             )
         )
-        return super().apply(
-            identity, state, uow, *args, **kwargs
-        )
+        return super().apply(identity, state, uow, *args, **kwargs)
 
 
 class PublishDraftDeclineAction(OARepoDeclineAction):
@@ -155,7 +160,9 @@ class PublishDraftDeclineAction(OARepoDeclineAction):
         """Publish the draft."""
         uow.register(
             NotificationOp(
-                PublishDraftRequestDeclineNotificationBuilder.build(request=self.request)
+                PublishDraftRequestDeclineNotificationBuilder.build(
+                    request=self.request
+                )
             )
         )
         return super().apply(identity, state, uow, *args, **kwargs)

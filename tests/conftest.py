@@ -15,7 +15,6 @@ from invenio_records_permissions.generators import (
     AuthenticatedUser,
     SystemProcess,
 )
-from invenio_users_resources.records import UserAggregate
 from invenio_records_resources.services.uow import RecordCommitOp
 from invenio_requests.customizations import CommentEventType, LogEventType
 from invenio_requests.proxies import current_requests_service
@@ -24,6 +23,7 @@ from invenio_requests.services.generators import Receiver
 from invenio_requests.services.permissions import (
     PermissionPolicy as InvenioRequestsPermissionPolicy,
 )
+from invenio_users_resources.records import UserAggregate
 from oarepo_runtime.i18n import lazy_gettext as _
 from oarepo_runtime.services.permissions import RecordOwners
 from oarepo_workflows import (
@@ -31,13 +31,17 @@ from oarepo_workflows import (
     AutoRequest,
     IfInState,
     WorkflowRequest,
+    WorkflowRequestEscalation,
     WorkflowRequestPolicy,
     WorkflowTransitions,
-    WorkflowRequestEscalation,
 )
 from oarepo_workflows.base import Workflow
 from oarepo_workflows.requests.events import WorkflowEvent
-from pytest_oarepo.requests.classes import TestEventType, UserGenerator
+from pytest_oarepo.requests.classes import (
+    CSLocaleUserGenerator,
+    TestEventType,
+    UserGenerator,
+)
 from thesis.proxies import current_service
 
 from oarepo_requests.actions.generic import (
@@ -57,7 +61,6 @@ from oarepo_requests.services.permissions.workflow_policies import (
 from oarepo_requests.types import ModelRefTypes, NonDuplicableOARepoRequestType
 from oarepo_requests.types.events.topic_update import TopicUpdateEventType
 
-
 pytest_plugins = [
     "pytest_oarepo.requests.fixtures",
     "pytest_oarepo.records",
@@ -75,6 +78,13 @@ def events_service():
     from invenio_requests.proxies import current_events_service
 
     return current_events_service
+
+@pytest.fixture
+def events_service():
+    from invenio_requests.proxies import current_events_service
+
+    return current_events_service
+
 
 @pytest.fixture(scope="module", autouse=True)
 def location(location):
@@ -162,6 +172,30 @@ class DefaultRequests(WorkflowRequestPolicy):
     )
 
 
+class DifferentLocalesPublish(WorkflowRequestPolicy):
+    publish_draft = WorkflowRequest(
+        requesters=[IfInState("draft", [RecordOwners()])],
+        recipients=[CSLocaleUserGenerator()],
+        transitions=WorkflowTransitions(
+            submitted="publishing",
+            accepted="published",
+            declined="draft",
+            cancelled="draft",
+        ),
+    )
+    delete_published_record = WorkflowRequest(
+        requesters=[AnyUser()],
+        recipients=[UserGenerator(1), CSLocaleUserGenerator()],
+        transitions=WorkflowTransitions(
+            submitted="deleting",
+            accepted="deleted",
+            declined="published",
+            cancelled="published",
+        ),
+        events=events_only_receiver_can_comment,
+    )
+
+
 class RequestWithMultipleRecipients(WorkflowRequestPolicy):
     publish_draft = WorkflowRequest(
         requesters=[IfInState("draft", [RecordOwners()])],
@@ -215,6 +249,7 @@ class RequestsWithDifferentRecipients(DefaultRequests):
         transitions=WorkflowTransitions(),
     )
 
+
 class RequestsWithApproveWithoutGeneric(WorkflowRequestPolicy):
     publish_draft = WorkflowRequest(
         requesters=[IfInState("approved", [AutoRequest()])],
@@ -256,6 +291,7 @@ class RequestsWithApproveWithoutGeneric(WorkflowRequestPolicy):
         transitions=WorkflowTransitions(),
         events=events_only_receiver_can_comment,
     )
+
 
 class RequestsWithApprove(WorkflowRequestPolicy):
     publish_draft = WorkflowRequest(
@@ -375,7 +411,7 @@ class AnotherTopicUpdatingRequestType(NonDuplicableOARepoRequestType):
     allowed_topic_ref_types = ModelRefTypes(published=True, draft=True)
 
     def topic_change(self, request: Request, new_topic: Dict, uow):
-        setattr(request, "topic", new_topic)
+        request.topic = new_topic
         uow.register(RecordCommitOp(request, indexer=current_requests_service.indexer))
 
 
@@ -412,6 +448,16 @@ class WithApprovalPermissions(RequestBasedWorkflowPermissions):
         IfInState("publishing", [RecordOwners(), UserGenerator(2)]),
         IfInState("published", [AuthenticatedUser()]),
         IfInState("deleting", [AuthenticatedUser()]),
+    ]
+
+
+class DifferentLocalesPermissions(RequestBasedWorkflowPermissions):
+    can_read = [
+        IfInState("draft", [RecordOwners()]),
+        IfInState("publishing", [RecordOwners(), CSLocaleUserGenerator()]),
+        IfInState("published", [AnyUser()]),
+        IfInState("published", [AuthenticatedUser()]),
+        IfInState("deleting", [AnyUser()]),
     ]
 
 
@@ -458,13 +504,12 @@ WORKFLOWS = {
         permission_policy_cls=TestWorkflowPermissions,
         request_policy_cls=RequestsWithSystemIdentity,
     ),
+    "different_locales": Workflow(
+        label=_("User with id 3 prefers cs locale."),
+        permission_policy_cls=DifferentLocalesPermissions,
+        request_policy_cls=DifferentLocalesPublish,
+    ),
 }
-
-"""
-@pytest.fixture(scope="module")
-def create_app(instance_path, entry_points):
-    return create_api
-"""
 
 
 @pytest.fixture()
@@ -587,6 +632,11 @@ def app_config(app_config):
     }
     app_config["FILES_REST_DEFAULT_STORAGE_CLASS"] = "L"
     app_config["MAIL_DEFAULT_SENDER"] = "test@invenio-rdm-records.org"
+
+    app_config["I18N_LANGUAGES"] = [("cs", "Czech")]
+    app_config["BABEL_DEFAULT_LOCALE"] = "en"
+
+    app_config["APP_THEME"] = ["oarepo", "semantic-ui"]
 
     return app_config
 

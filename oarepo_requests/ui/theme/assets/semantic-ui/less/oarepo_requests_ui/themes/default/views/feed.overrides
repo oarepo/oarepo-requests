@@ -43,6 +43,87 @@
             @commentEventBorderWidth
         );
       }
+      .extra {
+        margin-left: calc(
+          @verticalLineLeftMargin + @actionEventIconSize / 1.5
+        );
+
+        .diff-tables-container {          
+          .ui.accordion.operation-accordion {            
+            &:last-child {
+              margin-bottom: 0;
+            }
+
+            &.add {
+              border-left: 3px solid @green;
+              .operation-title {
+                color: @green;
+              }
+            }
+            
+            &.remove {
+              border-left: 3px solid @red;
+              .operation-title {
+                color: @red;
+              }
+            }
+            
+            &.replace {
+              border-left: 3px solid @orange;
+              .operation-title {
+                color: @orange;
+              }
+            }
+            
+            .operation-title {
+              padding: 0.2rem 0.5rem !important;
+              font-weight: 600;
+
+              &.active.title {
+                display: unset;
+
+                .icon:not(.dropdown) {
+                  transform: unset;
+                }
+              }
+              
+              .operation-icon {
+                margin-left: 0.2rem;
+              }
+              
+              .operation-count {
+                margin-left: 0.5rem;
+                font-weight: normal;
+                color: lighten(@grey, 10%);
+                font-size: 0.9em;
+              }
+            }
+                        
+            .record-diff-table {
+              margin-top: 0;
+              padding-left: 0.5rem;
+              width: 100%;
+              word-break: normal;
+
+              code {
+                padding: 0;
+                overflow-wrap: normal;
+              }
+
+              em {
+                color: lighten(@grey, 10%);
+              }
+              
+              pre {
+                margin: 0;
+                font-size: 0.9em;
+                white-space: pre-wrap;
+                overflow-wrap: anywhere;
+              }
+            }
+          }
+        }
+      }
     }
     .requests.action-event-icon {
       font-size: @actionEventIconSize;

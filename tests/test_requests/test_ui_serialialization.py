@@ -12,7 +12,7 @@ from deepdiff import DeepDiff
 from thesis.records.api import ThesisDraft, ThesisRecord
 
 from oarepo_requests.resolvers.ui import FallbackEntityReferenceUIResolver
-
+from pytest_oarepo.functions import clear_babel_context
 
 def test_user_serialization(
     users,
@@ -25,6 +25,7 @@ def test_user_serialization(
     link2testclient,
     search_clear,
 ):
+    clear_babel_context()
     fallback_label = users[0]
     username_label = users[1]
     fullname_label = users[2]
@@ -144,6 +145,7 @@ def test_resolver_fallback(
     link2testclient,
     search_clear,
 ):
+    clear_babel_context()
     config_restore = copy.deepcopy(app.config["ENTITY_REFERENCE_UI_RESOLVERS"])
     app.config["ENTITY_REFERENCE_UI_RESOLVERS"] = {
         "fallback": FallbackEntityReferenceUIResolver("fallback"),
@@ -235,6 +237,7 @@ def test_role(
     draft_factory,
     search_clear,
 ):
+    clear_babel_context()
     config_restore = app.config["OAREPO_REQUESTS_DEFAULT_RECEIVER"]
 
     def current_receiver(record=None, request_type=None, **kwargs):
@@ -287,6 +290,7 @@ def test_auto_approve(
     record_factory,
     search_clear,
 ):
+    clear_babel_context()
     creator = users[0]
     creator_client = logged_client(creator)
 

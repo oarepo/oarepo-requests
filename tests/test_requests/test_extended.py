@@ -8,7 +8,7 @@
 from invenio_requests.records.api import RequestEvent
 from pytest_oarepo.functions import is_valid_subdict
 from thesis.records.api import ThesisDraft
-
+from pytest_oarepo.functions import clear_babel_context
 
 def test_listing(
     logged_client,
@@ -18,6 +18,7 @@ def test_listing(
     draft_factory,
     search_clear,
 ):
+    clear_babel_context()
     creator = users[0]
     creator_client = logged_client(creator)
 
@@ -44,6 +45,7 @@ def test_read_extended(
     draft_factory,
     search_clear,
 ):
+    clear_babel_context()
     creator = users[0]
     creator_client = logged_client(creator)
 
