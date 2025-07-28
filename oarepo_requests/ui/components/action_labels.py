@@ -27,13 +27,13 @@ class ActionLabelsComponent(UIResourceComponent):
         identity: Identity,
         view_args: dict[str, Any],
         form_config: dict,
+        request_type: RequestType,
         **kwargs: Any,
     ) -> None:
         """Add action labels to the form config."""
-        type_: RequestType = view_args.get("request_type")
         action_labels = {}
-        if type_:
-            for action_type, action in type_.available_actions.items():
+        if request_type:
+            for action_type, action in request_type.available_actions.items():
                 if hasattr(action, "stateful_name"):
                     name = action.stateful_name(identity, **kwargs)
                 else:
