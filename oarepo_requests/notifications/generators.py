@@ -29,21 +29,22 @@ def _extract_entity_email_data(entity: Any) -> dict[str, Any]:
         else:
             return getattr(entity, key, None)
 
-    def _add(entity, key, res, error=False, transform=lambda x: x):
+    def _add(entity, key, res, transform=lambda x: x):
         v = _get(entity, key)
-        if error and not v:
-            log.error(
-                "Entity %s %s does not have %s attribute, skipping.",
-                type(entity),
-                entity,
-                key
-            )
-            return {}
         if v:
             res[key] = transform(v)
+            return v
+        return None
 
     ret = {}
-    _add(entity, "email", ret, error=True)
+    email = _add(entity, "email", ret)
+    if not email:
+        log.error(
+            "Entity %s %s does not have email/emails attribute, skipping.",
+            type(entity),
+            entity,
+        )
+        return {}
     _add(entity, "preferences", ret, transform=lambda x: dict(x))
     _add(entity, "id", ret)
 
