@@ -69,11 +69,9 @@ pytest_plugins = [
     "pytest_oarepo.files",
 ]
 
-
 @pytest.fixture(scope="module")
 def record_service():
     return current_service
-
 
 @pytest.fixture
 def events_service():
@@ -86,11 +84,9 @@ def events_service():
 def location(location):
     return location
 
-
 @pytest.fixture(autouse=True)
 def vocab_cf(vocab_cf):
     return vocab_cf
-
 
 can_comment_only_receiver = [
     Receiver(),
