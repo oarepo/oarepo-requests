@@ -24,7 +24,7 @@ if TYPE_CHECKING:
 
 def _extract_entity_email_data(entity: Any) -> dict[str, Any]:
     def _get(entity, key):
-        if isinstance(entity, dict) and key in dict:
+        if isinstance(entity, dict) and key in entity:
             return entity.get(key, None)
         else:
             return getattr(entity, key, None)
