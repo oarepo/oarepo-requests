@@ -549,6 +549,7 @@ def ui_serialization_result():
     def _result(topic_id, request_id):
         return {
             # 'created': '2024-01-26T10:06:17.945916',
+            "category": None,
             "created_by": {
                 "label": "id: 1",
                 "links": {"self": "https://127.0.0.1:5000/api/users/1"},
