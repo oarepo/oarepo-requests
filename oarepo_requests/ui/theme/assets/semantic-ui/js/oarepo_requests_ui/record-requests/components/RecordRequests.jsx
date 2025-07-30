@@ -53,7 +53,6 @@ const RecordRequests = ({
   actionExtraContext,
 }) => {
   const queryClient = useQueryClient();
-  const [visibleAccordions, setVisibleAccordions] = useState([0, 1]);
   const [actionsLocked, setActionsLocked] = useState(false);
   const {
     data: requestTypes,
@@ -65,14 +64,6 @@ const RecordRequests = ({
     {
       enabled: !!initialRecord.links?.["applicable-requests"],
       refetchOnWindowFocus: false,
-      onSuccess: (data) => {
-        const applicableRequests = data?.data?.hits?.hits;
-        if (!_isEmpty(applicableRequests)) {
-          setVisibleAccordions((prev) => [...new Set([...prev, 0])]);
-        } else {
-          setVisibleAccordions((prev) => prev.filter((i) => i !== 0));
-        }
-      },
     }
   );
   const {
@@ -82,17 +73,6 @@ const RecordRequests = ({
   } = useQuery(["requests"], () => httpVnd.get(initialRecord.links?.requests), {
     enabled: !!initialRecord.links?.requests,
     refetchOnWindowFocus: false,
-    onSuccess: (data) => {
-      const openRequests = data?.data?.hits?.hits.filter(
-        (request) =>
-          request.is_open || request?.status_code.toLowerCase() === "created"
-      );
-      if (!_isEmpty(openRequests)) {
-        setVisibleAccordions((prev) => [...new Set([...prev, 1])]);
-      } else {
-        setVisibleAccordions((prev) => prev.filter((i) => i !== 1));
-      }
-    },
   });
   const applicableRequestTypes = requestTypes?.data?.hits?.hits;
   const createRequests = applicableRequestTypes?.filter(
@@ -108,12 +88,6 @@ const RecordRequests = ({
     (request) =>
       request.is_open || request?.status_code.toLowerCase() === "created"
   );
-
-  const handleAccordionClick = (_, { index }) => {
-    setVisibleAccordions((prev) =>
-      prev.includes(index) ? prev.filter((i) => i !== index) : [...prev, index]
-    );
-  };
 
   useEffect(() => {
     const handleBeforeUnload = () => {
@@ -152,44 +126,49 @@ const RecordRequests = ({
       >
         {initialRecord?.id && (
           <ContainerComponent>
-            <Accordion fluid exclusive={false}>
-              {(!_isEmpty(createRequests) || applicableRequestTypesLoading || applicableRequestsLoadingError) &&  (
-                <Accordion.Panel
-                  active={visibleAccordions.includes(0)}
-                  onTitleClick={handleAccordionClick}
-                  index={0}
-                  title={i18next.t("New Request")}
-                  content={{
-                    content: (
-                      <CreateRequestButtonGroup
-                        applicableRequestsLoading={applicableRequestTypesLoading}
-                        applicableRequestsLoadingError={
-                          applicableRequestsLoadingError
-                        }
-                        createRequests={createRequests}
-                      />
-                    ),
-                  }}
-                />
-              )}
-              {(!_isEmpty(openRequests) || requestsLoading || requestsLoadingError) && (
-                <Accordion.Panel
-                  active={visibleAccordions.includes(1)}
-                  onTitleClick={handleAccordionClick}
-                  index={1}
-                  title={i18next.t("Open Requests")}
-                  content={{
-                    content: (
-                      <RequestListContainer
-                        requestsLoading={requestsLoading}
-                        requestsLoadingError={requestsLoadingError}
-                        openRequests={openRequests}
-                      />
-                    ),
-                  }}
-                />
-              )}
-            </Accordion>
+            <Accordion
+              fluid
+              exclusive={false}
+              defaultActiveIndex={[0, 1]}
+              panels={[
+                ...(!_isEmpty(createRequests) || applicableRequestTypesLoading || applicableRequestsLoadingError)
+                  ? [
+                      {
+                        key: "new-request",
+                        title: i18next.t("New Request"),
+                        content: {
+                          content: (
+                            <CreateRequestButtonGroup
+                              applicableRequestsLoading={applicableRequestTypesLoading}
+                              applicableRequestsLoadingError={
+                                applicableRequestsLoadingError
+                              }
+                              createRequests={createRequests}
+                            />
+                          ),
+                        },
+                      },
+                    ]
+                  : [],
+                ...(!_isEmpty(openRequests) || requestsLoading || requestsLoadingError)
+                  ? [
+                      {
+                        key: "open-requests",
+                        title: i18next.t("Open Requests"),
+                        content: {
+                          content: (
+                            <RequestListContainer
+                              requestsLoading={requestsLoading}
+                              requestsLoadingError={requestsLoadingError}
+                              openRequests={openRequests}
+                            />
+                          ),
+                        },
+                      },
+                    ]
+                  : [],
+              ]}
+            />
           </ContainerComponent>
         )}
       </CallbackContextProvider>

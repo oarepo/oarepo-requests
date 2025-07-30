@@ -11,5 +11,5 @@ export { RequestModal, RequestModalContent } from "@js/oarepo_requests_common";
 export { RecordRequests } from "./RecordRequests";
 export { CreateRequestModalContent } from "./CreateRequestModalContent";
 export { RequestList } from "./RequestList";
-export { RequestsPerCategory } from "./RequestsPerCategory";
+export { RequestButtons } from "./RequestButtons";
 export { CreateRequestButton } from "./CreateRequestButton";

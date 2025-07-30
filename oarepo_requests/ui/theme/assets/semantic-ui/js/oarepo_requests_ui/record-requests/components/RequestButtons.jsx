@@ -7,7 +7,7 @@ import _map from "lodash/map";
 import _isNil from "lodash/isNil";
 import _partition from "lodash/partition";
 
-export const RequestsPerCategory = ({ requests, mapRequestToModalComponent }) => {
+export const RequestButtons = ({ requests, mapRequestToModalComponent }) => {
   const [requestsWithCategory, requestsWithoutCategory] = _partition(requests, (request) => !_isNil(request?.category));
 
   const groupedRequests = _groupBy(requestsWithCategory, "category");
@@ -49,7 +49,7 @@ export const RequestsPerCategory = ({ requests, mapRequestToModalComponent }) =>
   );
 };
 
-RequestsPerCategory.propTypes = {
+RequestButtons.propTypes = {
   requests: PropTypes.arrayOf(PropTypes.object).isRequired,
-  mapRequestToModal: PropTypes.func.isRequired,
+  mapRequestToModalComponent: PropTypes.func.isRequired,
 };

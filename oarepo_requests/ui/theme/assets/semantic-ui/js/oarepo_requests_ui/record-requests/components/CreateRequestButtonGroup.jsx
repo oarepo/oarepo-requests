@@ -1,4 +1,4 @@
-import React, { useCallback } from "react";
+import React from "react";
 import PropTypes from "prop-types";
 
 import { Placeholder, Message } from "semantic-ui-react";
@@ -6,7 +6,39 @@ import { useIsMutating } from "@tanstack/react-query";
 
 import { useRequestContext } from "@js/oarepo_requests_common";
 import { i18next } from "@translations/oarepo_requests_ui/i18next";
-import { CreateRequestButton, RequestsPerCategory } from ".";
+import { CreateRequestButton, RequestButtons } from ".";
+
+/**
+ * Component for rendering individual create request buttons
+ */
+const CreateRequestButtonWrapper = ({ requestType }) => {
+  const { requestButtonsIconsConfig } = useRequestContext();
+  const isMutating = useIsMutating();
+  
+  const header =
+    requestType.stateful_name || requestType.name || requestType.type_id;
+  const buttonIconProps =
+    requestButtonsIconsConfig[requestType.type_id] ||
+    requestButtonsIconsConfig?.default;
+
+  return (
+    <CreateRequestButton
+      key={requestType.type_id}
+      requestType={requestType}
+      isMutating={isMutating}
+      buttonIconProps={buttonIconProps}
+      header={header}
+    />
+  );
+};
+
+CreateRequestButtonWrapper.propTypes = {
+  requestType: PropTypes.object.isRequired,
+};
+
+const mapRequestTypeToModal = (requestType) => (
+  <CreateRequestButtonWrapper key={requestType.type_id} requestType={requestType} />
+);
 
 /**
  * @param {{  applicableRequestsLoading: boolean, applicableRequestsLoadingError: Error }} props
@@ -16,27 +48,6 @@ export const CreateRequestButtonGroup = ({
   applicableRequestsLoadingError,
   createRequests,
 }) => {
-  const { requestButtonsIconsConfig } = useRequestContext();
-  const isMutating = useIsMutating();
-
-  const mapRequestTypeToModal = useCallback((requestType) => {
-    const header =
-      requestType.stateful_name || requestType.name || requestType.type_id;
-    const buttonIconProps =
-      requestButtonsIconsConfig[requestType.type_id] ||
-      requestButtonsIconsConfig?.default;
-
-    return (
-      <CreateRequestButton
-        key={requestType.type_id}
-        requestType={requestType}
-        isMutating={isMutating}
-        buttonIconProps={buttonIconProps}
-        header={header}
-      />
-    );
-  }, [requestButtonsIconsConfig, isMutating]);
-
   let content;
 
   if (applicableRequestsLoading) {
@@ -59,7 +70,7 @@ export const CreateRequestButtonGroup = ({
       </Message>
     );
   } else {
-    content = <RequestsPerCategory requests={createRequests} mapRequestToModalComponent={mapRequestTypeToModal} />;
+    content = <RequestButtons requests={createRequests} mapRequestToModalComponent={mapRequestTypeToModal} />;
   }
 
   return (
