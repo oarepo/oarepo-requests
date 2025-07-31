@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { Button, Icon } from "semantic-ui-react";
 import PropTypes from "prop-types";
 import { useFormikContext } from "formik";
@@ -6,6 +6,7 @@ import {
   useModalControlContext,
   useAction,
   ConfirmationModal,
+  REQUEST_TYPE,
 } from "@js/oarepo_requests_common";
 import { useConfirmationModal } from "@js/oarepo_ui";
 
@@ -40,6 +41,25 @@ export const RequestActionButton = ({
       requestAction();
     }
   };
+
+  useEffect(() => {
+    if (requestActionName !== REQUEST_TYPE.SUBMIT) return;
+
+    const handleKeyDown = (e) => {
+      if (e.key === "Enter") {
+        e.preventDefault();
+        handleClick();
+      }
+    };
+
+    document.addEventListener("keydown", handleKeyDown);
+
+    return () => {
+      document.removeEventListener("keydown", handleKeyDown);
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    // want to run this only once when the component mounts
+  }, []);
 
   return (
     <>
