@@ -25,7 +25,6 @@ class ActionLabelsComponent(UIResourceComponent):
         self,
         *,
         identity: Identity,
-        view_args: dict[str, Any],
         form_config: dict,
         request_type: RequestType,
         **kwargs: Any,

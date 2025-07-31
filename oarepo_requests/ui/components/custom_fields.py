@@ -23,7 +23,7 @@ class FormConfigCustomFieldsComponent(UIResourceComponent):
     """Component for adding custom fields to request's form config."""
 
     def form_config(
-        self, *, view_args: dict[str, Any], form_config: dict, request_type: RequestType, **kwargs: Any
+        self, *, form_config: dict, request_type: RequestType, **kwargs: Any
     ) -> None:
         """Add custom fields to the form config."""
         # ignore the type as we are checking for alternatives below
@@ -57,7 +57,7 @@ class FormConfigRequestTypePropertiesComponent(UIResourceComponent):
     """Component for adding request type properties to request's form config."""
 
     def form_config(
-        self, *, view_args: dict[str, Any], form_config: dict, request_type: RequestType, **kwargs: Any
+        self, *, form_config: dict, request_type: RequestType, **kwargs: Any
     ) -> None:
         """Add request type properties to the form config (dangerous, editable, has_form)."""
         request_type_properties = {}
