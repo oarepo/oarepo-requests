@@ -33,7 +33,10 @@ class DeleteDraftRequestType(NonDuplicableOARepoRequestType):
 
     type_id = "delete_draft"
     name = _("Delete draft")
-    category = dict(value="modification", label=_("Modification"))
+    category = {
+        "value": "modification",
+        "label": _("Modification")
+    }
 
     dangerous = True
 
