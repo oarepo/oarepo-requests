@@ -12,16 +12,26 @@
 
   .title {
     text-align: center;
+    line-height: 1;
+    padding: 0.785714em 1.5em 0.785714em 2.57142857em + 1.5em;
+    color: rgba(0, 0, 0, 0.6);
 
     i.dropdown.icon {
       position: absolute;
-      left: 1.6em;
+      left: 1.7em;
     }
-
-    padding: 0.4em 0 0.4em 0;
   }
 
   .content {
     padding-top: 0 !important;
+
+    .ui.fluid.vertical.buttons > .button {
+      &:first-child {
+        border-top-left-radius: 0;
+        border-top-right-radius: 0;
+      }
+      
+      justify-content: center;
+    }
   }
 }
