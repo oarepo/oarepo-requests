@@ -86,6 +86,16 @@ class UIReferenceSchema(ma.Schema):
             return {**data, "status": "deleted"}
 
 
+class UIRequestCategorySchema(ma.Schema):
+    """UI schema for request categories."""
+
+    value = ma.fields.String()
+    """Value of the category."""
+
+    label = ma.fields.String()
+    """Label of the category."""
+
+
 class UIRequestSchemaMixin:
     """Mixin for UI request schemas."""
 
@@ -100,8 +110,8 @@ class UIRequestSchemaMixin:
 
     description = ma.fields.String()
     """Description of the request."""
-    
-    category = ma.fields.String()
+
+    category = ma.fields.Nested(UIRequestCategorySchema)
     """Category of the request, as given by the request type."""
 
     stateful_name = ma.fields.String(dump_only=True)
@@ -216,7 +226,7 @@ class UIRequestTypeSchema(RequestTypeSchema):
     description = ma.fields.String()
     """Description of the request type."""
 
-    category = ma.fields.String()
+    category = ma.fields.Nested(UIRequestCategorySchema)
     """Category of the request type."""
 
     fast_approve = ma.fields.Boolean()

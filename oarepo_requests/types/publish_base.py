@@ -71,6 +71,7 @@ class PublishRequestType(NonDuplicableOARepoRequestType):
         }
 
     description = _("Request to publish a draft")
+    category = dict(value="publication", label=_("Publication"))
     receiver_can_be_none = True
     allowed_topic_ref_types = ModelRefTypes(published=True, draft=True)
 

@@ -182,7 +182,10 @@ def test_ui_serialization(
     print(sorted_draft_list)
     assert sorted_draft_list == [
         {   
-            "category": None,
+            "category": {
+                "value": "modification",
+                "label": "Modification",
+            },
             "dangerous": True,
             "description": "Request deletion of draft",
             "editable": False,
@@ -198,7 +201,10 @@ def test_ui_serialization(
             "type_id": "delete_draft",
         },
         {
-            "category": None,
+            "category": {
+                "value": "publication",
+                "label": "Publication",
+            },
             "description": "Request to publish a draft",
             "links": {
                 "actions": {
@@ -222,7 +228,10 @@ def test_ui_serialization(
     sorted_published_list.sort(key=lambda serialized_rt: serialized_rt["type_id"])
     assert sorted_published_list == [
         {
-            "category": None,
+            "category": {
+                "value": "modification",
+                "label": "Modification",
+            },
             "type_id": "delete_published_record",
             "links": {
                 "actions": {
@@ -238,7 +247,10 @@ def test_ui_serialization(
             "stateful_name": "Request record deletion",
         },
         {
-            "category": None,
+            "category": {
+                "value": "modification",
+                "label": "Modification",
+            },
             "type_id": "edit_published_record",
             "links": {
                 "actions": {
@@ -254,7 +266,10 @@ def test_ui_serialization(
             "stateful_name": "Edit metadata",
         },
         {
-            "category": None,
+            "category": {
+                "value": "modification",
+                "label": "Modification",
+            },
             "type_id": "new_version",
             "links": {
                 "actions": {
