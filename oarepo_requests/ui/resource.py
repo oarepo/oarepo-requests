@@ -16,11 +16,11 @@ from flask_resources import resource_requestctx, route
 from invenio_records_resources.proxies import current_service_registry
 from invenio_records_resources.resources.records.resource import (
     request_read_args,
-    request_view_args,
 )
 from invenio_records_resources.services import LinksTemplate
+from oarepo_ui.resources.config import pass_route_args
 from oarepo_ui.proxies import current_oarepo_ui
-from oarepo_ui.resources.resource import UIResource
+from oarepo_ui.resources.resource import UIResource, FormConfigResource
 from oarepo_ui.resources.templating.data import FieldData
 
 if TYPE_CHECKING:
@@ -84,18 +84,13 @@ class RequestUIResource(UIResource):
         return self.config.custom_fields(identity=g.identity, **kwargs)
 
     @request_read_args
-    @request_view_args
-    def detail(self) -> Response:
+    @pass_route_args("view")
+    def detail(self, pid_value) -> Response:
         """Return item detail page."""
         api_record = self.api_service.read(
-            g.identity, resource_requestctx.view_args["pid_value"]
+            g.identity, pid_value
         )
-        render_method = self.get_jinjax_macro(
-            "detail",
-            identity=g.identity,
-            args=resource_requestctx.args,
-            view_args=resource_requestctx.view_args,
-        )
+        render_method = self.get_jinjax_macro("detail")
 
         # TODO: handle permissions UI way - better response than generic error
         record = self.config.ui_serializer.dump_obj(api_record.to_dict())
@@ -123,8 +118,7 @@ class RequestUIResource(UIResource):
             identity=g.identity,
             form_config=form_config,
             extra_context=extra_context,
-            args=resource_requestctx.args,
-            view_args=resource_requestctx.view_args,
+            pid_value=pid_value,
             ui_links=ui_links,
         )
 
@@ -134,8 +128,7 @@ class RequestUIResource(UIResource):
             record=record,
             identity=g.identity,
             extra_context=extra_context,
-            args=resource_requestctx.args,
-            view_args=resource_requestctx.view_args,
+            pid_value=pid_value,
             ui_links=ui_links,
             custom_fields=self._get_custom_fields(
                 api_record=api_record, resource_requestctx=resource_requestctx
@@ -152,6 +145,7 @@ class RequestUIResource(UIResource):
             "form_config": form_config,
             "api_record": api_record,
             "ui_links": ui_links,
+            "pid_value": pid_value,
             "context": current_oarepo_ui.catalog.jinja_env.globals,
             "d": FieldData(record, self.ui_model),
         }
@@ -172,9 +166,6 @@ class RequestUIResource(UIResource):
         self,
         template_type: str,
         *,
-        identity: Identity | None = None,
-        args: dict[str, Any] | None = None,
-        view_args: dict[str, Any] | None = None,
         default_macro: str | None = None,
     ) -> str:
         """Return which jinjax macro should be used for rendering the template.
@@ -195,7 +186,6 @@ class RequestUIResource(UIResource):
         return current_oarepo_ui.catalog.render(
             self.get_jinjax_macro(
                 "tombstone",
-                identity=g.identity,
                 default_macro="Tombstone",
             ),
             pid=getattr(error, "pid_value", None) or getattr(error, "pid", None),
@@ -206,7 +196,6 @@ class RequestUIResource(UIResource):
         return current_oarepo_ui.catalog.render(
             self.get_jinjax_macro(
                 "not_found",
-                identity=g.identity,
                 default_macro="NotFound",
             ),
             pid=getattr(error, "pid_value", None) or getattr(error, "pid", None),
@@ -220,9 +209,21 @@ class RequestUIResource(UIResource):
         return current_oarepo_ui.catalog.render(
             self.get_jinjax_macro(
                 "permission_denied",
-                identity=g.identity,
                 default_macro="PermissionDenied",
             ),
             pid=getattr(error, "pid_value", None) or getattr(error, "pid", None),
             error=error,
         )
+
+class RequestsFormConfigResource(FormConfigResource):
+    @pass_route_args("view")
+    def form_config(self, request_type, pid_value=None):
+        form_config = self._get_form_config()
+        self.run_components(
+            "form_config",
+            form_config=form_config,
+            identity=g.identity,
+            pid_value=pid_value,
+            request_type=request_type,
+        )
+        return form_config

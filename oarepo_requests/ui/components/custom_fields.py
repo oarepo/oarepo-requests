@@ -23,12 +23,11 @@ class FormConfigCustomFieldsComponent(UIResourceComponent):
     """Component for adding custom fields to request's form config."""
 
     def form_config(
-        self, *, view_args: dict[str, Any], form_config: dict, **kwargs: Any
+        self, *, form_config: dict, request_type: RequestType, **kwargs: Any
     ) -> None:
         """Add custom fields to the form config."""
-        type_ = view_args.get("request_type")
         # ignore the type as we are checking for alternatives below
-        form: dict | list = getattr(type_, "form", None)  # type: ignore
+        form: dict | list = getattr(request_type, "form", None)  # type: ignore
         if not form:
             return
 
@@ -58,18 +57,16 @@ class FormConfigRequestTypePropertiesComponent(UIResourceComponent):
     """Component for adding request type properties to request's form config."""
 
     def form_config(
-        self, *, view_args: dict[str, Any], form_config: dict, **kwargs: Any
+        self, *, form_config: dict, request_type: RequestType, **kwargs: Any
     ) -> None:
         """Add request type properties to the form config (dangerous, editable, has_form)."""
-        type_: RequestType = view_args.get("request_type")
-
         request_type_properties = {}
-        if type_ and isinstance(type_, OARepoRequestType):
-            if hasattr(type_, "dangerous"):
-                request_type_properties["dangerous"] = type_.dangerous
-            if hasattr(type_, "is_editable"):
-                request_type_properties["editable"] = type_.is_editable
-            if hasattr(type_, "has_form"):
-                request_type_properties["has_form"] = type_.has_form
+        if request_type and isinstance(request_type, OARepoRequestType):
+            if hasattr(request_type, "dangerous"):
+                request_type_properties["dangerous"] = request_type.dangerous
+            if hasattr(request_type, "is_editable"):
+                request_type_properties["editable"] = request_type.is_editable
+            if hasattr(request_type, "has_form"):
+                request_type_properties["has_form"] = request_type.has_form
 
         form_config["request_type_properties"] = request_type_properties
