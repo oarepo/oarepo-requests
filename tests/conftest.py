@@ -164,6 +164,12 @@ class DefaultRequests(WorkflowRequestPolicy):
         recipients=[AutoApprove()],
         transitions=WorkflowTransitions(),
     )
+    
+    request_user_access=WorkflowRequest(
+        requesters=[AuthenticatedUser()],
+        recipients=[
+            UserGenerator(1),
+    ])
 
 
 class DifferentLocalesPublish(WorkflowRequestPolicy):
