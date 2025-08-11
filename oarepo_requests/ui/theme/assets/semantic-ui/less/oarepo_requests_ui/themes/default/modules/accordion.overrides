@@ -7,18 +7,27 @@
   }
 
   &.styled {
-    box-shadow: 0px 0px 2px 0 @grey, 0px 0px 0px 1px @lightGrey;
+    box-shadow: none;
   }
 
   .title {
     text-align: center;
     line-height: 1;
-    padding: 0.785714em 1.5em 0.785714em 2.57142857em + 1.5em;
-    color: rgba(0, 0, 0, 0.6);
+    font-size: @boxTitleFontSize;
+    border-radius: @boxTitleBorderRadius;
+    border: 1px solid @boxTitleBorderColor !important;
+    padding: @boxTitleVerticalPadding @boxTitleHorizontalPadding @boxTitleVerticalPadding @boxTitleIconOffset + @boxTitleHorizontalPadding;
+    color: @boxTitleColor;
+
+    &.active {
+      border-bottom: none !important;
+      border-radius: @boxTitleBorderRadius @boxTitleBorderRadius 0 0;
+      border-color: @styledActiveTitleColor;
+    }
 
     i.dropdown.icon {
       position: absolute;
-      left: 1.7em;
+      left: @boxIconLeftOffset;
     }
   }
 

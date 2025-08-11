@@ -1,0 +1,8 @@
+@boxTitleColor: rgba(0, 0, 0, 0.6);
+@boxTitleFontSize: 0.9rem;
+@boxTitleBorderColor: @boxTitleColor;
+@boxTitleBorderRadius: 0.28571429rem;
+@boxTitleIconOffset: 2.57142857em;
+@boxTitleHorizontalPadding: 1.5em;
+@boxTitleVerticalPadding: 0.5em;
+@boxIconLeftOffset: 1.95em;
