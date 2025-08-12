@@ -72,7 +72,15 @@ export interface PayloadUI {
 
 export interface Field {
   field: string;
-  ui_widget: "Input" | "NumberInput" | "MultiInput" | "RichInput" | "TextArea" | "Dropdown" | "AutocompleteDropdown" | "BooleanCheckbox";
+  ui_widget:
+    | "Input"
+    | "NumberInput"
+    | "MultiInput"
+    | "RichInput"
+    | "TextArea"
+    | "Dropdown"
+    | "AutocompleteDropdown"
+    | "BooleanCheckbox";
   visible: ("requestor" | "approver")[];
   editable: ("requestor" | "approver")[];
   props: React.ComponentProps<any>;
