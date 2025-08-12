@@ -14,6 +14,7 @@ export const CreateRequestButton = ({
   const { actionsLocked, setActionsLocked } = useCallbackContext();
   const { dangerous, has_form: hasForm } = requestType;
   const needsDialog = dangerous || hasForm;
+  const description = requestType?.stateful_description || requestType?.description;
 
   if (!hasForm) {
     return (
@@ -35,7 +36,7 @@ export const CreateRequestButton = ({
           <Button
             className={`requests request-create-button ${requestType.type_id}`}
             fluid
-            title={header}
+            title={description}
             content={header}
             onClick={() => setActionsLocked(true)}
             disabled={actionsLocked || isMutating > 0}

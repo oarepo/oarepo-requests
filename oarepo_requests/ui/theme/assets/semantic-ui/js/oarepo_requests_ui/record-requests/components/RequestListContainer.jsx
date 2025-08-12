@@ -1,9 +1,7 @@
 import React from "react";
 import { i18next } from "@translations/oarepo_requests_ui/i18next";
 import { Placeholder, Message } from "semantic-ui-react";
-import _isEmpty from "lodash/isEmpty";
 import { RequestList } from ".";
-import { useRequestContext } from "@js/oarepo_requests_common";
 import PropTypes from "prop-types";
 
 /**
@@ -12,17 +10,8 @@ import PropTypes from "prop-types";
 export const RequestListContainer = ({
   requestsLoading,
   requestsLoadingError,
+  openRequests,
 }) => {
-  const { requests } = useRequestContext();
-  let openRequests = requests?.filter(
-    (request) =>
-      request.is_open || request?.status_code.toLowerCase() === "created"
-  );
-
-  if (!requestsLoading && !requestsLoadingError && _isEmpty(openRequests)) {
-    return null;
-  }
-
   return (
     <div className="requests-my-requests borderless">
       {requestsLoading && (
@@ -52,4 +41,5 @@ export const RequestListContainer = ({
 RequestListContainer.propTypes = {
   requestsLoading: PropTypes.bool.isRequired,
   requestsLoadingError: PropTypes.object,
+  openRequests: PropTypes.array,
 };

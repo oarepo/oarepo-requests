@@ -1384,5 +1384,21 @@ msgstr ""
 msgid "Not submitted"
 msgstr ""
 
+#: /home/martin/Projects/CESNET/OARepo/oarepo-requests/oarepo_requests/types/delete_draft.py:36
+#: /home/martin/Projects/CESNET/OARepo/oarepo-requests/oarepo_requests/types/delete_published_record.py:42
+#: /home/martin/Projects/CESNET/OARepo/oarepo-requests/oarepo_requests/types/edit_record.py:50
+msgid "Modification"
+msgstr ""
+
+#: /home/martin/Projects/CESNET/OARepo/oarepo-requests/oarepo_requests/types/publish_base.py:74
+msgid "Publication"
+msgstr ""
+
+msgid "New Request"
+msgstr ""
+
+msgid "Open Requests"
+msgstr ""
+
 #~ msgid "No status"
 #~ msgstr ""

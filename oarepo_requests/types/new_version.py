@@ -43,6 +43,11 @@ class NewVersionRequestType(NonDuplicableOARepoRequestType):
 
     type_id = "new_version"
     name = _("New Version")
+    category = {
+        "value": "modification",
+        "label": _("Modification")
+    }
+
     payload_schema = {
         "draft_record.links.self": ma.fields.Str(
             attribute="draft_record:links:self",

@@ -33,6 +33,10 @@ class DeleteDraftRequestType(NonDuplicableOARepoRequestType):
 
     type_id = "delete_draft"
     name = _("Delete draft")
+    category = {
+        "value": "modification",
+        "label": _("Modification")
+    }
 
     dangerous = True
 
