@@ -30,7 +30,7 @@ export const CreateRequestModalContent = ({
         <p
           id="request-modal-desc"
           dangerouslySetInnerHTML={{ __html: sanitizedDescription }}
-        ></p>
+        />
       )}
       {customFields?.ui && (
         <Form id="request-form">

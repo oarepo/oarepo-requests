@@ -17,7 +17,7 @@ const Decline = ({ request, extraData, isMutating }) => {
       extraData={extraData}
       requestOrRequestType={request}
       buttonLabel={i18next.t("Decline")}
-      requireConfirmation={true}
+      requireConfirmation
       requestActionName={REQUEST_TYPE.DECLINE}
     />
   );

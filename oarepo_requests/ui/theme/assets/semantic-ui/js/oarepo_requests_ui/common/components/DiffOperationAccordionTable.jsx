@@ -14,25 +14,29 @@ export const DiffOperationAccordionTable = ({ operations, operationType }) => {
     add: {
       title: i18next.t("Added"),
       icon: "add",
-      color: "green"
+      color: "green",
     },
     remove: {
       title: i18next.t("Removed"),
       icon: "remove",
-      color: "red"
+      color: "red",
     },
     replace: {
       title: i18next.t("Changed"),
       icon: "pencil",
-      color: "orange"
-    }
+      color: "orange",
+    },
   };
 
   const config = operationConfig[operationType];
   if (!config || operations.length === 0) return null;
 
   return (
-    <Accordion key={operationType} fluid className={`operation-accordion ${operationType} rel-mb-1`}>
+    <Accordion
+      key={operationType}
+      fluid
+      className={`operation-accordion ${operationType} rel-mb-1`}
+    >
       <Accordion.Title
         active={isAccordionVisible}
         onClick={() => setIsAccordionVisible(!isAccordionVisible)}
@@ -46,7 +50,12 @@ export const DiffOperationAccordionTable = ({ operations, operationType }) => {
         </span>
       </Accordion.Title>
       <Accordion.Content active={isAccordionVisible}>
-        <Table basic celled stackable className={`record-diff-table requests ${operationType} borderless`}>
+        <Table
+          basic
+          celled
+          stackable
+          className={`record-diff-table requests ${operationType} borderless`}
+        >
           <Table.Header>
             <Table.Row>
               <Table.HeaderCell>{i18next.t("Field")}</Table.HeaderCell>
@@ -77,7 +86,11 @@ export const DiffOperationAccordionTable = ({ operations, operationType }) => {
                   </>
                 ) : (
                   <Table.Cell>
-                    <pre>{formatValueToStringLikeFormat(operationType === "remove" ? op.old_value : op.value)}</pre>
+                    <pre>
+                      {formatValueToStringLikeFormat(
+                        operationType === "remove" ? op.old_value : op.value
+                      )}
+                    </pre>
                   </Table.Cell>
                 )}
               </Table.Row>
