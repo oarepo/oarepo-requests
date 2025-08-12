@@ -6,7 +6,7 @@ import PropTypes from "prop-types";
 import { httpApplicationJson } from "@js/oarepo_ui";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 
-export const Timeline = ({ request, timelinePageSize }) => {
+export const Timeline = ({ request, timelinePageSize = 25 }) => {
   const queryClient = useQueryClient();
 
   const [page, setPage] = useState(1);
@@ -114,10 +114,7 @@ export const Timeline = ({ request, timelinePageSize }) => {
 };
 
 Timeline.propTypes = {
-  request: PropTypes.object,
+  request: PropTypes.object.isRequired,
+  // eslint-disable-next-line react/require-default-props
   timelinePageSize: PropTypes.number,
-};
-
-Timeline.defaultProps = {
-  timelinePageSize: 25,
 };

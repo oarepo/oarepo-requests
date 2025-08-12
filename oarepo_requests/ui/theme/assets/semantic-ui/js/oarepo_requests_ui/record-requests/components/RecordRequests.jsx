@@ -40,12 +40,21 @@ export const requestButtonsDefaultIconConfig = {
 
 const queryClient = new QueryClient();
 
+const DefaultContainerComponent = ({ children }) => (
+  <div className="requests-container borderless">{children}</div>
+);
+
+DefaultContainerComponent.propTypes = {
+  // eslint-disable-next-line react/require-default-props
+  children: PropTypes.node,
+};
+
 const RecordRequests = ({
   record: initialRecord,
-  ContainerComponent,
-  onBeforeAction,
-  onAfterAction,
-  onErrorPlugins,
+  ContainerComponent = DefaultContainerComponent,
+  onBeforeAction = undefined,
+  onAfterAction = undefined,
+  onErrorPlugins = [],
   requestButtonsIconsConfig,
   actionExtraContext,
 }) => {
@@ -130,6 +139,7 @@ const RecordRequests = ({
   );
 };
 
+/* eslint-disable react/require-default-props */
 RecordRequests.propTypes = {
   record: PropTypes.object.isRequired,
   ContainerComponent: PropTypes.func,
@@ -139,13 +149,14 @@ RecordRequests.propTypes = {
   requestButtonsIconsConfig: PropTypes.object,
   actionExtraContext: PropTypes.object,
 };
+/* eslint-enable react/require-default-props */
 
 const RecordRequestsWithQueryClient = ({
   record: initialRecord,
-  ContainerComponent,
-  onBeforeAction,
-  onAfterAction,
-  onErrorPlugins,
+  ContainerComponent = DefaultContainerComponent,
+  onBeforeAction = undefined,
+  onAfterAction = undefined,
+  onErrorPlugins = [],
   requestButtonsIconsConfig,
   actionExtraContext,
 }) => {
@@ -166,6 +177,7 @@ const RecordRequestsWithQueryClient = ({
   );
 };
 
+/* eslint-disable react/require-default-props */
 RecordRequestsWithQueryClient.propTypes = {
   record: PropTypes.object.isRequired,
   ContainerComponent: PropTypes.func,
@@ -175,20 +187,6 @@ RecordRequestsWithQueryClient.propTypes = {
   requestButtonsIconsConfig: PropTypes.object,
   actionExtraContext: PropTypes.object,
 };
-
-const ContainerComponent = ({ children }) => (
-  <div className="requests-container borderless">{children}</div>
-);
-
-ContainerComponent.propTypes = {
-  children: PropTypes.node,
-};
-
-RecordRequestsWithQueryClient.defaultProps = {
-  ContainerComponent: ContainerComponent,
-  onBeforeAction: undefined,
-  onAfterAction: undefined,
-  onErrorPlugins: [],
-};
+/* eslint-enable react/require-default-props */
 
 export { RecordRequestsWithQueryClient as RecordRequests };

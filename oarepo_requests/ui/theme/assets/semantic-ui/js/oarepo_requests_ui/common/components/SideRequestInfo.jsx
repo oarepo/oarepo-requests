@@ -114,5 +114,5 @@ export const SideRequestInfo = ({ request }) => {
 };
 
 SideRequestInfo.propTypes = {
-  request: PropTypes.object,
+  request: PropTypes.object.isRequired,
 };

@@ -45,9 +45,11 @@ export const GenericActionEvent = ({
   );
 };
 
+/* eslint-disable react/require-default-props */
 GenericActionEvent.propTypes = {
-  event: PropTypes.object,
+  event: PropTypes.object.isRequired,
   eventIcon: PropTypes.object,
   feedMessage: PropTypes.string,
   ExtraContent: PropTypes.element,
 };
+/* eslint-enable react/require-default-props */

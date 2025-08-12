@@ -71,6 +71,7 @@ export const DiffOperationAccordionTable = ({ operations, operationType }) => {
           </Table.Header>
           <Table.Body>
             {operations.map((op, index) => (
+              // eslint-disable-next-line react/no-array-index-key -- there is no unique id for each operation in one request
               <Table.Row key={`${operationType}-${index}`}>
                 <Table.Cell>
                   <code>{formatNestedRecordFieldPath(op.path)}</code>

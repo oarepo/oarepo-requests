@@ -19,7 +19,7 @@ export const RequestModalContentAndActions = ({
   requestType,
   onSubmit,
   ContentComponent,
-  requestCreationModal,
+  requestCreationModal = false,
   onClose,
 }) => {
   const { errors } = useFormikContext();
@@ -101,10 +101,15 @@ export const RequestModalContentAndActions = ({
 };
 
 RequestModalContentAndActions.propTypes = {
+  // eslint-disable-next-line react/require-default-props -- only one of request or requestType is required
   request: PropTypes.object,
+  // eslint-disable-next-line react/require-default-props -- only one of request or requestType is required
   requestType: PropTypes.object,
-  ContentComponent: PropTypes.func,
+  ContentComponent: PropTypes.func.isRequired,
+  // eslint-disable-next-line react/require-default-props
   requestCreationModal: PropTypes.bool,
+  // eslint-disable-next-line react/require-default-props
   onSubmit: PropTypes.func,
+  // eslint-disable-next-line react/require-default-props
   onClose: PropTypes.func,
 };

@@ -6,10 +6,9 @@ import sanitizeHtml from "sanitize-html";
 
 /**
  * @typedef {import("../../record-requests/types").RequestType} RequestType
- * @typedef {import("formik").FormikConfig} FormikConfig
  */
 
-/** @param {{ requestType: RequestType, customSubmitHandler: (e) => void }} props */
+/** @param {{ requestType: RequestType }} props */
 export const CreateRequestModalContent = ({
   requestType,
   customFields,
@@ -49,9 +48,11 @@ export const CreateRequestModalContent = ({
   );
 };
 
+/* eslint-disable react/require-default-props */
 CreateRequestModalContent.propTypes = {
   requestType: PropTypes.object.isRequired,
   customFields: PropTypes.object,
   allowedHtmlAttrs: PropTypes.object,
   allowedHtmlTags: PropTypes.array,
 };
+/* eslint-enable react/require-default-props */

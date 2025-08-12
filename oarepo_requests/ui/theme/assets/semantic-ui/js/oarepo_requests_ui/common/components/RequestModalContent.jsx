@@ -11,19 +11,15 @@ import sanitizeHtml from "sanitize-html";
 
 /**
  * @typedef {import("../../record-requests/types").Request} Request
- * @typedef {import("../../record-requests/types").RequestTypeEnum} RequestTypeEnum
- * @typedef {import("../../record-requests/types").Event} Event
  */
 
-/** @param {{ request: Request, requestModalType: RequestTypeEnum, }} props */
+/** @param {{ request: Request }} props */
 export const RequestModalContent = ({
   request,
   customFields,
   allowedHtmlAttrs,
   allowedHtmlTags,
 }) => {
-  /** @type {{requests: Request[], setRequests: (requests: Request[]) => void}} */
-
   const description = request?.stateful_description || request?.description;
 
   const sanitizedDescription = sanitizeHtml(description, {
@@ -64,9 +60,11 @@ export const RequestModalContent = ({
   );
 };
 
+/* eslint-disable react/require-default-props */
 RequestModalContent.propTypes = {
   request: PropTypes.object.isRequired,
   customFields: PropTypes.object,
   allowedHtmlAttrs: PropTypes.object,
   allowedHtmlTags: PropTypes.array,
 };
+/* eslint-enable react/require-default-props */
