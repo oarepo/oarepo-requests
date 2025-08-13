@@ -52,8 +52,8 @@ DefaultContainerComponent.propTypes = {
 const RecordRequests = ({
   record: initialRecord,
   ContainerComponent = DefaultContainerComponent,
-  onBeforeAction = undefined,
-  onAfterAction = undefined,
+  onBeforeAction,
+  onAfterAction,
   onErrorPlugins = [],
   requestButtonsIconsConfig,
   actionExtraContext,
@@ -154,8 +154,8 @@ RecordRequests.propTypes = {
 const RecordRequestsWithQueryClient = ({
   record: initialRecord,
   ContainerComponent = DefaultContainerComponent,
-  onBeforeAction = undefined,
-  onAfterAction = undefined,
+  onBeforeAction,
+  onAfterAction,
   onErrorPlugins = [],
   requestButtonsIconsConfig,
   actionExtraContext,

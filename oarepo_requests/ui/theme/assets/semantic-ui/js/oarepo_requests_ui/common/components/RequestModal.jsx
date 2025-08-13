@@ -88,15 +88,13 @@ export const RequestModal = ({
   );
 };
 
+/* eslint-disable react/require-default-props */
 RequestModal.propTypes = {
-  // eslint-disable-next-line react/require-default-props -- only one of request or requestType is required
   request: PropTypes.object,
-  // eslint-disable-next-line react/require-default-props -- only one of request or requestType is required
   requestType: PropTypes.object,
   header: PropTypes.oneOfType([PropTypes.string, PropTypes.element]).isRequired,
-  // eslint-disable-next-line react/require-default-props
   trigger: PropTypes.element,
   ContentComponent: PropTypes.func.isRequired,
-  // eslint-disable-next-line react/require-default-props
   requestCreationModal: PropTypes.bool,
 };
+/* eslint-enable react/require-default-props */

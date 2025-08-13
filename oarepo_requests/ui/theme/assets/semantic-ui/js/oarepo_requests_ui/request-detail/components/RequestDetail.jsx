@@ -28,8 +28,8 @@ import sanitizeHtml from "sanitize-html";
 export const RequestDetail = ({
   request,
   timelinePageSize = 25,
-  onBeforeAction = undefined,
-  onAfterAction = undefined,
+  onBeforeAction,
+  onAfterAction,
   onErrorPlugins = [],
 }) => {
   const [activeTab, setActiveTab] = useState("timeline");
