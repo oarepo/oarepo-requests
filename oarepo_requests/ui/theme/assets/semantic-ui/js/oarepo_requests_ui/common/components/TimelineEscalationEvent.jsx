@@ -16,5 +16,5 @@ export const TimelineEscalationEvent = ({ event }) => {
 };
 
 TimelineEscalationEvent.propTypes = {
-  event: PropTypes.object,
+  event: PropTypes.object.isRequired,
 };

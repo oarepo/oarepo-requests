@@ -23,10 +23,12 @@ const Create = ({ requestType, extraData, isMutating }) => {
   );
 };
 
+/* eslint-disable react/require-default-props */
 Create.propTypes = {
-  requestType: PropTypes.object,
+  requestType: PropTypes.object.isRequired,
   extraData: PropTypes.object,
   isMutating: PropTypes.number,
 };
+/* eslint-enable react/require-default-props */
 
 export default Create;

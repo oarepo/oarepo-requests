@@ -13,7 +13,7 @@ export const RequestActionButton = ({
   requestOrRequestType,
   extraData,
   isMutating,
-  iconName,
+  iconName = "envelope outline",
   action,
   buttonLabel,
   requireConfirmation,
@@ -70,15 +70,17 @@ export const RequestActionButton = ({
   );
 };
 
+/* eslint-disable react/require-default-props */
 RequestActionButton.propTypes = {
-  requestOrRequestType: PropTypes.object,
+  requestOrRequestType: PropTypes.object.isRequired,
   extraData: PropTypes.object,
   isMutating: PropTypes.number,
   iconName: PropTypes.string,
-  action: PropTypes.func,
+  action: PropTypes.func.isRequired,
   buttonLabel: PropTypes.string,
   requireConfirmation: PropTypes.bool,
-  requestActionName: PropTypes.string,
+  requestActionName: PropTypes.string.isRequired,
 };
+/* eslint-enable react/require-default-props */
 
 export default RequestActionButton;

@@ -52,5 +52,5 @@ export const TopicPreview = ({ request }) => {
 };
 
 TopicPreview.propTypes = {
-  request: PropTypes.object,
+  request: PropTypes.object.isRequired,
 };

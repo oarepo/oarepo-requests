@@ -12,9 +12,11 @@ export const DefaultView = ({ fieldPath, label }) => {
   ) : null;
 };
 
+/* eslint-disable react/require-default-props */
 DefaultView.propTypes = {
-  fieldPath: PropTypes.string,
+  fieldPath: PropTypes.string.isRequired,
   label: PropTypes.string,
 };
+/* eslint-enable react/require-default-props */
 
 export default DefaultView;

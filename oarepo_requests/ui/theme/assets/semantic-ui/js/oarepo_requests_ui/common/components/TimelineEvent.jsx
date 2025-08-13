@@ -17,7 +17,7 @@ export const TimelineEvent = ({ event, requestId, page }) => {
       event={event}
       requestId={requestId}
       page={page}
-    ></Overridable>
+    />
   );
 };
 

@@ -23,10 +23,12 @@ const Cancel = ({ request, isMutating, extraData }) => {
   );
 };
 
+/* eslint-disable react/require-default-props */
 Cancel.propTypes = {
-  request: PropTypes.object,
+  request: PropTypes.object.isRequired,
   isMutating: PropTypes.number,
   extraData: PropTypes.object,
 };
+/* eslint-enable react/require-default-props */
 
 export default Cancel;

@@ -4,7 +4,11 @@ import { CustomFields } from "react-invenio-forms";
 import { REQUEST_MODAL_TYPE } from "@js/oarepo_requests_common";
 import PropTypes from "prop-types";
 
-export const RequestCustomFields = ({ request, customFields, columnWidth }) => {
+export const RequestCustomFields = ({
+  request,
+  customFields,
+  columnWidth = 16,
+}) => {
   const customFieldsType =
     request.status_code === "created"
       ? REQUEST_MODAL_TYPE.SUBMIT_FORM
@@ -25,10 +29,10 @@ export const RequestCustomFields = ({ request, customFields, columnWidth }) => {
   const readOnlyCustomFieldsConfig = customFields?.ui.map((section) => {
     const { fields } = section;
     const fieldsWithReadOnlyWidget = fields.map((field) => {
-      const { read_only_ui_widget } = field;
+      const { read_only_ui_widget: readOnlyUiWidget } = field;
       return {
         ...field,
-        ui_widget: read_only_ui_widget,
+        ui_widget: readOnlyUiWidget,
       };
     });
     return {
@@ -82,12 +86,10 @@ export const RequestCustomFields = ({ request, customFields, columnWidth }) => {
   ) : null;
 };
 
+/* eslint-disable react/require-default-props */
 RequestCustomFields.propTypes = {
   request: PropTypes.object.isRequired,
   customFields: PropTypes.object,
   columnWidth: PropTypes.number,
 };
-
-RequestCustomFields.defaultProps = {
-  columnWidth: 16,
-};
+/* eslint-enable react/require-default-props */

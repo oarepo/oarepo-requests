@@ -23,9 +23,9 @@ export const RequestModal = ({
   request,
   requestType,
   header,
-  trigger,
+  trigger = null,
   ContentComponent,
-  requestCreationModal,
+  requestCreationModal = false,
 }) => {
   const { isOpen, close: closeModal, open: openModal } = useConfirmationModal();
   const { setActionsLocked } = useCallbackContext();
@@ -88,11 +88,13 @@ export const RequestModal = ({
   );
 };
 
+/* eslint-disable react/require-default-props */
 RequestModal.propTypes = {
   request: PropTypes.object,
   requestType: PropTypes.object,
-  header: PropTypes.oneOfType([PropTypes.string, PropTypes.element]),
+  header: PropTypes.oneOfType([PropTypes.string, PropTypes.element]).isRequired,
   trigger: PropTypes.element,
-  ContentComponent: PropTypes.func,
+  ContentComponent: PropTypes.func.isRequired,
   requestCreationModal: PropTypes.bool,
 };
+/* eslint-enable react/require-default-props */

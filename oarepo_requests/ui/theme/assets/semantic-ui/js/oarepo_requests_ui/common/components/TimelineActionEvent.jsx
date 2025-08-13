@@ -20,5 +20,5 @@ export const TimelineActionEvent = ({ event }) => {
 };
 
 TimelineActionEvent.propTypes = {
-  event: PropTypes.object,
+  event: PropTypes.object.isRequired,
 };

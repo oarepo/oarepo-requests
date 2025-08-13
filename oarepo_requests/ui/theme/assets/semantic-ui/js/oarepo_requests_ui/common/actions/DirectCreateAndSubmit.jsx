@@ -57,10 +57,10 @@ const DirectCreateAndSubmit = ({
     return () => {
       clearTimeout(timeoutId);
     };
-  }, [isError, reset]);
+  }, [isError, reset, setActionsLocked]);
 
   return (
-    <React.Fragment>
+    <>
       <Button
         // applicable requests don't have a status
         className={`requests request-create-button ${requestType?.type_id}`}
@@ -92,14 +92,16 @@ const DirectCreateAndSubmit = ({
         isOpen={isOpen}
         close={close}
       />
-    </React.Fragment>
+    </>
   );
 };
 
+/* eslint-disable react/require-default-props */
 DirectCreateAndSubmit.propTypes = {
-  requestType: PropTypes.object,
+  requestType: PropTypes.object.isRequired,
   requireConfirmation: PropTypes.bool,
   isMutating: PropTypes.number,
 };
+/* eslint-enable react/require-default-props */
 
 export default DirectCreateAndSubmit;

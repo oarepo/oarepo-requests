@@ -13,9 +13,7 @@ import {
 
 const DiffFallbackMessage = ({ error }) => (
   <Message negative>
-    <Message.Header>
-      {i18next.t("Unable to parse diff data")}
-    </Message.Header>
+    <Message.Header>{i18next.t("Unable to parse diff data")}</Message.Header>
     <p>{i18next.t("There was an error processing the diff data.")}</p>
     {error?.message && <pre>{error.message}</pre>}
   </Message>

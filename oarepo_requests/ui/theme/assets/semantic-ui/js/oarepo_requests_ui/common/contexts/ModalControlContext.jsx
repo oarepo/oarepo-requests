@@ -13,6 +13,7 @@ export const ModalControlContextProvider = ({ children, value }) => {
 
 ModalControlContextProvider.propTypes = {
   value: PropTypes.object.isRequired,
+  // eslint-disable-next-line react/require-default-props
   children: PropTypes.node,
 };
 

@@ -12,10 +12,10 @@ import { Icon } from "semantic-ui-react";
 const CommentInput = ({
   comment,
   handleChange,
-  initialValue,
+  initialValue = "",
   length,
   setLength,
-  maxCommentLength,
+  maxCommentLength = MAX_COMMENT_LENGTH,
 }) => {
   // when focused move the cursor at the end of any existing content
   const handleFocus = (event, editor) => {
@@ -106,15 +106,12 @@ export const RequestCommentInput = Overridable.component(
 );
 
 CommentInput.propTypes = {
-  comment: PropTypes.string,
-  handleChange: PropTypes.func,
+  comment: PropTypes.string.isRequired,
+  handleChange: PropTypes.func.isRequired,
+  // eslint-disable-next-line react/require-default-props
   initialValue: PropTypes.string,
-  length: PropTypes.number,
-  setLength: PropTypes.func,
+  length: PropTypes.number.isRequired,
+  setLength: PropTypes.func.isRequired,
+  // eslint-disable-next-line react/require-default-props
   maxCommentLength: PropTypes.number,
-};
-
-CommentInput.defaultProps = {
-  initialValue: "",
-  maxCommentLength: MAX_COMMENT_LENGTH,
 };

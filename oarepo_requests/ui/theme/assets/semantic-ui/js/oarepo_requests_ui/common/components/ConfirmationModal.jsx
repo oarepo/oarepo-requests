@@ -80,6 +80,7 @@ export const ConfirmationModal = ({
   );
 };
 
+/* eslint-disable react/require-default-props */
 ConfirmationModal.propTypes = {
   requestActionName: PropTypes.string,
   requestOrRequestType: PropTypes.object,
@@ -88,6 +89,7 @@ ConfirmationModal.propTypes = {
   close: PropTypes.func,
   onConfirmAction: PropTypes.func,
 };
+/* eslint-enable react/require-default-props */
 
 const createConfirmDialogProps = (requestOrRequestType) => ({
   header: `${i18next.t("Create request")} (${requestOrRequestType?.name})`,

@@ -27,10 +27,10 @@ import sanitizeHtml from "sanitize-html";
 
 export const RequestDetail = ({
   request,
-  timelinePageSize,
+  timelinePageSize = 25,
   onBeforeAction,
   onAfterAction,
-  onErrorPlugins,
+  onErrorPlugins = [],
 }) => {
   const [activeTab, setActiveTab] = useState("timeline");
   const [scrollToTopVisible, setScrollToTopVisible] = useState(false);
@@ -129,7 +129,7 @@ export const RequestDetail = ({
                     dangerouslySetInnerHTML={{
                       __html: sanitizedDescription,
                     }}
-                  ></p>
+                  />
                 )}
                 <SideRequestInfo request={request} />
               </Grid.Column>
@@ -196,17 +196,12 @@ export const RequestDetail = ({
   );
 };
 
+/* eslint-disable react/require-default-props */
 RequestDetail.propTypes = {
-  request: PropTypes.object,
+  request: PropTypes.object.isRequired,
   onBeforeAction: PropTypes.func,
   onAfterAction: PropTypes.func,
   onErrorPlugins: PropTypes.array,
   timelinePageSize: PropTypes.number,
 };
-
-RequestDetail.defaultProps = {
-  onBeforeAction: undefined,
-  onAfterAction: undefined,
-  onErrorPlugins: [],
-  timelinePageSize: 25,
-};
+/* eslint-enable react/require-default-props */

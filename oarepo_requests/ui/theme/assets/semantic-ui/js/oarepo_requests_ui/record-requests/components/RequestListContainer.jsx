@@ -28,6 +28,7 @@ export const RequestListContainer = ({
       {requestsLoading && (
         <Placeholder fluid>
           {Array.from({ length: 2 }).map((_, index) => (
+            // eslint-disable-next-line react/no-array-index-key
             <Placeholder.Paragraph key={index}>
               <Placeholder.Line length="full" />
               <Placeholder.Line length="medium" />
@@ -51,5 +52,6 @@ export const RequestListContainer = ({
 
 RequestListContainer.propTypes = {
   requestsLoading: PropTypes.bool.isRequired,
+  // eslint-disable-next-line react/require-default-props -- Error object or null by default
   requestsLoadingError: PropTypes.object,
 };
