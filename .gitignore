@@ -370,6 +370,11 @@ vite.config.ts.timestamp-*
 # Linting
 linting.sh
 
+# Symbolic links
+node_modules
+
+pnpm-lock.yaml
+
 tests/test.db
 
 .venv*
@@ -382,8 +387,6 @@ docs/migration/data
 example/data
 
 test-model
-
-node_modules
 
 # Testing
 sample/
