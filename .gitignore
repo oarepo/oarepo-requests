@@ -1,3 +1,7 @@
+#
+# Python gitignore
+#
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[codz]
@@ -171,7 +175,7 @@ cython_debug/
 #  be found at https://github.com/github/gitignore/blob/main/Global/JetBrains.gitignore
 #  and can be added to the global gitignore or merged into this file.  For a more nuclear
 #  option (not recommended) you can uncomment the following to ignore the entire idea folder.
-.idea/
+#.idea/
 
 # Abstra
 # Abstra is an AI-powered process automation framework.
@@ -184,11 +188,12 @@ cython_debug/
 #  that can be found at https://github.com/github/gitignore/blob/main/Global/VisualStudioCode.gitignore
 #  and can be added to the global gitignore or merged into this file. However, if you prefer, 
 #  you could uncomment the following to ignore the entire vscode folder
-.vscode/
+# .vscode/
 
 # Ruff stuff:
 .ruff.toml
 .ruff_cache/
+.mypy.ini
 
 # PyPI configuration file
 .pypirc
@@ -209,6 +214,7 @@ uv.lock
 #
 # Logs
 logs
+*.log
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
@@ -227,6 +233,7 @@ pids
 lib-cov
 
 # Coverage directory used by tools like istanbul
+coverage
 *.lcov
 
 # nyc test coverage
@@ -273,10 +280,12 @@ web_modules/
 .yarn-integrity
 
 # dotenv environment variable files
+.env
 .env.*
 !.env.example
 
 # parcel-bundler cache (https://parceljs.org/)
+.cache
 .parcel-cache
 
 # Next.js build output
@@ -285,8 +294,10 @@ out
 
 # Nuxt.js build / generate output
 .nuxt
+dist
 
 # Gatsby files
+.cache/
 # Comment in the public line in if your project uses Gatsby and not Next.js
 # https://nextjs.org/blog/next-9-1#public-directory-support
 # public
@@ -296,6 +307,7 @@ out
 
 # vuepress v2.x temp and cache directory
 .temp
+.cache
 
 # Sveltekit cache directory
 .svelte-kit/
@@ -346,9 +358,13 @@ vite.config.ts.timestamp-*
 .runner.sh
 .env-services
 .eslintrc.yaml
+.mypy.ini
+.ruff.toml
 
 #
 # Editors
+.vscode/
+.idea/
 *.swp
 *.swo
 *.swn
@@ -363,17 +379,17 @@ vite.config.ts.timestamp-*
 *.komodotools.*
 .DS_Store
 *.DS_Store?
+#
+package-lock.json
+pnpm-lock.yaml
 
-# Vim swapfiles
-.*.sw?
+
 
 # Linting
 linting.sh
 
 # Symbolic links
 node_modules
-
-pnpm-lock.yaml
 
 tests/test.db
 
