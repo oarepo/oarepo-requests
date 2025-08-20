@@ -39,6 +39,10 @@ class DeletePublishedRecordRequestType(NonDuplicableOARepoRequestType):
 
     type_id = "delete_published_record"
     name = _("Delete record")
+    category = {
+        "value": "modification",
+        "label": _("Modification")
+    }
 
     payload_schema = {
         "removal_reason": ma.fields.Str(required=True),

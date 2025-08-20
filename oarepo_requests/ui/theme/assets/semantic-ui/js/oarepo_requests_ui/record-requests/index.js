@@ -26,3 +26,5 @@ if (recordRequestsAppDiv) {
     recordRequestsAppDiv
   );
 }
+
+export { RecordRequests };

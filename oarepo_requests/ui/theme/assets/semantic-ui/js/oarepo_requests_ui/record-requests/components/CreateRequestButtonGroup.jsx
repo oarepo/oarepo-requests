@@ -1,11 +1,44 @@
 import React from "react";
-import { i18next } from "@translations/oarepo_requests_ui/i18next";
-import { Placeholder, Message } from "semantic-ui-react";
-import _isEmpty from "lodash/isEmpty";
-import { useRequestContext } from "@js/oarepo_requests_common";
 import PropTypes from "prop-types";
+
+import { Placeholder, Message } from "semantic-ui-react";
 import { useIsMutating } from "@tanstack/react-query";
-import { CreateRequestButton } from "./CreateRequestButton";
+
+import { useRequestContext } from "@js/oarepo_requests_common";
+import { i18next } from "@translations/oarepo_requests_ui/i18next";
+import { CreateRequestButton, RequestButtons } from ".";
+
+/**
+ * Component for rendering individual create request buttons
+ */
+const CreateRequestButtonWrapper = ({ requestType }) => {
+  const { requestButtonsIconsConfig } = useRequestContext();
+  const isMutating = useIsMutating();
+  
+  const header =
+    requestType.stateful_name || requestType.name || requestType.type_id;
+  const buttonIconProps =
+    requestButtonsIconsConfig[requestType.type_id] ||
+    requestButtonsIconsConfig?.default;
+
+  return (
+    <CreateRequestButton
+      key={requestType.type_id}
+      requestType={requestType}
+      isMutating={isMutating}
+      buttonIconProps={buttonIconProps}
+      header={header}
+    />
+  );
+};
+
+CreateRequestButtonWrapper.propTypes = {
+  requestType: PropTypes.object.isRequired,
+};
+
+const mapRequestTypeToModal = (requestType) => (
+  <CreateRequestButtonWrapper key={requestType.type_id} requestType={requestType} />
+);
 
 /**
  * @param {{  applicableRequestsLoading: boolean, applicableRequestsLoadingError: Error }} props
@@ -13,13 +46,8 @@ import { CreateRequestButton } from "./CreateRequestButton";
 export const CreateRequestButtonGroup = ({
   applicableRequestsLoading,
   applicableRequestsLoadingError,
+  createRequests,
 }) => {
-  const { requestTypes, requestButtonsIconsConfig } = useRequestContext();
-  const createRequests = requestTypes?.filter(
-    (requestType) => requestType.links.actions?.create
-  );
-  const isMutating = useIsMutating();
-
   let content;
 
   if (applicableRequestsLoading) {
@@ -42,26 +70,8 @@ export const CreateRequestButtonGroup = ({
         </Message.Header>
       </Message>
     );
-  } else if (_isEmpty(createRequests)) {
-    return null; // No need to render anything if there are no requests
   } else {
-    content = createRequests.map((requestType) => {
-      const header =
-        requestType.stateful_name || requestType.name || requestType.type_id;
-      const buttonIconProps =
-        requestButtonsIconsConfig[requestType.type_id] ||
-        requestButtonsIconsConfig?.default;
-
-      return (
-        <CreateRequestButton
-          key={requestType.type_id}
-          requestType={requestType}
-          isMutating={isMutating}
-          buttonIconProps={buttonIconProps}
-          header={header}
-        />
-      );
-    });
+    content = <RequestButtons requests={createRequests} mapRequestToModalComponent={mapRequestTypeToModal} />;
   }
 
   return (
@@ -73,4 +83,5 @@ CreateRequestButtonGroup.propTypes = {
   applicableRequestsLoading: PropTypes.bool.isRequired,
   // eslint-disable-next-line react/require-default-props -- Error object or null by default
   applicableRequestsLoadingError: PropTypes.object,
+  createRequests: PropTypes.array,
 };

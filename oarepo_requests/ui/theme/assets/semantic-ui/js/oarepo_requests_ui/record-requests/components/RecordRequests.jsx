@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import PropTypes from "prop-types";
 import { CreateRequestButtonGroup, RequestListContainer } from ".";
 import {
@@ -11,9 +11,12 @@ import {
   QueryClient,
   QueryClientProvider,
 } from "@tanstack/react-query";
+import _isEmpty from "lodash/isEmpty";
 import { httpVnd } from "@js/oarepo_ui";
+import { i18next } from "@translations/oarepo_requests_ui/i18next";
 import { OverridableContext, overrideStore } from "react-overridable";
 import overrides from "@js/oarepo_requests_common/overrides";
+import { Accordion } from "semantic-ui-react";
 
 const overriddenComponents = {
   ...overrides,
@@ -59,7 +62,7 @@ const RecordRequests = ({
   actionExtraContext,
 }) => {
   const queryClient = useQueryClient();
-  const [actionsLocked, setActionsLocked] = React.useState(false);
+  const [actionsLocked, setActionsLocked] = useState(false);
   const {
     data: requestTypes,
     error: applicableRequestsLoadingError,
@@ -81,12 +84,19 @@ const RecordRequests = ({
     refetchOnWindowFocus: false,
   });
   const applicableRequestTypes = requestTypes?.data?.hits?.hits;
+  const createRequests = applicableRequestTypes?.filter(
+    (requestType) => requestType.links.actions?.create
+  );
 
   const requests = recordRequests?.data?.hits?.hits;
   const fetchNewRequests = useCallback(() => {
     queryClient.invalidateQueries(["applicableRequestTypes"]);
     queryClient.invalidateQueries(["requests"]);
   }, [queryClient]);
+  const openRequests = requests?.filter(
+    (request) =>
+      request.is_open || request?.status_code.toLowerCase() === "created"
+  );
 
   useEffect(() => {
     const handleBeforeUnload = () => {
@@ -99,6 +109,7 @@ const RecordRequests = ({
       window.removeEventListener("unload", handleBeforeUnload);
     };
   }, [setActionsLocked]);
+
   return (
     <RequestContextProvider
       value={{
@@ -124,13 +135,48 @@ const RecordRequests = ({
       >
         {initialRecord?.id && (
           <ContainerComponent>
-            <CreateRequestButtonGroup
-              applicableRequestsLoading={applicableRequestTypesLoading}
-              applicableRequestsLoadingError={applicableRequestsLoadingError}
-            />
-            <RequestListContainer
-              requestsLoading={requestsLoading}
-              requestsLoadingError={requestsLoadingError}
+            <Accordion
+              fluid
+              exclusive={false}
+              defaultActiveIndex={[0, 1]}
+              panels={[
+                ...(!_isEmpty(createRequests) || applicableRequestTypesLoading || applicableRequestsLoadingError)
+                  ? [
+                      {
+                        key: "new-request",
+                        title: i18next.t("New Request"),
+                        content: {
+                          content: (
+                            <CreateRequestButtonGroup
+                              applicableRequestsLoading={applicableRequestTypesLoading}
+                              applicableRequestsLoadingError={
+                                applicableRequestsLoadingError
+                              }
+                              createRequests={createRequests}
+                            />
+                          ),
+                        },
+                      },
+                    ]
+                  : [],
+                ...(!_isEmpty(openRequests) || requestsLoading || requestsLoadingError)
+                  ? [
+                      {
+                        key: "open-requests",
+                        title: i18next.t("Open Requests"),
+                        content: {
+                          content: (
+                            <RequestListContainer
+                              requestsLoading={requestsLoading}
+                              requestsLoadingError={requestsLoadingError}
+                              openRequests={openRequests}
+                            />
+                          ),
+                        },
+                      },
+                    ]
+                  : [],
+              ]}
             />
           </ContainerComponent>
         )}
