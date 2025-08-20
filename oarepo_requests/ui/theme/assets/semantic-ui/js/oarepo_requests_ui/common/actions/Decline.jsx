@@ -17,16 +17,18 @@ const Decline = ({ request, extraData, isMutating }) => {
       extraData={extraData}
       requestOrRequestType={request}
       buttonLabel={i18next.t("Decline")}
-      requireConfirmation={true}
+      requireConfirmation
       requestActionName={REQUEST_TYPE.DECLINE}
     />
   );
 };
 
+/* eslint-disable react/require-default-props */
 Decline.propTypes = {
-  request: PropTypes.object,
+  request: PropTypes.object.isRequired,
   extraData: PropTypes.object,
   isMutating: PropTypes.number,
 };
+/* eslint-enable react/require-default-props */
 
 export default Decline;

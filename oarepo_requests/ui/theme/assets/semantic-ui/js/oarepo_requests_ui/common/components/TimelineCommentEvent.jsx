@@ -287,7 +287,7 @@ const TimelineCommentEvent = ({ event, requestId, page }) => {
         }
         content={i18next.t("Are you sure you want to delete this comment?")}
       />
-      <div className="comment-event-vertical-line"></div>
+      <div className="comment-event-vertical-line" />
     </div>
   );
 };

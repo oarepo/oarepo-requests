@@ -10,7 +10,8 @@ export const RequestContextProvider = ({ children, value }) => {
 };
 
 RequestContextProvider.propTypes = {
-  value: PropTypes.object,
+  value: PropTypes.object.isRequired,
+  // eslint-disable-next-line react/require-default-props
   children: PropTypes.node,
 };
 

@@ -23,10 +23,12 @@ const Submit = ({ request, extraData, isMutating }) => {
   );
 };
 
+/* eslint-disable react/require-default-props */
 Submit.propTypes = {
-  request: PropTypes.object,
+  request: PropTypes.object.isRequired,
   extraData: PropTypes.object,
   isMutating: PropTypes.number,
 };
+/* eslint-enable react/require-default-props */
 
 export default Submit;

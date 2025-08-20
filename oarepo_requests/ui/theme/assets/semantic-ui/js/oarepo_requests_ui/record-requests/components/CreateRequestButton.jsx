@@ -52,8 +52,9 @@ export const CreateRequestButton = ({
 };
 
 CreateRequestButton.propTypes = {
-  requestType: PropTypes.object,
+  requestType: PropTypes.object.isRequired,
   isMutating: PropTypes.number.isRequired,
+  // eslint-disable-next-line react/require-default-props
   buttonIconProps: PropTypes.object,
   header: PropTypes.string.isRequired,
 };
