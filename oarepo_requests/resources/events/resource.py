@@ -13,7 +13,6 @@ from flask import g
 from flask_resources import (
     from_conf,
     request_body_parser,
-    request_parser,
     resource_requestctx,
     response_handler,
     route,
