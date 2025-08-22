@@ -5,10 +5,13 @@
 # modify it under the terms of the MIT License; see LICENSE file for more
 # details.
 #
+import json
 import os
+import sys
+import time
 from datetime import timedelta
 from typing import Dict
-
+from invenio_rdm_records.services.permissions import RDMRequestsPermissionPolicy
 import pytest
 from invenio_records_permissions.generators import (
     AnyUser,
@@ -24,8 +27,10 @@ from invenio_requests.services.permissions import (
     PermissionPolicy as InvenioRequestsPermissionPolicy,
 )
 from invenio_users_resources.records import UserAggregate
-from oarepo_runtime.i18n import lazy_gettext as _
-from oarepo_runtime.services.permissions import RecordOwners
+from oarepo_model.customizations import AddFileToModule
+from oarepo_model.presets.rdm import rdm_presets
+from invenio_i18n import _
+from invenio_rdm_records.services.generators import RecordOwners
 from oarepo_workflows import (
     AutoApprove,
     AutoRequest,
@@ -36,19 +41,20 @@ from oarepo_workflows import (
     WorkflowTransitions,
 )
 from oarepo_workflows.base import Workflow
+from oarepo_workflows.model.presets import workflows_presets
 from oarepo_workflows.requests.events import WorkflowEvent
 from pytest_oarepo.requests.classes import (
     CSLocaleUserGenerator,
     TestEventType,
     UserGenerator,
 )
-from thesis.proxies import current_service
 
 from oarepo_requests.actions.generic import (
     OARepoAcceptAction,
     OARepoDeclineAction,
     OARepoSubmitAction,
 )
+from oarepo_requests.model.presets.requests import requests_presets
 from oarepo_requests.receiver import default_workflow_receiver_function
 from oarepo_requests.services.permissions.generators.conditional import (
     IfNoEditDraft,
@@ -69,10 +75,6 @@ pytest_plugins = [
     "pytest_oarepo.files",
 ]
 
-@pytest.fixture(scope="module")
-def record_service():
-    return current_service
-
 @pytest.fixture
 def events_service():
     from invenio_requests.proxies import current_events_service
@@ -84,9 +86,12 @@ def events_service():
 def location(location):
     return location
 
+"""
 @pytest.fixture(autouse=True)
 def vocab_cf(vocab_cf):
     return vocab_cf
+"""
+
 
 can_comment_only_receiver = [
     Receiver(),
@@ -426,34 +431,35 @@ class ConditionalRecipientRequestType(NonDuplicableOARepoRequestType):
 
 
 class TestWorkflowPermissions(RequestBasedWorkflowPermissions):
-    can_read = [
+    can_read = (
         IfInState("draft", [RecordOwners()]),
         IfInState("publishing", [RecordOwners(), UserGenerator(2)]),
         IfInState("published", [AnyUser()]),
         IfInState("published", [AuthenticatedUser()]),
         IfInState("deleting", [AnyUser()]),
-    ]
+    )
+    can_manage_files = (RecordOwners(),)
 
 
-class WithApprovalPermissions(RequestBasedWorkflowPermissions):
-    can_read = [
+class WithApprovalPermissions(TestWorkflowPermissions):
+    can_read = (
         IfInState("draft", [RecordOwners()]),
         IfInState("approving", [RecordOwners(), UserGenerator(2)]),
         IfInState("approved", [RecordOwners(), UserGenerator(2)]),
         IfInState("publishing", [RecordOwners(), UserGenerator(2)]),
         IfInState("published", [AuthenticatedUser()]),
         IfInState("deleting", [AuthenticatedUser()]),
-    ]
+    )
 
 
-class DifferentLocalesPermissions(RequestBasedWorkflowPermissions):
-    can_read = [
+class DifferentLocalesPermissions(TestWorkflowPermissions):
+    can_read = (
         IfInState("draft", [RecordOwners()]),
         IfInState("publishing", [RecordOwners(), CSLocaleUserGenerator()]),
         IfInState("published", [AnyUser()]),
         IfInState("published", [AuthenticatedUser()]),
         IfInState("deleting", [AnyUser()]),
-    ]
+    )
 
 
 WORKFLOWS = {
@@ -509,7 +515,7 @@ WORKFLOWS = {
 
 @pytest.fixture()
 def urls():
-    return {"BASE_URL": "/thesis/", "BASE_URL_REQUESTS": "/requests/"}
+    return {"BASE_URL": "/requests-test/", "BASE_URL_REQUESTS": "/requests/"}
 
 
 @pytest.fixture()
@@ -537,7 +543,7 @@ def serialization_result():
             "is_expired": False,
             "created_by": {"user": "1"},
             "receiver": {"user": "2"},
-            "topic": {"thesis_draft": topic_id},
+            "topic": {"requests_test_draft": topic_id},
         }
 
     return _result
@@ -578,11 +584,11 @@ def ui_serialization_result():
                 # "label": f"id: {topic_id}",
                 "label": "blabla",
                 "links": {
-                    "self": f"https://127.0.0.1:5000/api/thesis/{topic_id}/draft",
-                    "self_html": f"https://127.0.0.1:5000/thesis/{topic_id}/preview",
+                    "self": f"https://127.0.0.1:5000/api/requests_test/{topic_id}/draft",
+                    "self_html": f"https://127.0.0.1:5000/requests_test/{topic_id}/preview",
                 },
-                "reference": {"thesis_draft": topic_id},
-                "type": "thesis_draft",
+                "reference": {"requests_test_draft": topic_id},
+                "type": "requests_test_draft",
             },
             "type": "publish_draft",
             # 'updated': '2024-01-26T10:06:18.084317'
@@ -592,7 +598,7 @@ def ui_serialization_result():
 
 
 @pytest.fixture(scope="module")
-def app_config(app_config):
+def app_config(app_config, requests_model):
     app_config["REQUESTS_REGISTERED_EVENT_TYPES"] = [
         TestEventType(),  # remaining are loaded from .config
     ]
@@ -633,6 +639,12 @@ def app_config(app_config):
 
     app_config["APP_THEME"] = ["oarepo", "semantic-ui"]
 
+    app_config["REST_CSRF_ENABLED"] = False
+    app_config["RDM_PERSISTENT_IDENTIFIERS"] = {}
+    app_config["REQUESTS_PERMISSION_POLICY"] = (
+        RDMRequestsPermissionPolicy  # TODO: rdm expected as default, though the app_rdm (?) config is not used for now?
+    )
+
     return app_config
 
 
@@ -652,8 +664,8 @@ def check_publish_topic_update():
             f"{urls['BASE_URL_REQUESTS']}extended/{request_id}/timeline"
         ).json["hits"]["hits"]
 
-        assert before_update_response["topic"] == {"thesis_draft": record_id}
-        assert after_update_response["topic"] == {"thesis": record_id}
+        assert before_update_response["topic"] == {"requests_test_draft": record_id}
+        assert after_update_response["topic"] == {"requests_test": record_id}
 
         topic_updated_events = [
             e for e in events if e["type"] == TopicUpdateEventType.type_id
@@ -661,9 +673,9 @@ def check_publish_topic_update():
         assert len(topic_updated_events) == 1
         assert (
             topic_updated_events[0]["payload"]["old_topic"]
-            == f"thesis_draft.{record_id}"
+            == f"requests_test_draft.{record_id}"
         )
-        assert topic_updated_events[0]["payload"]["new_topic"] == f"thesis.{record_id}"
+        assert topic_updated_events[0]["payload"]["new_topic"] == f"requests_test.{record_id}"
 
     return _check_publish_topic_update
 
@@ -753,3 +765,61 @@ def more_users(app, db, UserFixture):
     db.session.commit()
     UserAggregate.index.refresh()
     return [user1, user2, user3, user4, user5, user6, user7, user10]
+
+
+@pytest.fixture(scope="session")
+def model_types():
+    """Model types fixture."""
+    # Define the model types used in the tests
+    return {
+        "Metadata": {
+            "properties": {
+                "title": {"type": "fulltext+keyword", "required": True},
+            }
+        }
+    }
+
+@pytest.fixture(scope="module")
+def requests_model(model_types):
+
+    from oarepo_model.api import model
+    from oarepo_model.presets.drafts import drafts_presets
+    from oarepo_model.presets.records_resources import records_resources_presets
+
+    t1 = time.time()
+
+    workflow_model = model(
+        name="requests_test",
+        version="1.0.0",
+        presets=[records_resources_presets, drafts_presets, rdm_presets, workflows_presets, requests_presets],
+        types=[model_types],
+        metadata_type="Metadata",
+        customizations=[            AddFileToModule(
+                "parent-jsonschema",
+                "jsonschemas",
+                "parent-v1.0.0.json",
+                json.dumps(
+                    {
+                        "$schema": "http://json-schema.org/draft-07/schema#",
+                        "$id": "local://parent-v1.0.0.json",
+                        "type": "object",
+                        "properties": {"id": {"type": "string"}},
+                    }
+                ),
+            ),],
+    )
+    workflow_model.register()
+
+    t2 = time.time()
+    print(f"Model created in {t2 - t1:.2f} seconds", file=sys.stderr, flush=True)
+
+    try:
+        yield workflow_model
+    finally:
+        workflow_model.unregister()
+
+    return workflow_model
+
+@pytest.fixture
+def record_service(requests_model):
+    return requests_model.proxies.current_service

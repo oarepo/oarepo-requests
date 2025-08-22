@@ -7,10 +7,10 @@
 #
 from invenio_requests.records.api import RequestEvent
 from pytest_oarepo.functions import is_valid_subdict
-from thesis.records.api import ThesisDraft
 from pytest_oarepo.functions import clear_babel_context
 
 def test_listing(
+    requests_model,
     logged_client,
     users,
     urls,
@@ -28,7 +28,7 @@ def test_listing(
     create_request_on_draft(creator.identity, draft1["id"], "publish_draft")
     create_request_on_draft(creator.identity, draft2["id"], "publish_draft")
 
-    ThesisDraft.index.refresh()
+    requests_model.Draft.index.refresh()
     search = creator_client.get(
         urls["BASE_URL_REQUESTS"],
         headers={"Accept": "application/vnd.inveniordm.v1+json"},

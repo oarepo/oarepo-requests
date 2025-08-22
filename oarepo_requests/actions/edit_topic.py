@@ -11,7 +11,7 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING, Any, override
 
-from oarepo_runtime.datastreams.utils import get_record_service_for_record
+from oarepo_runtime.proxies import current_runtime
 from oarepo_requests.actions.record_snapshot_mixin import RecordSnapshotMixin
 from .generic import AddTopicLinksOnPayloadMixin, OARepoAcceptAction
 
@@ -37,7 +37,7 @@ class EditTopicAcceptAction(AddTopicLinksOnPayloadMixin, RecordSnapshotMixin, OA
         **kwargs: Any,
     ) -> None:
         """Apply the action, creating a draft of the record for editing metadata."""
-        topic_service = get_record_service_for_record(state.topic)
+        topic_service = current_runtime.get_record_service_for_record(state.topic)
         if not topic_service:
             raise KeyError(f"topic {state.topic} service not found")
         state.topic = topic_service.edit(identity, state.topic["id"], uow=uow)._record

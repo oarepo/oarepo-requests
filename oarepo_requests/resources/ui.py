@@ -17,7 +17,7 @@ from flask_resources import BaseListSchema
 from flask_resources.serializers import JSONSerializer
 from invenio_records_resources.services.errors import RecordPermissionDeniedError
 from invenio_pidstore.errors import PIDDeletedError
-from oarepo_runtime.resources import LocalizedUIJSONSerializer
+# from oarepo_runtime.resources import LocalizedUIJSONSerializer
 
 from ..proxies import current_oarepo_requests
 from ..resolvers.ui import resolve
@@ -28,6 +28,7 @@ from ..services.ui_schema import (
 )
 from ..utils import reference_to_tuple
 
+from flask_resources.serializers.base import MarshmallowSerializer #TODO: temp - not decided what's used here
 if TYPE_CHECKING:
     from flask_principal import Identity
 
@@ -116,7 +117,7 @@ class CachedReferenceResolver:
                 return {"reference": reference, "status": "denied"}
 
 
-class OARepoRequestsUIJSONSerializer(LocalizedUIJSONSerializer):
+class OARepoRequestsUIJSONSerializer(MarshmallowSerializer):
     """UI JSON serializer."""
 
     def __init__(self) -> None:
@@ -154,7 +155,7 @@ class OARepoRequestsUIJSONSerializer(LocalizedUIJSONSerializer):
         return super().dump_list(obj_list, *args, extra_context=extra_context, **kwargs)
 
 
-class OARepoRequestEventsUIJSONSerializer(LocalizedUIJSONSerializer):
+class OARepoRequestEventsUIJSONSerializer(MarshmallowSerializer):
     """UI JSON serializer for request events."""
 
     def __init__(self) -> None:
@@ -167,7 +168,7 @@ class OARepoRequestEventsUIJSONSerializer(LocalizedUIJSONSerializer):
         )
 
 
-class OARepoRequestTypesUIJSONSerializer(LocalizedUIJSONSerializer):
+class OARepoRequestTypesUIJSONSerializer(MarshmallowSerializer):
     """UI JSON serializer for request types."""
 
     def __init__(self) -> None:

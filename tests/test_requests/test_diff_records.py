@@ -1,4 +1,3 @@
-from thesis.records.api import ThesisDraft, ThesisRecord
 from invenio_records_resources.proxies import current_service_registry
 from invenio_db import db
 from oarepo_requests.models import RecordSnapshot
@@ -47,6 +46,7 @@ def test_new_record(
     assert len(results) == 0
 
 def test_diff_after_publish_is_denied(
+    requests_model,
     logged_client,
     users,
     urls,
@@ -65,8 +65,8 @@ def test_diff_after_publish_is_denied(
     draft2 = draft_factory(creator.identity)
     draft2_id = draft2["id"]
 
-    ThesisRecord.index.refresh()
-    ThesisDraft.index.refresh()
+    requests_model.Record.index.refresh()
+    requests_model.Draft.index.refresh()
 
     resp_request_submit = submit_request_on_draft(
         creator.identity, draft2_id, "publish_draft"
@@ -153,8 +153,8 @@ def test_new_version_diff(
     assert "draft_record:links:self" in request["payload"]
     assert "draft_record:links:self_html" in request["payload"]
 
-    ThesisRecord.index.refresh()
-    ThesisDraft.index.refresh()
+    requests_model.Record.index.refresh()
+    requests_model.Draft.index.refresh()
     # new_version action worked?
     search = creator_client.get(
         f'user{urls["BASE_URL"]}?allversions=true',
@@ -202,6 +202,7 @@ def test_new_version_diff(
     assert event['payload']['diff'] != '[]'
 
 def test_edited_metadata_diff(
+    requests_model,
     logged_client,
     users,
     urls,
@@ -236,8 +237,8 @@ def test_edited_metadata_diff(
     assert "draft_record:links:self" in request["payload"]
     assert "draft_record:links:self_html" in request["payload"]
 
-    ThesisRecord.index.refresh()
-    ThesisDraft.index.refresh()
+    requests_model.Record.index.refresh()
+    requests_model.Draft.index.refresh()
     # edit metadata action worked?
     search = creator_client.get(
         f'user{urls["BASE_URL"]}?allversions=true',

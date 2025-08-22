@@ -11,7 +11,7 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING, Any, override
 
-from oarepo_runtime.datastreams.utils import get_record_service_for_record
+from oarepo_runtime.proxies import current_runtime
 
 from .cascade_events import cancel_requests_on_topic_delete
 from .generic import OARepoAcceptAction
@@ -34,7 +34,7 @@ class DeleteDraftAcceptAction(OARepoAcceptAction):
         *args: Any,
         **kwargs: Any,
     ) -> None:
-        topic_service = get_record_service_for_record(state.topic)
+        topic_service = current_runtime.get_record_service_for_record(state.topic)
         if not topic_service:
             raise KeyError(f"topic {state.topic} service not found")
         topic_service.delete_draft(identity, state.topic["id"], *args, uow=uow, **kwargs)

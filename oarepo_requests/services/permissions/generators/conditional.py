@@ -15,7 +15,7 @@ from flask_principal import Identity
 from invenio_records_permissions.generators import ConditionalGenerator, Generator
 from invenio_records_resources.references.entity_resolvers import EntityProxy
 from invenio_requests.resolvers.registry import ResolverRegistry
-from oarepo_runtime.datastreams.utils import get_record_service_for_record
+from oarepo_runtime.proxies import current_runtime
 from oarepo_workflows.requests import RecipientGeneratorMixin
 from oarepo_workflows.requests.generators import IfEventType as WorkflowIfEventType
 from oarepo_workflows.requests.generators import IfRequestType as WorkflowIfRequestType
@@ -170,7 +170,7 @@ class IfNoEditDraft(ConditionalGenerator):
     def _condition(self, record: Record, **kwargs: Any) -> bool:
         if getattr(record, "is_draft", False):
             return False
-        records_service = get_record_service_for_record(record)
+        records_service = current_runtime.get_record_service_for_record(record)
         try:
             records_service.config.draft_cls.pid.resolve(
                 record["id"]

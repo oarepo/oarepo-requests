@@ -8,11 +8,11 @@
 import json
 
 from invenio_access.permissions import system_identity
-from thesis.records.api import ThesisDraft, ThesisRecord
 from pytest_oarepo.functions import clear_babel_context
 
 def test_resolve_topic(
     db,
+    requests_model,
     logged_client,
     record_factory,
     users,
@@ -29,8 +29,8 @@ def test_resolve_topic(
 
     record1 = record_factory(creator.identity)
     record1_id = record1["id"]
-    ThesisRecord.index.refresh()
-    ThesisDraft.index.refresh()
+    requests_model.Record.index.refresh()
+    requests_model.Draft.index.refresh()
 
     resp_request_submit = submit_request_on_record(
         creator.identity, record1_id, "delete_published_record", create_additional_data={"payload": {"removal_reason": "test reason"}}
@@ -52,7 +52,7 @@ def test_resolve_topic(
     }
 
     record_service.delete(system_identity, record1_id)
-    ThesisRecord.index.refresh()
+    requests_model.Record.index.refresh()
 
     resp = creator_client.get(
         link2testclient(resp_request_submit["links"]["self"]),
@@ -75,6 +75,7 @@ def test_resolve_topic(
 
 def test_ui_resolve_topic(
     db,
+    requests_model,
     logged_client,
     record_factory,
     users,
@@ -92,8 +93,8 @@ def test_ui_resolve_topic(
 
     record1 = record_factory(creator.identity)
     record1_id = record1["id"]
-    ThesisRecord.index.refresh()
-    ThesisDraft.index.refresh()
+    requests_model.Record.index.refresh()
+    requests_model.Draft.index.refresh()
 
     resp_request_submit = submit_request_on_record(
         creator.identity, record1_id, "delete_published_record", create_additional_data={"payload": {"removal_reason": "test reason"}}
@@ -127,7 +128,7 @@ def test_ui_resolve_topic(
     )
 
     record_service.delete(system_identity, record1_id)
-    ThesisRecord.index.refresh()
+    requests_model.Record.index.refresh()
 
     resp = creator_client.get(
         link2testclient(resp_request_submit["links"]["self"]),

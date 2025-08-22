@@ -22,7 +22,7 @@ from invenio_users_resources.proxies import (
     current_groups_service,
     current_users_service,
 )
-from oarepo_runtime.i18n import gettext as _
+from invenio_i18n import gettext as _
 
 from ..proxies import current_oarepo_requests
 from ..utils import get_matching_service_for_refdict

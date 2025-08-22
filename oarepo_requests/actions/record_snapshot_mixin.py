@@ -3,7 +3,7 @@ from __future__ import annotations
 from typing import Any, TYPE_CHECKING
 
 
-from oarepo_runtime.datastreams.utils import get_record_service_for_record
+from oarepo_runtime.proxies import current_runtime
 from flask_principal import PermissionDenied
 from contextlib import suppress
 
@@ -27,7 +27,7 @@ class RecordSnapshotMixin:
         """Take snapshot of the record."""
         super_apply = super().apply(identity, state.request_type, state.topic, uow, *args, **kwargs)
 
-        service = get_record_service_for_record(state.topic)
+        service = current_runtime.get_record_service_for_record(state.topic)
         
         with suppress(PermissionDenied):
             if not state.topic.is_draft:

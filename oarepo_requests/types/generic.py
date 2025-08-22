@@ -131,13 +131,11 @@ class OARepoRequestType(RequestType):
         method is used to check whether there is a possible situation a user might create
         this request eg. for the purpose of serializing a link on associated record
         """
-        try:
-            current_requests_service.require_permission(
+
+        return current_requests_service.check_permission(
                 identity, "create", record=topic, request_type=cls, **kwargs
             )
-        except PermissionDeniedError:
-            return False
-        return True
+
 
     allowed_topic_ref_types = ModelRefTypes()
     allowed_receiver_ref_types = ReceiverRefTypes()

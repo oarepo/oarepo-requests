@@ -14,8 +14,8 @@ from typing import TYPE_CHECKING, Any
 from invenio_access.permissions import system_identity
 from invenio_notifications.services.uow import NotificationOp
 from invenio_requests.records.api import Request
-from oarepo_runtime.datastreams.utils import get_record_service_for_record
-from oarepo_runtime.i18n import lazy_gettext as _
+from oarepo_runtime.proxies import current_runtime
+from invenio_i18n import _
 
 from oarepo_requests.errors import VersionAlreadyExists, UnresolvedRequestsError
 from oarepo_requests.utils import get_requests_service_for_records_service
@@ -74,7 +74,7 @@ class PublishDraftSubmitAction(PublishMixin, RecordSnapshotMixin, OARepoSubmitAc
     ) -> Record:
         """Publish the draft."""
         if "payload" in self.request and "version" in self.request["payload"]:
-            topic_service = get_record_service_for_record(state.topic)
+            topic_service = current_runtime.get_record_service_for_record(state.topic)
             versions = topic_service.search_versions(
                 identity, state.topic.pid.pid_value
             )
@@ -112,7 +112,7 @@ class PublishDraftAcceptAction(
         **kwargs: Any,
     ) -> Record:
         """Publish the draft."""
-        topic_service = get_record_service_for_record(state.topic)
+        topic_service = current_runtime.get_record_service_for_record(state.topic)
         if not topic_service:
             raise KeyError(f"topic {state.topic} service not found")
         request_service = get_requests_service_for_records_service(topic_service)

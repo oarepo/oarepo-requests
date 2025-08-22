@@ -9,12 +9,13 @@ import copy
 from pprint import pprint
 
 from deepdiff import DeepDiff
-from thesis.records.api import ThesisDraft, ThesisRecord
+
 
 from oarepo_requests.resolvers.ui import FallbackEntityReferenceUIResolver
 from pytest_oarepo.functions import clear_babel_context
 
 def test_user_serialization(
+    requests_model,
     users,
     urls,
     ui_serialization_result,
@@ -42,8 +43,8 @@ def test_user_serialization(
     draft3_id = draft3["id"]
 
     draft_id = draft1_id
-    ThesisRecord.index.refresh()
-    ThesisDraft.index.refresh()
+    requests_model.Record.index.refresh()
+    requests_model.Draft.index.refresh()
 
     resp_request_create = create_request_on_draft(
         fallback_label.identity, draft1_id, "publish_draft"
@@ -136,6 +137,7 @@ def test_user_serialization(
 
 def test_resolver_fallback(
     app,
+    requests_model,
     users,
     urls,
     ui_serialization_result,
@@ -156,8 +158,8 @@ def test_resolver_fallback(
 
         draft1 = draft_factory(creator.identity)
         draft_id = draft1["id"]
-        ThesisRecord.index.refresh()
-        ThesisDraft.index.refresh()
+        requests_model.Record.index.refresh()
+        requests_model.Draft.index.refresh()
 
         resp_request_create = create_request_on_draft(
             creator.identity, draft_id, "publish_draft"
@@ -228,6 +230,7 @@ def test_resolver_fallback(
 
 def test_role(
     app,
+    requests_model,
     users,
     role,
     urls,
@@ -253,8 +256,8 @@ def test_role(
 
         draft1 = draft_factory(creator.identity)
         draft_id = draft1["id"]
-        ThesisRecord.index.refresh()
-        ThesisDraft.index.refresh()
+        requests_model.Record.index.refresh()
+        requests_model.Draft.index.refresh()
 
         resp_request_create = create_request_on_draft(
             creator.identity,

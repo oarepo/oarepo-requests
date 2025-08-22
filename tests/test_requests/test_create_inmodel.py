@@ -6,11 +6,10 @@
 # details.
 #
 
-from thesis.records.api import ThesisDraft, ThesisRecord
-
 
 # todo since inline is now the default way to create records, these might be redundant
 def test_record(
+    requests_model,
     logged_client,
     record_factory,
     users,
@@ -39,8 +38,8 @@ def test_record(
             record.json["expanded"]["requests"][0]["links"]["actions"]["accept"]
         )
     )
-    ThesisRecord.index.refresh()
-    ThesisDraft.index.refresh()
+    requests_model.Record.index.refresh()
+    requests_model.Draft.index.refresh()
     lst = creator_client.get(urls["BASE_URL"])
     assert len(lst.json["hits"]["hits"]) == 0
 
@@ -74,7 +73,5 @@ def test_draft(
     receiver_client.post(
         link2testclient(record["expanded"]["requests"][0]["links"]["actions"]["accept"])
     )
-    ThesisRecord.index.refresh()
-    ThesisDraft.index.refresh()
     lst = creator_client.get(urls["BASE_URL"]).json
     assert len(lst["hits"]["hits"]) == 1

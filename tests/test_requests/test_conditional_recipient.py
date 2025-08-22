@@ -6,6 +6,7 @@
 # details.
 #
 def test_conditional_receiver_creator_matches(
+    requests_model,
     logged_client,
     users,
     urls,
@@ -29,6 +30,7 @@ def test_conditional_receiver_creator_matches(
 
 
 def test_conditional_receiver_creator_does_not_match(
+    requests_model,
     logged_client,
     users,
     urls,

@@ -11,6 +11,7 @@ from oarepo_requests.types.events import TopicDeleteEventType
 
 
 def test_cascade_update(
+    requests_model,
     logged_client,
     users,
     urls,
@@ -66,11 +67,12 @@ def test_cascade_update(
         f"{urls['BASE_URL_REQUESTS']}{publish_request_on_second_draft['id']}"
     ).json
     assert second_draft_request["topic"] == {
-        "thesis_draft": draft2_id
+        "requests_test_draft": draft2_id
     }  # check request on the other draft is unchanged
 
 
 def test_cascade_cancel(
+    requests_model,
     logged_client,
     users,
     urls,

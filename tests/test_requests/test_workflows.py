@@ -11,7 +11,6 @@ from invenio_records_resources.services.errors import PermissionDeniedError
 from invenio_records_resources.services.uow import RecordCommitOp, unit_of_work
 from invenio_requests.customizations.event_types import LogEventType
 from invenio_requests.records.api import RequestEvent
-from thesis.records.api import ThesisDraft, ThesisRecord
 from invenio_requests.proxies import current_requests_service
 from oarepo_requests.services.permissions.workflow_policies import (
     CreatorsFromWorkflowRequestsPermissionPolicy,
@@ -55,6 +54,7 @@ def patch_requests_permissions(
     setattr(events_service_config, "permission_policy_cls", scenario_permissions)
 
 def test_publish_with_workflows(
+    requests_model,
     logged_client,
     users,
     urls,
@@ -73,8 +73,8 @@ def test_publish_with_workflows(
 
     draft1 = draft_factory(creator.identity)
     draft1_id = draft1["id"]
-    ThesisRecord.index.refresh()
-    ThesisDraft.index.refresh()
+    requests_model.Record.index.refresh()
+    requests_model.Draft.index.refresh()
 
     # test record owner can create publish request
     create_non_owner = receiver_client.post(

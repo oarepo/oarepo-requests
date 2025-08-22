@@ -25,12 +25,11 @@ if TYPE_CHECKING:
     from invenio_requests.customizations import RequestType
 
 from typing import TYPE_CHECKING, Any
-
+from invenio_i18n import _
 from invenio_db import db
 from invenio_notifications.services.uow import NotificationOp
 from invenio_records_resources.services.uow import UnitOfWork
-from oarepo_runtime.datastreams.utils import get_record_service_for_record
-from oarepo_runtime.i18n import lazy_gettext as _
+from oarepo_runtime.proxies import current_runtime
 
 from .generic import OARepoAcceptAction, OARepoDeclineAction, OARepoSubmitAction
 
@@ -84,7 +83,7 @@ class DeletePublishedRecordAcceptAction(OARepoAcceptAction):
         *args: Any,
         **kwargs: Any,
     ) -> None:
-        topic_service = get_record_service_for_record(state.topic)
+        topic_service = current_runtime.get_record_service_for_record(state.topic)
         if not topic_service:
             raise KeyError(f"topic {state.topic} service not found")
         if hasattr(topic_service, "delete_record"):

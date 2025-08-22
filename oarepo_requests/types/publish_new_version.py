@@ -13,9 +13,8 @@ from typing import TYPE_CHECKING, Any, override
 
 import marshmallow as ma
 from invenio_requests.records.api import Request
-from oarepo_runtime.datastreams.utils import get_record_service_for_record
 from invenio_i18n import gettext, lazy_gettext as _
-
+from oarepo_runtime.proxies import current_runtime
 from oarepo_requests.actions.publish_draft import (
     PublishDraftDeclineAction,
     PublishDraftSubmitAction,
@@ -164,7 +163,7 @@ class PublishNewVersionRequestType(PublishRequestType):
         **kwargs: Any,
     ) -> None:
         """Check if the request can be created."""
-        topic_service = get_record_service_for_record(topic)
+        topic_service = current_runtime.get_record_service_for_record(topic)
         # Only needed in case of new version as when you are publishing
         # draft for the first time, there are no previous versions with
         # which you can have collision

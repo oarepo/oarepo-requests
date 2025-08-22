@@ -12,7 +12,7 @@ from __future__ import annotations
 from typing import TYPE_CHECKING, Any
 
 import marshmallow as ma
-from oarepo_runtime.datastreams.utils import get_record_service_for_record_class
+from oarepo_runtime.proxies import current_runtime
 from invenio_i18n import gettext, lazy_gettext as _
 from typing_extensions import override
 
@@ -77,7 +77,7 @@ class DeletePublishedRecordRequestType(NonDuplicableOARepoRequestType):
     def get_ui_redirect_url(self, request: Request, context: dict) -> str:
         if request.status == "accepted":
             topic_cls = request.topic.record_cls
-            service = get_record_service_for_record_class(topic_cls)
+            service = current_runtime.get_record_service_for_record_class(topic_cls)
             return service.config.links_search["self_html"].expand(None, context)
 
     dangerous = True

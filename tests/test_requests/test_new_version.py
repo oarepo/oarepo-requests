@@ -6,11 +6,11 @@
 # details.
 #
 
-from thesis.records.api import ThesisDraft, ThesisRecord
 from invenio_records_resources.proxies import current_service_registry
 
 
 def test_new_version_autoaccept(
+    requests_model,
     logged_client,
     users,
     urls,
@@ -44,8 +44,8 @@ def test_new_version_autoaccept(
     assert "draft_record:links:self" in request["payload"]
     assert "draft_record:links:self_html" in request["payload"]
 
-    ThesisRecord.index.refresh()
-    ThesisDraft.index.refresh()
+    requests_model.Record.index.refresh()
+    requests_model.Draft.index.refresh()
     # new_version action worked?
     search = creator_client.get(
         f'user{urls["BASE_URL"]}?allversions=true',
@@ -56,6 +56,7 @@ def test_new_version_autoaccept(
 
 
 def test_new_version_files(
+    requests_model,
     logged_client,
     users,
     urls,
@@ -79,7 +80,7 @@ def test_new_version_files(
     )
     submit2 = submit_request_on_record(creator.identity, record2_id, "new_version")
 
-    ThesisDraft.index.refresh()
+    requests_model.Draft.index.refresh()
     draft_search = creator_client.get(f"/user/thesis/").json["hits"][
         "hits"
     ]  # a link is in another pull request for now
@@ -109,6 +110,7 @@ def test_new_version_files(
 
 
 def test_redirect_url(
+    requests_model,
     logged_client,
     users,
     urls,
@@ -134,7 +136,7 @@ def test_redirect_url(
         f'{urls["BASE_URL_REQUESTS"]}{original_request_id}',
     ).json
 
-    ThesisDraft.index.refresh()
+    requests_model.Draft.index.refresh()
     draft_search = creator_client.get(f"/user/thesis/").json["hits"][
         "hits"
     ]  # a link is in another pull request for now

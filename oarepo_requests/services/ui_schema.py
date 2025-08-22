@@ -26,9 +26,11 @@ from invenio_requests.services.schemas import (
     EventTypeMarshmallowField,
 )
 from marshmallow import validate
-from oarepo_runtime.i18n import lazy_gettext as _
-from oarepo_runtime.services.schema.marshmallow import BaseRecordSchema
-from oarepo_runtime.services.schema.ui import LocalizedDateTime
+from invenio_i18n import _
+# from oarepo_runtime.services.schema.marshmallow import BaseRecordSchema
+# from oarepo_runtime.services.schema.ui import LocalizedDateTime
+from invenio_rdm_records.resources.serializers.ui.schema import FormatDate #TODO: temp
+from invenio_records_resources.services.records.schema import BaseRecordSchema #TODO: temp
 from sqlalchemy.orm.exc import NoResultFound
 
 from oarepo_requests.resolvers.ui import resolve
@@ -89,11 +91,10 @@ class UIReferenceSchema(ma.Schema):
 class UIRequestSchemaMixin:
     """Mixin for UI request schemas."""
 
-    created = LocalizedDateTime(dump_only=True)
-    """Creation date of the request."""
+    created = FormatDate(attribute="created", format="long") # LocalizedDateTime(dump_only=True)
+    """Creation date of the event."""
 
-    updated = LocalizedDateTime(dump_only=True)
-    """Update date of the request."""
+    updated = FormatDate(attribute="updated", format="long") # LocalizedDateTime(dump_only=True)
 
     name = ma.fields.String()
     """Name of the request."""
@@ -285,10 +286,10 @@ class UIRequestsSerializationMixin(ma.Schema):
 class UIBaseRequestEventSchema(BaseRecordSchema):
     """Base schema for request events."""
 
-    created = LocalizedDateTime(dump_only=True)
+    created = FormatDate(attribute="created", format="long") # LocalizedDateTime(dump_only=True)
     """Creation date of the event."""
 
-    updated = LocalizedDateTime(dump_only=True)
+    updated = FormatDate(attribute="updated", format="long") # LocalizedDateTime(dump_only=True)
     """Update date of the event."""
 
     type = EventTypeMarshmallowField(dump_only=True)

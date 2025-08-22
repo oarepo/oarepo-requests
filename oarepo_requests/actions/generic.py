@@ -14,8 +14,8 @@ from typing import TYPE_CHECKING, Any
 
 from invenio_pidstore.errors import PersistentIdentifierError
 from invenio_requests.customizations import actions
-from oarepo_runtime.i18n import lazy_gettext as _
-from oarepo_runtime.datastreams.utils import get_record_service_for_record
+from invenio_i18n import _
+from oarepo_runtime.proxies import current_runtime
 from dataclasses import dataclass
 
 from oarepo_requests.proxies import current_oarepo_requests
@@ -168,7 +168,7 @@ class AddTopicLinksOnPayloadMixin:
         """Apply the action to the topic."""
         super().apply(identity, state, uow, *args, **kwargs)
             
-        service = get_record_service_for_record(state.topic)
+        service = current_runtime.get_record_service_for_record(state.topic)
 
         if not state.topic.is_draft:
             ret = service.read(system_identity, state.topic.pid.pid_value)

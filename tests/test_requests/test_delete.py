@@ -6,10 +6,10 @@
 # details.
 #
 from pytest_oarepo.requests.functions import get_request_create_link
-from thesis.records.api import ThesisDraft, ThesisRecord
 
 
 def test_delete(
+    requests_model,
     logged_client,
     record_factory,
     users,
@@ -29,8 +29,8 @@ def test_delete(
     record1_id = record1["id"]
     record2_id = record2["id"]
     record3_id = record3["id"]
-    ThesisRecord.index.refresh()
-    ThesisDraft.index.refresh()
+    requests_model.Record.index.refresh()
+    requests_model.Draft.index.refresh()
     lst = creator_client.get(urls["BASE_URL"])
     assert len(lst.json["hits"]["hits"]) == 3
 
@@ -49,11 +49,11 @@ def test_delete(
         ),
     )
     assert (
-        link2testclient(delete.json["links"]["ui_redirect_url"], ui=True) == "/thesis/"
+        link2testclient(delete.json["links"]["ui_redirect_url"], ui=True) == urls["BASE_URL"]
     )
 
-    ThesisRecord.index.refresh()
-    ThesisDraft.index.refresh()
+    requests_model.Record.index.refresh()
+    requests_model.Draft.index.refresh()
     lst = creator_client.get(urls["BASE_URL"])
     assert len(lst.json["hits"]["hits"]) == 2
 
@@ -125,6 +125,6 @@ def test_delete_draft(
     assert request_after.json["is_closed"]
     assert (
         link2testclient(request_after.json["links"]["ui_redirect_url"], ui=True)
-        == "/thesis/"
+        == urls["BASE_URL"]
     )
     assert read_deleted.status_code == 404

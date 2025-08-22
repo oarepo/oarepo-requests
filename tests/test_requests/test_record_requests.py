@@ -5,10 +5,10 @@
 # modify it under the terms of the MIT License; see LICENSE file for more
 # details.
 #
-from thesis.records.api import ThesisDraft, ThesisRecord
 
 
 def test_read_requests_on_draft(
+    requests_model,
     logged_client,
     users,
     urls,
@@ -29,8 +29,8 @@ def test_read_requests_on_draft(
     draft1_id = draft1["id"]
     draft2_id = draft2["id"]
     draft3_id = draft3["id"]
-    ThesisRecord.index.refresh()
-    ThesisDraft.index.refresh()
+    requests_model.Record.index.refresh()
+    requests_model.Draft.index.refresh()
 
     resp_request_submit = submit_request_on_draft(
         creator.identity, draft1_id, "publish_draft"
@@ -81,8 +81,8 @@ def test_read_requests_on_record(
     record1_id = record1["id"]
     record2_id = record2["id"]
     record3_id = record3["id"]
-    ThesisRecord.index.refresh()
-    ThesisDraft.index.refresh()
+    requests_model.Record.index.refresh()
+    requests_model.Draft.index.refresh()
     resp_request_submit = submit_request_on_record(
         creator.identity, record1_id, "delete_published_record", create_additional_data={"payload": {"removal_reason": "test reason"}}
     )

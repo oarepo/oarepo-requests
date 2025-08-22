@@ -7,11 +7,9 @@
 #
 import copy
 
-from thesis.records.api import ThesisDraft, ThesisRecord
-
 
 def test_publish_service(
-    users, record_service, default_record_with_workflow_json, search_clear
+    requests_model, users, record_service, default_record_with_workflow_json, search_clear
 ):
     from invenio_requests.proxies import (
         current_requests_service as current_invenio_requests_service,
@@ -51,6 +49,7 @@ def test_publish_service(
 
 
 def test_publish(
+    requests_model,
     logged_client,
     users,
     urls,
@@ -71,8 +70,8 @@ def test_publish(
     draft1_id = draft1["id"]
     draft2_id = draft2["id"]
     draft3_id = draft3["id"]
-    ThesisRecord.index.refresh()
-    ThesisDraft.index.refresh()
+    requests_model.Record.index.refresh()
+    requests_model.Draft.index.refresh()
     draft_lst = creator_client.get(f"/user{urls['BASE_URL']}")
     lst = creator_client.get(
         urls["BASE_URL"], query_string={"record_status": "published"}
@@ -83,8 +82,8 @@ def test_publish(
     resp_request_submit = submit_request_on_draft(
         creator.identity, draft1_id, "publish_draft"
     )
-    ThesisRecord.index.refresh()
-    ThesisDraft.index.refresh()
+    requests_model.Record.index.refresh()
+    requests_model.Draft.index.refresh()
 
     record = receiver_client.get(f"{urls['BASE_URL']}{draft1_id}/draft?expand=true")
     assert record.json["expanded"]["requests"][0]["links"]["actions"].keys() == {
@@ -105,8 +104,8 @@ def test_publish(
     # version is no more on "publish_draft" request
     # assert "version" in published_record.json["metadata"]
 
-    ThesisRecord.index.refresh()
-    ThesisDraft.index.refresh()
+    requests_model.Record.index.refresh()
+    requests_model.Draft.index.refresh()
     draft_lst = creator_client.get(f"/user{urls['BASE_URL']}")
     lst = creator_client.get(
         urls["BASE_URL"], query_string={"record_status": "published"}

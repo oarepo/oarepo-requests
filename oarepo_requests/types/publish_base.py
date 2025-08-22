@@ -16,7 +16,7 @@ from invenio_i18n import gettext
 from invenio_i18n import lazy_gettext as _
 from invenio_records_resources.services.uow import RecordCommitOp, UnitOfWork
 from invenio_requests.proxies import current_requests_service
-from oarepo_runtime.datastreams.utils import get_record_service_for_record
+from oarepo_runtime.proxies import current_runtime
 
 from oarepo_requests.actions.publish_draft import (
     PublishDraftAcceptAction,
@@ -80,7 +80,7 @@ class PublishRequestType(NonDuplicableOARepoRequestType):
         self,
         topic: Record,
     ) -> None:
-        topic_service = get_record_service_for_record(topic)
+        topic_service = current_runtime.get_record_service_for_record(topic)
 
         request_service = get_requests_service_for_records_service(
             topic_service
@@ -131,7 +131,7 @@ class PublishRequestType(NonDuplicableOARepoRequestType):
 
         :raises: ValidationError: if the topic is not valid
         """
-        topic_service = get_record_service_for_record(topic)
+        topic_service = current_runtime.get_record_service_for_record(topic)
         topic_service.validate_draft(identity, topic["id"])
 
         # if files support is enabled for this topic, check if there are any files

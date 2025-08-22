@@ -14,7 +14,7 @@ from typing import TYPE_CHECKING, Any
 from invenio_records_resources.services.uow import IndexRefreshOp, unit_of_work
 from invenio_requests import current_request_type_registry
 from invenio_requests.services import RequestsService
-from oarepo_runtime.i18n import lazy_gettext as _
+from invenio_i18n import _
 
 from oarepo_requests.errors import CustomHTTPJSONException, UnknownRequestType
 from oarepo_requests.proxies import current_oarepo_requests

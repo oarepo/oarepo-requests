@@ -13,8 +13,8 @@ from typing import TYPE_CHECKING, Any, cast
 
 from invenio_records_resources.services import LinksTemplate
 from invenio_records_resources.services.errors import PermissionDeniedError
-from oarepo_runtime.datastreams.utils import get_record_service_for_record
-from oarepo_runtime.services.results import RecordList, ResultsComponent
+from oarepo_runtime.proxies import current_runtime
+from oarepo_runtime.services.results import RecordList, ResultComponent
 
 from oarepo_requests.services.draft.service import DraftRecordRequestsService
 from oarepo_requests.services.schema import RequestTypeSchema
@@ -31,7 +31,7 @@ if TYPE_CHECKING:
     from invenio_requests.customizations.request_types import RequestType
 
 
-class RequestTypesComponent(ResultsComponent):
+class RequestTypesComponent(ResultComponent):
     """Component for expanding request types."""
 
     def update_data(
@@ -79,7 +79,7 @@ def serialize_request_type(
     )
 
 
-class RequestsComponent(ResultsComponent):
+class RequestsComponent(ResultComponent):
     """Component for expanding requests on a record."""
 
     def update_data(
@@ -90,7 +90,7 @@ class RequestsComponent(ResultsComponent):
             return
 
         service = get_requests_service_for_records_service(
-            get_record_service_for_record(record)
+            current_runtime.get_record_service_for_record(record)
         )
         reader = (
             cast(DraftRecordRequestsService, service).search_requests_for_draft

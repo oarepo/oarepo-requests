@@ -19,35 +19,10 @@ from flask_resources import (
 from invenio_requests.errors import CannotExecuteActionError
 from flask_resources.serializers.json import JSONEncoder
 from invenio_i18n import gettext, lazy_gettext as _
-from oarepo_workflows.errors import (
-    EventTypeNotInWorkflow as WorkflowEventTypeNotInWorkflow,
-)
-from oarepo_workflows.errors import (
-    RequestTypeNotInWorkflow as WorkflowRequestTypeNotInWorkflow,
-)
-from typing_extensions import deprecated
 
 if TYPE_CHECKING:
     from invenio_records_resources.records import Record
     from invenio_requests.customizations import RequestType
-
-
-@deprecated(
-    "This exception is deprecated. Use oarepo_workflows.errors.RequestTypeNotInWorkflow instead."
-)
-class EventTypeNotInWorkflow(WorkflowEventTypeNotInWorkflow):
-    """Raised when an event type is not in the workflow."""
-
-    ...
-
-
-@deprecated(
-    "This exception is deprecated. Use oarepo_workflows.errors.RequestTypeNotInWorkflow instead."
-)
-class RequestTypeNotInWorkflow(WorkflowRequestTypeNotInWorkflow):
-    """Raised when a request type is not in the workflow."""
-
-    ...
 
 
 class CustomHTTPJSONException(HTTPJSONException):

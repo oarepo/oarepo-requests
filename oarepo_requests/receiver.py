@@ -10,8 +10,8 @@
 from __future__ import annotations
 
 from typing import TYPE_CHECKING, Any
-
-from oarepo_requests.errors import ReceiverNonReferencable, RequestTypeNotInWorkflow
+from oarepo_workflows.errors import RequestTypeNotInWorkflowError
+from oarepo_requests.errors import ReceiverNonReferencable
 
 if TYPE_CHECKING:
     from invenio_records_resources.records.api import Record
@@ -42,7 +42,7 @@ def default_workflow_receiver_function(
             request_type.type_id,
         )
     except AttributeError as e:
-        raise RequestTypeNotInWorkflow(request_type.type_id, workflow_id) from e
+        raise RequestTypeNotInWorkflowError(request_type.type_id, workflow_id) from e
 
     receiver = request.recipient_entity_reference(
         record=record, request_type=request_type, **kwargs

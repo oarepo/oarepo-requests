@@ -5,10 +5,10 @@
 # modify it under the terms of the MIT License; see LICENSE file for more
 # details.
 #
-from thesis.records.api import ThesisDraft, ThesisRecord
 
 
 def test_edit_autoaccept(
+    requests_model,
     logged_client,
     users,
     urls,
@@ -43,8 +43,8 @@ def test_edit_autoaccept(
     assert "draft_record:links:self" in request["payload"]
     assert "draft_record:links:self_html" in request["payload"]
 
-    ThesisRecord.index.refresh()
-    ThesisDraft.index.refresh()
+    requests_model.Record.index.refresh()
+    requests_model.index.refresh()
     # edit action worked?
     search = creator_client.get(
         f'user{urls["BASE_URL"]}',

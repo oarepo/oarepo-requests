@@ -17,7 +17,7 @@ from invenio_records_resources.services.errors import PermissionDeniedError
 from invenio_records_resources.services.uow import RecordCommitOp, UnitOfWork
 from invenio_requests.proxies import current_requests_service
 from invenio_requests.records.api import Request
-from oarepo_runtime.datastreams.utils import get_record_service_for_record_class
+from oarepo_runtime.proxies import current_runtime
 from invenio_i18n import gettext, lazy_gettext as _
 from oarepo_runtime.records.drafts import has_draft
 from typing_extensions import override
@@ -60,7 +60,7 @@ class EditPublishedRecordRequestType(NonDuplicableOARepoRequestType):
 
     def get_ui_redirect_url(self, request: Request, ctx: dict) -> str:
         if request.status == "accepted":
-            service = get_record_service_for_record_class(request.topic.record_cls)
+            service = current_runtime.get_record_service_for_record_class(request.topic.record_cls)
             try:
                 result_item = service.read_draft(
                     ctx["identity"], request.topic._parse_ref_dict_id()

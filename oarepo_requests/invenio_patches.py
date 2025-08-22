@@ -178,7 +178,7 @@ def override_invenio_requests_config(
 
         from invenio_requests.proxies import current_request_type_registry
         from invenio_requests.services.requests.facets import status, type
-        from oarepo_runtime.i18n import lazy_gettext as _
+        from invenio_i18n import _
 
         status._value_labels = {
             "submitted": _("Submitted"),
