@@ -6,3 +6,5 @@
 # details.
 #
 """Invenio extension for better handling of requests."""
+
+from __future__ import annotations

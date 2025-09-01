@@ -7,6 +7,9 @@
 #
 
 
+from __future__ import annotations
+
+
 def test_read_requests_on_draft(
     requests_model,
     logged_client,

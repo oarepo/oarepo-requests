@@ -7,6 +7,9 @@
 #
 
 
+from __future__ import annotations
+
+
 def test_new_version_autoaccept(
     requests_model,
     logged_client,

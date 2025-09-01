@@ -5,6 +5,8 @@
 # modify it under the terms of the MIT License; see LICENSE file for more
 # details.
 #
+from __future__ import annotations
+
 from pytest_oarepo.requests.functions import get_request_create_link
 
 

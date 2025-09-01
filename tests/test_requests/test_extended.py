@@ -5,6 +5,8 @@
 # modify it under the terms of the MIT License; see LICENSE file for more
 # details.
 #
+from __future__ import annotations
+
 from invenio_requests.records.api import RequestEvent
 from pytest_oarepo.functions import clear_babel_context, is_valid_subdict
 

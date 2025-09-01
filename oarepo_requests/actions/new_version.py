@@ -45,7 +45,7 @@ class NewVersionAcceptAction(AddTopicLinksOnPayloadMixin, RecordSnapshotMixin, O
             raise KeyError(f"topic {state.topic} service not found")
 
         new_version_topic = topic_service.new_version(identity, state.topic["id"], uow=uow)
-        state.topic = new_version_topic._record
+        state.topic = new_version_topic._record  # noqa SLF001
         if (
             "payload" in self.request
             and "keep_files" in self.request["payload"]

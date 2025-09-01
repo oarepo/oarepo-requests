@@ -6,6 +6,8 @@
 # oarepo-model is free software; you can redistribute it and/or modify it
 # under the terms of the MIT License; see LICENSE file for more details.
 #
+"""API blueprint preset for api request types on record."""
+
 from __future__ import annotations
 
 from collections.abc import Generator

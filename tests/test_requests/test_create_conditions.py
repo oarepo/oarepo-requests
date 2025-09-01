@@ -7,6 +7,9 @@
 #
 
 
+from __future__ import annotations
+
+
 def test_can_create(
     logged_client,
     users,

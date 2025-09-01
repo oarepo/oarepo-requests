@@ -6,7 +6,7 @@
 # oarepo-model is free software; you can redistribute it and/or modify it
 # under the terms of the MIT License; see LICENSE file for more details.
 #
-"""Module to generate metadata mapping for records."""
+"""Module to add requests-relevant metadata mappings on record."""
 
 from __future__ import annotations
 

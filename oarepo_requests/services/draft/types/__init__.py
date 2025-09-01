@@ -6,3 +6,5 @@
 # details.
 #
 """Service returning applicable request types for a record."""
+
+from __future__ import annotations

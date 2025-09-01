@@ -71,7 +71,7 @@ def update_topic(request: Request, old_topic: Record, new_topic: Record, uow: Un
     old_topic_ref = _get_topic_reference(old_topic)
     requests_with_topic = _get_requests_with_topic_reference(old_topic_ref)
     new_topic_ref = ResolverRegistry.reference_entity(new_topic)
-    for request_from_search in requests_with_topic._results:  # result list links might crash before update of the topic
+    for request_from_search in requests_with_topic._results:  # noqa SLF001  # result list links might crash before update of the topic
         request_from_search_id = request_from_search["uuid"]
         request_type = current_request_type_registry.lookup(request_from_search["type"], quiet=True)
         if hasattr(request_type, "topic_change"):
@@ -97,7 +97,7 @@ def cancel_requests_on_topic_delete(request: Request, topic: Record, uow: UnitOf
 
     topic_ref = _get_topic_reference(topic)
     requests_with_topic = _get_requests_with_topic_reference(topic_ref)
-    for request_from_search in requests_with_topic._results:  # result list links might crash before update of the topic
+    for request_from_search in requests_with_topic._results:  # noqa SLF001 # result list links might crash before update of the topic
         request_from_search_id = request_from_search["uuid"]
         request_type = current_request_type_registry.lookup(request_from_search["type"], quiet=True)
         if hasattr(request_type, "on_topic_delete"):

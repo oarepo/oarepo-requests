@@ -16,7 +16,9 @@ from typing import TYPE_CHECKING, Any
 from invenio_access.permissions import system_identity
 from invenio_i18n import _
 from invenio_pidstore.errors import PersistentIdentifierError
+from invenio_records_resources.records import Record
 from invenio_requests.customizations import actions
+from invenio_requests.records.api import Request
 from oarepo_runtime.proxies import current_runtime
 
 from oarepo_requests.proxies import current_oarepo_requests
@@ -24,9 +26,7 @@ from oarepo_requests.proxies import current_oarepo_requests
 if TYPE_CHECKING:
     from flask_babel.speaklater import LazyString
     from flask_principal import Identity
-    from invenio_records_resources.records import Record
     from invenio_records_resources.services.uow import UnitOfWork
-    from invenio_requests.records.api import Request
 
     from oarepo_requests.actions.components import RequestActionComponent
 
@@ -47,12 +47,12 @@ class RequestActionState:
 
     def __post__init__(self):
         """Assert correct types after initializing."""
-        assert isinstance(self.request, Request), f"self.request is not instance of Request, got {type(self.request)=}"
-        assert isinstance(self.request_type, RequestType), (
-            f"self.request_type is not instance of Request, got {type(self.request_type)=}"
-        )
-        assert isinstance(self.topic, Record), f"self.topic is not instance of Record, got {type(self.topic)=}"
-        # assert isinstance(self.action, ActionType), f"self.action is not instance of ActionType, got {type(self.action)=}"
+        if not isinstance(self.request, Request):
+            raise TypeError(f"self.request is not instance of Request, got {type(self.request)=}")
+        if not isinstance(self.request_type, RequestType):
+            raise TypeError(f"self.request_type is not instance of Request, got {type(self.request_type)=}")
+        if not isinstance(self.topic, Record):
+            raise TypeError(f"self.topic is not instance of Record, got {type(self.topic)=}")
 
 
 class OARepoGenericActionMixin:
@@ -61,7 +61,7 @@ class OARepoGenericActionMixin:
     name: str
 
     @classmethod
-    def stateful_name(cls, identity: Identity, **kwargs: Any) -> str | LazyString:
+    def stateful_name(cls, identity: Identity, **kwargs: Any) -> str | LazyString:  # noqa ARG003
         """Return the name of the action.
 
         The name can be a lazy multilingual string and may depend on the state of the action,
@@ -102,7 +102,7 @@ class OARepoGenericActionMixin:
         """
         if not components:
             self.apply(identity, state, uow, *args, **kwargs)
-            super().execute(identity, uow, *args, **kwargs)  # type: ignore
+            super().execute(identity, uow, *args, **kwargs)
         else:
             with components[0].apply(identity, state, uow, *args, **kwargs):
                 self._execute_with_components(components[1:], identity, state, uow, *args, **kwargs)
@@ -114,7 +114,7 @@ class OARepoGenericActionMixin:
 
     def execute(self, identity: Identity, uow: UnitOfWork, *args: Any, **kwargs: Any) -> None:
         """Execute the action."""
-        request: Request = self.request  # type: ignore
+        request: Request = self.request
         request_type = request.type
         try:
             topic = request.topic.resolve()
@@ -154,7 +154,7 @@ class AddTopicLinksOnPayloadMixin:
             ret = service.read_draft(system_identity, state.topic.pid.pid_value)
         topic_dict = ret.to_dict()
 
-        request: Request = self.request  # type: ignore
+        request: Request = self.request
 
         if "payload" not in request:
             request["payload"] = {}
@@ -164,7 +164,8 @@ class AddTopicLinksOnPayloadMixin:
         # can not use dot notation as marshmallow tries to be too smart and does not serialize dotted keys
         if (
             "self" in topic_dict["links"]
-        ):  # TODO consider - this happens if receiver doesn't have read rights to the topic, like after a draft is created after edit
+        ):  # TODO: consider - this happens if receiver doesn't have read rights to the topic,
+            # like after a draft is created after edit
             # if it's needed in all cases, we could do a system identity call here
             request["payload"][self.self_link] = topic_dict["links"]["self"]
         if "self_html" in topic_dict["links"]:
@@ -195,5 +196,5 @@ class OARepoCancelAction(OARepoGenericActionMixin, actions.CancelAction):
 
     name = _("Cancel")
 
-    status_from = ["created", "submitted"]
+    status_from = ("created", "submitted")
     status_to = "cancelled"

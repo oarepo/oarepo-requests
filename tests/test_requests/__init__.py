@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 #
 # Copyright (C) 2024 CESNET z.s.p.o.
 #

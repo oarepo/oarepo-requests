@@ -6,3 +6,5 @@
 # details.
 #
 """API for events on requests."""
+
+from __future__ import annotations

@@ -6,3 +6,5 @@
 # details.
 #
 """UI semantic-ui theme for the module."""
+
+from __future__ import annotations

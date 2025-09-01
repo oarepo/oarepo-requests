@@ -95,7 +95,7 @@ class DeletePublishedRecordAcceptAction(OARepoAcceptAction):
                 "note": self.request["payload"].get("note", ""),
                 "is_visible": True,
             }
-            deleted_topic = topic_service.delete_record(identity, state.topic["id"], data)._record
+            deleted_topic = topic_service.delete_record(identity, state.topic["id"], data)._record  # noqa SLF001
             db.session.commit()
             state.topic = deleted_topic
         else:

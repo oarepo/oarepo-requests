@@ -6,3 +6,5 @@
 # details.
 #
 """Service layer for request on /model/<id>/requests endpoint."""
+
+from __future__ import annotations

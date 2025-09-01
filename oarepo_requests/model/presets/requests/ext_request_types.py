@@ -25,6 +25,7 @@ from oarepo_requests.resources.draft.types.config import DraftRequestTypesResour
 from oarepo_requests.resources.draft.types.resource import DraftRequestTypesResource
 from oarepo_requests.services.draft.types.service import DraftRecordRequestTypesService
 
+"""Module providing preset for processing request types queries extension."""
 if TYPE_CHECKING:
     from oarepo_model.builder import InvenioModelBuilder
 

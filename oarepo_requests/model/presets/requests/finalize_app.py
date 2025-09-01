@@ -20,6 +20,7 @@ from oarepo_model.customizations import (
 from oarepo_model.model import InvenioModel
 from oarepo_model.presets import Preset
 
+"""Module providing preset for defining finalize_app entrypoints."""
 if TYPE_CHECKING:
     from oarepo_model.builder import InvenioModelBuilder
 

@@ -48,7 +48,7 @@ class PublishMixin:
 
     def can_execute(self: RequestAction) -> bool:
         """Check if the action can be executed."""
-        if not super().can_execute():  # type: ignore
+        if not super().can_execute():
             return False
 
         try:
@@ -56,9 +56,9 @@ class PublishMixin:
 
             topic = self.request.topic.resolve()
             PublishDraftRequestType.validate_topic(system_identity, topic)
-            return True
         except:  # noqa E722: used for displaying buttons, so ignore errors here
             return False
+        return True
 
 
 class PublishDraftSubmitAction(PublishMixin, RecordSnapshotMixin, OARepoSubmitAction):
@@ -81,7 +81,7 @@ class PublishDraftSubmitAction(PublishMixin, RecordSnapshotMixin, OARepoSubmitAc
                 if "version" in rec["metadata"]:
                     version = rec["metadata"]["version"]
                     if version == self.request["payload"]["version"]:
-                        raise VersionAlreadyExists()
+                        raise VersionAlreadyExists
             state.topic.metadata["version"] = self.request["payload"]["version"]
         uow.register(NotificationOp(PublishDraftRequestSubmitNotificationBuilder.build(request=self.request)))
         return super().apply(identity, state, uow, *args, **kwargs)
@@ -110,23 +110,24 @@ class PublishDraftAcceptAction(PublishMixin, AddTopicLinksOnPayloadMixin, OARepo
         request_service = get_requests_service_for_records_service(topic_service)
         requests = request_service.search_requests_for_draft(system_identity, state.topic.pid.pid_value)
 
-        for result in requests._results:
+        for result in requests._results:  # noqa SLF001
             if (
                 result.type not in ["publish_draft", "publish_new_version", "publish_changed_metadata"]
                 and result.is_open
+                and Request.get_record(result.uuid)["status"]
+                in (
+                    "submitted",
+                    "created",
+                )
             ):
                 # note: we can not use solely the result.is_open because changes may not be committed yet
                 # to opensearch index. That's why we need to get the record from DB and re-check.
-                if Request.get_record(result.uuid)["status"] in (
-                    "submitted",
-                    "created",
-                ):
-                    raise UnresolvedRequestsError(action=str(self.name))
+                raise UnresolvedRequestsError(action=str(self.name))
         id_ = state.topic["id"]
 
         published_topic = topic_service.publish(identity, id_, *args, uow=uow, expand=False, **kwargs)
-        update_topic(self.request, state.topic, published_topic._record, uow)
-        state.topic = published_topic._record
+        update_topic(self.request, state.topic, published_topic._record, uow)  # noqa SLF001
+        state.topic = published_topic._record  # noqa SLF001
         uow.register(NotificationOp(PublishDraftRequestAcceptNotificationBuilder.build(request=self.request)))
         return super().apply(identity, state, uow, *args, **kwargs)
 

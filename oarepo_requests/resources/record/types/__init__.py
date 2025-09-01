@@ -6,3 +6,5 @@
 # details.
 #
 """API Resource for record request types."""
+
+from __future__ import annotations

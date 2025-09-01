@@ -6,3 +6,5 @@
 # details.
 #
 """Record request an applicable requests API resource."""
+
+from __future__ import annotations

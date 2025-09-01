@@ -68,12 +68,13 @@ REQUESTS_REGISTERED_TYPES = [
     PublishDraftRequestType(),
 ]
 
-REQUESTS_REGISTERED_EVENT_TYPES = [
+REQUESTS_REGISTERED_EVENT_TYPES = (
     TopicUpdateEventType(),
     TopicDeleteEventType(),
     EscalationEventType(),
     RecordSnapshotEventType(),
-] + invenio_requests.config.REQUESTS_REGISTERED_EVENT_TYPES
+    *invenio_requests.config.REQUESTS_REGISTERED_EVENT_TYPES,
+)
 
 REQUESTS_ALLOWED_RECEIVERS = ["user", "group", "auto_approve"]
 
@@ -104,7 +105,9 @@ REQUESTS_ACTION_COMPONENTS = {
         RequestIdentityComponent,
     ],
     "submitted": [
-        AutoAcceptComponent,  # AutoAcceptComponent must always be first, so that auto accept is called as the last step in action handling
+        # AutoAcceptComponent must always be first, so that auto accept is called as the last
+        # step in action handling
+        AutoAcceptComponent,
         *workflow_action_components,
         RequestIdentityComponent,
     ],

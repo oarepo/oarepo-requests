@@ -7,6 +7,9 @@
 #
 
 
+from __future__ import annotations
+
+
 def test_search(
     logged_client,
     users,

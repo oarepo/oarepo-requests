@@ -6,3 +6,5 @@
 # details.
 #
 """API for applicable request types for a draft record."""
+
+from __future__ import annotations

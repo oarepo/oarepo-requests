@@ -21,6 +21,7 @@ from oarepo_model.customizations import (
 from oarepo_model.model import InvenioModel, ModelMixin
 from oarepo_model.presets import Preset
 
+"""Module providing preset for processing request queries extension."""
 if TYPE_CHECKING:
     from oarepo_model.builder import InvenioModelBuilder
 

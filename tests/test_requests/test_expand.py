@@ -7,6 +7,9 @@
 #
 
 
+from __future__ import annotations
+
+
 def test_requests_field(
     logged_client,
     users,

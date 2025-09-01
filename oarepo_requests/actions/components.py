@@ -31,6 +31,8 @@ if TYPE_CHECKING:
     from flask_principal import Identity
     from invenio_records_resources.services.uow import UnitOfWork
 
+log = logging.getLogger(__name__)
+
 
 class RequestActionComponent(abc.ABC):
     """Abstract request action component."""
@@ -164,6 +166,6 @@ class AutoAcceptComponent(RequestActionComponent):
             try:
                 new_topic = new_request.topic.resolve()
                 state.topic = new_topic
-            except Exception as e:
-                logging.exception(e)
+            except Exception:
+                log.exception("Exception while resolving topic")
                 state.topic = None

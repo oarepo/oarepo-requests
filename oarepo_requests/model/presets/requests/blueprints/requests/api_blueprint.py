@@ -19,6 +19,7 @@ from oarepo_model.customizations import (
 from oarepo_model.model import InvenioModel
 from oarepo_model.presets import Preset
 
+"""API blueprint preset for api requests query on record."""
 if TYPE_CHECKING:
     from oarepo_model.builder import InvenioModelBuilder
 

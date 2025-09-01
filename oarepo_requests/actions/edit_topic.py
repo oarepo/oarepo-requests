@@ -43,5 +43,5 @@ class EditTopicAcceptAction(AddTopicLinksOnPayloadMixin, RecordSnapshotMixin, OA
         topic_service = current_runtime.get_record_service_for_record(state.topic)
         if not topic_service:
             raise KeyError(f"topic {state.topic} service not found")
-        state.topic = topic_service.edit(identity, state.topic["id"], uow=uow)._record
+        state.topic = topic_service.edit(identity, state.topic["id"], uow=uow)._record  # noqa SLF001
         super().apply(identity, state, uow, *args, **kwargs)
