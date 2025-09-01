@@ -6,10 +6,12 @@
 # oarepo-model is free software; you can redistribute it and/or modify it
 # under the terms of the MIT License; see LICENSE file for more details.
 #
+"""Module providing preset for processing request types queries extension."""
+
 from __future__ import annotations
 
 from functools import cached_property
-from typing import TYPE_CHECKING, Any
+from typing import TYPE_CHECKING, Any, override
 
 from oarepo_model.customizations import (
     AddMixins,
@@ -24,7 +26,6 @@ from oarepo_requests.resources.draft.types.config import DraftRequestTypesResour
 from oarepo_requests.resources.draft.types.resource import DraftRequestTypesResource
 from oarepo_requests.services.draft.types.service import DraftRecordRequestTypesService
 
-"""Module providing preset for processing request types queries extension."""
 if TYPE_CHECKING:
     from collections.abc import Generator
 
@@ -34,9 +35,10 @@ if TYPE_CHECKING:
 class ExtRequestTypesPreset(Preset):
     """Preset for extension class."""
 
-    depends_on = ["RecordService", "RecordServiceConfig"]
-    modifies = ["Ext"]
+    depends_on = ("RecordService", "RecordServiceConfig")
+    modifies = ("Ext",)
 
+    @override
     def apply(
         self,
         builder: InvenioModelBuilder,
@@ -47,13 +49,13 @@ class ExtRequestTypesPreset(Preset):
             """Mixin for extension class."""
 
             @cached_property
-            def service_record_request_types(self):
+            def service_record_request_types(self) -> DraftRecordRequestTypesService:
                 return DraftRecordRequestTypesService(
                     **self.service_record_request_types_params,
                 )
 
             @property
-            def service_record_request_types_params(self):
+            def service_record_request_types_params(self) -> dict[str, Any]:
                 """Parameters for the file service."""
                 return {
                     "record_service": self.records_service,
@@ -61,13 +63,13 @@ class ExtRequestTypesPreset(Preset):
                 }
 
             @cached_property
-            def resource_record_request_types(self):
+            def resource_record_request_types(self) -> DraftRequestTypesResource:
                 return DraftRequestTypesResource(
                     **self.resource_record_request_types_params,
                 )
 
             @property
-            def resource_record_request_types_params(self):
+            def resource_record_request_types_params(self) -> dict[str, Any]:
                 """Parameters for the file resource."""
                 return {
                     "service": self.service_record_request_types,

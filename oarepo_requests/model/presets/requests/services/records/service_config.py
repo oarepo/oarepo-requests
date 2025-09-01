@@ -6,23 +6,17 @@
 # oarepo-model is free software; you can redistribute it and/or modify it
 # under the terms of the MIT License; see LICENSE file for more details.
 #
+"""Module providing preset for applying changes to record service config."""
+
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Any
+from typing import TYPE_CHECKING, Any, override
 
-from invenio_records_resources.services import (
-    ConditionalLink,
-    RecordLink,
-)
 from oarepo_model.customizations import (
-    AddToDictionary,
     AddToList,
     Customization,
 )
 from oarepo_model.presets import Preset
-from oarepo_runtime.services.config import (
-    is_published_record,
-)
 
 from oarepo_requests.services.components.autorequest import AutorequestComponent
 from oarepo_requests.services.record.components.snapshot_component import RecordSnapshotComponent
@@ -37,15 +31,20 @@ if TYPE_CHECKING:
 class RequestsServiceConfigPreset(Preset):
     """Preset for record service config class."""
 
-    modifies = ["record_links_item", "record_service_components"]
+    modifies = ("record_links_item", "record_service_components")
 
+    @override
     def apply(
         self,
         builder: InvenioModelBuilder,
         model: InvenioModel,
         dependencies: dict[str, Any],
     ) -> Generator[Customization]:
-        api_base = "{+api}/" + builder.model.slug + "/"
+        yield AddToList("record_service_components", AutorequestComponent)
+        yield AddToList("record_service_components", RecordSnapshotComponent)
+
+        # TODO: use endpoint links
+        """api_base = "{+api}/" + builder.model.slug + "/"
         ui_base = "{+ui}/" + builder.model.slug + "/"
 
         api_url = api_base + "{id}"
@@ -64,7 +63,6 @@ class RequestsServiceConfigPreset(Preset):
             ),
         }
 
-        yield AddToDictionary("record_links_item", links)
 
-        yield AddToList("record_service_components", AutorequestComponent)
-        yield AddToList("record_service_components", RecordSnapshotComponent)
+        yield AddToDictionary("record_links_item", links)
+        """

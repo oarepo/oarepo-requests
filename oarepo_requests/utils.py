@@ -134,7 +134,6 @@ def search_requests_filter(
     )
 
 
-
 def open_request_exists(topic_or_reference: Record | EntityReference, type_id: str) -> bool:
     """Check if there is an open request of a given type for the topic.
 

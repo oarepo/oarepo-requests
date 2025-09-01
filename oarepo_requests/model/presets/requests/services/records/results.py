@@ -6,9 +6,11 @@
 # oarepo-model is free software; you can redistribute it and/or modify it
 # under the terms of the MIT License; see LICENSE file for more details.
 #
+"""Module providing preset for configuring requests result classes."""
+
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Any
+from typing import TYPE_CHECKING, Any, override
 
 from oarepo_model.customizations import (
     AddToList,
@@ -26,10 +28,11 @@ if TYPE_CHECKING:
 
 
 class RequestsRecordItemPreset(Preset):
-    modifies = [
-        "record_result_item_components",
-    ]
+    """Preset for configuring requests result classes."""
 
+    modifies = ("record_result_item_components",)
+
+    @override
     def apply(
         self,
         builder: InvenioModelBuilder,

@@ -24,7 +24,6 @@ if TYPE_CHECKING:
     from invenio_requests.records.api import Request
 
 
-
 class PublishDraftRequestType(PublishRequestType):
     """Publish draft request type."""
 

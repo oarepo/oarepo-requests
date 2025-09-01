@@ -5,6 +5,8 @@
 # modify it under the terms of the MIT License; see LICENSE file for more
 # details.
 #
+"""to do - probably reconceptualize this."""
+
 from __future__ import annotations
 
 import logging
@@ -19,7 +21,8 @@ if TYPE_CHECKING:
 log = logging.getLogger(__name__)
 
 
-# TODO consider - we are not using this strictly in the ui context - so how should we separate these things in the future
+# TODO: consider - we are not using this strictly in the ui context - so how should we separate these
+#  things in the future
 def resolve_entity(entity: str, obj: Request, ctx: dict[str, Any]) -> dict:
     """Resolve the entity and put it into the context cache.
 

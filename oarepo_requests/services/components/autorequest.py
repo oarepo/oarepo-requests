@@ -5,9 +5,12 @@
 # modify it under the terms of the MIT License; see LICENSE file for more
 # details.
 #
+"""Maybe reconceptualize this."""
+
+# TODO: ...
 from __future__ import annotations
 
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Any, override
 
 from invenio_records_resources.services.records.components import ServiceComponent
 
@@ -21,7 +24,8 @@ if TYPE_CHECKING:
 class AutorequestComponent(ServiceComponent):
     """Component for assigning request numbers to new requests."""
 
-    def create(self, identity: Identity, data: dict | None = None, record: Record = None, **kwargs) -> None:
+    @override
+    def create(self, identity: Identity, data: dict | None = None, record: Record = None, **kwargs: Any) -> None:
         """Create requests that should be created automatically on state change.
 
         For each of the WorkflowRequest definition in the workflow of the record,

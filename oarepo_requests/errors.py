@@ -10,7 +10,7 @@
 from __future__ import annotations
 
 import json
-from typing import TYPE_CHECKING, Any
+from typing import TYPE_CHECKING, Any, override
 
 from flask import g
 from flask_resources import (
@@ -22,6 +22,7 @@ from invenio_i18n import lazy_gettext as _
 from invenio_requests.errors import CannotExecuteActionError
 
 if TYPE_CHECKING:
+    from flask_babel.speaklater import LazyString
     from invenio_records_resources.records import Record
     from invenio_requests.customizations import RequestType
 
@@ -43,6 +44,7 @@ class CustomHTTPJSONException(HTTPJSONException):
         self.request_payload_errors = request_payload_errors or []
         self.extra_kwargs = kwargs  # Save all kwargs
 
+    @override
     def get_body(self, environ: any | None = None, scope: any | None = None) -> str:
         """Get the request body."""
         body = {"status": self.code, "message": self.get_description(environ)}
@@ -57,13 +59,13 @@ class CustomHTTPJSONException(HTTPJSONException):
         if self.request_payload_errors:
             body["request_payload_errors"] = self.request_payload_errors
 
-        if self.code and (self.code >= 500) and hasattr(g, "sentry_event_id"):
+        if self.code and (self.code >= 500) and hasattr(g, "sentry_event_id"):  # noqa PLR2004
             body["error_id"] = str(g.sentry_event_id)
 
         return json.dumps(body, cls=JSONEncoder)
 
 
-class OpenRequestAlreadyExists(CannotExecuteActionError):
+class OpenRequestAlreadyExistsError(CannotExecuteActionError):
     """An open request already exists."""
 
     def __init__(self, request_type: RequestType, record: Record) -> None:
@@ -72,10 +74,11 @@ class OpenRequestAlreadyExists(CannotExecuteActionError):
         self.record = record
 
     def __str__(self):
+        """Return str representation."""
         return self.description
 
     @property
-    def description(self):
+    def description(self) -> LazyString:
         """Exception's description."""
         return gettext("There is already an open request of %(request_type)s on %(record_id)s.") % {
             "request_type": self.request_type.name,
@@ -87,6 +90,7 @@ class UnresolvedRequestsError(CannotExecuteActionError):
     """There were unresolved requests before an action could proceed."""
 
     def __init__(self, action: str, reason: str | None = None) -> None:
+        """Initialize the exception."""
         self.action = action
         self.reason = reason or _("All open requests must be closed first.")
 
@@ -98,7 +102,7 @@ class UnresolvedRequestsError(CannotExecuteActionError):
         }
 
 
-class UnknownRequestType(Exception):
+class UnknownRequestTypeError(Exception):
     """Exception raised when user tries to create a request with an unknown request type."""
 
     def __init__(self, request_type: str) -> None:
@@ -113,7 +117,7 @@ class UnknownRequestType(Exception):
         }
 
 
-class ReceiverNonReferencable(Exception):
+class ReceiverNonReferencableError(Exception):
     """Raised when receiver is required but could not be estimated from the record/caller."""
 
     def __init__(self, request_type: RequestType, record: Record, **kwargs: Any) -> None:
@@ -126,7 +130,8 @@ class ReceiverNonReferencable(Exception):
     def description(self) -> str:
         """Exception's description."""
         message = gettext(
-            "Receiver for request type %(request_type)s is required but wasn't successfully referenced on record %(record_id)s."
+            "Receiver for request type %(request_type)s is required but wasn't successfully "
+            "referenced on record %(record_id)s."
         ) % {
             "request_type": self.request_type,
             "record_id": self.record["id"],

@@ -37,9 +37,7 @@ def test_read_requests_on_draft(
 
     submit_request_on_draft(creator.identity, draft1_id, "publish_draft")
     record = receiver_client.get(f"{urls['BASE_URL']}/{draft1_id}/draft?expand=true")
-    receiver_client.post(
-        link2testclient(record.json["expanded"]["requests"][0]["links"]["actions"]["decline"])
-    )
+    receiver_client.post(link2testclient(record.json["expanded"]["requests"][0]["links"]["actions"]["decline"]))
 
     create_request_on_draft(creator.identity, draft1_id, "publish_draft")
     create_request_on_draft(creator.identity, draft2_id, "publish_draft")

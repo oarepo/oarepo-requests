@@ -24,8 +24,7 @@ def oarepo_requests() -> None:
 
 @oarepo_requests.command(name="escalate")
 def escalate_requests() -> None:
-    """Check and escalate all stale requests by changing the recipient and sending the notification to
-    the new recipient.
+    """Check and escalate all stale requests by changing the recipient and sending the notification.
 
     Stale request is a type of request in which original recipient did not react in time (21 days, 7 days etc.)
     """

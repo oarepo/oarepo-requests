@@ -13,7 +13,7 @@ from typing import TYPE_CHECKING, Any
 
 from oarepo_workflows.errors import RequestTypeNotInWorkflowError
 
-from oarepo_requests.errors import ReceiverNonReferencable
+from oarepo_requests.errors import ReceiverNonReferencableError
 
 if TYPE_CHECKING:
     from invenio_records_resources.records.api import Record
@@ -50,5 +50,5 @@ def default_workflow_receiver_function(
 
     receiver = request.recipient_entity_reference(record=record, request_type=request_type, **kwargs)
     if not request_type.receiver_can_be_none and not receiver:
-        raise ReceiverNonReferencable(request_type=request_type, record=record, **kwargs)
+        raise ReceiverNonReferencableError(request_type=request_type, record=record, **kwargs)
     return receiver

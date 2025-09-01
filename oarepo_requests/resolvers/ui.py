@@ -6,7 +6,7 @@
 # details.
 #
 """UI resolvers of common entities."""
-
+# TODO: reconceptualize
 from __future__ import annotations
 
 import abc

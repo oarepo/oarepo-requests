@@ -37,7 +37,6 @@ if TYPE_CHECKING:
     from oarepo_requests.typing import EntityReference
 
 
-
 from invenio_access.permissions import system_identity
 from invenio_requests.records.api import Request
 

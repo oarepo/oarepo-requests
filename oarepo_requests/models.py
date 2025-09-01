@@ -5,10 +5,13 @@
 # modify it under the terms of the MIT License; see LICENSE file for more
 # details.
 #
+"""DB model for record snapshots."""
+
 from __future__ import annotations
 
 import logging
 from datetime import datetime
+from typing import TYPE_CHECKING
 
 import sqlalchemy as sa
 from invenio_db import db
@@ -16,6 +19,9 @@ from invenio_requests.records.models import RequestMetadata
 from sqlalchemy.dialects import postgresql
 from sqlalchemy.exc import IntegrityError, NoResultFound, SQLAlchemyError
 from sqlalchemy_utils.types import JSONType, UUIDType
+
+if TYPE_CHECKING:
+    from uuid import UUID
 
 logger = logging.getLogger("record-snapshot-table")
 
@@ -29,7 +35,7 @@ class RecordSnapshot(db.Model):
     __tablename__ = "record_snapshots"
 
     __table_args__ = (
-        # TODO
+        # TODO: ..
     )
 
     id = db.Column(db.Integer, primary_key=True)
@@ -52,7 +58,7 @@ class RecordSnapshot(db.Model):
             JSONType(),
             "mysql",
         ),
-        default=lambda: dict(),
+        default=lambda: dict(),  # noqa C408 ; is there a reason to use lambda here?
         nullable=False,
     )
     """JSON with current snapshot of the record."""
@@ -66,7 +72,7 @@ class RecordSnapshot(db.Model):
     created = sa.Column(sa.DateTime, default=datetime.utcnow, nullable=False)
 
     @classmethod
-    def create(cls, record_uuid, request_id, json):
+    def create(cls, record_uuid: UUID, request_id: UUID, json: dict) -> None:  # TODO: json type?
         """Create new snapshot."""
         try:
             with db.session.begin_nested():
@@ -90,25 +96,25 @@ class RecordSnapshot(db.Model):
         return obj
 
     @classmethod
-    def get(cls, record_uuid):
+    def get(cls, record_uuid: UUID) -> RecordSnapshot:
         """Get one snapshot for given record_uuid."""
         try:
             return db.session.query(cls).filter_by(record_uuid=record_uuid).one()
-        except NoResultFound:
-            raise ValueError(f"No record snapshot for record uuid {record_uuid}")
+        except NoResultFound as exc:
+            raise ValueError(f"No record snapshot for record uuid {record_uuid}") from exc
 
     @classmethod
-    def get_all(cls, record_uuid):
+    def get_all(cls, record_uuid: UUID) -> list[RecordSnapshot]:
         """Get all snapshot for given record_uuid."""
         try:
             return db.session.query(cls).filter_by(record_uuid=record_uuid).all()
-        except NoResultFound:
-            raise ValueError(f"No record snapshots for record uuid {record_uuid}")
+        except NoResultFound as exc:
+            raise ValueError(f"No record snapshots for record uuid {record_uuid}") from exc
 
     @classmethod
-    def get_two_latest_snapshots_by_record_uuid(cls, record_uuid):
+    def get_two_latest_snapshots_by_record_uuid(cls, record_uuid: UUID) -> list[RecordSnapshot]:
         """Get latest two snapshot for record_uuid."""
         try:
             return db.session.query(cls).filter_by(record_uuid=record_uuid).order_by(cls.created.desc()).limit(2).all()
-        except NoResultFound:
-            raise ValueError(f"No record snapshot for record uuid {record_uuid}")
+        except NoResultFound as exc:
+            raise ValueError(f"No record snapshot for record uuid {record_uuid}") from exc

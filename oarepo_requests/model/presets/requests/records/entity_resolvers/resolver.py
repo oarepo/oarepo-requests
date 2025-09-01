@@ -6,10 +6,14 @@
 # oarepo-model is free software; you can redistribute it and/or modify it
 # under the terms of the MIT License; see LICENSE file for more details.
 #
+"""Module providing preset for draft entity resolver creation."""
+
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Any
+from typing import TYPE_CHECKING, Any, override
 
+# TODO: temp
+from invenio_records_resources.references import RecordResolver
 from oarepo_model.customizations import (
     AddClass,
     AddMixins,
@@ -45,15 +49,13 @@ class {{ vars.record_resolver|class_header }}:
 {% endif %}
 """
 
-# TODO: temp
-from invenio_records_resources.references import RecordResolver
-
 
 class RecordResolverPreset(Preset):
-    provides = [
-        "RecordResolver",
-    ]
+    """Preset for published resolver."""
 
+    provides = ("RecordResolver",)
+
+    @override
     def apply(
         self,
         builder: InvenioModelBuilder,
@@ -61,17 +63,16 @@ class RecordResolverPreset(Preset):
         dependencies: dict[str, Any],
     ) -> Generator[Customization]:
         class RecordResolverMixin:
-            """Base class for records in the model.
-            This class extends InvenioRecord and can be customized further.
-            """
+            """Mixin specifying published record resolver."""
 
-            # invenio_requests.registry.TypeRegistry
-            # requires name of the resolver for the model; needs only to be unique for the model, so use the name of the model
+            # requires name of the resolver for the model; needs only to be unique for the model,
+            # so use the name of the model
             type_id = builder.model.base_name
 
             proxy_cls = RecordProxy
 
-            def __init__(self, record_cls, service_id, type_key):
+            def __init__(self, record_cls: type, service_id: str, type_key: str) -> None:
+                """Construct the resolver."""
                 super().__init__(record_cls, service_id, type_key=type_key, proxy_cls=self.proxy_cls)
 
         yield AddClass(

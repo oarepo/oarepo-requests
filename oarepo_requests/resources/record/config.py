@@ -9,6 +9,8 @@
 
 from __future__ import annotations
 
+from typing import ClassVar
+
 import importlib_metadata
 import marshmallow as ma
 from flask_resources import JSONSerializer, ResponseHandler
@@ -28,7 +30,7 @@ class RecordRequestsResourceConfig:
 
     blueprint_name: str | None = None  # will be merged from the record's resource config
 
-    routes = {
+    routes: ClassVar[dict[str, str]] = {
         "list-requests": "/<pid_value>/requests",
         "request-type": "/<pid_value>/requests/<request_type>",
     }

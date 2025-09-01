@@ -36,7 +36,7 @@ class DraftRecordRequestsService(RecordRequestsService):
         return self.record_service.config.draft_cls
 
     # from invenio_rdm_records.services.requests.service.RecordRequestsService
-    def search_requests_for_draft(
+    def search_requests_for_draft(  # noqa PLR0913
         self,
         identity: Identity,
         record_id: str,
@@ -71,14 +71,15 @@ class DraftRecordRequestsService(RecordRequestsService):
             **kwargs,
         )
 
+    # TODO: expires at?
     @unit_of_work()
-    def create_for_draft(
+    def create_for_draft(  # noqa PLR0913
         self,
         identity: Identity,
         data: dict,
         request_type: str,
         topic_id: str,
-        expires_at: datetime | None = None,
+        expires_at: datetime | None = None,  # noqa ARG002
         uow: UnitOfWork | None = None,
         expand: bool = False,
     ) -> RequestItem:

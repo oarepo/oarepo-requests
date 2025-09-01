@@ -9,6 +9,8 @@
 
 from __future__ import annotations
 
+from typing import ClassVar
+
 import importlib_metadata
 
 from oarepo_requests.resources.record.config import RecordRequestsResourceConfig
@@ -17,7 +19,7 @@ from oarepo_requests.resources.record.config import RecordRequestsResourceConfig
 class DraftRecordRequestsResourceConfig(RecordRequestsResourceConfig):
     """Configuration of the draft record requests resource."""
 
-    routes = {
+    routes: ClassVar[dict[str, str]] = {
         **RecordRequestsResourceConfig.routes,
         "list-requests-draft": "/<pid_value>/draft/requests",
         "request-type-draft": "/<pid_value>/draft/requests/<request_type>",

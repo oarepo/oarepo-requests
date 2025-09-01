@@ -6,9 +6,11 @@
 # oarepo-model is free software; you can redistribute it and/or modify it
 # under the terms of the MIT License; see LICENSE file for more details.
 #
+"""API blueprint preset for api requests query on record."""
+
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Any
+from typing import TYPE_CHECKING, Any, override
 
 from oarepo_model.customizations import (
     AddEntryPoint,
@@ -17,10 +19,10 @@ from oarepo_model.customizations import (
 )
 from oarepo_model.presets import Preset
 
-"""API blueprint preset for api requests query on record."""
 if TYPE_CHECKING:
     from collections.abc import Generator
 
+    from flask import Blueprint, Flask
     from oarepo_model.builder import InvenioModelBuilder
     from oarepo_model.model import InvenioModel
 
@@ -28,8 +30,9 @@ if TYPE_CHECKING:
 class ApiRequestsBlueprintPreset(Preset):
     """Preset for api blueprint."""
 
-    modifies = ["blueprints"]
+    modifies = ("blueprints",)
 
+    @override
     def apply(
         self,
         builder: InvenioModelBuilder,
@@ -37,10 +40,9 @@ class ApiRequestsBlueprintPreset(Preset):
         dependencies: dict[str, Any],
     ) -> Generator[Customization]:
         @staticmethod  # need to use staticmethod as python's magic always passes self as the first argument
-        def create_requests_api_blueprint(app):
+        def create_requests_api_blueprint(app: Flask) -> Blueprint:
             with app.app_context():
                 return app.extensions[model.base_name].resource_record_requests.as_blueprint()
-
 
         yield AddToModule(
             "blueprints",

@@ -9,6 +9,8 @@
 
 from __future__ import annotations
 
+from typing import ClassVar
+
 from flask_resources import JSONSerializer, ResponseHandler
 from invenio_records_resources.resources.records.headers import etag_headers
 
@@ -24,7 +26,7 @@ class RecordRequestTypesResourceConfig:
 
     blueprint_name: str | None = None  # will be merged from the record's resource config
 
-    routes = {
+    routes: ClassVar[dict[str, str]] = {
         "list-applicable-requests": "/<pid_value>/requests/applicable",
     }
 

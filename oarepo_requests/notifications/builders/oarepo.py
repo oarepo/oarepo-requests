@@ -5,9 +5,11 @@
 # modify it under the terms of the MIT License; see LICENSE file for more
 # details.
 #
+"""General OARepo notification builders related classes."""
+
 from __future__ import annotations
 
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, override
 
 from invenio_notifications.backends import EmailNotificationBackend
 from invenio_notifications.models import Notification
@@ -20,12 +22,17 @@ if TYPE_CHECKING:
 
 
 class OARepoUserEmailBackend(UserEmailBackend):
+    """OARepo email backend."""
+
     backend_id = EmailNotificationBackend.id
 
 
 class OARepoRequestActionNotificationBuilder(NotificationBuilder):
+    """General OARepo notification builder."""
+
     @classmethod
-    def build(cls, request: Request):
+    @override
+    def build(cls, request: Request) -> Notification:
         """Build notification with context."""
         return Notification(
             type=cls.type,
@@ -35,10 +42,10 @@ class OARepoRequestActionNotificationBuilder(NotificationBuilder):
             },
         )
 
-    context = [
+    context = (
         EntityResolve(key="request"),
         EntityResolve(key="request.topic"),
         EntityResolve(key="request.created_by"),
-    ]
+    )
 
-    recipient_backends = [OARepoUserEmailBackend()]
+    recipient_backends = (OARepoUserEmailBackend(),)

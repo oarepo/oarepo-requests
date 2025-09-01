@@ -9,6 +9,8 @@
 
 from __future__ import annotations
 
+from typing import ClassVar
+
 import importlib_metadata
 import marshmallow as ma
 from flask_resources import ResponseHandler
@@ -23,7 +25,7 @@ class OARepoRequestsCommentsResourceConfig(RequestCommentsResourceConfig, Config
 
     blueprint_name = "oarepo_request_events"
     url_prefix = "/requests"
-    routes = {
+    routes: ClassVar[dict[str, str]] = {
         **RequestCommentsResourceConfig.routes,
         "list-extended": "/extended/<request_id>/comments",
         "timeline-extended": "/extended/<request_id>/timeline",
@@ -33,7 +35,8 @@ class OARepoRequestsCommentsResourceConfig(RequestCommentsResourceConfig, Config
     }
 
     @property
-    def request_item_view_args(self):
+    def request_item_view_args(self) -> dict[str, ma.fields.Field]:
+        """Return the request item view args."""
         return {
             **super().request_item_view_args,
             "event_type": ma.fields.Str(),

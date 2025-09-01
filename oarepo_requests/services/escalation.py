@@ -5,6 +5,8 @@
 # modify it under the terms of the MIT License; see LICENSE file for more
 # details.
 #
+"""Methods responsible for request escalation."""
+
 from __future__ import annotations
 
 import json
@@ -29,20 +31,23 @@ from oarepo_requests.types.events.escalation import EscalationEventType
 if TYPE_CHECKING:
     from collections.abc import Iterator
 
+    from invenio_db.uow import UnitOfWork
     from oarepo_workflows import WorkflowRequestEscalation
+
+log = logging.getLogger(__name__)
 
 
 @unit_of_work()
-def escalate_request(request: Request, escalation: WorkflowRequestEscalation, uow=None) -> None:
+def escalate_request(request: Request, escalation: WorkflowRequestEscalation, uow: UnitOfWork = None) -> None:
     """Escalate single request and commit the change to the database."""
-    logging.info(f"Escalating request {request.id}")
+    log.info("Escalating request %s", request.id)
     resolved_topic = request.topic.resolve()
     receiver = RecipientEntityReference(request_or_escalation=escalation, record=resolved_topic)
 
     old_receiver_str = json.dumps(request["receiver"], sort_keys=True)
     new_receiver_str = json.dumps(receiver, sort_keys=True)
     if new_receiver_str != old_receiver_str:
-        logging.info(f"Request {request.id} receiver changed from {old_receiver_str} to {new_receiver_str}")
+        log.info("Request %s receiver changed from %s to %s", request.id, old_receiver_str, new_receiver_str)
 
         data = {
             "payload": {
@@ -63,13 +68,12 @@ def escalate_request(request: Request, escalation: WorkflowRequestEscalation, uo
         request.receiver = receiver
         request.commit()
         uow.register(NotificationOp(EscalateRequestSubmitNotificationBuilder.build(request=request)))
-        logging.info(f"Notification mail sent to {new_receiver_str}")
+        log.info("Notification mail sent to %s", new_receiver_str)
         uow.register(RecordCommitOp(request))
 
 
 def check_escalations() -> None:
     """Check and escalate all stale requests, if after time delta is reached."""
-    print("Checking for stale requests")
     for request, escalation in stale_requests():
         escalate_request(request, escalation)
 

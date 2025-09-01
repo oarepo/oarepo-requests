@@ -5,11 +5,13 @@
 # modify it under the terms of the MIT License; see LICENSE file for more
 # details.
 #
+"""Notification generators."""
+
 from __future__ import annotations
 
 import logging
 from abc import abstractmethod
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, override
 
 from invenio_access.permissions import system_identity
 from invenio_notifications.models import Recipient
@@ -30,13 +32,13 @@ if TYPE_CHECKING:
     from invenio_notifications.models import Notification
 
 
-def _extract_entity_email_data(entity: Any) -> dict[str, Any]:
-    def _get(entity, key):
+def _extract_entity_email_data(entity: Any) -> dict[str, Any]:  # TODO: what kind of dicts these really are?
+    def _get(entity: dict[str, Any], key: Any) -> Any:
         if isinstance(entity, dict) and key in entity:
-            return entity.get(key, None)
+            return entity.get(key)
         return getattr(entity, key, None)
 
-    def _add(entity, key, res, transform=lambda x: x):
+    def _add(entity: dict[str, Any], key: Any, res: dict[str, Any], transform: callable = lambda x: x) -> Any | None:
         v = _get(entity, key)
         if v:
             res[key] = transform(v)
@@ -59,13 +61,34 @@ def _extract_entity_email_data(entity: Any) -> dict[str, Any]:
 
 
 class EntityRecipient(RecipientGenerator):
-    """Recipient generator working as handler for generic entity."""
+    """Recipient generator working as handler for generic entity.
 
-    def __init__(self, key: str):
+    This class resolves entity references from the notification context and generates
+    recipients using registered recipient resolvers for the entity type.
+    """
+
+    def __init__(self, key: str) -> None:
+        """Initialize the generator.
+
+        Args:
+            key: Dot-separated path to the entity reference in the notification context
+
+        """
         self.key = key
 
-    def __call__(self, notification: Notification, recipients: dict[str, Recipient], backend_ids: list[str] | None = None):
-        """"""
+    @override
+    def __call__(
+        self, notification: Notification, recipients: dict[str, Recipient], backend_ids: list[str] | None = None
+    ):
+        """Generate recipients from the entity reference.
+
+        Args:
+            notification: The notification to generate recipients for
+            recipients: Dictionary to storing generated recipients
+            backend_ids: List of backend IDs to use for recipient generation,
+                        defaults to notification context backend_ids
+
+        """
         backend_ids = backend_ids if backend_ids else notification.context["backend_ids"]
         entity_ref_or_entity = dict_lookup(notification.context, self.key)
 
@@ -83,7 +106,8 @@ class EntityRecipient(RecipientGenerator):
                 generator = generator_cls(entity_ref_or_entity)
                 generator(notification, recipients)
 
-    def _get_unresolved_entity_from_resolved(self, context, key):
+    # TODO: what kind of dicts these really are?
+    def _get_unresolved_entity_from_resolved(self, context: dict[str, Any], key: str) -> dict[str, Any] | None:
         """Get the unresolved entity from the resolved one."""
         match key.split(".", maxsplit=1):
             case "request", field:
@@ -99,33 +123,51 @@ class EntityRecipient(RecipientGenerator):
 class SpecificEntityRecipient(RecipientGenerator):
     """Superclass for implementations of recipient generators for specific entities."""
 
-    def __init__(self, key):
-        self.key = key  # TODO this is entity_reference, not path to entity as EntityRecipient, might be confusing
+    def __init__(self, key: str) -> None:
+        """Construct generator."""
+        self.key = key  # TODO: this is entity_reference, not path to entity as EntityRecipient, might be confusing
 
-    def __call__(self, notification: Notification, recipients: dict[str, Recipient]):
+    @override
+    def __call__(self, notification: Notification, recipients: dict[str, Recipient]) -> dict[str, Recipient]:
+        """Call the generator."""
         entity = self._resolve_entity()
         recipients.update(self._get_recipients(entity))
         return recipients
 
     @abstractmethod
     def _get_recipients(self, entity: Any) -> dict[str, Recipient]:
+        """Get recipients from the entity."""
         raise NotImplementedError
 
     def _resolve_entity(self) -> Any:
+        """Resolve the entity."""
         entity_type = next(iter(self.key))
         registry = current_requests.entity_resolvers_registry
 
-        registered_resolvers = registry._registered_types
+        registered_resolvers = registry._registered_types  # noqa SLF001
         resolver = registered_resolvers.get(entity_type)
         proxy = resolver.get_entity_proxy(self.key)
         return proxy.resolve()
 
 
 class UserEmailRecipient(SpecificEntityRecipient):
-    """User email recipient generator for a notification."""
+    """User email recipient generator for a notification.
 
+    This generator extracts email addresses from user entities.
+    """
+
+    @override
     def _get_recipients(self, entity: Any) -> dict[str, Recipient]:
-        """Get user email of the entity."""
+        """Get user email of the entity.
+
+        Args:
+            entity: User entity to extract email from
+
+        Returns:
+            Dictionary mapping email to Recipient object if email exists,
+            empty dict otherwise
+
+        """
         # might be a system identity or a ghost user
         email = getattr(entity, "email", None)
         if email:
@@ -134,9 +176,22 @@ class UserEmailRecipient(SpecificEntityRecipient):
 
 
 class GroupEmailRecipient(SpecificEntityRecipient):
-    """Recipient generator returning emails of the members of the recipient group."""
+    """Recipient generator returning emails of the members of the recipient group.
 
+    This generator extracts email addresses from all users in a group.
+    """
+
+    @override
     def _get_recipients(self, entity: Any) -> dict[str, Recipient]:
+        """Get emails of all users in the group.
+
+        Args:
+            entity: Group entity containing user members
+
+        Returns:
+            Dictionary mapping user emails to Recipient objects
+
+        """
         return {
             user.email: Recipient(data=_extract_entity_email_data(user))
             for user in entity.users.all()
@@ -147,6 +202,7 @@ class GroupEmailRecipient(SpecificEntityRecipient):
 class MultipleRecipientsEmailRecipients(SpecificEntityRecipient):
     """Recipient generator returning emails of entity with multiple recipients."""
 
+    @override
     def _get_recipients(self, entity: Any) -> dict[str, Recipient]:
         """Get recipient emails of entity with multiple recipients.."""
         final_recipients = {}
@@ -166,6 +222,7 @@ class MultipleRecipientsEmailRecipients(SpecificEntityRecipient):
                 continue
         return final_recipients
 
+    @override
     def __call__(self, notification: Notification, recipients: dict[str, Recipient]):
         """Get the emails from the multiple recipients entity."""
         entity = self._resolve_entity()
@@ -174,9 +231,23 @@ class MultipleRecipientsEmailRecipients(SpecificEntityRecipient):
 
 
 class RequestEntityResolve(EntityResolve):
-    """Entity resolver that adds the correct title if it is missing."""
+    """Entity resolver that adds the correct title if it is missing.
 
-    def __call__(self, notification):
+    This resolver ensures request entities have proper titles by falling back
+    to the request type's stateful name if needed.
+    """
+
+    @override
+    def __call__(self, notification: Notification) -> Notification:
+        """Resolve request entity and ensure it has a title.
+
+        Args:
+            notification: The notification containing the request
+
+        Returns:
+            Resolved request dictionary with title
+
+        """
         notification = super().__call__(notification)
         request_dict = notification.context["request"]
         if request_dict.get("title"):
@@ -192,17 +263,20 @@ class RequestEntityResolve(EntityResolve):
 
 
 class OARepoRequestParticipantsRecipient(RecipientGenerator):
-    """Recipient generator based on request and it's events."""
+    # TODO: this is more of a hack than anything
+    """Generator extending functionality of invenio_requests.notifications.generators.RequestParticipantsRecipient.
 
-    def __init__(self, key: str):
+    Extends functionality to generic entities.
+    """
+
+    def __init__(self, key: str) -> None:
         """Ctor."""
         self.key = key
 
-    def __call__(self, notification: Notification, recipients: dict[str, Recipient]):
-        """Fetch users involved in request and add as recipients."""
+    def __call__(self, notification: Notification, recipients: dict[str, Recipient]) -> dict[str, Recipient]:
+        """Fetch entities involved in request and add as recipients."""
         request = dict_lookup(notification.context, self.key)
 
-        # hack for invenio compatibility
         before_keys = set(recipients.keys())
         EntityRecipient("request.created_by")(notification, recipients, backend_ids=["email"])
         EntityRecipient("request.receiver")(notification, recipients, backend_ids=["email"])

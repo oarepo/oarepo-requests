@@ -9,6 +9,8 @@
 
 from __future__ import annotations
 
+from typing import ClassVar
+
 import importlib_metadata
 from flask_resources import ResponseHandler
 from invenio_records_resources.services.base.config import ConfiguratorMixin
@@ -22,7 +24,7 @@ class OARepoRequestsResourceConfig(RequestsResourceConfig, ConfiguratorMixin):
 
     blueprint_name = "oarepo-requests"
     url_prefix = "/requests"
-    routes = {
+    routes: ClassVar[dict[str, str]] = {
         **RequestsResourceConfig.routes,
         "list": "/",
         "list-extended": "/extended",

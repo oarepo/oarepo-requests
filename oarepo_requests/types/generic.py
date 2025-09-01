@@ -16,7 +16,7 @@ from invenio_requests.customizations import RequestType
 from invenio_requests.customizations.states import RequestState
 from invenio_requests.proxies import current_requests_service
 
-from oarepo_requests.errors import OpenRequestAlreadyExists
+from oarepo_requests.errors import OpenRequestAlreadyExistsError
 from oarepo_requests.utils import classproperty, open_request_exists
 
 from ..actions.generic import (
@@ -263,7 +263,7 @@ class NonDuplicableOARepoRequestType(OARepoRequestType):
         :param kwargs:          additional keyword arguments
         """
         if open_request_exists(topic, self.type_id):
-            raise OpenRequestAlreadyExists(self, topic)
+            raise OpenRequestAlreadyExistsError(self, topic)
         super().can_create(identity, data, receiver, topic, creator, *args, **kwargs)
 
     @classmethod

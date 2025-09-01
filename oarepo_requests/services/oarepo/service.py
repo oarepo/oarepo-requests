@@ -16,7 +16,7 @@ from invenio_records_resources.services.uow import IndexRefreshOp, unit_of_work
 from invenio_requests import current_request_type_registry
 from invenio_requests.services import RequestsService
 
-from oarepo_requests.errors import CustomHTTPJSONException, UnknownRequestType
+from oarepo_requests.errors import CustomHTTPJSONException, UnknownRequestTypeError
 from oarepo_requests.proxies import current_oarepo_requests
 
 if TYPE_CHECKING:
@@ -34,7 +34,7 @@ class OARepoRequestsService(RequestsService):
     """OARepo extension to invenio-requests service."""
 
     @unit_of_work()
-    def create(
+    def create(  # noqa: PLR0913
         self,
         identity: Identity,
         data: dict,
@@ -42,11 +42,11 @@ class OARepoRequestsService(RequestsService):
         receiver: EntityReference | Any | None = None,
         creator: EntityReference | Any | None = None,
         topic: RecordBase = None,
-        expires_at: datetime | None = None,
+        expires_at: datetime | None = None,  # noqa ARG002
         uow: UnitOfWork = None,
         expand: bool = False,
-        *args: Any,
-        **kwargs: Any,
+        *args: Any,  # noqa ARG002
+        **kwargs: Any,  # noqa ARG002
     ) -> RequestItem:
         """Create a request.
 
@@ -64,7 +64,7 @@ class OARepoRequestsService(RequestsService):
         """
         type_ = current_request_type_registry.lookup(request_type, quiet=True)
         if not type_:
-            raise UnknownRequestType(request_type)
+            raise UnknownRequestTypeError(request_type)
 
         if receiver is None:
             # if explicit creator is not passed, use current identity - this is in sync with invenio_requests
@@ -111,7 +111,7 @@ class OARepoRequestsService(RequestsService):
         return super().read(identity, id_, expand)
 
     @unit_of_work()
-    def update(
+    def update(  # noqa: PLR0913
         self,
         identity: Identity,
         id_: str,
@@ -121,7 +121,7 @@ class OARepoRequestsService(RequestsService):
         expand: bool = False,
     ) -> RequestItem:
         """Update a request."""
-        assert uow is not None
+        # TODO: originally asserting whether uow is none - why
         result = super().update(identity, id_, data, revision_id=revision_id, uow=uow, expand=expand)
         uow.register(IndexRefreshOp(indexer=self.indexer, index=self.record_cls.index))
         return result

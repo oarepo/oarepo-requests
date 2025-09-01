@@ -65,9 +65,7 @@ def test_delete(
         create_additional_data={"payload": {"removal_reason": "test reason"}},
     )
     record = receiver_client.get(f"{urls['BASE_URL']}/{record2_id}?expand=true")
-    receiver_client.post(
-        link2testclient(record.json["expanded"]["requests"][0]["links"]["actions"]["decline"])
-    )
+    receiver_client.post(link2testclient(record.json["expanded"]["requests"][0]["links"]["actions"]["decline"]))
     declined_request = creator_client.get(f"{urls['BASE_URL_REQUESTS']}{resp_request_submit['id']}")
     assert declined_request.json["status"] == "declined"
 

@@ -6,10 +6,12 @@
 # oarepo-model is free software; you can redistribute it and/or modify it
 # under the terms of the MIT License; see LICENSE file for more details.
 #
+"""Module providing preset for processing request queries extension."""
+
 from __future__ import annotations
 
 from functools import cached_property
-from typing import TYPE_CHECKING, Any
+from typing import TYPE_CHECKING, Any, override
 
 from oarepo_model.customizations import (
     AddMixins,
@@ -19,7 +21,6 @@ from oarepo_model.customizations import (
 from oarepo_model.model import InvenioModel, ModelMixin
 from oarepo_model.presets import Preset
 
-"""Module providing preset for processing request queries extension."""
 if TYPE_CHECKING:
     from collections.abc import Generator
 
@@ -36,6 +37,8 @@ from oarepo_requests.resources.draft.resource import DraftRecordRequestsResource
 from oarepo_requests.services.draft.service import DraftRecordRequestsService
 
 if TYPE_CHECKING:
+    from invenio_rdm_records.records.api import RDMDraft, RDMRecord
+    from invenio_records_resources.services.records.results import RecordItem
     from oarepo_model.builder import InvenioModelBuilder
 
 from invenio_records_resources.references.entity_resolvers.results import (
@@ -46,17 +49,11 @@ from invenio_records_resources.references.entity_resolvers.results import (
 class RDMPIDServiceResultResolver(ServiceResultResolver):
     """Service result resolver for draft records."""
 
-    def _reference_entity(self, entity):
+    def _reference_entity(self, entity: RDMRecord | RDMDraft | RecordItem) -> dict[str, str]:
         """Create a reference dict for the given result item."""
         pid = entity.id if isinstance(entity, self.item_cls) else entity.pid.pid_value
         return {self.type_key: str(pid)}
 
-
-# ThesisFileDraftResolver(
-#    record_cls=ThesisFileDraft,
-#    service_id="thesis_file_draft",
-#    type_key="thesis_file_draft",
-# ),
 
 """
 # todo ? the endpoint adding code could be automated on higher level? - it's just a bunch of copy paste
@@ -127,12 +124,14 @@ class EndpointExtClassFactory(Preset):
 class ExtRequestsPreset(Preset):
     """Preset for extension class."""
 
-    depends_on = ["RecordResolver", "DraftResolver"]
+    depends_on = (
+        "RecordResolver",
+        "DraftResolver",
+    )
 
-    modifies = [
-        "Ext",
-    ]
+    modifies = ("Ext",)
 
+    @override
     def apply(
         self,
         builder: InvenioModelBuilder,
@@ -164,13 +163,13 @@ class ExtRequestsPreset(Preset):
                 super().init_config(app)
 
             @cached_property
-            def service_record_requests(self):
+            def service_record_requests(self) -> DraftRecordRequestsService:
                 return DraftRecordRequestsService(
                     **self.service_record_requests_params,
                 )
 
             @property
-            def service_record_requests_params(self):
+            def service_record_requests_params(self) -> dict[str, Any]:
                 """Parameters for the file service."""
                 return {
                     "record_service": self.records_service,
@@ -178,13 +177,13 @@ class ExtRequestsPreset(Preset):
                 }
 
             @cached_property
-            def resource_record_requests(self):
+            def resource_record_requests(self) -> DraftRecordRequestsResource:
                 return DraftRecordRequestsResource(
                     **self.resource_record_requests_params,
                 )
 
             @property
-            def resource_record_requests_params(self):
+            def resource_record_requests_params(self) -> dict[str, Any]:
                 """Parameters for the file resource."""
                 return {
                     "service": self.service_record_requests,

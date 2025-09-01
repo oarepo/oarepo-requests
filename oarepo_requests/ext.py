@@ -44,7 +44,6 @@ class ServiceConfigs:
     """Configurations for services provided by this package."""
 
     requests: OARepoRequestsServiceConfig
-    # request_events = RequestEventsServiceConfig.build(app)
 
 
 class OARepoRequests:
@@ -209,9 +208,8 @@ class OARepoRequests:
         app.config.setdefault("NOTIFICATIONS_ENTITY_RESOLVERS", [])
         app.config["NOTIFICATIONS_ENTITY_RESOLVERS"] += config.NOTIFICATIONS_ENTITY_RESOLVERS
 
-        app_notification_builders = app.config.setdefault(  # can't set default config directly because it might be initialized to {} in invenio-notifications
-            "NOTIFICATIONS_BUILDERS", {}
-        )
+        # can't set default config directly because it might be initialized to {} in invenio-notifications
+        app_notification_builders = app.config.setdefault("NOTIFICATIONS_BUILDERS", {})
         app_notification_backends = app.config.setdefault("NOTIFICATIONS_BACKENDS", {})
 
         app.config["NOTIFICATIONS_BUILDERS"] = conservative_merger.merge(
@@ -234,7 +232,6 @@ def finalize_app(app: Flask) -> None:
     # Register services - cannot be done in extension because
     # Invenio-Records-Resources might not have been initialized.
     rr_ext = app.extensions["invenio-records-resources"]
-    # idx_ext = app.extensions["invenio-indexer"]
     ext = app.extensions["oarepo-requests"]
 
     # services
@@ -243,10 +240,10 @@ def finalize_app(app: Flask) -> None:
         service_id=ext.requests_service.config.service_id,
     )
 
-    # TODO i have to do this cause there is bug in invenio-requests for events
+    # TODO: i have to do this cause there is bug in invenio-requests for events
     # but imo this is better than entrypoints
-    for type in app.config["REQUESTS_REGISTERED_EVENT_TYPES"]:
-        current_event_type_registry.register_type(type)
+    for type_ in app.config["REQUESTS_REGISTERED_EVENT_TYPES"]:
+        current_event_type_registry.register_type(type_)
 
     ext.notification_recipients_resolvers_registry = app.config["NOTIFICATION_RECIPIENTS_RESOLVERS"]
 

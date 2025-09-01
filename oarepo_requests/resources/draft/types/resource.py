@@ -41,7 +41,7 @@ class DraftRequestTypesResource(RecordRequestTypesResource):
         # TODO: split the resource to service-agnostic part (just the configuration)
         # and service-dependent part (the actual service)
         # this will then allow removing the type: ignore below
-        hits = self.service.get_applicable_request_types_for_draft_record(  # type: ignore
+        hits = self.service.get_applicable_request_types_for_draft_record(
             identity=g.identity,
             record_id=resource_requestctx.view_args["pid_value"],
         )
