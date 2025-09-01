@@ -8,7 +8,6 @@
 #
 from __future__ import annotations
 
-from collections.abc import Generator
 from typing import TYPE_CHECKING, Any
 
 from oarepo_model.customizations import (
@@ -16,11 +15,13 @@ from oarepo_model.customizations import (
     AddMixins,
     Customization,
 )
-from oarepo_model.model import InvenioModel
 from oarepo_model.presets import Preset
 
 if TYPE_CHECKING:
+    from collections.abc import Generator
+
     from oarepo_model.builder import InvenioModelBuilder
+    from oarepo_model.model import InvenioModel
 
 from invenio_access.permissions import system_identity
 from invenio_pidstore.errors import PIDUnregistered
@@ -33,7 +34,7 @@ from invenio_records_resources.references.entity_resolvers.results import (
 from sqlalchemy.exc import NoResultFound
 
 
-def set_field(result, resolved_dict, field_name):
+def set_field(result, resolved_dict, field_name) -> None:
     from_metadata = resolved_dict.get("metadata", {}).get(field_name)
     from_data = resolved_dict.get(field_name)
 

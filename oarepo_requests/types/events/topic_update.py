@@ -20,9 +20,9 @@ class TopicUpdateEventType(EventType):
 
     type_id = "T"
 
-    payload_schema = dict(
-        old_topic=fields.Str(validate=[_serialized_topic_validator]),
-        new_topic=fields.Str(validate=[_serialized_topic_validator]),
-    )
+    payload_schema = {
+        "old_topic": fields.Str(validate=[_serialized_topic_validator]),
+        "new_topic": fields.Str(validate=[_serialized_topic_validator]),
+    }
 
     payload_required = True

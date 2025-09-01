@@ -71,6 +71,7 @@ class NewVersionRequestType(NonDuplicableOARepoRequestType):
                 return result_item["links"]["edit_html"]
             if "self_html" in result_item["links"]:
                 return result_item["links"]["self_html"]
+        return None
 
     @classproperty
     def available_actions(cls) -> dict[str, type[RequestAction]]:

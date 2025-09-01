@@ -93,7 +93,7 @@ def test_allowed_request_types_on_published_resource(
     search_clear,
 ):
     creator = users[0]
-    receiver = users[1]
+    users[1]
     creator_client = logged_client(creator)
 
     published1 = record_factory(creator.identity)
@@ -162,7 +162,6 @@ def test_ui_serialization(
 
     sorted_draft_list = allowed_request_types_draft.json["hits"]["hits"]
     sorted_draft_list.sort(key=lambda serialized_rt: serialized_rt["type_id"])
-    print(sorted_draft_list)
     assert sorted_draft_list == [
         {
             "dangerous": True,

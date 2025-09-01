@@ -71,13 +71,13 @@ def test_new_version_files(
     record1_id = record1["id"]
     record2_id = record2["id"]
 
-    submit1 = submit_request_on_record(
+    submit_request_on_record(
         creator.identity,
         record1_id,
         "new_version",
         create_additional_data={"payload": {"keep_files": "yes"}},
     )
-    submit2 = submit_request_on_record(creator.identity, record2_id, "new_version")
+    submit_request_on_record(creator.identity, record2_id, "new_version")
 
     requests_model.Draft.index.refresh()
     draft_search = creator_client.get("/user/requests-test").json["hits"][
@@ -129,13 +129,13 @@ def test_redirect_url(
     draft_search = creator_client.get("/user/requests-test").json["hits"][
         "hits"
     ]  # a link is in another pull request for now
-    new_draft = [x for x in draft_search if x["parent"]["id"] == record1["parent"]["id"] and x["state"] == "draft"][0]
+    new_draft = next(x for x in draft_search if x["parent"]["id"] == record1["parent"]["id"] and x["state"] == "draft")
     assert link2testclient(request["links"]["ui_redirect_url"], ui=True) == f"/requests-test/{new_draft['id']}/preview"
 
     new_draft = creator_client.get(f"{urls['BASE_URL']}/{new_draft['id']}/draft").json
     publish_request = submit_request_on_draft(creator.identity, new_draft["id"], "publish_draft")
     receiver_request = receiver_client.get(f"{urls['BASE_URL_REQUESTS']}{publish_request['id']}")
-    accept = receiver_client.post(link2testclient(receiver_request.json["links"]["actions"]["accept"]))
+    receiver_client.post(link2testclient(receiver_request.json["links"]["actions"]["accept"]))
 
     original_request = creator_client.get(
         f"{urls['BASE_URL_REQUESTS']}{original_request_id}",

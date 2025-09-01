@@ -31,7 +31,7 @@ def test_publish_with_system_identity(app, requests_model, draft_factory, submit
         requests_model.Record.index.refresh()
         requests_model.Draft.index.refresh()
 
-        submit_response = current_requests_service.execute_action(
+        current_requests_service.execute_action(
             system_identity,
             id_=resp_request_submit["id"],
             action="accept",
@@ -41,5 +41,4 @@ def test_publish_with_system_identity(app, requests_model, draft_factory, submit
         assert len(outbox) == 0
 
     # check that no error/exception was logged
-    print(caplog.text)
     assert len(caplog.records) == 0

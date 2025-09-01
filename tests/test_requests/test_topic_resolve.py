@@ -7,8 +7,6 @@
 #
 from __future__ import annotations
 
-import json
-
 from invenio_access.permissions import system_identity
 from pytest_oarepo.functions import clear_babel_context
 
@@ -28,7 +26,7 @@ def test_resolve_topic(
     creator = users[0]
     receiver = users[1]
     creator_client = logged_client(creator)
-    receiver_client = logged_client(receiver)
+    logged_client(receiver)
 
     record1 = record_factory(creator.identity)
     record1_id = record1["id"]
@@ -71,7 +69,6 @@ def test_resolve_topic(
         query_string={"expand": "true"},
     )
     assert resp.status_code == 200
-    print(json.dumps(resp.json, indent=2))
     assert resp.json["topic"] == {"test_requests": record1_id}
     assert resp.json["expanded"]["topic"] == {
         "id": record1_id,
@@ -95,7 +92,7 @@ def test_ui_resolve_topic(
     creator = users[0]
     receiver = users[1]
     creator_client = logged_client(creator)
-    receiver_client = logged_client(receiver)
+    logged_client(receiver)
 
     record1 = record_factory(creator.identity)
     record1_id = record1["id"]
@@ -143,7 +140,6 @@ def test_ui_resolve_topic(
         headers={"Accept": "application/vnd.inveniordm.v1+json"},
     )
     assert resp.status_code == 200
-    print(json.dumps(resp.json, indent=2))
     assert resp.json["topic"] == {
         "reference": {
             "test_requests": record1_id,

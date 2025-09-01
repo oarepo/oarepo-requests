@@ -43,7 +43,7 @@ class CustomHTTPJSONException(HTTPJSONException):
         self.request_payload_errors = request_payload_errors or []
         self.extra_kwargs = kwargs  # Save all kwargs
 
-    def get_body(self, environ: any = None, scope: any = None) -> str:
+    def get_body(self, environ: any | None = None, scope: any | None = None) -> str:
         """Get the request body."""
         body = {"status": self.code, "message": self.get_description(environ)}
 
@@ -86,7 +86,7 @@ class OpenRequestAlreadyExists(CannotExecuteActionError):
 class UnresolvedRequestsError(CannotExecuteActionError):
     """There were unresolved requests before an action could proceed."""
 
-    def __init__(self, action: str, reason: str = None) -> None:
+    def __init__(self, action: str, reason: str | None = None) -> None:
         self.action = action
         self.reason = reason or _("All open requests must be closed first.")
 

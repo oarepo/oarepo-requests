@@ -8,7 +8,6 @@
 from __future__ import annotations
 
 import copy
-from pprint import pprint
 
 from pytest_oarepo.functions import clear_babel_context
 
@@ -53,18 +52,17 @@ def test_user_serialization(
         f"{urls['BASE_URL_REQUESTS']}{resp_request_create['id']}",
         headers={"Accept": "application/vnd.inveniordm.v1+json"},
     ).json
-    resp_request_create_username = create_request_on_draft(
+    create_request_on_draft(
         username_label.identity,
         draft2_id,
         "publish_draft",
     )
-    resp_request_create_fullname = create_request_on_draft(
+    create_request_on_draft(
         fullname_label.identity,
         draft3_id,
         "publish_draft",
     )
 
-    pprint(resp_request_create)
     assert resp_request_create["stateful_name"] == "Submit for review"
     assert resp_request_create["stateful_description"] == (
         "Submit for review. After submitting the draft for review, "
@@ -75,14 +73,13 @@ def test_user_serialization(
         link2testclient(resp_request_create["links"]["actions"]["submit"]),
         headers={"Accept": "application/vnd.inveniordm.v1+json"},
     )
-    pprint(resp_request_submit.json)
     assert resp_request_submit.json["stateful_name"] == "Draft submitted for review"
     assert (
         resp_request_submit.json["stateful_description"]
         == "The draft has been submitted for review. It is now locked and no further changes are possible. You will be notified about the decision by email."
     )
 
-    record = fallback_label_client.get(f"{urls['BASE_URL']}/{draft_id}/draft").json
+    fallback_label_client.get(f"{urls['BASE_URL']}/{draft_id}/draft").json
     ui_record = fallback_label_client.get(
         f"{urls['BASE_URL']}/{draft_id}/draft?expand=true",
         headers={"Accept": "application/vnd.inveniordm.v1+json"},
@@ -170,7 +167,7 @@ def test_resolver_fallback(
             == "Submit for review. After submitting the draft for review, it will be locked and no further modifications will be possible."
         )
 
-        resp_request_submit = creator_client.post(link2testclient(resp_request_create["links"]["actions"]["submit"]))
+        creator_client.post(link2testclient(resp_request_create["links"]["actions"]["submit"]))
         ui_serialization_read_submitted = creator_client.get(
             f"{urls['BASE_URL_REQUESTS']}{request_id}",
             headers={"Accept": "application/vnd.inveniordm.v1+json"},

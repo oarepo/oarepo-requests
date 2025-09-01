@@ -50,14 +50,13 @@ class RecordRequestTypesResource(ErrorHandlersMixin, Resource):
         """Create the URL rules for the record resource."""
         routes = self.config.routes
 
-        url_rules = [
+        return [
             route(
                 "GET",
                 routes["list-applicable-requests"],
                 self.get_applicable_request_types,
             )
         ]
-        return url_rules
 
     @request_view_args
     @response_handler(many=True)

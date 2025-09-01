@@ -54,11 +54,10 @@ class RecordRequestsResource(RecordResource):
         """Create the URL rules for the record resource."""
         routes = self.config.routes
 
-        url_rules = [
+        return [
             route("GET", routes["list-requests"], self.search_requests_for_record),
             route("POST", routes["request-type"], self.create),
         ]
-        return url_rules
 
     @request_extra_args
     @request_search_args

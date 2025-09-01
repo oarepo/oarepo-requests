@@ -26,7 +26,7 @@ log = logging.getLogger(__name__)
 class RequestEntityLinks(Link):
     """Utility class for keeping track of and resolve links."""
 
-    def __init__(self, entity: str, when: callable = None):
+    def __init__(self, entity: str, when: callable | None = None):
         """Constructor."""
         self._entity = entity
         self._when_func = when
@@ -42,7 +42,7 @@ class RequestEntityLinks(Link):
 
 
 class RedirectLink(Link):
-    def __init__(self, when: callable = None):
+    def __init__(self, when: callable | None = None):
         """Constructor."""
         self._when_func = when
 

@@ -9,7 +9,6 @@ from __future__ import annotations
 
 import json
 import os
-import sys
 import time
 from datetime import timedelta
 
@@ -645,7 +644,7 @@ def app_config(app_config, requests_model):
 
 @pytest.fixture
 def check_publish_topic_update():
-    def _check_publish_topic_update(creator_client, urls, record, before_update_response):
+    def _check_publish_topic_update(creator_client, urls, record, before_update_response) -> None:
         request_id = before_update_response["id"]
         record_id = record["id"]
 
@@ -676,7 +675,7 @@ def user_links():
     return _user_links
 
 
-def _create_user(user_fixture, app, db):
+def _create_user(user_fixture, app, db) -> None:
     try:
         user_fixture.create(app, db)
     except IntegrityError:
@@ -779,7 +778,7 @@ def requests_model(model_types):
     from oarepo_model.presets.drafts import drafts_presets
     from oarepo_model.presets.records_resources import records_resources_presets
 
-    t1 = time.time()
+    time.time()
 
     workflow_model = model(
         name="requests_test",
@@ -805,8 +804,7 @@ def requests_model(model_types):
     )
     workflow_model.register()
 
-    t2 = time.time()
-    print(f"Model created in {t2 - t1:.2f} seconds", file=sys.stderr, flush=True)
+    time.time()
 
     try:
         yield workflow_model

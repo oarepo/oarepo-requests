@@ -8,7 +8,6 @@
 #
 from __future__ import annotations
 
-from collections.abc import Generator
 from typing import TYPE_CHECKING, Any
 
 from oarepo_model.customizations import (
@@ -16,13 +15,15 @@ from oarepo_model.customizations import (
     AddMixins,
     Customization,
 )
-from oarepo_model.model import InvenioModel
 from oarepo_model.presets import Preset
 
 from oarepo_requests.model.presets.requests.records.entity_resolvers.draft_resolver import RecordProxy
 
 if TYPE_CHECKING:
+    from collections.abc import Generator
+
     from oarepo_model.builder import InvenioModelBuilder
+    from oarepo_model.model import InvenioModel
 
 
 """

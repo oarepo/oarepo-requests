@@ -37,10 +37,10 @@ if TYPE_CHECKING:
     from oarepo_requests.typing import EntityReference
 
 
+
 from invenio_access.permissions import system_identity
 from invenio_requests.records.api import Request
 
-from oarepo_requests.typing import EntityReference
 from oarepo_requests.utils import get_requests_service_for_records_service
 
 from ..errors import UnresolvedRequestsError
@@ -149,8 +149,7 @@ class PublishRequestType(NonDuplicableOARepoRequestType):
         """Check if the request type is applicable to the topic."""
         if not topic.is_draft:
             return False
-        super_ = super().is_applicable_to(identity, topic, *args, **kwargs)
-        return super_
+        return super().is_applicable_to(identity, topic, *args, **kwargs)
 
     def topic_change(self, request: Request, new_topic: dict, uow: UnitOfWork) -> None:
         """Change the topic of the request."""

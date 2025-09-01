@@ -64,9 +64,9 @@ class EntityRecipient(RecipientGenerator):
     def __init__(self, key: str):
         self.key = key
 
-    def __call__(self, notification: Notification, recipients: dict[str, Recipient], backend_ids: list[str] = None):
+    def __call__(self, notification: Notification, recipients: dict[str, Recipient], backend_ids: list[str] | None = None):
         """"""
-        backend_ids = notification.context["backend_ids"] if not backend_ids else backend_ids
+        backend_ids = backend_ids if backend_ids else notification.context["backend_ids"]
         entity_ref_or_entity = dict_lookup(notification.context, self.key)
 
         if len(entity_ref_or_entity) != 1:
@@ -75,7 +75,7 @@ class EntityRecipient(RecipientGenerator):
         if not entity_ref_or_entity:
             return
 
-        entity_type = list(entity_ref_or_entity.keys())[0]
+        entity_type = next(iter(entity_ref_or_entity.keys()))
 
         for backend_id in backend_ids:
             generator_cls = current_notification_recipients_resolvers_registry.get(entity_type, {}).get(backend_id)
@@ -112,14 +112,13 @@ class SpecificEntityRecipient(RecipientGenerator):
         raise NotImplementedError
 
     def _resolve_entity(self) -> Any:
-        entity_type = list(self.key)[0]
+        entity_type = next(iter(self.key))
         registry = current_requests.entity_resolvers_registry
 
         registered_resolvers = registry._registered_types
         resolver = registered_resolvers.get(entity_type)
         proxy = resolver.get_entity_proxy(self.key)
-        entity = proxy.resolve()
-        return entity
+        return proxy.resolve()
 
 
 class UserEmailRecipient(SpecificEntityRecipient):

@@ -18,7 +18,7 @@ from opensearch_dsl.query import Bool, Term, Terms
 
 
 class RecordSnapshotComponent(ServiceComponent):
-    def create_snapshot(self, record):
+    def create_snapshot(self, record) -> None:
         topic_dict = ResolverRegistry.reference_entity(record)
         topic_type, topic_id = next(iter(topic_dict.items()))
 
@@ -42,9 +42,9 @@ class RecordSnapshotComponent(ServiceComponent):
 
             create_snapshot_and_possible_event(record, record["metadata"], UUID(requests[0]["id"]))
 
-    def update(self, identity, *, record, **kwargs):
+    def update(self, identity, *, record, **kwargs) -> None:
         """Update handler."""
         self.create_snapshot(record)
 
-    def update_draft(self, identity, *, record, **kwargs):
+    def update_draft(self, identity, *, record, **kwargs) -> None:
         self.create_snapshot(record)

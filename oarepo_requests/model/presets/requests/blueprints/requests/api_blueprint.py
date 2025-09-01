@@ -8,7 +8,6 @@
 #
 from __future__ import annotations
 
-from collections.abc import Generator
 from typing import TYPE_CHECKING, Any
 
 from oarepo_model.customizations import (
@@ -16,12 +15,14 @@ from oarepo_model.customizations import (
     AddToModule,
     Customization,
 )
-from oarepo_model.model import InvenioModel
 from oarepo_model.presets import Preset
 
 """API blueprint preset for api requests query on record."""
 if TYPE_CHECKING:
+    from collections.abc import Generator
+
     from oarepo_model.builder import InvenioModelBuilder
+    from oarepo_model.model import InvenioModel
 
 
 class ApiRequestsBlueprintPreset(Preset):
@@ -38,9 +39,8 @@ class ApiRequestsBlueprintPreset(Preset):
         @staticmethod  # need to use staticmethod as python's magic always passes self as the first argument
         def create_requests_api_blueprint(app):
             with app.app_context():
-                blueprint = app.extensions[model.base_name].resource_record_requests.as_blueprint()
+                return app.extensions[model.base_name].resource_record_requests.as_blueprint()
 
-            return blueprint
 
         yield AddToModule(
             "blueprints",

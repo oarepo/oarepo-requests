@@ -79,9 +79,9 @@ def test_redirect_url(
     edit_request_id = resp_request_submit["id"]
 
     receiver_get = receiver_client.get(f"{urls['BASE_URL_REQUESTS']}{edit_request_id}")
-    resp_request_accept = receiver_client.post(link2testclient(receiver_get.json["links"]["actions"]["accept"]))
+    receiver_client.post(link2testclient(receiver_get.json["links"]["actions"]["accept"]))
     # is request accepted and closed?
-    request = creator_client.get(
+    creator_client.get(
         f"{urls['BASE_URL_REQUESTS']}{edit_request_id}",
     ).json
 
@@ -96,7 +96,7 @@ def test_redirect_url(
         link2testclient(creator_edit_accepted["links"]["ui_redirect_url"], ui=True)
         == f"/requests-test/{record_id}/preview"
     )
-    assert receiver_edit_accepted["links"]["ui_redirect_url"] == None
+    assert receiver_edit_accepted["links"]["ui_redirect_url"] is None
 
     draft = creator_client.get(f"{urls['BASE_URL']}/{record_id}/draft").json
     publish_request = submit_request_on_draft(creator.identity, draft["id"], "publish_draft")
@@ -118,5 +118,5 @@ def test_redirect_url(
         f"{urls['BASE_URL_REQUESTS']}{edit_request_id}",
     ).json
     assert (
-        creator_edit_request_after_merge["links"]["ui_redirect_url"] == None
+        creator_edit_request_after_merge["links"]["ui_redirect_url"] is None
     )  # draft now doesn't exist so we can't redirect to it

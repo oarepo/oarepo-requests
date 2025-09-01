@@ -8,20 +8,21 @@
 #
 from __future__ import annotations
 
-from collections.abc import Generator
 from typing import TYPE_CHECKING, Any
 
 from oarepo_model.customizations import (
     AddToList,
     Customization,
 )
-from oarepo_model.model import InvenioModel
 from oarepo_model.presets import Preset
 
 from oarepo_requests.services.results import RequestsComponent, RequestTypesComponent
 
 if TYPE_CHECKING:
+    from collections.abc import Generator
+
     from oarepo_model.builder import InvenioModelBuilder
+    from oarepo_model.model import InvenioModel
 
 
 class RequestsRecordItemPreset(Preset):

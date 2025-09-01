@@ -64,7 +64,7 @@ class UIReferenceSchema(ma.Schema):
     @ma.pre_dump
     def _create_reference(self, data: Any, **kwargs: Any) -> dict | None:
         if data:
-            return dict(reference=data)
+            return {"reference": data}
         return None
 
     @ma.post_dump
@@ -223,7 +223,7 @@ class UIRequestTypeSchema(RequestTypeSchema):
 
     editable = ma.fields.Boolean(dump_only=True)
     """Whether the request type is editable.
-    
+
     Editable requests are not automatically submitted, they are kept in open state
     until the user decides to submit them."""
 

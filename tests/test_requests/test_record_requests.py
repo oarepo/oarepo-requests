@@ -35,14 +35,14 @@ def test_read_requests_on_draft(
     requests_model.Record.index.refresh()
     requests_model.Draft.index.refresh()
 
-    resp_request_submit = submit_request_on_draft(creator.identity, draft1_id, "publish_draft")
+    submit_request_on_draft(creator.identity, draft1_id, "publish_draft")
     record = receiver_client.get(f"{urls['BASE_URL']}/{draft1_id}/draft?expand=true")
-    decline = receiver_client.post(
+    receiver_client.post(
         link2testclient(record.json["expanded"]["requests"][0]["links"]["actions"]["decline"])
     )
 
-    r2 = create_request_on_draft(creator.identity, draft1_id, "publish_draft")
-    r3 = create_request_on_draft(creator.identity, draft2_id, "publish_draft")
+    create_request_on_draft(creator.identity, draft1_id, "publish_draft")
+    create_request_on_draft(creator.identity, draft2_id, "publish_draft")
 
     resp1 = creator_client.get(f"{urls['BASE_URL']}/{draft1_id}/draft/requests").json["hits"]["hits"]
     resp2 = creator_client.get(f"{urls['BASE_URL']}/{draft2_id}/draft/requests").json["hits"]["hits"]
@@ -77,23 +77,23 @@ def test_read_requests_on_record(
     record3_id = record3["id"]
     requests_model.Record.index.refresh()
     requests_model.Draft.index.refresh()
-    resp_request_submit = submit_request_on_record(
+    submit_request_on_record(
         creator.identity,
         record1_id,
         "delete_published_record",
         create_additional_data={"payload": {"removal_reason": "test reason"}},
     )
     record = receiver_client.get(f"{urls['BASE_URL']}/{record1_id}?expand=true")
-    decline = receiver_client.post(
+    receiver_client.post(
         link2testclient(record.json["expanded"]["requests"][0]["links"]["actions"]["decline"]),
     )
-    r2 = create_request_on_record(
+    create_request_on_record(
         creator.identity,
         record1_id,
         "delete_published_record",
         additional_data={"payload": {"removal_reason": "test reason"}},
     )
-    r3 = create_request_on_record(
+    create_request_on_record(
         creator.identity,
         record2_id,
         "delete_published_record",

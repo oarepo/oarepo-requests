@@ -29,7 +29,7 @@ def test_publish_notifications(
     draft1 = draft_factory(creator.identity)
 
     with mail.record_messages() as outbox:
-        resp_request_submit = submit_request_on_draft(creator.identity, draft1["id"], "publish_draft")
+        submit_request_on_draft(creator.identity, draft1["id"], "publish_draft")
         # check notification is build on submit
         assert len(outbox) == 1
         sent_mail = outbox[0]
@@ -41,7 +41,7 @@ def test_publish_notifications(
 
     with mail.record_messages() as outbox:
         # Validate that email was sent
-        publish = receiver_client.post(
+        receiver_client.post(
             link2testclient(record.json["expanded"]["requests"][0]["links"]["actions"]["accept"]),
         )
         # check notification is build on submit
@@ -52,12 +52,12 @@ def test_publish_notifications(
         assert 'Your record "blabla" has been published. You can see the record at' in sent_mail.html
 
     draft1 = draft_factory(creator.identity)
-    resp_request_submit = submit_request_on_draft(creator.identity, draft1["id"], "publish_draft")
+    submit_request_on_draft(creator.identity, draft1["id"], "publish_draft")
     record = receiver_client.get(f"{urls['BASE_URL']}/{draft1['id']}/draft?expand=true")
     with mail.record_messages() as outbox:
         # Validate that email was sent
         request_html_link = record.json["expanded"]["requests"][0]["links"]["self_html"]
-        decline = receiver_client.post(
+        receiver_client.post(
             link2testclient(record.json["expanded"]["requests"][0]["links"]["actions"]["decline"]),
         )
         # check notification is build on submit
@@ -87,7 +87,7 @@ def test_delete_published_notifications(
     record1 = record_factory(creator.identity)
 
     with mail.record_messages() as outbox:
-        resp_request_submit = submit_request_on_record(
+        submit_request_on_record(
             creator.identity,
             record1["id"],
             "delete_published_record",
@@ -96,7 +96,6 @@ def test_delete_published_notifications(
         # check notification is build on submit
         assert len(outbox) == 1
         sent_mail = outbox[0]
-        print(sent_mail)
         assert "Request to delete published record blabla" in sent_mail.subject
 
     with mail.record_messages() as outbox:
@@ -106,19 +105,18 @@ def test_delete_published_notifications(
     with mail.record_messages() as outbox:
         # Validate that email was sent
         request_html_link = record.json["expanded"]["requests"][0]["links"]["self_html"]
-        publish = receiver_client.post(
+        receiver_client.post(
             link2testclient(record.json["expanded"]["requests"][0]["links"]["actions"]["accept"]),
         )
         # check notification is build on submit
         assert len(outbox) == 1
         sent_mail = outbox[0]
-        print(sent_mail)
         assert "Published record has been deleted" in sent_mail.subject
         assert request_html_link in sent_mail.html
         assert request_html_link in sent_mail.body
 
     record1 = record_factory(creator.identity)
-    resp_request_submit = submit_request_on_record(
+    submit_request_on_record(
         creator.identity,
         record1["id"],
         "delete_published_record",
@@ -129,7 +127,7 @@ def test_delete_published_notifications(
     with mail.record_messages() as outbox:
         # Validate that email was sent
         request_html_link = record.json["expanded"]["requests"][0]["links"]["self_html"]
-        decline = receiver_client.post(
+        receiver_client.post(
             link2testclient(record.json["expanded"]["requests"][0]["links"]["actions"]["decline"]),
         )
         # check notification is build on submit
@@ -199,7 +197,7 @@ def test_locale(
     draft1 = draft_factory(en_creator.identity, custom_workflow="different_locales")
 
     with mail.record_messages() as outbox:
-        resp_request_submit = submit_request_on_draft(en_creator.identity, draft1["id"], "publish_draft")
+        submit_request_on_draft(en_creator.identity, draft1["id"], "publish_draft")
         # check notification is build on submit
         assert len(outbox) == 1
         sent_mail = outbox[0]
@@ -211,7 +209,7 @@ def test_locale(
 
     with mail.record_messages() as outbox:
         # Validate that email was sent
-        publish = receiver_client.post(
+        receiver_client.post(
             link2testclient(record.json["expanded"]["requests"][0]["links"]["actions"]["accept"]),
         )
         # check notification is build on submit

@@ -38,13 +38,13 @@ def test_cascade_update(
     publish_request_create = submit_request_on_draft(creator.identity, draft1_id, "publish_draft")
     another_request_create = submit_request_on_draft(creator.identity, draft1_id, "another_topic_updating")
     record = receiver_client.get(f"{urls['BASE_URL']}/{draft1_id}/draft?expand=true").json
-    accept_another_request = receiver_client.post(
+    receiver_client.post(
         link2testclient(record["expanded"]["requests"][0]["links"]["actions"]["accept"]),
     )
     publish_request_on_second_draft = create_request_on_draft(creator.identity, draft2_id, "publish_draft")
 
     record = receiver_client.get(f"{urls['BASE_URL']}/{draft1_id}/draft?expand=true").json
-    publish = receiver_client.post(
+    receiver_client.post(
         link2testclient(record["expanded"]["requests"][1]["links"]["actions"]["accept"]),
     )
 
@@ -84,7 +84,7 @@ def test_cascade_cancel(
     r2 = create_request_on_draft(creator.identity, draft1_id, "another_topic_updating")
     r3 = submit_request_on_draft(creator.identity, draft2_id, "publish_draft")
 
-    delete_request = submit_request_on_draft(creator.identity, draft1_id, "delete_draft")
+    submit_request_on_draft(creator.identity, draft1_id, "delete_draft")
 
     r1_read = receiver_client.get(f"{urls['BASE_URL_REQUESTS']}{r1['id']}").json
     r2_read = receiver_client.get(f"{urls['BASE_URL_REQUESTS']}{r2['id']}").json

@@ -37,7 +37,7 @@ def test_publish_service(requests_model, users, record_service, default_record_w
     assert "self" in submit_result.links["topic"]
     assert "self_html" in submit_result.links["topic"]
 
-    accept_result = current_invenio_requests_service.execute_action(receiver.identity, request.id, "accept")
+    current_invenio_requests_service.execute_action(receiver.identity, request.id, "accept")
 
     record_service.read(creator.identity, draft["id"])  # will throw exception if record isn't published
 
@@ -87,7 +87,7 @@ def test_publish(
     assert "published_record:links:self" in publish.json["payload"]
     assert "published_record:links:self_html" in publish.json["payload"]
 
-    published_record = receiver_client.get(f"{urls['BASE_URL']}/{draft1_id}?expand=true")
+    receiver_client.get(f"{urls['BASE_URL']}/{draft1_id}?expand=true")
 
     # version is no more on "publish_draft" request
     # assert "version" in published_record.json["metadata"]
@@ -101,7 +101,7 @@ def test_publish(
 
     resp_request_submit = submit_request_on_draft(creator.identity, draft2_id, "publish_draft")
     record = receiver_client.get(f"{urls['BASE_URL']}/{draft2_id}/draft?expand=true")
-    decline = receiver_client.post(
+    receiver_client.post(
         link2testclient(record.json["expanded"]["requests"][0]["links"]["actions"]["decline"]),
     )
     declined_request = creator_client.get(f"{urls['BASE_URL_REQUESTS']}{resp_request_submit['id']}")
@@ -110,7 +110,7 @@ def test_publish(
     resp_request_submit = submit_request_on_draft(creator.identity, draft3_id, "publish_draft")
     record = creator_client.get(f"{urls['BASE_URL']}/{draft3_id}/draft?expand=true")
     assert record.json["expanded"]["requests"][0]["links"]["actions"].keys() == {"cancel"}
-    cancel = creator_client.post(
+    creator_client.post(
         link2testclient(record.json["expanded"]["requests"][0]["links"]["actions"]["cancel"]),
     )
     canceled_request = logged_client(creator).get(f"{urls['BASE_URL_REQUESTS']}{resp_request_submit['id']}")
@@ -126,7 +126,7 @@ def test_create_fails_if_draft_not_validated(
     search_clear,
 ):
     creator = users[0]
-    receiver = users[1]
+    users[1]
 
     creator_client = logged_client(creator)
 

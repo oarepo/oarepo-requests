@@ -8,11 +8,9 @@
 #
 from __future__ import annotations
 
-from collections.abc import Generator
 from functools import cached_property
 from typing import TYPE_CHECKING, Any
 
-from flask import Flask
 from oarepo_model.customizations import (
     AddMixins,
     AddToList,
@@ -23,6 +21,9 @@ from oarepo_model.presets import Preset
 
 """Module providing preset for processing request queries extension."""
 if TYPE_CHECKING:
+    from collections.abc import Generator
+
+    from flask import Flask
     from oarepo_model.builder import InvenioModelBuilder
 
 from invenio_rdm_records.requests.entity_resolvers import RDMRecordServiceResultProxy

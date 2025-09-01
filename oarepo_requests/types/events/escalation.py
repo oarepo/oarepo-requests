@@ -18,10 +18,10 @@ class EscalationEventType(EventType):
 
     type_id = "E"
 
-    payload_schema = dict(
-        old_receiver=fields.Str(),
-        new_receiver=fields.Str(),
-        escalation=fields.Str(),
-    )
+    payload_schema = {
+        "old_receiver": fields.Str(),
+        "new_receiver": fields.Str(),
+        "escalation": fields.Str(),
+    }
 
     payload_required = True

@@ -21,7 +21,7 @@ if TYPE_CHECKING:
 class AutorequestComponent(ServiceComponent):
     """Component for assigning request numbers to new requests."""
 
-    def create(self, identity: Identity, data: dict = None, record: Record = None, **kwargs) -> None:
+    def create(self, identity: Identity, data: dict | None = None, record: Record = None, **kwargs) -> None:
         """Create requests that should be created automatically on state change.
 
         For each of the WorkflowRequest definition in the workflow of the record,

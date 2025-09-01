@@ -173,6 +173,6 @@ class PublishNewVersionRequestType(PublishRequestType):
                 if "version" in rec["metadata"]:
                     version = rec["metadata"]["version"]
                     if version == data["payload"]["version"]:
-                        raise VersionAlreadyExists()
+                        raise VersionAlreadyExists
 
         super().can_create(identity, data, receiver, topic, creator, *args, **kwargs)

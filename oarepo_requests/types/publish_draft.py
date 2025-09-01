@@ -21,8 +21,8 @@ if TYPE_CHECKING:
     from flask_babel.speaklater import LazyString
     from flask_principal import Identity
     from invenio_drafts_resources.records import Record
+    from invenio_requests.records.api import Request
 
-from invenio_requests.records.api import Request
 
 
 class PublishDraftRequestType(PublishRequestType):

@@ -10,7 +10,6 @@
 
 from __future__ import annotations
 
-from collections.abc import Generator
 from typing import TYPE_CHECKING, Any
 
 from oarepo_model.customizations import (
@@ -18,11 +17,13 @@ from oarepo_model.customizations import (
     AddToModule,
     Customization,
 )
-from oarepo_model.model import InvenioModel
 from oarepo_model.presets import Preset
 
 if TYPE_CHECKING:
+    from collections.abc import Generator
+
     from oarepo_model.builder import InvenioModelBuilder
+    from oarepo_model.model import InvenioModel
 
 
 class ApiRequestTypesBlueprintPreset(Preset):
@@ -39,9 +40,8 @@ class ApiRequestTypesBlueprintPreset(Preset):
         @staticmethod  # need to use staticmethod as python's magic always passes self as the first argument
         def create_request_types_api_blueprint(app):
             with app.app_context():
-                blueprint = app.extensions[model.base_name].resource_record_request_types.as_blueprint()
+                return app.extensions[model.base_name].resource_record_request_types.as_blueprint()
 
-            return blueprint
 
         yield AddToModule(
             "blueprints",

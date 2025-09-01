@@ -38,7 +38,7 @@ def test_can_create(
     assert resp.status_code == 400
     assert "There is already an open request of Publish draft" in resp.json["message"]
 
-    resp_request_submit = creator_client.post(
+    creator_client.post(
         link2testclient(resp_request_create["links"]["actions"]["submit"]),
     )
 
@@ -53,7 +53,7 @@ def test_can_create(
     assert create_for_request_draft2.status_code == 201
 
     # try declining the request for draft2, we should be able to create again then
-    resp_request_submit = creator_client.post(
+    creator_client.post(
         link2testclient(create_for_request_draft2.json["links"]["actions"]["submit"]),
     )
 
@@ -62,7 +62,7 @@ def test_can_create(
     assert "There is already an open request of Publish draft" in create_for_request_draft2.json["message"]
 
     record = receiver_client.get(f"{urls['BASE_URL']}/{draft2_id}/draft?expand=true").json
-    decline = receiver_client.post(
+    receiver_client.post(
         link2testclient(record["expanded"]["requests"][0]["links"]["actions"]["decline"]),
     )
 
@@ -92,7 +92,7 @@ def test_can_possibly_create(
 
     record_resp_after_create = creator_client.get(f"{urls['BASE_URL']}/{draft1_id}/draft?expand=true").json
 
-    resp_request_submit = creator_client.post(
+    creator_client.post(
         link2testclient(resp_request_create["links"]["actions"]["submit"]),
     )
 

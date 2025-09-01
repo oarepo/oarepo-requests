@@ -23,8 +23,7 @@ def create_app_blueprint(app: Flask) -> Blueprint:
 
     :param app: Flask application
     """
-    blueprint = Blueprint("oarepo_requests_app", __name__, url_prefix="/requests/")
-    return blueprint
+    return Blueprint("oarepo_requests_app", __name__, url_prefix="/requests/")
 
 
 def create_app_events_blueprint(app: Flask) -> Blueprint:
@@ -32,8 +31,7 @@ def create_app_events_blueprint(app: Flask) -> Blueprint:
 
     :param app: Flask application
     """
-    blueprint = Blueprint("oarepo_requests_events_app", __name__, url_prefix="/requests/")
-    return blueprint
+    return Blueprint("oarepo_requests_events_app", __name__, url_prefix="/requests/")
 
 
 def create_notifications(app: Flask) -> Blueprint:

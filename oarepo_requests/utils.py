@@ -10,7 +10,6 @@
 from __future__ import annotations
 
 import copy
-from collections.abc import Callable
 from typing import TYPE_CHECKING, Any
 
 from invenio_access.permissions import system_identity
@@ -32,6 +31,8 @@ from oarepo_workflows.errors import MissingWorkflowError
 from oarepo_workflows.proxies import current_oarepo_workflows
 
 if TYPE_CHECKING:
+    from collections.abc import Callable
+
     from flask_principal import Identity
     from invenio_records_resources.records import Record
     from invenio_records_resources.services import RecordService
@@ -77,7 +78,7 @@ def allowed_request_types_for_record(identity: Identity, record: Record) -> dict
         # so returning all matching request types
         pass
 
-    record_ref = list(ResolverRegistry.reference_entity(record).keys())[0]
+    record_ref = next(iter(ResolverRegistry.reference_entity(record).keys()))
 
     ret = {}
     for rt in current_request_type_registry:
@@ -96,7 +97,7 @@ def create_query_term_for_reference(field_name: str, reference: EntityReference)
     """
     return dsl.Q(
         "term",
-        **{f"{field_name}.{list(reference.keys())[0]}": list(reference.values())[0]},
+        **{f"{field_name}.{next(iter(reference.keys()))}": next(iter(reference.values()))},
     )
 
 
@@ -127,12 +128,11 @@ def search_requests_filter(
     if topic_reference:
         must.append(create_query_term_for_reference("topic", topic_reference))
 
-    extra_filter = dsl.query.Bool(
+    return dsl.query.Bool(
         "must",
         must=must,
     )
 
-    return extra_filter
 
 
 def open_request_exists(topic_or_reference: Record | EntityReference, type_id: str) -> bool:
@@ -144,8 +144,7 @@ def open_request_exists(topic_or_reference: Record | EntityReference, type_id: s
     topic_reference = ResolverRegistry.reference_entity(topic_or_reference, raise_=True)
     base_filter = search_requests_filter(type_id=type_id, topic_reference=topic_reference, is_open=True)
     results = current_requests_service.search(system_identity, extra_filter=base_filter).hits
-    request_exists = bool(list(results))
-    return request_exists
+    return bool(list(results))
 
 
 def resolve_reference_dict(reference_dict: EntityReference) -> Record:

@@ -16,7 +16,6 @@ from invenio_records_resources.services.errors import PermissionDeniedError
 from oarepo_runtime.proxies import current_runtime
 from oarepo_runtime.services.results import RecordList, ResultComponent
 
-from oarepo_requests.services.draft.service import DraftRecordRequestsService
 from oarepo_requests.services.schema import RequestTypeSchema
 from oarepo_requests.utils import (
     allowed_request_types_for_record,
@@ -29,6 +28,8 @@ if TYPE_CHECKING:
     from flask_principal import Identity
     from invenio_records_resources.records.api import Record
     from invenio_requests.customizations.request_types import RequestType
+
+    from oarepo_requests.services.draft.service import DraftRecordRequestsService
 
 
 class RequestTypesComponent(ResultComponent):
@@ -129,10 +130,10 @@ class RequestTypesList(RecordList):
         for hit in self._results:
             # Project the record
             projection = self._schema(
-                context=dict(
-                    identity=self._identity,
-                    record=self._record,
-                )
+                context={
+                    "identity": self._identity,
+                    "record": self._record,
+                }
             ).dump(
                 hit,
             )

@@ -8,7 +8,6 @@
 #
 from __future__ import annotations
 
-from collections.abc import Generator
 from typing import TYPE_CHECKING, Any
 
 from oarepo_model.customizations import (
@@ -17,12 +16,14 @@ from oarepo_model.customizations import (
     AddToModule,
     Customization,
 )
-from oarepo_model.model import InvenioModel
 from oarepo_model.presets import Preset
 
 """Module providing preset for defining finalize_app entrypoints."""
 if TYPE_CHECKING:
+    from collections.abc import Generator
+
     from oarepo_model.builder import InvenioModelBuilder
+    from oarepo_model.model import InvenioModel
 
 
 # ThesisFileDraftResolver(
@@ -42,7 +43,7 @@ class RequestsFinalizeAppPreset(Preset):
         dependencies: dict[str, Any],
     ) -> Generator[Customization]:
         @staticmethod
-        def finalize_app(app):
+        def finalize_app(app) -> None:
             runtime_deps = builder.get_runtime_dependencies()
             service_id = builder.model.base_name
             type_key_published = service_id

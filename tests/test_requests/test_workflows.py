@@ -260,7 +260,7 @@ def test_workflow_events(
     draft1 = draft_factory(user1.identity, custom_workflow="with_approve_without_generic")
     record_id = draft1["id"]
 
-    resp_request_submit = submit_request_on_draft(user1.identity, record_id, "approve_draft")
+    submit_request_on_draft(user1.identity, record_id, "approve_draft")
 
     read_from_record = user1_client.get(
         f"{urls['BASE_URL']}/{record_id}/draft?expand=true",
@@ -294,9 +294,9 @@ def test_workflow_events(
         f"{urls['BASE_URL']}/{record_id}/draft?expand=true",
     )
 
-    publish_request = [
+    publish_request = next(
         request for request in read_from_record.json["expanded"]["requests"] if request["type"] == "publish_draft"
-    ][0]
+    )
     request_id = publish_request["id"]
 
     create_event_u1 = events_service.create(
@@ -338,7 +338,7 @@ def test_workflow_events_resource(
     draft1 = draft_factory(user1.identity, custom_workflow="with_approve_without_generic")
     record_id = draft1["id"]
 
-    resp_request_submit = submit_request_on_draft(user1.identity, record_id, "approve_draft")
+    submit_request_on_draft(user1.identity, record_id, "approve_draft")
 
     read_from_record = user1_client.get(
         f"{urls['BASE_URL']}/{record_id}/draft?expand=true",
@@ -369,9 +369,9 @@ def test_workflow_events_resource(
     read_from_record = user2_client.get(
         f"{urls['BASE_URL']}/{record_id}/draft?expand=true",
     )
-    publish_request = [
+    publish_request = next(
         request for request in read_from_record.json["expanded"]["requests"] if request["type"] == "publish_draft"
-    ][0]
+    )
     request_id = publish_request["id"]
 
     create_event_u1 = user1_client.post(
@@ -403,7 +403,7 @@ def test_delete_log(
     record = record_factory(creator.identity)
     record_id = record["id"]
 
-    record_response = creator_client.get(
+    creator_client.get(
         f"{urls['BASE_URL']}/{record_id}?expand=true",
     )
 
@@ -436,7 +436,7 @@ def test_delete_log(
         if event["type"] == LogEventType.type_id and event["payload"]["event"] == "accepted":
             break
     else:
-        assert False
+        raise AssertionError
 
 
 def test_cancel_transition(
@@ -453,7 +453,7 @@ def test_cancel_transition(
 
     draft1 = draft_factory(creator.identity)
     draft_id = draft1["id"]
-    resp_request_submit = submit_request_on_draft(creator.identity, draft_id, "publish_draft")
+    submit_request_on_draft(creator.identity, draft_id, "publish_draft")
     record = creator_client.get(f"{urls['BASE_URL']}/{draft_id}/draft?expand=true")
     assert record.json["expanded"]["requests"][0]["links"]["actions"].keys() == {
         "cancel",

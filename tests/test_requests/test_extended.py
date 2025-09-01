@@ -31,7 +31,7 @@ def test_listing(
     create_request_on_draft(creator.identity, draft2["id"], "publish_draft")
 
     requests_model.Draft.index.refresh()
-    search = creator_client.get(
+    creator_client.get(
         urls["BASE_URL_REQUESTS"],
         headers={"Accept": "application/vnd.inveniordm.v1+json"},
     )
@@ -56,7 +56,7 @@ def test_read_extended(
 
     resp_request_submit = submit_request_on_draft(creator.identity, draft_id, "publish_draft")
 
-    old_call = creator_client.get(f"{urls['BASE_URL_REQUESTS']}{resp_request_submit['id']}")
+    creator_client.get(f"{urls['BASE_URL_REQUESTS']}{resp_request_submit['id']}")
     new_call = creator_client.get(
         f"{urls['BASE_URL_REQUESTS']}extended/{resp_request_submit['id']}",
     )
@@ -134,7 +134,7 @@ def test_events_resource(
 
     resp_request_submit = submit_request_on_draft(creator.identity, draft1_id, "publish_draft")
 
-    read_before = creator_client.get(
+    creator_client.get(
         link2testclient(resp_request_submit["links"]["self"]),
         headers={"Accept": "application/vnd.inveniordm.v1+json"},
     )

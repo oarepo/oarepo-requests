@@ -20,8 +20,8 @@ class TopicDeleteEventType(EventType):
 
     type_id = "D"
 
-    payload_schema = dict(
-        topic=fields.Str(validate=[_serialized_topic_validator]),
-    )
+    payload_schema = {
+        "topic": fields.Str(validate=[_serialized_topic_validator]),
+    }
 
     payload_required = True

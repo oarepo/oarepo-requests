@@ -65,7 +65,7 @@ def test_delete(
         create_additional_data={"payload": {"removal_reason": "test reason"}},
     )
     record = receiver_client.get(f"{urls['BASE_URL']}/{record2_id}?expand=true")
-    decline = receiver_client.post(
+    receiver_client.post(
         link2testclient(record.json["expanded"]["requests"][0]["links"]["actions"]["decline"])
     )
     declined_request = creator_client.get(f"{urls['BASE_URL_REQUESTS']}{resp_request_submit['id']}")
@@ -79,7 +79,7 @@ def test_delete(
     )
     record = creator_client.get(f"{urls['BASE_URL']}/{record3_id}?expand=true")
     assert record.json["expanded"]["requests"][0]["links"]["actions"].keys() == {"cancel"}
-    cancel = creator_client.post(
+    creator_client.post(
         link2testclient(record.json["expanded"]["requests"][0]["links"]["actions"]["cancel"]),
     )
     canceled_request = creator_client.get(f"{urls['BASE_URL_REQUESTS']}{resp_request_submit['id']}")
@@ -106,7 +106,7 @@ def test_delete_draft(
     resp_request_create = creator_client.post(
         link2testclient(get_request_create_link(read.json["expanded"]["request_types"], "delete_draft"))
     )
-    resp_request_submit = creator_client.post(
+    creator_client.post(
         link2testclient(resp_request_create.json["links"]["actions"]["submit"]),
     )
 

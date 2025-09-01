@@ -8,7 +8,6 @@
 #
 from __future__ import annotations
 
-from collections.abc import Generator
 from typing import TYPE_CHECKING, Any
 
 from invenio_records_resources.services import (
@@ -20,7 +19,6 @@ from oarepo_model.customizations import (
     AddToList,
     Customization,
 )
-from oarepo_model.model import InvenioModel
 from oarepo_model.presets import Preset
 from oarepo_runtime.services.config import (
     is_published_record,
@@ -30,7 +28,10 @@ from oarepo_requests.services.components.autorequest import AutorequestComponent
 from oarepo_requests.services.record.components.snapshot_component import RecordSnapshotComponent
 
 if TYPE_CHECKING:
+    from collections.abc import Generator
+
     from oarepo_model.builder import InvenioModelBuilder
+    from oarepo_model.model import InvenioModel
 
 
 class RequestsServiceConfigPreset(Preset):
@@ -48,7 +49,7 @@ class RequestsServiceConfigPreset(Preset):
         ui_base = "{+ui}/" + builder.model.slug + "/"
 
         api_url = api_base + "{id}"
-        ui_url = ui_base + "{id}"
+        ui_base + "{id}"
 
         links = {
             "requests": ConditionalLink(

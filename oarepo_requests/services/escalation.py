@@ -9,8 +9,8 @@ from __future__ import annotations
 
 import json
 import logging
-from collections.abc import Iterator
 from datetime import UTC, datetime
+from typing import TYPE_CHECKING
 
 from invenio_access.permissions import system_identity
 from invenio_db import db
@@ -20,12 +20,16 @@ from invenio_requests import current_events_service
 from invenio_requests.proxies import current_requests_service
 from invenio_requests.records import Request
 from invenio_requests.records.models import RequestEventModel
-from oarepo_workflows import WorkflowRequestEscalation
 from oarepo_workflows.proxies import current_oarepo_workflows
 from oarepo_workflows.requests import RecipientEntityReference
 
 from oarepo_requests.notifications.builders.escalate import EscalateRequestSubmitNotificationBuilder
 from oarepo_requests.types.events.escalation import EscalationEventType
+
+if TYPE_CHECKING:
+    from collections.abc import Iterator
+
+    from oarepo_workflows import WorkflowRequestEscalation
 
 
 @unit_of_work()
@@ -71,7 +75,7 @@ def check_escalations() -> None:
 
 
 def stale_requests() -> Iterator[Request]:
-    """Yield all submitted requests with expired time of escalation"""
+    """Yield all submitted requests with expired time of escalation."""
     hits = current_requests_service.scan(system_identity, params={"is_open": True})
     for hit in hits:
         # with (suppress(Exception)):

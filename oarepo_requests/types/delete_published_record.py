@@ -79,6 +79,7 @@ class DeletePublishedRecordRequestType(NonDuplicableOARepoRequestType):
             topic_cls = request.topic.record_cls
             service = current_runtime.get_record_service_for_record_class(topic_cls)
             return service.config.links_search["self_html"].expand(None, context)
+        return None
 
     dangerous = True
 

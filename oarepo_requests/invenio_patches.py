@@ -9,7 +9,6 @@
 
 from __future__ import annotations
 
-from collections.abc import Callable
 from functools import cached_property, partial
 from typing import TYPE_CHECKING, Any
 
@@ -42,6 +41,8 @@ from oarepo_requests.resources.ui import (
 from oarepo_requests.services.oarepo.config import OARepoRequestsServiceConfig
 
 if TYPE_CHECKING:
+    from collections.abc import Callable
+
     from flask.blueprints import BlueprintSetupState
     from flask_principal import Identity
     from flask_resources.serializers.base import BaseSerializer
@@ -109,12 +110,7 @@ class IsClosedParam(IsOpenParam):
 class EnhancedRequestSearchOptions(RequestSearchOptions):
     """Searched options enhanced with additional filters."""
 
-    params_interpreters_cls = RequestSearchOptions.params_interpreters_cls + [
-        RequestOwnerFilterParam.factory("mine", "created_by.user"),
-        RequestNotOwnerFilterParam.factory("assigned", "created_by.user"),
-        RequestAllAvailableFilterParam.factory("all"),
-        IsClosedParam.factory("is_closed"),
-    ]
+    params_interpreters_cls = [*RequestSearchOptions.params_interpreters_cls, RequestOwnerFilterParam.factory("mine", "created_by.user"), RequestNotOwnerFilterParam.factory("assigned", "created_by.user"), RequestAllAvailableFilterParam.factory("all"), IsClosedParam.factory("is_closed")]
 
 
 class ExtendedRequestSearchRequestArgsSchema(RequestSearchRequestArgsSchema):

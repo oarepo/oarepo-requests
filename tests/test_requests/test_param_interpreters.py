@@ -7,8 +7,6 @@
 #
 from __future__ import annotations
 
-import json
-
 
 def _init(users, logged_client, draft_factory, submit_request, urls):
     user1 = users[0]
@@ -20,8 +18,8 @@ def _init(users, logged_client, draft_factory, submit_request, urls):
     draft1 = draft_factory(user1.identity, custom_workflow="different_recipients")
     draft2 = draft_factory(user2.identity, custom_workflow="different_recipients")
 
-    submit_response_user1 = submit_request(user1.identity, draft1["id"], "publish_draft")  # recipient should be 2
-    submit_response_user2 = submit_request(user2.identity, draft2["id"], "another_topic_updating")  # should be 1
+    submit_request(user1.identity, draft1["id"], "publish_draft")  # recipient should be 2
+    submit_request(user2.identity, draft2["id"], "another_topic_updating")  # should be 1
 
     search_unfiltered = user2_client.get(urls["BASE_URL_REQUESTS"])
     assert len(search_unfiltered.json["hits"]["hits"]) == 2
@@ -69,7 +67,6 @@ def test_owner_param_interpreter(
 
     # mine requests should be in all=true as well
     search_user1_only = user1_client.get(f"{urls['BASE_URL_REQUESTS']}?all=true")
-    print(json.dumps(search_user1_only.json))
     for hit in search_user1_only.json["hits"]["hits"]:
         assert hit["created_by"] == {"user": "1"} or hit["receiver"] == {"user": "1"}
 
@@ -87,7 +84,7 @@ def test_open_param_interpreter(
     user1 = users[0]
     user2 = users[1]
 
-    user1_client = logged_client(user1)
+    logged_client(user1)
     user2_client = logged_client(user2)
 
     draft1 = draft_factory(user1.identity)
@@ -97,12 +94,12 @@ def test_open_param_interpreter(
     draft2_id = draft2["id"]
     draft3_id = draft3["id"]
 
-    submit_response_user1 = submit_request_on_draft(user1.identity, draft1_id, "publish_draft")
-    submit_response_user2 = submit_request_on_draft(user1.identity, draft2_id, "publish_draft")
-    create_response = create_request_on_draft(user2.identity, draft3_id, "publish_draft")
+    submit_request_on_draft(user1.identity, draft1_id, "publish_draft")
+    submit_request_on_draft(user1.identity, draft2_id, "publish_draft")
+    create_request_on_draft(user2.identity, draft3_id, "publish_draft")
 
     read = user2_client.get(f"{urls['BASE_URL']}/{draft1_id}/draft?expand=true")
-    publish = user2_client.post(link2testclient(read.json["expanded"]["requests"][0]["links"]["actions"]["accept"]))
+    user2_client.post(link2testclient(read.json["expanded"]["requests"][0]["links"]["actions"]["accept"]))
 
     search_unfiltered = user2_client.get(urls["BASE_URL_REQUESTS"]).json["hits"]["hits"]
     search_open = user2_client.get(f"{urls['BASE_URL_REQUESTS']}?is_open=true").json["hits"]["hits"]

@@ -9,7 +9,6 @@
 
 from __future__ import annotations
 
-from collections.abc import Callable
 from typing import TYPE_CHECKING, Any
 
 from invenio_access.permissions import system_identity
@@ -35,6 +34,8 @@ from ..utils import (
 from .ref_types import ModelRefTypes, ReceiverRefTypes
 
 if TYPE_CHECKING:
+    from collections.abc import Callable
+
     from flask_babel.speaklater import LazyString
     from flask_principal import Identity
     from invenio_records_resources.records import Record
@@ -60,7 +61,7 @@ class OARepoRequestType(RequestType):
         current_requests_service.execute_action(system_identity, request.id, "cancel")
 
     @classproperty[dict[str, RequestState]]
-    def available_statuses(cls) -> dict[str, RequestState]:
+    def available_statuses(self) -> dict[str, RequestState]:
         """Return available statuses for the request type.
 
         The status (open, closed, undefined) are used for request filtering.

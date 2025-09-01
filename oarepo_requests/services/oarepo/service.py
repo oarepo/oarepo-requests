@@ -89,10 +89,7 @@ class OARepoRequestsService(RequestsService):
                 code=400,
             )
 
-        if hasattr(type_, "can_create"):
-            error = type_.can_create(identity, data, receiver, topic, creator)
-        else:
-            error = None
+        error = type_.can_create(identity, data, receiver, topic, creator) if hasattr(type_, "can_create") else None
 
         if not error:
             result = super().create(
@@ -107,11 +104,11 @@ class OARepoRequestsService(RequestsService):
             )
             uow.register(IndexRefreshOp(indexer=self.indexer, index=self.record_cls.index))
             return result
+        return None
 
     def read(self, identity: Identity, id_: str, expand: bool = False) -> RequestItem:
         """Retrieve a request."""
-        api_request = super().read(identity, id_, expand)
-        return api_request
+        return super().read(identity, id_, expand)
 
     @unit_of_work()
     def update(

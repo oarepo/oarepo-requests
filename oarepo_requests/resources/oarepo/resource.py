@@ -55,7 +55,7 @@ class OARepoRequestsResource(RequestsResource, ErrorHandlersMixin):
 
         routes = self.config.routes
 
-        url_rules = [
+        return [
             route("POST", p(routes["list"]), self.create),
             route(
                 "POST",
@@ -66,7 +66,6 @@ class OARepoRequestsResource(RequestsResource, ErrorHandlersMixin):
             route("GET", p(routes["item-extended"]), self.read_extended),
             route("PUT", p(routes["item-extended"]), self.update),
         ]
-        return url_rules
 
     @request_extra_args
     @request_headers

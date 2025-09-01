@@ -91,7 +91,7 @@ def resolve(identity: Identity, reference: dict[str, str]) -> UIResolvedReferenc
 
 def fallback_label_result(reference: dict[str, str]) -> str:
     """Get a fallback label for a reference if there is no other way to get it."""
-    id_ = list(reference.values())[0]
+    id_ = next(iter(reference.values()))
     return f"id: {id_}"
 
 
@@ -167,8 +167,7 @@ class OARepoUIResolver(abc.ABC):
         entity = self._search_one(identity, _id)
         if not entity:
             return fallback_result(reference, **kwargs)
-        resolved = self._get_entity_ui_representation(entity, reference)
-        return resolved
+        return self._get_entity_ui_representation(entity, reference)
 
     def resolve_many(self, identity: Identity, ids: list[str]) -> list[UIResolvedReference]:
         """Resolve many references to UI representations.
@@ -312,13 +311,12 @@ class UserEntityReferenceUIResolver(OARepoUIResolver):
             label = entity["username"]
         else:
             label = fallback_label_result(reference)
-        ret = UIResolvedReference(
+        return UIResolvedReference(
             reference=reference,
             type="user",
             label=label,
             links=self._extract_links_from_resolved_reference(entity),
         )
-        return ret
 
 
 class RecordEntityReferenceUIResolver(OARepoUIResolver):
@@ -346,7 +344,7 @@ class RecordEntityReferenceUIResolver(OARepoUIResolver):
         if not ids:
             return []
         # TODO what if search not permitted?
-        service = get_matching_service_for_refdict({self.reference_type: list(ids)[0]})
+        service = get_matching_service_for_refdict({self.reference_type: next(iter(ids))})
         if not service:
             raise ValueError(f"No service found for handling reference type {self.reference_type}")
         extra_filter = dsl.Q("terms", id=list(ids))
@@ -379,13 +377,12 @@ class RecordEntityReferenceUIResolver(OARepoUIResolver):
             label = entity["metadata"]["title"]
         else:
             label = fallback_label_result(reference)
-        ret = UIResolvedReference(
+        return UIResolvedReference(
             reference=reference,
-            type=list(reference.keys())[0],
+            type=next(iter(reference.keys())),
             label=label,
             links=self._extract_links_from_resolved_reference(entity),
         )
-        return ret
 
 
 class RecordEntityDraftReferenceUIResolver(RecordEntityReferenceUIResolver):
@@ -405,7 +402,7 @@ class RecordEntityDraftReferenceUIResolver(RecordEntityReferenceUIResolver):
         if not ids:
             return []
 
-        service: DraftsService = get_matching_service_for_refdict({self.reference_type: list(ids)[0]})
+        service: DraftsService = get_matching_service_for_refdict({self.reference_type: next(iter(ids))})
         extra_filter = dsl.Q("terms", id=list(ids))
         return service.search_drafts(identity, extra_filter=extra_filter).to_dict()["hits"]["hits"]
 
@@ -487,7 +484,7 @@ class FallbackEntityReferenceUIResolver(OARepoUIResolver):
 
         return UIResolvedReference(
             reference=reference,
-            type=list(reference.keys())[0],
+            type=next(iter(reference.keys())),
             label=label,
             links=self._extract_links_from_resolved_reference(entity),
         )
@@ -504,7 +501,7 @@ class KeywordUIEntityResolver(OARepoUIResolver):
 
         :result:    value of the keyword of the entity
         """
-        return list(entity.values())[0]
+        return next(iter(entity.values()))
 
     @override
     def _search_many(self, identity: Identity, ids: list[str], *args: Any, **kwargs: Any) -> list[dict]:

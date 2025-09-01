@@ -10,7 +10,6 @@
 from __future__ import annotations
 
 import dataclasses
-from collections.abc import Callable
 from functools import cached_property
 from typing import TYPE_CHECKING
 
@@ -28,6 +27,8 @@ from oarepo_requests.services.oarepo.config import OARepoRequestsServiceConfig
 from oarepo_requests.services.oarepo.service import OARepoRequestsService
 
 if TYPE_CHECKING:
+    from collections.abc import Callable
+
     from flask import Flask
     from flask_principal import Identity
     from invenio_records_resources.records.api import Record

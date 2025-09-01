@@ -13,5 +13,5 @@ from oarepo_requests.services.escalation import check_escalations
 
 
 @shared_task(name="escalate-requests")
-def escalate_requests_task():
+def escalate_requests_task() -> None:
     check_escalations()

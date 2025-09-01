@@ -8,7 +8,6 @@
 #
 from __future__ import annotations
 
-from collections.abc import Generator
 from functools import cached_property
 from typing import TYPE_CHECKING, Any
 
@@ -27,6 +26,8 @@ from oarepo_requests.services.draft.types.service import DraftRecordRequestTypes
 
 """Module providing preset for processing request types queries extension."""
 if TYPE_CHECKING:
+    from collections.abc import Generator
+
     from oarepo_model.builder import InvenioModelBuilder
 
 

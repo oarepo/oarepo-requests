@@ -21,7 +21,7 @@ def test_new_record(db, users, record_service, default_record_with_workflow_json
     from oarepo_requests.proxies import current_oarepo_requests_service
 
     creator = users[0]
-    receiver = users[1]
+    users[1]
     draft = record_service.create(creator.identity, default_record_with_workflow_json)
     request = current_oarepo_requests_service.create(
         identity=creator.identity,
@@ -84,7 +84,7 @@ def test_diff_after_publish_is_denied(
     assert len(results) == 0
 
     record = receiver_client.get(f"{urls['BASE_URL']}/{draft2_id}/draft?expand=true")
-    decline = receiver_client.post(
+    receiver_client.post(
         link2testclient(record.json["expanded"]["requests"][0]["links"]["actions"]["decline"]),
     )
     declined_request = creator_client.get(f"{urls['BASE_URL_REQUESTS']}{resp_request_submit['id']}")
@@ -164,7 +164,7 @@ def test_new_version_diff(
     assert len(results) == 1
 
     draft_search = creator_client.get(f"/user{urls['BASE_URL']}").json["hits"]["hits"]
-    new_draft = [x for x in draft_search if x["parent"]["id"] == record1["parent"]["id"] and x["state"] == "draft"][0]
+    new_draft = next(x for x in draft_search if x["parent"]["id"] == record1["parent"]["id"] and x["state"] == "draft")
 
     new_draft = creator_client.get(f"{urls['BASE_URL']}/{new_draft['id']}/draft").json
     new_draft["metadata"]["title"] = "new title"
@@ -177,7 +177,7 @@ def test_new_version_diff(
     results = db.session.query(RequestEventModel).filter_by(type="S").all()
     assert len(results) == 0
 
-    publish_request = submit_request_on_draft(creator.identity, new_draft["id"], "publish_draft")
+    submit_request_on_draft(creator.identity, new_draft["id"], "publish_draft")
 
     results = db.session.query(RecordSnapshot).all()
     assert len(results) == 2
@@ -241,7 +241,7 @@ def test_edited_metadata_diff(
     assert len(results) == 0
 
     draft_search = creator_client.get(f"/user{urls['BASE_URL']}").json["hits"]["hits"]
-    new_draft = [x for x in draft_search if x["parent"]["id"] == record1["parent"]["id"] and x["state"] == "draft"][0]
+    new_draft = next(x for x in draft_search if x["parent"]["id"] == record1["parent"]["id"] and x["state"] == "draft")
 
     new_draft = creator_client.get(f"{urls['BASE_URL']}/{new_draft['id']}/draft").json
     new_draft["metadata"]["title"] = "new title"
@@ -254,7 +254,7 @@ def test_edited_metadata_diff(
     results = db.session.query(RequestEventModel).filter_by(type="S").all()
     assert len(results) == 0
 
-    publish_request = submit_request_on_draft(creator.identity, new_draft["id"], "publish_draft")
+    submit_request_on_draft(creator.identity, new_draft["id"], "publish_draft")
 
     results = db.session.query(RecordSnapshot).all()
     assert len(results) == 2
@@ -262,7 +262,7 @@ def test_edited_metadata_diff(
     results = db.session.query(RequestEventModel).filter_by(type="S").all()
     assert len(results) == 1
 
-    event = results[0].json
+    results[0].json
 
 
 def test_request_active_diff(
@@ -282,7 +282,7 @@ def test_request_active_diff(
     from oarepo_requests.proxies import current_oarepo_requests_service
 
     creator = users[0]
-    creator_client = logged_client(creator)
+    logged_client(creator)
 
     receiver = users[1]
     draft = record_service.create(creator.identity, default_record_with_workflow_json)
@@ -320,6 +320,6 @@ def test_request_active_diff(
     results = db.session.query(RequestEventModel).filter_by(type="S").all()
     assert len(results) == 1
 
-    accept_result = current_invenio_requests_service.execute_action(receiver.identity, request.id, "accept")
+    current_invenio_requests_service.execute_action(receiver.identity, request.id, "accept")
 
     record_service.read(creator.identity, draft["id"])  # will throw exception if record isn't published

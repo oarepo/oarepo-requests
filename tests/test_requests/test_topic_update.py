@@ -30,7 +30,7 @@ def test_publish(
     draft1_id = draft1["id"]
     resp_request_submit = submit_request_on_draft(creator.identity, draft1_id, "publish_draft")
     record = receiver_client.get(f"{urls['BASE_URL']}/{draft1_id}/draft?expand=true").json
-    publish = receiver_client.post(
+    receiver_client.post(
         link2testclient(record["expanded"]["requests"][0]["links"]["actions"]["accept"]),
     )
     check_publish_topic_update(creator_client, urls, record, resp_request_submit)
