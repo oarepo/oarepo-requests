@@ -50,7 +50,7 @@ class RedirectLink(Link):
         """Create the request links."""
         link = None
         if hasattr(obj.type, "get_ui_redirect_url"):
-            link = getattr(obj.type, "get_ui_redirect_url")(obj, context)
+            link = obj.type.get_ui_redirect_url(obj, context)
         return link
 
 

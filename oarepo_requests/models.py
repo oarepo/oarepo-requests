@@ -48,9 +48,7 @@ class RecordSnapshot(db.Model):
     )
     """JSON with current snapshot of the record."""
 
-    request_id = db.Column(
-        UUIDType, db.ForeignKey(RequestMetadata.id, ondelete="cascade"), nullable=True
-    )
+    request_id = db.Column(UUIDType, db.ForeignKey(RequestMetadata.id, ondelete="cascade"), nullable=True)
     """Request ID when snapshot is made."""
 
     request = db.relationship(RequestMetadata, foreign_keys=[request_id])
@@ -65,9 +63,7 @@ class RecordSnapshot(db.Model):
             with db.session.begin_nested():
                 obj = cls(record_uuid=record_uuid, request_id=request_id, json=json)
                 db.session.add(obj)
-            logger.info(
-                "Created record snapshot for record uuid {record_uuid} with json {json}"
-            )
+            logger.info("Created record snapshot for record uuid {record_uuid} with json {json}")
 
         except IntegrityError:
             logger.exception(
@@ -104,12 +100,6 @@ class RecordSnapshot(db.Model):
     def get_two_latest_snapshots_by_record_uuid(cls, record_uuid):
         """Get latest two snapshot for record_uuid."""
         try:
-            return (
-                db.session.query(cls)
-                .filter_by(record_uuid=record_uuid)
-                .order_by(cls.created.desc())
-                .limit(2)
-                .all()
-            )
+            return db.session.query(cls).filter_by(record_uuid=record_uuid).order_by(cls.created.desc()).limit(2).all()
         except NoResultFound:
             raise ValueError(f"No record snapshot for record uuid {record_uuid}")

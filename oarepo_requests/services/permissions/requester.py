@@ -32,15 +32,16 @@ if TYPE_CHECKING:
 
 # TODO: move this to a more appropriate place
 
-def create_autorequests(identity: Identity,
+
+def create_autorequests(
+    identity: Identity,
     record: Record,
     uow: UnitOfWork,
-    **kwargs: Any,)-> None:
+    **kwargs: Any,
+) -> None:
     record_workflow = current_oarepo_workflows.get_workflow(record)
     for request_type_id, workflow_request in record_workflow.requests().items():
-        needs = workflow_request.requester_generator.needs(
-            request_type=request_type_id, record=record, **kwargs
-        )
+        needs = workflow_request.requester_generator.needs(request_type=request_type_id, record=record, **kwargs)
         if auto_request_need in needs:
             data = kwargs.get("data", {})
             creator_ref = ResolverRegistry.reference_identity(identity)
@@ -57,11 +58,8 @@ def create_autorequests(identity: Identity,
             if not action_obj.can_execute():
                 raise CannotExecuteActionError("submit")
             action_obj.execute(identity, uow)
-            uow.register(
-                RecordCommitOp(
-                    request_item._record, indexer=current_requests_service.indexer
-                )
-            )
+            uow.register(RecordCommitOp(request_item._record, indexer=current_requests_service.indexer))
+
 
 @unit_of_work()
 def auto_request_state_change_notifier(

@@ -12,12 +12,12 @@ from __future__ import annotations
 from typing import TYPE_CHECKING, Any
 
 from invenio_access.permissions import system_identity
+from invenio_i18n import _
 from invenio_notifications.services.uow import NotificationOp
 from invenio_requests.records.api import Request
 from oarepo_runtime.proxies import current_runtime
-from invenio_i18n import _
 
-from oarepo_requests.errors import VersionAlreadyExists, UnresolvedRequestsError
+from oarepo_requests.errors import UnresolvedRequestsError, VersionAlreadyExists
 from oarepo_requests.utils import get_requests_service_for_records_service
 
 from ..notifications.builders.publish import (
@@ -75,9 +75,7 @@ class PublishDraftSubmitAction(PublishMixin, RecordSnapshotMixin, OARepoSubmitAc
         """Publish the draft."""
         if "payload" in self.request and "version" in self.request["payload"]:
             topic_service = current_runtime.get_record_service_for_record(state.topic)
-            versions = topic_service.search_versions(
-                identity, state.topic.pid.pid_value
-            )
+            versions = topic_service.search_versions(identity, state.topic.pid.pid_value)
             versions_hits = versions.to_dict()["hits"]["hits"]
             for rec in versions_hits:
                 if "version" in rec["metadata"]:
@@ -85,17 +83,11 @@ class PublishDraftSubmitAction(PublishMixin, RecordSnapshotMixin, OARepoSubmitAc
                     if version == self.request["payload"]["version"]:
                         raise VersionAlreadyExists()
             state.topic.metadata["version"] = self.request["payload"]["version"]
-        uow.register(
-            NotificationOp(
-                PublishDraftRequestSubmitNotificationBuilder.build(request=self.request)
-            )
-        )
+        uow.register(NotificationOp(PublishDraftRequestSubmitNotificationBuilder.build(request=self.request)))
         return super().apply(identity, state, uow, *args, **kwargs)
 
 
-class PublishDraftAcceptAction(
-    PublishMixin, AddTopicLinksOnPayloadMixin, OARepoAcceptAction
-):
+class PublishDraftAcceptAction(PublishMixin, AddTopicLinksOnPayloadMixin, OARepoAcceptAction):
     """Accept action for publishing draft requests."""
 
     self_link = "published_record:links:self"
@@ -116,12 +108,13 @@ class PublishDraftAcceptAction(
         if not topic_service:
             raise KeyError(f"topic {state.topic} service not found")
         request_service = get_requests_service_for_records_service(topic_service)
-        requests = request_service.search_requests_for_draft(
-            system_identity, state.topic.pid.pid_value
-        )
+        requests = request_service.search_requests_for_draft(system_identity, state.topic.pid.pid_value)
 
         for result in requests._results:
-            if result.type not in ["publish_draft","publish_new_version", "publish_changed_metadata"] and result.is_open:
+            if (
+                result.type not in ["publish_draft", "publish_new_version", "publish_changed_metadata"]
+                and result.is_open
+            ):
                 # note: we can not use solely the result.is_open because changes may not be committed yet
                 # to opensearch index. That's why we need to get the record from DB and re-check.
                 if Request.get_record(result.uuid)["status"] in (
@@ -131,16 +124,10 @@ class PublishDraftAcceptAction(
                     raise UnresolvedRequestsError(action=str(self.name))
         id_ = state.topic["id"]
 
-        published_topic = topic_service.publish(
-            identity, id_, *args, uow=uow, expand=False, **kwargs
-        )
+        published_topic = topic_service.publish(identity, id_, *args, uow=uow, expand=False, **kwargs)
         update_topic(self.request, state.topic, published_topic._record, uow)
         state.topic = published_topic._record
-        uow.register(
-            NotificationOp(
-                PublishDraftRequestAcceptNotificationBuilder.build(request=self.request)
-            )
-        )
+        uow.register(NotificationOp(PublishDraftRequestAcceptNotificationBuilder.build(request=self.request)))
         return super().apply(identity, state, uow, *args, **kwargs)
 
 
@@ -158,11 +145,5 @@ class PublishDraftDeclineAction(OARepoDeclineAction):
         **kwargs: Any,
     ) -> Record:
         """Publish the draft."""
-        uow.register(
-            NotificationOp(
-                PublishDraftRequestDeclineNotificationBuilder.build(
-                    request=self.request
-                )
-            )
-        )
+        uow.register(NotificationOp(PublishDraftRequestDeclineNotificationBuilder.build(request=self.request)))
         return super().apply(identity, state, uow, *args, **kwargs)

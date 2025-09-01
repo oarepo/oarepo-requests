@@ -10,21 +10,22 @@
 from __future__ import annotations
 
 import dataclasses
+from collections.abc import Callable
 from functools import cached_property
-from typing import TYPE_CHECKING, Callable
+from typing import TYPE_CHECKING
 
 import importlib_metadata
 from deepmerge import conservative_merger
 from invenio_base.utils import obj_or_import_string
 from invenio_requests.proxies import current_events_service
 
+from oarepo_requests.cli import oarepo_requests  # noqa
 from oarepo_requests.resources.events.config import OARepoRequestsCommentsResourceConfig
 from oarepo_requests.resources.events.resource import OARepoRequestsCommentsResource
 from oarepo_requests.resources.oarepo.config import OARepoRequestsResourceConfig
 from oarepo_requests.resources.oarepo.resource import OARepoRequestsResource
 from oarepo_requests.services.oarepo.config import OARepoRequestsServiceConfig
 from oarepo_requests.services.oarepo.service import OARepoRequestsService
-from oarepo_requests.cli import oarepo_requests # noqa
 
 if TYPE_CHECKING:
     from flask import Flask
@@ -99,10 +100,7 @@ class OARepoRequests:
         :param creator: Creator of the request.
         :param data: Payload of the request.
         """
-
-        return obj_or_import_string(
-            self.app.config["OAREPO_REQUESTS_DEFAULT_RECEIVER"]
-        )(
+        return obj_or_import_string(self.app.config["OAREPO_REQUESTS_DEFAULT_RECEIVER"])(
             identity=identity,
             request_type=request_type,
             record=record,
@@ -127,13 +125,9 @@ class OARepoRequests:
         registered under the group oarepo_requests.identity_to_entity_references.
         """
         group_name = "oarepo_requests.identity_to_entity_references"
-        return [
-            x.load() for x in importlib_metadata.entry_points().select(group=group_name)
-        ]
+        return [x.load() for x in importlib_metadata.entry_points().select(group=group_name)]
 
-    def identity_to_entity_references(
-        self, identity: Identity
-    ) -> list[EntityReference]:
+    def identity_to_entity_references(self, identity: Identity) -> list[EntityReference]:
         """Map the identity to entity references."""
         ret = [
             mapping_fnc(identity)
@@ -169,28 +163,19 @@ class OARepoRequests:
 
     from invenio_requests.customizations.actions import RequestAction
 
-    def action_components(
-        self, action: RequestAction
-    ) -> list[type[RequestActionComponent]]:
+    def action_components(self, action: RequestAction) -> list[type[RequestActionComponent]]:
         """Return components for the given action."""
         components = self.app.config["REQUESTS_ACTION_COMPONENTS"]
         if callable(components):
             return components(action)
-        return [
-            obj_or_import_string(component)
-            for component in components[action.status_to]
-        ]
+        return [obj_or_import_string(component) for component in components[action.status_to]]
 
     def init_config(self, app: Flask) -> None:
         """Initialize configuration."""
         from . import config
 
-        app.config.setdefault("REQUESTS_ALLOWED_RECEIVERS", []).extend(
-            config.REQUESTS_ALLOWED_RECEIVERS
-        )
-        app.config.setdefault("ENTITY_REFERENCE_UI_RESOLVERS", {}).update(
-            config.ENTITY_REFERENCE_UI_RESOLVERS
-        )
+        app.config.setdefault("REQUESTS_ALLOWED_RECEIVERS", []).extend(config.REQUESTS_ALLOWED_RECEIVERS)
+        app.config.setdefault("ENTITY_REFERENCE_UI_RESOLVERS", {}).update(config.ENTITY_REFERENCE_UI_RESOLVERS)
         app.config.setdefault("REQUESTS_UI_SERIALIZATION_REFERENCED_FIELDS", []).extend(
             config.REQUESTS_UI_SERIALIZATION_REFERENCED_FIELDS
         )
@@ -199,9 +184,7 @@ class OARepoRequests:
         app.config.setdefault("PUBLISH_REQUEST_TYPES", config.PUBLISH_REQUEST_TYPES)
 
         # do not overwrite user's stuff
-        app_default_workflow_events = app.config.setdefault(
-            "DEFAULT_WORKFLOW_EVENTS", {}
-        )
+        app_default_workflow_events = app.config.setdefault("DEFAULT_WORKFLOW_EVENTS", {})
         for k, v in config.DEFAULT_WORKFLOW_EVENTS.items():
             if k not in app_default_workflow_events:
                 app_default_workflow_events[k] = v
@@ -212,16 +195,12 @@ class OARepoRequests:
             if k not in rac:
                 rac[k] = v
 
-        app_registered_event_types = app.config.setdefault(
-            "REQUESTS_REGISTERED_EVENT_TYPES", []
-        )
+        app_registered_event_types = app.config.setdefault("REQUESTS_REGISTERED_EVENT_TYPES", [])
         for event_type in config.REQUESTS_REGISTERED_EVENT_TYPES:
             if event_type not in app_registered_event_types:
                 app_registered_event_types.append(event_type)
 
-        app_registered_event_types = app.config.setdefault(
-            "NOTIFICATION_RECIPIENTS_RESOLVERS", {}
-        )
+        app_registered_event_types = app.config.setdefault("NOTIFICATION_RECIPIENTS_RESOLVERS", {})
         app.config["NOTIFICATION_RECIPIENTS_RESOLVERS"] = conservative_merger.merge(
             app_registered_event_types, config.NOTIFICATION_RECIPIENTS_RESOLVERS
         )
@@ -229,12 +208,10 @@ class OARepoRequests:
         app.config.setdefault("NOTIFICATIONS_ENTITY_RESOLVERS", [])
         app.config["NOTIFICATIONS_ENTITY_RESOLVERS"] += config.NOTIFICATIONS_ENTITY_RESOLVERS
 
-        app_notification_builders = app.config.setdefault( # can't set default config directly because it might be initialized to {} in invenio-notifications
+        app_notification_builders = app.config.setdefault(  # can't set default config directly because it might be initialized to {} in invenio-notifications
             "NOTIFICATIONS_BUILDERS", {}
         )
-        app_notification_backends = app.config.setdefault(
-            "NOTIFICATIONS_BACKENDS", {}
-        )
+        app_notification_backends = app.config.setdefault("NOTIFICATIONS_BACKENDS", {})
 
         app.config["NOTIFICATIONS_BUILDERS"] = conservative_merger.merge(
             app_notification_builders, config.NOTIFICATIONS_BUILDERS
@@ -265,19 +242,16 @@ def finalize_app(app: Flask) -> None:
         service_id=ext.requests_service.config.service_id,
     )
 
-    # todo i have to do this cause there is bug in invenio-requests for events
+    # TODO i have to do this cause there is bug in invenio-requests for events
     # but imo this is better than entrypoints
     for type in app.config["REQUESTS_REGISTERED_EVENT_TYPES"]:
         current_event_type_registry.register_type(type)
 
-    ext.notification_recipients_resolvers_registry = app.config[
-        "NOTIFICATION_RECIPIENTS_RESOLVERS"
-    ]
+    ext.notification_recipients_resolvers_registry = app.config["NOTIFICATION_RECIPIENTS_RESOLVERS"]
 
-    invenio_notifications = app.extensions["invenio-notifications"] # initialized during ext in invenio notifications, our config might not be loaded
-    notification_resolvers = {
-        er.type_key: er for er in app.config["NOTIFICATIONS_ENTITY_RESOLVERS"]
-    }
+    invenio_notifications = app.extensions[
+        "invenio-notifications"
+    ]  # initialized during ext in invenio notifications, our config might not be loaded
+    notification_resolvers = {er.type_key: er for er in app.config["NOTIFICATIONS_ENTITY_RESOLVERS"]}
     invenio_notifications.entity_resolvers = notification_resolvers
-    invenio_notifications.init_manager(app) # race condition between config init and original init_manager
-
+    invenio_notifications.init_manager(app)  # race condition between config init and original init_manager

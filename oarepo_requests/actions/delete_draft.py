@@ -18,8 +18,9 @@ from .generic import OARepoAcceptAction
 
 if TYPE_CHECKING:
     from flask_principal import Identity
-    from .components import RequestActionState
     from invenio_records_resources.services.uow import UnitOfWork
+
+    from .components import RequestActionState
 
 
 class DeleteDraftAcceptAction(OARepoAcceptAction):

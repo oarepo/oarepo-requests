@@ -12,10 +12,6 @@ class RecordSnapshotEventType(EventType):
 
     type_id = "S"
 
-    payload_schema = dict(
-        old_version=fields.Str(),
-        new_version=fields.Str(),
-        diff=fields.Str()
-    )
+    payload_schema = dict(old_version=fields.Str(), new_version=fields.Str(), diff=fields.Str())
 
     payload_required = True

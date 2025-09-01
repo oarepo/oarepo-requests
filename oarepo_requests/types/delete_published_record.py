@@ -9,12 +9,12 @@
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Any
+from typing import TYPE_CHECKING, Any, override
 
 import marshmallow as ma
+from invenio_i18n import gettext
+from invenio_i18n import lazy_gettext as _
 from oarepo_runtime.proxies import current_runtime
-from invenio_i18n import gettext, lazy_gettext as _
-from typing_extensions import override
 
 from oarepo_requests.actions.delete_published_record import (
     DeletePublishedRecordAcceptAction,
@@ -135,8 +135,7 @@ class DeletePublishedRecordRequestType(NonDuplicableOARepoRequestType):
             case "submitted":
                 if request_identity_matches(request.created_by, identity):
                     return gettext(
-                        "Permission to delete record requested. "
-                        "You will be notified about the decision by email."
+                        "Permission to delete record requested. You will be notified about the decision by email."
                     )
                 if request_identity_matches(request.receiver, identity):
                     return gettext(

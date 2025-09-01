@@ -12,7 +12,7 @@ if TYPE_CHECKING:
 log = logging.getLogger(__name__)
 
 
-# todo consider - we are not using this strictly in the ui context - so how should we separate these things in the future
+# TODO consider - we are not using this strictly in the ui context - so how should we separate these things in the future
 def resolve_entity(entity: str, obj: Request, ctx: dict[str, Any]) -> dict:
     """Resolve the entity and put it into the context cache.
 
@@ -31,7 +31,7 @@ def resolve_entity(entity: str, obj: Request, ctx: dict[str, Any]) -> dict:
         return ctx[key]
     try:
         entity = resolve(ctx["identity"], reference_dict)
-    except Exception as e:  # noqa
+    except Exception as e:
         if not isinstance(e, PersistentIdentifierError):
             log.exception(
                 "Error resolving %s for identity %s",
@@ -45,6 +45,4 @@ def resolve_entity(entity: str, obj: Request, ctx: dict[str, Any]) -> dict:
 
 def entity_context_key(reference_dict: dict) -> str:
     """Create a key for the entity context cache."""
-    return "entity:" + ":".join(
-        f"{x[0]}:{x[1]}" for x in sorted(reference_dict.items())
-    )
+    return "entity:" + ":".join(f"{x[0]}:{x[1]}" for x in sorted(reference_dict.items()))

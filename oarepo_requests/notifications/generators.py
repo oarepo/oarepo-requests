@@ -3,15 +3,16 @@ from __future__ import annotations
 import logging
 from abc import abstractmethod
 from typing import TYPE_CHECKING
-from invenio_notifications.services.generators import EntityResolve, RecipientGenerator
-from invenio_requests.proxies import current_requests
-from invenio_requests.records.api import Request
+
 from invenio_access.permissions import system_identity
 from invenio_notifications.models import Recipient
+from invenio_notifications.services.generators import EntityResolve, RecipientGenerator
 from invenio_records.dictutils import dict_lookup
+from invenio_requests.proxies import current_events_service, current_requests
+from invenio_requests.records.api import Request
 from invenio_search.engine import dsl
 from invenio_users_resources.proxies import current_users_service
-from invenio_requests.proxies import current_events_service
+
 from oarepo_requests.proxies import current_notification_recipients_resolvers_registry
 
 log = logging.getLogger("oarepo_requests.notifications.generators")
@@ -26,8 +27,7 @@ def _extract_entity_email_data(entity: Any) -> dict[str, Any]:
     def _get(entity, key):
         if isinstance(entity, dict) and key in entity:
             return entity.get(key, None)
-        else:
-            return getattr(entity, key, None)
+        return getattr(entity, key, None)
 
     def _add(entity, key, res, transform=lambda x: x):
         v = _get(entity, key)
@@ -64,18 +64,14 @@ class EntityRecipient(RecipientGenerator):
 
         if len(entity_ref_or_entity) != 1:
             # a hack - we need to have the original entity reference, not the resolved one
-            entity_ref_or_entity = self._get_unresolved_entity_from_resolved(
-                notification.context, self.key
-            )
+            entity_ref_or_entity = self._get_unresolved_entity_from_resolved(notification.context, self.key)
         if not entity_ref_or_entity:
             return
 
         entity_type = list(entity_ref_or_entity.keys())[0]
 
         for backend_id in backend_ids:
-            generator_cls = current_notification_recipients_resolvers_registry.get(
-                entity_type, {}
-            ).get(backend_id)
+            generator_cls = current_notification_recipients_resolvers_registry.get(entity_type, {}).get(backend_id)
             if generator_cls:
                 generator = generator_cls(entity_ref_or_entity)
                 generator(notification, recipients)
@@ -97,7 +93,7 @@ class SpecificEntityRecipient(RecipientGenerator):
     """Superclass for implementations of recipient generators for specific entities."""
 
     def __init__(self, key):
-        self.key = key  # todo this is entity_reference, not path to entity as EntityRecipient, might be confusing
+        self.key = key  # TODO this is entity_reference, not path to entity as EntityRecipient, might be confusing
 
     def __call__(self, notification: Notification, recipients: dict[str, Recipient]):
         entity = self._resolve_entity()
@@ -106,7 +102,7 @@ class SpecificEntityRecipient(RecipientGenerator):
 
     @abstractmethod
     def _get_recipients(self, entity: Any) -> dict[str, Recipient]:
-        raise NotImplementedError()
+        raise NotImplementedError
 
     def _resolve_entity(self) -> Any:
         entity_type = list(self.key)[0]
@@ -128,8 +124,7 @@ class UserEmailRecipient(SpecificEntityRecipient):
         email = getattr(entity, "email", None)
         if email:
             return {email: Recipient(data=_extract_entity_email_data(entity))}
-        else:
-            return {}
+        return {}
 
 
 class GroupEmailRecipient(SpecificEntityRecipient):
@@ -152,14 +147,10 @@ class MultipleRecipientsEmailRecipients(SpecificEntityRecipient):
         for current_entity in entity.entities:
             recipient_entity = current_entity.resolve()
             if hasattr(recipient_entity, "email"):
-                final_recipients[recipient_entity.email] = Recipient(
-                    data=_extract_entity_email_data(recipient_entity)
-                )
+                final_recipients[recipient_entity.email] = Recipient(data=_extract_entity_email_data(recipient_entity))
             elif hasattr(recipient_entity, "emails"):
                 for email_data in recipient_entity.emails:
-                    final_recipients[email_data["email"]] = Recipient(
-                        _extract_entity_email_data(email_data)
-                    )
+                    final_recipients[email_data["email"]] = Recipient(_extract_entity_email_data(email_data))
             else:
                 log.error(
                     "Entity %s %s does not have email/emails attribute, skipping.",
@@ -190,10 +181,9 @@ class RequestEntityResolve(EntityResolve):
             # If the request type has a stateful name, use it
             # note: do not have better identity here, so using system_identity
             # as a fallback
-            request_dict["title"] = request.type.stateful_name(
-                system_identity, topic=None
-            )
+            request_dict["title"] = request.type.stateful_name(system_identity, topic=None)
         return notification
+
 
 class OARepoRequestParticipantsRecipient(RecipientGenerator):
     """Recipient generator based on request and it's events."""
@@ -205,7 +195,6 @@ class OARepoRequestParticipantsRecipient(RecipientGenerator):
     def __call__(self, notification: Notification, recipients: dict[str, Recipient]):
         """Fetch users involved in request and add as recipients."""
         request = dict_lookup(notification.context, self.key)
-
 
         # hack for invenio compatibility
         before_keys = set(recipients.keys())
@@ -223,13 +212,9 @@ class OARepoRequestParticipantsRecipient(RecipientGenerator):
             extra_filter=dsl.Q("term", request_id=request["id"]),
         )
         # assume commenters can only be users
-        user_ids =             {
-                re["created_by"]["user"]
-                for re in request_events
-                if re["created_by"].get("user")
-            }
+        user_ids = {re["created_by"]["user"] for re in request_events if re["created_by"].get("user")}
 
-        filter_ = dsl.Q("terms", **{"id": list(user_ids)})
+        filter_ = dsl.Q("terms", id=list(user_ids))
         users = current_users_service.scan(system_identity, extra_filter=filter_)
         for u in users:
             recipients[u["id"]] = Recipient(data=u)

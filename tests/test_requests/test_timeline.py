@@ -8,6 +8,7 @@
 from invenio_requests.records.api import RequestEvent
 from pytest_oarepo.functions import clear_babel_context
 
+
 def test_timeline(
     logged_client,
     users,
@@ -25,9 +26,7 @@ def test_timeline(
     draft1 = draft_factory(creator.identity)
     draft1_id = draft1["id"]
 
-    publish_request_submit_resp = submit_request_on_draft(
-        creator.identity, draft1_id, "publish_draft"
-    )
+    publish_request_submit_resp = submit_request_on_draft(creator.identity, draft1_id, "publish_draft")
 
     comment_resp = creator_client.post(
         link2testclient(publish_request_submit_resp["links"]["comments"]),

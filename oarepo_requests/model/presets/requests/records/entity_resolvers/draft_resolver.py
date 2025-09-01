@@ -8,25 +8,29 @@
 #
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Any, Generator
+from collections.abc import Generator
+from typing import TYPE_CHECKING, Any
+
 from oarepo_model.customizations import (
     AddClass,
     AddMixins,
     Customization,
 )
-from oarepo_model.model import Dependency, InvenioModel
+from oarepo_model.model import InvenioModel
 from oarepo_model.presets import Preset
 
 if TYPE_CHECKING:
     from oarepo_model.builder import InvenioModelBuilder
 
+from invenio_access.permissions import system_identity
 from invenio_pidstore.errors import PIDUnregistered
 from invenio_records_resources.references.entity_resolvers.records import (
     RecordProxy as InvenioRecordProxy,
 )
+from invenio_records_resources.references.entity_resolvers.results import (
+    ServiceResultProxy as InvenioServiceResultProxy,
+)
 from sqlalchemy.exc import NoResultFound
-from invenio_access.permissions import system_identity
-from invenio_records_resources.references.entity_resolvers.results import ServiceResultProxy as InvenioServiceResultProxy
 
 
 def set_field(result, resolved_dict, field_name):
@@ -37,7 +41,10 @@ def set_field(result, resolved_dict, field_name):
         result.setdefault("metadata", {})[field_name] = from_metadata
     if from_data:
         result[field_name] = from_data
+
+
 from invenio_records_resources.references import RecordResolver
+
 """
 from oarepo_runtime.records.entity_resolvers import (
     DraftProxy,
@@ -45,7 +52,9 @@ from oarepo_runtime.records.entity_resolvers import (
 
 from oarepo_runtime.records.entity_resolvers import RecordResolver as BaseRecordResolver
 """
-#TODO: temp
+
+
+# TODO: temp
 class RecordProxy(InvenioRecordProxy):
     picked_fields = ["title", "creators", "contributors"]
 
@@ -65,6 +74,7 @@ class RecordProxy(InvenioRecordProxy):
                 "title": "Deleted record",
             },
         }
+
 
 class WithDeletedServiceResultProxy(InvenioServiceResultProxy):
     """Resolver proxy for a result item entity."""
@@ -87,18 +97,14 @@ class DraftProxy(RecordProxy):
 
 
 class DraftResolverPreset(Preset):
-
-    provides = (
-        "DraftResolver",
-    )
+    provides = ("DraftResolver",)
 
     def apply(
         self,
         builder: InvenioModelBuilder,
         model: InvenioModel,
         dependencies: dict[str, Any],
-    ) -> Generator[Customization, None, None]:
-
+    ) -> Generator[Customization]:
         class DraftResolverMixin:
             """Base class for records in the model.
             This class extends InvenioRecord and can be customized further.
@@ -109,9 +115,7 @@ class DraftResolverPreset(Preset):
             proxy_cls = DraftProxy
 
             def __init__(self, record_cls, service_id, type_key):
-                super().__init__(
-                    record_cls, service_id, type_key=type_key, proxy_cls=self.proxy_cls
-                )
+                super().__init__(record_cls, service_id, type_key=type_key, proxy_cls=self.proxy_cls)
 
         yield AddClass(
             "DraftResolver",

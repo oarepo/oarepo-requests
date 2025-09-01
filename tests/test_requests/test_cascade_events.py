@@ -33,31 +33,17 @@ def test_cascade_update(
     draft1_id = draft1["id"]
     draft2_id = draft2["id"]
 
-    publish_request_create = submit_request_on_draft(
-        creator.identity, draft1_id, "publish_draft"
-    )
-    another_request_create = submit_request_on_draft(
-        creator.identity, draft1_id, "another_topic_updating"
-    )
-    record = receiver_client.get(
-        f"{urls['BASE_URL']}{draft1_id}/draft?expand=true"
-    ).json
+    publish_request_create = submit_request_on_draft(creator.identity, draft1_id, "publish_draft")
+    another_request_create = submit_request_on_draft(creator.identity, draft1_id, "another_topic_updating")
+    record = receiver_client.get(f"{urls['BASE_URL']}/{draft1_id}/draft?expand=true").json
     accept_another_request = receiver_client.post(
-        link2testclient(
-            record["expanded"]["requests"][0]["links"]["actions"]["accept"]
-        ),
+        link2testclient(record["expanded"]["requests"][0]["links"]["actions"]["accept"]),
     )
-    publish_request_on_second_draft = create_request_on_draft(
-        creator.identity, draft2_id, "publish_draft"
-    )
+    publish_request_on_second_draft = create_request_on_draft(creator.identity, draft2_id, "publish_draft")
 
-    record = receiver_client.get(
-        f"{urls['BASE_URL']}{draft1_id}/draft?expand=true"
-    ).json
+    record = receiver_client.get(f"{urls['BASE_URL']}/{draft1_id}/draft?expand=true").json
     publish = receiver_client.post(
-        link2testclient(
-            record["expanded"]["requests"][1]["links"]["actions"]["accept"]
-        ),
+        link2testclient(record["expanded"]["requests"][1]["links"]["actions"]["accept"]),
     )
 
     check_publish_topic_update(creator_client, urls, record, publish_request_create)
@@ -96,9 +82,7 @@ def test_cascade_cancel(
     r2 = create_request_on_draft(creator.identity, draft1_id, "another_topic_updating")
     r3 = submit_request_on_draft(creator.identity, draft2_id, "publish_draft")
 
-    delete_request = submit_request_on_draft(
-        creator.identity, draft1_id, "delete_draft"
-    )
+    delete_request = submit_request_on_draft(creator.identity, draft1_id, "delete_draft")
 
     r1_read = receiver_client.get(f"{urls['BASE_URL_REQUESTS']}{r1['id']}").json
     r2_read = receiver_client.get(f"{urls['BASE_URL_REQUESTS']}{r2['id']}").json
@@ -109,25 +93,13 @@ def test_cascade_cancel(
     assert r3_read["status"] == "submitted"
 
     RequestEvent.index.refresh()
-    events1 = creator_client.get(
-        f"{urls['BASE_URL_REQUESTS']}extended/{r1['id']}/timeline"
-    ).json["hits"]["hits"]
-    events2 = creator_client.get(
-        f"{urls['BASE_URL_REQUESTS']}extended/{r2['id']}/timeline"
-    ).json["hits"]["hits"]
-    events3 = creator_client.get(
-        f"{urls['BASE_URL_REQUESTS']}extended/{r3['id']}/timeline"
-    ).json["hits"]["hits"]
+    events1 = creator_client.get(f"{urls['BASE_URL_REQUESTS']}extended/{r1['id']}/timeline").json["hits"]["hits"]
+    events2 = creator_client.get(f"{urls['BASE_URL_REQUESTS']}extended/{r2['id']}/timeline").json["hits"]["hits"]
+    events3 = creator_client.get(f"{urls['BASE_URL_REQUESTS']}extended/{r3['id']}/timeline").json["hits"]["hits"]
 
-    topic_deleted_events1 = [
-        e for e in events1 if e["type"] == TopicDeleteEventType.type_id
-    ]
-    topic_deleted_events2 = [
-        e for e in events2 if e["type"] == TopicDeleteEventType.type_id
-    ]
-    topic_deleted_events3 = [
-        e for e in events3 if e["type"] == TopicDeleteEventType.type_id
-    ]
+    topic_deleted_events1 = [e for e in events1 if e["type"] == TopicDeleteEventType.type_id]
+    topic_deleted_events2 = [e for e in events2 if e["type"] == TopicDeleteEventType.type_id]
+    topic_deleted_events3 = [e for e in events3 if e["type"] == TopicDeleteEventType.type_id]
     assert len(topic_deleted_events1) == 1
     assert len(topic_deleted_events2) == 1
     assert len(topic_deleted_events3) == 0

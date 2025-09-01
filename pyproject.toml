@@ -15,8 +15,10 @@ build-backend = "hatchling.build"
 
 [dependency-groups]
 dev = [
-    "oarepo-runtime>=2.0.0dev5,<3.0.0",
-    "oarepo[rdm,tests]>=13.0.0,<14.0.0",
+    "oarepo-runtime>=2.0.0dev13,<3.0.0",
+    "graphlib",
+    "oarepo[rdm,tests]>=13.0.14,<14.0.0",
+    "oarepo-model>=0.1.0.dev5"
 ]
 
 [project.optional-dependencies]
@@ -64,6 +66,8 @@ group = "oarepo_requests.identity_to_entity_references:group_mappings"
 record_snapshots = "oarepo_requests.models"
 [project.entry-points."invenio_db.alembic"]
 oarepo_requests = "oarepo_requests:alembic"
+[project.entry-points."oarepo_workflows.state_changed_notifiers"]
+auto_requester = "oarepo_requests.services.permissions.requester:auto_request_state_change_notifier"
 
 
 [[tool.mypy.overrides]]

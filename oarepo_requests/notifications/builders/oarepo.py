@@ -17,7 +17,6 @@ class OARepoUserEmailBackend(UserEmailBackend):
 
 
 class OARepoRequestActionNotificationBuilder(NotificationBuilder):
-
     @classmethod
     def build(cls, request: Request):
         """Build notification with context."""
@@ -25,9 +24,7 @@ class OARepoRequestActionNotificationBuilder(NotificationBuilder):
             type=cls.type,
             context={
                 "request": EntityResolverRegistry.reference_entity(request),
-                "backend_ids": [
-                    backend.backend_id for backend in cls.recipient_backends
-                ],
+                "backend_ids": [backend.backend_id for backend in cls.recipient_backends],
             },
         )
 

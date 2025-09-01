@@ -14,29 +14,27 @@ from __future__ import annotations
 
 import abc
 import contextlib
+import logging
 from typing import TYPE_CHECKING, Any, override
-from dataclasses import dataclass
 
-from invenio_requests.customizations import RequestAction, RequestActions, RequestType
+from invenio_requests.customizations import RequestActions
 from invenio_requests.errors import CannotExecuteActionError
+from invenio_requests.records.api import Request
 
 from oarepo_requests.services.permissions.identity import request_active
-from .generic import OARepoGenericActionMixin
-import logging
+
+from .generic import OARepoGenericActionMixin, RequestActionState
+
 if TYPE_CHECKING:
     from collections.abc import Generator
-    from invenio_drafts_resources.records import Record
+
     from flask_principal import Identity
     from invenio_records_resources.services.uow import UnitOfWork
-    from invenio_requests.records.api import Request
-
-from .generic import RequestActionState
-
 
 
 class RequestActionComponent(abc.ABC):
     """Abstract request action component."""
-    
+
     @abc.abstractmethod
     def apply(
         self,
@@ -72,7 +70,7 @@ class RequestIdentityComponent(RequestActionComponent):
         uow: UnitOfWork,
         *args: Any,
         **kwargs: Any,
-    ) -> Generator[None, None, None]:
+    ) -> Generator[None]:
         identity.provides.add(request_active)
         try:
             yield
@@ -98,35 +96,29 @@ class WorkflowTransitionComponent(RequestActionComponent):
         uow: UnitOfWork,
         *args: Any,
         **kwargs: Any,
-    ) -> Generator[None, None, None]:
+    ) -> Generator[None]:
         from oarepo_workflows.proxies import current_oarepo_workflows
         from sqlalchemy.exc import NoResultFound
 
         yield
-        if (
-            not state.topic
-        ):  # for example if we are cancelling requests after deleting draft, it does not make sense to attempt changing the state of the draft
+        if not state.topic:
+            # for example if we are cancelling requests after deleting draft,
+            # it does not make sense to attempt changing the state of the draft
             return
         try:
             transitions = (
-                current_oarepo_workflows.get_workflow(state.topic)
-                .requests()[state.request_type.type_id]
-                .transitions
+                current_oarepo_workflows.get_workflow(state.topic).requests()[state.request_type.type_id].transitions
             )
-        except (
-            NoResultFound
-        ):  # parent might be deleted - this is the case for delete_draft request type
+        except NoResultFound:  # parent might be deleted - this is the case for delete_draft request type
             return
-        target_state = transitions[state.action.status_to]  # type: ignore
-        
-        if (
-            target_state and not state.topic.is_deleted
-        ):  # commit doesn't work on deleted record?
+        target_state = transitions[state.action.status_to]
+
+        if target_state and not state.topic.is_deleted:  # commit doesn't work on deleted record?
             current_oarepo_workflows.set_state(
                 identity,
                 state.topic,
                 target_state,
-                request=state.action.request,  # type: ignore
+                request=state.action.request,
                 uow=uow,
             )
 
@@ -143,9 +135,9 @@ class AutoAcceptComponent(RequestActionComponent):
         uow: UnitOfWork,
         *args: Any,
         **kwargs: Any,
-    ) -> Generator[None, None, None]:
+    ) -> Generator[None]:
         yield
-        request: Request = state.action.request  # type: ignore
+        request: Request = state.action.request
         if request.status != "submitted":
             return
         receiver_ref = state.request.receiver  # this is <x>proxy, not dict
@@ -173,5 +165,5 @@ class AutoAcceptComponent(RequestActionComponent):
                 new_topic = new_request.topic.resolve()
                 state.topic = new_topic
             except Exception as e:
-                logging.error(e)
-                state.topic = None    
+                logging.exception(e)
+                state.topic = None

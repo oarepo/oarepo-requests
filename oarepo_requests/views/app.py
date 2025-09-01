@@ -32,9 +32,7 @@ def create_app_events_blueprint(app: Flask) -> Blueprint:
 
     :param app: Flask application
     """
-    blueprint = Blueprint(
-        "oarepo_requests_events_app", __name__, url_prefix="/requests/"
-    )
+    blueprint = Blueprint("oarepo_requests_events_app", __name__, url_prefix="/requests/")
     return blueprint
 
 

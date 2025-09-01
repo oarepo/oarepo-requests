@@ -111,9 +111,7 @@ class OARepoRequestsResource(RequestsResource, ErrorHandlersMixin):
             data=resource_requestctx.data,
             request_type=resource_requestctx.data.pop("request_type", None),
             topic=(
-                resolve_reference_dict(
-                    stringify_first_val(resource_requestctx.data.pop("topic", None))
-                )
+                resolve_reference_dict(stringify_first_val(resource_requestctx.data.pop("topic", None)))
                 if resource_requestctx.data
                 else None
             ),

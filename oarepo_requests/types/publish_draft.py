@@ -6,14 +6,14 @@
 # details.
 #
 """Publish draft request type."""
+
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Any
+from typing import TYPE_CHECKING, Any, override
 
 import marshmallow as ma
 from invenio_i18n import gettext
 from invenio_i18n import lazy_gettext as _
-from typing_extensions import override
 
 from .publish_base import PublishRequestType
 
@@ -47,9 +47,7 @@ class PublishDraftRequestType(PublishRequestType):
     }
 
     @classmethod
-    def is_applicable_to(
-        cls, identity: Identity, topic: Record, *args: Any, **kwargs: Any
-    ) -> bool:
+    def is_applicable_to(cls, identity: Identity, topic: Record, *args: Any, **kwargs: Any) -> bool:
         """Check if the request type is applicable to the topic."""
         if cls.topic_type(topic) != "initial":
             return False
@@ -111,8 +109,7 @@ class PublishDraftRequestType(PublishRequestType):
                 "it will be locked and no further modifications will be possible."
             ),
             submitted_receiver=gettext(
-                "The draft has been submitted for review. "
-                "You can now accept or decline the request."
+                "The draft has been submitted for review. You can now accept or decline the request."
             ),
             submitted_creator=gettext(
                 "The draft has been submitted for review. "

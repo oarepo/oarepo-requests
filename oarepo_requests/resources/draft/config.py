@@ -27,12 +27,8 @@ class DraftRecordRequestsResourceConfig(RecordRequestsResourceConfig):
     def error_handlers(self) -> dict:
         """Get error handlers."""
         entrypoint_error_handlers = {**super().error_handlers}
-        for x in importlib_metadata.entry_points(
-            group="oarepo_requests.error_handlers"
-        ):
+        for x in importlib_metadata.entry_points(group="oarepo_requests.error_handlers"):
             entrypoint_error_handlers.update(x.load())
-        for x in importlib_metadata.entry_points(
-            group="oarepo_requests.draft.error_handlers"
-        ):
+        for x in importlib_metadata.entry_points(group="oarepo_requests.draft.error_handlers"):
             entrypoint_error_handlers.update(x.load())
         return entrypoint_error_handlers

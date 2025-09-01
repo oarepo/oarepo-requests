@@ -9,17 +9,17 @@
 
 from __future__ import annotations
 
+from dataclasses import dataclass
 from functools import cached_property
 from typing import TYPE_CHECKING, Any
 
+from invenio_access.permissions import system_identity
+from invenio_i18n import _
 from invenio_pidstore.errors import PersistentIdentifierError
 from invenio_requests.customizations import actions
-from invenio_i18n import _
 from oarepo_runtime.proxies import current_runtime
-from dataclasses import dataclass
 
 from oarepo_requests.proxies import current_oarepo_requests
-from invenio_access.permissions import system_identity
 
 if TYPE_CHECKING:
     from flask_babel.speaklater import LazyString
@@ -30,31 +30,29 @@ if TYPE_CHECKING:
 
     from oarepo_requests.actions.components import RequestActionComponent
 
-from invenio_requests.customizations import RequestAction, RequestActions, RequestType
+from invenio_requests.customizations import RequestAction, RequestType
 
-type ActionType = (
-    OARepoGenericActionMixin | RequestAction
-)  # should be a type intersection, not yet in python
-
+type ActionType = OARepoGenericActionMixin | RequestAction  # should be a type intersection, not yet in python
 
 
 @dataclass
 class RequestActionState:
     """RequestActionState dataclass to update possibly changed record between actions steps."""
-    
+
     request: Request
     request_type: RequestType
     topic: Record
     created_by: Any
     action: ActionType
-    
+
     def __post__init__(self):
         """Assert correct types after initializing."""
         assert isinstance(self.request, Request), f"self.request is not instance of Request, got {type(self.request)=}"
-        assert isinstance(self.request_type, RequestType), f"self.request_type is not instance of Request, got {type(self.request_type)=}"
+        assert isinstance(self.request_type, RequestType), (
+            f"self.request_type is not instance of Request, got {type(self.request_type)=}"
+        )
         assert isinstance(self.topic, Record), f"self.topic is not instance of Record, got {type(self.topic)=}"
         # assert isinstance(self.action, ActionType), f"self.action is not instance of ActionType, got {type(self.action)=}"
-    
 
 
 class OARepoGenericActionMixin:
@@ -82,16 +80,11 @@ class OARepoGenericActionMixin:
         """Apply the action to the topic."""
 
     def execute_with_components(
-        self,
-        identity: Identity, 
-        state: RequestActionState,
-        uow: UnitOfWork,
-        *args: Any,
-        **kwargs: Any
+        self, identity: Identity, state: RequestActionState, uow: UnitOfWork, *args: Any, **kwargs: Any
     ) -> None:
         """Execute action with components."""
         self._execute_with_components(self.components, identity, state, uow, *args, **kwargs)
-    
+
     def _execute_with_components(
         self,
         components: list[RequestActionComponent],
@@ -111,24 +104,15 @@ class OARepoGenericActionMixin:
             self.apply(identity, state, uow, *args, **kwargs)
             super().execute(identity, uow, *args, **kwargs)  # type: ignore
         else:
-            with components[0].apply(
-                identity, state, uow, *args, **kwargs
-            ):
-                self._execute_with_components(
-                    components[1:], identity, state, uow, *args, **kwargs
-                )
+            with components[0].apply(identity, state, uow, *args, **kwargs):
+                self._execute_with_components(components[1:], identity, state, uow, *args, **kwargs)
 
     @cached_property
     def components(self) -> list[RequestActionComponent]:
         """Return a list of components for this action."""
-        return [
-            component_cls()
-            for component_cls in current_oarepo_requests.action_components(self)
-        ]
+        return [component_cls() for component_cls in current_oarepo_requests.action_components(self)]
 
-    def execute(
-        self, identity: Identity, uow: UnitOfWork, *args: Any, **kwargs: Any
-    ) -> None:
+    def execute(self, identity: Identity, uow: UnitOfWork, *args: Any, **kwargs: Any) -> None:
         """Execute the action."""
         request: Request = self.request  # type: ignore
         request_type = request.type
@@ -139,16 +123,10 @@ class OARepoGenericActionMixin:
 
         # create a shared state between different actions to track changes in topic/requests etc.
         state: RequestActionState = RequestActionState(
-                request=request,
-                request_type=request_type, 
-                topic=topic,
-                created_by=request.created_by,
-                action=self
+            request=request, request_type=request_type, topic=topic, created_by=request.created_by, action=self
         )
 
-        self._execute_with_components(
-            self.components, identity, state, uow, *args, **kwargs
-        )
+        self._execute_with_components(self.components, identity, state, uow, *args, **kwargs)
 
 
 class AddTopicLinksOnPayloadMixin:
@@ -167,7 +145,7 @@ class AddTopicLinksOnPayloadMixin:
     ) -> Record:
         """Apply the action to the topic."""
         super().apply(identity, state, uow, *args, **kwargs)
-            
+
         service = current_runtime.get_record_service_for_record(state.topic)
 
         if not state.topic.is_draft:
@@ -186,7 +164,7 @@ class AddTopicLinksOnPayloadMixin:
         # can not use dot notation as marshmallow tries to be too smart and does not serialize dotted keys
         if (
             "self" in topic_dict["links"]
-        ):  # todo consider - this happens if receiver doesn't have read rights to the topic, like after a draft is created after edit
+        ):  # TODO consider - this happens if receiver doesn't have read rights to the topic, like after a draft is created after edit
             # if it's needed in all cases, we could do a system identity call here
             request["payload"][self.self_link] = topic_dict["links"]["self"]
         if "self_html" in topic_dict["links"]:

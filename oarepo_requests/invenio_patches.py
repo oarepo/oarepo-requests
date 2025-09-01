@@ -9,8 +9,9 @@
 
 from __future__ import annotations
 
+from collections.abc import Callable
 from functools import cached_property, partial
-from typing import TYPE_CHECKING, Any, Callable
+from typing import TYPE_CHECKING, Any
 
 from flask import current_app
 from flask_babel import LazyString, force_locale
@@ -18,6 +19,7 @@ from flask_resources import JSONSerializer, ResponseHandler
 from invenio_records_resources.resources.records.headers import etag_headers
 from invenio_records_resources.services.records.params import FilterParam
 from invenio_records_resources.services.records.params.base import ParamInterpreter
+from invenio_requests.notifications.generators import RequestParticipantsRecipient
 from invenio_requests.resources.events.config import RequestCommentsResourceConfig
 from invenio_requests.resources.requests.config import (
     RequestSearchRequestArgsSchema,
@@ -31,7 +33,7 @@ from invenio_requests.services.requests.params import IsOpenParam
 from invenio_search.engine import dsl
 from marshmallow import fields
 from opensearch_dsl.query import Bool
-from invenio_requests.notifications.generators import RequestParticipantsRecipient
+
 from oarepo_requests.notifications.generators import OARepoRequestParticipantsRecipient
 from oarepo_requests.resources.ui import (
     OARepoRequestEventsUIJSONSerializer,
@@ -88,9 +90,7 @@ class RequestNotOwnerFilterParam(FilterParam):
         """Apply the filter to the search."""
         value = params.pop(self.param_name, None)
         if value is not None:
-            search = search.filter(
-                Bool(must_not=[dsl.Q("term", **{self.field_name: identity.id})])
-            )
+            search = search.filter(Bool(must_not=[dsl.Q("term", **{self.field_name: identity.id})]))
         return search
 
 
@@ -126,9 +126,7 @@ class ExtendedRequestSearchRequestArgsSchema(RequestSearchRequestArgsSchema):
     is_closed = fields.Boolean()
 
 
-def override_invenio_requests_config(
-    state: BlueprintSetupState, *args: Any, **kwargs: Any
-) -> None:
+def override_invenio_requests_config(state: BlueprintSetupState, *args: Any, **kwargs: Any) -> None:
     """Override the invenio requests configuration.
 
     This function is called from the blueprint setup function as this should be a safe moment
@@ -137,9 +135,7 @@ def override_invenio_requests_config(
     with state.app.app_context():
         # this monkey patch should be done better (support from invenio)
         RequestsServiceConfig.search = EnhancedRequestSearchOptions
-        RequestsResourceConfig.request_search_args = (
-            ExtendedRequestSearchRequestArgsSchema
-        )
+        RequestsResourceConfig.request_search_args = ExtendedRequestSearchRequestArgsSchema
         # add extra links to the requests
         for k, v in OARepoRequestsServiceConfig.links_item.items():
             if k not in RequestsServiceConfig.links_item:
@@ -176,9 +172,9 @@ def override_invenio_requests_config(
             **RequestCommentsResourceConfig.response_handlers,
         }
 
+        from invenio_i18n import _
         from invenio_requests.proxies import current_request_type_registry
         from invenio_requests.services.requests.facets import status, type
-        from invenio_i18n import _
 
         status._value_labels = {
             "submitted": _("Submitted"),
@@ -191,15 +187,11 @@ def override_invenio_requests_config(
         status._label = _("Request status")
 
         # add extra request types dynamically
-        type._value_labels = {
-            rt.type_id: rt.name for rt in iter(current_request_type_registry)
-        }
+        type._value_labels = {rt.type_id: rt.name for rt in iter(current_request_type_registry)}
         type._label = _("Type")
 
 
-def override_invenio_notifications(
-    state: BlueprintSetupState, *args: Any, **kwargs: Any
-) -> None:
+def override_invenio_notifications(state: BlueprintSetupState, *args: Any, **kwargs: Any) -> None:
     with state.app.app_context():
         from invenio_notifications.services.generators import EntityResolve
         from invenio_requests.notifications.builders import (
@@ -216,16 +208,15 @@ def override_invenio_notifications(
                 EntityResolve(key="request.topic"),
             )
 
-
         for r in CommentRequestEventCreateNotificationBuilder.recipients:
             if isinstance(r, RequestParticipantsRecipient):
                 CommentRequestEventCreateNotificationBuilder.recipients.remove(r)
-                CommentRequestEventCreateNotificationBuilder.recipients.append(OARepoRequestParticipantsRecipient(key="request"))
+                CommentRequestEventCreateNotificationBuilder.recipients.append(
+                    OARepoRequestParticipantsRecipient(key="request")
+                )
                 break
 
-        for idx, r in list(
-            enumerate(CommentRequestEventCreateNotificationBuilder.context)
-        ):
+        for idx, r in list(enumerate(CommentRequestEventCreateNotificationBuilder.context)):
             if isinstance(r, EntityResolve) and r.key == "request":
                 CommentRequestEventCreateNotificationBuilder.context[idx] = (
                     # entity resolver that adds the correct title if it is missing
@@ -256,9 +247,8 @@ def override_invenio_notifications(
 def resolve_lazy_strings(data):
     if isinstance(data, dict):
         return {key: resolve_lazy_strings(value) for key, value in data.items()}
-    elif isinstance(data, list):
+    if isinstance(data, list):
         return [resolve_lazy_strings(item) for item in data]
-    elif isinstance(data, LazyString):
+    if isinstance(data, LazyString):
         return str(data)
-    else:
-        return data
+    return data

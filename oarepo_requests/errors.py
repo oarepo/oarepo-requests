@@ -10,15 +10,16 @@
 from __future__ import annotations
 
 import json
-from typing import TYPE_CHECKING, Any, Optional, Union
+from typing import TYPE_CHECKING, Any
 
 from flask import g
 from flask_resources import (
     HTTPJSONException,
 )
-from invenio_requests.errors import CannotExecuteActionError
 from flask_resources.serializers.json import JSONEncoder
-from invenio_i18n import gettext, lazy_gettext as _
+from invenio_i18n import gettext
+from invenio_i18n import lazy_gettext as _
+from invenio_requests.errors import CannotExecuteActionError
 
 if TYPE_CHECKING:
     from invenio_records_resources.records import Record
@@ -30,10 +31,10 @@ class CustomHTTPJSONException(HTTPJSONException):
 
     def __init__(
         self,
-        code: Optional[int] = None,
-        errors: Optional[Union[dict[str, any], list]] = None,
-        topic_errors: Optional[Union[dict[str, any], list]] = None,
-        request_payload_errors: Optional[Union[dict[str, any], list]] = None,
+        code: int | None = None,
+        errors: dict[str, any] | list | None = None,
+        topic_errors: dict[str, any] | list | None = None,
+        request_payload_errors: dict[str, any] | list | None = None,
         **kwargs: Any,
     ) -> None:
         """Initialize CustomHTTPJSONException."""
@@ -76,9 +77,7 @@ class OpenRequestAlreadyExists(CannotExecuteActionError):
     @property
     def description(self):
         """Exception's description."""
-        return gettext(
-            "There is already an open request of %(request_type)s on %(record_id)s."
-        ) % {
+        return gettext("There is already an open request of %(request_type)s on %(record_id)s.") % {
             "request_type": self.request_type.name,
             "record_id": self.record.id,
         }
@@ -117,9 +116,7 @@ class UnknownRequestType(Exception):
 class ReceiverNonReferencable(Exception):
     """Raised when receiver is required but could not be estimated from the record/caller."""
 
-    def __init__(
-        self, request_type: RequestType, record: Record, **kwargs: Any
-    ) -> None:
+    def __init__(self, request_type: RequestType, record: Record, **kwargs: Any) -> None:
         """Initialize the exception."""
         self.request_type = request_type
         self.record = record

@@ -10,6 +10,7 @@ import json
 from invenio_access.permissions import system_identity
 from pytest_oarepo.functions import clear_babel_context
 
+
 def test_resolve_topic(
     db,
     requests_model,
@@ -33,7 +34,10 @@ def test_resolve_topic(
     requests_model.Draft.index.refresh()
 
     resp_request_submit = submit_request_on_record(
-        creator.identity, record1_id, "delete_published_record", create_additional_data={"payload": {"removal_reason": "test reason"}}
+        creator.identity,
+        record1_id,
+        "delete_published_record",
+        create_additional_data={"payload": {"removal_reason": "test reason"}},
     )
     assert resp_request_submit["status"] == "submitted"
 
@@ -42,7 +46,7 @@ def test_resolve_topic(
         query_string={"expand": "true"},
     )
     assert resp.status_code == 200
-    assert resp.json["expanded"]["topic"] == {
+    assert resp.json["expanded"]["topic"] == {  # TODO: why is there a test creators and contributors in metadata?
         "id": record1_id,
         "metadata": {
             "contributors": ["Contributor 1"],
@@ -58,7 +62,7 @@ def test_resolve_topic(
         link2testclient(resp_request_submit["links"]["self"]),
     )
     assert resp.status_code == 200
-    assert resp.json["topic"] == {"thesis": record1_id}
+    assert resp.json["topic"] == {"test_requests": record1_id}
 
     resp = creator_client.get(
         link2testclient(resp_request_submit["links"]["self"]),
@@ -66,7 +70,7 @@ def test_resolve_topic(
     )
     assert resp.status_code == 200
     print(json.dumps(resp.json, indent=2))
-    assert resp.json["topic"] == {"thesis": record1_id}
+    assert resp.json["topic"] == {"test_requests": record1_id}
     assert resp.json["expanded"]["topic"] == {
         "id": record1_id,
         "metadata": {"title": "Deleted record"},
@@ -97,7 +101,10 @@ def test_ui_resolve_topic(
     requests_model.Draft.index.refresh()
 
     resp_request_submit = submit_request_on_record(
-        creator.identity, record1_id, "delete_published_record", create_additional_data={"payload": {"removal_reason": "test reason"}}
+        creator.identity,
+        record1_id,
+        "delete_published_record",
+        create_additional_data={"payload": {"removal_reason": "test reason"}},
     )
     assert resp_request_submit["status"] == "submitted"
 
@@ -109,22 +116,21 @@ def test_ui_resolve_topic(
     assert (
         resp.json["topic"].items()
         >= {
-            "reference": {"thesis": record1_id},
-            "type": "thesis",
+            "reference": {"test_requests": record1_id},
+            "type": "test_requests",
             "label": "blabla",
         }.items()
     )
     assert (
         resp.json["topic"]["links"].items()
         >= {
-            "self": f"https://127.0.0.1:5000/api/thesis/{record1_id}",
-            "self_html": f"https://127.0.0.1:5000/thesis/{record1_id}",
+            "self": f"https://127.0.0.1:5000/api/requests-test/{record1_id}",
+            "self_html": f"https://127.0.0.1:5000/requests-test/{record1_id}",
         }.items()
     )
     assert resp.json["stateful_name"] == "Record deletion requested"
     assert resp.json["stateful_description"] == (
-        "Permission to delete record requested. "
-        "You will be notified about the decision by email."
+        "Permission to delete record requested. You will be notified about the decision by email."
     )
 
     record_service.delete(system_identity, record1_id)
@@ -138,7 +144,7 @@ def test_ui_resolve_topic(
     print(json.dumps(resp.json, indent=2))
     assert resp.json["topic"] == {
         "reference": {
-            "thesis": record1_id,
+            "test_requests": record1_id,
         },
         "status": "deleted",
     }

@@ -13,11 +13,17 @@ import datetime
 from typing import TYPE_CHECKING, Any, cast
 
 import marshmallow as ma
+from invenio_i18n import _
 from invenio_pidstore.errors import (
     PersistentIdentifierError,
     PIDDeletedError,
 )
+
+# from oarepo_runtime.services.schema.marshmallow import BaseRecordSchema
+# from oarepo_runtime.services.schema.ui import LocalizedDateTime
+from invenio_rdm_records.resources.serializers.ui.schema import FormatDate  # TODO: temp
 from invenio_rdm_records.services.errors import RecordDeletedException
+from invenio_records_resources.services.records.schema import BaseRecordSchema  # TODO: temp
 from invenio_requests.proxies import current_request_type_registry, current_requests
 from invenio_requests.records import Request
 from invenio_requests.resolvers.registry import ResolverRegistry
@@ -26,11 +32,6 @@ from invenio_requests.services.schemas import (
     EventTypeMarshmallowField,
 )
 from marshmallow import validate
-from invenio_i18n import _
-# from oarepo_runtime.services.schema.marshmallow import BaseRecordSchema
-# from oarepo_runtime.services.schema.ui import LocalizedDateTime
-from invenio_rdm_records.resources.serializers.ui.schema import FormatDate #TODO: temp
-from invenio_records_resources.services.records.schema import BaseRecordSchema #TODO: temp
 from sqlalchemy.orm.exc import NoResultFound
 
 from oarepo_requests.resolvers.ui import resolve
@@ -70,9 +71,7 @@ class UIReferenceSchema(ma.Schema):
     def _dereference(self, data: dict, **kwargs: Any) -> dict[str, Any]:
         if "resolved" not in self.context:
             try:
-                return cast(
-                    "dict", resolve(self.context["identity"], data["reference"])
-                )
+                return cast("dict", resolve(self.context["identity"], data["reference"]))
             except PIDDeletedError:
                 return {**data, "status": "removed"}
             except PersistentIdentifierError:
@@ -91,10 +90,10 @@ class UIReferenceSchema(ma.Schema):
 class UIRequestSchemaMixin:
     """Mixin for UI request schemas."""
 
-    created = FormatDate(attribute="created", format="long") # LocalizedDateTime(dump_only=True)
+    created = FormatDate(attribute="created", format="long")  # LocalizedDateTime(dump_only=True)
     """Creation date of the event."""
 
-    updated = FormatDate(attribute="updated", format="long") # LocalizedDateTime(dump_only=True)
+    updated = FormatDate(attribute="updated", format="long")  # LocalizedDateTime(dump_only=True)
 
     name = ma.fields.String()
     """Name of the request."""
@@ -159,9 +158,7 @@ class UIRequestSchemaMixin:
 
         return data
 
-    def _get_stateful_labels(
-        self, type_obj: RequestType, data: dict
-    ) -> tuple[str | None, str | None]:
+    def _get_stateful_labels(self, type_obj: RequestType, data: dict) -> tuple[str | None, str | None]:
         stateful_name = None
         stateful_description = None
         try:
@@ -264,32 +261,26 @@ class UIRequestsSerializationMixin(ma.Schema):
     """Mixin for serialization of record that adds information from request type."""
 
     @ma.post_dump(pass_original=True)
-    def _add_request_types(
-        self, data: dict, original_data: dict, **kwargs: Any
-    ) -> dict:
+    def _add_request_types(self, data: dict, original_data: dict, **kwargs: Any) -> dict:
         """If the expansion is requested, add UI form of request types and requests to the serialized record."""
         expanded = data.get("expanded", {})
         if not expanded:
             return data
         context = {**self.context, "topic": original_data}
         if "request_types" in expanded:
-            expanded["request_types"] = UIRequestTypeSchema(context=context).dump(
-                expanded["request_types"], many=True
-            )
+            expanded["request_types"] = UIRequestTypeSchema(context=context).dump(expanded["request_types"], many=True)
         if "requests" in expanded:
-            expanded["requests"] = UIBaseRequestSchema(context=context).dump(
-                expanded["requests"], many=True
-            )
+            expanded["requests"] = UIBaseRequestSchema(context=context).dump(expanded["requests"], many=True)
         return data
 
 
 class UIBaseRequestEventSchema(BaseRecordSchema):
     """Base schema for request events."""
 
-    created = FormatDate(attribute="created", format="long") # LocalizedDateTime(dump_only=True)
+    created = FormatDate(attribute="created", format="long")  # LocalizedDateTime(dump_only=True)
     """Creation date of the event."""
 
-    updated = FormatDate(attribute="updated", format="long") # LocalizedDateTime(dump_only=True)
+    updated = FormatDate(attribute="updated", format="long")  # LocalizedDateTime(dump_only=True)
     """Update date of the event."""
 
     type = EventTypeMarshmallowField(dump_only=True)
@@ -311,12 +302,7 @@ class UIBaseRequestEventSchema(BaseRecordSchema):
         if is_comment:
             service = current_requests.request_events_service
             return {
-                "can_update_comment": service.check_permission(
-                    self.context["identity"], "update_comment", event=obj
-                ),
-                "can_delete_comment": service.check_permission(
-                    self.context["identity"], "delete_comment", event=obj
-                ),
+                "can_update_comment": service.check_permission(self.context["identity"], "update_comment", event=obj),
+                "can_delete_comment": service.check_permission(self.context["identity"], "delete_comment", event=obj),
             }
-        else:
-            return {}
+        return {}

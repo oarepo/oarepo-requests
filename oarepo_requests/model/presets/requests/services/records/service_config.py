@@ -8,56 +8,42 @@
 #
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Any, Generator
-from oarepo_requests.services.components.autorequest import AutorequestComponent
-from invenio_drafts_resources.services import (
-    RecordServiceConfig as DraftServiceConfig,
-)
+from collections.abc import Generator
+from typing import TYPE_CHECKING, Any
+
 from invenio_records_resources.services import (
     ConditionalLink,
     RecordLink,
 )
-from invenio_records_resources.services.records.config import (
-    RecordServiceConfig,
+from oarepo_model.customizations import (
+    AddToDictionary,
+    AddToList,
+    Customization,
 )
+from oarepo_model.model import InvenioModel
+from oarepo_model.presets import Preset
 from oarepo_runtime.services.config import (
-    has_draft,
-    has_draft_permission,
-    has_permission,
-    has_published_record,
     is_published_record,
 )
 
-from oarepo_model.customizations import (
-    AddMixins,
-    AddToDictionary,
-    AddToList,
-    ChangeBase,
-    Customization,
-)
-from oarepo_model.model import Dependency, InvenioModel, ModelMixin
-from oarepo_model.presets import Preset
+from oarepo_requests.services.components.autorequest import AutorequestComponent
+from oarepo_requests.services.record.components.snapshot_component import RecordSnapshotComponent
 
 if TYPE_CHECKING:
     from oarepo_model.builder import InvenioModelBuilder
 
-class RequestsServiceConfigPreset(Preset):
-    """
-    Preset for record service config class.
-    """
 
-    modifies = [
-        "record_links_item",
-        "record_service_components"
-    ]
+class RequestsServiceConfigPreset(Preset):
+    """Preset for record service config class."""
+
+    modifies = ["record_links_item", "record_service_components"]
 
     def apply(
         self,
         builder: InvenioModelBuilder,
         model: InvenioModel,
         dependencies: dict[str, Any],
-    ) -> Generator[Customization, None, None]:
-
+    ) -> Generator[Customization]:
         api_base = "{+api}/" + builder.model.slug + "/"
         ui_base = "{+ui}/" + builder.model.slug + "/"
 
@@ -77,10 +63,7 @@ class RequestsServiceConfigPreset(Preset):
             ),
         }
 
-        yield AddToDictionary(
-            "record_links_item",
-            links
-        )
+        yield AddToDictionary("record_links_item", links)
 
         yield AddToList("record_service_components", AutorequestComponent)
-
+        yield AddToList("record_service_components", RecordSnapshotComponent)

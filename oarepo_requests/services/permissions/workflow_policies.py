@@ -42,6 +42,6 @@ class RequestBasedWorkflowPermissions(DefaultWorkflowPermissions):
 
 
 __all__ = (
-    "RequestBasedWorkflowPermissions",
     "CreatorsFromWorkflowRequestsPermissionPolicy",
+    "RequestBasedWorkflowPermissions",
 )

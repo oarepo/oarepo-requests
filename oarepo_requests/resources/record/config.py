@@ -11,10 +11,10 @@ from __future__ import annotations
 
 import importlib_metadata
 import marshmallow as ma
-from invenio_requests.proxies import current_requests_resource
 from flask_resources import JSONSerializer, ResponseHandler
 from invenio_records_resources.resources import RecordResourceConfig
 from invenio_records_resources.resources.records.headers import etag_headers
+from invenio_requests.proxies import current_requests_resource
 
 from oarepo_requests.resources.ui import OARepoRequestsUIJSONSerializer
 
@@ -26,25 +26,19 @@ class RecordRequestsResourceConfig:
     the requests resource lives.
     """
 
-    blueprint_name: str | None = (
-        None  # will be merged from the record's resource config
-    )
+    blueprint_name: str | None = None  # will be merged from the record's resource config
 
     routes = {
         "list-requests": "/<pid_value>/requests",
         "request-type": "/<pid_value>/requests/<request_type>",
     }
-    request_view_args = RecordResourceConfig.request_view_args | {
-        "request_type": ma.fields.Str()
-    }
+    request_view_args = RecordResourceConfig.request_view_args | {"request_type": ma.fields.Str()}
 
     @property
     def response_handlers(self) -> dict[str, ResponseHandler]:
         """Response handlers for the record requests resource."""
         return {
-            "application/vnd.inveniordm.v1+json": ResponseHandler(
-                OARepoRequestsUIJSONSerializer()
-            ),
+            "application/vnd.inveniordm.v1+json": ResponseHandler(OARepoRequestsUIJSONSerializer()),
             "application/json": ResponseHandler(JSONSerializer(), headers=etag_headers),
         }
 
@@ -52,12 +46,8 @@ class RecordRequestsResourceConfig:
     def error_handlers(self) -> dict:
         """Get error handlers."""
         entrypoint_error_handlers = {**current_requests_resource.config.error_handlers}
-        for x in importlib_metadata.entry_points(
-            group="oarepo_requests.error_handlers"
-        ):
+        for x in importlib_metadata.entry_points(group="oarepo_requests.error_handlers"):
             entrypoint_error_handlers.update(x.load())
-        for x in importlib_metadata.entry_points(
-            group="oarepo_requests.record.error_handlers"
-        ):
+        for x in importlib_metadata.entry_points(group="oarepo_requests.record.error_handlers"):
             entrypoint_error_handlers.update(x.load())
         return entrypoint_error_handlers

@@ -31,9 +31,7 @@ class DraftRecordRequestTypesService(RecordRequestTypesService):
         """Factory for creating a record class."""
         return self.record_service.config.draft_cls
 
-    def get_applicable_request_types_for_draft_record(
-        self, identity: Identity, record_id: str
-    ) -> RequestTypesList:
+    def get_applicable_request_types_for_draft_record(self, identity: Identity, record_id: str) -> RequestTypesList:
         """Return applicable request types for a draft record."""
         record = self.draft_cls.pid.resolve(record_id, registered_only=False)
         return self._get_applicable_request_types(identity, record)

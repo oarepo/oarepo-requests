@@ -23,8 +23,8 @@ from oarepo_ui.proxies import current_oarepo_ui
 from oarepo_ui.resources import UIResource
 from oarepo_ui.templating.data import FieldData
 
-#from oarepo_ui.resources.resource import UIResource
-#from oarepo_ui.resources.templating.data import FieldData
+# from oarepo_ui.resources.resource import UIResource
+# from oarepo_ui.resources.templating.data import FieldData
 
 if TYPE_CHECKING:
     from flask_principal import Identity
@@ -66,17 +66,13 @@ class RequestUIResource(UIResource):
             routes.append(route("GET", route_url, getattr(self, route_name)))
         return routes
 
-    def expand_detail_links(
-        self, identity: Identity, request: Request
-    ) -> dict[str, str]:
+    def expand_detail_links(self, identity: Identity, request: Request) -> dict[str, str]:
         """Get links for this result item.
 
         :param identity: Identity of the caller
         :param request: Request to get the links for
         """
-        tpl = LinksTemplate(
-            self.config.ui_links_item, {"url_prefix": self.config.url_prefix}
-        )
+        tpl = LinksTemplate(self.config.ui_links_item, {"url_prefix": self.config.url_prefix})
         return tpl.expand(identity, request)
 
     def _get_custom_fields(self, **kwargs: Any) -> dict:
@@ -90,9 +86,7 @@ class RequestUIResource(UIResource):
     @request_view_args
     def detail(self) -> Response:
         """Return item detail page."""
-        api_record = self.api_service.read(
-            g.identity, resource_requestctx.view_args["pid_value"]
-        )
+        api_record = self.api_service.read(g.identity, resource_requestctx.view_args["pid_value"])
         render_method = self.get_jinjax_macro(
             "detail",
             identity=g.identity,
@@ -140,9 +134,7 @@ class RequestUIResource(UIResource):
             args=resource_requestctx.args,
             view_args=resource_requestctx.view_args,
             ui_links=ui_links,
-            custom_fields=self._get_custom_fields(
-                api_record=api_record, resource_requestctx=resource_requestctx
-            ),
+            custom_fields=self._get_custom_fields(api_record=api_record, resource_requestctx=resource_requestctx),
         )
 
         metadata = dict(record.get("metadata", record))
@@ -167,9 +159,7 @@ class RequestUIResource(UIResource):
     @property
     def ui_model(self) -> dict[str, Any]:
         """Return the ui model for requests."""
-        return current_oarepo_ui.ui_models.get(
-            self.config.api_service.replace("-", "_"), {}
-        )
+        return current_oarepo_ui.ui_models.get(self.config.api_service.replace("-", "_"), {})
 
     def get_jinjax_macro(
         self,
@@ -216,9 +206,7 @@ class RequestUIResource(UIResource):
             error=error,
         )
 
-    def permission_denied(
-        self, error: Exception, *args: Any, **kwargs: Any
-    ) -> Response:
+    def permission_denied(self, error: Exception, *args: Any, **kwargs: Any) -> Response:
         """Render permission denied page for a request that the user does not have access to."""
         return current_oarepo_ui.catalog.render(
             self.get_jinjax_macro(

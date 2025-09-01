@@ -21,9 +21,7 @@ def test_search(
 
     draft1 = draft_factory(creator.identity)
 
-    resp_request_create = create_request_on_draft(
-        creator.identity, draft1["id"], "publish_draft"
-    )
+    resp_request_create = create_request_on_draft(creator.identity, draft1["id"], "publish_draft")
     # should work without refreshing requests index
     requests_search = creator_client.get(urls["BASE_URL_REQUESTS"]).json
 

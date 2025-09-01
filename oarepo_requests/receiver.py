@@ -10,7 +10,9 @@
 from __future__ import annotations
 
 from typing import TYPE_CHECKING, Any
+
 from oarepo_workflows.errors import RequestTypeNotInWorkflowError
+
 from oarepo_requests.errors import ReceiverNonReferencable
 
 if TYPE_CHECKING:
@@ -32,23 +34,21 @@ def default_workflow_receiver_function(
     """
     from oarepo_workflows.proxies import current_oarepo_workflows
 
-    workflow_id = current_oarepo_workflows.get_workflow_from_record(record)
-    if not workflow_id:
+    workflow = current_oarepo_workflows.get_workflow(record)
+    if not workflow:
         return None  # exception?
 
     try:
         request: WorkflowRequest = getattr(
-            current_oarepo_workflows.record_workflows[workflow_id].requests(),
+            workflow.requests(),
             request_type.type_id,
         )
     except AttributeError as e:
-        raise RequestTypeNotInWorkflowError(request_type.type_id, workflow_id) from e
+        raise RequestTypeNotInWorkflowError(
+            request_type.type_id, current_oarepo_workflows.get_workflow_id(record)
+        ) from e  # TODO: reconsider how to save workflow id
 
-    receiver = request.recipient_entity_reference(
-        record=record, request_type=request_type, **kwargs
-    )
+    receiver = request.recipient_entity_reference(record=record, request_type=request_type, **kwargs)
     if not request_type.receiver_can_be_none and not receiver:
-        raise ReceiverNonReferencable(
-            request_type=request_type, record=record, **kwargs
-        )
+        raise ReceiverNonReferencable(request_type=request_type, record=record, **kwargs)
     return receiver

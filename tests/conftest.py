@@ -10,9 +10,11 @@ import os
 import sys
 import time
 from datetime import timedelta
-from typing import Dict
-from invenio_rdm_records.services.permissions import RDMRequestsPermissionPolicy
+
 import pytest
+from invenio_i18n import _
+from invenio_rdm_records.services.generators import RecordOwners
+from invenio_rdm_records.services.permissions import RDMRequestsPermissionPolicy
 from invenio_records_permissions.generators import (
     AnyUser,
     AuthenticatedUser,
@@ -29,8 +31,6 @@ from invenio_requests.services.permissions import (
 from invenio_users_resources.records import UserAggregate
 from oarepo_model.customizations import AddFileToModule
 from oarepo_model.presets.rdm import rdm_presets
-from invenio_i18n import _
-from invenio_rdm_records.services.generators import RecordOwners
 from oarepo_workflows import (
     AutoApprove,
     AutoRequest,
@@ -48,6 +48,7 @@ from pytest_oarepo.requests.classes import (
     TestEventType,
     UserGenerator,
 )
+from sqlalchemy.exc import IntegrityError
 
 from oarepo_requests.actions.generic import (
     OARepoAcceptAction,
@@ -75,6 +76,11 @@ pytest_plugins = [
     "pytest_oarepo.files",
 ]
 
+# import logging
+# logging.basicConfig(level=logging.INFO)
+# logging.getLogger("sqlalchemy.engine").setLevel(logging.INFO)
+
+
 @pytest.fixture
 def events_service():
     from invenio_requests.proxies import current_events_service
@@ -85,6 +91,7 @@ def events_service():
 @pytest.fixture(scope="module", autouse=True)
 def location(location):
     return location
+
 
 """
 @pytest.fixture(autouse=True)
@@ -100,12 +107,8 @@ can_comment_only_receiver = [
 
 events_only_receiver_can_comment = {
     CommentEventType.type_id: WorkflowEvent(submitters=can_comment_only_receiver),
-    LogEventType.type_id: WorkflowEvent(
-        submitters=InvenioRequestsPermissionPolicy.can_create_comment
-    ),
-    TopicUpdateEventType.type_id: WorkflowEvent(
-        submitters=InvenioRequestsPermissionPolicy.can_create_comment
-    ),
+    LogEventType.type_id: WorkflowEvent(submitters=InvenioRequestsPermissionPolicy.can_create_comment),
+    TopicUpdateEventType.type_id: WorkflowEvent(submitters=InvenioRequestsPermissionPolicy.can_create_comment),
     TestEventType.type_id: WorkflowEvent(submitters=can_comment_only_receiver),
 }
 
@@ -342,9 +345,7 @@ class RequestsWithApprove(WorkflowRequestPolicy):
 class RequestsWithCT(WorkflowRequestPolicy):
     conditional_recipient_rt = WorkflowRequest(
         requesters=[AnyUser()],
-        recipients=[
-            IfRequestedBy(UserGenerator(1), [UserGenerator(2)], [UserGenerator(3)])
-        ],
+        recipients=[IfRequestedBy(UserGenerator(1), [UserGenerator(2)], [UserGenerator(3)])],
     )
     approve_draft = WorkflowRequest(
         requesters=[IfInState("draft", [RecordOwners()])],
@@ -410,7 +411,7 @@ class AnotherTopicUpdatingRequestType(NonDuplicableOARepoRequestType):
     receiver_can_be_none = True
     allowed_topic_ref_types = ModelRefTypes(published=True, draft=True)
 
-    def topic_change(self, request: Request, new_topic: Dict, uow):
+    def topic_change(self, request: Request, new_topic: dict, uow):
         request.topic = new_topic
         uow.register(RecordCommitOp(request, indexer=current_requests_service.indexer))
 
@@ -489,9 +490,7 @@ WORKFLOWS = {
         request_policy_cls=RequestsWithAnotherTopicUpdatingRequestType,
     ),
     "different_recipients": Workflow(
-        label=_(
-            "Workflow with draft requests with different recipients to test param interpreters"
-        ),
+        label=_("Workflow with draft requests with different recipients to test param interpreters"),
         permission_policy_cls=TestWorkflowPermissions,
         request_policy_cls=RequestsWithDifferentRecipients,
     ),
@@ -513,21 +512,19 @@ WORKFLOWS = {
 }
 
 
-@pytest.fixture()
+@pytest.fixture
 def urls():
-    return {"BASE_URL": "/requests-test/", "BASE_URL_REQUESTS": "/requests/"}
+    return {"BASE_URL": "/requests-test", "BASE_URL_REQUESTS": "/requests/"}
 
 
-@pytest.fixture()
+@pytest.fixture
 def serialization_result():
     def _result(topic_id, request_id):
         return {
             "id": request_id,  #'created': '2024-01-29T22:09:13.931722',
             #'updated': '2024-01-29T22:09:13.954850',
             "links": {
-                "actions": {
-                    "cancel": f"https://127.0.0.1:5000/api/requests/{request_id}/actions/cancel"
-                },
+                "actions": {"cancel": f"https://127.0.0.1:5000/api/requests/{request_id}/actions/cancel"},
                 "self": f"https://127.0.0.1:5000/api/requests/extended/{request_id}",
                 "comments": f"https://127.0.0.1:5000/api/requests/extended/{request_id}/comments",
                 "timeline": f"https://127.0.0.1:5000/api/requests/extended/{request_id}/timeline",
@@ -549,7 +546,7 @@ def serialization_result():
     return _result
 
 
-@pytest.fixture()
+@pytest.fixture
 def ui_serialization_result():
     # TODO correct time formats, translations etc
     def _result(topic_id, request_id):
@@ -568,9 +565,7 @@ def ui_serialization_result():
             "is_expired": False,
             "is_open": True,
             "links": {
-                "actions": {
-                    "cancel": f"https://127.0.0.1:5000/api/requests/{request_id}/actions/cancel"
-                },
+                "actions": {"cancel": f"https://127.0.0.1:5000/api/requests/{request_id}/actions/cancel"},
                 "self": f"https://127.0.0.1:5000/api/requests/extended/{request_id}",
                 "comments": f"https://127.0.0.1:5000/api/requests/extended/{request_id}/comments",
                 "timeline": f"https://127.0.0.1:5000/api/requests/extended/{request_id}/timeline",
@@ -609,12 +604,8 @@ def app_config(app_config, requests_model):
         }
     ]
     app_config["JSONSCHEMAS_HOST"] = "localhost"
-    app_config["RECORDS_REFRESOLVER_CLS"] = (
-        "invenio_records.resolver.InvenioRefResolver"
-    )
-    app_config["RECORDS_REFRESOLVER_STORE"] = (
-        "invenio_jsonschemas.proxies.current_refresolver_store"
-    )
+    app_config["RECORDS_REFRESOLVER_CLS"] = "invenio_records.resolver.InvenioRefResolver"
+    app_config["RECORDS_REFRESOLVER_STORE"] = "invenio_jsonschemas.proxies.current_refresolver_store"
     app_config["CACHE_TYPE"] = "SimpleCache"
 
     app_config["OAREPO_REQUESTS_DEFAULT_RECEIVER"] = default_workflow_receiver_function
@@ -644,37 +635,28 @@ def app_config(app_config, requests_model):
     app_config["REQUESTS_PERMISSION_POLICY"] = (
         RDMRequestsPermissionPolicy  # TODO: rdm expected as default, though the app_rdm (?) config is not used for now?
     )
+    app_config["RDM_OPTIONAL_DOI_VALIDATOR"] = lambda _draft, _previous_published, **_kwargs: True
+    app_config["RDM_RECORDS_ALLOW_RESTRICTION_AFTER_GRACE_PERIOD"] = True
 
     return app_config
 
 
 @pytest.fixture
 def check_publish_topic_update():
-    def _check_publish_topic_update(
-        creator_client, urls, record, before_update_response
-    ):
+    def _check_publish_topic_update(creator_client, urls, record, before_update_response):
         request_id = before_update_response["id"]
         record_id = record["id"]
 
-        after_update_response = creator_client.get(
-            f"{urls['BASE_URL_REQUESTS']}{request_id}"
-        ).json
+        after_update_response = creator_client.get(f"{urls['BASE_URL_REQUESTS']}{request_id}").json
         RequestEvent.index.refresh()
-        events = creator_client.get(
-            f"{urls['BASE_URL_REQUESTS']}extended/{request_id}/timeline"
-        ).json["hits"]["hits"]
+        events = creator_client.get(f"{urls['BASE_URL_REQUESTS']}extended/{request_id}/timeline").json["hits"]["hits"]
 
         assert before_update_response["topic"] == {"requests_test_draft": record_id}
         assert after_update_response["topic"] == {"requests_test": record_id}
 
-        topic_updated_events = [
-            e for e in events if e["type"] == TopicUpdateEventType.type_id
-        ]
+        topic_updated_events = [e for e in events if e["type"] == TopicUpdateEventType.type_id]
         assert len(topic_updated_events) == 1
-        assert (
-            topic_updated_events[0]["payload"]["old_topic"]
-            == f"requests_test_draft.{record_id}"
-        )
+        assert topic_updated_events[0]["payload"]["old_topic"] == f"requests_test_draft.{record_id}"
         assert topic_updated_events[0]["payload"]["new_topic"] == f"requests_test.{record_id}"
 
     return _check_publish_topic_update
@@ -692,6 +674,15 @@ def user_links():
     return _user_links
 
 
+def _create_user(user_fixture, app, db):
+    try:
+        user_fixture.create(app, db)
+    except IntegrityError:
+        datastore = app.extensions["security"].datastore
+        user_fixture._user = datastore.get_user_by_email(user_fixture.email)
+        user_fixture._app = app
+
+
 @pytest.fixture
 def more_users(app, db, UserFixture):
     user1 = UserFixture(
@@ -700,7 +691,7 @@ def more_users(app, db, UserFixture):
         active=True,
         confirmed=True,
     )
-    user1.create(app, db)
+    _create_user(user1, app, db)
 
     user2 = UserFixture(
         email="user2@example.org",
@@ -708,7 +699,7 @@ def more_users(app, db, UserFixture):
         active=True,
         confirmed=True,
     )
-    user2.create(app, db)
+    _create_user(user2, app, db)
 
     user3 = UserFixture(
         email="user3@example.org",
@@ -720,7 +711,7 @@ def more_users(app, db, UserFixture):
         active=True,
         confirmed=True,
     )
-    user3.create(app, db)
+    _create_user(user3, app, db)
 
     user4 = UserFixture(
         email="user4@example.org",
@@ -728,7 +719,7 @@ def more_users(app, db, UserFixture):
         active=True,
         confirmed=True,
     )
-    user4.create(app, db)
+    _create_user(user4, app, db)
 
     user5 = UserFixture(
         email="user5@example.org",
@@ -736,7 +727,7 @@ def more_users(app, db, UserFixture):
         active=True,
         confirmed=True,
     )
-    user5.create(app, db)
+    _create_user(user5, app, db)
 
     user6 = UserFixture(
         email="user6@example.org",
@@ -744,7 +735,7 @@ def more_users(app, db, UserFixture):
         active=True,
         confirmed=True,
     )
-    user6.create(app, db)
+    _create_user(user6, app, db)
 
     user7 = UserFixture(
         email="user7@example.org",
@@ -752,7 +743,7 @@ def more_users(app, db, UserFixture):
         active=True,
         confirmed=True,
     )
-    user7.create(app, db)
+    _create_user(user7, app, db)
 
     user10 = UserFixture(
         email="user10@example.org",
@@ -760,7 +751,7 @@ def more_users(app, db, UserFixture):
         active=True,
         confirmed=True,
     )
-    user10.create(app, db)
+    _create_user(user10, app, db)
 
     db.session.commit()
     UserAggregate.index.refresh()
@@ -779,9 +770,9 @@ def model_types():
         }
     }
 
-@pytest.fixture(scope="module")
-def requests_model(model_types):
 
+@pytest.fixture(scope="session")
+def requests_model(model_types):
     from oarepo_model.api import model
     from oarepo_model.presets.drafts import drafts_presets
     from oarepo_model.presets.records_resources import records_resources_presets
@@ -794,7 +785,8 @@ def requests_model(model_types):
         presets=[records_resources_presets, drafts_presets, rdm_presets, workflows_presets, requests_presets],
         types=[model_types],
         metadata_type="Metadata",
-        customizations=[            AddFileToModule(
+        customizations=[
+            AddFileToModule(
                 "parent-jsonschema",
                 "jsonschemas",
                 "parent-v1.0.0.json",
@@ -806,7 +798,8 @@ def requests_model(model_types):
                         "properties": {"id": {"type": "string"}},
                     }
                 ),
-            ),],
+            ),
+        ],
     )
     workflow_model.register()
 
@@ -819,6 +812,7 @@ def requests_model(model_types):
         workflow_model.unregister()
 
     return workflow_model
+
 
 @pytest.fixture
 def record_service(requests_model):

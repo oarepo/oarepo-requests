@@ -18,9 +18,7 @@ from invenio_requests.resources.events.config import RequestCommentsResourceConf
 from oarepo_requests.resources.ui import OARepoRequestEventsUIJSONSerializer
 
 
-class OARepoRequestsCommentsResourceConfig(
-    RequestCommentsResourceConfig, ConfiguratorMixin
-):
+class OARepoRequestsCommentsResourceConfig(RequestCommentsResourceConfig, ConfiguratorMixin):
     """Resource configuration for comments."""
 
     blueprint_name = "oarepo_request_events"
@@ -48,9 +46,7 @@ class OARepoRequestsCommentsResourceConfig(
         :return: Response handlers (dict of content-type -> handler)
         """
         return {
-            "application/vnd.inveniordm.v1+json": ResponseHandler(
-                OARepoRequestEventsUIJSONSerializer()
-            ),
+            "application/vnd.inveniordm.v1+json": ResponseHandler(OARepoRequestEventsUIJSONSerializer()),
             **super().response_handlers,
         }
 
@@ -58,12 +54,8 @@ class OARepoRequestsCommentsResourceConfig(
     def error_handlers(self) -> dict:
         """Get error handlers."""
         entrypoint_error_handlers = {}
-        for x in importlib_metadata.entry_points(
-            group="oarepo_requests.error_handlers"
-        ):
+        for x in importlib_metadata.entry_points(group="oarepo_requests.error_handlers"):
             entrypoint_error_handlers.update(x.load())
-        for x in importlib_metadata.entry_points(
-            group="oarepo_requests.events.error_handlers"
-        ):
+        for x in importlib_metadata.entry_points(group="oarepo_requests.events.error_handlers"):
             entrypoint_error_handlers.update(x.load())
         return entrypoint_error_handlers

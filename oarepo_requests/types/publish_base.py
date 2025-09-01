@@ -85,9 +85,7 @@ class PublishRequestType(NonDuplicableOARepoRequestType):
         request_service = get_requests_service_for_records_service(
             topic_service
         )  # , extra_filters = TermQuery(status="open")
-        requests = request_service.search_requests_for_draft(
-            system_identity, topic.pid.pid_value
-        )
+        requests = request_service.search_requests_for_draft(system_identity, topic.pid.pid_value)
 
         for result in requests._results:
             # note: we can not use solely the result.is_open because changes may not be committed yet
@@ -115,9 +113,7 @@ class PublishRequestType(NonDuplicableOARepoRequestType):
     ) -> None:
         """Check if the request can be created."""
         if not topic.is_draft:
-            raise ValueError(
-                gettext("Trying to create publish request on published record")
-            )
+            raise ValueError(gettext("Trying to create publish request on published record"))
         self.assert_no_pending_requests(topic)
         super().can_create(identity, data, receiver, topic, creator, *args, **kwargs)
         self.validate_topic(identity, topic)
@@ -136,9 +132,7 @@ class PublishRequestType(NonDuplicableOARepoRequestType):
 
         # if files support is enabled for this topic, check if there are any files
         if hasattr(topic, "files"):
-            can_toggle_files = topic_service.check_permission(
-                identity, "manage_files", record=topic
-            )
+            can_toggle_files = topic_service.check_permission(identity, "manage_files", record=topic)
             draft_files = topic.files  # type: ignore
             if draft_files.enabled and not draft_files.items():
                 if can_toggle_files:
@@ -151,9 +145,7 @@ class PublishRequestType(NonDuplicableOARepoRequestType):
                 raise ma.ValidationError({"files.enabled": [my_message]})
 
     @classmethod
-    def is_applicable_to(
-        cls, identity: Identity, topic: Record, *args: Any, **kwargs: Any
-    ) -> bool:
+    def is_applicable_to(cls, identity: Identity, topic: Record, *args: Any, **kwargs: Any) -> bool:
         """Check if the request type is applicable to the topic."""
         if not topic.is_draft:
             return False
@@ -166,14 +158,7 @@ class PublishRequestType(NonDuplicableOARepoRequestType):
         uow.register(RecordCommitOp(request, indexer=current_requests_service.indexer))
 
     @classmethod
-    def topic_type(
-        cls, topic: Record
-    ) -> (
-        Literal["initial"]
-        | Literal["new_version"]
-        | Literal["metadata"]
-        | Literal["published"]
-    ):
+    def topic_type(cls, topic: Record) -> Literal["initial", "new_version", "metadata", "published"]:
         index = topic.versions.index
         is_latest = topic.versions.is_latest
         is_draft = topic.is_draft
@@ -183,6 +168,6 @@ class PublishRequestType(NonDuplicableOARepoRequestType):
 
         if index == 1 and not is_latest:
             return "initial"
-        elif index > 1 and not is_latest:
+        if index > 1 and not is_latest:
             return "new_version"
         return "metadata"

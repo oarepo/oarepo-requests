@@ -12,13 +12,16 @@ from __future__ import annotations
 from typing import TYPE_CHECKING, Any, override
 
 from oarepo_runtime.proxies import current_runtime
+
 from oarepo_requests.actions.record_snapshot_mixin import RecordSnapshotMixin
+
 from .generic import AddTopicLinksOnPayloadMixin, OARepoAcceptAction
 
 if TYPE_CHECKING:
     from flask_principal import Identity
-    from .components import RequestActionState
     from invenio_records_resources.services.uow import UnitOfWork
+
+    from .components import RequestActionState
 
 
 class EditTopicAcceptAction(AddTopicLinksOnPayloadMixin, RecordSnapshotMixin, OARepoAcceptAction):

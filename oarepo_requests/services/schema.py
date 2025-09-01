@@ -22,9 +22,7 @@ from oarepo_runtime.services.config.link_conditions import is_published_record
 
 def get_links_schema() -> ma.fields.Dict:
     """Get links schema."""
-    return ma.fields.Dict(
-        keys=ma.fields.String()
-    )  # value is either string or dict of strings (for actions)
+    return ma.fields.Dict(keys=ma.fields.String())  # value is either string or dict of strings (for actions)
 
 
 class RequestTypeSchema(ma.Schema):
@@ -41,9 +39,7 @@ class RequestTypeSchema(ma.Schema):
         if "links" in data:
             return data
         if "record" not in self.context:
-            raise ma.ValidationError(
-                "record not in context for request types serialization"
-            )
+            raise ma.ValidationError("record not in context for request types serialization")
         type_id = data["type_id"]
         # current_request_type_registry.lookup(type_id, quiet=True)
         record = self.context["record"]
@@ -51,9 +47,7 @@ class RequestTypeSchema(ma.Schema):
         link = ConditionalLink(
             cond=is_published_record(),
             if_=Link(f"{{+api}}{service.config.url_prefix}{{id}}/requests/{type_id}"),
-            else_=Link(
-                f"{{+api}}{service.config.url_prefix}{{id}}/draft/requests/{type_id}"
-            ),
+            else_=Link(f"{{+api}}{service.config.url_prefix}{{id}}/draft/requests/{type_id}"),
         )
         template = LinksTemplate({"create": link}, context={"id": record["id"]})
         data["links"] = {"actions": template.expand(self.context["identity"], record)}

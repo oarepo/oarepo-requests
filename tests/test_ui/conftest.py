@@ -30,12 +30,8 @@ def app_config(app_config):
             "port": os.environ.get("OPENSEARCH_PORT", "9200"),
         }
     ]
-    app_config["RECORDS_REFRESOLVER_CLS"] = (
-        "invenio_records.resolver.InvenioRefResolver"
-    )
-    app_config["RECORDS_REFRESOLVER_STORE"] = (
-        "invenio_jsonschemas.proxies.current_refresolver_store"
-    )
+    app_config["RECORDS_REFRESOLVER_CLS"] = "invenio_records.resolver.InvenioRefResolver"
+    app_config["RECORDS_REFRESOLVER_STORE"] = "invenio_jsonschemas.proxies.current_refresolver_store"
 
     # for ui tests
     app_config["APP_THEME"] = ["semantic-ui"]
@@ -59,18 +55,14 @@ def record_ui_resource_config(app):
 @pytest.fixture(scope="module")
 def record_ui_resource(app, record_ui_resource_config, record_service):
     ui_resource = ModelUIResource(record_ui_resource_config)
-    app.register_blueprint(
-        ui_resource.as_blueprint(template_folder=Path(__file__).parent / "templates")
-    )
+    app.register_blueprint(ui_resource.as_blueprint(template_folder=Path(__file__).parent / "templates"))
     return ui_resource
 
 
-@pytest.fixture()
+@pytest.fixture
 def fake_manifest(app):
     python_path = Path(sys.executable)
     invenio_instance_path = python_path.parent.parent / "var" / "instance"
     manifest_path = invenio_instance_path / "static" / "dist"
     manifest_path.mkdir(parents=True, exist_ok=True)
-    shutil.copy(
-        Path(__file__).parent / "manifest.json", manifest_path / "manifest.json"
-    )
+    shutil.copy(Path(__file__).parent / "manifest.json", manifest_path / "manifest.json")

@@ -9,11 +9,10 @@ class UserNotificationProxy(UserProxy):
         user_id = self._parse_ref_dict_id()
         if user_id == system_user_id:  # system_user_id is a string: "system"
             return self.system_record()
-        else:
-            try:
-                return current_users_service.read(system_identity, user_id).data
-            except:
-                return self.ghost_record({"id": user_id})
+        try:
+            return current_users_service.read(system_identity, user_id).data
+        except:
+            return self.ghost_record({"id": user_id})
 
 
 class UserNotificationResolver(UserResolver):

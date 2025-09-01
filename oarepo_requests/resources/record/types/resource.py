@@ -41,12 +41,8 @@ class RecordRequestTypesResource(ErrorHandlersMixin, Resource):
         :param service:
         :param record_requests_config: config specific for the record request serivce
         """
-        record_requests_config.blueprint_name = (
-            f"{config.blueprint_name}_applicable_requests"
-        )
-        actual_config = merge_resource_configs(
-            config_to_merge_in=record_requests_config, original_config=config
-        )
+        record_requests_config.blueprint_name = f"{config.blueprint_name}_applicable_requests"
+        actual_config = merge_resource_configs(config_to_merge_in=record_requests_config, original_config=config)
         super().__init__(actual_config)
         self.service = service
 

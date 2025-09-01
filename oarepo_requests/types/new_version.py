@@ -9,24 +9,24 @@
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Any
+from typing import TYPE_CHECKING, Any, override
 
 import marshmallow as ma
 from invenio_drafts_resources.resources.records.errors import DraftNotCreatedError
+from invenio_i18n import gettext
+from invenio_i18n import lazy_gettext as _
+from invenio_pidstore.errors import PIDDoesNotExistError
 from invenio_records_resources.services.errors import PermissionDeniedError
 from invenio_records_resources.services.uow import RecordCommitOp, UnitOfWork
 from invenio_requests.proxies import current_requests_service
 from marshmallow.validate import OneOf
 from oarepo_runtime.proxies import current_runtime
-from invenio_i18n import gettext, lazy_gettext as _
 from oarepo_runtime.records.drafts import has_draft
-from typing_extensions import override
 
 from ..actions.new_version import NewVersionAcceptAction
 from ..utils import classproperty, is_auto_approved, request_identity_matches
 from .generic import NonDuplicableOARepoRequestType
 from .ref_types import ModelRefTypes
-from invenio_pidstore.errors import PIDDoesNotExistError
 
 if TYPE_CHECKING:
     from flask_babel.speaklater import LazyString
@@ -63,15 +63,13 @@ class NewVersionRequestType(NonDuplicableOARepoRequestType):
         if request.status == "accepted":
             service = current_runtime.get_record_service_for_record_class(request.topic.record_cls)
             try:
-                result_item = service.read_draft(
-                    ctx["identity"], request["payload"]["draft_record:id"]
-                )
+                result_item = service.read_draft(ctx["identity"], request["payload"]["draft_record:id"])
             except (PermissionDeniedError, DraftNotCreatedError, PIDDoesNotExistError):
                 return None
 
             if "edit_html" in result_item["links"]:
                 return result_item["links"]["edit_html"]
-            elif "self_html" in result_item["links"]:
+            if "self_html" in result_item["links"]:
                 return result_item["links"]["self_html"]
 
     @classproperty
@@ -103,9 +101,7 @@ class NewVersionRequestType(NonDuplicableOARepoRequestType):
     }
 
     @classmethod
-    def is_applicable_to(
-        cls, identity: Identity, topic: Record, *args: Any, **kwargs: Any
-    ) -> bool:
+    def is_applicable_to(cls, identity: Identity, topic: Record, *args: Any, **kwargs: Any) -> bool:
         """Check if the request type is applicable to the topic."""
         if topic.is_draft:
             return False

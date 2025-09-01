@@ -22,9 +22,7 @@ class RecordRequestTypesResourceConfig:
     the request types resource lives.
     """
 
-    blueprint_name: str | None = (
-        None  # will be merged from the record's resource config
-    )
+    blueprint_name: str | None = None  # will be merged from the record's resource config
 
     routes = {
         "list-applicable-requests": "/<pid_value>/requests/applicable",
@@ -34,8 +32,6 @@ class RecordRequestTypesResourceConfig:
     def response_handlers(self) -> dict[str, ResponseHandler]:
         """Response handlers for the record request types resource."""
         return {
-            "application/vnd.inveniordm.v1+json": ResponseHandler(
-                OARepoRequestTypesUIJSONSerializer()
-            ),
+            "application/vnd.inveniordm.v1+json": ResponseHandler(OARepoRequestTypesUIJSONSerializer()),
             "application/json": ResponseHandler(JSONSerializer(), headers=etag_headers),
         }

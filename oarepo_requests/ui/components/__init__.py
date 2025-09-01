@@ -16,7 +16,7 @@ from oarepo_requests.ui.components.custom_fields import (
 )
 
 __all__ = (
+    "ActionLabelsComponent",
     "FormConfigCustomFieldsComponent",
     "FormConfigRequestTypePropertiesComponent",
-    "ActionLabelsComponent",
 )

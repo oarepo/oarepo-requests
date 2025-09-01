@@ -24,16 +24,12 @@ from invenio_pidstore.errors import (
 from invenio_records_resources.proxies import current_service_registry
 from invenio_records_resources.services.errors import PermissionDeniedError
 from invenio_requests import current_request_type_registry
-#from oarepo_runtime.services.custom_fields import CustomFields, InlinedCustomFields #TODO: temp
-from oarepo_ui.resources.components import AllowedHtmlTagsComponent
-#from oarepo_ui.resources.config import FormConfigResourceConfig, UIResourceConfig
-#from oarepo_ui.resources.links import UIRecordLink
 
-from oarepo_requests.ui.components import (
-    ActionLabelsComponent,
-    FormConfigCustomFieldsComponent,
-    FormConfigRequestTypePropertiesComponent,
-)
+# from oarepo_runtime.services.custom_fields import CustomFields, InlinedCustomFields #TODO: temp
+from oarepo_ui.resources.components import AllowedHtmlTagsComponent
+
+# from oarepo_ui.resources.config import FormConfigResourceConfig, UIResourceConfig
+# from oarepo_ui.resources.links import UIRecordLink
 
 if TYPE_CHECKING:
     from collections.abc import Mapping
@@ -61,6 +57,7 @@ class RequestTypeSchema(ma.fields.Str):
         ret = super()._deserialize(value, attr, data, **kwargs)
         return current_request_type_registry.lookup(ret, quiet=True)
 
+
 """
 class RequestsFormConfigResourceConfig(FormConfigResourceConfig):
     url_prefix = "/requests"
@@ -79,6 +76,8 @@ class RequestsFormConfigResourceConfig(FormConfigResourceConfig):
 
 # TODO: temp
 from flask_resources import ResourceConfig
+
+
 class UIResourceConfig(ResourceConfig):
     components = None
     template_folder = None
@@ -89,12 +88,7 @@ class UIResourceConfig(ResourceConfig):
 
         tf = Path(self.template_folder)
         if not tf.is_absolute():
-            tf = (
-                Path(inspect.getfile(type(self)))
-                .parent.absolute()
-                .joinpath(tf)
-                .absolute()
-            )
+            tf = Path(inspect.getfile(type(self))).parent.absolute().joinpath(tf).absolute()
         return str(tf)
 
     response_handlers = {"text/html": None, "application/json": None}
@@ -103,6 +97,7 @@ class UIResourceConfig(ResourceConfig):
     # Request parsing
     request_read_args = {}
     request_view_args = {}
+
 
 class RequestUIResourceConfig(UIResourceConfig):
     """Config for request detail page."""

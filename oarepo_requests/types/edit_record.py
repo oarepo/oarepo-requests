@@ -9,18 +9,18 @@
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Any
+from typing import TYPE_CHECKING, Any, override
 
 import marshmallow as ma
 from invenio_drafts_resources.resources.records.errors import DraftNotCreatedError
+from invenio_i18n import gettext
+from invenio_i18n import lazy_gettext as _
 from invenio_records_resources.services.errors import PermissionDeniedError
 from invenio_records_resources.services.uow import RecordCommitOp, UnitOfWork
 from invenio_requests.proxies import current_requests_service
 from invenio_requests.records.api import Request
 from oarepo_runtime.proxies import current_runtime
-from invenio_i18n import gettext, lazy_gettext as _
 from oarepo_runtime.records.drafts import has_draft
-from typing_extensions import override
 
 from oarepo_requests.actions.edit_topic import EditTopicAcceptAction
 
@@ -62,15 +62,13 @@ class EditPublishedRecordRequestType(NonDuplicableOARepoRequestType):
         if request.status == "accepted":
             service = current_runtime.get_record_service_for_record_class(request.topic.record_cls)
             try:
-                result_item = service.read_draft(
-                    ctx["identity"], request.topic._parse_ref_dict_id()
-                )
+                result_item = service.read_draft(ctx["identity"], request.topic._parse_ref_dict_id())
             except (PermissionDeniedError, DraftNotCreatedError):
                 return None
 
             if "edit_html" in result_item["links"]:
                 return result_item["links"]["edit_html"]
-            elif "self_html" in result_item["links"]:
+            if "self_html" in result_item["links"]:
                 return result_item["links"]["self_html"]
 
     @classproperty
@@ -86,9 +84,7 @@ class EditPublishedRecordRequestType(NonDuplicableOARepoRequestType):
     allowed_topic_ref_types = ModelRefTypes(published=True, draft=True)
 
     @classmethod
-    def is_applicable_to(
-        cls, identity: Identity, topic: Record, *args: Any, **kwargs: Any
-    ) -> bool:
+    def is_applicable_to(cls, identity: Identity, topic: Record, *args: Any, **kwargs: Any) -> bool:
         """Check if the request type is applicable to the topic."""
         if topic.is_draft:
             return False
@@ -162,24 +158,13 @@ class EditPublishedRecordRequestType(NonDuplicableOARepoRequestType):
             return gettext("Click to start editing the metadata of the record.")
 
         if not request:
-            return gettext(
-                "Request edit access to the record. "
-                "You will be notified about the decision by email."
-            )
+            return gettext("Request edit access to the record. You will be notified about the decision by email.")
         match request.status:
             case "submitted":
                 if request_identity_matches(request.created_by, identity):
-                    return gettext(
-                        "Edit access requested. You will be notified about "
-                        "the decision by email."
-                    )
+                    return gettext("Edit access requested. You will be notified about the decision by email.")
                 if request_identity_matches(request.receiver, identity):
-                    return gettext(
-                        "You have been requested to grant edit access to the record."
-                    )
+                    return gettext("You have been requested to grant edit access to the record.")
                 return gettext("Edit access requested.")
             case _:
-                return gettext(
-                    "Request edit access to the record. "
-                    "You will be notified about the decision by email."
-                )
+                return gettext("Request edit access to the record. You will be notified about the decision by email.")

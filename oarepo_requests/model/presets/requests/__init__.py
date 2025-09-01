@@ -5,9 +5,19 @@ from oarepo_requests.model.presets.requests.ext_requests import ExtRequestsPrese
 from oarepo_requests.model.presets.requests.finalize_app import RequestsFinalizeAppPreset
 from oarepo_requests.model.presets.requests.records.entity_resolvers.draft_resolver import DraftResolverPreset
 from oarepo_requests.model.presets.requests.records.entity_resolvers.resolver import RecordResolverPreset
+from oarepo_requests.model.presets.requests.records.metadata_mapping import RequestsMetadataMappingPreset
 from oarepo_requests.model.presets.requests.services.records.results import RequestsRecordItemPreset
 from oarepo_requests.model.presets.requests.services.records.service_config import RequestsServiceConfigPreset
 
-requests_presets = [ApiRequestTypesBlueprintPreset, ApiRequestsBlueprintPreset, RecordResolverPreset,
-                    RequestsServiceConfigPreset, RequestsRecordItemPreset, DraftResolverPreset, ExtRequestTypesPreset,
-                    ExtRequestsPreset, RequestsFinalizeAppPreset]
+requests_presets = [
+    RequestsMetadataMappingPreset,
+    ApiRequestTypesBlueprintPreset,
+    ApiRequestsBlueprintPreset,
+    RecordResolverPreset,
+    RequestsServiceConfigPreset,
+    RequestsRecordItemPreset,
+    DraftResolverPreset,
+    ExtRequestTypesPreset,
+    ExtRequestsPreset,
+    RequestsFinalizeAppPreset,
+]

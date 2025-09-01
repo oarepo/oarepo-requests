@@ -8,22 +8,23 @@
 #
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Any, Generator
-from oarepo_requests.services.results import RequestsComponent, RequestTypesComponent
-from oarepo_model.customizations import AddToList
+from collections.abc import Generator
+from typing import TYPE_CHECKING, Any
 
 from oarepo_model.customizations import (
+    AddToList,
     Customization,
 )
 from oarepo_model.model import InvenioModel
 from oarepo_model.presets import Preset
+
+from oarepo_requests.services.results import RequestsComponent, RequestTypesComponent
 
 if TYPE_CHECKING:
     from oarepo_model.builder import InvenioModelBuilder
 
 
 class RequestsRecordItemPreset(Preset):
-
     modifies = [
         "record_result_item_components",
     ]
@@ -33,6 +34,6 @@ class RequestsRecordItemPreset(Preset):
         builder: InvenioModelBuilder,
         model: InvenioModel,
         dependencies: dict[str, Any],
-    ) -> Generator[Customization, None, None]:
+    ) -> Generator[Customization]:
         yield AddToList("record_result_item_components", RequestsComponent)
         yield AddToList("record_result_item_components", RequestTypesComponent)

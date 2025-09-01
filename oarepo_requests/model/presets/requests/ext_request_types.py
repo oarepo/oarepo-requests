@@ -8,10 +8,9 @@
 #
 from __future__ import annotations
 
+from collections.abc import Generator
 from functools import cached_property
-from typing import TYPE_CHECKING, Any, Generator
-
-from oarepo_runtime.config import build_config
+from typing import TYPE_CHECKING, Any
 
 from oarepo_model.customizations import (
     AddMixins,
@@ -21,35 +20,29 @@ from oarepo_model.customizations import (
 from oarepo_model.model import InvenioModel, ModelMixin
 from oarepo_model.presets import Preset
 
-from oarepo_requests.services.draft.types.service import DraftRecordRequestTypesService
 from oarepo_requests.proxies import current_oarepo_requests_service
-from oarepo_requests.resources.draft.types.resource import DraftRequestTypesResource
 from oarepo_requests.resources.draft.types.config import DraftRequestTypesResourceConfig
-
+from oarepo_requests.resources.draft.types.resource import DraftRequestTypesResource
+from oarepo_requests.services.draft.types.service import DraftRecordRequestTypesService
 
 if TYPE_CHECKING:
     from oarepo_model.builder import InvenioModelBuilder
 
 
 class ExtRequestTypesPreset(Preset):
-    """
-    Preset for extension class.
-    """
+    """Preset for extension class."""
+
     depends_on = ["RecordService", "RecordServiceConfig"]
-    modifies = [
-        "Ext"
-    ]
+    modifies = ["Ext"]
 
     def apply(
         self,
         builder: InvenioModelBuilder,
         model: InvenioModel,
         dependencies: dict[str, Any],
-    ) -> Generator[Customization, None, None]:
+    ) -> Generator[Customization]:
         class ExtRequestTypesMixin(ModelMixin):
-            """
-            Mixin for extension class.
-            """
+            """Mixin for extension class."""
 
             @cached_property
             def service_record_request_types(self):
@@ -59,9 +52,7 @@ class ExtRequestTypesPreset(Preset):
 
             @property
             def service_record_request_types_params(self):
-                """
-                Parameters for the file service.
-                """
+                """Parameters for the file service."""
                 return {
                     "record_service": self.records_service,
                     "oarepo_requests_service": current_oarepo_requests_service,
@@ -75,9 +66,7 @@ class ExtRequestTypesPreset(Preset):
 
             @property
             def resource_record_request_types_params(self):
-                """
-                Parameters for the file resource.
-                """
+                """Parameters for the file resource."""
                 return {
                     "service": self.service_record_request_types,
                     "config": self.records_resource.config,

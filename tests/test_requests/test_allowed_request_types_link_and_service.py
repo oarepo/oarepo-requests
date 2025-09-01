@@ -8,6 +8,7 @@
 from flask import current_app
 from pytest_oarepo.functions import clear_babel_context
 
+
 # def test_workflow_read(workflow_model, users, logged_client, default_workflow_json, location, search_clear):
 def test_allowed_request_types_on_draft_service(
     requests_model,
@@ -20,17 +21,11 @@ def test_allowed_request_types_on_draft_service(
     draft1 = draft_factory(identity)
     draft1_id = draft1["id"]
 
-    thesis_ext = current_app.extensions["requests_test"]
-    thesis_requests_service = thesis_ext.service_record_request_types
+    test_ext = current_app.extensions["requests_test"]
+    test_requests_service = test_ext.service_record_request_types
 
-    allowed_request_types = (
-        thesis_requests_service.get_applicable_request_types_for_draft_record(
-            identity, draft1_id
-        )
-    )
-    assert sorted(
-        allowed_request_types.to_dict()["hits"]["hits"], key=lambda x: x["type_id"]
-    ) == [
+    allowed_request_types = test_requests_service.get_applicable_request_types_for_draft_record(identity, draft1_id)
+    assert sorted(allowed_request_types.to_dict()["hits"]["hits"], key=lambda x: x["type_id"]) == [
         {
             "links": {
                 "actions": {
@@ -65,16 +60,9 @@ def test_allowed_request_types_on_draft_resource(
     draft1_id = draft1["id"]
 
     applicable_requests_link = draft1["links"]["applicable-requests"]
-    assert (
-        applicable_requests_link
-        == f"https://127.0.0.1:5000/api/requests-test/{draft1_id}/draft/requests/applicable"
-    )
-    allowed_request_types = creator_client.get(
-        link2testclient(applicable_requests_link)
-    )
-    assert sorted(
-        allowed_request_types.json["hits"]["hits"], key=lambda x: x["type_id"]
-    ) == [
+    assert applicable_requests_link == f"https://127.0.0.1:5000/api/requests-test/{draft1_id}/draft/requests/applicable"
+    allowed_request_types = creator_client.get(link2testclient(applicable_requests_link))
+    assert sorted(allowed_request_types.json["hits"]["hits"], key=lambda x: x["type_id"]) == [
         {
             "links": {
                 "actions": {
@@ -110,17 +98,10 @@ def test_allowed_request_types_on_published_resource(
     published1_id = published1["id"]
 
     applicable_requests_link = published1["links"]["applicable-requests"]
-    assert (
-        applicable_requests_link
-        == f"https://127.0.0.1:5000/api/requests-test/{published1_id}/requests/applicable"
-    )
-    allowed_request_types = creator_client.get(
-        link2testclient(applicable_requests_link)
-    )
+    assert applicable_requests_link == f"https://127.0.0.1:5000/api/requests-test/{published1_id}/requests/applicable"
+    allowed_request_types = creator_client.get(link2testclient(applicable_requests_link))
     assert allowed_request_types.status_code == 200
-    assert sorted(
-        allowed_request_types.json["hits"]["hits"], key=lambda x: x["type_id"]
-    ) == [
+    assert sorted(allowed_request_types.json["hits"]["hits"], key=lambda x: x["type_id"]) == [
         {
             "links": {
                 "actions": {
@@ -139,13 +120,12 @@ def test_allowed_request_types_on_published_resource(
         },
         {
             "links": {
-                "actions": {
-                    "create": f"https://127.0.0.1:5000/api/requests-test/{published1_id}/requests/new_version"
-                }
+                "actions": {"create": f"https://127.0.0.1:5000/api/requests-test/{published1_id}/requests/new_version"}
             },
             "type_id": "new_version",
         },
     ]
+
 
 def test_ui_serialization(
     logged_client,
@@ -171,13 +151,11 @@ def test_ui_serialization(
 
     # with app.test_request_context(headers=[("Accept-Language", "en")]):
     allowed_request_types_draft = creator_client.get(
-        link2testclient(applicable_requests_link_draft),
-        headers={"Accept": "application/vnd.inveniordm.v1+json"}
+        link2testclient(applicable_requests_link_draft), headers={"Accept": "application/vnd.inveniordm.v1+json"}
     )
 
     allowed_request_types_published = creator_client.get(
-        link2testclient(applicable_requests_link_published),
-        headers={"Accept": "application/vnd.inveniordm.v1+json"}
+        link2testclient(applicable_requests_link_published), headers={"Accept": "application/vnd.inveniordm.v1+json"}
     )
 
     sorted_draft_list = allowed_request_types_draft.json["hits"]["hits"]
@@ -191,7 +169,7 @@ def test_ui_serialization(
             "has_form": False,
             "links": {
                 "actions": {
-                    "create": f"https://127.0.0.1:5000/api/thesis/{draft_id}/draft/requests/delete_draft"
+                    "create": f"https://127.0.0.1:5000/api/requests-test/{draft_id}/draft/requests/delete_draft"
                 }
             },
             "name": "Delete draft",
@@ -203,7 +181,7 @@ def test_ui_serialization(
             "description": "Request to publish a draft",
             "links": {
                 "actions": {
-                    "create": f"https://127.0.0.1:5000/api/thesis/{draft_id}/draft/requests/publish_draft"
+                    "create": f"https://127.0.0.1:5000/api/requests-test/{draft_id}/draft/requests/publish_draft"
                 }
             },
             "name": "Publish draft",
@@ -226,7 +204,7 @@ def test_ui_serialization(
             "type_id": "delete_published_record",
             "links": {
                 "actions": {
-                    "create": f"https://127.0.0.1:5000/api/thesis/{published_id}/requests/delete_published_record"
+                    "create": f"https://127.0.0.1:5000/api/requests-test/{published_id}/requests/delete_published_record"
                 }
             },
             "description": "Request deletion of published record",
@@ -241,7 +219,7 @@ def test_ui_serialization(
             "type_id": "edit_published_record",
             "links": {
                 "actions": {
-                    "create": f"https://127.0.0.1:5000/api/thesis/{published_id}/requests/edit_published_record"
+                    "create": f"https://127.0.0.1:5000/api/requests-test/{published_id}/requests/edit_published_record"
                 }
             },
             "description": "Request re-opening of published record",
@@ -255,17 +233,14 @@ def test_ui_serialization(
         {
             "type_id": "new_version",
             "links": {
-                "actions": {
-                    "create": f"https://127.0.0.1:5000/api/thesis/{published_id}/requests/new_version"
-                }
+                "actions": {"create": f"https://127.0.0.1:5000/api/requests-test/{published_id}/requests/new_version"}
             },
             "description": "Request requesting creation of new version of a published record.",
             "name": "New Version",
             "dangerous": False,
             "editable": False,
             "has_form": True,
-            "stateful_description": "Click to start creating a new version of the "
-            "record.",
+            "stateful_description": "Click to start creating a new version of the record.",
             "stateful_name": "New Version",
         },
     ]

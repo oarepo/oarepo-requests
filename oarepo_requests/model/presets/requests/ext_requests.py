@@ -8,27 +8,53 @@
 #
 from __future__ import annotations
 
+from collections.abc import Generator
 from functools import cached_property
-from typing import TYPE_CHECKING, Any, Generator
+from typing import TYPE_CHECKING, Any
 
-from oarepo_runtime.config import build_config
-
+from flask import Flask
 from oarepo_model.customizations import (
     AddMixins,
     AddToList,
     Customization,
 )
-from oarepo_model.model import InvenioModel, ModelMixin, Dependency
+from oarepo_model.model import InvenioModel, ModelMixin
 from oarepo_model.presets import Preset
 
 if TYPE_CHECKING:
     from oarepo_model.builder import InvenioModelBuilder
 
-from oarepo_requests.services.draft.service import DraftRecordRequestsService
-from oarepo_requests.proxies import current_oarepo_requests_service
-from oarepo_requests.resources.draft.resource import DraftRecordRequestsResource
-from oarepo_requests.resources.draft.config import DraftRecordRequestsResourceConfig
+from invenio_rdm_records.requests.entity_resolvers import RDMRecordServiceResultProxy
 
+from oarepo_requests.model.presets.requests.records.entity_resolvers.draft_resolver import WithDeletedServiceResultProxy
+from oarepo_requests.proxies import current_oarepo_requests_service
+from oarepo_requests.resolvers.service_result import DraftServiceResultResolver
+from oarepo_requests.resources.draft.config import DraftRecordRequestsResourceConfig
+from oarepo_requests.resources.draft.resource import DraftRecordRequestsResource
+from oarepo_requests.services.draft.service import DraftRecordRequestsService
+
+if TYPE_CHECKING:
+    from oarepo_model.builder import InvenioModelBuilder
+
+from invenio_records_resources.references.entity_resolvers.results import (
+    ServiceResultResolver,
+)
+
+
+class RDMPIDServiceResultResolver(ServiceResultResolver):
+    """Service result resolver for draft records."""
+
+    def _reference_entity(self, entity):
+        """Create a reference dict for the given result item."""
+        pid = entity.id if isinstance(entity, self.item_cls) else entity.pid.pid_value
+        return {self.type_key: str(pid)}
+
+
+# ThesisFileDraftResolver(
+#    record_cls=ThesisFileDraft,
+#    service_id="thesis_file_draft",
+#    type_key="thesis_file_draft",
+# ),
 
 """
 # todo ? the endpoint adding code could be automated on higher level? - it's just a bunch of copy paste
@@ -97,9 +123,10 @@ class EndpointExtClassFactory(Preset):
 
 
 class ExtRequestsPreset(Preset):
-    """
-    Preset for extension class.
-    """
+    """Preset for extension class."""
+
+    depends_on = ["RecordResolver", "DraftResolver"]
+
     modifies = [
         "Ext",
     ]
@@ -109,11 +136,31 @@ class ExtRequestsPreset(Preset):
         builder: InvenioModelBuilder,
         model: InvenioModel,
         dependencies: dict[str, Any],
-    ) -> Generator[Customization, None, None]:
+    ) -> Generator[Customization]:
         class ExtRequestsMixin(ModelMixin):
-            """
-            Mixin for extension class.
-            """
+            """Mixin for extension class."""
+
+            def init_config(self, app: Flask) -> None:
+                """Initialize configuration."""
+                service_id = builder.model.base_name
+                type_key_published = service_id
+                type_key_draft = f"{service_id}_draft"
+
+                NOTIFICATIONS_ENTITY_RESOLVERS = [
+                    RDMPIDServiceResultResolver(
+                        service_id=service_id, type_key=type_key_published, proxy_cls=WithDeletedServiceResultProxy
+                    ),
+                    DraftServiceResultResolver(
+                        service_id=service_id,
+                        type_key=type_key_draft,
+                        proxy_cls=RDMRecordServiceResultProxy,
+                    ),
+                ]
+
+                app.config.setdefault("NOTIFICATIONS_ENTITY_RESOLVERS", [])
+                app.config["NOTIFICATIONS_ENTITY_RESOLVERS"] += NOTIFICATIONS_ENTITY_RESOLVERS
+                super().init_config(app)
+
             @cached_property
             def service_record_requests(self):
                 return DraftRecordRequestsService(
@@ -122,9 +169,7 @@ class ExtRequestsPreset(Preset):
 
             @property
             def service_record_requests_params(self):
-                """
-                Parameters for the file service.
-                """
+                """Parameters for the file service."""
                 return {
                     "record_service": self.records_service,
                     "oarepo_requests_service": current_oarepo_requests_service,
@@ -138,9 +183,7 @@ class ExtRequestsPreset(Preset):
 
             @property
             def resource_record_requests_params(self):
-                """
-                Parameters for the file resource.
-                """
+                """Parameters for the file resource."""
                 return {
                     "service": self.service_record_requests,
                     "config": self.records_resource.config,

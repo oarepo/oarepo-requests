@@ -7,11 +7,17 @@
 # under the terms of the MIT License; see LICENSE file for more details.
 #
 from __future__ import annotations
-from typing import TYPE_CHECKING, Any, Generator
+
+from collections.abc import Generator
+from typing import TYPE_CHECKING, Any
+
 from oarepo_model.customizations import (
-    Customization, AddEntryPoint, AddModule, AddToModule,
+    AddEntryPoint,
+    AddModule,
+    AddToModule,
+    Customization,
 )
-from oarepo_model.model import InvenioModel, Dependency
+from oarepo_model.model import InvenioModel
 from oarepo_model.presets import Preset
 
 if TYPE_CHECKING:
@@ -26,27 +32,30 @@ if TYPE_CHECKING:
 
 
 class RequestsFinalizeAppPreset(Preset):
-    """
-    Preset for extension class.
-    """
-    depends_on = ["RecordResolver", "DraftResolver"]
+    """Preset for extension class."""
 
     def apply(
         self,
         builder: InvenioModelBuilder,
         model: InvenioModel,
         dependencies: dict[str, Any],
-    ) -> Generator[Customization, None, None]:
-
+    ) -> Generator[Customization]:
         @staticmethod
         def finalize_app(app):
             runtime_deps = builder.get_runtime_dependencies()
-            ENTITY_RESOLVERS = [
-                runtime_deps.get("RecordResolver")(record_cls=runtime_deps.get("Record"), service_id=builder.model.base_name, type_key=builder.model.base_name),
-                runtime_deps.get("DraftResolver")(record_cls=runtime_deps.get("Draft"), service_id=builder.model.base_name, type_key=f"{builder.model.base_name}_draft"),
+            service_id = builder.model.base_name
+            type_key_published = service_id
+            type_key_draft = f"{service_id}_draft"
+            REQUESTS_ENTITY_RESOLVERS = [
+                runtime_deps.get("RecordResolver")(
+                    record_cls=runtime_deps.get("Record"), service_id=service_id, type_key=type_key_published
+                ),
+                runtime_deps.get("DraftResolver")(
+                    record_cls=runtime_deps.get("Draft"), service_id=service_id, type_key=type_key_draft
+                ),
             ]
             requests = app.extensions["invenio-requests"]
-            for resolver in ENTITY_RESOLVERS:
+            for resolver in REQUESTS_ENTITY_RESOLVERS:
                 requests.entity_resolvers_registry.register_type(resolver)
 
         yield AddModule("finalize", exists_ok=True)

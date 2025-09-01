@@ -11,10 +11,10 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING, Any
 
+from invenio_i18n import _
 from invenio_records_resources.services.uow import IndexRefreshOp, unit_of_work
 from invenio_requests import current_request_type_registry
 from invenio_requests.services import RequestsService
-from invenio_i18n import _
 
 from oarepo_requests.errors import CustomHTTPJSONException, UnknownRequestType
 from oarepo_requests.proxies import current_oarepo_requests
@@ -84,9 +84,7 @@ class OARepoRequestsService(RequestsService):
         )
         if errors:
             raise CustomHTTPJSONException(
-                description=_(
-                    "Action could not be performed due to validation request fields validation errors."
-                ),
+                description=_("Action could not be performed due to validation request fields validation errors."),
                 request_payload_errors=errors,
                 code=400,
             )
@@ -107,9 +105,7 @@ class OARepoRequestsService(RequestsService):
                 expand=expand,
                 uow=uow,
             )
-            uow.register(
-                IndexRefreshOp(indexer=self.indexer, index=self.record_cls.index)
-            )
+            uow.register(IndexRefreshOp(indexer=self.indexer, index=self.record_cls.index))
             return result
 
     def read(self, identity: Identity, id_: str, expand: bool = False) -> RequestItem:
@@ -129,8 +125,6 @@ class OARepoRequestsService(RequestsService):
     ) -> RequestItem:
         """Update a request."""
         assert uow is not None
-        result = super().update(
-            identity, id_, data, revision_id=revision_id, uow=uow, expand=expand
-        )
+        result = super().update(identity, id_, data, revision_id=revision_id, uow=uow, expand=expand)
         uow.register(IndexRefreshOp(indexer=self.indexer, index=self.record_cls.index))
         return result
