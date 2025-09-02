@@ -7,7 +7,7 @@
 #
 
 
-# TODO since inline is now the default way to create records, these might be redundant
+# TODO: since inline is now the default way to create records, these might be redundant
 from __future__ import annotations
 
 

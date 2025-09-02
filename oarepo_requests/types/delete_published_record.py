@@ -9,7 +9,7 @@
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Any, override
+from typing import TYPE_CHECKING, Any, ClassVar, override
 
 import marshmallow as ma
 from invenio_i18n import gettext
@@ -33,6 +33,8 @@ if TYPE_CHECKING:
     from invenio_requests.customizations.actions import RequestAction
     from invenio_requests.records.api import Request
 
+    from ..utils import JsonValue
+
 
 class DeletePublishedRecordRequestType(NonDuplicableOARepoRequestType):
     """Request type for requesting deletion of a published record."""
@@ -40,12 +42,12 @@ class DeletePublishedRecordRequestType(NonDuplicableOARepoRequestType):
     type_id = "delete_published_record"
     name = _("Delete record")
 
-    payload_schema = {
+    payload_schema: ClassVar[dict[str, ma.fields.Field]] = {
         "removal_reason": ma.fields.Str(required=True),
         "note": ma.fields.Str(),
     }
 
-    form = [
+    form: ClassVar[JsonValue] = [
         {
             "section": "",
             "fields": [
@@ -74,7 +76,8 @@ class DeletePublishedRecordRequestType(NonDuplicableOARepoRequestType):
 
     editable = False
 
-    def get_ui_redirect_url(self, request: Request, context: dict) -> str:
+    def get_ui_redirect_url(self, request: Request, context: dict) -> str:  # TODO: new way of link handling
+        """Return URL to redirect ui after the request action is executed."""
         if request.status == "accepted":
             topic_cls = request.topic.record_cls
             service = current_runtime.get_record_service_for_record_class(topic_cls)
@@ -84,7 +87,7 @@ class DeletePublishedRecordRequestType(NonDuplicableOARepoRequestType):
     dangerous = True
 
     @classproperty
-    def available_actions(cls) -> dict[str, type[RequestAction]]:
+    def available_actions(cls) -> dict[str, type[RequestAction]]:  # noqa N805
         """Return available actions for the request type."""
         return {
             **super().available_actions,
@@ -118,7 +121,7 @@ class DeletePublishedRecordRequestType(NonDuplicableOARepoRequestType):
                 return gettext("Request record deletion")
 
     @override
-    def stateful_description(
+    def stateful_description(  # noqa PLR0911
         self,
         identity: Identity,
         *,

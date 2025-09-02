@@ -24,7 +24,7 @@ def test_publish_service(requests_model, users, record_service, default_record_w
         identity=creator.identity,
         data={"payload": {"version": "1.0"}},
         request_type="publish_draft",
-        topic=draft._record,
+        topic=draft._record,  # noqa SLF001
     )
     submit_result = current_invenio_requests_service.execute_action(creator.identity, request.id, "submit")
     assert "created_by" in request.links
@@ -88,9 +88,6 @@ def test_publish(
     assert "published_record:links:self_html" in publish.json["payload"]
 
     receiver_client.get(f"{urls['BASE_URL']}/{draft1_id}?expand=true")
-
-    # version is no more on "publish_draft" request
-    # assert "version" in published_record.json["metadata"]
 
     requests_model.Record.index.refresh()
     requests_model.Draft.index.refresh()

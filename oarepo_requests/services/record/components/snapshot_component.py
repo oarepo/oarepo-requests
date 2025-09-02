@@ -5,20 +5,32 @@
 # modify it under the terms of the MIT License; see LICENSE file for more
 # details.
 #
+"""Component for creating record snapshots."""
+
 from __future__ import annotations
 
+from typing import TYPE_CHECKING, override
 from uuid import UUID
 
 from flask import current_app
 from invenio_access.permissions import system_identity
-from invenio_records_resources.services.records.components import ServiceComponent
+from invenio_drafts_resources.services.records.components.base import ServiceComponent
 from invenio_requests.proxies import current_requests_service
 from invenio_requests.resolvers.registry import ResolverRegistry
 from opensearch_dsl.query import Bool, Term, Terms
 
+if TYPE_CHECKING:
+    from typing import Any
+
+    from flask_principal import Identity
+    from invenio_records_resources.records.api import Record
+
 
 class RecordSnapshotComponent(ServiceComponent):
-    def create_snapshot(self, record) -> None:
+    """Component for handling record snapshots."""
+
+    def create_snapshot(self, record: Record) -> None:
+        """Create snapshot for the record."""
         topic_dict = ResolverRegistry.reference_entity(record)
         topic_type, topic_id = next(iter(topic_dict.items()))
 
@@ -42,9 +54,14 @@ class RecordSnapshotComponent(ServiceComponent):
 
             create_snapshot_and_possible_event(record, record["metadata"], UUID(requests[0]["id"]))
 
-    def update(self, identity, *, record, **kwargs) -> None:
-        """Update handler."""
+    @override
+    def update(self, identity: Identity, *, record: Record, **kwargs: Any) -> None:
+        """Create snapshot on update call."""
         self.create_snapshot(record)
 
-    def update_draft(self, identity, *, record, **kwargs) -> None:
+    # TODO: technically we have subclassed service for drafts, so to be really consistent we should also have
+    # separate components?
+    @override
+    def update_draft(self, identity: Identity, *, record: Record, **kwargs: Any) -> None:
+        """Create snapshot on update draft call."""
         self.create_snapshot(record)

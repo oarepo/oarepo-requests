@@ -100,7 +100,7 @@ def test_request_detail_page(
     creator_client = logged_client(users[0])
 
     topic = record_factory(identity)
-    record = record_service.read(identity, id_=topic["id"])._obj
+    record = record_service.read(identity, id_=topic["id"])._obj  # noqa SLF001
 
     creator_identity = users[0].identity
     request = current_requests_service.create(

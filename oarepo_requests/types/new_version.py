@@ -9,7 +9,7 @@
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Any, override
+from typing import TYPE_CHECKING, Any, ClassVar, override
 
 import marshmallow as ma
 from invenio_drafts_resources.resources.records.errors import DraftNotCreatedError
@@ -37,13 +37,15 @@ if TYPE_CHECKING:
 
     from oarepo_requests.typing import EntityReference
 
+    from ..utils import JsonValue
+
 
 class NewVersionRequestType(NonDuplicableOARepoRequestType):
     """Request type for requesting new version of a published record."""
 
     type_id = "new_version"
     name = _("New Version")
-    payload_schema = {
+    payload_schema: ClassVar[dict[str, ma.fields.Field]] = {
         "draft_record.links.self": ma.fields.Str(
             attribute="draft_record:links:self",
             data_key="draft_record:links:self",
@@ -60,6 +62,7 @@ class NewVersionRequestType(NonDuplicableOARepoRequestType):
     }
 
     def get_ui_redirect_url(self, request: Request, ctx: dict) -> str:
+        """Return URL to redirect ui after the request action is executed."""
         if request.status == "accepted":
             service = current_runtime.get_record_service_for_record_class(request.topic.record_cls)
             try:
@@ -74,7 +77,8 @@ class NewVersionRequestType(NonDuplicableOARepoRequestType):
         return None
 
     @classproperty
-    def available_actions(cls) -> dict[str, type[RequestAction]]:
+    @override
+    def available_actions(cls) -> dict[str, type[RequestAction]]:  # noqa N805
         """Return available actions for the request type."""
         return {
             **super().available_actions,
@@ -85,14 +89,15 @@ class NewVersionRequestType(NonDuplicableOARepoRequestType):
     allowed_topic_ref_types = ModelRefTypes(published=True, draft=True)
     editable = False
 
-    form = {
+    form: ClassVar[JsonValue] = {
         "field": "keep_files",
         "ui_widget": "Dropdown",
         "props": {
             "label": _("Keep files"),
             "placeholder": _("Yes or no"),
             "description": _(
-                "If you choose yes, the current record's files will be linked to the new version of the record. Then you will be able to add/remove files in the form."
+                "If you choose yes, the current record's files will be linked to the new version of the record. "
+                "Then you will be able to add/remove files in the form."
             ),
             "options": [
                 {"id": "yes", "title_l10n": _("Yes")},
@@ -154,7 +159,7 @@ class NewVersionRequestType(NonDuplicableOARepoRequestType):
                 return gettext("Request new version access")
 
     @override
-    def stateful_description(
+    def stateful_description(  # noqa PLR0911
         self,
         identity: Identity,
         *,

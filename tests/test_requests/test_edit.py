@@ -83,7 +83,7 @@ def test_redirect_url(
     # is request accepted and closed?
     creator_client.get(
         f"{urls['BASE_URL_REQUESTS']}{edit_request_id}",
-    ).json
+    )
 
     creator_edit_accepted = creator_client.get(
         f"{urls['BASE_URL_REQUESTS']}{edit_request_id}",

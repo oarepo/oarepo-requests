@@ -7,10 +7,12 @@
 #
 from __future__ import annotations
 
+import base64
 import json
 import os
 import time
 from datetime import timedelta
+from typing import TYPE_CHECKING, ClassVar
 
 import pytest
 from invenio_i18n import _
@@ -69,6 +71,9 @@ from oarepo_requests.services.permissions.workflow_policies import (
 from oarepo_requests.types import ModelRefTypes, NonDuplicableOARepoRequestType
 from oarepo_requests.types.events.topic_update import TopicUpdateEventType
 
+if TYPE_CHECKING:
+    from invenio_requests.customizations.actions import RequestAction
+
 pytest_plugins = [
     "pytest_oarepo.requests.fixtures",
     "pytest_oarepo.records",
@@ -76,10 +81,6 @@ pytest_plugins = [
     "pytest_oarepo.users",
     "pytest_oarepo.files",
 ]
-
-# import logging
-# logging.basicConfig(level=logging.INFO)
-# logging.getLogger("sqlalchemy.engine").setLevel(logging.INFO)
 
 
 @pytest.fixture
@@ -115,6 +116,8 @@ events_only_receiver_can_comment = {
 
 
 class DefaultRequests(WorkflowRequestPolicy):
+    """Default test requests workflow."""
+
     publish_draft = WorkflowRequest(
         requesters=[IfInState("draft", [RecordOwners()])],
         recipients=[UserGenerator(2)],
@@ -176,6 +179,8 @@ class DefaultRequests(WorkflowRequestPolicy):
 
 
 class DifferentLocalesPublish(WorkflowRequestPolicy):
+    """Different locales test requests workflow."""
+
     publish_draft = WorkflowRequest(
         requesters=[IfInState("draft", [RecordOwners()])],
         recipients=[CSLocaleUserGenerator()],
@@ -200,6 +205,8 @@ class DifferentLocalesPublish(WorkflowRequestPolicy):
 
 
 class RequestWithMultipleRecipients(WorkflowRequestPolicy):
+    """Multiple recipients test requests workflow."""
+
     publish_draft = WorkflowRequest(
         requesters=[IfInState("draft", [RecordOwners()])],
         recipients=[UserGenerator(2), UserGenerator(1)],
@@ -238,6 +245,8 @@ class RequestWithMultipleRecipients(WorkflowRequestPolicy):
 
 
 class RequestsWithDifferentRecipients(DefaultRequests):
+    """Alternative recipients to default test requests workflow."""
+
     another_topic_updating = WorkflowRequest(
         requesters=[AnyUser()],
         recipients=[UserGenerator(1)],
@@ -255,6 +264,8 @@ class RequestsWithDifferentRecipients(DefaultRequests):
 
 
 class RequestsWithApproveWithoutGeneric(WorkflowRequestPolicy):
+    """Publish needs approval before publishing test requests workflow."""
+
     publish_draft = WorkflowRequest(
         requesters=[IfInState("approved", [AutoRequest()])],
         recipients=[UserGenerator(1)],
@@ -298,6 +309,8 @@ class RequestsWithApproveWithoutGeneric(WorkflowRequestPolicy):
 
 
 class RequestsWithApprove(WorkflowRequestPolicy):
+    """Publish needs approval before publishing test requests workflow."""
+
     publish_draft = WorkflowRequest(
         requesters=[IfInState("approved", [AutoRequest()])],
         recipients=[UserGenerator(1)],
@@ -344,6 +357,8 @@ class RequestsWithApprove(WorkflowRequestPolicy):
 
 
 class RequestsWithCT(WorkflowRequestPolicy):
+    """With conditional recipient test requests workflow."""
+
     conditional_recipient_rt = WorkflowRequest(
         requesters=[AnyUser()],
         recipients=[IfRequestedBy(UserGenerator(1), [UserGenerator(2)], [UserGenerator(3)])],
@@ -355,6 +370,8 @@ class RequestsWithCT(WorkflowRequestPolicy):
 
 
 class RequestsWithAnotherTopicUpdatingRequestType(DefaultRequests):
+    """Test requests workflow with another topic updating request."""
+
     another_topic_updating = WorkflowRequest(
         requesters=[AnyUser()],
         recipients=[UserGenerator(2)],
@@ -362,6 +379,8 @@ class RequestsWithAnotherTopicUpdatingRequestType(DefaultRequests):
 
 
 class RequestsWithSystemIdentity(WorkflowRequestPolicy):
+    """Test requests workflow with publish only by system identity."""
+
     publish_draft = WorkflowRequest(
         requesters=[AnyUser()],
         recipients=[UserGenerator("system")],
@@ -369,10 +388,12 @@ class RequestsWithSystemIdentity(WorkflowRequestPolicy):
 
 
 class GenericTestableRequestType(NonDuplicableOARepoRequestType):
+    """Generic usable request type for tests."""
+
     type_id = "generic"
     name = _("Generic")
 
-    available_actions = {
+    available_actions: ClassVar[dict[str, type[RequestAction]]] = {
         **NonDuplicableOARepoRequestType.available_actions,
         "accept": OARepoAcceptAction,
         "submit": OARepoSubmitAction,
@@ -384,10 +405,12 @@ class GenericTestableRequestType(NonDuplicableOARepoRequestType):
 
 
 class ApproveRequestType(NonDuplicableOARepoRequestType):
+    """Request type for approving before publish."""
+
     type_id = "approve_draft"
     name = _("Approve draft")
 
-    available_actions = {
+    available_actions: ClassVar[dict[str, type[RequestAction]]] = {
         **NonDuplicableOARepoRequestType.available_actions,
         "accept": OARepoAcceptAction,
         "submit": OARepoSubmitAction,
@@ -399,10 +422,12 @@ class ApproveRequestType(NonDuplicableOARepoRequestType):
 
 
 class AnotherTopicUpdatingRequestType(NonDuplicableOARepoRequestType):
+    """Generic request type with topic change on topic update."""
+
     type_id = "another_topic_updating"
     name = _("Another topic updating")
 
-    available_actions = {
+    available_actions: ClassVar[dict[str, type[RequestAction]]] = {
         **NonDuplicableOARepoRequestType.available_actions,
         "accept": OARepoAcceptAction,
         "submit": OARepoSubmitAction,
@@ -413,15 +438,18 @@ class AnotherTopicUpdatingRequestType(NonDuplicableOARepoRequestType):
     allowed_topic_ref_types = ModelRefTypes(published=True, draft=True)
 
     def topic_change(self, request: Request, new_topic: dict, uow):
+        """Update topic on topic update."""
         request.topic = new_topic
         uow.register(RecordCommitOp(request, indexer=current_requests_service.indexer))
 
 
 class ConditionalRecipientRequestType(NonDuplicableOARepoRequestType):
+    """Generic request type with conditional recipient."""
+
     type_id = "conditional_recipient_rt"
     name = _("Request type to test conditional recipients")
 
-    available_actions = {
+    available_actions: ClassVar[dict[str, type[RequestAction]]] = {
         **NonDuplicableOARepoRequestType.available_actions,
         "accept": OARepoAcceptAction,
         "submit": OARepoSubmitAction,
@@ -433,6 +461,8 @@ class ConditionalRecipientRequestType(NonDuplicableOARepoRequestType):
 
 
 class TestWorkflowPermissions(RequestBasedWorkflowPermissions):
+    """Default workflow permissions for testing."""
+
     can_read = (
         IfInState("draft", [RecordOwners()]),
         IfInState("publishing", [RecordOwners(), UserGenerator(2)]),
@@ -444,6 +474,8 @@ class TestWorkflowPermissions(RequestBasedWorkflowPermissions):
 
 
 class WithApprovalPermissions(TestWorkflowPermissions):
+    """Default workflow permissions for testing requests with publish approval."""
+
     can_read = (
         IfInState("draft", [RecordOwners()]),
         IfInState("approving", [RecordOwners(), UserGenerator(2)]),
@@ -455,6 +487,8 @@ class WithApprovalPermissions(TestWorkflowPermissions):
 
 
 class DifferentLocalesPermissions(TestWorkflowPermissions):
+    """Default workflow permissions for testing with multiple locales."""
+
     can_read = (
         IfInState("draft", [RecordOwners()]),
         IfInState("publishing", [RecordOwners(), CSLocaleUserGenerator()]),
@@ -520,10 +554,9 @@ def urls():
 
 @pytest.fixture
 def serialization_result():
-    def _result(topic_id, request_id):
+    def _result(topic_id: str, request_id: str) -> dict[str, str | bool | int]:
         return {
-            "id": request_id,  #'created': '2024-01-29T22:09:13.931722',
-            #'updated': '2024-01-29T22:09:13.954850',
+            "id": request_id,
             "links": {
                 "actions": {"cancel": f"https://127.0.0.1:5000/api/requests/{request_id}/actions/cancel"},
                 "self": f"https://127.0.0.1:5000/api/requests/extended/{request_id}",
@@ -549,10 +582,9 @@ def serialization_result():
 
 @pytest.fixture
 def ui_serialization_result():
-    # TODO correct time formats, translations etc
-    def _result(topic_id, request_id):
+    # TODO: correct time formats, translations etc
+    def _result(topic_id, request_id) -> dict[str, str | bool | int]:
         return {
-            # 'created': '2024-01-26T10:06:17.945916',
             "created_by": {
                 "label": "id: 1",
                 "links": {"self": "https://127.0.0.1:5000/api/users/1"},
@@ -577,7 +609,6 @@ def ui_serialization_result():
             "status": "Submitted",
             "title": "",
             "topic": {
-                # "label": f"id: {topic_id}",
                 "label": "blabla",
                 "links": {
                     "self": f"https://127.0.0.1:5000/api/requests_test/{topic_id}/draft",
@@ -587,7 +618,6 @@ def ui_serialization_result():
                 "type": "requests_test_draft",
             },
             "type": "publish_draft",
-            # 'updated': '2024-01-26T10:06:18.084317'
         }
 
     return _result
@@ -665,7 +695,7 @@ def check_publish_topic_update():
 
 @pytest.fixture
 def user_links():
-    def _user_links(user_id):
+    def _user_links(user_id) -> dict[str, str]:
         return {
             "avatar": f"https://127.0.0.1:5000/api/users/{user_id}/avatar.svg",
             "records_html": f"https://127.0.0.1:5000/search/records?q=parent.access.owned_by.user:{user_id}",
@@ -680,15 +710,22 @@ def _create_user(user_fixture, app, db) -> None:
         user_fixture.create(app, db)
     except IntegrityError:
         datastore = app.extensions["security"].datastore
-        user_fixture._user = datastore.get_user_by_email(user_fixture.email)
-        user_fixture._app = app
+        user_fixture._user = datastore.get_user_by_email(user_fixture.email)  # noqa SLF001
+        user_fixture._app = app  # noqa SLF001
+
+
+# TODO: use pytest-oarepo instead of this
+@pytest.fixture
+def password():
+    """Password fixture."""
+    return base64.b64encode(os.urandom(16)).decode("utf-8")
 
 
 @pytest.fixture
-def more_users(app, db, UserFixture):
+def more_users(app, db, UserFixture, password):  # noqa N803
     user1 = UserFixture(
         email="user1@example.org",
-        password="password",  # NOSONAR
+        password=password,
         active=True,
         confirmed=True,
     )
@@ -696,7 +733,7 @@ def more_users(app, db, UserFixture):
 
     user2 = UserFixture(
         email="user2@example.org",
-        password="beetlesmasher",  # NOSONAR
+        password=password,
         active=True,
         confirmed=True,
     )
@@ -704,7 +741,7 @@ def more_users(app, db, UserFixture):
 
     user3 = UserFixture(
         email="user3@example.org",
-        password="beetlesmasher",  # NOSONAR
+        password=password,
         user_profile={
             "full_name": "Maxipes Fik",
             "affiliations": "CERN",
@@ -716,7 +753,7 @@ def more_users(app, db, UserFixture):
 
     user4 = UserFixture(
         email="user4@example.org",
-        password="password",  # NOSONAR
+        password=password,
         active=True,
         confirmed=True,
     )
@@ -724,7 +761,7 @@ def more_users(app, db, UserFixture):
 
     user5 = UserFixture(
         email="user5@example.org",
-        password="password",  # NOSONAR
+        password=password,
         active=True,
         confirmed=True,
     )
@@ -732,7 +769,7 @@ def more_users(app, db, UserFixture):
 
     user6 = UserFixture(
         email="user6@example.org",
-        password="password",  # NOSONAR
+        password=password,
         active=True,
         confirmed=True,
     )
@@ -740,7 +777,7 @@ def more_users(app, db, UserFixture):
 
     user7 = UserFixture(
         email="user7@example.org",
-        password="password",  # NOSONAR
+        password=password,
         active=True,
         confirmed=True,
     )
@@ -748,7 +785,7 @@ def more_users(app, db, UserFixture):
 
     user10 = UserFixture(
         email="user10@example.org",
-        password="password",  # NOSONAR
+        password=password,
         active=True,
         confirmed=True,
     )

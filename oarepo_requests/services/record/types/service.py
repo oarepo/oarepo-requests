@@ -44,7 +44,7 @@ class RecordRequestTypesService:
     @property
     def config(self) -> ServiceConfig:
         """Return a dummy config."""
-        return SimpleNamespace(service_id=self.service_id)  # type: ignore
+        return SimpleNamespace(service_id=self.service_id)
 
     @property
     def service_id(self) -> str:
@@ -58,7 +58,7 @@ class RecordRequestTypesService:
 
     def get_applicable_request_types_for_published_record(self, identity: Identity, record_id: str) -> RequestTypesList:
         """Get applicable request types for a record given by persistent identifier."""
-        record = self.record_cls.pid.resolve(record_id)  # type: ignore
+        record = self.record_cls.pid.resolve(record_id)
         return self._get_applicable_request_types(identity, record)
 
     def _get_applicable_request_types(self, identity: Identity, record: Record) -> RequestTypesList:

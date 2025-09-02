@@ -5,9 +5,11 @@
 # modify it under the terms of the MIT License; see LICENSE file for more
 # details.
 #
+"""Celery task for cleaning old record snapshots."""
+
 from __future__ import annotations
 
-from datetime import datetime, timedelta
+from datetime import UTC, datetime, timedelta
 
 from celery import shared_task
 from flask import current_app
@@ -25,7 +27,7 @@ def clean_snapshots() -> None:
     """
     days = current_app.config.get("SNAPSHOT_CLEANUP_DAYS", 365)
 
-    cutoff_date = datetime.utcnow() - timedelta(days=days)
+    cutoff_date = datetime.now(UTC) - timedelta(days=days)
 
     accepted_requests = (
         db.session.query(RequestMetadata.id).filter(RequestMetadata.json["type"] == "accepted").subquery()

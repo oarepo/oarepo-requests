@@ -6,6 +6,7 @@
 # details.
 #
 """UI resolvers of common entities."""
+
 # TODO: reconceptualize
 from __future__ import annotations
 
@@ -458,7 +459,7 @@ class FallbackEntityReferenceUIResolver(OARepoUIResolver):
 
         try:
             if self.reference_type.endswith("_draft"):
-                response = service.read_draft(identity, _id)  # type: ignore
+                response = service.read_draft(identity, _id)
             else:
                 response = service.read(identity, _id)
         except:  # noqa - we don't care which exception has been caught, just returning fallback result

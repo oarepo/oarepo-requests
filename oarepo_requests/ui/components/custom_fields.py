@@ -26,7 +26,7 @@ class FormConfigCustomFieldsComponent(UIResourceComponent):
         """Add custom fields to the form config."""
         type_ = view_args.get("request_type")
         # ignore the type as we are checking for alternatives below
-        form: dict | list = getattr(type_, "form", None)  # type: ignore
+        form: dict | list = getattr(type_, "form", None)
         if not form:
             return
 

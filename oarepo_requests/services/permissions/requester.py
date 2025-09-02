@@ -39,6 +39,7 @@ def create_autorequests(
     uow: UnitOfWork,
     **kwargs: Any,
 ) -> None:
+    """Create requests that should be created automatically."""
     record_workflow = current_oarepo_workflows.get_workflow(record)
     for request_type_id, workflow_request in record_workflow.requests().items():
         needs = workflow_request.requester_generator.needs(request_type=request_type_id, record=record, **kwargs)
@@ -54,19 +55,20 @@ def create_autorequests(
                 uow=uow,
                 **kwargs,
             )
-            action_obj = RequestActions.get_action(request_item._record, "submit")
+            action_obj = RequestActions.get_action(request_item._record, "submit")  # noqa SLF001
             if not action_obj.can_execute():
                 raise CannotExecuteActionError("submit")
             action_obj.execute(identity, uow)
-            uow.register(RecordCommitOp(request_item._record, indexer=current_requests_service.indexer))
+            uow.register(RecordCommitOp(request_item._record, indexer=current_requests_service.indexer))  # noqa SLF001
 
 
+# TODO: consider subclassing from a protocol or callable?
 @unit_of_work()
 def auto_request_state_change_notifier(
     identity: Identity,
     record: Record,
-    prev_state: str,
-    new_state: str,
+    prev_state: str,  # noqa ARG001
+    new_state: str,  # noqa ARG001
     uow: UnitOfWork | None = None,
     **kwargs: Any,
 ) -> None:

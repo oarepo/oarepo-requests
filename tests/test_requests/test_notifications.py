@@ -7,6 +7,8 @@
 #
 from __future__ import annotations
 
+from typing import Any
+
 from invenio_requests.customizations.event_types import CommentEventType
 
 
@@ -156,7 +158,7 @@ def test_group(
     add_user_in_role(users[0], role)
     add_user_in_role(users[1], role)
 
-    def current_receiver(record=None, request_type=None, **kwargs):
+    def current_receiver(record=None, request_type=None, **kwargs: Any) -> Any:
         if request_type.type_id == "publish_draft":
             return role
         return config_restore(record, request_type, **kwargs)
@@ -269,7 +271,6 @@ def test_comment_notifications(
     """Test notification being built on review submit."""
     mail = app.extensions.get("mail")
     creator = users[0]
-    # receiver = users[2]
     draft1 = draft_factory(creator.identity)  # so i don't have to create a new workflow
     submit = submit_request_on_draft(creator.identity, draft1["id"], "publish_draft")
 

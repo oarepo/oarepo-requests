@@ -18,9 +18,6 @@ from invenio_pidstore.errors import (
     PersistentIdentifierError,
     PIDDeletedError,
 )
-
-# from oarepo_runtime.services.schema.marshmallow import BaseRecordSchema
-# from oarepo_runtime.services.schema.ui import LocalizedDateTime
 from invenio_rdm_records.resources.serializers.ui.schema import FormatDate  # TODO: temp
 from invenio_rdm_records.services.errors import RecordDeletedException
 from invenio_records_resources.services.records.schema import BaseRecordSchema  # TODO: temp
@@ -62,13 +59,13 @@ class UIReferenceSchema(ma.Schema):
     """Links to the entity."""
 
     @ma.pre_dump
-    def _create_reference(self, data: Any, **kwargs: Any) -> dict | None:
+    def _create_reference(self, data: Any, **kwargs: Any) -> dict | None:  # noqa ARG002
         if data:
             return {"reference": data}
         return None
 
     @ma.post_dump
-    def _dereference(self, data: dict, **kwargs: Any) -> dict[str, Any]:
+    def _dereference(self, data: dict, **kwargs: Any) -> dict[str, Any]:  # noqa ARG002, PLR0911
         if "resolved" not in self.context:
             try:
                 return cast("dict", resolve(self.context["identity"], data["reference"]))
@@ -126,7 +123,7 @@ class UIRequestSchemaMixin:
     """Status code of the request."""
 
     @ma.pre_dump
-    def _convert_dates_for_localized(self, data: dict, **kwargs: Any) -> dict:
+    def _convert_dates_for_localized(self, data: dict, **kwargs: Any) -> dict:  # noqa ARG002 (or delete the kwargs in these)
         if isinstance(data.get("created"), str):
             data["created"] = datetime.datetime.fromisoformat(data["created"])
 
@@ -139,14 +136,14 @@ class UIRequestSchemaMixin:
         return data
 
     @ma.pre_dump
-    def _add_type_details(self, data: dict, **kwargs: Any) -> dict:
+    def _add_type_details(self, data: dict, **kwargs: Any) -> dict:  # noqa ARG002
         """Add details taken from the request type to the serialized request."""
         if isinstance(data.get("created"), str):
             data["created"] = datetime.datetime.fromisoformat(data["created"])
         if isinstance(data.get("updated"), str):
             data["updated"] = datetime.datetime.fromisoformat(data["updated"])
-        type = data["type"]
-        type_obj = current_request_type_registry.lookup(type, quiet=True)
+        type_ = data["type"]
+        type_obj = current_request_type_registry.lookup(type_, quiet=True)
         if hasattr(type_obj, "description"):
             data["description"] = type_obj.description
         if hasattr(type_obj, "name"):
@@ -166,13 +163,13 @@ class UIRequestSchemaMixin:
             if not topic_dict:
                 return stateful_name, stateful_description
 
-            topic = ResolverRegistry.resolve_entity(topic_dict, False)
+            topic = ResolverRegistry.resolve_entity(topic_dict, raise_=False)
             if topic:
                 request_obj = None
                 if hasattr(type_obj, "stateful_name"):
                     request_obj = Request.get_record(data["id"])
                     stateful_name = type_obj.stateful_name(
-                        identity=self.context["identity"],  # type: ignore
+                        identity=self.context["identity"],
                         topic=topic,
                         request=request_obj,
                     )
@@ -180,7 +177,7 @@ class UIRequestSchemaMixin:
                     if request_obj is None:
                         request_obj = Request.get_record(data["id"])
                     stateful_description = type_obj.stateful_description(
-                        identity=self.context["identity"],  # type: ignore
+                        identity=self.context["identity"],
                         topic=topic,
                         request=request_obj,
                     )
@@ -190,7 +187,7 @@ class UIRequestSchemaMixin:
         return stateful_name, stateful_description
 
     @ma.pre_dump
-    def _process_status(self, data: dict, **kwargs: Any) -> dict:
+    def _process_status(self, data: dict, **kwargs: Any) -> dict:  # noqa ARG002
         data["status_code"] = data["status"]
         data["status"] = _(data["status"].capitalize())
         return data
@@ -231,10 +228,10 @@ class UIRequestTypeSchema(RequestTypeSchema):
     """Whether the request type has a form."""
 
     @ma.post_dump
-    def _add_type_details(self, data: dict, **kwargs: Any) -> dict:
+    def _add_type_details(self, data: dict, **kwargs: Any) -> dict:  # noqa ARG002
         """Serialize details from request type."""
-        type = data["type_id"]
-        type_obj = current_request_type_registry.lookup(type, quiet=True)
+        type_ = data["type_id"]
+        type_obj = current_request_type_registry.lookup(type_, quiet=True)
         if hasattr(type_obj, "description"):
             data["description"] = type_obj.description
         if hasattr(type_obj, "name"):
@@ -261,7 +258,7 @@ class UIRequestsSerializationMixin(ma.Schema):
     """Mixin for serialization of record that adds information from request type."""
 
     @ma.post_dump(pass_original=True)
-    def _add_request_types(self, data: dict, original_data: dict, **kwargs: Any) -> dict:
+    def _add_request_types(self, data: dict, original_data: dict, **kwargs: Any) -> dict:  # noqa ARG002
         """If the expansion is requested, add UI form of request types and requests to the serialized record."""
         expanded = data.get("expanded", {})
         if not expanded:
@@ -297,8 +294,8 @@ class UIBaseRequestEventSchema(BaseRecordSchema):
 
     def get_permissions(self, obj: RequestEvent) -> dict:
         """Return permissions to act on comments or empty dict."""
-        type = self.get_attribute(obj, "type", None)
-        is_comment = type == CommentEventType
+        type_ = self.get_attribute(obj, "type", None)
+        is_comment = type_ == CommentEventType
         if is_comment:
             service = current_requests.request_events_service
             return {

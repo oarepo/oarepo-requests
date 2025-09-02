@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 #
 # Copyright (C) 2024 CESNET z.s.p.o.
 #
@@ -7,3 +5,6 @@ from __future__ import annotations
 # modify it under the terms of the MIT License; see LICENSE file for more
 # details.
 #
+"""UI tests module."""
+
+from __future__ import annotations

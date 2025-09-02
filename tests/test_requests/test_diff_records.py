@@ -21,13 +21,12 @@ def test_new_record(db, users, record_service, default_record_with_workflow_json
     from oarepo_requests.proxies import current_oarepo_requests_service
 
     creator = users[0]
-    users[1]
     draft = record_service.create(creator.identity, default_record_with_workflow_json)
     request = current_oarepo_requests_service.create(
         identity=creator.identity,
         data={"payload": {"version": "1.0"}},
         request_type="publish_draft",
-        topic=draft._record,
+        topic=draft._record,  # noqa SLF001
     )
     submit_result = current_invenio_requests_service.execute_action(creator.identity, request.id, "submit")
     assert "created_by" in request.links
@@ -262,8 +261,6 @@ def test_edited_metadata_diff(
     results = db.session.query(RequestEventModel).filter_by(type="S").all()
     assert len(results) == 1
 
-    results[0].json
-
 
 def test_request_active_diff(
     db,
@@ -290,7 +287,7 @@ def test_request_active_diff(
         identity=creator.identity,
         data={"payload": {"version": "1.0"}},
         request_type="publish_draft",
-        topic=draft._record,
+        topic=draft._record,  # noqa SLF001
     )
     submit_result = current_invenio_requests_service.execute_action(creator.identity, request.id, "submit")
     assert "created_by" in request.links

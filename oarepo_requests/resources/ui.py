@@ -19,7 +19,6 @@ from flask_resources.serializers.base import MarshmallowSerializer  # TODO: temp
 from invenio_pidstore.errors import PIDDeletedError
 from invenio_records_resources.services.errors import RecordPermissionDeniedError
 
-# from oarepo_runtime.resources import LocalizedUIJSONSerializer
 from ..proxies import current_oarepo_requests
 from ..resolvers.ui import resolve
 from ..services.ui_schema import (
@@ -86,7 +85,7 @@ class CachedReferenceResolver:
         self._cache = _create_cache(identity, reference_map)
         self._identity = identity
 
-    def dereference(self, reference: dict, **context: Any) -> dict:
+    def dereference(self, reference: dict) -> dict:
         """Dereference a reference.
 
         If the reference is in the cache, return the cached value.
@@ -96,7 +95,6 @@ class CachedReferenceResolver:
         dereferenced dict given from ui entity resolver.
 
         :param reference:   reference to resolve
-        :param context:     additional context
         """
         key = reference_to_tuple(reference)
         if key in self._cache:

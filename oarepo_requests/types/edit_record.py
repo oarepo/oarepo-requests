@@ -9,7 +9,7 @@
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Any, override
+from typing import TYPE_CHECKING, Any, ClassVar, override
 
 import marshmallow as ma
 from invenio_drafts_resources.resources.records.errors import DraftNotCreatedError
@@ -47,7 +47,7 @@ class EditPublishedRecordRequestType(NonDuplicableOARepoRequestType):
 
     type_id = "edit_published_record"
     name = _("Edit metadata")
-    payload_schema = {
+    payload_schema: ClassVar[dict[str, ma.fields.Field]] = {
         "draft_record.links.self": ma.fields.Str(
             attribute="draft_record:links:self",
             data_key="draft_record:links:self",
@@ -59,10 +59,11 @@ class EditPublishedRecordRequestType(NonDuplicableOARepoRequestType):
     }
 
     def get_ui_redirect_url(self, request: Request, ctx: dict) -> str:
+        """Return URL to redirect ui after the request action is executed."""
         if request.status == "accepted":
             service = current_runtime.get_record_service_for_record_class(request.topic.record_cls)
             try:
-                result_item = service.read_draft(ctx["identity"], request.topic._parse_ref_dict_id())
+                result_item = service.read_draft(ctx["identity"], request.topic._parse_ref_dict_id())  # noqa SLF001
             except (PermissionDeniedError, DraftNotCreatedError):
                 return None
 
@@ -73,7 +74,7 @@ class EditPublishedRecordRequestType(NonDuplicableOARepoRequestType):
         return None
 
     @classproperty
-    def available_actions(cls) -> dict[str, type[RequestAction]]:
+    def available_actions(cls) -> dict[str, type[RequestAction]]:  # noqa N805
         """Return available actions for the request type."""
         return {
             **super().available_actions,

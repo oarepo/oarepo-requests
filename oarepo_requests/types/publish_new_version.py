@@ -9,7 +9,7 @@
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Any, override
+from typing import TYPE_CHECKING, Any, ClassVar, override
 
 import marshmallow as ma
 from invenio_i18n import gettext
@@ -37,18 +37,20 @@ if TYPE_CHECKING:
 
     from oarepo_requests.typing import EntityReference
 
+    from ..utils import JsonValue
+
 
 class PublishNewVersionRequestType(PublishRequestType):
     """Request type for publication of a new version of a record."""
 
     type_id = "publish_new_version"
     name = _("Publish new version")
-    payload_schema = {
+    payload_schema: ClassVar[dict[str, ma.fields.Field]] = {
         **PublishRequestType.payload_schema,
         "version": ma.fields.Str(),
     }
 
-    form = {
+    form: ClassVar[JsonValue] = {
         "field": "version",
         "ui_widget": "Input",
         "props": {
@@ -59,7 +61,7 @@ class PublishNewVersionRequestType(PublishRequestType):
     }
 
     @classproperty
-    def available_actions(cls) -> dict[str, type[RequestAction]]:
+    def available_actions(cls) -> dict[str, type[RequestAction]]:  # noqa N805
         """Return available actions for the request type."""
         return {
             **super().available_actions,
@@ -72,7 +74,7 @@ class PublishNewVersionRequestType(PublishRequestType):
     receiver_can_be_none = True
     allowed_topic_ref_types = ModelRefTypes(published=True, draft=True)
 
-    editable = False  # type: ignore
+    editable = False
 
     @classmethod
     def is_applicable_to(cls, identity: Identity, topic: Record, *args: Any, **kwargs: Any) -> bool:

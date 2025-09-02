@@ -5,4 +5,6 @@
 # modify it under the terms of the MIT License; see LICENSE file for more
 # details.
 #
+"""Components package for requests query service on model."""
+
 from __future__ import annotations

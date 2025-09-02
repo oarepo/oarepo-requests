@@ -28,6 +28,7 @@ dev = [
 ]
 tests = [
     "pytest-invenio",
+    "deepdiff"
 ]
 
 [project.entry-points."invenio_base.apps"]

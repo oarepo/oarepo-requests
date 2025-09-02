@@ -44,7 +44,9 @@ class RequestTypesComponent(ResultComponent):
         projection["expanded"]["request_types"] = request_types_list
 
 
-def serialize_request_types(request_types: dict[str, RequestType], identity: Identity, record: Record) -> list[dict]:
+def serialize_request_types(
+    request_types: dict[str, RequestType], identity: Identity, record: Record
+) -> list[RequestTypeSchema]:
     """Serialize request types.
 
     :param request_types: Request types to serialize.
@@ -52,20 +54,10 @@ def serialize_request_types(request_types: dict[str, RequestType], identity: Ide
     :param record: Record for which the request types are serialized.
     :return: List of serialized request types.
     """
-    request_types_list = []
-    for request_type in request_types.values():
-        request_types_list.append(serialize_request_type(request_type, identity, record))
-    return request_types_list
-
-
-def serialize_request_type(request_type: RequestType, identity: Identity, record: Record) -> dict:
-    """Serialize a request type.
-
-    :param request_type: Request type to serialize.
-    :param identity: Identity of the caller.
-    :param record: Record for which the request type is serialized.
-    """
-    return RequestTypeSchema(context={"identity": identity, "record": record}).dump(request_type)
+    return [
+        RequestTypeSchema(context={"identity": identity, "record": record}).dump(request_type)
+        for request_type in request_types.values()
+    ]
 
 
 class RequestsComponent(ResultComponent):
@@ -110,7 +102,7 @@ class RequestTypesList(RecordList):
         record_links = self._service.config.links_item
         rendered_record_links = LinksTemplate(record_links, context={}).expand(self._identity, self._record)
         links_tpl = LinksTemplate(
-            self._links_tpl._links,
+            self._links_tpl._links,  # noqa SLF001
             context={**{f"record_link_{k}": v for k, v in rendered_record_links.items()}},
         )
         res = RequestTypesListDict(

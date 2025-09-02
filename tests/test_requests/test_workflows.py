@@ -51,7 +51,7 @@ def test_publish_with_workflows(
     assert resp_request_submit.status_code == 200
 
     # test state of the record is changed to published
-    draft_with_submitted_request = record_service.read_draft(creator.identity, draft1_id)._record
+    draft_with_submitted_request = record_service.read_draft(creator.identity, draft1_id)._record  # noqa SLF001
     assert draft_with_submitted_request["state"] == "publishing"
 
     record_creator = creator_client.get(f"{urls['BASE_URL']}/{draft1_id}/draft?expand=true").json
@@ -64,7 +64,7 @@ def test_publish_with_workflows(
         link2testclient(record_receiver["expanded"]["requests"][0]["links"]["actions"]["accept"]),
     )
     assert accept.status_code == 200
-    published_record = record_service.read(creator.identity, draft1_id)._record
+    published_record = record_service.read(creator.identity, draft1_id)._record  # noqa SLF001
     assert published_record["state"] == "published"
 
 
@@ -100,7 +100,7 @@ def test_autorequest(
     resp_request_submit = creator_client.post(
         link2testclient(resp_request_create.json["links"]["actions"]["submit"]),
     )
-    approving_record = record_service.read_draft(creator.identity, record_id)._record
+    approving_record = record_service.read_draft(creator.identity, record_id)._record  # noqa SLF001
     assert resp_request_submit.status_code == 200
     assert approving_record["state"] == "approving"
     record_receiver = receiver_client.get(f"{urls['BASE_URL']}/{record_id}/draft?expand=true").json
@@ -110,7 +110,7 @@ def test_autorequest(
     assert accept.status_code == 200
 
     # the publish request should be created automatically
-    publishing_record = record_service.read_draft(creator.identity, record_id)._record
+    publishing_record = record_service.read_draft(creator.identity, record_id)._record  # noqa SLF001
     assert publishing_record["state"] == "publishing"
 
 
@@ -219,7 +219,8 @@ def test_if_no_edit_draft(
         r["type_id"] for r in requests
     }  # new version created, requests should not be available again
 
-    record = creator_client.get(  # try if edit_published_record is still allowed?; does it make sense edit request while also creating new version?
+    # try if edit_published_record is still allowed?# ; does it make sense edit request while also creating new version?
+    record = creator_client.get(
         f"{urls['BASE_URL']}/{id2_}?expand=true",
     )
     requests = record.json["expanded"]["request_types"]
@@ -287,7 +288,7 @@ def test_workflow_events(
         link2testclient(record_receiver["expanded"]["requests"][0]["links"]["actions"]["accept"]),
     )
     assert accept.status_code == 200
-    publishing_record = record_service.read_draft(user1.identity, record_id)._record
+    publishing_record = record_service.read_draft(user1.identity, record_id)._record  # noqa SLF001
     assert publishing_record["state"] == "publishing"
 
     read_from_record = user2_client.get(
@@ -363,7 +364,7 @@ def test_workflow_events_resource(
         link2testclient(record_receiver["expanded"]["requests"][0]["links"]["actions"]["accept"]),
     )
     assert accept.status_code == 200
-    publishing_record = record_service.read_draft(user1.identity, record_id)._record
+    publishing_record = record_service.read_draft(user1.identity, record_id)._record  # noqa SLF001
     assert publishing_record["state"] == "publishing"
 
     read_from_record = user2_client.get(

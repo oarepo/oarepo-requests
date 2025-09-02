@@ -36,7 +36,8 @@ class DeleteDraftRequestType(NonDuplicableOARepoRequestType):
 
     dangerous = True
 
-    def get_ui_redirect_url(self, request: Request, context: dict) -> str:
+    def get_ui_redirect_url(self, request: Request, context: dict) -> str:  # TODO: new way of link handling
+        """Return URL to redirect ui after the request action is executed."""
         if request.status == "accepted":
             topic_cls = request.topic.record_cls
             service = current_runtime.get_record_service_for_record_class(topic_cls)
@@ -44,7 +45,7 @@ class DeleteDraftRequestType(NonDuplicableOARepoRequestType):
         return None
 
     @classproperty
-    def available_actions(cls) -> dict[str, type[RequestAction]]:
+    def available_actions(cls) -> dict[str, type[RequestAction]]:  # noqa N805
         """Return available actions for the request type."""
         return {
             **super().available_actions,
@@ -76,7 +77,7 @@ class DeleteDraftRequestType(NonDuplicableOARepoRequestType):
                 return gettext("Request draft deletion")
 
     @override
-    def stateful_description(
+    def stateful_description(  # noqa PLR0911
         self,
         identity: Identity,
         *,

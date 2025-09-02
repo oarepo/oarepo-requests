@@ -17,8 +17,8 @@ def test_conditional_receiver_creator_matches(
     draft_factory,
     search_clear,
 ):
-    # user[0] is creator, user[1] is receiver
-    # user[0] is not a creator, user[2] is receiver
+    # /for mypy - this is not code/ user[0] is creator, user[1] is receiver
+    # /for mypy - this is not code/ user[0] is not a creator, user[2] is receiver
 
     creator = users[0]
     assert creator.id == "1"
@@ -39,8 +39,8 @@ def test_conditional_receiver_creator_does_not_match(
     draft_factory,
     search_clear,
 ):
-    # user[0] is creator, user[1] is receiver
-    # user[0] is not a creator, user[2] is receiver
+    # /for mypy - this is not code/ user[0] is creator, user[1] is receiver
+    # /for mypy - this is not code/ user[0] is not a creator, user[2] is receiver
 
     creator = users[1]
     assert creator.id != 1

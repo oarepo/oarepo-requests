@@ -78,7 +78,8 @@ class PublishChangedMetadataRequestType(PublishRequestType):
             topic=topic,
             request=request,
             create=gettext(
-                "By submitting the changed metadata for review you are requesting the publication of the changed metadata. "
+                "By submitting the changed metadata for review you are requesting the publication of the "
+                "changed metadata. "
                 "The draft will become locked and no further changes will be possible until the request "
                 "is accepted or declined. You will be notified about the decision by email."
             ),

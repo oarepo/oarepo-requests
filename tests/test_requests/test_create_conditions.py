@@ -96,9 +96,9 @@ def test_can_possibly_create(
         link2testclient(resp_request_create["links"]["actions"]["submit"]),
     )
 
-    def find_request_type(requests, type):
+    def find_request_type(requests, type_) -> dict | None:
         for request in requests:
-            if request["type_id"] == type:
+            if request["type_id"] == type_:
                 return request
         return None
 

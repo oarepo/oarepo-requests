@@ -9,7 +9,7 @@
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Any, Literal
+from typing import TYPE_CHECKING, Any, ClassVar, Literal, override
 
 import marshmallow as ma
 from invenio_i18n import gettext
@@ -48,7 +48,7 @@ from ..errors import UnresolvedRequestsError
 class PublishRequestType(NonDuplicableOARepoRequestType):
     """Publish draft request type."""
 
-    payload_schema = {
+    payload_schema: ClassVar[dict[str, ma.fields.Field]] = {
         "published_record.links.self": ma.fields.Str(
             attribute="published_record:links:self",
             data_key="published_record:links:self",
@@ -60,7 +60,7 @@ class PublishRequestType(NonDuplicableOARepoRequestType):
     }
 
     @classproperty
-    def available_actions(cls) -> dict[str, type[RequestAction]]:
+    def available_actions(cls) -> dict[str, type[RequestAction]]:  # noqa N805
         """Return available actions for the request type."""
         return {
             **super().available_actions,
@@ -73,12 +73,13 @@ class PublishRequestType(NonDuplicableOARepoRequestType):
     receiver_can_be_none = True
     allowed_topic_ref_types = ModelRefTypes(published=True, draft=True)
 
-    editable = False  # type: ignore
+    editable = False
 
     def assert_no_pending_requests(
         self,
         topic: Record,
     ) -> None:
+        """Assert that there are no pending requests on the topic."""
         topic_service = current_runtime.get_record_service_for_record(topic)
 
         request_service = get_requests_service_for_records_service(
@@ -86,7 +87,7 @@ class PublishRequestType(NonDuplicableOARepoRequestType):
         )  # , extra_filters = TermQuery(status="open")
         requests = request_service.search_requests_for_draft(system_identity, topic.pid.pid_value)
 
-        for result in requests._results:
+        for result in requests._results:  # noqa SLF001
             # note: we can not use solely the result.is_open because changes may not be committed yet
             # to opensearch index. That's why we need to get the record from DB and re-check.
             if (
@@ -100,6 +101,7 @@ class PublishRequestType(NonDuplicableOARepoRequestType):
             ):
                 raise UnresolvedRequestsError(action=str(self.name))
 
+    @override
     def can_create(
         self,
         identity: Identity,
@@ -132,7 +134,7 @@ class PublishRequestType(NonDuplicableOARepoRequestType):
         # if files support is enabled for this topic, check if there are any files
         if hasattr(topic, "files"):
             can_toggle_files = topic_service.check_permission(identity, "manage_files", record=topic)
-            draft_files = topic.files  # type: ignore
+            draft_files = topic.files
             if draft_files.enabled and not draft_files.items():
                 if can_toggle_files:
                     my_message = gettext(
@@ -144,12 +146,14 @@ class PublishRequestType(NonDuplicableOARepoRequestType):
                 raise ma.ValidationError({"files.enabled": [my_message]})
 
     @classmethod
+    @override
     def is_applicable_to(cls, identity: Identity, topic: Record, *args: Any, **kwargs: Any) -> bool:
         """Check if the request type is applicable to the topic."""
         if not topic.is_draft:
             return False
         return super().is_applicable_to(identity, topic, *args, **kwargs)
 
+    # TODO: move to superclass and only check whether it should be changed?
     def topic_change(self, request: Request, new_topic: dict, uow: UnitOfWork) -> None:
         """Change the topic of the request."""
         request.topic = new_topic
@@ -157,6 +161,7 @@ class PublishRequestType(NonDuplicableOARepoRequestType):
 
     @classmethod
     def topic_type(cls, topic: Record) -> Literal["initial", "new_version", "metadata", "published"]:
+        """Return publish status type of the topic."""
         index = topic.versions.index
         is_latest = topic.versions.is_latest
         is_draft = topic.is_draft

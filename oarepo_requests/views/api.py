@@ -42,7 +42,7 @@ def create_oarepo_requests_events(app: Flask) -> Blueprint:
     return ext.request_events_resource.as_blueprint()
 
 
-def create_notifications(app: Flask) -> Blueprint:
+def create_notifications(app: Flask) -> Blueprint:  # noqa ARG001
     """Register blueprint routes on app."""
     return Blueprint(
         "oarepo_notifications",

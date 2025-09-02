@@ -34,7 +34,7 @@ def test_escalate_request_most_recent(app, more_users, record_service, default_r
         identity=creator.identity,
         data={"payload": {"version": "1.0"}},
         request_type="publish_draft",
-        topic=draft._record,
+        topic=draft._record,  # noqa SLF001
     )
     current_invenio_requests_service.execute_action(creator.identity, request.id, "submit")
     id_ = request.id
@@ -106,7 +106,7 @@ def test_escalate_request_most_recent_multiple_recipients(
         identity=creator.identity,
         data={"payload": {"version": "1.0"}},
         request_type="publish_draft",
-        topic=draft._record,
+        topic=draft._record,  # noqa SLF001
     )
     current_invenio_requests_service.execute_action(creator.identity, request.id, "submit")
     id_ = request.id
@@ -191,7 +191,7 @@ def test_escalate_request_most_recent_2(
         identity=creator.identity,
         data={"payload": {"version": "1.0"}},
         request_type="publish_draft",
-        topic=draft._record,
+        topic=draft._record,  # noqa SLF001
     )
     current_invenio_requests_service.execute_action(creator.identity, request.id, "submit")
     id_ = request.id
@@ -259,7 +259,7 @@ def test_escalate_request_most_recent_2_multiple_recipients(
         identity=creator.identity,
         data={"payload": {"version": "1.0"}},
         request_type="publish_draft",
-        topic=draft._record,
+        topic=draft._record,  # noqa SLF001
     )
     current_invenio_requests_service.execute_action(creator.identity, request.id, "submit")
     id_ = request.id
@@ -353,7 +353,7 @@ def test_escalate_request_most_recent_3(
         identity=creator.identity,
         data={"payload": {"version": "1.0"}},
         request_type="publish_draft",
-        topic=draft._record,
+        topic=draft._record,  # noqa SLF001
     )
     current_invenio_requests_service.execute_action(creator.identity, request.id, "submit")
     id_ = request.id
@@ -421,7 +421,7 @@ def test_escalate_request_most_recent_3_multiple_recipients(
         identity=creator.identity,
         data={"payload": {"version": "1.0"}},
         request_type="publish_draft",
-        topic=draft._record,
+        topic=draft._record,  # noqa SLF001
     )
     current_invenio_requests_service.execute_action(creator.identity, request.id, "submit")
     id_ = request.id
@@ -494,7 +494,7 @@ def test_escalate_request_already_processed(
         identity=creator.identity,
         data={"payload": {"version": "1.0"}},
         request_type="publish_draft",
-        topic=draft._record,
+        topic=draft._record,  # noqa SLF001
     )
     current_invenio_requests_service.execute_action(creator.identity, request.id, "submit")
     id_ = request.id
@@ -558,7 +558,7 @@ def test_escalate_request_already_processed_multiple_recipients(
         identity=creator.identity,
         data={"payload": {"version": "1.0"}},
         request_type="publish_draft",
-        topic=draft._record,
+        topic=draft._record,  # noqa SLF001
     )
     current_invenio_requests_service.execute_action(creator.identity, request.id, "submit")
     id_ = request.id
@@ -641,7 +641,7 @@ def test_escalate_request_already_processed_2(
         identity=creator.identity,
         data={"payload": {"version": "1.0"}},
         request_type="publish_draft",
-        topic=draft._record,
+        topic=draft._record,  # noqa SLF001
     )
     current_invenio_requests_service.execute_action(creator.identity, request.id, "submit")
     id_ = request.id

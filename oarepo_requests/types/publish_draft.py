@@ -9,7 +9,7 @@
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Any, override
+from typing import TYPE_CHECKING, Any, ClassVar, override
 
 import marshmallow as ma
 from invenio_i18n import gettext
@@ -23,6 +23,8 @@ if TYPE_CHECKING:
     from invenio_drafts_resources.records import Record
     from invenio_requests.records.api import Request
 
+    from ..utils import JsonValue
+
 
 class PublishDraftRequestType(PublishRequestType):
     """Publish draft request type."""
@@ -30,12 +32,12 @@ class PublishDraftRequestType(PublishRequestType):
     type_id = "publish_draft"
     name = _("Publish draft")
 
-    payload_schema = {
+    payload_schema: ClassVar[dict[str, ma.fields.Field]] = {
         **PublishRequestType.payload_schema,
         "version": ma.fields.Str(),
     }
 
-    form = {
+    form: ClassVar[JsonValue] = {
         "field": "version",
         "ui_widget": "Input",
         "props": {

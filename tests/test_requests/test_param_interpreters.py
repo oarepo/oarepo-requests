@@ -7,8 +7,13 @@
 #
 from __future__ import annotations
 
+from typing import TYPE_CHECKING
 
-def _init(users, logged_client, draft_factory, submit_request, urls):
+if TYPE_CHECKING:
+    from pytest_oarepo.fixtures import LoggedClient
+
+
+def _init(users, logged_client, draft_factory, submit_request, urls) -> tuple[LoggedClient, LoggedClient]:
     user1 = users[0]
     user2 = users[1]
 
@@ -110,4 +115,5 @@ def test_open_param_interpreter(
     assert len(search_closed) == 1
 
 
-# TODO perhaps test with groups too so we test extracting more references from identity here; tested in communities with community_role
+# TODO: perhaps test with groups too so we test extracting more references from identity here;
+#  tested in communities with community_role

@@ -5,6 +5,8 @@
 # modify it under the terms of the MIT License; see LICENSE file for more
 # details.
 #
+"""Module for handling record snapshot creation."""
+
 from __future__ import annotations
 
 import json
@@ -20,18 +22,26 @@ from jsonpointer import resolve_pointer
 from oarepo_requests.models import RecordSnapshot
 from oarepo_requests.types.events.record_snapshot import RecordSnapshotEventType
 
+# TODO: should this work also on records without drafts? re type hinting - perhaps we should declare
+#  alias for Record with and without drafts for this to be clear
 if TYPE_CHECKING:
+    from uuid import UUID
+
+    from invenio_db.uow import UnitOfWork
     from invenio_drafts_resources.records import Record
-    from sqlalchemy_utils.types import UUIDType
 
 
 @unit_of_work()
-def create_snapshot_and_possible_event(topic: Record, record_metadata: dict, request_id: UUIDType, uow=None) -> None:
-    """Creates new snapshot of a record and create possible event with old version, new version and difference between versions.
+def create_snapshot_and_possible_event(
+    topic: Record, record_metadata: dict, request_id: UUID, uow: UnitOfWork = None
+) -> None:
+    """Create new snapshot of a record and possibly event.
+
+    Saves record state and records difference between old and new version in the database.
 
     :param Record topic: New topic to take snapshot of
-    :param UUIDType request_id: Request id for given topic
-    :param Any record_item: Record item with metadata, could be retrieved with service.read/read_draft(identity, topic.pid.pid_value), where service = get_record_service_for_record(topic)
+    :param dict record_metadata: Metadata of the record to take snapshot of
+    :param UUID request_id: Request id for given topic
     :param UnitOfWork uow: Unit of work to use (invenio)
     """
     RecordSnapshot.create(record_uuid=topic.id, request_id=request_id, json=record_metadata)
@@ -47,7 +57,8 @@ def create_snapshot_and_possible_event(topic: Record, record_metadata: dict, req
         .all()
     )
 
-    if len(results) == 2:
+    # writing const like "VERSIONS_NEEDED_TO_QUERY_DIFFERENCE == 2" is a bit absurd, right?
+    if len(results) == 2:  # noqa PLR2004
         old_version = results[1].json
         new_version = record_metadata
         diff = jsonpatch.JsonPatch.from_diff(old_version, new_version).patch

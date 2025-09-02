@@ -11,22 +11,14 @@ from __future__ import annotations
 
 from .active import RequestActive
 from .conditional import (
-    IfEventOnRequestType,
-    IfEventType,
     IfNoEditDraft,
     IfNoNewVersionDraft,
     IfRequestedBy,
-    IfRequestType,
-    IfRequestTypeBase,
 )
 
 __all__ = (
-    "IfEventOnRequestType",
-    "IfEventType",
     "IfNoEditDraft",
     "IfNoNewVersionDraft",
-    "IfRequestType",
-    "IfRequestTypeBase",
     "IfRequestedBy",
     "RequestActive",
 )

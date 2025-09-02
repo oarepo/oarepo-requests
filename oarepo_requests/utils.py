@@ -12,6 +12,7 @@ from __future__ import annotations
 import copy
 from typing import TYPE_CHECKING, Any
 
+from flask_babel.speaklater import LazyString
 from invenio_access.permissions import system_identity
 from invenio_pidstore.errors import PersistentIdentifierError
 from invenio_records_resources.proxies import current_service_registry
@@ -45,7 +46,12 @@ if TYPE_CHECKING:
     from .services.record.service import RecordRequestsService
 
 
-class classproperty[T]:
+# TODO: perhaps we could use centrally defined custom types in runtime?
+type JsonValue = str | LazyString | int | float | bool | None | dict[str, JsonValue] | list[JsonValue]
+
+
+# TODO: move to runtime
+class classproperty[T]:  # noqa N801
     """Class property decorator as decorator chaining for declaring class properties was deprecated in python 3.11."""
 
     def __init__(self, func: Callable):
@@ -161,7 +167,7 @@ def get_matching_service_for_refdict(
     """
     for resolver in ResolverRegistry.get_registered_resolvers():
         if resolver.matches_reference_dict(reference_dict):
-            return current_service_registry.get(resolver._service_id)
+            return current_service_registry.get(resolver._service_id)  # noqa SLF001
     return None
 
 

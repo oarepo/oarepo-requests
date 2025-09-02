@@ -51,7 +51,7 @@ class RecordRequestsService:
     @property
     def config(self) -> ServiceConfig:
         """Return a dummy config."""
-        return SimpleNamespace(service_id=self.service_id)  # type: ignore
+        return SimpleNamespace(service_id=self.service_id)
 
     @property
     def service_id(self) -> str:
@@ -69,7 +69,7 @@ class RecordRequestsService:
         return current_oarepo_requests.requests_service
 
     # from invenio_rdm_records.services.requests.service.RecordRequestsService
-    def search_requests_for_record(
+    def search_requests_for_record(  # noqa PLR0913
         self,
         identity: Identity,
         record_id: str,
@@ -80,7 +80,7 @@ class RecordRequestsService:
         **kwargs: Any,
     ) -> RecordList:
         """Search for record's requests."""
-        record = self.record_cls.pid.resolve(record_id)  # type: ignore
+        record = self.record_cls.pid.resolve(record_id)
         self.record_service.require_permission(identity, "read", record=record)
 
         search_filter = dsl.query.Bool(
@@ -105,18 +105,18 @@ class RecordRequestsService:
         )
 
     @unit_of_work()
-    def create(
+    def create(  # noqa PLR0913
         self,
         identity: Identity,
         data: dict[str, Any],
         request_type: str,
         topic_id: str,
-        expires_at: datetime | None = None,
+        expires_at: datetime | None = None,  # noqa ARG002
         uow: UnitOfWork | None = None,
         expand: bool = False,
     ) -> RecordItem:
         """Create a request for a record."""
-        record = self.record_cls.pid.resolve(topic_id)  # type: ignore
+        record = self.record_cls.pid.resolve(topic_id)
         return self.oarepo_requests_service.create(
             identity=identity,
             data=data,

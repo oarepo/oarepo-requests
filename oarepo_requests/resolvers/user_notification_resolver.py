@@ -26,7 +26,7 @@ class UserNotificationProxy(UserProxy):
             return self.system_record()
         try:
             return current_users_service.read(system_identity, user_id).data
-        except: # noqa E722
+        except:  # noqa E722
             return self.ghost_record({"id": user_id})
 
 

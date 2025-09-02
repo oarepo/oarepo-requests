@@ -8,10 +8,11 @@
 from __future__ import annotations
 
 import copy
+from typing import Any
 
+from deepdiff import DeepDiff
 from pytest_oarepo.functions import clear_babel_context
 
-# from deepdiff import DeepDiff
 from oarepo_requests.resolvers.ui import FallbackEntityReferenceUIResolver
 
 
@@ -76,23 +77,22 @@ def test_user_serialization(
     assert resp_request_submit.json["stateful_name"] == "Draft submitted for review"
     assert (
         resp_request_submit.json["stateful_description"]
-        == "The draft has been submitted for review. It is now locked and no further changes are possible. You will be notified about the decision by email."
+        == "The draft has been submitted for review. It is now locked and no further changes are possible. "
+        "You will be notified about the decision by email."
     )
 
-    fallback_label_client.get(f"{urls['BASE_URL']}/{draft_id}/draft").json
+    fallback_label_client.get(f"{urls['BASE_URL']}/{draft_id}/draft")
     ui_record = fallback_label_client.get(
         f"{urls['BASE_URL']}/{draft_id}/draft?expand=true",
         headers={"Accept": "application/vnd.inveniordm.v1+json"},
     ).json
 
-    """
     diff = DeepDiff(
         ui_serialization_result(draft_id, ui_record["expanded"]["requests"][0]["id"]),
         ui_record["expanded"]["requests"][0],
     )
     assert "dictionary_item_removed" not in diff
     assert "dictionary_item_changed" not in diff
-    """
 
     creator_serialization = {
         "label": "id: 1",
@@ -164,7 +164,8 @@ def test_resolver_fallback(
         assert ui_serialization_read["stateful_name"] == "Submit for review"
         assert (
             ui_serialization_read["stateful_description"]
-            == "Submit for review. After submitting the draft for review, it will be locked and no further modifications will be possible."
+            == "Submit for review. After submitting the draft for review, it will be locked and no further "
+            "modifications will be possible."
         )
 
         creator_client.post(link2testclient(resp_request_create["links"]["actions"]["submit"]))
@@ -175,7 +176,8 @@ def test_resolver_fallback(
         assert ui_serialization_read_submitted["stateful_name"] == "Draft submitted for review"
         assert (
             ui_serialization_read_submitted["stateful_description"]
-            == "The draft has been submitted for review. It is now locked and no further changes are possible. You will be notified about the decision by email."
+            == "The draft has been submitted for review. It is now locked and no further changes are possible."
+            " You will be notified about the decision by email."
         )
 
         ui_record = creator_client.get(
@@ -228,7 +230,7 @@ def test_role(
     clear_babel_context()
     config_restore = app.config["OAREPO_REQUESTS_DEFAULT_RECEIVER"]
 
-    def current_receiver(record=None, request_type=None, **kwargs):
+    def current_receiver(record=None, request_type=None, **kwargs: Any) -> Any:
         if request_type.type_id == "publish_draft":
             return role
         return config_restore(record, request_type, **kwargs)
@@ -256,8 +258,8 @@ def test_role(
         ).json
         assert ui_serialization_read["stateful_name"] == "Submit for review"
         assert (
-            ui_serialization_read["stateful_description"]
-            == "Submit for review. After submitting the draft for review, it will be locked and no further modifications will be possible."
+            ui_serialization_read["stateful_description"] == "Submit for review. After submitting the draft for review,"
+            " it will be locked and no further modifications will be possible."
         )
 
         ui_record = creator_client.get(

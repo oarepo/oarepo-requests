@@ -35,13 +35,12 @@ class RequestTypeSchema(ma.Schema):
     """Links to the request type."""
 
     @ma.post_dump
-    def _create_link(self, data: dict, **kwargs: Any) -> dict:
+    def _create_link(self, data: dict, **kwargs: Any) -> dict:  # noqa ARG002
         if "links" in data:
             return data
         if "record" not in self.context:
             raise ma.ValidationError("record not in context for request types serialization")
         type_id = data["type_id"]
-        # current_request_type_registry.lookup(type_id, quiet=True)
         record = self.context["record"]
         service = current_runtime.get_record_service_for_record(record)
         link = ConditionalLink(
