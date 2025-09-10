@@ -1031,7 +1031,7 @@ msgid ""
 "%(link)s\n"
 "    "
 msgstr ""
-"Žádost o publikování záznamu \"%(topic_title)s\" byla zamítnuta. Žádost můžete zobrazit na\n"
+"Žádost o smazání záznamu \"%(topic_title)s\" byla zamítnuta. Žádost můžete zobrazit na\n"
 "%(link)s\n"
 
 #: /Users/m/w/cesnet/oarepo-requests/oarepo_requests/templates/semantic-ui/invenio_notifications/publish-draft-request-event.decline.jinja:9
