@@ -29,7 +29,9 @@ from invenio_requests.resources.events.resource import RequestCommentsResource
 class OARepoRequestsCommentsResource(RequestCommentsResource, ErrorHandlersMixin):
     """OARepo extensions to invenio requests comments resource."""
 
-    item_view_args_parser = request_parser(from_conf("request_item_view_args"), location="view_args")
+    item_view_args_parser = request_parser(
+        from_conf("request_item_view_args"), location="view_args"
+    )
 
     data_parser = request_body_parser(
         parsers=from_conf("request_body_parsers"),
@@ -55,28 +57,29 @@ class OARepoRequestsCommentsResource(RequestCommentsResource, ErrorHandlersMixin
             route("DELETE", routes["item-extended"], self.delete_extended),
             route("GET", routes["timeline-extended"], self.search_extended),
         ]
-        return url_rules + base_routes
+        # invenio is untyped returns chaos of things
+        return url_rules + base_routes  # type: ignore[no-any-return]
 
     # from parent
-    def create_extended(self) -> tuple[dict, int]:
+    def create_extended(self) -> tuple[dict[str, Any], int]:
         """Create a new comment."""
-        return super().create()
+        return super().create()  # type: ignore[no-any-return]
 
-    def read_extended(self) -> tuple[dict, int]:
+    def read_extended(self) -> tuple[dict[str, Any], int]:
         """Read a comment."""
-        return super().read()
+        return super().read()  # type: ignore[no-any-return]
 
-    def update_extended(self) -> tuple[dict, int]:
+    def update_extended(self) -> tuple[dict[str, Any], int]:
         """Update a comment."""
-        return super().update()
+        return super().update()  # type: ignore[no-any-return]
 
-    def delete_extended(self) -> tuple[dict, int]:
+    def delete_extended(self) -> tuple[dict[str, Any], int]:
         """Delete a comment."""
-        return super().delete()
+        return super().delete()  # type: ignore[no-any-return]
 
-    def search_extended(self) -> tuple[dict, int]:
+    def search_extended(self) -> tuple[dict[str, Any], int]:
         """Search for comments."""
-        return super().search()
+        return super().search()  # type: ignore[no-any-return]
 
     # list args parser in invenio parses request_id input through UUID instead of Str; does this have any
     # relevance for us?
@@ -84,9 +87,11 @@ class OARepoRequestsCommentsResource(RequestCommentsResource, ErrorHandlersMixin
     @request_extra_args
     @data_parser
     @response_handler()
-    def create_event(self) -> tuple[dict, int]:
+    def create_event(self) -> tuple[dict[str, Any], int]:
         """Create a comment."""
-        type_ = current_event_type_registry.lookup(resource_requestctx.view_args["event_type"], quiet=True)
+        type_ = current_event_type_registry.lookup(
+            resource_requestctx.view_args["event_type"], quiet=True
+        )
         item = self.service.create(
             identity=g.identity,
             request_id=resource_requestctx.view_args["request_id"],

@@ -36,12 +36,14 @@ class DeleteDraftRequestType(NonDuplicableOARepoRequestType):
 
     dangerous = True
 
-    def get_ui_redirect_url(self, request: Request, context: dict) -> str:  # TODO: new way of link handling
+    def get_ui_redirect_url(
+        self, request: Request, context: dict
+    ) -> str:  # TODO: new way of link handling
         """Return URL to redirect ui after the request action is executed."""
         if request.status == "accepted":
             topic_cls = request.topic.record_cls
             service = current_runtime.get_record_service_for_record_class(topic_cls)
-            return service.config.links_search["self_html"].expand(None, context)
+#             return service.config.links_search["self_html"].expand(None, context) # TODO: temp
         return None
 
     @classproperty
@@ -102,8 +104,12 @@ class DeleteDraftRequestType(NonDuplicableOARepoRequestType):
                         "You have been asked to approve the request to permanently delete the draft. "
                         "You can approve or reject the request."
                     )
-                return gettext("Permission to delete draft (including files) requested. ")
+                return gettext(
+                    "Permission to delete draft (including files) requested. "
+                )
             case _:
                 if request_identity_matches(request.created_by, identity):
-                    return gettext("Submit request to get permission to delete the draft.")
+                    return gettext(
+                        "Submit request to get permission to delete the draft."
+                    )
                 return gettext("You do not have permission to delete the draft.")

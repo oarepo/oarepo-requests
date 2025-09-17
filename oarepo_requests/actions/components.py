@@ -109,13 +109,19 @@ class WorkflowTransitionComponent(RequestActionComponent):
             return
         try:
             transitions = (
-                current_oarepo_workflows.get_workflow(state.topic).requests()[state.request_type.type_id].transitions
+                current_oarepo_workflows.get_workflow(state.topic)
+                .requests()[state.request_type.type_id]
+                .transitions
             )
-        except NoResultFound:  # parent might be deleted - this is the case for delete_draft request type
+        except (
+            NoResultFound
+        ):  # parent might be deleted - this is the case for delete_draft request type
             return
         target_state = transitions[state.action.status_to]
 
-        if target_state and not state.topic.is_deleted:  # commit doesn't work on deleted record?
+        if (
+            target_state and not state.topic.is_deleted
+        ):  # commit doesn't work on deleted record?
             current_oarepo_workflows.set_state(
                 identity,
                 state.topic,
@@ -155,7 +161,9 @@ class AutoAcceptComponent(RequestActionComponent):
             try:
                 current_action_obj = state.action
                 state.action = action_obj
-                action_obj.execute_with_components(identity, state, uow, *args, **kwargs)
+                action_obj.execute_with_components(
+                    identity, state, uow, *args, **kwargs
+                )
             finally:
                 state.action = current_action_obj
         else:

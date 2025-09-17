@@ -23,9 +23,10 @@ from invenio_requests.proxies import current_requests_service
 from invenio_requests.records import Request
 from invenio_requests.records.models import RequestEventModel
 from oarepo_workflows.proxies import current_oarepo_workflows
-from oarepo_workflows.requests import RecipientEntityReference
 
-from oarepo_requests.notifications.builders.escalate import EscalateRequestSubmitNotificationBuilder
+from oarepo_requests.notifications.builders.escalate import (
+    EscalateRequestSubmitNotificationBuilder,
+)
 from oarepo_requests.types.events.escalation import EscalationEventType
 
 if TYPE_CHECKING:
@@ -38,16 +39,25 @@ log = logging.getLogger(__name__)
 
 
 @unit_of_work()
-def escalate_request(request: Request, escalation: WorkflowRequestEscalation, uow: UnitOfWork = None) -> None:
+def escalate_request(
+    request: Request, escalation: WorkflowRequestEscalation, uow: UnitOfWork = None
+) -> None:
     """Escalate single request and commit the change to the database."""
     log.info("Escalating request %s", request.id)
     resolved_topic = request.topic.resolve()
-    receiver = RecipientEntityReference(request_or_escalation=escalation, record=resolved_topic)
+    receiver = escalation.recipient_entity_reference(
+        record=resolved_topic
+    )
 
     old_receiver_str = json.dumps(request["receiver"], sort_keys=True)
     new_receiver_str = json.dumps(receiver, sort_keys=True)
     if new_receiver_str != old_receiver_str:
-        log.info("Request %s receiver changed from %s to %s", request.id, old_receiver_str, new_receiver_str)
+        log.info(
+            "Request %s receiver changed from %s to %s",
+            request.id,
+            old_receiver_str,
+            new_receiver_str,
+        )
 
         data = {
             "payload": {
@@ -67,7 +77,11 @@ def escalate_request(request: Request, escalation: WorkflowRequestEscalation, uo
 
         request.receiver = receiver
         request.commit()
-        uow.register(NotificationOp(EscalateRequestSubmitNotificationBuilder.build(request=request)))
+        uow.register(
+            NotificationOp(
+                EscalateRequestSubmitNotificationBuilder.build(request=request)
+            )
+        )
         log.info("Notification mail sent to %s", new_receiver_str)
         uow.register(RecordCommitOp(request))
 
@@ -92,20 +106,29 @@ def stale_requests() -> Iterator[Request]:
         if hasattr(workflow_request, "escalations") and workflow_request.escalations:
             results = (
                 db.session.query(RequestEventModel)
-                .filter(RequestEventModel.type == "E", RequestEventModel.request_id == r.id)
+                .filter(
+                    RequestEventModel.type == "E", RequestEventModel.request_id == r.id
+                )
                 .all()
             )
 
-            sorted_escalations = sorted(workflow_request.escalations, key=lambda escalation: escalation.after)
+            sorted_escalations = sorted(
+                workflow_request.escalations, key=lambda escalation: escalation.after
+            )
             most_recent_escalation = None
 
             for escalation in sorted_escalations:
-                if any(result.json["payload"]["escalation"] == escalation.escalation_id for result in results):
+                if any(
+                    result.json["payload"]["escalation"] == escalation.escalation_id
+                    for result in results
+                ):
                     continue  # already processed
 
                 # take the most recent one
                 utc_now_naive = datetime.now(UTC).replace(tzinfo=None)
-                if r.updated + escalation.after <= utc_now_naive:  # for some reason request is not timezone aware
+                if (
+                    r.updated + escalation.after <= utc_now_naive
+                ):  # for some reason request is not timezone aware
                     most_recent_escalation = escalation
                 else:
                     break

@@ -55,4 +55,6 @@ def resolve_entity(entity: str, obj: Request, ctx: dict[str, Any]) -> dict:
 
 def entity_context_key(reference_dict: dict) -> str:
     """Create a key for the entity context cache."""
-    return "entity:" + ":".join(f"{x[0]}:{x[1]}" for x in sorted(reference_dict.items()))
+    return "entity:" + ":".join(
+        f"{x[0]}:{x[1]}" for x in sorted(reference_dict.items())
+    )

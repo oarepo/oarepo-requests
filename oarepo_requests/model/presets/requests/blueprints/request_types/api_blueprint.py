@@ -42,7 +42,9 @@ class ApiRequestTypesBlueprintPreset(Preset):
         @staticmethod  # need to use staticmethod as python's magic always passes self as the first argument
         def create_request_types_api_blueprint(app: Flask) -> Blueprint:
             with app.app_context():
-                return app.extensions[model.base_name].resource_record_request_types.as_blueprint()
+                return app.extensions[
+                    model.base_name
+                ].resource_record_request_types.as_blueprint()
 
         yield AddToModule(
             "blueprints",

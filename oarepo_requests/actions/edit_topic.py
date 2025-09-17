@@ -24,7 +24,9 @@ if TYPE_CHECKING:
     from .components import RequestActionState
 
 
-class EditTopicAcceptAction(AddTopicLinksOnPayloadMixin, RecordSnapshotMixin, OARepoAcceptAction):
+class EditTopicAcceptAction(
+    AddTopicLinksOnPayloadMixin, RecordSnapshotMixin, OARepoAcceptAction
+):
     """Accept creation of a draft of a published record for editing metadata."""
 
     self_link = "draft_record:links:self"

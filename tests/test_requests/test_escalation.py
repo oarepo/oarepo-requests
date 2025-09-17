@@ -16,7 +16,9 @@ from invenio_requests.records.models import RequestEventModel
 from oarepo_requests.services.escalation import check_escalations
 
 
-def test_escalate_request_most_recent(app, more_users, record_service, default_record_with_workflow_json, search_clear):
+def test_escalate_request_most_recent(
+    app, more_users, record_service, default_record_with_workflow_json, search_clear
+):
     from invenio_requests.proxies import (
         current_requests_service as current_invenio_requests_service,
     )
@@ -36,7 +38,9 @@ def test_escalate_request_most_recent(app, more_users, record_service, default_r
         request_type="publish_draft",
         topic=draft._record,  # noqa SLF001
     )
-    current_invenio_requests_service.execute_action(creator.identity, request.id, "submit")
+    current_invenio_requests_service.execute_action(
+        creator.identity, request.id, "submit"
+    )
     id_ = request.id
 
     # check before escalation
@@ -48,7 +52,9 @@ def test_escalate_request_most_recent(app, more_users, record_service, default_r
         check_escalations()
 
         # nothing should change, first escalation period is 2 seconds
-        request = current_oarepo_requests_service.read(identity=creator.identity, id_=id_)
+        request = current_oarepo_requests_service.read(
+            identity=creator.identity, id_=id_
+        )
         assert request.data["receiver"] == {"user": "2"}
         assert len(outbox) == 0
 
@@ -59,7 +65,9 @@ def test_escalate_request_most_recent(app, more_users, record_service, default_r
         check_escalations()
 
         # check again
-        request = current_oarepo_requests_service.read(identity=creator.identity, id_=id_)
+        request = current_oarepo_requests_service.read(
+            identity=creator.identity, id_=id_
+        )
         assert request.data["receiver"] == {"user": "3"}
 
         # event should exist in DB
@@ -108,7 +116,9 @@ def test_escalate_request_most_recent_multiple_recipients(
         request_type="publish_draft",
         topic=draft._record,  # noqa SLF001
     )
-    current_invenio_requests_service.execute_action(creator.identity, request.id, "submit")
+    current_invenio_requests_service.execute_action(
+        creator.identity, request.id, "submit"
+    )
     id_ = request.id
 
     # check before escalation
@@ -152,8 +162,12 @@ def test_escalate_request_most_recent_multiple_recipients(
         check_escalations()
 
         # check again
-        request = current_oarepo_requests_service.read(identity=creator.identity, id_=id_)
-        assert request.data["receiver"] == {"multiple": '[{"user": "3"}, {"user": "7"}]'}
+        request = current_oarepo_requests_service.read(
+            identity=creator.identity, id_=id_
+        )
+        assert request.data["receiver"] == {
+            "multiple": '[{"user": "3"}, {"user": "7"}]'
+        }
 
         # assert event exist
         results = (
@@ -168,8 +182,14 @@ def test_escalate_request_most_recent_multiple_recipients(
         assert len(outbox) == 2
 
         # OR in case of first notification is slower than other, dont know if this can happen, but to be sure
-        assert outbox[0].recipients[0] == "user3@example.org" or outbox[0].recipients[0] == "user7@example.org"
-        assert outbox[1].recipients[0] == "user3@example.org" or outbox[1].recipients[0] == "user7@example.org"
+        assert (
+            outbox[0].recipients[0] == "user3@example.org"
+            or outbox[0].recipients[0] == "user7@example.org"
+        )
+        assert (
+            outbox[1].recipients[0] == "user3@example.org"
+            or outbox[1].recipients[0] == "user7@example.org"
+        )
 
 
 def test_escalate_request_most_recent_2(
@@ -193,7 +213,9 @@ def test_escalate_request_most_recent_2(
         request_type="publish_draft",
         topic=draft._record,  # noqa SLF001
     )
-    current_invenio_requests_service.execute_action(creator.identity, request.id, "submit")
+    current_invenio_requests_service.execute_action(
+        creator.identity, request.id, "submit"
+    )
     id_ = request.id
 
     with mail.record_messages() as outbox:
@@ -201,7 +223,9 @@ def test_escalate_request_most_recent_2(
         check_escalations()
 
         # check before escalation
-        request = current_oarepo_requests_service.read(identity=creator.identity, id_=id_)
+        request = current_oarepo_requests_service.read(
+            identity=creator.identity, id_=id_
+        )
         assert request.data["receiver"] == {"user": "2"}
 
         # wait until escalation time
@@ -212,7 +236,9 @@ def test_escalate_request_most_recent_2(
         check_escalations()
 
         # check again
-        request = current_oarepo_requests_service.read(identity=creator.identity, id_=id_)
+        request = current_oarepo_requests_service.read(
+            identity=creator.identity, id_=id_
+        )
         assert request.data["receiver"] == {"user": "4"}
 
         # assert event exist
@@ -261,7 +287,9 @@ def test_escalate_request_most_recent_2_multiple_recipients(
         request_type="publish_draft",
         topic=draft._record,  # noqa SLF001
     )
-    current_invenio_requests_service.execute_action(creator.identity, request.id, "submit")
+    current_invenio_requests_service.execute_action(
+        creator.identity, request.id, "submit"
+    )
     id_ = request.id
 
     # sanity check, no escalation -> no event in database
@@ -312,7 +340,9 @@ def test_escalate_request_most_recent_2_multiple_recipients(
         check_escalations()
 
         # check again
-        request = current_oarepo_requests_service.read(identity=creator.identity, id_=id_)
+        request = current_oarepo_requests_service.read(
+            identity=creator.identity, id_=id_
+        )
         assert request.data["receiver"] == {"user": "4"}
 
         # assert event exist
@@ -355,7 +385,9 @@ def test_escalate_request_most_recent_3(
         request_type="publish_draft",
         topic=draft._record,  # noqa SLF001
     )
-    current_invenio_requests_service.execute_action(creator.identity, request.id, "submit")
+    current_invenio_requests_service.execute_action(
+        creator.identity, request.id, "submit"
+    )
     id_ = request.id
 
     with mail.record_messages() as outbox:
@@ -363,7 +395,9 @@ def test_escalate_request_most_recent_3(
         check_escalations()
 
         # check before escalation
-        request = current_oarepo_requests_service.read(identity=creator.identity, id_=id_)
+        request = current_oarepo_requests_service.read(
+            identity=creator.identity, id_=id_
+        )
         assert request.data["receiver"] == {"user": "2"}
         assert len(outbox) == 0
 
@@ -374,7 +408,9 @@ def test_escalate_request_most_recent_3(
         check_escalations()
 
         # check again
-        request = current_oarepo_requests_service.read(identity=creator.identity, id_=id_)
+        request = current_oarepo_requests_service.read(
+            identity=creator.identity, id_=id_
+        )
         assert request.data["receiver"] == {"user": "5"}
 
         # assert event exist
@@ -423,7 +459,9 @@ def test_escalate_request_most_recent_3_multiple_recipients(
         request_type="publish_draft",
         topic=draft._record,  # noqa SLF001
     )
-    current_invenio_requests_service.execute_action(creator.identity, request.id, "submit")
+    current_invenio_requests_service.execute_action(
+        creator.identity, request.id, "submit"
+    )
     id_ = request.id
 
     with mail.record_messages() as outbox:
@@ -453,7 +491,9 @@ def test_escalate_request_most_recent_3_multiple_recipients(
         check_escalations()
 
         # check again
-        request = current_oarepo_requests_service.read(identity=creator.identity, id_=id_)
+        request = current_oarepo_requests_service.read(
+            identity=creator.identity, id_=id_
+        )
         assert request.data["receiver"] == {"user": "5"}
 
         # assert event exist
@@ -496,7 +536,9 @@ def test_escalate_request_already_processed(
         request_type="publish_draft",
         topic=draft._record,  # noqa SLF001
     )
-    current_invenio_requests_service.execute_action(creator.identity, request.id, "submit")
+    current_invenio_requests_service.execute_action(
+        creator.identity, request.id, "submit"
+    )
     id_ = request.id
 
     # wait until escalation
@@ -506,12 +548,16 @@ def test_escalate_request_already_processed(
         check_escalations()
 
         # check before escalation
-        request = current_oarepo_requests_service.read(identity=creator.identity, id_=id_)
+        request = current_oarepo_requests_service.read(
+            identity=creator.identity, id_=id_
+        )
         assert request.data["receiver"] == {"user": "5"}
 
         # nothing should change
         check_escalations()
-        request = current_oarepo_requests_service.read(identity=creator.identity, id_=id_)
+        request = current_oarepo_requests_service.read(
+            identity=creator.identity, id_=id_
+        )
         assert request.data["receiver"] == {"user": "5"}
 
         # assert event exist
@@ -560,7 +606,9 @@ def test_escalate_request_already_processed_multiple_recipients(
         request_type="publish_draft",
         topic=draft._record,  # noqa SLF001
     )
-    current_invenio_requests_service.execute_action(creator.identity, request.id, "submit")
+    current_invenio_requests_service.execute_action(
+        creator.identity, request.id, "submit"
+    )
     id_ = request.id
 
     # assert event exist
@@ -579,8 +627,12 @@ def test_escalate_request_already_processed_multiple_recipients(
         check_escalations()
 
         # check after escalation
-        request = current_oarepo_requests_service.read(identity=creator.identity, id_=id_)
-        assert request.data["receiver"] == {"multiple": '[{"user": "5"}, {"user": "6"}]'}
+        request = current_oarepo_requests_service.read(
+            identity=creator.identity, id_=id_
+        )
+        assert request.data["receiver"] == {
+            "multiple": '[{"user": "5"}, {"user": "6"}]'
+        }
 
         # assert event exist
         results = (
@@ -601,8 +653,12 @@ def test_escalate_request_already_processed_multiple_recipients(
 
         # nothing should change
         check_escalations()
-        request = current_oarepo_requests_service.read(identity=creator.identity, id_=id_)
-        assert request.data["receiver"] == {"multiple": '[{"user": "5"}, {"user": "6"}]'}
+        request = current_oarepo_requests_service.read(
+            identity=creator.identity, id_=id_
+        )
+        assert request.data["receiver"] == {
+            "multiple": '[{"user": "5"}, {"user": "6"}]'
+        }
 
         results = (
             db.session.query(RequestEventModel)
@@ -643,7 +699,9 @@ def test_escalate_request_already_processed_2(
         request_type="publish_draft",
         topic=draft._record,  # noqa SLF001
     )
-    current_invenio_requests_service.execute_action(creator.identity, request.id, "submit")
+    current_invenio_requests_service.execute_action(
+        creator.identity, request.id, "submit"
+    )
     id_ = request.id
 
     # wait until escalation
@@ -653,7 +711,9 @@ def test_escalate_request_already_processed_2(
         check_escalations()
 
         # first escalation
-        request = current_oarepo_requests_service.read(identity=creator.identity, id_=id_)
+        request = current_oarepo_requests_service.read(
+            identity=creator.identity, id_=id_
+        )
         assert request.data["receiver"] == {"user": "3"}
 
         # assert event exist
@@ -678,7 +738,9 @@ def test_escalate_request_already_processed_2(
         # second escalation
         time.sleep(7)
         check_escalations()
-        request = current_oarepo_requests_service.read(identity=creator.identity, id_=id_)
+        request = current_oarepo_requests_service.read(
+            identity=creator.identity, id_=id_
+        )
         assert request.data["receiver"] == {"user": "4"}
 
         # assert event exist

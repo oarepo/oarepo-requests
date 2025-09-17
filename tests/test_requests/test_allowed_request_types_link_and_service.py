@@ -26,8 +26,14 @@ def test_allowed_request_types_on_draft_service(
     test_ext = current_app.extensions["requests_test"]
     test_requests_service = test_ext.service_record_request_types
 
-    allowed_request_types = test_requests_service.get_applicable_request_types_for_draft_record(identity, draft1_id)
-    assert sorted(allowed_request_types.to_dict()["hits"]["hits"], key=lambda x: x["type_id"]) == [
+    allowed_request_types = (
+        test_requests_service.get_applicable_request_types_for_draft_record(
+            identity, draft1_id
+        )
+    )
+    assert sorted(
+        allowed_request_types.to_dict()["hits"]["hits"], key=lambda x: x["type_id"]
+    ) == [
         {
             "links": {
                 "actions": {
@@ -62,9 +68,16 @@ def test_allowed_request_types_on_draft_resource(
     draft1_id = draft1["id"]
 
     applicable_requests_link = draft1["links"]["applicable-requests"]
-    assert applicable_requests_link == f"https://127.0.0.1:5000/api/requests-test/{draft1_id}/draft/requests/applicable"
-    allowed_request_types = creator_client.get(link2testclient(applicable_requests_link))
-    assert sorted(allowed_request_types.json["hits"]["hits"], key=lambda x: x["type_id"]) == [
+    assert (
+        applicable_requests_link
+        == f"https://127.0.0.1:5000/api/requests-test/{draft1_id}/draft/requests/applicable"
+    )
+    allowed_request_types = creator_client.get(
+        link2testclient(applicable_requests_link)
+    )
+    assert sorted(
+        allowed_request_types.json["hits"]["hits"], key=lambda x: x["type_id"]
+    ) == [
         {
             "links": {
                 "actions": {
@@ -100,10 +113,17 @@ def test_allowed_request_types_on_published_resource(
     published1_id = published1["id"]
 
     applicable_requests_link = published1["links"]["applicable-requests"]
-    assert applicable_requests_link == f"https://127.0.0.1:5000/api/requests-test/{published1_id}/requests/applicable"
-    allowed_request_types = creator_client.get(link2testclient(applicable_requests_link))
+    assert (
+        applicable_requests_link
+        == f"https://127.0.0.1:5000/api/requests-test/{published1_id}/requests/applicable"
+    )
+    allowed_request_types = creator_client.get(
+        link2testclient(applicable_requests_link)
+    )
     assert allowed_request_types.status_code == 200
-    assert sorted(allowed_request_types.json["hits"]["hits"], key=lambda x: x["type_id"]) == [
+    assert sorted(
+        allowed_request_types.json["hits"]["hits"], key=lambda x: x["type_id"]
+    ) == [
         {
             "links": {
                 "actions": {
@@ -122,7 +142,9 @@ def test_allowed_request_types_on_published_resource(
         },
         {
             "links": {
-                "actions": {"create": f"https://127.0.0.1:5000/api/requests-test/{published1_id}/requests/new_version"}
+                "actions": {
+                    "create": f"https://127.0.0.1:5000/api/requests-test/{published1_id}/requests/new_version"
+                }
             },
             "type_id": "new_version",
         },
@@ -153,11 +175,13 @@ def test_ui_serialization(
 
     # with app.test_request_context(headers=[("Accept-Language", "en")]):
     allowed_request_types_draft = creator_client.get(
-        link2testclient(applicable_requests_link_draft), headers={"Accept": "application/vnd.inveniordm.v1+json"}
+        link2testclient(applicable_requests_link_draft),
+        headers={"Accept": "application/vnd.inveniordm.v1+json"},
     )
 
     allowed_request_types_published = creator_client.get(
-        link2testclient(applicable_requests_link_published), headers={"Accept": "application/vnd.inveniordm.v1+json"}
+        link2testclient(applicable_requests_link_published),
+        headers={"Accept": "application/vnd.inveniordm.v1+json"},
     )
 
     sorted_draft_list = allowed_request_types_draft.json["hits"]["hits"]
@@ -234,7 +258,9 @@ def test_ui_serialization(
         {
             "type_id": "new_version",
             "links": {
-                "actions": {"create": f"https://127.0.0.1:5000/api/requests-test/{published_id}/requests/new_version"}
+                "actions": {
+                    "create": f"https://127.0.0.1:5000/api/requests-test/{published_id}/requests/new_version"
+                }
             },
             "description": "Request requesting creation of new version of a published record.",
             "name": "New Version",

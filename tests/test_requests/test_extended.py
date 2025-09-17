@@ -54,7 +54,9 @@ def test_read_extended(
     draft1 = draft_factory(creator.identity)
     draft_id = draft1["id"]
 
-    resp_request_submit = submit_request_on_draft(creator.identity, draft_id, "publish_draft")
+    resp_request_submit = submit_request_on_draft(
+        creator.identity, draft_id, "publish_draft"
+    )
 
     creator_client.get(f"{urls['BASE_URL_REQUESTS']}{resp_request_submit['id']}")
     new_call = creator_client.get(
@@ -92,7 +94,9 @@ def test_update_self_link(
     draft1 = draft_factory(creator.identity)
     draft1_id = draft1["id"]
 
-    resp_request_submit = submit_request_on_draft(creator.identity, draft1_id, "publish_draft")
+    resp_request_submit = submit_request_on_draft(
+        creator.identity, draft1_id, "publish_draft"
+    )
 
     read_before = creator_client.get(
         link2testclient(resp_request_submit["links"]["self"]),
@@ -100,7 +104,9 @@ def test_update_self_link(
     read_from_record = creator_client.get(
         f"{urls['BASE_URL']}/{draft1_id}/draft?expand=true",
     )
-    link_to_extended = link2testclient(read_from_record.json["expanded"]["requests"][0]["links"]["self"])
+    link_to_extended = link2testclient(
+        read_from_record.json["expanded"]["requests"][0]["links"]["self"]
+    )
 
     assert link_to_extended.startswith(f"{urls['BASE_URL_REQUESTS']}extended")
     update_extended = creator_client.put(
@@ -132,7 +138,9 @@ def test_events_resource(
     draft1 = draft_factory(creator.identity)
     draft1_id = draft1["id"]
 
-    resp_request_submit = submit_request_on_draft(creator.identity, draft1_id, "publish_draft")
+    resp_request_submit = submit_request_on_draft(
+        creator.identity, draft1_id, "publish_draft"
+    )
 
     creator_client.get(
         link2testclient(resp_request_submit["links"]["self"]),
@@ -142,8 +150,12 @@ def test_events_resource(
         f"{urls['BASE_URL']}/{draft1_id}/draft?expand=true",
     )
 
-    comments_link = link2testclient(read_from_record.json["expanded"]["requests"][0]["links"]["comments"])
-    timeline_link = link2testclient(read_from_record.json["expanded"]["requests"][0]["links"]["timeline"])
+    comments_link = link2testclient(
+        read_from_record.json["expanded"]["requests"][0]["links"]["comments"]
+    )
+    timeline_link = link2testclient(
+        read_from_record.json["expanded"]["requests"][0]["links"]["timeline"]
+    )
 
     assert comments_link.startswith("/requests/extended")
     assert timeline_link.startswith("/requests/extended")

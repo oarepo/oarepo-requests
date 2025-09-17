@@ -15,7 +15,9 @@ from typing import TYPE_CHECKING, Any, cast
 from flask import g
 from flask_resources import BaseListSchema
 from flask_resources.serializers import JSONSerializer
-from flask_resources.serializers.base import MarshmallowSerializer  # TODO: temp - not decided what's used here
+from flask_resources.serializers.base import (
+    MarshmallowSerializer,
+)  # TODO: temp - not decided what's used here
 from invenio_pidstore.errors import PIDDeletedError
 from invenio_records_resources.services.errors import RecordPermissionDeniedError
 
@@ -49,11 +51,15 @@ def _reference_map_from_list(obj_list: list[dict]) -> dict[str, set]:
             if reference_type in hit:
                 reference = hit[reference_type]
                 if reference:
-                    reference_map[next(iter(reference.keys()))].add(next(iter(reference.values())))
+                    reference_map[next(iter(reference.keys()))].add(
+                        next(iter(reference.values()))
+                    )
     return reference_map
 
 
-def _create_cache(identity: Identity, reference_map: dict[str, set[str]]) -> dict[tuple[str, str], dict]:
+def _create_cache(
+    identity: Identity, reference_map: dict[str, set[str]]
+) -> dict[tuple[str, str], dict]:
     """Create a cache of resolved references.
 
     For each of the (entity_type, entity_ids) pairs in the reference_map, resolve the references
@@ -68,7 +74,10 @@ def _create_cache(identity: Identity, reference_map: dict[str, set[str]]) -> dic
             resolver = entity_resolvers[reference_type]
             results = resolver.resolve_many(identity, list(values))
             # we are expecting "reference" in results
-            cache_for_type = {reference_to_tuple(result["reference"]): cast("dict", result) for result in results}
+            cache_for_type = {
+                reference_to_tuple(result["reference"]): cast("dict", result)
+                for result in results
+            }
             cache |= cache_for_type
     return cache
 
@@ -124,7 +133,9 @@ class OARepoRequestsUIJSONSerializer(MarshmallowSerializer):
 
         Do not create a cache for single objects as there is no performance boost by doing so.
         """
-        extra_context = {"resolved": CachedReferenceResolver(self.schema_context["identity"], [])}
+        extra_context = {
+            "resolved": CachedReferenceResolver(self.schema_context["identity"], [])
+        }
         return super().dump_obj(obj, *args, extra_context=extra_context, **kwargs)
 
     def dump_list(self, obj_list: dict, *args: Any, **kwargs: Any) -> list[dict]:
@@ -135,7 +146,11 @@ class OARepoRequestsUIJSONSerializer(MarshmallowSerializer):
 
         :param obj_list:    objects to serialize in opensearch list format
         """
-        extra_context = {"resolved": CachedReferenceResolver(self.schema_context["identity"], obj_list["hits"]["hits"])}
+        extra_context = {
+            "resolved": CachedReferenceResolver(
+                self.schema_context["identity"], obj_list["hits"]["hits"]
+            )
+        }
         return super().dump_list(obj_list, *args, extra_context=extra_context, **kwargs)
 
 

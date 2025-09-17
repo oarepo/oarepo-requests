@@ -46,7 +46,9 @@ def _get_requests_with_topic_reference(topic_ref: EntityReference) -> list[dict]
     )
 
 
-def _create_event(cur_request: Request, payload: dict, event_type: type[EventType], uow: UnitOfWork) -> None:
+def _create_event(
+    cur_request: Request, payload: dict, event_type: type[EventType], uow: UnitOfWork
+) -> None:
     data = {"payload": payload}
     current_events_service.create(
         system_identity,
@@ -57,7 +59,9 @@ def _create_event(cur_request: Request, payload: dict, event_type: type[EventTyp
     )
 
 
-def update_topic(request: Request, old_topic: Record, new_topic: Record, uow: UnitOfWork) -> None:
+def update_topic(
+    request: Request, old_topic: Record, new_topic: Record, uow: UnitOfWork
+) -> None:
     """Update topic on all requests with the old topic to the new topic.
 
     :param request: Request on which the action is being executed, might be handled differently than
@@ -73,10 +77,14 @@ def update_topic(request: Request, old_topic: Record, new_topic: Record, uow: Un
     new_topic_ref = ResolverRegistry.reference_entity(new_topic)
     for request_from_search in requests_with_topic._results:  # noqa SLF001  # result list links might crash before update of the topic
         request_from_search_id = request_from_search["uuid"]
-        request_type = current_request_type_registry.lookup(request_from_search["type"], quiet=True)
+        request_type = current_request_type_registry.lookup(
+            request_from_search["type"], quiet=True
+        )
         if hasattr(request_type, "topic_change"):
             cur_request = (
-                Request.get_record(request_from_search_id) if request_from_search_id != str(request.id) else request
+                Request.get_record(request_from_search_id)
+                if request_from_search_id != str(request.id)
+                else request
             )  # request on which the action is executed is recommited later,
             # the change must be done on the same instance
             request_type.topic_change(cur_request, new_topic_ref, uow)
@@ -91,7 +99,9 @@ def update_topic(request: Request, old_topic: Record, new_topic: Record, uow: Un
                 _create_event(cur_request, payload, TopicUpdateEventType, uow)
 
 
-def cancel_requests_on_topic_delete(request: Request, topic: Record, uow: UnitOfWork) -> None:
+def cancel_requests_on_topic_delete(
+    request: Request, topic: Record, uow: UnitOfWork
+) -> None:
     """Cancel all requests with the topic that is being deleted."""
     from oarepo_requests.types.events import TopicDeleteEventType
 
@@ -99,12 +109,16 @@ def cancel_requests_on_topic_delete(request: Request, topic: Record, uow: UnitOf
     requests_with_topic = _get_requests_with_topic_reference(topic_ref)
     for request_from_search in requests_with_topic._results:  # noqa SLF001 # result list links might crash before update of the topic
         request_from_search_id = request_from_search["uuid"]
-        request_type = current_request_type_registry.lookup(request_from_search["type"], quiet=True)
+        request_type = current_request_type_registry.lookup(
+            request_from_search["type"], quiet=True
+        )
         if hasattr(request_type, "on_topic_delete"):
             if request_from_search_id == str(request.id):
                 continue
             cur_request = Request.get_record(request_from_search_id)
             if cur_request.is_open:
-                request_type.on_topic_delete(cur_request, uow)  # possibly return message to save on event payload?
+                request_type.on_topic_delete(
+                    request=cur_request
+                )  # possibly return message to save on event payload?
                 payload = {"topic": _str_from_ref(topic_ref)}
                 _create_event(cur_request, payload, TopicDeleteEventType, uow)

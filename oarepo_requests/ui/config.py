@@ -88,7 +88,12 @@ class UIResourceConfig(ResourceConfig):
 
         tf = Path(self.template_folder)
         if not tf.is_absolute():
-            tf = Path(inspect.getfile(type(self))).parent.absolute().joinpath(tf).absolute()
+            tf = (
+                Path(inspect.getfile(type(self)))
+                .parent.absolute()
+                .joinpath(tf)
+                .absolute()
+            )
         return str(tf)
 
     response_handlers = {"text/html": None, "application/json": None}

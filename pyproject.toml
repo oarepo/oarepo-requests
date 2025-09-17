@@ -7,28 +7,27 @@ authors = [
     { name = "Ronald Krist", email = "krist@cesnet.cz" }
 ]
 requires-python = ">=3.13,<3.14"
-dependencies = []
 
-[build-system]
-requires = ["hatchling"]
-build-backend = "hatchling.build"
-
-[dependency-groups]
-dev = [
+dependencies = [
     "oarepo-runtime>=2.0.0dev13,<3.0.0",
     "graphlib",
-    "oarepo[rdm,tests]>=13.0.14,<14.0.0",
+    "oarepo[rdm,tests]>=13.0.0,<14.0.0",
     "oarepo-model>=0.1.0.dev5"
 ]
+
+[project.urls]
+Homepage = "https://github.com/oarepo/oarepo-requests"
 
 [project.optional-dependencies]
 dev = [
     "ruff>=0.11.13",
     "types-PyYAML",
 ]
+
 tests = [
     "pytest-invenio",
-    "deepdiff"
+    "oarepo-rdm>=1.0.0.dev4",
+    "oarepo-ui>=6.0.0dev1", # remove once dev versions aren't used
 ]
 
 [project.entry-points."invenio_base.apps"]
@@ -74,3 +73,16 @@ auto_requester = "oarepo_requests.services.permissions.requester:auto_request_st
 [[tool.mypy.overrides]]
 module = ["untyped_package.*"]
 follow_untyped_imports = true
+
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.version]
+path = "oarepo_workflows/__init__.py"
+
+[tool.hatch.build.targets.sdist]
+include = [
+    "/oarepo_workflows",
+]

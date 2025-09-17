@@ -21,7 +21,9 @@ from oarepo_model.customizations import (
 )
 from oarepo_model.presets import Preset
 
-from oarepo_requests.model.presets.requests.records.entity_resolvers.draft_resolver import RecordProxy
+from oarepo_requests.model.presets.requests.records.entity_resolvers.draft_resolver import (
+    RecordProxy,
+)
 
 if TYPE_CHECKING:
     from collections.abc import Generator
@@ -71,9 +73,13 @@ class RecordResolverPreset(Preset):
 
             proxy_cls = RecordProxy
 
-            def __init__(self, record_cls: type, service_id: str, type_key: str) -> None:
+            def __init__(
+                self, record_cls: type, service_id: str, type_key: str
+            ) -> None:
                 """Construct the resolver."""
-                super().__init__(record_cls, service_id, type_key=type_key, proxy_cls=self.proxy_cls)
+                super().__init__(
+                    record_cls, service_id, type_key=type_key, proxy_cls=self.proxy_cls
+                )
 
         yield AddClass(
             "RecordResolver",

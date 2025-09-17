@@ -80,7 +80,9 @@ class OpenRequestAlreadyExistsError(CannotExecuteActionError):
     @property
     def description(self) -> LazyString:
         """Exception's description."""
-        return gettext("There is already an open request of %(request_type)s on %(record_id)s.") % {
+        return gettext(
+            "There is already an open request of %(request_type)s on %(record_id)s."
+        ) % {
             "request_type": self.request_type.name,
             "record_id": self.record.id,
         }
@@ -120,7 +122,9 @@ class UnknownRequestTypeError(Exception):
 class ReceiverNonReferencableError(Exception):
     """Raised when receiver is required but could not be estimated from the record/caller."""
 
-    def __init__(self, request_type: RequestType, record: Record, **kwargs: Any) -> None:
+    def __init__(
+        self, request_type: RequestType, record: Record, **kwargs: Any
+    ) -> None:
         """Initialize the exception."""
         self.request_type = request_type
         self.record = record
@@ -147,7 +151,9 @@ class VersionAlreadyExists(CustomHTTPJSONException):
 
     def __init__(self) -> None:
         """Initialize the exception."""
-        description = gettext("There is already a record version with this version tag.")
+        description = gettext(
+            "There is already a record version with this version tag."
+        )
         request_payload_errors = [
             {
                 "field": "payload.version",

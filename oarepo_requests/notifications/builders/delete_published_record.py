@@ -15,7 +15,9 @@ from ..generators import EntityRecipient
 from .oarepo import OARepoRequestActionNotificationBuilder
 
 
-class DeletePublishedRecordRequestSubmitNotificationBuilder(OARepoRequestActionNotificationBuilder):
+class DeletePublishedRecordRequestSubmitNotificationBuilder(
+    OARepoRequestActionNotificationBuilder
+):
     """Notification builder for delete published record request submit action notifications."""
 
     type = "delete-published-record-request-event.submit"
@@ -23,7 +25,9 @@ class DeletePublishedRecordRequestSubmitNotificationBuilder(OARepoRequestActionN
     recipients = (EntityRecipient(key="request.receiver"),)  # email only
 
 
-class DeletePublishedRecordRequestAcceptNotificationBuilder(OARepoRequestActionNotificationBuilder):
+class DeletePublishedRecordRequestAcceptNotificationBuilder(
+    OARepoRequestActionNotificationBuilder
+):
     """Notification builder for delete published record request accept action notifications."""
 
     type = "delete-published-record-request-event.accept"
@@ -33,7 +37,9 @@ class DeletePublishedRecordRequestAcceptNotificationBuilder(OARepoRequestActionN
     context = (EntityResolve(key="request"),)
 
 
-class DeletePublishedRecordRequestDeclineNotificationBuilder(OARepoRequestActionNotificationBuilder):
+class DeletePublishedRecordRequestDeclineNotificationBuilder(
+    OARepoRequestActionNotificationBuilder
+):
     """Notification builder for delete published record request decline action notifications."""
 
     type = "delete-published-record-request-event.decline"

@@ -37,7 +37,9 @@ if TYPE_CHECKING:
     from oarepo_model.model import InvenioModel
 
 
-def set_field(result: dict[str, Any], resolved_dict: dict[str, Any], field_name: str) -> None:
+def set_field(
+    result: dict[str, Any], resolved_dict: dict[str, Any], field_name: str
+) -> None:
     """Set field from resolved dict to result dict."""
     from_metadata = resolved_dict.get("metadata", {}).get(field_name)
     from_data = resolved_dict.get(field_name)
@@ -63,7 +65,9 @@ class RecordProxy(InvenioRecordProxy):
 
     picked_fields = ("title", "creators", "contributors")
 
-    def pick_resolved_fields(self, identity: Identity, resolved_dict: dict[str, Any]) -> dict[str, Any]:
+    def pick_resolved_fields(
+        self, identity: Identity, resolved_dict: dict[str, Any]
+    ) -> dict[str, Any]:
         """Select which fields to return when resolving the reference."""
         resolved_fields = super().pick_resolved_fields(identity, resolved_dict)
 
@@ -124,8 +128,12 @@ class DraftResolverPreset(Preset):
 
             proxy_cls = DraftProxy
 
-            def __init__(self, record_cls: type, service_id: str, type_key: str) -> None:
-                super().__init__(record_cls, service_id, type_key=type_key, proxy_cls=self.proxy_cls)
+            def __init__(
+                self, record_cls: type, service_id: str, type_key: str
+            ) -> None:
+                super().__init__(
+                    record_cls, service_id, type_key=type_key, proxy_cls=self.proxy_cls
+                )
 
         yield AddClass(
             "DraftResolver",

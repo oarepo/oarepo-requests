@@ -44,7 +44,9 @@ def create_snapshot_and_possible_event(
     :param UUID request_id: Request id for given topic
     :param UnitOfWork uow: Unit of work to use (invenio)
     """
-    RecordSnapshot.create(record_uuid=topic.id, request_id=request_id, json=record_metadata)
+    RecordSnapshot.create(
+        record_uuid=topic.id, request_id=request_id, json=record_metadata
+    )
     db.session.flush()
 
     # go through table, filter latest two

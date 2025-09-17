@@ -30,7 +30,9 @@ def clean_snapshots() -> None:
     cutoff_date = datetime.now(UTC) - timedelta(days=days)
 
     accepted_requests = (
-        db.session.query(RequestMetadata.id).filter(RequestMetadata.json["type"] == "accepted").subquery()
+        db.session.query(RequestMetadata.id)
+        .filter(RequestMetadata.json["type"] == "accepted")
+        .subquery()
     )
 
     db.session.query(RecordSnapshot).filter(

@@ -24,7 +24,9 @@ if TYPE_CHECKING:
 class ModelUIResourceConfig(RecordsUIResourceConfig):
     """Mock UI resource config."""
 
-    api_service = "thesis"  # must be something included in oarepo, as oarepo is used in tests
+    api_service = (
+        "thesis"  # must be something included in oarepo, as oarepo is used in tests
+    )
 
     blueprint_name = "thesis"
     url_prefix = "/thesis/"

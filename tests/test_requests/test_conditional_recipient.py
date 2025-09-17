@@ -15,6 +15,7 @@ def test_conditional_receiver_creator_matches(
     urls,
     create_request_on_draft,
     draft_factory,
+    location,
     search_clear,
 ):
     # /for mypy - this is not code/ user[0] is creator, user[1] is receiver
@@ -25,7 +26,9 @@ def test_conditional_receiver_creator_matches(
 
     draft1 = draft_factory(creator.identity, custom_workflow="with_ct")
 
-    resp_request_create = create_request_on_draft(creator.identity, draft1["id"], "conditional_recipient_rt")
+    resp_request_create = create_request_on_draft(
+        creator.identity, draft1["id"], "conditional_recipient_rt"
+    )
 
     assert resp_request_create["receiver"] == {"user": "2"}
 
@@ -37,6 +40,7 @@ def test_conditional_receiver_creator_does_not_match(
     urls,
     create_request_on_draft,
     draft_factory,
+    location,
     search_clear,
 ):
     # /for mypy - this is not code/ user[0] is creator, user[1] is receiver
@@ -47,6 +51,8 @@ def test_conditional_receiver_creator_does_not_match(
 
     draft1 = draft_factory(creator.identity, custom_workflow="with_ct")
 
-    resp_request_create = create_request_on_draft(creator.identity, draft1["id"], "conditional_recipient_rt")
+    resp_request_create = create_request_on_draft(
+        creator.identity, draft1["id"], "conditional_recipient_rt"
+    )
 
     assert resp_request_create["receiver"] == {"user": "3"}

@@ -46,7 +46,9 @@ def test_resolve_topic(
         query_string={"expand": "true"},
     )
     assert resp.status_code == 200
-    assert resp.json["expanded"]["topic"] == {  # TODO: why is there a test creators and contributors in metadata?
+    assert resp.json["expanded"][
+        "topic"
+    ] == {  # TODO: why is there a test creators and contributors in metadata?
         "id": record1_id,
         "metadata": {
             "contributors": ["Contributor 1"],

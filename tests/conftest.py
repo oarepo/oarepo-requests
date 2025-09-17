@@ -33,7 +33,7 @@ from invenio_requests.services.permissions import (
 )
 from invenio_users_resources.records import UserAggregate
 from oarepo_model.customizations import AddFileToModule
-from oarepo_model.presets.rdm import rdm_presets
+from oarepo_rdm import rdm_preset
 from oarepo_workflows import (
     AutoApprove,
     AutoRequest,
@@ -44,7 +44,7 @@ from oarepo_workflows import (
     WorkflowTransitions,
 )
 from oarepo_workflows.base import Workflow
-from oarepo_workflows.model.presets import workflows_presets
+from oarepo_workflows.model.presets import workflows_preset
 from oarepo_workflows.requests.events import WorkflowEvent
 from pytest_oarepo.requests.classes import (
     CSLocaleUserGenerator,
@@ -58,7 +58,7 @@ from oarepo_requests.actions.generic import (
     OARepoDeclineAction,
     OARepoSubmitAction,
 )
-from oarepo_requests.model.presets.requests import requests_presets
+from oarepo_requests.model.presets.requests import requests_preset
 from oarepo_requests.receiver import default_workflow_receiver_function
 from oarepo_requests.services.permissions.generators.conditional import (
     IfNoEditDraft,
@@ -68,8 +68,16 @@ from oarepo_requests.services.permissions.generators.conditional import (
 from oarepo_requests.services.permissions.workflow_policies import (
     RequestBasedWorkflowPermissions,
 )
-from oarepo_requests.types import ModelRefTypes, NonDuplicableOARepoRequestType
+from oarepo_requests.types import (
+    ModelRefTypes,
+    NonDuplicableOARepoRequestType,
+    PublishDraftRequestType,
+    DeletePublishedRecordRequestType,
+    EditPublishedRecordRequestType,
+)
+from oarepo_requests.types.delete_draft import DeleteDraftRequestType
 from oarepo_requests.types.events.topic_update import TopicUpdateEventType
+from oarepo_requests.types.new_version import NewVersionRequestType
 
 if TYPE_CHECKING:
     from invenio_requests.customizations.actions import RequestAction
@@ -89,10 +97,11 @@ def events_service():
 
     return current_events_service
 
-
+"""
 @pytest.fixture(scope="module", autouse=True)
 def location(location):
     return location
+"""
 
 
 """
@@ -109,10 +118,98 @@ can_comment_only_receiver = [
 
 events_only_receiver_can_comment = {
     CommentEventType.type_id: WorkflowEvent(submitters=can_comment_only_receiver),
-    LogEventType.type_id: WorkflowEvent(submitters=InvenioRequestsPermissionPolicy.can_create_comment),
-    TopicUpdateEventType.type_id: WorkflowEvent(submitters=InvenioRequestsPermissionPolicy.can_create_comment),
+    LogEventType.type_id: WorkflowEvent(
+        submitters=InvenioRequestsPermissionPolicy.can_create_comment
+    ),
+    TopicUpdateEventType.type_id: WorkflowEvent(
+        submitters=InvenioRequestsPermissionPolicy.can_create_comment
+    ),
     TestEventType.type_id: WorkflowEvent(submitters=can_comment_only_receiver),
 }
+
+"""
+def _override(original: tuple[WorkflowRequest], *new_):
+    to_remove = []
+    for n in new_:
+        for o in original:
+            if n.request_type == o.request_type:
+                to_remove.append(o)
+    o_keep = [o for o in original if o not in to_remove]
+    return (*o_keep, *new_)
+"""
+
+
+class GenericTestableRequestType(NonDuplicableOARepoRequestType):
+    """Generic usable request type for tests."""
+
+    type_id = "generic"
+    name = _("Generic")
+
+    available_actions: ClassVar[dict[str, type[RequestAction]]] = {
+        **NonDuplicableOARepoRequestType.available_actions,
+        "accept": OARepoAcceptAction,
+        "submit": OARepoSubmitAction,
+        "decline": OARepoDeclineAction,
+    }
+    description = _("Generic request that doesn't do anything")
+    receiver_can_be_none = False
+    allowed_topic_ref_types = ModelRefTypes(published=True, draft=True)
+
+
+class ApproveRequestType(NonDuplicableOARepoRequestType):
+    """Request type for approving before publish."""
+
+    type_id = "approve_draft"
+    name = _("Approve draft")
+
+    available_actions: ClassVar[dict[str, type[RequestAction]]] = {
+        **NonDuplicableOARepoRequestType.available_actions,
+        "accept": OARepoAcceptAction,
+        "submit": OARepoSubmitAction,
+        "decline": OARepoDeclineAction,
+    }
+    description = _("Request approving of a draft")
+    receiver_can_be_none = True
+    allowed_topic_ref_types = ModelRefTypes(published=False, draft=True)
+
+
+class AnotherTopicUpdatingRequestType(NonDuplicableOARepoRequestType):
+    """Generic request type with topic change on topic update."""
+
+    type_id = "another_topic_updating"
+    name = _("Another topic updating")
+
+    available_actions: ClassVar[dict[str, type[RequestAction]]] = {
+        **NonDuplicableOARepoRequestType.available_actions,
+        "accept": OARepoAcceptAction,
+        "submit": OARepoSubmitAction,
+        "decline": OARepoDeclineAction,
+    }
+    description = _("Request to test cascade update of live topic")
+    receiver_can_be_none = True
+    allowed_topic_ref_types = ModelRefTypes(published=True, draft=True)
+
+    def topic_change(self, request: Request, new_topic: dict, uow):
+        """Update topic on topic update."""
+        request.topic = new_topic
+        uow.register(RecordCommitOp(request, indexer=current_requests_service.indexer))
+
+
+class ConditionalRecipientRequestType(NonDuplicableOARepoRequestType):
+    """Generic request type with conditional recipient."""
+
+    type_id = "conditional_recipient_rt"
+    name = _("Request type to test conditional recipients")
+
+    available_actions: ClassVar[dict[str, type[RequestAction]]] = {
+        **NonDuplicableOARepoRequestType.available_actions,
+        "accept": OARepoAcceptAction,
+        "submit": OARepoSubmitAction,
+        "decline": OARepoDeclineAction,
+    }
+    description = _("A no-op request to check conditional recipients")
+    receiver_can_be_none = False
+    allowed_topic_ref_types = ModelRefTypes(published=False, draft=True)
 
 
 class DefaultRequests(WorkflowRequestPolicy):
@@ -202,6 +299,7 @@ class DifferentLocalesPublish(WorkflowRequestPolicy):
         ),
         events=events_only_receiver_can_comment,
     )
+
 
 
 class RequestWithMultipleRecipients(WorkflowRequestPolicy):
@@ -498,53 +596,64 @@ class DifferentLocalesPermissions(TestWorkflowPermissions):
     )
 
 
-WORKFLOWS = {
-    "default": Workflow(
+WORKFLOWS = [
+    Workflow(
+        code="default",
         label=_("Default workflow"),
         permission_policy_cls=TestWorkflowPermissions,
         request_policy_cls=DefaultRequests,
     ),
-    "with_approve": Workflow(
+    Workflow(
+        code="with_approve",
         label=_("Workflow with approval process"),
         permission_policy_cls=WithApprovalPermissions,
         request_policy_cls=RequestsWithApprove,
     ),
-    "with_approve_without_generic": Workflow(
+    Workflow(
+        code="with_approve_without_generic",
         label=_("Workflow with approval process"),
         permission_policy_cls=WithApprovalPermissions,
         request_policy_cls=RequestsWithApproveWithoutGeneric,
     ),
-    "with_ct": Workflow(
+    Workflow(
+        code="with_ct",
         label=_("Workflow with approval process"),
         permission_policy_cls=WithApprovalPermissions,
         request_policy_cls=RequestsWithCT,
     ),
-    "cascade_update": Workflow(
+    Workflow(
+        code="cascade_update",
         label=_("Workflow to test update of live topic"),
         permission_policy_cls=WithApprovalPermissions,
         request_policy_cls=RequestsWithAnotherTopicUpdatingRequestType,
     ),
-    "different_recipients": Workflow(
-        label=_("Workflow with draft requests with different recipients to test param interpreters"),
+    Workflow(
+        code="different_recipients",
+        label=_(
+            "Workflow with draft requests with different recipients to test param interpreters"
+        ),
         permission_policy_cls=TestWorkflowPermissions,
         request_policy_cls=RequestsWithDifferentRecipients,
     ),
-    "multiple_recipients": Workflow(
+    Workflow(
+        code="multiple_recipients",
         label=_("Workflow with multiple recipient to test escalation of the request"),
         permission_policy_cls=TestWorkflowPermissions,
         request_policy_cls=RequestWithMultipleRecipients,
     ),
-    "system_identity": Workflow(
+    Workflow(
+        code="system_identity",
         label=_("Workflow with system identity"),
         permission_policy_cls=TestWorkflowPermissions,
         request_policy_cls=RequestsWithSystemIdentity,
     ),
-    "different_locales": Workflow(
+    Workflow(
+        code="different_locales",
         label=_("User with id 3 prefers cs locale."),
         permission_policy_cls=DifferentLocalesPermissions,
         request_policy_cls=DifferentLocalesPublish,
     ),
-}
+]
 
 
 @pytest.fixture
@@ -558,7 +667,9 @@ def serialization_result():
         return {
             "id": request_id,
             "links": {
-                "actions": {"cancel": f"https://127.0.0.1:5000/api/requests/{request_id}/actions/cancel"},
+                "actions": {
+                    "cancel": f"https://127.0.0.1:5000/api/requests/{request_id}/actions/cancel"
+                },
                 "self": f"https://127.0.0.1:5000/api/requests/extended/{request_id}",
                 "comments": f"https://127.0.0.1:5000/api/requests/extended/{request_id}/comments",
                 "timeline": f"https://127.0.0.1:5000/api/requests/extended/{request_id}/timeline",
@@ -598,7 +709,9 @@ def ui_serialization_result():
             "is_expired": False,
             "is_open": True,
             "links": {
-                "actions": {"cancel": f"https://127.0.0.1:5000/api/requests/{request_id}/actions/cancel"},
+                "actions": {
+                    "cancel": f"https://127.0.0.1:5000/api/requests/{request_id}/actions/cancel"
+                },
                 "self": f"https://127.0.0.1:5000/api/requests/extended/{request_id}",
                 "comments": f"https://127.0.0.1:5000/api/requests/extended/{request_id}/comments",
                 "timeline": f"https://127.0.0.1:5000/api/requests/extended/{request_id}/timeline",
@@ -635,8 +748,12 @@ def app_config(app_config, requests_model):
         }
     ]
     app_config["JSONSCHEMAS_HOST"] = "localhost"
-    app_config["RECORDS_REFRESOLVER_CLS"] = "invenio_records.resolver.InvenioRefResolver"
-    app_config["RECORDS_REFRESOLVER_STORE"] = "invenio_jsonschemas.proxies.current_refresolver_store"
+    app_config["RECORDS_REFRESOLVER_CLS"] = (
+        "invenio_records.resolver.InvenioRefResolver"
+    )
+    app_config["RECORDS_REFRESOLVER_STORE"] = (
+        "invenio_jsonschemas.proxies.current_refresolver_store"
+    )
     app_config["CACHE_TYPE"] = "SimpleCache"
 
     app_config["OAREPO_REQUESTS_DEFAULT_RECEIVER"] = default_workflow_receiver_function
@@ -663,10 +780,9 @@ def app_config(app_config, requests_model):
 
     app_config["REST_CSRF_ENABLED"] = False
     app_config["RDM_PERSISTENT_IDENTIFIERS"] = {}
-    app_config["REQUESTS_PERMISSION_POLICY"] = (
-        RDMRequestsPermissionPolicy  # TODO: rdm expected as default, though the app_rdm (?) config is not used for now?
+    app_config["RDM_OPTIONAL_DOI_VALIDATOR"] = (
+        lambda _draft, _previous_published, **_kwargs: True
     )
-    app_config["RDM_OPTIONAL_DOI_VALIDATOR"] = lambda _draft, _previous_published, **_kwargs: True
     app_config["RDM_RECORDS_ALLOW_RESTRICTION_AFTER_GRACE_PERIOD"] = True
 
     return app_config
@@ -674,21 +790,35 @@ def app_config(app_config, requests_model):
 
 @pytest.fixture
 def check_publish_topic_update():
-    def _check_publish_topic_update(creator_client, urls, record, before_update_response) -> None:
+    def _check_publish_topic_update(
+        creator_client, urls, record, before_update_response
+    ) -> None:
         request_id = before_update_response["id"]
         record_id = record["id"]
 
-        after_update_response = creator_client.get(f"{urls['BASE_URL_REQUESTS']}{request_id}").json
+        after_update_response = creator_client.get(
+            f"{urls['BASE_URL_REQUESTS']}{request_id}"
+        ).json
         RequestEvent.index.refresh()
-        events = creator_client.get(f"{urls['BASE_URL_REQUESTS']}extended/{request_id}/timeline").json["hits"]["hits"]
+        events = creator_client.get(
+            f"{urls['BASE_URL_REQUESTS']}extended/{request_id}/timeline"
+        ).json["hits"]["hits"]
 
         assert before_update_response["topic"] == {"requests_test_draft": record_id}
         assert after_update_response["topic"] == {"requests_test": record_id}
 
-        topic_updated_events = [e for e in events if e["type"] == TopicUpdateEventType.type_id]
+        topic_updated_events = [
+            e for e in events if e["type"] == TopicUpdateEventType.type_id
+        ]
         assert len(topic_updated_events) == 1
-        assert topic_updated_events[0]["payload"]["old_topic"] == f"requests_test_draft.{record_id}"
-        assert topic_updated_events[0]["payload"]["new_topic"] == f"requests_test.{record_id}"
+        assert (
+            topic_updated_events[0]["payload"]["old_topic"]
+            == f"requests_test_draft.{record_id}"
+        )
+        assert (
+            topic_updated_events[0]["payload"]["new_topic"]
+            == f"requests_test.{record_id}"
+        )
 
     return _check_publish_topic_update
 
@@ -812,15 +942,21 @@ def model_types():
 @pytest.fixture(scope="session")
 def requests_model(model_types):
     from oarepo_model.api import model
-    from oarepo_model.presets.drafts import drafts_presets
-    from oarepo_model.presets.records_resources import records_resources_presets
+    from oarepo_model.presets.drafts import drafts_preset
+    from oarepo_model.presets.records_resources import records_resources_preset
 
     time.time()
 
     workflow_model = model(
         name="requests_test",
         version="1.0.0",
-        presets=[records_resources_presets, drafts_presets, rdm_presets, workflows_presets, requests_presets],
+        presets=[
+            records_resources_preset,
+            drafts_preset,
+            rdm_preset,
+            workflows_preset,
+            requests_preset,
+        ],
         types=[model_types],
         metadata_type="Metadata",
         customizations=[

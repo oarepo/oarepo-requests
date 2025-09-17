@@ -95,7 +95,9 @@ class RequestNotOwnerFilterParam(FilterParam):
         """Apply the filter to the search."""
         value = params.pop(self.param_name, None)
         if value is not None:
-            search = search.filter(Bool(must_not=[dsl.Q("term", **{self.field_name: identity.id})]))
+            search = search.filter(
+                Bool(must_not=[dsl.Q("term", **{self.field_name: identity.id})])
+            )
         return search
 
 
@@ -133,7 +135,9 @@ class ExtendedRequestSearchRequestArgsSchema(RequestSearchRequestArgsSchema):
     is_closed = fields.Boolean()
 
 
-def override_invenio_requests_config(state: BlueprintSetupState, *args: Any, **kwargs: Any) -> None:  # noqa ARG001
+def override_invenio_requests_config(
+    state: BlueprintSetupState, *args: Any, **kwargs: Any
+) -> None:  # noqa ARG001
     """Override the invenio requests configuration.
 
     This function is called from the blueprint setup function as this should be a safe moment
@@ -142,7 +146,9 @@ def override_invenio_requests_config(state: BlueprintSetupState, *args: Any, **k
     with state.app.app_context():
         # this monkey patch should be done better (support from invenio)
         RequestsServiceConfig.search = EnhancedRequestSearchOptions
-        RequestsResourceConfig.request_search_args = ExtendedRequestSearchRequestArgsSchema
+        RequestsResourceConfig.request_search_args = (
+            ExtendedRequestSearchRequestArgsSchema
+        )
         # add extra links to the requests
         for k, v in OARepoRequestsServiceConfig.links_item.items():
             if k not in RequestsServiceConfig.links_item:
@@ -194,11 +200,15 @@ def override_invenio_requests_config(state: BlueprintSetupState, *args: Any, **k
         status._label = _("Request status")  # noqa SLF001
 
         # add extra request types dynamically
-        type._value_labels = {rt.type_id: rt.name for rt in iter(current_request_type_registry)}  # noqa SLF001
+        type._value_labels = {
+            rt.type_id: rt.name for rt in iter(current_request_type_registry)
+        }  # noqa SLF001
         type._label = _("Type")  # noqa SLF001
 
 
-def override_invenio_notifications(state: BlueprintSetupState, *args: Any, **kwargs: Any) -> None:  # noqa ARG001
+def override_invenio_notifications(
+    state: BlueprintSetupState, *args: Any, **kwargs: Any
+) -> None:  # noqa ARG001
     """Override invenio notifications configuration."""
     with state.app.app_context():
         from invenio_notifications.services.generators import EntityResolve
@@ -224,7 +234,9 @@ def override_invenio_notifications(state: BlueprintSetupState, *args: Any, **kwa
                 )
                 break
 
-        for idx, r in list(enumerate(CommentRequestEventCreateNotificationBuilder.context)):
+        for idx, r in list(
+            enumerate(CommentRequestEventCreateNotificationBuilder.context)
+        ):
             if isinstance(r, EntityResolve) and r.key == "request":
                 CommentRequestEventCreateNotificationBuilder.context[idx] = (
                     # entity resolver that adds the correct title if it is missing
@@ -239,7 +251,9 @@ def override_invenio_notifications(state: BlueprintSetupState, *args: Any, **kwa
 
         original_delay = dispatch_notification.delay
 
-        def i18n_enabled_notification_delay(backend: str, recipient: dict, notification: dict) -> None:
+        def i18n_enabled_notification_delay(
+            backend: str, recipient: dict, notification: dict
+        ) -> None:
             """Delay can not handle lazy strings, so we need to resolve them before calling the delay."""
             locale = None
             if isinstance(recipient, dict):

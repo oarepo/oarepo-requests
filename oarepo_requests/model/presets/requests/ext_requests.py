@@ -29,7 +29,9 @@ if TYPE_CHECKING:
 
 from invenio_rdm_records.requests.entity_resolvers import RDMRecordServiceResultProxy
 
-from oarepo_requests.model.presets.requests.records.entity_resolvers.draft_resolver import WithDeletedServiceResultProxy
+from oarepo_requests.model.presets.requests.records.entity_resolvers.draft_resolver import (
+    WithDeletedServiceResultProxy,
+)
 from oarepo_requests.proxies import current_oarepo_requests_service
 from oarepo_requests.resolvers.service_result import DraftServiceResultResolver
 from oarepo_requests.resources.draft.config import DraftRecordRequestsResourceConfig
@@ -49,77 +51,12 @@ from invenio_records_resources.references.entity_resolvers.results import (
 class RDMPIDServiceResultResolver(ServiceResultResolver):
     """Service result resolver for draft records."""
 
-    def _reference_entity(self, entity: RDMRecord | RDMDraft | RecordItem) -> dict[str, str]:
+    def _reference_entity(
+        self, entity: RDMRecord | RDMDraft | RecordItem
+    ) -> dict[str, str]:
         """Create a reference dict for the given result item."""
         pid = entity.id if isinstance(entity, self.item_cls) else entity.pid.pid_value
         return {self.type_key: str(pid)}
-
-
-"""
-# todo ? the endpoint adding code could be automated on higher level? - it's just a bunch of copy paste
-# decorators, yields seem to be a problem?
-
-def create_endpoint_ext_class(name: str):
-    capitalized_name = name.capitalize()
-    return type(f"Ext{capitalized_name}Preset", (Preset,), {"name": name, f"{name}_service": })
-
-class EndpointExtClassFactory(Preset):
-
-    modifies = [
-        "Ext",
-    ]
-
-
-    def apply(
-        self,
-        builder: InvenioModelBuilder,
-        model: InvenioModel,
-        dependencies: dict[str, Any],
-    ) -> Generator[Customization, None, None]:
-        class ExtFilesMixin(ModelMixin):
-
-
-            @cached_property
-            def files_service(self):
-                return self.get_model_dependency(f"{self.name}Service")(
-                    **self.files_service_params,
-                )
-
-            @property
-
-                return {
-                    "config": build_config(
-                        self.get_model_dependency(f"{self.name}ServiceConfig"), self.app
-                    )
-                }
-
-            @cached_property
-            def files_resource(self):
-                return self.get_model_dependency(f"{self.name}Resource")(
-                    **self.files_resource_params,
-                )
-
-            @property
-            def files_resource_params(self):
-
-                return {
-                    "service": self.files_service,
-                    "config": build_config(
-                        self.get_model_dependency(f"{self.name}ResourceConfig"), self.app
-                    ),
-                }
-
-        yield AddMixins("Ext", ExtFilesMixin)
-
-        yield AddToList(
-            "services_registry_list",
-            (
-                lambda ext: ext.files_service,
-                lambda ext: ext.files_service.config.service_id,
-            ),
-        )
-"""
-
 
 class ExtRequestsPreset(Preset):
     """Preset for extension class."""
@@ -149,7 +86,9 @@ class ExtRequestsPreset(Preset):
 
                 NOTIFICATIONS_ENTITY_RESOLVERS = [
                     RDMPIDServiceResultResolver(
-                        service_id=service_id, type_key=type_key_published, proxy_cls=WithDeletedServiceResultProxy
+                        service_id=service_id,
+                        type_key=type_key_published,
+                        proxy_cls=WithDeletedServiceResultProxy,
                     ),
                     DraftServiceResultResolver(
                         service_id=service_id,
@@ -159,7 +98,9 @@ class ExtRequestsPreset(Preset):
                 ]
 
                 app.config.setdefault("NOTIFICATIONS_ENTITY_RESOLVERS", [])
-                app.config["NOTIFICATIONS_ENTITY_RESOLVERS"] += NOTIFICATIONS_ENTITY_RESOLVERS
+                app.config["NOTIFICATIONS_ENTITY_RESOLVERS"] += (
+                    NOTIFICATIONS_ENTITY_RESOLVERS
+                )
                 super().init_config(app)
 
             @cached_property

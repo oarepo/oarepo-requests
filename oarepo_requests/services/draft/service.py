@@ -55,7 +55,9 @@ class DraftRecordRequestsService(RecordRequestsService):
             must=[
                 dsl.Q(
                     "term",
-                    **{f"topic.{get_entity_key_for_record_cls(self.draft_cls)}": record_id},
+                    **{
+                        f"topic.{get_entity_key_for_record_cls(self.draft_cls)}": record_id
+                    },
                 ),
             ],
         )

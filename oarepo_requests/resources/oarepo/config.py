@@ -35,7 +35,9 @@ class OARepoRequestsResourceConfig(RequestsResourceConfig, ConfiguratorMixin):
     def response_handlers(self) -> dict[str, ResponseHandler]:
         """Response handlers for the extended requests API."""
         return {
-            "application/vnd.inveniordm.v1+json": ResponseHandler(OARepoRequestsUIJSONSerializer()),
+            "application/vnd.inveniordm.v1+json": ResponseHandler(
+                OARepoRequestsUIJSONSerializer()
+            ),
             **super().response_handlers,
         }
 
@@ -43,8 +45,12 @@ class OARepoRequestsResourceConfig(RequestsResourceConfig, ConfiguratorMixin):
     def error_handlers(self) -> dict:
         """Get error handlers."""
         entrypoint_error_handlers = {}
-        for x in importlib_metadata.entry_points(group="oarepo_requests.error_handlers"):
+        for x in importlib_metadata.entry_points(
+            group="oarepo_requests.error_handlers"
+        ):
             entrypoint_error_handlers.update(x.load())
-        for x in importlib_metadata.entry_points(group="oarepo_requests.extended.error_handlers"):
+        for x in importlib_metadata.entry_points(
+            group="oarepo_requests.extended.error_handlers"
+        ):
             entrypoint_error_handlers.update(x.load())
         return entrypoint_error_handlers

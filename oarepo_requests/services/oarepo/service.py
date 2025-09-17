@@ -84,12 +84,18 @@ class OARepoRequestsService(RequestsService):
         )
         if errors:
             raise CustomHTTPJSONException(
-                description=_("Action could not be performed due to validation request fields validation errors."),
+                description=_(
+                    "Action could not be performed due to validation request fields validation errors."
+                ),
                 request_payload_errors=errors,
                 code=400,
             )
 
-        error = type_.can_create(identity, data, receiver, topic, creator) if hasattr(type_, "can_create") else None
+        error = (
+            type_.can_create(identity, data, receiver, topic, creator)
+            if hasattr(type_, "can_create")
+            else None
+        )
 
         if not error:
             result = super().create(
@@ -102,7 +108,9 @@ class OARepoRequestsService(RequestsService):
                 expand=expand,
                 uow=uow,
             )
-            uow.register(IndexRefreshOp(indexer=self.indexer, index=self.record_cls.index))
+            uow.register(
+                IndexRefreshOp(indexer=self.indexer, index=self.record_cls.index)
+            )
             return result
         return None
 
@@ -122,6 +130,8 @@ class OARepoRequestsService(RequestsService):
     ) -> RequestItem:
         """Update a request."""
         # TODO: originally asserting whether uow is none - why
-        result = super().update(identity, id_, data, revision_id=revision_id, uow=uow, expand=expand)
+        result = super().update(
+            identity, id_, data, revision_id=revision_id, uow=uow, expand=expand
+        )
         uow.register(IndexRefreshOp(indexer=self.indexer, index=self.record_cls.index))
         return result

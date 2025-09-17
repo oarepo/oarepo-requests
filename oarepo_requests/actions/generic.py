@@ -15,7 +15,7 @@ from typing import TYPE_CHECKING, Any
 
 from invenio_access.permissions import system_identity
 from invenio_i18n import _
-from invenio_pidstore.errors import PersistentIdentifierError
+from invenio_pidstore.errors import PersistentIdentifierError, PIDDoesNotExistError
 from invenio_records_resources.records import Record
 from invenio_requests.customizations import actions
 from invenio_requests.records.api import Request
@@ -32,7 +32,9 @@ if TYPE_CHECKING:
 
 from invenio_requests.customizations import RequestAction, RequestType
 
-type ActionType = OARepoGenericActionMixin | RequestAction  # should be a type intersection, not yet in python
+type ActionType = (
+    OARepoGenericActionMixin | RequestAction
+)  # should be a type intersection, not yet in python
 
 
 @dataclass
@@ -48,11 +50,17 @@ class RequestActionState:
     def __post__init__(self):
         """Assert correct types after initializing."""
         if not isinstance(self.request, Request):
-            raise TypeError(f"self.request is not instance of Request, got {type(self.request)=}")
+            raise TypeError(
+                f"self.request is not instance of Request, got {type(self.request)=}"
+            )
         if not isinstance(self.request_type, RequestType):
-            raise TypeError(f"self.request_type is not instance of Request, got {type(self.request_type)=}")
+            raise TypeError(
+                f"self.request_type is not instance of Request, got {type(self.request_type)=}"
+            )
         if not isinstance(self.topic, Record):
-            raise TypeError(f"self.topic is not instance of Record, got {type(self.topic)=}")
+            raise TypeError(
+                f"self.topic is not instance of Record, got {type(self.topic)=}"
+            )
 
 
 class OARepoGenericActionMixin:
@@ -80,10 +88,17 @@ class OARepoGenericActionMixin:
         """Apply the action to the topic."""
 
     def execute_with_components(
-        self, identity: Identity, state: RequestActionState, uow: UnitOfWork, *args: Any, **kwargs: Any
+        self,
+        identity: Identity,
+        state: RequestActionState,
+        uow: UnitOfWork,
+        *args: Any,
+        **kwargs: Any,
     ) -> None:
         """Execute action with components."""
-        self._execute_with_components(self.components, identity, state, uow, *args, **kwargs)
+        self._execute_with_components(
+            self.components, identity, state, uow, *args, **kwargs
+        )
 
     def _execute_with_components(
         self,
@@ -105,28 +120,41 @@ class OARepoGenericActionMixin:
             super().execute(identity, uow, *args, **kwargs)
         else:
             with components[0].apply(identity, state, uow, *args, **kwargs):
-                self._execute_with_components(components[1:], identity, state, uow, *args, **kwargs)
+                self._execute_with_components(
+                    components[1:], identity, state, uow, *args, **kwargs
+                )
 
     @cached_property
     def components(self) -> list[RequestActionComponent]:
         """Return a list of components for this action."""
-        return [component_cls() for component_cls in current_oarepo_requests.action_components(self)]
+        return [
+            component_cls()
+            for component_cls in current_oarepo_requests.action_components(self)
+        ]
 
-    def execute(self, identity: Identity, uow: UnitOfWork, *args: Any, **kwargs: Any) -> None:
+    def execute(
+        self, identity: Identity, uow: UnitOfWork, *args: Any, **kwargs: Any
+    ) -> None:
         """Execute the action."""
         request: Request = self.request
         request_type = request.type
         try:
             topic = request.topic.resolve()
-        except PersistentIdentifierError:
+        except (PersistentIdentifierError, PIDDoesNotExistError):
             topic = None
 
         # create a shared state between different actions to track changes in topic/requests etc.
         state: RequestActionState = RequestActionState(
-            request=request, request_type=request_type, topic=topic, created_by=request.created_by, action=self
+            request=request,
+            request_type=request_type,
+            topic=topic,
+            created_by=request.created_by,
+            action=self,
         )
 
-        self._execute_with_components(self.components, identity, state, uow, *args, **kwargs)
+        self._execute_with_components(
+            self.components, identity, state, uow, *args, **kwargs
+        )
 
 
 class AddTopicLinksOnPayloadMixin:

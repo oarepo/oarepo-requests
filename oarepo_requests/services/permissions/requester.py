@@ -41,15 +41,18 @@ def create_autorequests(
 ) -> None:
     """Create requests that should be created automatically."""
     record_workflow = current_oarepo_workflows.get_workflow(record)
-    for request_type_id, workflow_request in record_workflow.requests().items():
-        needs = workflow_request.requester_generator.needs(request_type=request_type_id, record=record, **kwargs)
+    for workflow_request in record_workflow.requests().requests:
+        type_id = workflow_request.request_type.type_id
+        needs = workflow_request.requester_generator.needs(
+            request_type=type_id, record=record, **kwargs # TODO: consider just sending the Type itself
+        )
         if auto_request_need in needs:
             data = kwargs.get("data", {})
             creator_ref = ResolverRegistry.reference_identity(identity)
             request_item = current_oarepo_requests_service.create(
                 system_identity,
                 data=data,
-                request_type=request_type_id,
+                request_type=type_id,
                 topic=record,
                 creator=creator_ref,
                 uow=uow,
@@ -59,7 +62,11 @@ def create_autorequests(
             if not action_obj.can_execute():
                 raise CannotExecuteActionError("submit")
             action_obj.execute(identity, uow)
-            uow.register(RecordCommitOp(request_item._record, indexer=current_requests_service.indexer))  # noqa SLF001
+            uow.register(
+                RecordCommitOp(
+                    request_item._record, indexer=current_requests_service.indexer
+                )
+            )  # noqa SLF001
 
 
 # TODO: consider subclassing from a protocol or callable?

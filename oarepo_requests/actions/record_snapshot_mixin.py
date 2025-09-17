@@ -36,7 +36,9 @@ class RecordSnapshotMixin:
         **kwargs: Any,
     ) -> Record:
         """Take snapshot of the record."""
-        super_apply = super().apply(identity, state.request_type, state.topic, uow, *args, **kwargs)
+        super_apply = super().apply(
+            identity, state.request_type, state.topic, uow, *args, **kwargs
+        )
 
         service = current_runtime.get_record_service_for_record(state.topic)
 
@@ -48,6 +50,8 @@ class RecordSnapshotMixin:
 
             from oarepo_requests.snapshots import create_snapshot_and_possible_event
 
-            create_snapshot_and_possible_event(state.topic, ret.to_dict()["metadata"], self.request.id)
+            create_snapshot_and_possible_event(
+                state.topic, ret.to_dict()["metadata"], self.request.id
+            )
 
         return super_apply

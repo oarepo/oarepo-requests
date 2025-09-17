@@ -44,14 +44,22 @@ def test_publish_notifications(
     with mail.record_messages() as outbox:
         # Validate that email was sent
         receiver_client.post(
-            link2testclient(record.json["expanded"]["requests"][0]["links"]["actions"]["accept"]),
+            link2testclient(
+                record.json["expanded"]["requests"][0]["links"]["actions"]["accept"]
+            ),
         )
         # check notification is build on submit
         assert len(outbox) == 1
         sent_mail = outbox[0]
         assert "Record 'blabla' has been published" in sent_mail.subject
-        assert 'Your record "blabla" has been published. You can see the record at' in sent_mail.body
-        assert 'Your record "blabla" has been published. You can see the record at' in sent_mail.html
+        assert (
+            'Your record "blabla" has been published. You can see the record at'
+            in sent_mail.body
+        )
+        assert (
+            'Your record "blabla" has been published. You can see the record at'
+            in sent_mail.html
+        )
 
     draft1 = draft_factory(creator.identity)
     submit_request_on_draft(creator.identity, draft1["id"], "publish_draft")
@@ -60,12 +68,17 @@ def test_publish_notifications(
         # Validate that email was sent
         request_html_link = record.json["expanded"]["requests"][0]["links"]["self_html"]
         receiver_client.post(
-            link2testclient(record.json["expanded"]["requests"][0]["links"]["actions"]["decline"]),
+            link2testclient(
+                record.json["expanded"]["requests"][0]["links"]["actions"]["decline"]
+            ),
         )
         # check notification is build on submit
         assert len(outbox) == 1
         sent_mail = outbox[0]
-        assert "Request for publishing of record 'blabla' was declined" in sent_mail.subject
+        assert (
+            "Request for publishing of record 'blabla' was declined"
+            in sent_mail.subject
+        )
         assert request_html_link in sent_mail.html
         assert request_html_link in sent_mail.body
 
@@ -108,7 +121,9 @@ def test_delete_published_notifications(
         # Validate that email was sent
         request_html_link = record.json["expanded"]["requests"][0]["links"]["self_html"]
         receiver_client.post(
-            link2testclient(record.json["expanded"]["requests"][0]["links"]["actions"]["accept"]),
+            link2testclient(
+                record.json["expanded"]["requests"][0]["links"]["actions"]["accept"]
+            ),
         )
         # check notification is build on submit
         assert len(outbox) == 1
@@ -130,13 +145,17 @@ def test_delete_published_notifications(
         # Validate that email was sent
         request_html_link = record.json["expanded"]["requests"][0]["links"]["self_html"]
         receiver_client.post(
-            link2testclient(record.json["expanded"]["requests"][0]["links"]["actions"]["decline"]),
+            link2testclient(
+                record.json["expanded"]["requests"][0]["links"]["actions"]["decline"]
+            ),
         )
         # check notification is build on submit
         assert len(outbox) == 1
         sent_mail = outbox[0]
 
-        assert "Request for deletion of record 'blabla' was declined" in sent_mail.subject
+        assert (
+            "Request for deletion of record 'blabla' was declined" in sent_mail.subject
+        )
         assert request_html_link in sent_mail.html
         assert request_html_link in sent_mail.body
 
@@ -212,14 +231,22 @@ def test_locale(
     with mail.record_messages() as outbox:
         # Validate that email was sent
         receiver_client.post(
-            link2testclient(record.json["expanded"]["requests"][0]["links"]["actions"]["accept"]),
+            link2testclient(
+                record.json["expanded"]["requests"][0]["links"]["actions"]["accept"]
+            ),
         )
         # check notification is build on submit
         assert len(outbox) == 1
         sent_mail = outbox[0]
         assert "Record 'blabla' has been published" in sent_mail.subject
-        assert 'Your record "blabla" has been published. You can see the record at' in sent_mail.body
-        assert 'Your record "blabla" has been published. You can see the record at' in sent_mail.html
+        assert (
+            'Your record "blabla" has been published. You can see the record at'
+            in sent_mail.body
+        )
+        assert (
+            'Your record "blabla" has been published. You can see the record at'
+            in sent_mail.html
+        )
 
 
 def test_locale_multiple_recipients(
@@ -249,10 +276,17 @@ def test_locale_multiple_recipients(
         )
         # check notification is build on submit
         assert len(outbox) == 2
-        sent_mail_cz = [mail for mail in outbox if mail.recipients[0] == cs_receiver.user.email]
-        sent_mail_en = [mail for mail in outbox if mail.recipients[0] == users[0].user.email]
+        sent_mail_cz = [
+            mail for mail in outbox if mail.recipients[0] == cs_receiver.user.email
+        ]
+        sent_mail_en = [
+            mail for mail in outbox if mail.recipients[0] == users[0].user.email
+        ]
         assert len(sent_mail_cz) == len(sent_mail_en) == 1
-        assert sent_mail_cz[0].subject == "❗️ Žádost o smazání vypublikovaného záznamu blabla"
+        assert (
+            sent_mail_cz[0].subject
+            == "❗️ Žádost o smazání vypublikovaného záznamu blabla"
+        )
         assert sent_mail_en[0].subject == "❗️ Request to delete published record blabla"
 
 

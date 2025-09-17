@@ -75,7 +75,9 @@ def resolve(identity: Identity, reference: dict[str, str]) -> UIResolvedReferenc
             for key, value in reference_values_item.items():
                 resolved.append(entity_resolvers[key].resolve_one(identity, value))
     elif reference_type in entity_resolvers:
-        resolved = entity_resolvers[reference_type].resolve_one(identity, reference_value)
+        resolved = entity_resolvers[reference_type].resolve_one(
+            identity, reference_value
+        )
     else:
         fallback_resolver = copy.copy(entity_resolvers["fallback"])
         fallback_resolver.reference_type = reference_type
@@ -85,7 +87,9 @@ def resolve(identity: Identity, reference: dict[str, str]) -> UIResolvedReferenc
     # use cache to avoid multiple resolve for the same reference within one request
     # the runtime error is risen when we are outside the request context - in this case we just skip the cache
     with contextlib.suppress(RuntimeError):
-        request.current_oarepo_requests_ui_resolve_cache[(reference_type, reference_value)] = resolved
+        request.current_oarepo_requests_ui_resolve_cache[
+            (reference_type, reference_value)
+        ] = resolved
 
     return resolved
 
@@ -124,7 +128,9 @@ class OARepoUIResolver(abc.ABC):
         """
         raise NotImplementedError(f"Implement this in {self.__class__.__name__}")
 
-    def _search_many(self, identity: Identity, ids: list[str], *args: Any, **kwargs: Any) -> list[dict]:
+    def _search_many(
+        self, identity: Identity, ids: list[str], *args: Any, **kwargs: Any
+    ) -> list[dict]:
         """Search for many records of the same type at once.
 
         :param identity:    identity of the user
@@ -135,7 +141,9 @@ class OARepoUIResolver(abc.ABC):
         """
         raise NotImplementedError(f"Implement this in {self.__class__.__name__}")
 
-    def _search_one(self, identity: Identity, _id: str, *args: Any, **kwargs: Any) -> dict | None:
+    def _search_one(
+        self, identity: Identity, _id: str, *args: Any, **kwargs: Any
+    ) -> dict | None:
         """Search for a single entity of the same type.
 
         :param identity:    identity of the user
@@ -148,7 +156,9 @@ class OARepoUIResolver(abc.ABC):
         """
         raise NotImplementedError(f"Implement this in {self.__class__.__name__}")
 
-    def _get_entity_ui_representation(self, entity: dict, reference: EntityReference) -> UIResolvedReference:
+    def _get_entity_ui_representation(
+        self, entity: dict, reference: EntityReference
+    ) -> UIResolvedReference:
         """Create a UI representation of a entity.
 
         :entity:        resolved and API serialized entity
@@ -157,7 +167,9 @@ class OARepoUIResolver(abc.ABC):
         """
         raise NotImplementedError(f"Implement this in {self.__class__.__name__}")
 
-    def resolve_one(self, identity: Identity, _id: str, **kwargs: Any) -> UIResolvedReference:
+    def resolve_one(
+        self, identity: Identity, _id: str, **kwargs: Any
+    ) -> UIResolvedReference:
         """Resolve a single reference to a UI representation.
 
         :param identity:    identity of the user
@@ -170,7 +182,9 @@ class OARepoUIResolver(abc.ABC):
             return fallback_result(reference, **kwargs)
         return self._get_entity_ui_representation(entity, reference)
 
-    def resolve_many(self, identity: Identity, ids: list[str]) -> list[UIResolvedReference]:
+    def resolve_many(
+        self, identity: Identity, ids: list[str]
+    ) -> list[UIResolvedReference]:
         """Resolve many references to UI representations.
 
         :param identity:    identity of the user
@@ -182,10 +196,16 @@ class OARepoUIResolver(abc.ABC):
         result: dict
         for result in search_results:
             # it would be simple if there was a map of results, can opensearch do this?
-            ret.append(self._get_entity_ui_representation(result, {self.reference_type: self._get_id(result)}))
+            ret.append(
+                self._get_entity_ui_representation(
+                    result, {self.reference_type: self._get_id(result)}
+                )
+            )
         return ret
 
-    def _extract_links_from_resolved_reference(self, resolved_reference: dict) -> dict[str, str]:
+    def _extract_links_from_resolved_reference(
+        self, resolved_reference: dict
+    ) -> dict[str, str]:
         """Extract links from a entity."""
         entity_links = {}
         if "links" in resolved_reference:
@@ -205,7 +225,9 @@ class GroupEntityReferenceUIResolver(OARepoUIResolver):
         return result["id"]
 
     @override
-    def _search_many(self, identity: Identity, ids: list[str], *args: Any, **kwargs: Any) -> list[dict]:
+    def _search_many(
+        self, identity: Identity, ids: list[str], *args: Any, **kwargs: Any
+    ) -> list[dict]:
         """Search for many records of the same type at once.
 
         :param identity:    identity of the user
@@ -224,7 +246,9 @@ class GroupEntityReferenceUIResolver(OARepoUIResolver):
         return result
 
     @override
-    def _search_one(self, identity: Identity, _id: str, *args: Any, **kwargs: Any) -> dict | None:
+    def _search_one(
+        self, identity: Identity, _id: str, *args: Any, **kwargs: Any
+    ) -> dict | None:
         """Search for a single entity of the same type.
 
         :param identity:    identity of the user
@@ -237,7 +261,9 @@ class GroupEntityReferenceUIResolver(OARepoUIResolver):
             return None
 
     @override
-    def _get_entity_ui_representation(self, entity: dict, reference: EntityReference) -> UIResolvedReference:
+    def _get_entity_ui_representation(
+        self, entity: dict, reference: EntityReference
+    ) -> UIResolvedReference:
         """Create a UI representation of a entity.
 
         :entity:        resolved entity
@@ -265,7 +291,9 @@ class UserEntityReferenceUIResolver(OARepoUIResolver):
         return result["id"]
 
     @override
-    def _search_many(self, identity: Identity, ids: list[str], *args: Any, **kwargs: Any) -> list[dict]:
+    def _search_many(
+        self, identity: Identity, ids: list[str], *args: Any, **kwargs: Any
+    ) -> list[dict]:
         """Search for many records of the same type at once.
 
         :param identity:    identity of the user
@@ -284,7 +312,9 @@ class UserEntityReferenceUIResolver(OARepoUIResolver):
         return result
 
     @override
-    def _search_one(self, identity: Identity, _id: str, *args: Any, **kwargs: Any) -> dict | None:
+    def _search_one(
+        self, identity: Identity, _id: str, *args: Any, **kwargs: Any
+    ) -> dict | None:
         """Search for a single entity of the same type.
 
         :param identity:    identity of the user
@@ -297,7 +327,9 @@ class UserEntityReferenceUIResolver(OARepoUIResolver):
             return None
 
     @override
-    def _get_entity_ui_representation(self, entity: dict, reference: EntityReference) -> UIResolvedReference:
+    def _get_entity_ui_representation(
+        self, entity: dict, reference: EntityReference
+    ) -> UIResolvedReference:
         """Create a UI representation of a entity.
 
         :entity:        resolved entity
@@ -306,7 +338,11 @@ class UserEntityReferenceUIResolver(OARepoUIResolver):
         """
         if entity["id"] == "system":
             label = _("System user")
-        elif "profile" in entity and "full_name" in entity["profile"] and entity["profile"]["full_name"]:
+        elif (
+            "profile" in entity
+            and "full_name" in entity["profile"]
+            and entity["profile"]["full_name"]
+        ):
             label = entity["profile"]["full_name"]
         elif entity.get("username"):
             label = entity["username"]
@@ -332,7 +368,9 @@ class RecordEntityReferenceUIResolver(OARepoUIResolver):
         return result["id"]
 
     @override
-    def _search_many(self, identity: Identity, ids: list[str], *args: Any, **kwargs: Any) -> list[dict]:
+    def _search_many(
+        self, identity: Identity, ids: list[str], *args: Any, **kwargs: Any
+    ) -> list[dict]:
         """Search for many records of the same type at once.
 
         :param identity:    identity of the user
@@ -345,14 +383,22 @@ class RecordEntityReferenceUIResolver(OARepoUIResolver):
         if not ids:
             return []
         # TODO what if search not permitted?
-        service = get_matching_service_for_refdict({self.reference_type: next(iter(ids))})
+        service = get_matching_service_for_refdict(
+            {self.reference_type: next(iter(ids))}
+        )
         if not service:
-            raise ValueError(f"No service found for handling reference type {self.reference_type}")
+            raise ValueError(
+                f"No service found for handling reference type {self.reference_type}"
+            )
         extra_filter = dsl.Q("terms", id=list(ids))
-        return service.search(identity, extra_filter=extra_filter).to_dict()["hits"]["hits"]
+        return service.search(identity, extra_filter=extra_filter).to_dict()["hits"][
+            "hits"
+        ]
 
     @override
-    def _search_one(self, identity: Identity, _id: str, *args: Any, **kwargs: Any) -> dict | None:
+    def _search_one(
+        self, identity: Identity, _id: str, *args: Any, **kwargs: Any
+    ) -> dict | None:
         """Search for a single entity of the same type.
 
         :param identity:    identity of the user
@@ -360,14 +406,18 @@ class RecordEntityReferenceUIResolver(OARepoUIResolver):
         """
         service = get_matching_service_for_refdict({self.reference_type: _id})
         if not service:
-            raise ValueError(f"No service found for handling reference type {self.reference_type}")
+            raise ValueError(
+                f"No service found for handling reference type {self.reference_type}"
+            )
         try:
             return service.read(identity, _id, include_deleted=True).data
         except RecordDeletedException as e:
             return e.record
 
     @override
-    def _get_entity_ui_representation(self, entity: dict, reference: EntityReference) -> UIResolvedReference:
+    def _get_entity_ui_representation(
+        self, entity: dict, reference: EntityReference
+    ) -> UIResolvedReference:
         """Create a UI representation of a entity.
 
         :entity:        resolved entity
@@ -390,7 +440,9 @@ class RecordEntityDraftReferenceUIResolver(RecordEntityReferenceUIResolver):
     """UI resolver for entity entity draft references."""
 
     @override
-    def _search_many(self, identity: Identity, ids: list[str], *args: Any, **kwargs: Any) -> list[dict]:
+    def _search_many(
+        self, identity: Identity, ids: list[str], *args: Any, **kwargs: Any
+    ) -> list[dict]:
         """Search for many records of the same type at once.
 
         :param identity:    identity of the user
@@ -403,18 +455,26 @@ class RecordEntityDraftReferenceUIResolver(RecordEntityReferenceUIResolver):
         if not ids:
             return []
 
-        service: DraftsService = get_matching_service_for_refdict({self.reference_type: next(iter(ids))})
+        service: DraftsService = get_matching_service_for_refdict(
+            {self.reference_type: next(iter(ids))}
+        )
         extra_filter = dsl.Q("terms", id=list(ids))
-        return service.search_drafts(identity, extra_filter=extra_filter).to_dict()["hits"]["hits"]
+        return service.search_drafts(identity, extra_filter=extra_filter).to_dict()[
+            "hits"
+        ]["hits"]
 
     @override
-    def _search_one(self, identity: Identity, _id: str, *args: Any, **kwargs: Any) -> dict | None:
+    def _search_one(
+        self, identity: Identity, _id: str, *args: Any, **kwargs: Any
+    ) -> dict | None:
         """Search for a single entity of the same type.
 
         :param identity:    identity of the user
         :param _id:         id to search for
         """
-        service: DraftsService = get_matching_service_for_refdict({self.reference_type: _id})
+        service: DraftsService = get_matching_service_for_refdict(
+            {self.reference_type: _id}
+        )
         return service.read_draft(identity, _id).data
 
 
@@ -430,7 +490,9 @@ class FallbackEntityReferenceUIResolver(OARepoUIResolver):
         return result["id"]
 
     @override
-    def _search_many(self, identity: Identity, ids: list[str], *args: Any, **kwargs: Any) -> list[dict]:
+    def _search_many(
+        self, identity: Identity, ids: list[str], *args: Any, **kwargs: Any
+    ) -> list[dict]:
         """Search for many records of the same type at once.
 
         :param identity:    identity of the user
@@ -442,7 +504,9 @@ class FallbackEntityReferenceUIResolver(OARepoUIResolver):
         raise NotImplementedError("Intentionally not implemented")
 
     @override
-    def _search_one(self, identity: Identity, _id: str, *args: Any, **kwargs: Any) -> dict | None:
+    def _search_one(
+        self, identity: Identity, _id: str, *args: Any, **kwargs: Any
+    ) -> dict | None:
         """Search for a single entity of the same type.
 
         :param identity:    identity of the user
@@ -471,7 +535,9 @@ class FallbackEntityReferenceUIResolver(OARepoUIResolver):
         return response
 
     @override
-    def _get_entity_ui_representation(self, entity: dict, reference: EntityReference) -> UIResolvedReference:
+    def _get_entity_ui_representation(
+        self, entity: dict, reference: EntityReference
+    ) -> UIResolvedReference:
         """Create a UI representation of a entity.
 
         :entity:        resolved entity
@@ -505,7 +571,9 @@ class KeywordUIEntityResolver(OARepoUIResolver):
         return next(iter(entity.values()))
 
     @override
-    def _search_many(self, identity: Identity, ids: list[str], *args: Any, **kwargs: Any) -> list[dict]:
+    def _search_many(
+        self, identity: Identity, ids: list[str], *args: Any, **kwargs: Any
+    ) -> list[dict]:
         """Return list of references of keyword entities.
 
         :param identity:    identity of the user
@@ -517,7 +585,9 @@ class KeywordUIEntityResolver(OARepoUIResolver):
         return [{self.keyword: _id} for _id in ids]
 
     @override
-    def _search_one(self, identity: Identity, _id: str, *args: Any, **kwargs: Any) -> dict | None:
+    def _search_one(
+        self, identity: Identity, _id: str, *args: Any, **kwargs: Any
+    ) -> dict | None:
         """Return keyword entity reference.
 
         :param identity:    identity of the user
@@ -533,7 +603,9 @@ class AutoApproveUIEntityResolver(KeywordUIEntityResolver):
     keyword = "auto_approve"
 
     @override
-    def _get_entity_ui_representation(self, entity: dict, reference: EntityReference) -> UIResolvedReference:
+    def _get_entity_ui_representation(
+        self, entity: dict, reference: EntityReference
+    ) -> UIResolvedReference:
         """Create a UI representation of an auto approve entity.
 
         :entity:        resolved entity

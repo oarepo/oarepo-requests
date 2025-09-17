@@ -63,7 +63,9 @@ class RecordSnapshot(db.Model):
     )
     """JSON with current snapshot of the record."""
 
-    request_id = db.Column(UUIDType, db.ForeignKey(RequestMetadata.id, ondelete="cascade"), nullable=True)
+    request_id = db.Column(
+        UUIDType, db.ForeignKey(RequestMetadata.id, ondelete="cascade"), nullable=True
+    )
     """Request ID when snapshot is made."""
 
     request = db.relationship(RequestMetadata, foreign_keys=[request_id])
@@ -72,13 +74,17 @@ class RecordSnapshot(db.Model):
     created = sa.Column(sa.DateTime, default=datetime.utcnow, nullable=False)
 
     @classmethod
-    def create(cls, record_uuid: UUID, request_id: UUID, json: dict) -> None:  # TODO: json type?
+    def create(
+        cls, record_uuid: UUID, request_id: UUID, json: dict
+    ) -> None:  # TODO: json type?
         """Create new snapshot."""
         try:
             with db.session.begin_nested():
                 obj = cls(record_uuid=record_uuid, request_id=request_id, json=json)
                 db.session.add(obj)
-            logger.info("Created record snapshot for record uuid {record_uuid} with json {json}")
+            logger.info(
+                "Created record snapshot for record uuid {record_uuid} with json {json}"
+            )
 
         except IntegrityError:
             logger.exception(
@@ -101,7 +107,9 @@ class RecordSnapshot(db.Model):
         try:
             return db.session.query(cls).filter_by(record_uuid=record_uuid).one()
         except NoResultFound as exc:
-            raise ValueError(f"No record snapshot for record uuid {record_uuid}") from exc
+            raise ValueError(
+                f"No record snapshot for record uuid {record_uuid}"
+            ) from exc
 
     @classmethod
     def get_all(cls, record_uuid: UUID) -> list[RecordSnapshot]:
@@ -109,12 +117,24 @@ class RecordSnapshot(db.Model):
         try:
             return db.session.query(cls).filter_by(record_uuid=record_uuid).all()
         except NoResultFound as exc:
-            raise ValueError(f"No record snapshots for record uuid {record_uuid}") from exc
+            raise ValueError(
+                f"No record snapshots for record uuid {record_uuid}"
+            ) from exc
 
     @classmethod
-    def get_two_latest_snapshots_by_record_uuid(cls, record_uuid: UUID) -> list[RecordSnapshot]:
+    def get_two_latest_snapshots_by_record_uuid(
+        cls, record_uuid: UUID
+    ) -> list[RecordSnapshot]:
         """Get latest two snapshot for record_uuid."""
         try:
-            return db.session.query(cls).filter_by(record_uuid=record_uuid).order_by(cls.created.desc()).limit(2).all()
+            return (
+                db.session.query(cls)
+                .filter_by(record_uuid=record_uuid)
+                .order_by(cls.created.desc())
+                .limit(2)
+                .all()
+            )
         except NoResultFound as exc:
-            raise ValueError(f"No record snapshot for record uuid {record_uuid}") from exc
+            raise ValueError(
+                f"No record snapshot for record uuid {record_uuid}"
+            ) from exc

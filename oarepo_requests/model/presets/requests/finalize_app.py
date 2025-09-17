@@ -46,10 +46,14 @@ class RequestsFinalizeAppPreset(Preset):
             type_key_draft = f"{service_id}_draft"
             REQUESTS_ENTITY_RESOLVERS = [
                 runtime_deps.get("RecordResolver")(
-                    record_cls=runtime_deps.get("Record"), service_id=service_id, type_key=type_key_published
+                    record_cls=runtime_deps.get("Record"),
+                    service_id=service_id,
+                    type_key=type_key_published,
                 ),
                 runtime_deps.get("DraftResolver")(
-                    record_cls=runtime_deps.get("Draft"), service_id=service_id, type_key=type_key_draft
+                    record_cls=runtime_deps.get("Draft"),
+                    service_id=service_id,
+                    type_key=type_key_draft,
                 ),
             ]
             requests = app.extensions["invenio-requests"]

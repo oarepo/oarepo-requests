@@ -14,13 +14,18 @@ from typing import TYPE_CHECKING, Any, override
 
 from oarepo_model.customizations import (
     AddToList,
-    Customization,
+    Customization, AddToDictionary,
 )
 from oarepo_model.presets import Preset
+from oarepo_runtime.services.config import is_published_record
 
 from oarepo_requests.services.components.autorequest import AutorequestComponent
-from oarepo_requests.services.record.components.snapshot_component import RecordSnapshotComponent
-
+from oarepo_requests.services.record.components.snapshot_component import (
+    RecordSnapshotComponent,
+)
+from invenio_records_resources.services.base.links import EndpointLink
+from invenio_records_resources.services.records.links import RecordEndpointLink
+from invenio_records_resources.services.base.links import ConditionalLink
 if TYPE_CHECKING:
     from collections.abc import Generator
 
@@ -42,27 +47,31 @@ class RequestsServiceConfigPreset(Preset):
     ) -> Generator[Customization]:
         yield AddToList("record_service_components", AutorequestComponent)
         yield AddToList("record_service_components", RecordSnapshotComponent)
-
-        # TODO: use endpoint links
-        """api_base = "{+api}/" + builder.model.slug + "/"
-        ui_base = "{+ui}/" + builder.model.slug + "/"
-
-        api_url = api_base + "{id}"
-        ui_base + "{id}"
-
-        links = {
-            "requests": ConditionalLink(
-                cond=is_published_record(),
-                if_=RecordLink(api_url + "/requests"),
-                else_=RecordLink(api_url + "/draft/requests"),
-            ),
-            "applicable-requests": ConditionalLink(
-                cond=is_published_record(),
-                if_=RecordLink(api_url + "/requests/applicable"),
-                else_=RecordLink(api_url + "/draft/requests/applicable"),
-            ),
-        }
-
-
-        yield AddToDictionary("record_links_item", links)
-        """
+        yield AddToDictionary(
+            "record_links_item",
+            {
+                "requests": ConditionalLink(
+                    cond=is_published_record(),
+                    if_=RecordEndpointLink(
+                    f"{builder.model.base_name}_requests.search_requests_for_record", # TODO: how to get the blueprint name correctly?
+                ),
+                    else_=RecordEndpointLink(
+                    f"{builder.model.base_name}_requests.search_requests_for_draft",
+                )
+                )
+            }
+        )
+        yield AddToDictionary(
+            "record_links_item",
+            {
+                "applicable-requests": ConditionalLink(
+                    cond=is_published_record(),
+                    if_=RecordEndpointLink(
+                    f"{builder.model.base_name}_applicable_requests.get_applicable_request_types", # TODO: how to get the blueprint name correctly?
+                ),
+                    else_=RecordEndpointLink(
+                    f"{builder.model.base_name}_applicable_requests.get_applicable_request_types_for_draft",
+                )
+                )
+            }
+        )

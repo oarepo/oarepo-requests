@@ -52,7 +52,9 @@ class RecordSnapshotComponent(ServiceComponent):
         if requests:
             from oarepo_requests.snapshots import create_snapshot_and_possible_event
 
-            create_snapshot_and_possible_event(record, record["metadata"], UUID(requests[0]["id"]))
+            create_snapshot_and_possible_event(
+                record, record["metadata"], UUID(requests[0]["id"])
+            )
 
     @override
     def update(self, identity: Identity, *, record: Record, **kwargs: Any) -> None:
@@ -62,6 +64,8 @@ class RecordSnapshotComponent(ServiceComponent):
     # TODO: technically we have subclassed service for drafts, so to be really consistent we should also have
     # separate components?
     @override
-    def update_draft(self, identity: Identity, *, record: Record, **kwargs: Any) -> None:
+    def update_draft(
+        self, identity: Identity, *, record: Record, **kwargs: Any
+    ) -> None:
         """Create snapshot on update draft call."""
         self.create_snapshot(record)

@@ -75,7 +75,9 @@ class PublishDraftSubmitAction(PublishMixin, RecordSnapshotMixin, OARepoSubmitAc
         """Publish the draft."""
         if "payload" in self.request and "version" in self.request["payload"]:
             topic_service = current_runtime.get_record_service_for_record(state.topic)
-            versions = topic_service.search_versions(identity, state.topic.pid.pid_value)
+            versions = topic_service.search_versions(
+                identity, state.topic.pid.pid_value
+            )
             versions_hits = versions.to_dict()["hits"]["hits"]
             for rec in versions_hits:
                 if "version" in rec["metadata"]:
@@ -83,11 +85,17 @@ class PublishDraftSubmitAction(PublishMixin, RecordSnapshotMixin, OARepoSubmitAc
                     if version == self.request["payload"]["version"]:
                         raise VersionAlreadyExists
             state.topic.metadata["version"] = self.request["payload"]["version"]
-        uow.register(NotificationOp(PublishDraftRequestSubmitNotificationBuilder.build(request=self.request)))
+        uow.register(
+            NotificationOp(
+                PublishDraftRequestSubmitNotificationBuilder.build(request=self.request)
+            )
+        )
         return super().apply(identity, state, uow, *args, **kwargs)
 
 
-class PublishDraftAcceptAction(PublishMixin, AddTopicLinksOnPayloadMixin, OARepoAcceptAction):
+class PublishDraftAcceptAction(
+    PublishMixin, AddTopicLinksOnPayloadMixin, OARepoAcceptAction
+):
     """Accept action for publishing draft requests."""
 
     self_link = "published_record:links:self"
@@ -108,11 +116,18 @@ class PublishDraftAcceptAction(PublishMixin, AddTopicLinksOnPayloadMixin, OARepo
         if not topic_service:
             raise KeyError(f"topic {state.topic} service not found")
         request_service = get_requests_service_for_records_service(topic_service)
-        requests = request_service.search_requests_for_draft(system_identity, state.topic.pid.pid_value)
+        requests = request_service.search_requests_for_draft(
+            system_identity, state.topic.pid.pid_value
+        )
 
         for result in requests._results:  # noqa SLF001
             if (
-                result.type not in ["publish_draft", "publish_new_version", "publish_changed_metadata"]
+                result.type
+                not in [
+                    "publish_draft",
+                    "publish_new_version",
+                    "publish_changed_metadata",
+                ]
                 and result.is_open
                 and Request.get_record(result.uuid)["status"]
                 in (
@@ -125,10 +140,16 @@ class PublishDraftAcceptAction(PublishMixin, AddTopicLinksOnPayloadMixin, OARepo
                 raise UnresolvedRequestsError(action=str(self.name))
         id_ = state.topic["id"]
 
-        published_topic = topic_service.publish(identity, id_, *args, uow=uow, expand=False, **kwargs)
+        published_topic = topic_service.publish(
+            identity, id_, *args, uow=uow, expand=False, **kwargs
+        )
         update_topic(self.request, state.topic, published_topic._record, uow)  # noqa SLF001
         state.topic = published_topic._record  # noqa SLF001
-        uow.register(NotificationOp(PublishDraftRequestAcceptNotificationBuilder.build(request=self.request)))
+        uow.register(
+            NotificationOp(
+                PublishDraftRequestAcceptNotificationBuilder.build(request=self.request)
+            )
+        )
         return super().apply(identity, state, uow, *args, **kwargs)
 
 
@@ -146,5 +167,11 @@ class PublishDraftDeclineAction(OARepoDeclineAction):
         **kwargs: Any,
     ) -> Record:
         """Publish the draft."""
-        uow.register(NotificationOp(PublishDraftRequestDeclineNotificationBuilder.build(request=self.request)))
+        uow.register(
+            NotificationOp(
+                PublishDraftRequestDeclineNotificationBuilder.build(
+                    request=self.request
+                )
+            )
+        )
         return super().apply(identity, state, uow, *args, **kwargs)

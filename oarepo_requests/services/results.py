@@ -35,12 +35,16 @@ if TYPE_CHECKING:
 class RequestTypesComponent(ResultComponent):
     """Component for expanding request types."""
 
-    def update_data(self, identity: Identity, record: Record, projection: dict, expand: bool) -> None:
+    def update_data(
+        self, identity: Identity, record: Record, projection: dict, expand: bool
+    ) -> None:
         """Expand request types if requested."""
         if not expand:
             return
         allowed_request_types = allowed_request_types_for_record(identity, record)
-        request_types_list = serialize_request_types(allowed_request_types, identity, record)
+        request_types_list = serialize_request_types(
+            allowed_request_types, identity, record
+        )
         projection["expanded"]["request_types"] = request_types_list
 
 
@@ -55,7 +59,9 @@ def serialize_request_types(
     :return: List of serialized request types.
     """
     return [
-        RequestTypeSchema(context={"identity": identity, "record": record}).dump(request_type)
+        RequestTypeSchema(context={"identity": identity, "record": record}).dump(
+            request_type
+        )
         for request_type in request_types.values()
     ]
 
@@ -63,12 +69,16 @@ def serialize_request_types(
 class RequestsComponent(ResultComponent):
     """Component for expanding requests on a record."""
 
-    def update_data(self, identity: Identity, record: Record, projection: dict, expand: bool) -> None:
+    def update_data(
+        self, identity: Identity, record: Record, projection: dict, expand: bool
+    ) -> None:
         """Expand requests if requested."""
         if not expand:
             return
 
-        service = get_requests_service_for_records_service(current_runtime.get_record_service_for_record(record))
+        service = get_requests_service_for_records_service(
+            current_runtime.get_record_service_for_record(record)
+        )
         reader = (
             cast("DraftRecordRequestsService", service).search_requests_for_draft
             if getattr(record, "is_draft", False)
@@ -100,10 +110,14 @@ class RequestTypesList(RecordList):
         hits = list(self.hits)
 
         record_links = self._service.config.links_item
-        rendered_record_links = LinksTemplate(record_links, context={}).expand(self._identity, self._record)
+        rendered_record_links = LinksTemplate(record_links, context={}).expand(
+            self._identity, self._record
+        )
         links_tpl = LinksTemplate(
             self._links_tpl._links,  # noqa SLF001
-            context={**{f"record_link_{k}": v for k, v in rendered_record_links.items()}},
+            context={
+                **{f"record_link_{k}": v for k, v in rendered_record_links.items()}
+            },
         )
         res = RequestTypesListDict(
             hits={

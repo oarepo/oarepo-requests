@@ -47,7 +47,16 @@ if TYPE_CHECKING:
 
 
 # TODO: perhaps we could use centrally defined custom types in runtime?
-type JsonValue = str | LazyString | int | float | bool | None | dict[str, JsonValue] | list[JsonValue]
+type JsonValue = (
+    str
+    | LazyString
+    | int
+    | float
+    | bool
+    | None
+    | dict[str, JsonValue]
+    | list[JsonValue]
+)
 
 
 # TODO: move to runtime
@@ -63,7 +72,9 @@ class classproperty[T]:  # noqa N801
         return self.fget(owner)
 
 
-def allowed_request_types_for_record(identity: Identity, record: Record) -> dict[str, RequestType]:
+def allowed_request_types_for_record(
+    identity: Identity, record: Record
+) -> dict[str, RequestType]:
     """Return allowed request types for the record.
 
     If there is a workflow defined on the record, only request types allowed by the workflow are returned.
@@ -77,7 +88,9 @@ def allowed_request_types_for_record(identity: Identity, record: Record) -> dict
         workflow_requests = current_oarepo_workflows.get_workflow(record).requests()
         return {
             type_id: wr.request_type
-            for (type_id, wr) in workflow_requests.applicable_workflow_requests(identity, record=record)
+            for (type_id, wr) in workflow_requests.applicable_workflow_requests(
+                identity, record=record
+            )
         }
     except MissingWorkflowError:
         # workflow not defined on the record, probably not a workflow-enabled record
@@ -94,7 +107,9 @@ def allowed_request_types_for_record(identity: Identity, record: Record) -> dict
     return ret
 
 
-def create_query_term_for_reference(field_name: str, reference: EntityReference) -> Query:
+def create_query_term_for_reference(
+    field_name: str, reference: EntityReference
+) -> Query:
     """Create an opensearch query term for the reference.
 
     :param field_name: Field name to search in (can be "topic", "receiver", ...).
@@ -103,7 +118,11 @@ def create_query_term_for_reference(field_name: str, reference: EntityReference)
     """
     return dsl.Q(
         "term",
-        **{f"{field_name}.{next(iter(reference.keys()))}": next(iter(reference.values()))},
+        **{
+            f"{field_name}.{next(iter(reference.keys()))}": next(
+                iter(reference.values())
+            )
+        },
     )
 
 
@@ -140,15 +159,21 @@ def search_requests_filter(
     )
 
 
-def open_request_exists(topic_or_reference: Record | EntityReference, type_id: str) -> bool:
+def open_request_exists(
+    topic_or_reference: Record | EntityReference, type_id: str
+) -> bool:
     """Check if there is an open request of a given type for the topic.
 
     :param topic_or_reference: Topic record or reference to the record in the form {"datasets": "id"}.
     :param type_id: Request type id.
     """
     topic_reference = ResolverRegistry.reference_entity(topic_or_reference, raise_=True)
-    base_filter = search_requests_filter(type_id=type_id, topic_reference=topic_reference, is_open=True)
-    results = current_requests_service.search(system_identity, extra_filter=base_filter).hits
+    base_filter = search_requests_filter(
+        type_id=type_id, topic_reference=topic_reference, is_open=True
+    )
+    results = current_requests_service.search(
+        system_identity, extra_filter=base_filter
+    ).hits
     return bool(list(results))
 
 
@@ -180,7 +205,9 @@ def get_entity_key_for_record_cls(record_cls: type[Record]) -> str:
     for resolver in ResolverRegistry.get_registered_resolvers():
         if hasattr(resolver, "record_cls") and resolver.record_cls == record_cls:
             return resolver.type_id
-    raise AttributeError(f"Record class {record_cls} does not have a registered entity resolver.")
+    raise AttributeError(
+        f"Record class {record_cls} does not have a registered entity resolver."
+    )
 
 
 def get_requests_service_for_records_service(
@@ -269,15 +296,22 @@ def is_auto_approved(
     if not current_oarepo_workflows:
         return False
 
-    receiver = get_receiver_for_request_type(request_type=request_type, identity=identity, topic=topic)
+    receiver = get_receiver_for_request_type(
+        request_type=request_type, identity=identity, topic=topic
+    )
 
     return bool(
         receiver
-        and (isinstance(receiver, AutoApprove) or (isinstance(receiver, dict) and receiver.get("auto_approve")))
+        and (
+            isinstance(receiver, AutoApprove)
+            or (isinstance(receiver, dict) and receiver.get("auto_approve"))
+        )
     )
 
 
-def request_identity_matches(entity_reference: EntityReference, identity: Identity) -> bool:
+def request_identity_matches(
+    entity_reference: EntityReference, identity: Identity
+) -> bool:
     """Check if the identity matches the entity reference.
 
     Identity matches the entity reference if the needs provided by the entity reference

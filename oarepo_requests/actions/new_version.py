@@ -25,7 +25,9 @@ if TYPE_CHECKING:
     from .components import RequestActionState
 
 
-class NewVersionAcceptAction(AddTopicLinksOnPayloadMixin, RecordSnapshotMixin, OARepoAcceptAction):
+class NewVersionAcceptAction(
+    AddTopicLinksOnPayloadMixin, RecordSnapshotMixin, OARepoAcceptAction
+):
     """Accept creation of a new version of a published record."""
 
     self_link = "draft_record:links:self"
@@ -44,7 +46,9 @@ class NewVersionAcceptAction(AddTopicLinksOnPayloadMixin, RecordSnapshotMixin, O
         if not topic_service:
             raise KeyError(f"topic {state.topic} service not found")
 
-        new_version_topic = topic_service.new_version(identity, state.topic["id"], uow=uow)
+        new_version_topic = topic_service.new_version(
+            identity, state.topic["id"], uow=uow
+        )
         state.topic = new_version_topic._record  # noqa SLF001
         if (
             "payload" in self.request

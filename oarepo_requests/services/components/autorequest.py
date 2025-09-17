@@ -25,7 +25,13 @@ class AutorequestComponent(ServiceComponent):
     """Component for assigning request numbers to new requests."""
 
     @override
-    def create(self, identity: Identity, data: dict | None = None, record: Record = None, **kwargs: Any) -> None:
+    def create(
+        self,
+        identity: Identity,
+        data: dict | None = None,
+        record: Record = None,
+        **kwargs: Any,
+    ) -> None:
         """Create requests that should be created automatically on state change.
 
         For each of the WorkflowRequest definition in the workflow of the record,
