@@ -22,7 +22,16 @@ if TYPE_CHECKING:
     from invenio_records_resources.services.records.results import RecordItem
 
 
-class DraftServiceResultResolver(ServiceResultResolver):
+class RDMPIDServiceResultResolver(ServiceResultResolver):
+    """Service result resolver for draft records."""
+
+    def _reference_entity(self, entity):
+        """Create a reference dict for the given result item."""
+        pid = entity.id if isinstance(entity, self.item_cls) else entity.pid.pid_value
+        return {self.type_key: str(pid)}
+
+
+class DraftServiceResultResolver(RDMPIDServiceResultResolver):
     """Service result resolver for draft records, needed for RDM drafts."""
 
     # TODO: specific type for entity reference?

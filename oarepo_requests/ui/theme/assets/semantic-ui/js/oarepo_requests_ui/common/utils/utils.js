@@ -158,8 +158,7 @@ const serializeDataForInvenioApi = (formData) => {
 export const formatValueToStringLikeFormat = (value) => {
   if (value === null || value === undefined) return "—";
   if (_isArray(value) && _every(value, _isString)) return value.join(", ");
-  if (_isObjectLike(value))
-    return JSON.stringify(value, null, 2);
+  if (_isObjectLike(value)) return JSON.stringify(value, null, 2);
   return String(value);
 };
 
