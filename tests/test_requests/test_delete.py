@@ -18,7 +18,6 @@ def test_delete(
     urls,
     submit_request_on_record,
     link2testclient,
-    location,
     search_clear,
 ):
     creator = users[0]
@@ -54,10 +53,10 @@ def test_delete(
             record.json["expanded"]["requests"][0]["links"]["actions"]["accept"]
         ),
     )
-    #assert (
+    # assert (
     #    link2testclient(delete.json["links"]["ui_redirect_url"], ui=True)
     #    == urls["BASE_URL"]
-    #)
+    # )
 
     requests_model.Record.index.refresh()
     requests_model.Draft.index.refresh()
@@ -108,7 +107,6 @@ def test_delete_draft(
     users,
     urls,
     link2testclient,
-    location,
     search_clear,
 ):
     creator = users[0]
@@ -139,8 +137,8 @@ def test_delete_draft(
     )  # autoapprove suggested here
     assert request_after.json["status"] == "accepted"
     assert request_after.json["is_closed"]
-    #assert (
+    # assert (
     #    link2testclient(request_after.json["links"]["ui_redirect_url"], ui=True)
     #    == f"{urls['BASE_URL']}/"
-    #)
+    # )
     assert read_deleted.status_code == 404

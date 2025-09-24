@@ -76,7 +76,8 @@ def test_publish_with_workflows(
         ),
     )
     assert accept.status_code == 200
-    published_record = record_service.read(creator.identity, draft1_id)._record  # noqa SLF001
+    record_cls = requests_model.Record
+    published_record = record_cls.pid.resolve(draft1_id)
     assert published_record["state"] == "published"
 
 
@@ -470,7 +471,9 @@ def test_delete_log(
         f"{urls['BASE_URL_REQUESTS']}{request_id}",
     ).json
     assert accept.status_code == 200
-    assert post_delete_record_read.status_code == 410 # TODO: 403 because it's in deleted state
+    assert (
+        post_delete_record_read.status_code == 410
+    )  # TODO: 403 because it's in deleted state
     assert post_delete_request_read_json["status"] == "accepted"
     assert post_delete_request_read_json["topic"] == {"requests_test": record_id}
 

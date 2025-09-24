@@ -123,7 +123,7 @@ def test_escalate_request_most_recent_multiple_recipients(
 
     # check before escalation
     request = current_oarepo_requests_service.read(identity=creator.identity, id_=id_)
-    assert request.data["receiver"] == {"multiple": '[{"user": "2"}, {"user": "1"}]'}
+    assert request.data["receiver"] == {"multiple": '[{"user": "1"}, {"user": "2"}]'}
 
     with mail.record_messages() as outbox:
         # escalate
@@ -143,7 +143,7 @@ def test_escalate_request_most_recent_multiple_recipients(
 
     # nothing should change, first escalation period is 2 seconds
     request = current_oarepo_requests_service.read(identity=creator.identity, id_=id_)
-    assert request.data["receiver"] == {"multiple": '[{"user": "2"}, {"user": "1"}]'}
+    assert request.data["receiver"] == {"multiple": '[{"user": "1"}, {"user": "2"}]'}
 
     # no escalation -> no event in database
     results = (
@@ -321,7 +321,7 @@ def test_escalate_request_most_recent_2_multiple_recipients(
 
     # check before escalation
     request = current_oarepo_requests_service.read(identity=creator.identity, id_=id_)
-    assert request.data["receiver"] == {"multiple": '[{"user": "2"}, {"user": "1"}]'}
+    assert request.data["receiver"] == {"multiple": '[{"user": "1"}, {"user": "2"}]'}
 
     # no escalation -> no event in database
     results = (
@@ -471,7 +471,7 @@ def test_escalate_request_most_recent_3_multiple_recipients(
 
     # check before escalation
     request = current_oarepo_requests_service.read(identity=creator.identity, id_=id_)
-    assert request.data["receiver"] == {"multiple": '[{"user": "2"}, {"user": "1"}]'}
+    assert request.data["receiver"] == {"multiple": '[{"user": "1"}, {"user": "2"}]'}
 
     # sanity check
     results = (

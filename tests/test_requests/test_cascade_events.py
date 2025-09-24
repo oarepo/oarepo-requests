@@ -11,6 +11,7 @@ from invenio_requests.records.api import RequestEvent
 
 from oarepo_requests.types.events import TopicDeleteEventType
 
+
 # TODO: werkzeug.routing.exceptions.BuildError: Could not build url for endpoint 'requests_test.search_versions' with values ['page', 'size', 'sort']. Did you mean 'invenio_requests.static' instead? is an oarepo-ui todo
 def test_cascade_update(
     requests_model,
@@ -22,7 +23,6 @@ def test_cascade_update(
     create_request_on_draft,
     submit_request_on_draft,
     link2testclient,
-    location,
     search_clear,
 ):
     creator = users[0]
@@ -82,7 +82,6 @@ def test_cascade_cancel(
     draft_factory,
     create_request_on_draft,
     submit_request_on_draft,
-    location,
     search_clear,
 ):
     creator = users[0]

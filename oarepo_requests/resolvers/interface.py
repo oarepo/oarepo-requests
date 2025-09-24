@@ -14,7 +14,8 @@ from typing import TYPE_CHECKING, Any
 
 from invenio_pidstore.errors import PersistentIdentifierError
 
-from oarepo_requests.resolvers.ui import resolve
+# from oarepo_requests.resolvers.ui import resolve
+from invenio_requests.resolvers.registry import ResolverRegistry
 
 if TYPE_CHECKING:
     from invenio_requests.records import Request
@@ -51,6 +52,19 @@ def resolve_entity(entity: str, obj: Request, ctx: dict[str, Any]) -> dict:
         entity = {"links": {}}
     ctx[key] = entity
     return entity
+
+def resolve(identity, ref_dict):
+    for resolver in ResolverRegistry.get_registered_resolvers():
+        if resolver.matches_reference_dict(ref_dict):
+            break
+    else:
+        return None
+    service = resolver.get_service() # ServiceResultResolvers support this directly
+    # TODO: system user is not readable from service
+    if "draft" in next(iter(ref_dict.keys())): # TODO: unserious
+        return service.read_draft(identity, next(iter(ref_dict.values())))
+    return service.read(identity, next(iter(ref_dict.values())))
+
 
 
 def entity_context_key(reference_dict: dict) -> str:

@@ -58,6 +58,7 @@ class RDMPIDServiceResultResolver(ServiceResultResolver):
         pid = entity.id if isinstance(entity, self.item_cls) else entity.pid.pid_value
         return {self.type_key: str(pid)}
 
+
 class ExtRequestsPreset(Preset):
     """Preset for extension class."""
 

@@ -22,7 +22,12 @@ from oarepo_requests.actions.delete_published_record import (
     DeletePublishedRecordSubmitAction,
 )
 
-from ..utils import classproperty, is_auto_approved, request_identity_matches, open_request_exists
+from ..utils import (
+    classproperty,
+    is_auto_approved,
+    request_identity_matches,
+    open_request_exists,
+)
 from .generic import NonDuplicableOARepoRequestType
 from .ref_types import ModelRefTypes
 

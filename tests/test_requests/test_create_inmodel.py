@@ -19,7 +19,6 @@ def test_record(
     urls,
     create_request_on_record,
     link2testclient,
-    location,
     search_clear,
 ):
     creator = users[0]
@@ -59,7 +58,6 @@ def test_draft(
     draft_factory,
     create_request_on_draft,
     link2testclient,
-    location,
     search_clear,
 ):
     creator = users[0]
@@ -79,7 +77,7 @@ def test_draft(
     record = receiver_client.get(
         f"{urls['BASE_URL']}/{draft1_id}/draft?expand=true"
     ).json
-    receiver_client.post(
+    accept = receiver_client.post(
         link2testclient(record["expanded"]["requests"][0]["links"]["actions"]["accept"])
     )
     requests_model.Record.index.refresh()

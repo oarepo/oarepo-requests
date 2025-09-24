@@ -16,7 +16,6 @@ def test_can_create(
     urls,
     draft_factory,
     link2testclient,
-    location,
     search_clear,
 ):
     creator = users[0]
@@ -92,9 +91,9 @@ def test_can_possibly_create(
     urls,
     draft_factory,
     link2testclient,
-    location,
     search_clear,
 ):
+    print()
     creator = users[0]
     receiver = users[1]
 

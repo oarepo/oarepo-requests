@@ -14,7 +14,8 @@ from typing import TYPE_CHECKING, Any, override
 
 from oarepo_model.customizations import (
     AddToList,
-    Customization, AddToDictionary,
+    Customization,
+    AddToDictionary,
 )
 from oarepo_model.presets import Preset
 from oarepo_runtime.services.config import is_published_record
@@ -23,9 +24,9 @@ from oarepo_requests.services.components.autorequest import AutorequestComponent
 from oarepo_requests.services.record.components.snapshot_component import (
     RecordSnapshotComponent,
 )
-from invenio_records_resources.services.base.links import EndpointLink
 from invenio_records_resources.services.records.links import RecordEndpointLink
 from invenio_records_resources.services.base.links import ConditionalLink
+
 if TYPE_CHECKING:
     from collections.abc import Generator
 
@@ -53,13 +54,13 @@ class RequestsServiceConfigPreset(Preset):
                 "requests": ConditionalLink(
                     cond=is_published_record(),
                     if_=RecordEndpointLink(
-                    f"{builder.model.base_name}_requests.search_requests_for_record", # TODO: how to get the blueprint name correctly?
-                ),
+                        f"{builder.model.base_name}_requests.search_requests_for_record",  # TODO: how to get the blueprint name correctly?
+                    ),
                     else_=RecordEndpointLink(
-                    f"{builder.model.base_name}_requests.search_requests_for_draft",
+                        f"{builder.model.base_name}_requests.search_requests_for_draft",
+                    ),
                 )
-                )
-            }
+            },
         )
         yield AddToDictionary(
             "record_links_item",
@@ -67,11 +68,11 @@ class RequestsServiceConfigPreset(Preset):
                 "applicable-requests": ConditionalLink(
                     cond=is_published_record(),
                     if_=RecordEndpointLink(
-                    f"{builder.model.base_name}_applicable_requests.get_applicable_request_types", # TODO: how to get the blueprint name correctly?
-                ),
+                        f"{builder.model.base_name}_applicable_requests.get_applicable_request_types",  # TODO: how to get the blueprint name correctly?
+                    ),
                     else_=RecordEndpointLink(
-                    f"{builder.model.base_name}_applicable_requests.get_applicable_request_types_for_draft",
+                        f"{builder.model.base_name}_applicable_requests.get_applicable_request_types_for_draft",
+                    ),
                 )
-                )
-            }
+            },
         )

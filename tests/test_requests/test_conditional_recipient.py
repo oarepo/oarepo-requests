@@ -15,7 +15,6 @@ def test_conditional_receiver_creator_matches(
     urls,
     create_request_on_draft,
     draft_factory,
-    location,
     search_clear,
 ):
     # /for mypy - this is not code/ user[0] is creator, user[1] is receiver
@@ -40,7 +39,6 @@ def test_conditional_receiver_creator_does_not_match(
     urls,
     create_request_on_draft,
     draft_factory,
-    location,
     search_clear,
 ):
     # /for mypy - this is not code/ user[0] is creator, user[1] is receiver

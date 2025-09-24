@@ -44,7 +44,9 @@ def create_autorequests(
     for workflow_request in record_workflow.requests().requests:
         type_id = workflow_request.request_type.type_id
         needs = workflow_request.requester_generator.needs(
-            request_type=type_id, record=record, **kwargs # TODO: consider just sending the Type itself
+            request_type=type_id,
+            record=record,
+            **kwargs,  # TODO: consider just sending the Type itself
         )
         if auto_request_need in needs:
             data = kwargs.get("data", {})

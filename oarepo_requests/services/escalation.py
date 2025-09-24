@@ -45,9 +45,7 @@ def escalate_request(
     """Escalate single request and commit the change to the database."""
     log.info("Escalating request %s", request.id)
     resolved_topic = request.topic.resolve()
-    receiver = escalation.recipient_entity_reference(
-        record=resolved_topic
-    )
+    receiver = escalation.recipient_entity_reference(record=resolved_topic)
 
     old_receiver_str = json.dumps(request["receiver"], sort_keys=True)
     new_receiver_str = json.dumps(receiver, sort_keys=True)

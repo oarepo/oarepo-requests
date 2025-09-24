@@ -17,7 +17,6 @@ from typing import TYPE_CHECKING, ClassVar
 import pytest
 from invenio_i18n import _
 from invenio_rdm_records.services.generators import RecordOwners
-from invenio_rdm_records.services.permissions import RDMRequestsPermissionPolicy
 from invenio_records_permissions.generators import (
     AnyUser,
     AuthenticatedUser,
@@ -51,7 +50,7 @@ from pytest_oarepo.requests.classes import (
     TestEventType,
     UserGenerator,
 )
-from sqlalchemy.exc import IntegrityError
+from pytest_oarepo.users import _create_user
 
 from oarepo_requests.actions.generic import (
     OARepoAcceptAction,
@@ -71,13 +70,8 @@ from oarepo_requests.services.permissions.workflow_policies import (
 from oarepo_requests.types import (
     ModelRefTypes,
     NonDuplicableOARepoRequestType,
-    PublishDraftRequestType,
-    DeletePublishedRecordRequestType,
-    EditPublishedRecordRequestType,
 )
-from oarepo_requests.types.delete_draft import DeleteDraftRequestType
 from oarepo_requests.types.events.topic_update import TopicUpdateEventType
-from oarepo_requests.types.new_version import NewVersionRequestType
 
 if TYPE_CHECKING:
     from invenio_requests.customizations.actions import RequestAction
@@ -97,11 +91,10 @@ def events_service():
 
     return current_events_service
 
-"""
+
 @pytest.fixture(scope="module", autouse=True)
 def location(location):
     return location
-"""
 
 
 """
@@ -301,7 +294,6 @@ class DifferentLocalesPublish(WorkflowRequestPolicy):
     )
 
 
-
 class RequestWithMultipleRecipients(WorkflowRequestPolicy):
     """Multiple recipients test requests workflow."""
 
@@ -459,7 +451,9 @@ class RequestsWithCT(WorkflowRequestPolicy):
 
     conditional_recipient_rt = WorkflowRequest(
         requesters=[AnyUser()],
-        recipients=[IfRequestedBy(UserGenerator(1), [UserGenerator(2)], [UserGenerator(3)])],
+        recipients=[
+            IfRequestedBy(UserGenerator(1), [UserGenerator(2)], [UserGenerator(3)])
+        ],
     )
     approve_draft = WorkflowRequest(
         requesters=[IfInState("draft", [RecordOwners()])],
@@ -785,6 +779,9 @@ def app_config(app_config, requests_model):
     )
     app_config["RDM_RECORDS_ALLOW_RESTRICTION_AFTER_GRACE_PERIOD"] = True
 
+    app_config["CELERY_ALWAYS_EAGER"] = True
+    app_config["CELERY_TASK_ALWAYS_EAGER"] = True
+
     return app_config
 
 
@@ -835,15 +832,6 @@ def user_links():
     return _user_links
 
 
-def _create_user(user_fixture, app, db) -> None:
-    try:
-        user_fixture.create(app, db)
-    except IntegrityError:
-        datastore = app.extensions["security"].datastore
-        user_fixture._user = datastore.get_user_by_email(user_fixture.email)  # noqa SLF001
-        user_fixture._app = app  # noqa SLF001
-
-
 # TODO: use pytest-oarepo instead of this
 @pytest.fixture
 def password():
@@ -853,6 +841,15 @@ def password():
 
 @pytest.fixture
 def more_users(app, db, UserFixture, password):  # noqa N803
+
+    if db.engine.dialect.name == "postgresql":
+        from sqlalchemy import text
+        from invenio_accounts.models import User
+        name = User.__table__.name
+        sql = f'ALTER SEQUENCE "{name}_id_seq" RESTART WITH 1'
+        db.session.execute(text(sql))
+        db.session.commit()
+
     user1 = UserFixture(
         email="user1@example.org",
         password=password,

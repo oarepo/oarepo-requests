@@ -43,7 +43,7 @@ class DeleteDraftRequestType(NonDuplicableOARepoRequestType):
         if request.status == "accepted":
             topic_cls = request.topic.record_cls
             service = current_runtime.get_record_service_for_record_class(topic_cls)
-#             return service.config.links_search["self_html"].expand(None, context) # TODO: temp
+        #             return service.config.links_search["self_html"].expand(None, context) # TODO: temp
         return None
 
     @classproperty

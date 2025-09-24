@@ -35,8 +35,8 @@ class RequestEntityLinks(Link):
         """Create the request links."""
         res = {}
         resolved = resolve_entity(self._entity, obj, context)
-        if "links" in resolved:
-            res.update(resolved["links"])
+        if hasattr(resolved, "links"):
+            res.update(resolved.links)
 
         return res
 
