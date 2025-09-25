@@ -18,7 +18,7 @@ from oarepo_requests.proxies import current_oarepo_requests
 
 
 class ModelRefTypes:
-    """This class is used to define the allowed reference types for the topic reference.
+    """Class is used to define the allowed reference types for the topic reference.
 
     The list of ref types is taken from the configuration (configuration key REQUESTS_ALLOWED_TOPICS).
     """
@@ -35,13 +35,13 @@ class ModelRefTypes:
             if not isinstance(ref_type, RecordResolver):
                 continue
             is_draft: bool = getattr(ref_type.record_cls, "is_draft", False)
-            if self.published and not is_draft or self.draft and is_draft:
+            if (self.published and not is_draft) or (self.draft and is_draft):
                 ret.append(ref_type.type_key)
         return ret
 
 
 class ReceiverRefTypes:
-    """This class is used to define the allowed reference types for the receiver reference.
+    """Class is used to define the allowed reference types for the receiver reference.
 
     The list of ref types is taken from the configuration (configuration key REQUESTS_ALLOWED_RECEIVERS).
     """

@@ -1,9 +1,19 @@
+#
+# Copyright (C) 2025 CESNET z.s.p.o.
+#
+# oarepo-requests is free software; you can redistribute it and/or
+# modify it under the terms of the MIT License; see LICENSE file for more
+# details.
+#
 # SONARQUBE-SKIP
+from __future__ import annotations
+
 import time
 
-from oarepo_requests.services.escalation import check_escalations
 from invenio_db import db
 from invenio_requests.records.models import RequestEventModel
+
+from oarepo_requests.services.escalation import check_escalations
 
 
 def test_escalate_request_most_recent(
@@ -19,16 +29,16 @@ def test_escalate_request_most_recent(
     assert mail
 
     creator = more_users[0]
-    receiver = more_users[1]
+    more_users[1]
 
     draft = record_service.create(creator.identity, default_record_with_workflow_json)
     request = current_oarepo_requests_service.create(
         identity=creator.identity,
         data={"payload": {"version": "1.0"}},
         request_type="publish_draft",
-        topic=draft._record,
+        topic=draft._record,  # noqa SLF001
     )
-    submit_result = current_invenio_requests_service.execute_action(
+    current_invenio_requests_service.execute_action(
         creator.identity, request.id, "submit"
     )
     id_ = request.id
@@ -98,22 +108,22 @@ def test_escalate_request_most_recent_multiple_recipients(
     }
 
     creator = more_users[0]
-    receiver = more_users[1]
+    more_users[1]
     draft = record_service.create(creator.identity, record_multiple_recipients)
     request = current_oarepo_requests_service.create(
         identity=creator.identity,
         data={"payload": {"version": "1.0"}},
         request_type="publish_draft",
-        topic=draft._record,
+        topic=draft._record,  # noqa SLF001
     )
-    submit_result = current_invenio_requests_service.execute_action(
+    current_invenio_requests_service.execute_action(
         creator.identity, request.id, "submit"
     )
     id_ = request.id
 
     # check before escalation
     request = current_oarepo_requests_service.read(identity=creator.identity, id_=id_)
-    assert request.data["receiver"] == {"multiple": '[{"user": "2"}, {"user": "1"}]'}
+    assert request.data["receiver"] == {"multiple": '[{"user": "1"}, {"user": "2"}]'}
 
     with mail.record_messages() as outbox:
         # escalate
@@ -133,7 +143,7 @@ def test_escalate_request_most_recent_multiple_recipients(
 
     # nothing should change, first escalation period is 2 seconds
     request = current_oarepo_requests_service.read(identity=creator.identity, id_=id_)
-    assert request.data["receiver"] == {"multiple": '[{"user": "2"}, {"user": "1"}]'}
+    assert request.data["receiver"] == {"multiple": '[{"user": "1"}, {"user": "2"}]'}
 
     # no escalation -> no event in database
     results = (
@@ -170,8 +180,6 @@ def test_escalate_request_most_recent_multiple_recipients(
         )
         assert len(results) == 1
         assert len(outbox) == 2
-        print(f"{outbox[0].recipients=}")
-        print(f"{outbox[1].recipients=}")
 
         # OR in case of first notification is slower than other, dont know if this can happen, but to be sure
         assert (
@@ -197,15 +205,15 @@ def test_escalate_request_most_recent_2(
     assert mail
 
     creator = more_users[0]
-    receiver = more_users[1]
+    more_users[1]
     draft = record_service.create(creator.identity, default_record_with_workflow_json)
     request = current_oarepo_requests_service.create(
         identity=creator.identity,
         data={"payload": {"version": "1.0"}},
         request_type="publish_draft",
-        topic=draft._record,
+        topic=draft._record,  # noqa SLF001
     )
-    submit_result = current_invenio_requests_service.execute_action(
+    current_invenio_requests_service.execute_action(
         creator.identity, request.id, "submit"
     )
     id_ = request.id
@@ -265,7 +273,7 @@ def test_escalate_request_most_recent_2_multiple_recipients(
     assert mail
 
     creator = more_users[0]
-    receiver = more_users[1]
+    more_users[1]
 
     record_multiple_recipients = {
         **default_record_json,
@@ -277,9 +285,9 @@ def test_escalate_request_most_recent_2_multiple_recipients(
         identity=creator.identity,
         data={"payload": {"version": "1.0"}},
         request_type="publish_draft",
-        topic=draft._record,
+        topic=draft._record,  # noqa SLF001
     )
-    submit_result = current_invenio_requests_service.execute_action(
+    current_invenio_requests_service.execute_action(
         creator.identity, request.id, "submit"
     )
     id_ = request.id
@@ -313,7 +321,7 @@ def test_escalate_request_most_recent_2_multiple_recipients(
 
     # check before escalation
     request = current_oarepo_requests_service.read(identity=creator.identity, id_=id_)
-    assert request.data["receiver"] == {"multiple": '[{"user": "2"}, {"user": "1"}]'}
+    assert request.data["receiver"] == {"multiple": '[{"user": "1"}, {"user": "2"}]'}
 
     # no escalation -> no event in database
     results = (
@@ -369,15 +377,15 @@ def test_escalate_request_most_recent_3(
     assert mail
 
     creator = more_users[0]
-    receiver = more_users[1]
+    more_users[1]
     draft = record_service.create(creator.identity, default_record_with_workflow_json)
     request = current_oarepo_requests_service.create(
         identity=creator.identity,
         data={"payload": {"version": "1.0"}},
         request_type="publish_draft",
-        topic=draft._record,
+        topic=draft._record,  # noqa SLF001
     )
-    submit_result = current_invenio_requests_service.execute_action(
+    current_invenio_requests_service.execute_action(
         creator.identity, request.id, "submit"
     )
     id_ = request.id
@@ -437,7 +445,7 @@ def test_escalate_request_most_recent_3_multiple_recipients(
     mail = app.extensions.get("mail")
     assert mail
     creator = more_users[0]
-    receiver = more_users[1]
+    more_users[1]
 
     record_multiple_recipients = {
         **default_record_json,
@@ -449,9 +457,9 @@ def test_escalate_request_most_recent_3_multiple_recipients(
         identity=creator.identity,
         data={"payload": {"version": "1.0"}},
         request_type="publish_draft",
-        topic=draft._record,
+        topic=draft._record,  # noqa SLF001
     )
-    submit_result = current_invenio_requests_service.execute_action(
+    current_invenio_requests_service.execute_action(
         creator.identity, request.id, "submit"
     )
     id_ = request.id
@@ -463,7 +471,7 @@ def test_escalate_request_most_recent_3_multiple_recipients(
 
     # check before escalation
     request = current_oarepo_requests_service.read(identity=creator.identity, id_=id_)
-    assert request.data["receiver"] == {"multiple": '[{"user": "2"}, {"user": "1"}]'}
+    assert request.data["receiver"] == {"multiple": '[{"user": "1"}, {"user": "2"}]'}
 
     # sanity check
     results = (
@@ -520,15 +528,15 @@ def test_escalate_request_already_processed(
     assert mail
 
     creator = more_users[0]
-    receiver = more_users[1]
+    more_users[1]
     draft = record_service.create(creator.identity, default_record_with_workflow_json)
     request = current_oarepo_requests_service.create(
         identity=creator.identity,
         data={"payload": {"version": "1.0"}},
         request_type="publish_draft",
-        topic=draft._record,
+        topic=draft._record,  # noqa SLF001
     )
-    submit_result = current_invenio_requests_service.execute_action(
+    current_invenio_requests_service.execute_action(
         creator.identity, request.id, "submit"
     )
     id_ = request.id
@@ -582,7 +590,7 @@ def test_escalate_request_already_processed_multiple_recipients(
     from oarepo_requests.proxies import current_oarepo_requests_service
 
     creator = more_users[0]
-    receiver = more_users[1]
+    more_users[1]
     mail = app.extensions.get("mail")
     assert mail
 
@@ -596,9 +604,9 @@ def test_escalate_request_already_processed_multiple_recipients(
         identity=creator.identity,
         data={"payload": {"version": "1.0"}},
         request_type="publish_draft",
-        topic=draft._record,
+        topic=draft._record,  # noqa SLF001
     )
-    submit_result = current_invenio_requests_service.execute_action(
+    current_invenio_requests_service.execute_action(
         creator.identity, request.id, "submit"
     )
     id_ = request.id
@@ -683,15 +691,15 @@ def test_escalate_request_already_processed_2(
     assert mail
 
     creator = more_users[0]
-    receiver = more_users[1]
+    more_users[1]
     draft = record_service.create(creator.identity, default_record_with_workflow_json)
     request = current_oarepo_requests_service.create(
         identity=creator.identity,
         data={"payload": {"version": "1.0"}},
         request_type="publish_draft",
-        topic=draft._record,
+        topic=draft._record,  # noqa SLF001
     )
-    submit_result = current_invenio_requests_service.execute_action(
+    current_invenio_requests_service.execute_action(
         creator.identity, request.id, "submit"
     )
     id_ = request.id

@@ -19,17 +19,17 @@ if TYPE_CHECKING:
     from oarepo_requests.resources.oarepo.resource import OARepoRequestsResource
     from oarepo_requests.services.oarepo.service import OARepoRequestsService
 
-current_oarepo_requests: OARepoRequests = LocalProxy(  # type: ignore
+current_oarepo_requests: OARepoRequests = LocalProxy(  # type: ignore[assignment]
     lambda: current_app.extensions["oarepo-requests"]
 )
-current_oarepo_requests_service: OARepoRequestsService = LocalProxy(  # type: ignore
+current_oarepo_requests_service: OARepoRequestsService = LocalProxy(  # type: ignore[assignment]
     lambda: current_app.extensions["oarepo-requests"].requests_service
 )
-current_oarepo_requests_resource: OARepoRequestsResource = LocalProxy(  # type: ignore
+current_oarepo_requests_resource: OARepoRequestsResource = LocalProxy(  # type: ignore[assignment]
     lambda: current_app.extensions["oarepo-requests"].requests_resource
 )
 
-current_notification_recipients_resolvers_registry = LocalProxy(  # type: ignore
+current_notification_recipients_resolvers_registry = LocalProxy(  # type: ignore[assignment]
     lambda: current_app.extensions[
         "oarepo-requests"
     ].notification_recipients_resolvers_registry

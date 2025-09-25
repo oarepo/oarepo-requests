@@ -5,6 +5,9 @@
 # modify it under the terms of the MIT License; see LICENSE file for more
 # details.
 #
+from __future__ import annotations
+
+
 def test_no_recipient(
     logged_client,
     users,
@@ -23,7 +26,7 @@ def test_no_recipient(
         urls["BASE_URL_REQUESTS"],
         json={
             "request_type": "approve_draft",
-            "topic": {"thesis_draft": draft1["id"]},
+            "topic": {"requests_test_draft": draft1["id"]},
         },
     )
     assert resp_request_create.status_code == 201

@@ -6,3 +6,5 @@
 # details.
 #
 """OARepo requests service."""
+
+from __future__ import annotations

@@ -9,18 +9,18 @@
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Any
+from typing import TYPE_CHECKING, Any, ClassVar, override
 
 import marshmallow as ma
 from invenio_drafts_resources.resources.records.errors import DraftNotCreatedError
+from invenio_i18n import gettext
+from invenio_i18n import lazy_gettext as _
 from invenio_records_resources.services.errors import PermissionDeniedError
 from invenio_records_resources.services.uow import RecordCommitOp, UnitOfWork
 from invenio_requests.proxies import current_requests_service
 from invenio_requests.records.api import Request
-from oarepo_runtime.datastreams.utils import get_record_service_for_record_class
-from invenio_i18n import gettext, lazy_gettext as _
+from oarepo_runtime.proxies import current_runtime
 from oarepo_runtime.records.drafts import has_draft
-from typing_extensions import override
 
 from oarepo_requests.actions.edit_topic import EditTopicAcceptAction
 
@@ -47,7 +47,7 @@ class EditPublishedRecordRequestType(NonDuplicableOARepoRequestType):
 
     type_id = "edit_published_record"
     name = _("Edit metadata")
-    payload_schema = {
+    payload_schema: ClassVar[dict[str, ma.fields.Field]] = {
         "draft_record.links.self": ma.fields.Str(
             attribute="draft_record:links:self",
             data_key="draft_record:links:self",
@@ -59,22 +59,26 @@ class EditPublishedRecordRequestType(NonDuplicableOARepoRequestType):
     }
 
     def get_ui_redirect_url(self, request: Request, ctx: dict) -> str:
+        """Return URL to redirect ui after the request action is executed."""
         if request.status == "accepted":
-            service = get_record_service_for_record_class(request.topic.record_cls)
+            service = current_runtime.get_record_service_for_record_class(
+                request.topic.record_cls
+            )
             try:
                 result_item = service.read_draft(
                     ctx["identity"], request.topic._parse_ref_dict_id()
-                )
+                )  # noqa SLF001
             except (PermissionDeniedError, DraftNotCreatedError):
                 return None
 
             if "edit_html" in result_item["links"]:
                 return result_item["links"]["edit_html"]
-            elif "self_html" in result_item["links"]:
+            if "self_html" in result_item["links"]:
                 return result_item["links"]["self_html"]
+        return None
 
     @classproperty
-    def available_actions(cls) -> dict[str, type[RequestAction]]:
+    def available_actions(cls) -> dict[str, type[RequestAction]]:  # noqa N805
         """Return available actions for the request type."""
         return {
             **super().available_actions,
@@ -120,7 +124,9 @@ class EditPublishedRecordRequestType(NonDuplicableOARepoRequestType):
         if topic.is_draft:
             raise ValueError(gettext("Trying to create edit request on draft record"))
         if has_draft(topic):
-            raise ValueError(gettext("Trying to create edit request on record with draft"))
+            raise ValueError(
+                gettext("Trying to create edit request on record with draft")
+            )
         super().can_create(identity, data, receiver, topic, creator, *args, **kwargs)
 
     def topic_change(self, request: Request, new_topic: dict, uow: UnitOfWork) -> None:
@@ -163,15 +169,13 @@ class EditPublishedRecordRequestType(NonDuplicableOARepoRequestType):
 
         if not request:
             return gettext(
-                "Request edit access to the record. "
-                "You will be notified about the decision by email."
+                "Request edit access to the record. You will be notified about the decision by email."
             )
         match request.status:
             case "submitted":
                 if request_identity_matches(request.created_by, identity):
                     return gettext(
-                        "Edit access requested. You will be notified about "
-                        "the decision by email."
+                        "Edit access requested. You will be notified about the decision by email."
                     )
                 if request_identity_matches(request.receiver, identity):
                     return gettext(
@@ -180,6 +184,5 @@ class EditPublishedRecordRequestType(NonDuplicableOARepoRequestType):
                 return gettext("Edit access requested.")
             case _:
                 return gettext(
-                    "Request edit access to the record. "
-                    "You will be notified about the decision by email."
+                    "Request edit access to the record. You will be notified about the decision by email."
                 )

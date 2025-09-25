@@ -9,14 +9,14 @@
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Any, Literal
+from typing import TYPE_CHECKING, Any, ClassVar, Literal, override
 
 import marshmallow as ma
 from invenio_i18n import gettext
 from invenio_i18n import lazy_gettext as _
 from invenio_records_resources.services.uow import RecordCommitOp, UnitOfWork
 from invenio_requests.proxies import current_requests_service
-from oarepo_runtime.datastreams.utils import get_record_service_for_record
+from oarepo_runtime.proxies import current_runtime
 
 from oarepo_requests.actions.publish_draft import (
     PublishDraftAcceptAction,
@@ -40,7 +40,6 @@ if TYPE_CHECKING:
 from invenio_access.permissions import system_identity
 from invenio_requests.records.api import Request
 
-from oarepo_requests.typing import EntityReference
 from oarepo_requests.utils import get_requests_service_for_records_service
 
 from ..errors import UnresolvedRequestsError
@@ -49,7 +48,7 @@ from ..errors import UnresolvedRequestsError
 class PublishRequestType(NonDuplicableOARepoRequestType):
     """Publish draft request type."""
 
-    payload_schema = {
+    payload_schema: ClassVar[dict[str, ma.fields.Field]] = {
         "published_record.links.self": ma.fields.Str(
             attribute="published_record:links:self",
             data_key="published_record:links:self",
@@ -61,7 +60,7 @@ class PublishRequestType(NonDuplicableOARepoRequestType):
     }
 
     @classproperty
-    def available_actions(cls) -> dict[str, type[RequestAction]]:
+    def available_actions(cls) -> dict[str, type[RequestAction]]:  # noqa N805
         """Return available actions for the request type."""
         return {
             **super().available_actions,
@@ -74,13 +73,14 @@ class PublishRequestType(NonDuplicableOARepoRequestType):
     receiver_can_be_none = True
     allowed_topic_ref_types = ModelRefTypes(published=True, draft=True)
 
-    editable = False  # type: ignore
+    editable = False
 
     def assert_no_pending_requests(
         self,
         topic: Record,
     ) -> None:
-        topic_service = get_record_service_for_record(topic)
+        """Assert that there are no pending requests on the topic."""
+        topic_service = current_runtime.get_record_service_for_record(topic)
 
         request_service = get_requests_service_for_records_service(
             topic_service
@@ -89,7 +89,7 @@ class PublishRequestType(NonDuplicableOARepoRequestType):
             system_identity, topic.pid.pid_value
         )
 
-        for result in requests._results:
+        for result in requests._results:  # noqa SLF001
             # note: we can not use solely the result.is_open because changes may not be committed yet
             # to opensearch index. That's why we need to get the record from DB and re-check.
             if (
@@ -103,6 +103,7 @@ class PublishRequestType(NonDuplicableOARepoRequestType):
             ):
                 raise UnresolvedRequestsError(action=str(self.name))
 
+    @override
     def can_create(
         self,
         identity: Identity,
@@ -131,7 +132,7 @@ class PublishRequestType(NonDuplicableOARepoRequestType):
 
         :raises: ValidationError: if the topic is not valid
         """
-        topic_service = get_record_service_for_record(topic)
+        topic_service = current_runtime.get_record_service_for_record(topic)
         topic_service.validate_draft(identity, topic["id"])
 
         # if files support is enabled for this topic, check if there are any files
@@ -139,7 +140,7 @@ class PublishRequestType(NonDuplicableOARepoRequestType):
             can_toggle_files = topic_service.check_permission(
                 identity, "manage_files", record=topic
             )
-            draft_files = topic.files  # type: ignore
+            draft_files = topic.files
             if draft_files.enabled and not draft_files.items():
                 if can_toggle_files:
                     my_message = gettext(
@@ -151,15 +152,16 @@ class PublishRequestType(NonDuplicableOARepoRequestType):
                 raise ma.ValidationError({"files.enabled": [my_message]})
 
     @classmethod
+    @override
     def is_applicable_to(
         cls, identity: Identity, topic: Record, *args: Any, **kwargs: Any
     ) -> bool:
         """Check if the request type is applicable to the topic."""
         if not topic.is_draft:
             return False
-        super_ = super().is_applicable_to(identity, topic, *args, **kwargs)
-        return super_
+        return super().is_applicable_to(identity, topic, *args, **kwargs)
 
+    # TODO: move to superclass and only check whether it should be changed?
     def topic_change(self, request: Request, new_topic: dict, uow: UnitOfWork) -> None:
         """Change the topic of the request."""
         request.topic = new_topic
@@ -168,12 +170,8 @@ class PublishRequestType(NonDuplicableOARepoRequestType):
     @classmethod
     def topic_type(
         cls, topic: Record
-    ) -> (
-        Literal["initial"]
-        | Literal["new_version"]
-        | Literal["metadata"]
-        | Literal["published"]
-    ):
+    ) -> Literal["initial", "new_version", "metadata", "published"]:
+        """Return publish status type of the topic."""
         index = topic.versions.index
         is_latest = topic.versions.is_latest
         is_draft = topic.is_draft
@@ -183,6 +181,6 @@ class PublishRequestType(NonDuplicableOARepoRequestType):
 
         if index == 1 and not is_latest:
             return "initial"
-        elif index > 1 and not is_latest:
+        if index > 1 and not is_latest:
             return "new_version"
         return "metadata"

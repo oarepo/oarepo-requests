@@ -11,19 +11,22 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING, Any
 
-from oarepo_runtime.datastreams.utils import get_record_service_for_record
-from oarepo_requests.actions.record_snapshot_mixin import RecordSnapshotMixin
+from oarepo_runtime.proxies import current_runtime
+
+
 from .generic import AddTopicLinksOnPayloadMixin, OARepoAcceptAction
 
 if TYPE_CHECKING:
     from flask_principal import Identity
-    from .components import RequestActionState
     from invenio_drafts_resources.records import Record
     from invenio_records_resources.services.uow import UnitOfWork
-    from invenio_requests.customizations import RequestType
 
+    from .components import RequestActionState
 
-class NewVersionAcceptAction(AddTopicLinksOnPayloadMixin, RecordSnapshotMixin, OARepoAcceptAction):
+# TODO: snapshot
+class NewVersionAcceptAction(
+    AddTopicLinksOnPayloadMixin, OARepoAcceptAction
+):
     """Accept creation of a new version of a published record."""
 
     self_link = "draft_record:links:self"
@@ -38,12 +41,14 @@ class NewVersionAcceptAction(AddTopicLinksOnPayloadMixin, RecordSnapshotMixin, O
         **kwargs: Any,
     ) -> Record:
         """Apply the action, creating a new version of the record."""
-        topic_service = get_record_service_for_record(state.topic)
+        topic_service = current_runtime.get_record_service_for_record(state.topic)
         if not topic_service:
             raise KeyError(f"topic {state.topic} service not found")
 
-        new_version_topic = topic_service.new_version(identity, state.topic["id"], uow=uow)
-        state.topic = new_version_topic._record
+        new_version_topic = topic_service.new_version(
+            identity, state.topic["id"], uow=uow
+        )
+        state.topic = new_version_topic._record  # noqa SLF001
         if (
             "payload" in self.request
             and "keep_files" in self.request["payload"]
@@ -55,6 +60,4 @@ class NewVersionAcceptAction(AddTopicLinksOnPayloadMixin, RecordSnapshotMixin, O
             self.request["payload"] = {}
         self.request["payload"]["draft_record:id"] = new_version_topic["id"]
 
-        return super().apply(
-            identity, state, uow, *args, **kwargs
-        )
+        return super().apply(identity, state, uow, *args, **kwargs)

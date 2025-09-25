@@ -9,12 +9,12 @@
 
 from __future__ import annotations
 
+from typing import ClassVar
+
 import importlib_metadata
 from flask_resources import ResponseHandler
 from invenio_records_resources.services.base.config import ConfiguratorMixin
 from invenio_requests.resources import RequestsResourceConfig
-
-from oarepo_requests.resources.ui import OARepoRequestsUIJSONSerializer
 
 
 class OARepoRequestsResourceConfig(RequestsResourceConfig, ConfiguratorMixin):
@@ -22,7 +22,7 @@ class OARepoRequestsResourceConfig(RequestsResourceConfig, ConfiguratorMixin):
 
     blueprint_name = "oarepo-requests"
     url_prefix = "/requests"
-    routes = {
+    routes: ClassVar[dict[str, str]] = {
         **RequestsResourceConfig.routes,
         "list": "/",
         "list-extended": "/extended",
@@ -33,9 +33,7 @@ class OARepoRequestsResourceConfig(RequestsResourceConfig, ConfiguratorMixin):
     def response_handlers(self) -> dict[str, ResponseHandler]:
         """Response handlers for the extended requests API."""
         return {
-            "application/vnd.inveniordm.v1+json": ResponseHandler(
-                OARepoRequestsUIJSONSerializer()
-            ),
+            # TODO: UI serialization
             **super().response_handlers,
         }
 

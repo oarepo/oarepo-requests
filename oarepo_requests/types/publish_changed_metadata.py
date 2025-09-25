@@ -9,10 +9,10 @@
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Any
+from typing import TYPE_CHECKING, Any, override
 
-from invenio_i18n import gettext, lazy_gettext as _
-from typing_extensions import override
+from invenio_i18n import gettext
+from invenio_i18n import lazy_gettext as _
 
 from .publish_base import PublishRequestType
 
@@ -80,7 +80,8 @@ class PublishChangedMetadataRequestType(PublishRequestType):
             topic=topic,
             request=request,
             create=gettext(
-                "By submitting the changed metadata for review you are requesting the publication of the changed metadata. "
+                "By submitting the changed metadata for review you are requesting the publication of the "
+                "changed metadata. "
                 "The draft will become locked and no further changes will be possible until the request "
                 "is accepted or declined. You will be notified about the decision by email."
             ),

@@ -16,8 +16,8 @@ from invenio_records_resources.services import ConditionalLink
 from invenio_records_resources.services.base.links import Link, LinksTemplate
 from invenio_requests.services.schemas import GenericRequestSchema
 from marshmallow import fields
-from oarepo_runtime.datastreams.utils import get_record_service_for_record
-from oarepo_runtime.records import is_published_record
+from oarepo_runtime.proxies import current_runtime
+from oarepo_runtime.services.config.link_conditions import is_published_record
 
 
 def get_links_schema() -> ma.fields.Dict:
@@ -37,7 +37,7 @@ class RequestTypeSchema(ma.Schema):
     """Links to the request type."""
 
     @ma.post_dump
-    def _create_link(self, data: dict, **kwargs: Any) -> dict:
+    def _create_link(self, data: dict, **kwargs: Any) -> dict:  # noqa ARG002
         if "links" in data:
             return data
         if "record" not in self.context:
@@ -45,11 +45,10 @@ class RequestTypeSchema(ma.Schema):
                 "record not in context for request types serialization"
             )
         type_id = data["type_id"]
-        # current_request_type_registry.lookup(type_id, quiet=True)
         record = self.context["record"]
-        service = get_record_service_for_record(record)
+        service = current_runtime.get_record_service_for_record(record)
         link = ConditionalLink(
-            cond=is_published_record,
+            cond=is_published_record(),
             if_=Link(f"{{+api}}{service.config.url_prefix}{{id}}/requests/{type_id}"),
             else_=Link(
                 f"{{+api}}{service.config.url_prefix}{{id}}/draft/requests/{type_id}"

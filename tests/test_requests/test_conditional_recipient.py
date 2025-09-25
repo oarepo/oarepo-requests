@@ -5,7 +5,11 @@
 # modify it under the terms of the MIT License; see LICENSE file for more
 # details.
 #
+from __future__ import annotations
+
+
 def test_conditional_receiver_creator_matches(
+    requests_model,
     logged_client,
     users,
     urls,
@@ -13,8 +17,8 @@ def test_conditional_receiver_creator_matches(
     draft_factory,
     search_clear,
 ):
-    # user[0] is creator, user[1] is receiver
-    # user[0] is not a creator, user[2] is receiver
+    # /for mypy - this is not code/ user[0] is creator, user[1] is receiver
+    # /for mypy - this is not code/ user[0] is not a creator, user[2] is receiver
 
     creator = users[0]
     assert creator.id == "1"
@@ -29,6 +33,7 @@ def test_conditional_receiver_creator_matches(
 
 
 def test_conditional_receiver_creator_does_not_match(
+    requests_model,
     logged_client,
     users,
     urls,
@@ -36,8 +41,8 @@ def test_conditional_receiver_creator_does_not_match(
     draft_factory,
     search_clear,
 ):
-    # user[0] is creator, user[1] is receiver
-    # user[0] is not a creator, user[2] is receiver
+    # /for mypy - this is not code/ user[0] is creator, user[1] is receiver
+    # /for mypy - this is not code/ user[0] is not a creator, user[2] is receiver
 
     creator = users[1]
     assert creator.id != 1

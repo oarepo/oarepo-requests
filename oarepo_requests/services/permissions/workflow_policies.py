@@ -35,13 +35,13 @@ class RequestBasedWorkflowPermissions(DefaultWorkflowPermissions):
 
     """
 
-    can_delete = DefaultWorkflowPermissions.can_delete + [RequestActive()]
-    can_publish = [RequestActive()]
-    can_edit = [RequestActive()]
-    can_new_version = [RequestActive()]
+    can_delete = (*DefaultWorkflowPermissions.can_delete, RequestActive())
+    can_publish = (RequestActive(),)
+    can_edit = (RequestActive(),)
+    can_new_version = (RequestActive(),)
 
 
 __all__ = (
-    "RequestBasedWorkflowPermissions",
     "CreatorsFromWorkflowRequestsPermissionPolicy",
+    "RequestBasedWorkflowPermissions",
 )

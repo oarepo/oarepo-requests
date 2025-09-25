@@ -9,24 +9,24 @@
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Any
+from typing import TYPE_CHECKING, Any, ClassVar, override
 
 import marshmallow as ma
 from invenio_drafts_resources.resources.records.errors import DraftNotCreatedError
+from invenio_i18n import gettext
+from invenio_i18n import lazy_gettext as _
+from invenio_pidstore.errors import PIDDoesNotExistError
 from invenio_records_resources.services.errors import PermissionDeniedError
 from invenio_records_resources.services.uow import RecordCommitOp, UnitOfWork
 from invenio_requests.proxies import current_requests_service
 from marshmallow.validate import OneOf
-from oarepo_runtime.datastreams.utils import get_record_service_for_record_class
-from invenio_i18n import gettext, lazy_gettext as _
+from oarepo_runtime.proxies import current_runtime
 from oarepo_runtime.records.drafts import has_draft
-from typing_extensions import override
 
 from ..actions.new_version import NewVersionAcceptAction
 from ..utils import classproperty, is_auto_approved, request_identity_matches
 from .generic import NonDuplicableOARepoRequestType
 from .ref_types import ModelRefTypes
-from invenio_pidstore.errors import PIDDoesNotExistError
 
 if TYPE_CHECKING:
     from flask_babel.speaklater import LazyString
@@ -37,13 +37,15 @@ if TYPE_CHECKING:
 
     from oarepo_requests.typing import EntityReference
 
+    from ..utils import JsonValue
+
 
 class NewVersionRequestType(NonDuplicableOARepoRequestType):
     """Request type for requesting new version of a published record."""
 
     type_id = "new_version"
     name = _("New Version")
-    payload_schema = {
+    payload_schema: ClassVar[dict[str, ma.fields.Field]] = {
         "draft_record.links.self": ma.fields.Str(
             attribute="draft_record:links:self",
             data_key="draft_record:links:self",
@@ -60,8 +62,11 @@ class NewVersionRequestType(NonDuplicableOARepoRequestType):
     }
 
     def get_ui_redirect_url(self, request: Request, ctx: dict) -> str:
+        """Return URL to redirect ui after the request action is executed."""
         if request.status == "accepted":
-            service = get_record_service_for_record_class(request.topic.record_cls)
+            service = current_runtime.get_record_service_for_record_class(
+                request.topic.record_cls
+            )
             try:
                 result_item = service.read_draft(
                     ctx["identity"], request["payload"]["draft_record:id"]
@@ -71,11 +76,13 @@ class NewVersionRequestType(NonDuplicableOARepoRequestType):
 
             if "edit_html" in result_item["links"]:
                 return result_item["links"]["edit_html"]
-            elif "self_html" in result_item["links"]:
+            if "self_html" in result_item["links"]:
                 return result_item["links"]["self_html"]
+        return None
 
     @classproperty
-    def available_actions(cls) -> dict[str, type[RequestAction]]:
+    @override
+    def available_actions(cls) -> dict[str, type[RequestAction]]:  # noqa N805
         """Return available actions for the request type."""
         return {
             **super().available_actions,
@@ -86,14 +93,15 @@ class NewVersionRequestType(NonDuplicableOARepoRequestType):
     allowed_topic_ref_types = ModelRefTypes(published=True, draft=True)
     editable = False
 
-    form = {
+    form: ClassVar[JsonValue] = {
         "field": "keep_files",
         "ui_widget": "Dropdown",
         "props": {
             "label": _("Keep files"),
             "placeholder": _("Yes or no"),
             "description": _(
-                "If you choose yes, the current record's files will be linked to the new version of the record. Then you will be able to add/remove files in the form."
+                "If you choose yes, the current record's files will be linked to the new version of the record. "
+                "Then you will be able to add/remove files in the form."
             ),
             "options": [
                 {"id": "yes", "title_l10n": _("Yes")},
@@ -126,9 +134,13 @@ class NewVersionRequestType(NonDuplicableOARepoRequestType):
     ) -> None:
         """Check if the request can be created."""
         if topic.is_draft:
-            raise ValueError(gettext("Trying to create new version request on draft record"))
+            raise ValueError(
+                gettext("Trying to create new version request on draft record")
+            )
         if has_draft(topic):
-            raise ValueError(gettext("Trying to create edit request on record with draft"))
+            raise ValueError(
+                gettext("Trying to create edit request on record with draft")
+            )
         super().can_create(identity, data, receiver, topic, creator, *args, **kwargs)
 
     def topic_change(self, request: Request, new_topic: dict, uow: UnitOfWork) -> None:
@@ -157,7 +169,7 @@ class NewVersionRequestType(NonDuplicableOARepoRequestType):
                 return gettext("Request new version access")
 
     @override
-    def stateful_description(
+    def stateful_description(  # noqa PLR0911
         self,
         identity: Identity,
         *,
@@ -186,7 +198,9 @@ class NewVersionRequestType(NonDuplicableOARepoRequestType):
                         "You have been asked to approve the request to update the record. "
                         "You can approve or reject the request."
                     )
-                return gettext("Permission to update record (including files) requested. ")
+                return gettext(
+                    "Permission to update record (including files) requested. "
+                )
             case _:
                 if request_identity_matches(request.created_by, identity):
                     return gettext("Submit request to get edit access to the record.")

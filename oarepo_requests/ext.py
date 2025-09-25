@@ -11,22 +11,24 @@ from __future__ import annotations
 
 import dataclasses
 from functools import cached_property
-from typing import TYPE_CHECKING, Callable
+from typing import TYPE_CHECKING
 
 import importlib_metadata
 from deepmerge import conservative_merger
 from invenio_base.utils import obj_or_import_string
 from invenio_requests.proxies import current_events_service
 
+from oarepo_requests.cli import oarepo_requests  # noqa
 from oarepo_requests.resources.events.config import OARepoRequestsCommentsResourceConfig
 from oarepo_requests.resources.events.resource import OARepoRequestsCommentsResource
 from oarepo_requests.resources.oarepo.config import OARepoRequestsResourceConfig
 from oarepo_requests.resources.oarepo.resource import OARepoRequestsResource
 from oarepo_requests.services.oarepo.config import OARepoRequestsServiceConfig
 from oarepo_requests.services.oarepo.service import OARepoRequestsService
-from oarepo_requests.cli import oarepo_requests # noqa
 
 if TYPE_CHECKING:
+    from collections.abc import Callable
+
     from flask import Flask
     from flask_principal import Identity
     from invenio_records_resources.records.api import Record
@@ -42,7 +44,6 @@ class ServiceConfigs:
     """Configurations for services provided by this package."""
 
     requests: OARepoRequestsServiceConfig
-    # request_events = RequestEventsServiceConfig.build(app)
 
 
 class OARepoRequests:
@@ -99,7 +100,6 @@ class OARepoRequests:
         :param creator: Creator of the request.
         :param data: Payload of the request.
         """
-
         return obj_or_import_string(
             self.app.config["OAREPO_REQUESTS_DEFAULT_RECEIVER"]
         )(
@@ -227,14 +227,13 @@ class OARepoRequests:
         )
 
         app.config.setdefault("NOTIFICATIONS_ENTITY_RESOLVERS", [])
-        app.config["NOTIFICATIONS_ENTITY_RESOLVERS"] += config.NOTIFICATIONS_ENTITY_RESOLVERS
+        app.config["NOTIFICATIONS_ENTITY_RESOLVERS"] += (
+            config.NOTIFICATIONS_ENTITY_RESOLVERS
+        )
 
-        app_notification_builders = app.config.setdefault( # can't set default config directly because it might be initialized to {} in invenio-notifications
-            "NOTIFICATIONS_BUILDERS", {}
-        )
-        app_notification_backends = app.config.setdefault(
-            "NOTIFICATIONS_BACKENDS", {}
-        )
+        # can't set default config directly because it might be initialized to {} in invenio-notifications
+        app_notification_builders = app.config.setdefault("NOTIFICATIONS_BUILDERS", {})
+        app_notification_backends = app.config.setdefault("NOTIFICATIONS_BACKENDS", {})
 
         app.config["NOTIFICATIONS_BUILDERS"] = conservative_merger.merge(
             app_notification_builders, config.NOTIFICATIONS_BUILDERS
@@ -256,7 +255,6 @@ def finalize_app(app: Flask) -> None:
     # Register services - cannot be done in extension because
     # Invenio-Records-Resources might not have been initialized.
     rr_ext = app.extensions["invenio-records-resources"]
-    # idx_ext = app.extensions["invenio-indexer"]
     ext = app.extensions["oarepo-requests"]
 
     # services
@@ -265,19 +263,22 @@ def finalize_app(app: Flask) -> None:
         service_id=ext.requests_service.config.service_id,
     )
 
-    # todo i have to do this cause there is bug in invenio-requests for events
+    # TODO: i have to do this cause there is bug in invenio-requests for events
     # but imo this is better than entrypoints
-    for type in app.config["REQUESTS_REGISTERED_EVENT_TYPES"]:
-        current_event_type_registry.register_type(type)
+    for type_ in app.config["REQUESTS_REGISTERED_EVENT_TYPES"]:
+        current_event_type_registry.register_type(type_)
 
     ext.notification_recipients_resolvers_registry = app.config[
         "NOTIFICATION_RECIPIENTS_RESOLVERS"
     ]
 
-    invenio_notifications = app.extensions["invenio-notifications"] # initialized during ext in invenio notifications, our config might not be loaded
+    invenio_notifications = app.extensions[
+        "invenio-notifications"
+    ]  # initialized during ext in invenio notifications, our config might not be loaded
     notification_resolvers = {
         er.type_key: er for er in app.config["NOTIFICATIONS_ENTITY_RESOLVERS"]
     }
     invenio_notifications.entity_resolvers = notification_resolvers
-    invenio_notifications.init_manager(app) # race condition between config init and original init_manager
-
+    invenio_notifications.init_manager(
+        app
+    )  # race condition between config init and original init_manager

@@ -6,6 +6,7 @@
 # details.
 #
 """Base types for requests."""
+# TODO: move to runtime?
 
 from __future__ import annotations
 

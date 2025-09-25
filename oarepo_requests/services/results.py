@@ -13,10 +13,9 @@ from typing import TYPE_CHECKING, Any, cast
 
 from invenio_records_resources.services import LinksTemplate
 from invenio_records_resources.services.errors import PermissionDeniedError
-from oarepo_runtime.datastreams.utils import get_record_service_for_record
-from oarepo_runtime.services.results import RecordList, ResultsComponent
+from oarepo_runtime.proxies import current_runtime
+from oarepo_runtime.services.results import RecordList, ResultComponent
 
-from oarepo_requests.services.draft.service import DraftRecordRequestsService
 from oarepo_requests.services.schema import RequestTypeSchema
 from oarepo_requests.utils import (
     allowed_request_types_for_record,
@@ -31,7 +30,7 @@ if TYPE_CHECKING:
     from invenio_requests.customizations.request_types import RequestType
 
 
-class RequestTypesComponent(ResultsComponent):
+class RequestTypesComponent(ResultComponent):
     """Component for expanding request types."""
 
     def update_data(
@@ -49,7 +48,7 @@ class RequestTypesComponent(ResultsComponent):
 
 def serialize_request_types(
     request_types: dict[str, RequestType], identity: Identity, record: Record
-) -> list[dict]:
+) -> list[RequestTypeSchema]:
     """Serialize request types.
 
     :param request_types: Request types to serialize.
@@ -57,29 +56,15 @@ def serialize_request_types(
     :param record: Record for which the request types are serialized.
     :return: List of serialized request types.
     """
-    request_types_list = []
-    for request_type in request_types.values():
-        request_types_list.append(
-            serialize_request_type(request_type, identity, record)
+    return [
+        RequestTypeSchema(context={"identity": identity, "record": record}).dump(
+            request_type
         )
-    return request_types_list
+        for request_type in request_types.values()
+    ]
 
 
-def serialize_request_type(
-    request_type: RequestType, identity: Identity, record: Record
-) -> dict:
-    """Serialize a request type.
-
-    :param request_type: Request type to serialize.
-    :param identity: Identity of the caller.
-    :param record: Record for which the request type is serialized.
-    """
-    return RequestTypeSchema(context={"identity": identity, "record": record}).dump(
-        request_type
-    )
-
-
-class RequestsComponent(ResultsComponent):
+class RequestsComponent(ResultComponent):
     """Component for expanding requests on a record."""
 
     def update_data(
@@ -90,10 +75,10 @@ class RequestsComponent(ResultsComponent):
             return
 
         service = get_requests_service_for_records_service(
-            get_record_service_for_record(record)
+            current_runtime.get_record_service_for_record(record)
         )
         reader = (
-            cast(DraftRecordRequestsService, service).search_requests_for_draft
+            cast("DraftRecordRequestsService", service).search_requests_for_draft
             if getattr(record, "is_draft", False)
             else service.search_requests_for_record
         )
@@ -127,7 +112,7 @@ class RequestTypesList(RecordList):
             self._identity, self._record
         )
         links_tpl = LinksTemplate(
-            self._links_tpl._links,
+            self._links_tpl._links,  # noqa SLF001
             context={
                 **{f"record_link_{k}": v for k, v in rendered_record_links.items()}
             },
@@ -149,10 +134,10 @@ class RequestTypesList(RecordList):
         for hit in self._results:
             # Project the record
             projection = self._schema(
-                context=dict(
-                    identity=self._identity,
-                    record=self._record,
-                )
+                context={
+                    "identity": self._identity,
+                    "record": self._record,
+                }
             ).dump(
                 hit,
             )
