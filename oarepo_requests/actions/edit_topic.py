@@ -11,17 +11,22 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING, Any, override
 
-from oarepo_runtime.datastreams.utils import get_record_service_for_record
-from oarepo_requests.actions.record_snapshot_mixin import RecordSnapshotMixin
+from oarepo_runtime.proxies import current_runtime
+
+
+
 from .generic import AddTopicLinksOnPayloadMixin, OARepoAcceptAction
 
 if TYPE_CHECKING:
     from flask_principal import Identity
-    from .components import RequestActionState
     from invenio_records_resources.services.uow import UnitOfWork
 
+    from .components import RequestActionState
 
-class EditTopicAcceptAction(AddTopicLinksOnPayloadMixin, RecordSnapshotMixin, OARepoAcceptAction):
+# TODO: snapshot
+class EditTopicAcceptAction(
+    AddTopicLinksOnPayloadMixin, OARepoAcceptAction
+):
     """Accept creation of a draft of a published record for editing metadata."""
 
     self_link = "draft_record:links:self"
@@ -37,8 +42,8 @@ class EditTopicAcceptAction(AddTopicLinksOnPayloadMixin, RecordSnapshotMixin, OA
         **kwargs: Any,
     ) -> None:
         """Apply the action, creating a draft of the record for editing metadata."""
-        topic_service = get_record_service_for_record(state.topic)
+        topic_service = current_runtime.get_record_service_for_record(state.topic)
         if not topic_service:
             raise KeyError(f"topic {state.topic} service not found")
-        state.topic = topic_service.edit(identity, state.topic["id"], uow=uow)._record
+        state.topic = topic_service.edit(identity, state.topic["id"], uow=uow)._record  # noqa SLF001
         super().apply(identity, state, uow, *args, **kwargs)

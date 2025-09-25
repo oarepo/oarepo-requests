@@ -5,12 +5,19 @@
 # modify it under the terms of the MIT License; see LICENSE file for more
 # details.
 #
-"""Topic update event type."""
+"""Escalation event type."""
 
 from __future__ import annotations
 
+from typing import TYPE_CHECKING
+
 from invenio_requests.customizations.event_types import EventType
 from marshmallow import fields
+
+if TYPE_CHECKING:
+    from typing import ClassVar
+
+    import marshmallow as ma
 
 
 class EscalationEventType(EventType):
@@ -18,10 +25,10 @@ class EscalationEventType(EventType):
 
     type_id = "E"
 
-    payload_schema = dict(
-        old_receiver=fields.Str(),
-        new_receiver=fields.Str(),
-        escalation=fields.Str(),
-    )
+    payload_schema: ClassVar[dict[str, ma.fields.Field]] = {
+        "old_receiver": fields.Str(),
+        "new_receiver": fields.Str(),
+        "escalation": fields.Str(),
+    }
 
     payload_required = True

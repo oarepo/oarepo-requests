@@ -5,12 +5,14 @@
 # modify it under the terms of the MIT License; see LICENSE file for more
 # details.
 #
+from __future__ import annotations
+
 from invenio_requests.records.api import RequestEvent
-from pytest_oarepo.functions import is_valid_subdict
-from thesis.records.api import ThesisDraft
-from pytest_oarepo.functions import clear_babel_context
+from pytest_oarepo.functions import clear_babel_context, is_valid_subdict
+
 
 def test_listing(
+    requests_model,
     logged_client,
     users,
     urls,
@@ -28,8 +30,8 @@ def test_listing(
     create_request_on_draft(creator.identity, draft1["id"], "publish_draft")
     create_request_on_draft(creator.identity, draft2["id"], "publish_draft")
 
-    ThesisDraft.index.refresh()
-    search = creator_client.get(
+    requests_model.Draft.index.refresh()
+    creator_client.get(
         urls["BASE_URL_REQUESTS"],
         headers={"Accept": "application/vnd.inveniordm.v1+json"},
     )
@@ -56,9 +58,7 @@ def test_read_extended(
         creator.identity, draft_id, "publish_draft"
     )
 
-    old_call = creator_client.get(
-        f"{urls['BASE_URL_REQUESTS']}{resp_request_submit['id']}"
-    )
+    creator_client.get(f"{urls['BASE_URL_REQUESTS']}{resp_request_submit['id']}")
     new_call = creator_client.get(
         f"{urls['BASE_URL_REQUESTS']}extended/{resp_request_submit['id']}",
     )
@@ -102,7 +102,7 @@ def test_update_self_link(
         link2testclient(resp_request_submit["links"]["self"]),
     )
     read_from_record = creator_client.get(
-        f"{urls['BASE_URL']}{draft1_id}/draft?expand=true",
+        f"{urls['BASE_URL']}/{draft1_id}/draft?expand=true",
     )
     link_to_extended = link2testclient(
         read_from_record.json["expanded"]["requests"][0]["links"]["self"]
@@ -142,12 +142,12 @@ def test_events_resource(
         creator.identity, draft1_id, "publish_draft"
     )
 
-    read_before = creator_client.get(
+    creator_client.get(
         link2testclient(resp_request_submit["links"]["self"]),
         headers={"Accept": "application/vnd.inveniordm.v1+json"},
     )
     read_from_record = creator_client.get(
-        f"{urls['BASE_URL']}{draft1_id}/draft?expand=true",
+        f"{urls['BASE_URL']}/{draft1_id}/draft?expand=true",
     )
 
     comments_link = link2testclient(

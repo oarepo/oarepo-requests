@@ -28,7 +28,7 @@ class FormConfigCustomFieldsComponent(UIResourceComponent):
         """Add custom fields to the form config."""
         type_ = view_args.get("request_type")
         # ignore the type as we are checking for alternatives below
-        form: dict | list = getattr(type_, "form", None)  # type: ignore
+        form: dict | list = getattr(type_, "form", None)
         if not form:
             return
 
@@ -41,9 +41,9 @@ class FormConfigCustomFieldsComponent(UIResourceComponent):
                     raise ValueError(f"Form section must be a dictionary: {it}")
                 assert "section" in it, f"Form section must contain 'section' key: {it}"
                 assert "fields" in it, f"Form section must contain 'fields' key: {it}"
-                assert isinstance(
-                    it["fields"], list
-                ), f"Form section fields must be a list: {it}"
+                assert isinstance(it["fields"], list), (
+                    f"Form section fields must be a list: {it}"
+                )
         else:
             raise ValueError(
                 f"form must be either dict containing a definition of a single field or a list of sections: '{form}'. "

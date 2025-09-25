@@ -1,3 +1,5 @@
+# noqa INP001
+
 #
 # Copyright (C) 2024 CESNET z.s.p.o.
 #
@@ -7,7 +9,7 @@
 #
 from __future__ import annotations
 
-from oarepo_runtime.i18n import lazy_gettext as _
+from invenio_i18n import _
 
 _("Create Request")
 _("Open dialog for request")

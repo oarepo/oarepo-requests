@@ -10,6 +10,7 @@
 from __future__ import annotations
 
 import inspect
+from pathlib import Path
 from typing import TYPE_CHECKING, Any
 
 import marshmallow as ma
@@ -23,16 +24,12 @@ from invenio_pidstore.errors import (
 from invenio_records_resources.proxies import current_service_registry
 from invenio_records_resources.services.errors import PermissionDeniedError
 from invenio_requests import current_request_type_registry
-from oarepo_runtime.services.custom_fields import CustomFields, InlinedCustomFields
-from oarepo_ui.resources.components import AllowedHtmlTagsComponent
-from oarepo_ui.resources.config import FormConfigResourceConfig, UIResourceConfig
-from oarepo_ui.resources.links import UIRecordLink
 
-from oarepo_requests.ui.components import (
-    ActionLabelsComponent,
-    FormConfigCustomFieldsComponent,
-    FormConfigRequestTypePropertiesComponent,
-)
+# from oarepo_runtime.services.custom_fields import CustomFields, InlinedCustomFields #TODO: temp
+from oarepo_ui.resources.components import AllowedHtmlTagsComponent
+
+# from oarepo_ui.resources.config import FormConfigResourceConfig, UIResourceConfig
+# from oarepo_ui.resources.links import UIRecordLink
 
 if TYPE_CHECKING:
     from collections.abc import Mapping
@@ -61,9 +58,8 @@ class RequestTypeSchema(ma.fields.Str):
         return current_request_type_registry.lookup(ret, quiet=True)
 
 
+"""
 class RequestsFormConfigResourceConfig(FormConfigResourceConfig):
-    """Config for the requests form config resource."""
-
     url_prefix = "/requests"
     blueprint_name = "oarepo_requests_form_config"
     components = [
@@ -76,6 +72,36 @@ class RequestsFormConfigResourceConfig(FormConfigResourceConfig):
     routes = {
         "form_config": "/configs/<request_type>",
     }
+"""
+
+# TODO: temp
+from flask_resources import ResourceConfig
+
+
+class UIResourceConfig(ResourceConfig):
+    components = None
+    template_folder = None
+
+    def get_template_folder(self):
+        if not self.template_folder:
+            return None
+
+        tf = Path(self.template_folder)
+        if not tf.is_absolute():
+            tf = (
+                Path(inspect.getfile(type(self)))
+                .parent.absolute()
+                .joinpath(tf)
+                .absolute()
+            )
+        return str(tf)
+
+    response_handlers = {"text/html": None, "application/json": None}
+    default_accept_mimetype = "text/html"
+
+    # Request parsing
+    request_read_args = {}
+    request_view_args = {}
 
 
 class RequestUIResourceConfig(UIResourceConfig):
@@ -92,9 +118,7 @@ class RequestUIResourceConfig(UIResourceConfig):
         "detail": "/<pid_value>",
     }
     ui_serializer_class = "oarepo_requests.resources.ui.OARepoRequestsUIJSONSerializer"
-    ui_links_item = {
-        "self": UIRecordLink("{+ui}{+url_prefix}/{id}"),
-    }
+    ui_links_item = {}
     components = [AllowedHtmlTagsComponent]
 
     error_handlers = {
@@ -129,12 +153,14 @@ class RequestUIResourceConfig(UIResourceConfig):
             return ret
         # try to get custom fields from the record
         for _fld_name, fld in sorted(inspect.getmembers(record_class)):
+            """
             if isinstance(fld, InlinedCustomFields):
                 prefix = ""
             elif isinstance(fld, CustomFields):
                 prefix = fld.key + "."
             else:
                 continue
+            """
 
             ui_config = _get_custom_fields_ui_config(fld.config_key, **kwargs)
             if not ui_config:

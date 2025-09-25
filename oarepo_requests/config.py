@@ -13,18 +13,6 @@ import invenio_requests.config
 import oarepo_workflows  # noqa
 from invenio_app_rdm.config import NOTIFICATIONS_BUILDERS as RDM_NOTIFICATIONS_BUILDERS
 from invenio_notifications.backends.email import EmailNotificationBackend
-from oarepo_requests.notifications.builders.delete_published_record import (
-    DeletePublishedRecordRequestAcceptNotificationBuilder,
-    DeletePublishedRecordRequestSubmitNotificationBuilder, DeletePublishedRecordRequestDeclineNotificationBuilder,
-)
-from oarepo_requests.notifications.builders.publish import (
-    PublishDraftRequestAcceptNotificationBuilder,
-    PublishDraftRequestSubmitNotificationBuilder, PublishDraftRequestDeclineNotificationBuilder,
-)
-
-from oarepo_requests.notifications.builders.escalate import (
-    EscalateRequestSubmitNotificationBuilder,
-)
 from invenio_records_resources.references.entity_resolvers import ServiceResultResolver
 from invenio_requests.customizations import CommentEventType, LogEventType
 from invenio_requests.services.permissions import (
@@ -36,6 +24,19 @@ from oarepo_requests.actions.components import (
     AutoAcceptComponent,
     RequestIdentityComponent,
     WorkflowTransitionComponent,
+)
+from oarepo_requests.notifications.builders.delete_published_record import (
+    DeletePublishedRecordRequestAcceptNotificationBuilder,
+    DeletePublishedRecordRequestDeclineNotificationBuilder,
+    DeletePublishedRecordRequestSubmitNotificationBuilder,
+)
+from oarepo_requests.notifications.builders.escalate import (
+    EscalateRequestSubmitNotificationBuilder,
+)
+from oarepo_requests.notifications.builders.publish import (
+    PublishDraftRequestAcceptNotificationBuilder,
+    PublishDraftRequestDeclineNotificationBuilder,
+    PublishDraftRequestSubmitNotificationBuilder,
 )
 from oarepo_requests.notifications.generators import (
     GroupEmailRecipient,
@@ -67,12 +68,13 @@ REQUESTS_REGISTERED_TYPES = [
     PublishDraftRequestType(),
 ]
 
-REQUESTS_REGISTERED_EVENT_TYPES = [
+REQUESTS_REGISTERED_EVENT_TYPES = (
     TopicUpdateEventType(),
     TopicDeleteEventType(),
     EscalationEventType(),
     RecordSnapshotEventType(),
-] + invenio_requests.config.REQUESTS_REGISTERED_EVENT_TYPES
+    *invenio_requests.config.REQUESTS_REGISTERED_EVENT_TYPES,
+)
 
 REQUESTS_ALLOWED_RECEIVERS = ["user", "group", "auto_approve"]
 
@@ -115,7 +117,9 @@ REQUESTS_ACTION_COMPONENTS = {
         RequestIdentityComponent,
     ],
     "submitted": [
-        AutoAcceptComponent,  # AutoAcceptComponent must always be first, so that auto accept is called as the last step in action handling
+        # AutoAcceptComponent must always be first, so that auto accept is called as the last
+        # step in action handling
+        AutoAcceptComponent,
         *workflow_action_components,
         RequestIdentityComponent,
     ],

@@ -7,6 +7,9 @@
 #
 
 
+from __future__ import annotations
+
+
 def test_publish(
     logged_client,
     users,
@@ -29,9 +32,9 @@ def test_publish(
         creator.identity, draft1_id, "publish_draft"
     )
     record = receiver_client.get(
-        f"{urls['BASE_URL']}{draft1_id}/draft?expand=true"
+        f"{urls['BASE_URL']}/{draft1_id}/draft?expand=true"
     ).json
-    publish = receiver_client.post(
+    receiver_client.post(
         link2testclient(
             record["expanded"]["requests"][0]["links"]["actions"]["accept"]
         ),

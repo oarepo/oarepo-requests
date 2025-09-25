@@ -10,7 +10,7 @@
 from __future__ import annotations
 
 from functools import cached_property, partial
-from typing import TYPE_CHECKING, Any, Callable
+from typing import TYPE_CHECKING, Any, override
 
 from flask import current_app
 from flask_babel import LazyString, force_locale
@@ -18,6 +18,7 @@ from flask_resources import JSONSerializer, ResponseHandler
 from invenio_records_resources.resources.records.headers import etag_headers
 from invenio_records_resources.services.records.params import FilterParam
 from invenio_records_resources.services.records.params.base import ParamInterpreter
+from invenio_requests.notifications.generators import RequestParticipantsRecipient
 from invenio_requests.resources.events.config import RequestCommentsResourceConfig
 from invenio_requests.resources.requests.config import (
     RequestSearchRequestArgsSchema,
@@ -31,7 +32,7 @@ from invenio_requests.services.requests.params import IsOpenParam
 from invenio_search.engine import dsl
 from marshmallow import fields
 from opensearch_dsl.query import Bool
-from invenio_requests.notifications.generators import RequestParticipantsRecipient
+
 from oarepo_requests.notifications.generators import OARepoRequestParticipantsRecipient
 from oarepo_requests.resources.ui import (
     OARepoRequestEventsUIJSONSerializer,
@@ -40,15 +41,19 @@ from oarepo_requests.resources.ui import (
 from oarepo_requests.services.oarepo.config import OARepoRequestsServiceConfig
 
 if TYPE_CHECKING:
+    from collections.abc import Callable
+
     from flask.blueprints import BlueprintSetupState
     from flask_principal import Identity
     from flask_resources.serializers.base import BaseSerializer
+    from invenio_records_resources.services.records.config import SearchOptions
     from opensearch_dsl.query import Query
 
 
 class RequestOwnerFilterParam(FilterParam):
     """Filter requests by owner."""
 
+    @override
     def apply(self, identity: Identity, search: Query, params: dict[str, str]) -> Query:
         """Apply the filter to the search."""
         value = params.pop(self.param_name, None)
@@ -60,17 +65,18 @@ class RequestOwnerFilterParam(FilterParam):
 class RequestAllAvailableFilterParam(ParamInterpreter):
     """A no-op filter that returns all requests that are readable by the current user."""
 
-    def __init__(self, param_name, config):
+    def __init__(self, param_name: str, config: type[SearchOptions]) -> None:
         """Initialize the filter."""
         self.param_name = param_name
         super().__init__(config)
 
     @classmethod
-    def factory(cls, param=None):
+    def factory(cls, param: str | None = None) -> partial[ParamInterpreter]:
         """Create a new filter parameter."""
         return partial(cls, param)
 
-    def apply(self, identity, search, params):
+    @override
+    def apply(self, identity: Identity, search: Query, params: dict[str, str]) -> Query:
         """Apply the filter to the search - does nothing."""
         params.pop(self.param_name, None)
         return search
@@ -84,6 +90,7 @@ class RequestNotOwnerFilterParam(FilterParam):
     can approve.
     """
 
+    @override
     def apply(self, identity: Identity, search: Query, params: dict[str, str]) -> Query:
         """Apply the filter to the search."""
         value = params.pop(self.param_name, None)
@@ -97,6 +104,7 @@ class RequestNotOwnerFilterParam(FilterParam):
 class IsClosedParam(IsOpenParam):
     """Get just the closed requests."""
 
+    @override
     def apply(self, identity: Identity, search: Query, params: dict[str, str]) -> Query:
         """Evaluate the is_closed parameter on the search."""
         if params.get("is_closed") is True:
@@ -109,12 +117,13 @@ class IsClosedParam(IsOpenParam):
 class EnhancedRequestSearchOptions(RequestSearchOptions):
     """Searched options enhanced with additional filters."""
 
-    params_interpreters_cls = RequestSearchOptions.params_interpreters_cls + [
+    params_interpreters_cls = (
+        *RequestSearchOptions.params_interpreters_cls,
         RequestOwnerFilterParam.factory("mine", "created_by.user"),
         RequestNotOwnerFilterParam.factory("assigned", "created_by.user"),
         RequestAllAvailableFilterParam.factory("all"),
         IsClosedParam.factory("is_closed"),
-    ]
+    )
 
 
 class ExtendedRequestSearchRequestArgsSchema(RequestSearchRequestArgsSchema):
@@ -128,7 +137,7 @@ class ExtendedRequestSearchRequestArgsSchema(RequestSearchRequestArgsSchema):
 
 def override_invenio_requests_config(
     state: BlueprintSetupState, *args: Any, **kwargs: Any
-) -> None:
+) -> None:  # noqa ARG001
     """Override the invenio requests configuration.
 
     This function is called from the blueprint setup function as this should be a safe moment
@@ -176,11 +185,11 @@ def override_invenio_requests_config(
             **RequestCommentsResourceConfig.response_handlers,
         }
 
+        from invenio_i18n import _
         from invenio_requests.proxies import current_request_type_registry
-        from invenio_requests.services.requests.facets import status, type
-        from oarepo_runtime.i18n import lazy_gettext as _
+        from invenio_requests.services.requests.facets import status, type  # noqa A004
 
-        status._value_labels = {
+        status._value_labels = {  # noqa SLF001
             "submitted": _("Submitted"),
             "expired": _("Expired"),
             "accepted": _("Accepted"),
@@ -188,18 +197,19 @@ def override_invenio_requests_config(
             "cancelled": _("Cancelled"),
             "created": _("Created"),
         }
-        status._label = _("Request status")
+        status._label = _("Request status")  # noqa SLF001
 
         # add extra request types dynamically
         type._value_labels = {
             rt.type_id: rt.name for rt in iter(current_request_type_registry)
-        }
-        type._label = _("Type")
+        }  # noqa SLF001
+        type._label = _("Type")  # noqa SLF001
 
 
 def override_invenio_notifications(
     state: BlueprintSetupState, *args: Any, **kwargs: Any
-) -> None:
+) -> None:  # noqa ARG001
+    """Override invenio notifications configuration."""
     with state.app.app_context():
         from invenio_notifications.services.generators import EntityResolve
         from invenio_requests.notifications.builders import (
@@ -216,11 +226,12 @@ def override_invenio_notifications(
                 EntityResolve(key="request.topic"),
             )
 
-
         for r in CommentRequestEventCreateNotificationBuilder.recipients:
             if isinstance(r, RequestParticipantsRecipient):
                 CommentRequestEventCreateNotificationBuilder.recipients.remove(r)
-                CommentRequestEventCreateNotificationBuilder.recipients.append(OARepoRequestParticipantsRecipient(key="request"))
+                CommentRequestEventCreateNotificationBuilder.recipients.append(
+                    OARepoRequestParticipantsRecipient(key="request")
+                )
                 break
 
         for idx, r in list(
@@ -240,7 +251,9 @@ def override_invenio_notifications(
 
         original_delay = dispatch_notification.delay
 
-        def i18n_enabled_notification_delay(backend, recipient, notification):
+        def i18n_enabled_notification_delay(
+            backend: str, recipient: dict, notification: dict
+        ) -> None:
             """Delay can not handle lazy strings, so we need to resolve them before calling the delay."""
             locale = None
             if isinstance(recipient, dict):
@@ -253,12 +266,12 @@ def override_invenio_notifications(
         dispatch_notification.delay = i18n_enabled_notification_delay
 
 
-def resolve_lazy_strings(data):
+def resolve_lazy_strings(data: dict | list | LazyString | str) -> str:
+    """Resolve lazy strings in the given data."""
     if isinstance(data, dict):
         return {key: resolve_lazy_strings(value) for key, value in data.items()}
-    elif isinstance(data, list):
+    if isinstance(data, list):
         return [resolve_lazy_strings(item) for item in data]
-    elif isinstance(data, LazyString):
+    if isinstance(data, LazyString):
         return str(data)
-    else:
-        return data
+    return data

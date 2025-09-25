@@ -20,8 +20,11 @@ from invenio_records_resources.resources.records.resource import (
 )
 from invenio_records_resources.services import LinksTemplate
 from oarepo_ui.proxies import current_oarepo_ui
-from oarepo_ui.resources.resource import UIResource
-from oarepo_ui.resources.templating.data import FieldData
+from oarepo_ui.resources import UIResource
+from oarepo_ui.templating.data import FieldData
+
+# from oarepo_ui.resources.resource import UIResource
+# from oarepo_ui.resources.templating.data import FieldData
 
 if TYPE_CHECKING:
     from flask_principal import Identity

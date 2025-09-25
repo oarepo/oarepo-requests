@@ -10,7 +10,7 @@
 from __future__ import annotations
 
 import logging
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, ClassVar
 
 from invenio_records_resources.services.base.links import Link
 from invenio_requests.services import RequestsServiceConfig
@@ -26,8 +26,8 @@ log = logging.getLogger(__name__)
 class RequestEntityLinks(Link):
     """Utility class for keeping track of and resolve links."""
 
-    def __init__(self, entity: str, when: callable = None):
-        """Constructor."""
+    def __init__(self, entity: str, when: callable | None = None):
+        """Construct."""
         self._entity = entity
         self._when_func = when
 
@@ -35,22 +35,25 @@ class RequestEntityLinks(Link):
         """Create the request links."""
         res = {}
         resolved = resolve_entity(self._entity, obj, context)
-        if "links" in resolved:
-            res.update(resolved["links"])
+        if hasattr(resolved, "links"):
+            res.update(resolved.links)
 
         return res
 
 
 class RedirectLink(Link):
-    def __init__(self, when: callable = None):
-        """Constructor."""
+    """..."""
+
+    # TODO: scrape prob
+    def __init__(self, when: callable | None = None):
+        """Construct."""
         self._when_func = when
 
     def expand(self, obj: Request, context: dict) -> dict:
         """Create the request links."""
         link = None
         if hasattr(obj.type, "get_ui_redirect_url"):
-            link = getattr(obj.type, "get_ui_redirect_url")(obj, context)
+            link = obj.type.get_ui_redirect_url(obj, context)
         return link
 
 
@@ -59,7 +62,7 @@ class OARepoRequestsServiceConfig(RequestsServiceConfig):
 
     service_id = "oarepo_requests"
 
-    links_item = {
+    links_item: ClassVar[dict] = {  # TODO: scrape prob
         "self": RequestLink("{+api}/requests/extended/{id}"),
         "comments": RequestLink("{+api}/requests/extended/{id}/comments"),
         "timeline": RequestLink("{+api}/requests/extended/{id}/timeline"),

@@ -5,6 +5,8 @@
 # modify it under the terms of the MIT License; see LICENSE file for more
 # details.
 #
+from __future__ import annotations
+
 import os
 import shutil
 import sys
@@ -65,7 +67,7 @@ def record_ui_resource(app, record_ui_resource_config, record_service):
     return ui_resource
 
 
-@pytest.fixture()
+@pytest.fixture
 def fake_manifest(app):
     python_path = Path(sys.executable)
     invenio_instance_path = python_path.parent.parent / "var" / "instance"

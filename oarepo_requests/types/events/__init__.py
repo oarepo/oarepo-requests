@@ -9,8 +9,8 @@
 
 from __future__ import annotations
 
+from .escalation import EscalationEventType
 from .topic_delete import TopicDeleteEventType
 from .topic_update import TopicUpdateEventType
-from .escalation import EscalationEventType
 
-__all__ = ["TopicUpdateEventType", "TopicDeleteEventType", "EscalationEventType"]
+__all__ = ["EscalationEventType", "TopicDeleteEventType", "TopicUpdateEventType"]

@@ -5,8 +5,10 @@
 # modify it under the terms of the MIT License; see LICENSE file for more
 # details.
 #
-from flask import g
-from flask_principal import PermissionDenied
+from __future__ import annotations
+
+from typing import TYPE_CHECKING, ClassVar
+
 from oarepo_ui.resources import (
     BabelComponent,
     RecordsUIResource,
@@ -14,10 +16,14 @@ from oarepo_ui.resources import (
 )
 from oarepo_ui.resources.components import PermissionsComponent
 from thesis.resources.records.ui import ThesisUIJSONSerializer
-from werkzeug.exceptions import Forbidden
+
+if TYPE_CHECKING:
+    from collections.abc import Mapping
 
 
 class ModelUIResourceConfig(RecordsUIResourceConfig):
+    """Mock UI resource config."""
+
     api_service = (
         "thesis"  # must be something included in oarepo, as oarepo is used in tests
     )
@@ -26,16 +32,18 @@ class ModelUIResourceConfig(RecordsUIResourceConfig):
     url_prefix = "/thesis/"
     ui_serializer_class = ThesisUIJSONSerializer
 
-    templates = {
+    templates: ClassVar[Mapping[str, str | None]] = {
         **RecordsUIResourceConfig.templates,
         "detail": "TestDetail",
         "search": "TestDetail",
         "edit": "TestEdit",
     }
 
-    components = [BabelComponent, PermissionsComponent]
+    components = (BabelComponent, PermissionsComponent)
 
 
 class ModelUIResource(RecordsUIResource):
-    def _exportable_handlers(self):
+    """Mock UI resource."""
+
+    def _exportable_handlers(self) -> list:
         return []

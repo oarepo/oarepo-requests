@@ -55,7 +55,7 @@ class OARepoRequestsResource(RequestsResource, ErrorHandlersMixin):
 
         routes = self.config.routes
 
-        url_rules = [
+        return [
             route("POST", p(routes["list"]), self.create),
             route(
                 "POST",
@@ -66,7 +66,6 @@ class OARepoRequestsResource(RequestsResource, ErrorHandlersMixin):
             route("GET", p(routes["item-extended"]), self.read_extended),
             route("PUT", p(routes["item-extended"]), self.update),
         ]
-        return url_rules
 
     @request_extra_args
     @request_headers
@@ -102,10 +101,6 @@ class OARepoRequestsResource(RequestsResource, ErrorHandlersMixin):
                 ...payload
             }
         """
-        # request_type = resource_requestctx.data.pop("request_type", None)
-        # topic = stringify_first_val(resource_requestctx.data.pop("topic", None))
-        # resolved_topic = resolve_reference_dict(topic)
-
         items = self.oarepo_requests_service.create(
             identity=g.identity,
             data=resource_requestctx.data,

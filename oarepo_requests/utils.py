@@ -10,8 +10,9 @@
 from __future__ import annotations
 
 import copy
-from typing import TYPE_CHECKING, Any, Callable
+from typing import TYPE_CHECKING, Any
 
+from flask_babel.speaklater import LazyString
 from invenio_access.permissions import system_identity
 from invenio_pidstore.errors import PersistentIdentifierError
 from invenio_records_resources.proxies import current_service_registry
@@ -31,6 +32,8 @@ from oarepo_workflows.errors import MissingWorkflowError
 from oarepo_workflows.proxies import current_oarepo_workflows
 
 if TYPE_CHECKING:
+    from collections.abc import Callable
+
     from flask_principal import Identity
     from invenio_records_resources.records import Record
     from invenio_records_resources.services import RecordService
@@ -43,7 +46,21 @@ if TYPE_CHECKING:
     from .services.record.service import RecordRequestsService
 
 
-class classproperty[T]:
+# TODO: perhaps we could use centrally defined custom types in runtime?
+type JsonValue = (
+    str
+    | LazyString
+    | int
+    | float
+    | bool
+    | None
+    | dict[str, JsonValue]
+    | list[JsonValue]
+)
+
+
+# TODO: move to runtime
+class classproperty[T]:  # noqa N801
     """Class property decorator as decorator chaining for declaring class properties was deprecated in python 3.11."""
 
     def __init__(self, func: Callable):
@@ -80,7 +97,7 @@ def allowed_request_types_for_record(
         # so returning all matching request types
         pass
 
-    record_ref = list(ResolverRegistry.reference_entity(record).keys())[0]
+    record_ref = next(iter(ResolverRegistry.reference_entity(record).keys()))
 
     ret = {}
     for rt in current_request_type_registry:
@@ -101,7 +118,11 @@ def create_query_term_for_reference(
     """
     return dsl.Q(
         "term",
-        **{f"{field_name}.{list(reference.keys())[0]}": list(reference.values())[0]},
+        **{
+            f"{field_name}.{next(iter(reference.keys()))}": next(
+                iter(reference.values())
+            )
+        },
     )
 
 
@@ -121,10 +142,10 @@ def search_requests_filter(
     :param is_open: Whether the request is open or closed. If not set, both open and closed requests are returned.
     """
     must = [
-        dsl.Q("term", **{"type": type_id}),
+        dsl.Q("term", type=type_id),
     ]
     if is_open is not None:
-        must.append(dsl.Q("term", **{"is_open": is_open}))
+        must.append(dsl.Q("term", is_open=is_open))
     if receiver_reference:
         must.append(create_query_term_for_reference("receiver", receiver_reference))
     if creator_reference:
@@ -132,12 +153,10 @@ def search_requests_filter(
     if topic_reference:
         must.append(create_query_term_for_reference("topic", topic_reference))
 
-    extra_filter = dsl.query.Bool(
+    return dsl.query.Bool(
         "must",
         must=must,
     )
-
-    return extra_filter
 
 
 def open_request_exists(
@@ -155,8 +174,7 @@ def open_request_exists(
     results = current_requests_service.search(
         system_identity, extra_filter=base_filter
     ).hits
-    request_exists = bool(list(results))
-    return request_exists
+    return bool(list(results))
 
 
 def resolve_reference_dict(reference_dict: EntityReference) -> Record:
@@ -174,7 +192,7 @@ def get_matching_service_for_refdict(
     """
     for resolver in ResolverRegistry.get_registered_resolvers():
         if resolver.matches_reference_dict(reference_dict):
-            return current_service_registry.get(resolver._service_id)
+            return current_service_registry.get(resolver._service_id)  # noqa SLF001
     return None
 
 
@@ -286,8 +304,7 @@ def is_auto_approved(
         receiver
         and (
             isinstance(receiver, AutoApprove)
-            or isinstance(receiver, dict)
-            and receiver.get("auto_approve")
+            or (isinstance(receiver, dict) and receiver.get("auto_approve"))
         )
     )
 

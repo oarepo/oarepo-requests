@@ -1,3 +1,14 @@
+#
+# Copyright (C) 2025 CESNET z.s.p.o.
+#
+# oarepo-requests is free software; you can redistribute it and/or
+# modify it under the terms of the MIT License; see LICENSE file for more
+# details.
+#
+from __future__ import annotations
+
+from typing import Any
+
 from invenio_requests.customizations.event_types import CommentEventType
 
 
@@ -11,7 +22,6 @@ def test_publish_notifications(
     urls,
 ):
     """Test notification being built on review submit."""
-
     mail = app.extensions.get("mail")
     assert mail
 
@@ -21,9 +31,7 @@ def test_publish_notifications(
     draft1 = draft_factory(creator.identity)
 
     with mail.record_messages() as outbox:
-        resp_request_submit = submit_request_on_draft(
-            creator.identity, draft1["id"], "publish_draft"
-        )
+        submit_request_on_draft(creator.identity, draft1["id"], "publish_draft")
         # check notification is build on submit
         assert len(outbox) == 1
         sent_mail = outbox[0]
@@ -31,11 +39,11 @@ def test_publish_notifications(
         assert 'You have been asked to publish record "blabla".' in sent_mail.body
         assert 'You have been asked to publish record "blabla".' in sent_mail.html
 
-    record = receiver_client.get(f"{urls['BASE_URL']}{draft1['id']}/draft?expand=true")
+    record = receiver_client.get(f"{urls['BASE_URL']}/{draft1['id']}/draft?expand=true")
 
     with mail.record_messages() as outbox:
         # Validate that email was sent
-        publish = receiver_client.post(
+        receiver_client.post(
             link2testclient(
                 record.json["expanded"]["requests"][0]["links"]["actions"]["accept"]
             ),
@@ -54,14 +62,12 @@ def test_publish_notifications(
         )
 
     draft1 = draft_factory(creator.identity)
-    resp_request_submit = submit_request_on_draft(
-        creator.identity, draft1["id"], "publish_draft"
-    )
-    record = receiver_client.get(f"{urls['BASE_URL']}{draft1['id']}/draft?expand=true")
+    submit_request_on_draft(creator.identity, draft1["id"], "publish_draft")
+    record = receiver_client.get(f"{urls['BASE_URL']}/{draft1['id']}/draft?expand=true")
     with mail.record_messages() as outbox:
         # Validate that email was sent
         request_html_link = record.json["expanded"]["requests"][0]["links"]["self_html"]
-        decline = receiver_client.post(
+        receiver_client.post(
             link2testclient(
                 record.json["expanded"]["requests"][0]["links"]["actions"]["decline"]
             ),
@@ -87,7 +93,6 @@ def test_delete_published_notifications(
     urls,
 ):
     """Test notification being built on review submit."""
-
     mail = app.extensions.get("mail")
     assert mail
 
@@ -97,23 +102,25 @@ def test_delete_published_notifications(
     record1 = record_factory(creator.identity)
 
     with mail.record_messages() as outbox:
-        resp_request_submit = submit_request_on_record(
-            creator.identity, record1["id"], "delete_published_record", create_additional_data={"payload": {"removal_reason": "test reason"}}
+        submit_request_on_record(
+            creator.identity,
+            record1["id"],
+            "delete_published_record",
+            create_additional_data={"payload": {"removal_reason": "test reason"}},
         )
         # check notification is build on submit
         assert len(outbox) == 1
         sent_mail = outbox[0]
-        print(sent_mail)
         assert "Request to delete published record blabla" in sent_mail.subject
 
     with mail.record_messages() as outbox:
-        record = receiver_client.get(f"{urls['BASE_URL']}{record1['id']}?expand=true")
+        record = receiver_client.get(f"{urls['BASE_URL']}/{record1['id']}?expand=true")
         assert len(outbox) == 0
 
     with mail.record_messages() as outbox:
         # Validate that email was sent
         request_html_link = record.json["expanded"]["requests"][0]["links"]["self_html"]
-        publish = receiver_client.post(
+        receiver_client.post(
             link2testclient(
                 record.json["expanded"]["requests"][0]["links"]["actions"]["accept"]
             ),
@@ -121,21 +128,23 @@ def test_delete_published_notifications(
         # check notification is build on submit
         assert len(outbox) == 1
         sent_mail = outbox[0]
-        print(sent_mail)
         assert "Published record has been deleted" in sent_mail.subject
         assert request_html_link in sent_mail.html
         assert request_html_link in sent_mail.body
 
     record1 = record_factory(creator.identity)
-    resp_request_submit = submit_request_on_record(
-        creator.identity, record1["id"], "delete_published_record", create_additional_data={"payload": {"removal_reason": "test reason"}}
+    submit_request_on_record(
+        creator.identity,
+        record1["id"],
+        "delete_published_record",
+        create_additional_data={"payload": {"removal_reason": "test reason"}},
     )
-    record = receiver_client.get(f"{urls['BASE_URL']}{record1['id']}?expand=true")
+    record = receiver_client.get(f"{urls['BASE_URL']}/{record1['id']}?expand=true")
 
     with mail.record_messages() as outbox:
         # Validate that email was sent
         request_html_link = record.json["expanded"]["requests"][0]["links"]["self_html"]
-        decline = receiver_client.post(
+        receiver_client.post(
             link2testclient(
                 record.json["expanded"]["requests"][0]["links"]["actions"]["decline"]
             ),
@@ -163,13 +172,12 @@ def test_group(
     urls,
 ):
     """Test notification being built on review submit."""
-
     mail = app.extensions.get("mail")
     config_restore = app.config["OAREPO_REQUESTS_DEFAULT_RECEIVER"]
     add_user_in_role(users[0], role)
     add_user_in_role(users[1], role)
 
-    def current_receiver(record=None, request_type=None, **kwargs):
+    def current_receiver(record=None, request_type=None, **kwargs: Any) -> Any:
         if request_type.type_id == "publish_draft":
             return role
         return config_restore(record, request_type, **kwargs)
@@ -201,7 +209,6 @@ def test_locale(
     urls,
 ):
     """Test notification being built on review submit."""
-
     mail = app.extensions.get("mail")
     assert mail
 
@@ -211,9 +218,7 @@ def test_locale(
     draft1 = draft_factory(en_creator.identity, custom_workflow="different_locales")
 
     with mail.record_messages() as outbox:
-        resp_request_submit = submit_request_on_draft(
-            en_creator.identity, draft1["id"], "publish_draft"
-        )
+        submit_request_on_draft(en_creator.identity, draft1["id"], "publish_draft")
         # check notification is build on submit
         assert len(outbox) == 1
         sent_mail = outbox[0]
@@ -221,11 +226,11 @@ def test_locale(
         assert 'Byli jste požádáni o publikování záznamu "blabla".' in sent_mail.body
         assert 'Byli jste požádáni o publikování záznamu "blabla".' in sent_mail.body
 
-    record = receiver_client.get(f"{urls['BASE_URL']}{draft1['id']}/draft?expand=true")
+    record = receiver_client.get(f"{urls['BASE_URL']}/{draft1['id']}/draft?expand=true")
 
     with mail.record_messages() as outbox:
         # Validate that email was sent
-        publish = receiver_client.post(
+        receiver_client.post(
             link2testclient(
                 record.json["expanded"]["requests"][0]["links"]["actions"]["accept"]
             ),
@@ -255,7 +260,6 @@ def test_locale_multiple_recipients(
     urls,
 ):
     """Test notification being built on review submit."""
-
     mail = app.extensions.get("mail")
     assert mail
 
@@ -265,7 +269,10 @@ def test_locale_multiple_recipients(
 
     with mail.record_messages() as outbox:
         submit_request_on_record(
-            en_creator.identity, record1["id"], "delete_published_record", create_additional_data={"payload": {"removal_reason": "test reason"}}
+            en_creator.identity,
+            record1["id"],
+            "delete_published_record",
+            create_additional_data={"payload": {"removal_reason": "test reason"}},
         )
         # check notification is build on submit
         assert len(outbox) == 2
@@ -298,7 +305,6 @@ def test_comment_notifications(
     """Test notification being built on review submit."""
     mail = app.extensions.get("mail")
     creator = users[0]
-    # receiver = users[2]
     draft1 = draft_factory(creator.identity)  # so i don't have to create a new workflow
     submit = submit_request_on_draft(creator.identity, draft1["id"], "publish_draft")
 

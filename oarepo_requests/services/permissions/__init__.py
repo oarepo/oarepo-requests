@@ -6,3 +6,5 @@
 # details.
 #
 """Permissions for requests service."""
+
+from __future__ import annotations

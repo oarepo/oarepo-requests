@@ -39,16 +39,13 @@ def create_oarepo_requests(app: Flask) -> Blueprint:
 def create_oarepo_requests_events(app: Flask) -> Blueprint:
     """Create events blueprint."""
     ext = app.extensions["oarepo-requests"]
-    blueprint = ext.request_events_resource.as_blueprint()
-    return blueprint
+    return ext.request_events_resource.as_blueprint()
 
 
-def create_notifications(app: Flask) -> Blueprint:
+def create_notifications(app: Flask) -> Blueprint:  # noqa ARG001
     """Register blueprint routes on app."""
-    blueprint = Blueprint(
+    return Blueprint(
         "oarepo_notifications",
         __name__,
         template_folder=Path(__file__).parent.parent / "templates",
     )
-
-    return blueprint

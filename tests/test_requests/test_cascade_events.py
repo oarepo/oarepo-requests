@@ -5,12 +5,16 @@
 # modify it under the terms of the MIT License; see LICENSE file for more
 # details.
 #
+from __future__ import annotations
+
 from invenio_requests.records.api import RequestEvent
 
 from oarepo_requests.types.events import TopicDeleteEventType
 
 
+# TODO: werkzeug.routing.exceptions.BuildError: Could not build url for endpoint 'requests_test.search_versions' with values ['page', 'size', 'sort']. Did you mean 'invenio_requests.static' instead? is an oarepo-ui todo
 def test_cascade_update(
+    requests_model,
     logged_client,
     users,
     urls,
@@ -39,9 +43,9 @@ def test_cascade_update(
         creator.identity, draft1_id, "another_topic_updating"
     )
     record = receiver_client.get(
-        f"{urls['BASE_URL']}{draft1_id}/draft?expand=true"
+        f"{urls['BASE_URL']}/{draft1_id}/draft?expand=true"
     ).json
-    accept_another_request = receiver_client.post(
+    receiver_client.post(
         link2testclient(
             record["expanded"]["requests"][0]["links"]["actions"]["accept"]
         ),
@@ -51,9 +55,9 @@ def test_cascade_update(
     )
 
     record = receiver_client.get(
-        f"{urls['BASE_URL']}{draft1_id}/draft?expand=true"
+        f"{urls['BASE_URL']}/{draft1_id}/draft?expand=true"
     ).json
-    publish = receiver_client.post(
+    receiver_client.post(
         link2testclient(
             record["expanded"]["requests"][1]["links"]["actions"]["accept"]
         ),
@@ -66,17 +70,18 @@ def test_cascade_update(
         f"{urls['BASE_URL_REQUESTS']}{publish_request_on_second_draft['id']}"
     ).json
     assert second_draft_request["topic"] == {
-        "thesis_draft": draft2_id
+        "requests_test_draft": draft2_id
     }  # check request on the other draft is unchanged
 
 
 def test_cascade_cancel(
+    requests_model,
     logged_client,
     users,
     urls,
-    draft_factory,
-    create_request_on_draft,
-    submit_request_on_draft,
+    record_factory,
+    create_request_on_record,
+    submit_request_on_record,
     search_clear,
 ):
     creator = users[0]
@@ -85,18 +90,16 @@ def test_cascade_cancel(
     creator_client = logged_client(creator)
     receiver_client = logged_client(receiver)
 
-    draft1 = draft_factory(creator.identity, custom_workflow="cascade_update")
-    draft2 = draft_factory(creator.identity, custom_workflow="cascade_update")
+    draft1 = record_factory(creator.identity, custom_workflow="cascade_update")
+    draft2 = record_factory(creator.identity, custom_workflow="cascade_update")
     draft1_id = draft1["id"]
     draft2_id = draft2["id"]
 
-    r1 = submit_request_on_draft(creator.identity, draft1_id, "publish_draft")
-    r2 = create_request_on_draft(creator.identity, draft1_id, "another_topic_updating")
-    r3 = submit_request_on_draft(creator.identity, draft2_id, "publish_draft")
+    r1 = submit_request_on_record(creator.identity, draft1_id, "publish_draft")
+    r2 = create_request_on_record(creator.identity, draft1_id, "another_topic_updating")
+    r3 = submit_request_on_record(creator.identity, draft2_id, "publish_draft")
 
-    delete_request = submit_request_on_draft(
-        creator.identity, draft1_id, "delete_draft"
-    )
+    submit_request_on_record(creator.identity, draft1_id, "delete_published_record")
 
     r1_read = receiver_client.get(f"{urls['BASE_URL_REQUESTS']}{r1['id']}").json
     r2_read = receiver_client.get(f"{urls['BASE_URL_REQUESTS']}{r2['id']}").json

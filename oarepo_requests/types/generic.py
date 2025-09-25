@@ -9,15 +9,14 @@
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Any, Callable
+from typing import TYPE_CHECKING, Any
 
 from invenio_access.permissions import system_identity
-from invenio_records_resources.services.errors import PermissionDeniedError
 from invenio_requests.customizations import RequestType
 from invenio_requests.customizations.states import RequestState
 from invenio_requests.proxies import current_requests_service
 
-from oarepo_requests.errors import OpenRequestAlreadyExists
+from oarepo_requests.errors import OpenRequestAlreadyExistsError
 from oarepo_requests.utils import classproperty, open_request_exists
 
 from ..actions.generic import (
@@ -35,11 +34,14 @@ from ..utils import (
 from .ref_types import ModelRefTypes, ReceiverRefTypes
 
 if TYPE_CHECKING:
+    from collections.abc import Callable
+
     from flask_babel.speaklater import LazyString
     from flask_principal import Identity
     from invenio_records_resources.records import Record
     from invenio_requests.customizations.actions import RequestAction
     from invenio_requests.records.api import Request
+    from marshmallow.schema import Schema
 
     from oarepo_requests.typing import EntityReference
 
@@ -51,7 +53,8 @@ class OARepoRequestType(RequestType):
 
     dangerous = False
 
-    def on_topic_delete(self, request: Request, topic: Record) -> None:
+    # TODO: due to possible override on subclass that might do something with the topic?
+    def on_topic_delete(self, request: Request, **kwargs: Any) -> None:  # noqa ARG002
         """Cancel the request when the topic is deleted.
 
         :param request:         the request
@@ -60,7 +63,7 @@ class OARepoRequestType(RequestType):
         current_requests_service.execute_action(system_identity, request.id, "cancel")
 
     @classproperty[dict[str, RequestState]]
-    def available_statuses(cls) -> dict[str, RequestState]:
+    def available_statuses(cls) -> dict[str, RequestState]:  # noqa N805
         """Return available statuses for the request type.
 
         The status (open, closed, undefined) are used for request filtering.
@@ -68,7 +71,7 @@ class OARepoRequestType(RequestType):
         return {**super().available_statuses, "created": RequestState.OPEN}
 
     @classproperty[bool]
-    def has_form(cls) -> bool:
+    def has_form(cls) -> bool:  # noqa N805
         """Return whether the request type has a form."""
         return hasattr(cls, "form")
 
@@ -76,14 +79,14 @@ class OARepoRequestType(RequestType):
     """Whether the request type can be edited multiple times before it is submitted."""
 
     @classproperty[bool]
-    def is_editable(cls) -> bool:
+    def is_editable(cls) -> bool:  # noqa N805
         """Return whether the request type is editable."""
         if cls.editable is not None:
             return cls.editable
-        return cls.has_form  # noqa
+        return cls.has_form
 
     @classmethod
-    def _create_marshmallow_schema(cls):
+    def _create_marshmallow_schema(cls) -> type[Schema]:
         """Create a marshmallow schema for this request type with required payload field."""
         schema = super()._create_marshmallow_schema()
         if (
@@ -95,14 +98,15 @@ class OARepoRequestType(RequestType):
 
         return schema
 
+    # TODO: specify what can exactly come in the data dicts
     def can_create(
         self,
         identity: Identity,
-        data: dict,
-        receiver: EntityReference,
+        data: dict,  # noqa ARG002
+        receiver: EntityReference,  # noqa ARG002
         topic: Record,
-        creator: EntityReference,
-        *args: Any,
+        creator: EntityReference,  # noqa ARG002
+        *args: Any,  # noqa ARG002
         **kwargs: Any,
     ) -> None:
         """Check if the request can be created.
@@ -122,7 +126,7 @@ class OARepoRequestType(RequestType):
     @classmethod
     def is_applicable_to(
         cls, identity: Identity, topic: Record, *args: Any, **kwargs: Any
-    ) -> bool:
+    ) -> bool:  # noqa ARG002
         """Check if the request type is applicable to the topic.
 
         Used for checking whether there is any situation where the client can create
@@ -131,19 +135,15 @@ class OARepoRequestType(RequestType):
         method is used to check whether there is a possible situation a user might create
         this request eg. for the purpose of serializing a link on associated record
         """
-        try:
-            current_requests_service.require_permission(
-                identity, "create", record=topic, request_type=cls, **kwargs
-            )
-        except PermissionDeniedError:
-            return False
-        return True
+        return current_requests_service.check_permission(
+            identity, "create", record=topic, request_type=cls, **kwargs
+        )
 
     allowed_topic_ref_types = ModelRefTypes()
     allowed_receiver_ref_types = ReceiverRefTypes()
 
     @classproperty
-    def available_actions(cls) -> dict[str, type[RequestAction]]:
+    def available_actions(cls) -> dict[str, type[RequestAction]]:  # noqa N805
         """Return available actions for the request type."""
         return {
             **super().available_actions,
@@ -155,11 +155,11 @@ class OARepoRequestType(RequestType):
 
     def stateful_name(
         self,
-        identity: Identity,
+        identity: Identity,  # noqa ARG002
         *,
-        topic: Record,
-        request: Request | None = None,
-        **kwargs: Any,
+        topic: Record,  # noqa ARG002
+        request: Request | None = None,  # noqa ARG002
+        **kwargs: Any,  # noqa ARG002
     ) -> str | LazyString:
         """Return the name of the request that reflects its current state.
 
@@ -171,11 +171,11 @@ class OARepoRequestType(RequestType):
 
     def stateful_description(
         self,
-        identity: Identity,
+        identity: Identity,  # noqa ARG002
         *,
-        topic: Record,
-        request: Request | None = None,
-        **kwargs: Any,
+        topic: Record,  # noqa ARG002
+        request: Request | None = None,  # noqa ARG002
+        **kwargs: Any,  # noqa ARG002
     ) -> str | LazyString:
         """Return the description of the request that reflects its current state.
 
@@ -185,7 +185,7 @@ class OARepoRequestType(RequestType):
         """
         return self.description
 
-    def string_by_state(
+    def string_by_state(  # noqa C901, PLR0913, PLR0911
         self,
         identity: Identity,
         *,
@@ -318,7 +318,7 @@ class NonDuplicableOARepoRequestType(OARepoRequestType):
         :param kwargs:          additional keyword arguments
         """
         if open_request_exists(topic, self.type_id):
-            raise OpenRequestAlreadyExists(self, topic)
+            raise OpenRequestAlreadyExistsError(self, topic)
         super().can_create(identity, data, receiver, topic, creator, *args, **kwargs)
 
     @classmethod
