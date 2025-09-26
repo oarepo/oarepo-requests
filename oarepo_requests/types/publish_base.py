@@ -47,14 +47,7 @@ class PublishRequestType(NonDuplicableOARepoRequestType):
     """Publish draft request type."""
 
     payload_schema: ClassVar[dict[str, ma.fields.Field]] = {
-        "published_record.links.self": ma.fields.Str(
-            attribute="published_record:links:self",
-            data_key="published_record:links:self",
-        ),
-        "published_record.links.self_html": ma.fields.Str(
-            attribute="published_record:links:self_html",
-            data_key="published_record:links:self_html",
-        ),
+        "created_topic": ma.fields.Str()
     }
 
     @classproperty

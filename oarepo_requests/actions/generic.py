@@ -22,12 +22,13 @@ from invenio_requests.records.api import Request
 from oarepo_runtime.proxies import current_runtime
 
 from oarepo_requests.proxies import current_oarepo_requests
+from oarepo_requests.utils import reference_entity, ref_to_str
 
 if TYPE_CHECKING:
     from flask_babel.speaklater import LazyString
     from flask_principal import Identity
     from invenio_records_resources.services.uow import UnitOfWork
-
+    from invenio_records_resources.services.records.results import RecordItem
     from oarepo_requests.actions.components import RequestActionComponent
 
 from invenio_requests.customizations import RequestAction, RequestType
@@ -46,6 +47,7 @@ class RequestActionState:
     topic: Record
     created_by: Any
     action: ActionType
+    created_topic: Record | None = None
 
     def __post__init__(self):
         """Assert correct types after initializing."""
@@ -160,8 +162,10 @@ class OARepoGenericActionMixin:
 class AddTopicLinksOnPayloadMixin:
     """A mixin for action that takes links from the topic and stores them inside the payload."""
 
-    self_link: str | None = None
-    self_html_link: str | None = None
+    # self_link: str | None = None
+    # self_html_link: str | None = None
+    # self_created_topic_link: str | None = None
+    # self_created_topic_html_link: str | None = None
 
     def apply(
         self,
@@ -174,30 +178,31 @@ class AddTopicLinksOnPayloadMixin:
         """Apply the action to the topic."""
         super().apply(identity, state, uow, *args, **kwargs)
 
-        service = current_runtime.get_record_service_for_record(state.topic)
+        if not state.created_topic:
+            return state.topic
 
-        if not state.topic.is_draft:
-            ret = service.read(system_identity, state.topic.pid.pid_value)
-        else:
-            ret = service.read_draft(system_identity, state.topic.pid.pid_value)
-        topic_dict = ret.to_dict()
+        entity_ref = reference_entity(state.created_topic)
 
         request: Request = self.request
 
         if "payload" not in request:
             request["payload"] = {}
 
+        request["payload"]["created_topic"] = ref_to_str(entity_ref)
+
         # invenio does not allow non-string values in the payload, so using colon notation here
         # client will need to handle this and convert to links structure
         # can not use dot notation as marshmallow tries to be too smart and does not serialize dotted keys
+        """
         if (
             "self" in topic_dict["links"]
         ):  # TODO: consider - this happens if receiver doesn't have read rights to the topic,
             # like after a draft is created after edit
             # if it's needed in all cases, we could do a system identity call here
-            request["payload"][self.self_link] = topic_dict["links"]["self"]
+            request["payload"]["created_topic:links:self"] = topic_dict["links"]["self"]
         if "self_html" in topic_dict["links"]:
-            request["payload"][self.self_html_link] = topic_dict["links"]["self_html"]
+            request["payload"]["created_topic:links:self_html"] = topic_dict["links"]["self_html"]
+        """
         return state.topic
 
 

@@ -27,9 +27,6 @@ if TYPE_CHECKING:
 class EditTopicAcceptAction(AddTopicLinksOnPayloadMixin, OARepoAcceptAction):
     """Accept creation of a draft of a published record for editing metadata."""
 
-    self_link = "draft_record:links:self"
-    self_html_link = "draft_record:links:self_html"
-
     @override
     def apply(
         self,
@@ -43,5 +40,6 @@ class EditTopicAcceptAction(AddTopicLinksOnPayloadMixin, OARepoAcceptAction):
         topic_service = current_runtime.get_record_service_for_record(state.topic)
         if not topic_service:
             raise KeyError(f"topic {state.topic} service not found")
-        state.topic = topic_service.edit(identity, state.topic["id"], uow=uow)._record  # noqa SLF001
+        state.created_topic = topic_service.edit(identity, state.topic["id"], uow=uow)._record # noqa SLF001
+        # state.topic = topic_service.edit(identity, state.topic["id"], uow=uow)._record  # noqa SLF001
         super().apply(identity, state, uow, *args, **kwargs)

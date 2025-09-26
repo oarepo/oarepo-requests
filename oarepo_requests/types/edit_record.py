@@ -47,19 +47,13 @@ class EditPublishedRecordRequestType(NonDuplicableOARepoRequestType):
 
     type_id = "edit_published_record"
     name = _("Edit metadata")
-    payload_schema: ClassVar[dict[str, ma.fields.Field]] = {
-        "draft_record.links.self": ma.fields.Str(
-            attribute="draft_record:links:self",
-            data_key="draft_record:links:self",
-        ),
-        "draft_record.links.self_html": ma.fields.Str(
-            attribute="draft_record:links:self_html",
-            data_key="draft_record:links:self_html",
-        ),
-    }
 
+
+    payload_schema: ClassVar[dict[str, ma.fields.Field]] = {
+        "created_topic": ma.fields.Str()
+    }
+    """
     def get_ui_redirect_url(self, request: Request, ctx: dict) -> str:
-        """Return URL to redirect ui after the request action is executed."""
         if request.status == "accepted":
             service = current_runtime.get_record_service_for_record_class(
                 request.topic.record_cls
@@ -76,6 +70,7 @@ class EditPublishedRecordRequestType(NonDuplicableOARepoRequestType):
             if "self_html" in result_item["links"]:
                 return result_item["links"]["self_html"]
         return None
+    """
 
     @classproperty
     def available_actions(cls) -> dict[str, type[RequestAction]]:  # noqa N805

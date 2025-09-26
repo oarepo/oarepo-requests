@@ -70,6 +70,7 @@ class RecordProxy(InvenioRecordProxy):
     ) -> dict[str, Any]:
         """Select which fields to return when resolving the reference."""
         resolved_fields = super().pick_resolved_fields(identity, resolved_dict)
+        resolved_fields["links"] = resolved_dict["links"]
 
         for fld in self.picked_fields:
             set_field(resolved_fields, resolved_dict, fld)
@@ -84,7 +85,6 @@ class RecordProxy(InvenioRecordProxy):
                 "title": "Deleted record",
             },
         }
-
 
 class WithDeletedServiceResultProxy(InvenioServiceResultProxy):
     """Resolver proxy allowing deleted records."""

@@ -170,6 +170,8 @@ class OARepoRequests:
         """Initialize configuration."""
         from . import config
 
+        app.config.setdefault("OAREPO_REQUESTS_DEFAULT_RECEIVER", None)
+        app.config.setdefault("INVENIO_REQUESTS_SERVICE_CLASS", config.INVENIO_REQUESTS_SERVICE_CLASS)
         app.config.setdefault("REQUESTS_ALLOWED_RECEIVERS", []).extend(
             config.REQUESTS_ALLOWED_RECEIVERS
         )
@@ -229,8 +231,9 @@ def finalize_app(app: Flask) -> None:
 
     ### TODO: temp
     ext = app.extensions["oarepo-requests"]
-    req = app.extensions["invenio-requests"]
-    req.requests_service = ext.requests_service
+    # req = app.extensions["invenio-requests"]
+    # req.requests_service = ext.requests_service
+    # req.requests_resource.requests_service = ext.requests_service
     #
 
     rr_ext = app.extensions["invenio-records-resources"]

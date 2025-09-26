@@ -23,6 +23,7 @@ from oarepo_requests.actions.components import (
     RequestIdentityComponent,
     WorkflowTransitionComponent,
 )
+from oarepo_requests.services.oarepo.service import OARepoRequestsService
 
 from oarepo_requests.types import (
     DeletePublishedRecordRequestType,
@@ -112,3 +113,7 @@ PUBLISH_REQUEST_TYPES = ["publish_draft", "publish_new_version"]
 NOTIFICATIONS_BACKENDS = {
     EmailNotificationBackend.id: EmailNotificationBackend(),
 }
+
+INVENIO_REQUESTS_SERVICE_CLASS = OARepoRequestsService
+
+# INVENIO_REQUESTS_SERVICE_CONFIG_CLASS =
