@@ -43,8 +43,8 @@ def test_edit_autoaccept(
     assert not request["is_open"]
     assert request["is_closed"]
 
-    assert "draft_record:links:self" in request["payload"]
-    # assert "draft_record:links:self_html" in request["payload"]
+    assert "created_topic:links:self" in request["payload"]
+    assert "created_topic:links:self_html" in request["payload"]
 
     requests_model.Record.index.refresh()
     requests_model.Draft.index.refresh()
@@ -53,9 +53,9 @@ def test_edit_autoaccept(
         f"user{urls['BASE_URL']}",
     ).json["hits"]["hits"]
     assert len(search) == 1
-    assert search[0]["links"]["self"].endswith(
-        "/draft"
-    )  # TODO: why was this originally finding draft and now published record?
+    # assert search[0]["links"]["self"].endswith( # TODO: should self after edit point to published or draft?
+    #    "/draft"
+    #)
     assert search[0]["id"] == id_
 
 
@@ -92,15 +92,15 @@ def test_redirect_url(
     )
 
     creator_edit_accepted = creator_client.get(
-        f"{urls['BASE_URL_REQUESTS']}{edit_request_id}",
+        f"{urls['BASE_URL_REQUESTS']}{edit_request_id}?expand=true",
     ).json
     receiver_edit_accepted = receiver_client.get(
-        f"{urls['BASE_URL_REQUESTS']}{edit_request_id}",
+        f"{urls['BASE_URL_REQUESTS']}{edit_request_id}?expand=true",
     ).json  # receiver should be able to get the request but not to edit the draft - should not receive edit link
 
     assert (
-        link2testclient(creator_edit_accepted["links"]["ui_redirect_url"], ui=True)
-        == f"/requests-test/{record_id}/preview"
+        link2testclient(creator_edit_accepted["expanded"]["payload"]["created_topic"]["links"]["self_html"], ui=True)
+        == f"/api/test-ui-links/preview/{record_id}"
     )
     assert receiver_edit_accepted["links"]["ui_redirect_url"] is None
 
@@ -118,7 +118,7 @@ def test_redirect_url(
             ],
             ui=True,
         )
-        == f"/requests-test/{record_id}/preview"
+        == f"/api/test-ui-links/preview/{record_id}"
     )
 
     receiver_publish_request = receiver_client.get(

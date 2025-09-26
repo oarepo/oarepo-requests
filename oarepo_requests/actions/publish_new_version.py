@@ -27,9 +27,6 @@ from .publish_draft import PublishDraftAcceptAction
 class PublishNewVersionAcceptAction(PublishDraftAcceptAction):
     """Accept action for publishing draft requests."""
 
-    self_link = "published_record:links:self"
-    self_html_link = "published_record:links:self_html"
-
     name = _("Publish")
 
     def apply(

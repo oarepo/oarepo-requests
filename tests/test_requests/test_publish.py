@@ -92,6 +92,9 @@ def test_publish(
     requests_model.Draft.index.refresh()
 
     record = receiver_client.get(f"{urls['BASE_URL']}/{draft1_id}/draft?expand=true")
+    request = creator_client.get(
+        f"{urls['BASE_URL_REQUESTS']}{resp_request_submit["id"]}?expand=true",
+    ).json
     assert record.json["expanded"]["requests"][0]["links"]["actions"].keys() == {
         "accept",
         "decline",

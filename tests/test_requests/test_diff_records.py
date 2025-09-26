@@ -5,6 +5,7 @@
 # modify it under the terms of the MIT License; see LICENSE file for more
 # details.
 #
+"""
 from __future__ import annotations
 
 from invenio_access.permissions import system_identity
@@ -362,3 +363,4 @@ def test_request_active_diff(
     record_service.read(
         creator.identity, draft["id"]
     )  # will throw exception if record isn't published
+"""

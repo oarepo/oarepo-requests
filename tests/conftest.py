@@ -74,7 +74,8 @@ from oarepo_requests.types import (
     NonDuplicableOARepoRequestType,
 )
 from oarepo_requests.types.events.topic_update import TopicUpdateEventType
-
+from invenio_rdm_records.services.pids import providers
+from flask import Blueprint
 if TYPE_CHECKING:
     from invenio_requests.customizations.actions import RequestAction
 
@@ -97,6 +98,31 @@ def events_service():
 @pytest.fixture(scope="module", autouse=True)
 def location(location):
     return location
+
+@pytest.fixture(scope="module")
+def app(app):
+    bp = Blueprint("test_ui_links_ui", __name__)
+
+    # mock UI resource
+    @bp.route("/test-ui-links/preview/<pid_value>", methods=["GET"])
+    def preview(pid_value: str) -> str:
+        return "preview ok"
+
+    @bp.route("/test-ui-links/detail/<pid_value>", methods=["GET"])
+    def detail(pid_value: str) -> str:
+        return "detail ok"
+
+    @bp.route("/test-ui-links/latest/<pid_value>", methods=["GET"])
+    def latest(pid_value: str) -> str:
+        return "latest ok"
+
+    @bp.route("/test-ui-links/search", methods=["GET"])
+    def search() -> str:
+        return "search ok"
+
+    app.register_blueprint(bp)
+    return app
+
 
 
 """
@@ -767,11 +793,26 @@ def app_config(app_config, requests_model):
     app_config["APP_THEME"] = ["oarepo", "semantic-ui"]
 
     app_config["REST_CSRF_ENABLED"] = False
-    app_config["RDM_PERSISTENT_IDENTIFIERS"] = {}
     app_config["RDM_OPTIONAL_DOI_VALIDATOR"] = (
         lambda _draft, _previous_published, **_kwargs: True
     )
     app_config["RDM_RECORDS_ALLOW_RESTRICTION_AFTER_GRACE_PERIOD"] = True
+
+
+    app_config["RDM_PERSISTENT_IDENTIFIER_PROVIDERS"] = [
+        providers.OAIPIDProvider(
+            "oai",
+            label=_("OAI ID"),
+        ),
+    ]
+    app_config["RDM_PERSISTENT_IDENTIFIERS"] = {
+        "oai": {
+            "providers": ["oai"],
+            "required": True,
+            "label": _("OAI"),
+            "is_enabled": providers.OAIPIDProvider.is_enabled,
+        },
+    }
 
     app_config["CELERY_ALWAYS_EAGER"] = True
     app_config["CELERY_TASK_ALWAYS_EAGER"] = True
@@ -967,6 +1008,7 @@ def requests_model(model_types):
                 ),
             ),
         ],
+        configuration={"ui_blueprint_name": "test_ui_links_ui"},
     )
     workflow_model.register()
 

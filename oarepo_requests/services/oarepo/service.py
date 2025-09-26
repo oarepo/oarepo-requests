@@ -20,9 +20,11 @@ from oarepo_requests.errors import CustomHTTPJSONException, UnknownRequestTypeEr
 from oarepo_requests.proxies import current_oarepo_requests
 from invenio_records_resources.services.base.links import EndpointLink
 from oarepo_requests.utils import allowed_request_types_for_record, resolve_reference_dict
-from oarepo_requests.services.results import RequestTypesList
+from oarepo_requests.services.results import RequestTypesList, DraftAwareEntityResolverExpandableField, \
+    StringDraftAwareEntityResolverExpandableField
 from invenio_records_resources.services import LinksTemplate
 from invenio_drafts_resources.records.api import Record
+from invenio_requests.services.results import EntityResolverExpandableField
 
 if TYPE_CHECKING:
     from datetime import datetime
@@ -36,6 +38,16 @@ if TYPE_CHECKING:
 
 class OARepoRequestsService(RequestsService):
     """OARepo extension to invenio-requests service."""
+
+    @property
+    def expandable_fields(self):
+        """Get expandable fields."""
+        return [
+            EntityResolverExpandableField("created_by"),
+            EntityResolverExpandableField("receiver"),
+            DraftAwareEntityResolverExpandableField("topic"),
+            StringDraftAwareEntityResolverExpandableField("payload.created_topic"),
+        ]
 
     @unit_of_work()
     def create(  # noqa: PLR0913

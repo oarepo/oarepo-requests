@@ -24,7 +24,6 @@ log = logging.getLogger(__name__)
 class RedirectLink(Link):
     """..."""
 
-    # TODO: scrape prob
     def __init__(self, when: callable | None = None):
         """Construct."""
         self._when_func = when
@@ -32,16 +31,15 @@ class RedirectLink(Link):
     def expand(self, obj: Request, context: dict) -> dict:
         """Create the request links."""
         link = None
-        if hasattr(obj.type, "get_ui_redirect_url"):
-            link = obj.type.get_ui_redirect_url(obj, context)
+        if "payload" in obj and "created_topic:links:self_html" in obj["payload"]:
+            link = obj["payload"]["created_topic:links:self_html"]
         return link
 
 
 class OARepoRequestsServiceConfig(RequestsServiceConfig):
     """Configuration for the oarepo request service."""
 
-    """
-    links_item: ClassVar[dict] = {  # TODO: scrape prob
+
+    links_item: ClassVar[dict] = {
         "ui_redirect_url": RedirectLink(),
     }
-    """

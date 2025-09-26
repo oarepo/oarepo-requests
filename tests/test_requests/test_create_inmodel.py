@@ -71,7 +71,7 @@ def test_draft(
     resp_request_create = create_request_on_draft(
         creator.identity, draft1_id, "publish_draft"
     )
-    creator_client.post(
+    submit = creator_client.post(
         link2testclient(resp_request_create["links"]["actions"]["submit"]),
     )
     record = receiver_client.get(

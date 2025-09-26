@@ -140,7 +140,6 @@ class OARepoRequestsResource(RequestsResource, ErrorHandlersMixin):
             params=resource_requestctx.args,
             search_preference=search_preference(),
             expand=resource_requestctx.args.get("expand", False),
-            topic=resource_requestctx.view_args["topic"],
         )
         return hits.to_dict(), 200
 

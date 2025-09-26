@@ -11,7 +11,7 @@ requires-python = ">=3.13,<3.14"
 dependencies = [
     "oarepo-runtime>=2.0.0dev13,<3.0.0",
     "graphlib",
-    "oarepo[rdm,tests]>=13.0.0,<14.0.0",
+    "oarepo[rdm,tests]>=13.0.0,<15.0.0",
     "oarepo-model>=0.1.0.dev5",
     "oarepo-workflows>=2.0.0.dev2",
 ]

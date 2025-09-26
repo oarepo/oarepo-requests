@@ -13,11 +13,14 @@ from typing import Any
 
 import marshmallow as ma
 from invenio_records_resources.services import ConditionalLink
-from invenio_records_resources.services.base.links import Link, LinksTemplate
+from invenio_records_resources.services.base.links import Link, LinksTemplate, EndpointLink
 from invenio_requests.services.schemas import GenericRequestSchema
 from marshmallow import fields
 from oarepo_runtime.proxies import current_runtime
-from oarepo_runtime.services.config.link_conditions import is_published_record
+from invenio_drafts_resources.records.api import Record
+from invenio_requests.resolvers.registry import ResolverRegistry
+
+from oarepo_requests.utils import ref_to_str
 
 
 def get_links_schema() -> ma.fields.Dict:
@@ -46,15 +49,13 @@ class RequestTypeSchema(ma.Schema):
             )
         type_id = data["type_id"]
         record = self.context["record"]
-        service = current_runtime.get_record_service_for_record(record)
-        link = ConditionalLink(
-            cond=is_published_record(),
-            if_=Link(f"{{+api}}{service.config.url_prefix}{{id}}/requests/{type_id}"),
-            else_=Link(
-                f"{{+api}}{service.config.url_prefix}{{id}}/draft/requests/{type_id}"
-            ),
+        topic_ref = ref_to_str(
+            ResolverRegistry.reference_entity(record)
+            if isinstance(record, Record)
+            else record
         )
-        template = LinksTemplate({"create": link}, context={"id": record["id"]})
+        link = EndpointLink(f"oarepo_requests.create_args", params=["topic", "request_type"])
+        template = LinksTemplate({"create": link}, context={"topic": topic_ref, "request_type": type_id})
         data["links"] = {"actions": template.expand(self.context["identity"], record)}
         return data
 

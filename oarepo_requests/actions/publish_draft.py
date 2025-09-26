@@ -87,9 +87,6 @@ class PublishDraftAcceptAction(
 ):
     """Accept action for publishing draft requests."""
 
-    self_link = "published_record:links:self"
-    self_html_link = "published_record:links:self_html"
-
     name = _("Publish")
 
     def apply(
@@ -129,7 +126,8 @@ class PublishDraftAcceptAction(
         published_topic = topic_service.publish(
             identity, id_, *args, uow=uow, expand=False, **kwargs
         )
-        update_topic(self.request, state.topic, published_topic._record, uow)  # noqa SLF001
+        state.created_topic = published_topic._record
+        # TODO: topic update cascade?
         state.topic = published_topic._record  # noqa SLF001
         # TODO: notification
         return super().apply(identity, state, uow, *args, **kwargs)
