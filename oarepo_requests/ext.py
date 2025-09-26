@@ -16,11 +16,8 @@ from typing import TYPE_CHECKING
 import importlib_metadata
 from deepmerge import conservative_merger
 from invenio_base.utils import obj_or_import_string
-from invenio_requests.proxies import current_events_service
 
 from oarepo_requests.cli import oarepo_requests  # noqa
-from oarepo_requests.resources.events.config import OARepoRequestsCommentsResourceConfig
-from oarepo_requests.resources.events.resource import OARepoRequestsCommentsResource
 from oarepo_requests.resources.oarepo.config import OARepoRequestsResourceConfig
 from oarepo_requests.resources.oarepo.resource import OARepoRequestsResource
 from oarepo_requests.services.oarepo.config import OARepoRequestsServiceConfig
@@ -35,7 +32,6 @@ if TYPE_CHECKING:
     from invenio_requests.customizations import RequestType
 
     from oarepo_requests.actions.components import RequestActionComponent
-    from oarepo_requests.resolvers.ui import OARepoUIResolver
     from oarepo_requests.typing import EntityReference
 
 
@@ -61,14 +57,6 @@ class OARepoRequests:
         self.init_services(app)
         self.init_resources(app)
         app.extensions["oarepo-requests"] = self
-
-    @property
-    def entity_reference_ui_resolvers(self) -> dict[str, OARepoUIResolver]:
-        """Resolvers for entity references.
-
-        :return: a dictionary (entity-type -> resolver instance)
-        """
-        return self.app.config["ENTITY_REFERENCE_UI_RESOLVERS"]
 
     @property
     def ui_serialization_referenced_fields(self) -> list[str]:
@@ -162,10 +150,7 @@ class OARepoRequests:
             oarepo_requests_service=self.requests_service,
             config=OARepoRequestsResourceConfig.build(app),
         )
-        self.request_events_resource = OARepoRequestsCommentsResource(
-            service=current_events_service,
-            config=OARepoRequestsCommentsResourceConfig.build(app),
-        )
+        # TODO: event resource
 
     from invenio_requests.customizations.actions import RequestAction
 
@@ -187,9 +172,6 @@ class OARepoRequests:
 
         app.config.setdefault("REQUESTS_ALLOWED_RECEIVERS", []).extend(
             config.REQUESTS_ALLOWED_RECEIVERS
-        )
-        app.config.setdefault("ENTITY_REFERENCE_UI_RESOLVERS", {}).update(
-            config.ENTITY_REFERENCE_UI_RESOLVERS
         )
         app.config.setdefault("REQUESTS_UI_SERIALIZATION_REFERENCED_FIELDS", []).extend(
             config.REQUESTS_UI_SERIALIZATION_REFERENCED_FIELDS
@@ -219,25 +201,15 @@ class OARepoRequests:
             if event_type not in app_registered_event_types:
                 app_registered_event_types.append(event_type)
 
+        # TODO: notifications config
         app_registered_event_types = app.config.setdefault(
             "NOTIFICATION_RECIPIENTS_RESOLVERS", {}
-        )
-        app.config["NOTIFICATION_RECIPIENTS_RESOLVERS"] = conservative_merger.merge(
-            app_registered_event_types, config.NOTIFICATION_RECIPIENTS_RESOLVERS
-        )
-
-        app.config.setdefault("NOTIFICATIONS_ENTITY_RESOLVERS", [])
-        app.config["NOTIFICATIONS_ENTITY_RESOLVERS"] += (
-            config.NOTIFICATIONS_ENTITY_RESOLVERS
         )
 
         # can't set default config directly because it might be initialized to {} in invenio-notifications
         app_notification_builders = app.config.setdefault("NOTIFICATIONS_BUILDERS", {})
         app_notification_backends = app.config.setdefault("NOTIFICATIONS_BACKENDS", {})
 
-        app.config["NOTIFICATIONS_BUILDERS"] = conservative_merger.merge(
-            app_notification_builders, config.NOTIFICATIONS_BUILDERS
-        )
         app.config["NOTIFICATIONS_BACKENDS"] = conservative_merger.merge(
             app_notification_backends, config.NOTIFICATIONS_BACKENDS
         )
@@ -254,14 +226,20 @@ def finalize_app(app: Flask) -> None:
 
     # Register services - cannot be done in extension because
     # Invenio-Records-Resources might not have been initialized.
-    rr_ext = app.extensions["invenio-records-resources"]
+
+    ### TODO: temp
     ext = app.extensions["oarepo-requests"]
+    req = app.extensions["invenio-requests"]
+    req.requests_service = ext.requests_service
+    #
+
+    rr_ext = app.extensions["invenio-records-resources"]
 
     # services
-    rr_ext.registry.register(
-        ext.requests_service,
-        service_id=ext.requests_service.config.service_id,
-    )
+    #rr_ext.registry.register(
+    #    ext.requests_service,
+    #    service_id=ext.requests_service.config.service_id,
+    #)
 
     # TODO: i have to do this cause there is bug in invenio-requests for events
     # but imo this is better than entrypoints

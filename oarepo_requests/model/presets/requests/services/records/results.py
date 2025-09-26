@@ -18,7 +18,7 @@ from oarepo_model.customizations import (
 )
 from oarepo_model.presets import Preset
 
-from oarepo_requests.services.results import RequestsComponent, RequestTypesComponent
+from oarepo_requests.services.components.results import RequestTypesComponent, RequestsComponent
 
 if TYPE_CHECKING:
     from collections.abc import Generator

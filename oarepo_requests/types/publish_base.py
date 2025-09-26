@@ -23,6 +23,7 @@ from oarepo_requests.actions.publish_draft import (
     PublishDraftDeclineAction,
     PublishDraftSubmitAction,
 )
+from ..temp_utils import search_requests
 
 from ..utils import classproperty
 from .generic import NonDuplicableOARepoRequestType
@@ -39,9 +40,6 @@ if TYPE_CHECKING:
 
 from invenio_access.permissions import system_identity
 from invenio_requests.records.api import Request
-
-from oarepo_requests.utils import get_requests_service_for_records_service
-
 from ..errors import UnresolvedRequestsError
 
 
@@ -80,14 +78,7 @@ class PublishRequestType(NonDuplicableOARepoRequestType):
         topic: Record,
     ) -> None:
         """Assert that there are no pending requests on the topic."""
-        topic_service = current_runtime.get_record_service_for_record(topic)
-
-        request_service = get_requests_service_for_records_service(
-            topic_service
-        )  # , extra_filters = TermQuery(status="open")
-        requests = request_service.search_requests_for_draft(
-            system_identity, topic.pid.pid_value
-        )
+        requests = search_requests(system_identity, topic)
 
         for result in requests._results:  # noqa SLF001
             # note: we can not use solely the result.is_open because changes may not be committed yet

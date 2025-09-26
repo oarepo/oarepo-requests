@@ -13,12 +13,10 @@ from typing import TYPE_CHECKING, Any
 
 from invenio_access.permissions import system_identity
 from invenio_i18n import _
-from invenio_notifications.services.uow import NotificationOp
 from invenio_requests.records.api import Request
 from oarepo_runtime.proxies import current_runtime
 
 from oarepo_requests.errors import UnresolvedRequestsError, VersionAlreadyExists
-from oarepo_requests.utils import get_requests_service_for_records_service
 
 from .generic import (
     AddTopicLinksOnPayloadMixin,
@@ -26,7 +24,7 @@ from .generic import (
     OARepoDeclineAction,
     OARepoSubmitAction,
 )
-
+from ..temp_utils import search_requests
 
 if TYPE_CHECKING:
     from flask_principal import Identity
@@ -53,6 +51,7 @@ class PublishMixin:
         except:  # noqa E722: used for displaying buttons, so ignore errors here
             return False
         return True
+
 
 # TODO: snapshot
 class PublishDraftSubmitAction(PublishMixin, OARepoSubmitAction):
@@ -105,10 +104,7 @@ class PublishDraftAcceptAction(
         topic_service = current_runtime.get_record_service_for_record(state.topic)
         if not topic_service:
             raise KeyError(f"topic {state.topic} service not found")
-        request_service = get_requests_service_for_records_service(topic_service)
-        requests = request_service.search_requests_for_draft(
-            system_identity, state.topic.pid.pid_value
-        )
+        requests = search_requests(system_identity, state.topic)
 
         for result in requests._results:  # noqa SLF001
             if (

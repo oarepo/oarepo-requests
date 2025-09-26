@@ -23,10 +23,9 @@ if TYPE_CHECKING:
 
     from .components import RequestActionState
 
+
 # TODO: snapshot
-class NewVersionAcceptAction(
-    AddTopicLinksOnPayloadMixin, OARepoAcceptAction
-):
+class NewVersionAcceptAction(AddTopicLinksOnPayloadMixin, OARepoAcceptAction):
     """Accept creation of a new version of a published record."""
 
     self_link = "draft_record:links:self"

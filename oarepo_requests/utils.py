@@ -43,9 +43,6 @@ if TYPE_CHECKING:
 
     from oarepo_requests.typing import EntityReference
 
-    from .services.record.service import RecordRequestsService
-
-
 # TODO: perhaps we could use centrally defined custom types in runtime?
 type JsonValue = (
     str
@@ -210,17 +207,6 @@ def get_entity_key_for_record_cls(record_cls: type[Record]) -> str:
     )
 
 
-def get_requests_service_for_records_service(
-    records_service: RecordService,
-) -> RecordRequestsService:
-    """Get the requests service for the records service.
-
-    :param records_service: Records service.
-    :return: Requests service for the records service.
-    """
-    return current_service_registry.get(f"{records_service.config.service_id}_requests")
-
-
 def stringify_first_val[T](dct: T) -> T:
     """Convert the top-level value in a dictionary to string.
 
@@ -242,6 +228,11 @@ def reference_to_tuple(reference: EntityReference) -> tuple[str, str]:
     :return: Tuple in the form ("datasets", "id").
     """
     return next(iter(reference.items()))
+
+def string_to_reference(reference_str: str) -> EntityReference:
+    """Convert the reference string to a reference dict."""
+    split = reference_str.split(":")
+    return {split[0]: split[1]}
 
 
 # TODO: consider moving to oarepo-workflows

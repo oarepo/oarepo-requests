@@ -14,7 +14,6 @@ from typing import TYPE_CHECKING, Any, override
 from oarepo_runtime.proxies import current_runtime
 
 
-
 from .generic import AddTopicLinksOnPayloadMixin, OARepoAcceptAction
 
 if TYPE_CHECKING:
@@ -23,10 +22,9 @@ if TYPE_CHECKING:
 
     from .components import RequestActionState
 
+
 # TODO: snapshot
-class EditTopicAcceptAction(
-    AddTopicLinksOnPayloadMixin, OARepoAcceptAction
-):
+class EditTopicAcceptAction(AddTopicLinksOnPayloadMixin, OARepoAcceptAction):
     """Accept creation of a draft of a published record for editing metadata."""
 
     self_link = "draft_record:links:self"
