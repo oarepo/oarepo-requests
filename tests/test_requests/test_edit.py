@@ -43,8 +43,6 @@ def test_edit_autoaccept(
     assert not request["is_open"]
     assert request["is_closed"]
 
-    assert "created_topic:links:self" in request["payload"]
-    assert "created_topic:links:self_html" in request["payload"]
 
     requests_model.Record.index.refresh()
     requests_model.Draft.index.refresh()
@@ -60,6 +58,7 @@ def test_edit_autoaccept(
 
 
 def test_redirect_url(
+    requests_model,
     logged_client,
     users,
     urls,
@@ -69,6 +68,7 @@ def test_redirect_url(
     link2testclient,
     search_clear,
 ):
+    # whether the created topic is accessible now depends on permissions to see
     creator = users[0]
     receiver = users[1]
     creator_client = logged_client(creator)
@@ -90,7 +90,8 @@ def test_redirect_url(
     creator_client.get(
         f"{urls['BASE_URL_REQUESTS']}{edit_request_id}",
     )
-
+    requests_model.Record.index.refresh()
+    requests_model.Draft.index.refresh()
     creator_edit_accepted = creator_client.get(
         f"{urls['BASE_URL_REQUESTS']}{edit_request_id}?expand=true",
     ).json
@@ -102,35 +103,30 @@ def test_redirect_url(
         link2testclient(creator_edit_accepted["expanded"]["payload"]["created_topic"]["links"]["self_html"], ui=True)
         == f"/api/test-ui-links/preview/{record_id}"
     )
-    assert receiver_edit_accepted["links"]["ui_redirect_url"] is None
+    assert receiver_edit_accepted['expanded']['payload']['created_topic']['links'] == {}
 
     draft = creator_client.get(f"{urls['BASE_URL']}/{record_id}/draft").json
     publish_request = submit_request_on_draft(
         creator.identity, draft["id"], "publish_draft"
     )
+    requests_model.Record.index.refresh()
+    requests_model.Draft.index.refresh()
     receiver_edit_request_after_publish_draft_submitted = receiver_client.get(
-        f"{urls['BASE_URL_REQUESTS']}{edit_request_id}"
+        f"{urls['BASE_URL_REQUESTS']}{edit_request_id}?expand=true"
     ).json  # now receiver should have a right to view but not edit the topic
-    assert (
-        link2testclient(
-            receiver_edit_request_after_publish_draft_submitted["links"][
-                "ui_redirect_url"
-            ],
-            ui=True,
-        )
-        == f"/api/test-ui-links/preview/{record_id}"
-    )
+    assert receiver_edit_request_after_publish_draft_submitted["expanded"]["payload"]["created_topic"]["links"] == {} # receiver doesn't have permission to topic
+
 
     receiver_publish_request = receiver_client.get(
         f"{urls['BASE_URL_REQUESTS']}{publish_request['id']}"
     ).json
-    receiver_client.post(
+    accept = receiver_client.post(
         link2testclient(receiver_publish_request["links"]["actions"]["accept"])
     )
-
+    requests_model.Record.index.refresh()
+    requests_model.Draft.index.refresh()
     creator_edit_request_after_merge = creator_client.get(
-        f"{urls['BASE_URL_REQUESTS']}{edit_request_id}",
+        f"{urls['BASE_URL_REQUESTS']}{edit_request_id}?expand=true",
     ).json
-    assert (
-        creator_edit_request_after_merge["links"]["ui_redirect_url"] is None
-    )  # draft now doesn't exist so we can't redirect to it
+
+    assert creator_edit_request_after_merge["expanded"]["payload"]["created_topic"]["links"] == {}

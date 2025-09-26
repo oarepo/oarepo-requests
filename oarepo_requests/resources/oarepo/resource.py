@@ -85,7 +85,10 @@ class OARepoRequestsResource(RequestsResource, ErrorHandlersMixin):
         """
 
         request_type_id = resource_requestctx.data.pop("request_type", None)
-        topic = resolve_reference_dict(string_to_reference(resource_requestctx.data.pop("topic", None)))
+        topic = resource_requestctx.data.pop("topic", None)
+        if isinstance(topic, str):
+            topic = string_to_reference(topic)
+        topic = resolve_reference_dict(topic)
 
         items = self.oarepo_requests_service.create(
             identity=g.identity,

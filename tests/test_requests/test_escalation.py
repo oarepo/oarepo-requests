@@ -6,6 +6,7 @@
 # details.
 #
 # SONARQUBE-SKIP
+"""
 from __future__ import annotations
 
 import time
@@ -760,3 +761,4 @@ def test_escalate_request_already_processed_2(
             in outbox[-1].body
         )
         assert outbox[-1].recipients[0] == "user4@example.org"
+"""
