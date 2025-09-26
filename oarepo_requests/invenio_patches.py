@@ -12,14 +12,9 @@ from __future__ import annotations
 from functools import cached_property, partial
 from typing import TYPE_CHECKING, Any, override
 
-from flask import current_app
-from flask_babel import LazyString, force_locale
-from flask_resources import JSONSerializer, ResponseHandler
-from invenio_records_resources.resources.records.headers import etag_headers
+from flask_babel import LazyString
 from invenio_records_resources.services.records.params import FilterParam
 from invenio_records_resources.services.records.params.base import ParamInterpreter
-from invenio_requests.notifications.generators import RequestParticipantsRecipient
-from invenio_requests.resources.events.config import RequestCommentsResourceConfig
 from invenio_requests.resources.requests.config import (
     RequestSearchRequestArgsSchema,
     RequestsResourceConfig,
@@ -33,11 +28,6 @@ from invenio_search.engine import dsl
 from marshmallow import fields
 from opensearch_dsl.query import Bool
 
-from oarepo_requests.notifications.generators import OARepoRequestParticipantsRecipient
-from oarepo_requests.resources.ui import (
-    OARepoRequestEventsUIJSONSerializer,
-    OARepoRequestsUIJSONSerializer,
-)
 from oarepo_requests.services.oarepo.config import OARepoRequestsServiceConfig
 
 if TYPE_CHECKING:
@@ -170,20 +160,7 @@ def override_invenio_requests_config(
             def serialize_object(self) -> Callable:
                 return self.__instance.serialize_object
 
-        RequestsResourceConfig.response_handlers = {
-            "application/json": ResponseHandler(JSONSerializer(), headers=etag_headers),
-            "application/vnd.inveniordm.v1+json": ResponseHandler(
-                LazySerializer(OARepoRequestsUIJSONSerializer), headers=etag_headers
-            ),
-        }
-
-        RequestCommentsResourceConfig.response_handlers = {
-            "application/vnd.inveniordm.v1+json": ResponseHandler(
-                LazySerializer(OARepoRequestEventsUIJSONSerializer),
-                headers=etag_headers,
-            ),
-            **RequestCommentsResourceConfig.response_handlers,
-        }
+        # TODO: patch response handlers
 
         from invenio_i18n import _
         from invenio_requests.proxies import current_request_type_registry
@@ -206,64 +183,7 @@ def override_invenio_requests_config(
         type._label = _("Type")  # noqa SLF001
 
 
-def override_invenio_notifications(
-    state: BlueprintSetupState, *args: Any, **kwargs: Any
-) -> None:  # noqa ARG001
-    """Override invenio notifications configuration."""
-    with state.app.app_context():
-        from invenio_notifications.services.generators import EntityResolve
-        from invenio_requests.notifications.builders import (
-            CommentRequestEventCreateNotificationBuilder,
-        )
-
-        from oarepo_requests.notifications.generators import RequestEntityResolve
-
-        for r in CommentRequestEventCreateNotificationBuilder.context:
-            if isinstance(r, EntityResolve) and r.key == "request.topic":
-                break
-        else:
-            CommentRequestEventCreateNotificationBuilder.context.append(
-                EntityResolve(key="request.topic"),
-            )
-
-        for r in CommentRequestEventCreateNotificationBuilder.recipients:
-            if isinstance(r, RequestParticipantsRecipient):
-                CommentRequestEventCreateNotificationBuilder.recipients.remove(r)
-                CommentRequestEventCreateNotificationBuilder.recipients.append(
-                    OARepoRequestParticipantsRecipient(key="request")
-                )
-                break
-
-        for idx, r in list(
-            enumerate(CommentRequestEventCreateNotificationBuilder.context)
-        ):
-            if isinstance(r, EntityResolve) and r.key == "request":
-                CommentRequestEventCreateNotificationBuilder.context[idx] = (
-                    # entity resolver that adds the correct title if it is missing
-                    RequestEntityResolve(
-                        key="request",
-                    )
-                )
-
-        from invenio_notifications.tasks import (
-            dispatch_notification,
-        )
-
-        original_delay = dispatch_notification.delay
-
-        def i18n_enabled_notification_delay(
-            backend: str, recipient: dict, notification: dict
-        ) -> None:
-            """Delay can not handle lazy strings, so we need to resolve them before calling the delay."""
-            locale = None
-            if isinstance(recipient, dict):
-                locale = recipient.get("data", {}).get("preferences", {}).get("locale")
-            locale = locale or current_app.config.get("BABEL_DEFAULT_LOCALE", "en")
-            with force_locale(locale):
-                notification = resolve_lazy_strings(notification)
-            return original_delay(backend, recipient, notification)
-
-        dispatch_notification.delay = i18n_enabled_notification_delay
+# TODO: override_invenio_notifications
 
 
 def resolve_lazy_strings(data: dict | list | LazyString | str) -> str:

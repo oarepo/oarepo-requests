@@ -18,12 +18,16 @@ from invenio_requests.services import RequestsService
 
 from oarepo_requests.errors import CustomHTTPJSONException, UnknownRequestTypeError
 from oarepo_requests.proxies import current_oarepo_requests
+from invenio_records_resources.services.base.links import EndpointLink
+from oarepo_requests.utils import allowed_request_types_for_record, resolve_reference_dict
+from oarepo_requests.services.results import RequestTypesList
+from invenio_records_resources.services import LinksTemplate
+from invenio_drafts_resources.records.api import Record
 
 if TYPE_CHECKING:
     from datetime import datetime
 
     from flask_principal import Identity
-    from invenio_records.api import RecordBase
     from invenio_records_resources.services.uow import UnitOfWork
     from invenio_requests.services.requests.results import RequestItem
 
@@ -41,7 +45,7 @@ class OARepoRequestsService(RequestsService):
         request_type: str,
         receiver: EntityReference | Any | None = None,
         creator: EntityReference | Any | None = None,
-        topic: RecordBase = None,
+        topic: Record = None,
         expires_at: datetime | None = None,  # noqa ARG002
         uow: UnitOfWork = None,
         expand: bool = False,
@@ -114,24 +118,23 @@ class OARepoRequestsService(RequestsService):
             return result
         return None
 
-    def read(self, identity: Identity, id_: str, expand: bool = False) -> RequestItem:
-        """Retrieve a request."""
-        return super().read(identity, id_, expand)
+    def applicable_request_types(
+        self, identity: Identity, topic: Record | EntityReference
+    ) -> RequestTypesList:
+        """Get applicable request types for a record."""
+        topic = (
+            resolve_reference_dict(topic)
+            if not isinstance(topic, Record)
+            else topic
+        )  # type: ignore if isinstance(record, Record) else record
 
-    @unit_of_work()
-    def update(  # noqa: PLR0913
-        self,
-        identity: Identity,
-        id_: str,
-        data: dict,
-        revision_id: int | None = None,
-        uow: UnitOfWork | None = None,
-        expand: bool = False,
-    ) -> RequestItem:
-        """Update a request."""
-        # TODO: originally asserting whether uow is none - why
-        result = super().update(
-            identity, id_, data, revision_id=revision_id, uow=uow, expand=expand
+        allowed_request_types = allowed_request_types_for_record(identity, topic)
+        return RequestTypesList(
+            service=self,  # TODO: unserious
+            identity=identity,
+            results=list(allowed_request_types.values()),
+            links_tpl=LinksTemplate(
+                {"self": EndpointLink("oarepo_requests.applicable_request_types")}
+            ),
+            record=topic,
         )
-        uow.register(IndexRefreshOp(indexer=self.indexer, index=self.record_cls.index))
-        return result

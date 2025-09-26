@@ -41,6 +41,7 @@ def test_requests_field(
     assert "requests" not in record.json.get("expanded", {})
     assert "requests" in expanded_record.json["expanded"]
 
+
 """
 def test_user_receiver(
     logged_client,
@@ -106,27 +107,39 @@ def test_multiple_recipients(
     request = creator_client.get(
         f"{urls['BASE_URL_REQUESTS']}{resp_request_submit['id']}?expand=true"
     ).json
-    assert request["expanded"]["receiver"] == {'user': {'1': {'active': True,
-                'blocked_at': None,
-                'confirmed_at': None,
-                'email': 'user1@example.org',
-                'id': '1',
-                'is_current_user': True,
-                'links': {'avatar': 'https://127.0.0.1:5000/api/users/1/avatar.svg',
-                          'records_html': 'https://127.0.0.1:5000/search/records?q=parent.access.owned_by.user:1',
-                          'self': 'https://127.0.0.1:5000/api/users/1'},
-                'profile': {'affiliations': 'CERN', 'full_name': ''},
-                'username': None,
-                'verified_at': None},
-          '2': {'active': None,
-                'blocked_at': None,
-                'confirmed_at': None,
-                'email': '',
-                'id': '2',
-                'is_current_user': False,
-                'links': {'avatar': 'https://127.0.0.1:5000/api/users/2/avatar.svg',
-                          'records_html': 'https://127.0.0.1:5000/search/records?q=parent.access.owned_by.user:2',
-                          'self': 'https://127.0.0.1:5000/api/users/2'},
-                'profile': {'affiliations': 'CERN', 'full_name': ''},
-                'username': 'beetlesmasher',
-                'verified_at': None}}}
+    assert request["expanded"]["receiver"] == {
+        "user": {
+            "1": {
+                "active": True,
+                "blocked_at": None,
+                "confirmed_at": None,
+                "email": "user1@example.org",
+                "id": "1",
+                "is_current_user": True,
+                "links": {
+                    "avatar": "https://127.0.0.1:5000/api/users/1/avatar.svg",
+                    "records_html": "https://127.0.0.1:5000/search/records?q=parent.access.owned_by.user:1",
+                    "self": "https://127.0.0.1:5000/api/users/1",
+                },
+                "profile": {"affiliations": "CERN", "full_name": ""},
+                "username": None,
+                "verified_at": None,
+            },
+            "2": {
+                "active": None,
+                "blocked_at": None,
+                "confirmed_at": None,
+                "email": "",
+                "id": "2",
+                "is_current_user": False,
+                "links": {
+                    "avatar": "https://127.0.0.1:5000/api/users/2/avatar.svg",
+                    "records_html": "https://127.0.0.1:5000/search/records?q=parent.access.owned_by.user:2",
+                    "self": "https://127.0.0.1:5000/api/users/2",
+                },
+                "profile": {"affiliations": "CERN", "full_name": ""},
+                "username": "beetlesmasher",
+                "verified_at": None,
+            },
+        }
+    }

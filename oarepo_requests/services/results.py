@@ -9,84 +9,20 @@
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Any, cast
+from typing import TYPE_CHECKING, Any
+
+from flask_principal import Identity
+from invenio_records_resources.records import Record
 
 from invenio_records_resources.services import LinksTemplate
-from invenio_records_resources.services.errors import PermissionDeniedError
-from oarepo_runtime.proxies import current_runtime
-from oarepo_runtime.services.results import RecordList, ResultComponent
-
+from invenio_requests.customizations import RequestType
+from oarepo_runtime.services.results import RecordList
 from oarepo_requests.services.schema import RequestTypeSchema
-from oarepo_requests.utils import (
-    allowed_request_types_for_record,
-    get_requests_service_for_records_service,
-)
 
 if TYPE_CHECKING:
     from collections.abc import Iterator
-
-    from flask_principal import Identity
     from invenio_records_resources.records.api import Record
-    from invenio_requests.customizations.request_types import RequestType
-
-
-class RequestTypesComponent(ResultComponent):
-    """Component for expanding request types."""
-
-    def update_data(
-        self, identity: Identity, record: Record, projection: dict, expand: bool
-    ) -> None:
-        """Expand request types if requested."""
-        if not expand:
-            return
-        allowed_request_types = allowed_request_types_for_record(identity, record)
-        request_types_list = serialize_request_types(
-            allowed_request_types, identity, record
-        )
-        projection["expanded"]["request_types"] = request_types_list
-
-
-def serialize_request_types(
-    request_types: dict[str, RequestType], identity: Identity, record: Record
-) -> list[RequestTypeSchema]:
-    """Serialize request types.
-
-    :param request_types: Request types to serialize.
-    :param identity: Identity of the user.
-    :param record: Record for which the request types are serialized.
-    :return: List of serialized request types.
-    """
-    return [
-        RequestTypeSchema(context={"identity": identity, "record": record}).dump(
-            request_type
-        )
-        for request_type in request_types.values()
-    ]
-
-
-class RequestsComponent(ResultComponent):
-    """Component for expanding requests on a record."""
-
-    def update_data(
-        self, identity: Identity, record: Record, projection: dict, expand: bool
-    ) -> None:
-        """Expand requests if requested."""
-        if not expand:
-            return
-
-        service = get_requests_service_for_records_service(
-            current_runtime.get_record_service_for_record(record)
-        )
-        reader = (
-            cast("DraftRecordRequestsService", service).search_requests_for_draft
-            if getattr(record, "is_draft", False)
-            else service.search_requests_for_record
-        )
-        try:
-            requests = list(reader(identity, record["id"]).hits)
-        except PermissionDeniedError:
-            requests = []
-        projection["expanded"]["requests"] = requests
+    from marshmallow import Schema
 
 
 class RequestTypesListDict(dict):
@@ -98,33 +34,23 @@ class RequestTypesListDict(dict):
 class RequestTypesList(RecordList):
     """An in-memory list of request types compatible with opensearch record list."""
 
-    def __init__(self, *args: Any, record: Record | None = None, **kwargs: Any) -> None:
+    def __init__(self, *args: Any, record: Record | None = None, schema: Schema | None=None, **kwargs: Any) -> None:
         """Initialize the list of request types."""
         self._record = record
         super().__init__(*args, **kwargs)
+        self._schema = schema or RequestTypeSchema
 
     def to_dict(self) -> dict:
         """Return result as a dictionary."""
         hits = list(self.hits)
-
-        record_links = self._service.config.links_item
-        rendered_record_links = LinksTemplate(record_links, context={}).expand(
-            self._identity, self._record
-        )
-        links_tpl = LinksTemplate(
-            self._links_tpl._links,  # noqa SLF001
-            context={
-                **{f"record_link_{k}": v for k, v in rendered_record_links.items()}
-            },
-        )
         res = RequestTypesListDict(
             hits={
                 "hits": hits,
                 "total": self.total,
             }
         )
-        if self._links_tpl:
-            res["links"] = links_tpl.expand(self._identity, None)
+        if self._links_tpl: # TODO: pass1: query params in link?
+            res["links"] = self._links_tpl.expand(self._identity, None)
         res.topic = self._record
         return res
 
@@ -149,3 +75,21 @@ class RequestTypesList(RecordList):
     def total(self) -> int:
         """Total number of hits."""
         return len(self._results)
+
+
+def serialize_request_types(
+    request_types: dict[str, RequestType], identity: Identity, record: Record
+) -> list[RequestTypeSchema]:
+    """Serialize request types.
+
+    :param request_types: Request types to serialize.
+    :param identity: Identity of the user.
+    :param record: Record for which the request types are serialized.
+    :return: List of serialized request types.
+    """
+    return [
+        RequestTypeSchema(context={"identity": identity, "record": record}).dump(
+            request_type
+        )
+        for request_type in request_types.values()
+    ]

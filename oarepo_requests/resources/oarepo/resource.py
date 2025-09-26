@@ -19,11 +19,12 @@ from invenio_records_resources.resources.records.resource import (
     request_extra_args,
     request_headers,
     request_view_args,
+    request_search_args,
 )
 from invenio_requests.proxies import current_requests_service
 from invenio_requests.resources import RequestsResource
-
-from oarepo_requests.utils import resolve_reference_dict, stringify_first_val
+from invenio_records_resources.resources.records.utils import search_preference
+from oarepo_requests.utils import resolve_reference_dict, stringify_first_val, reference_to_tuple, string_to_reference
 
 if TYPE_CHECKING:
     from invenio_requests.services.requests import RequestsService
@@ -56,34 +57,15 @@ class OARepoRequestsResource(RequestsResource, ErrorHandlersMixin):
         routes = self.config.routes
 
         return [
+            route("GET", p(routes["list"]), self.search),
             route("POST", p(routes["list"]), self.create),
+            route("POST", p(routes["list-args"]), self.create_args),
             route(
-                "POST",
-                p(routes["list-extended"]),
-                self.create,
-                endpoint="extended_create",
+                "GET", p(routes["list-applicable"]), self.applicable_request_types
             ),
-            route("GET", p(routes["item-extended"]), self.read_extended),
-            route("PUT", p(routes["item-extended"]), self.update),
         ]
 
     @request_extra_args
-    @request_headers
-    @request_view_args
-    @request_data
-    @response_handler()
-    def update(self) -> tuple[dict, int]:
-        """Update a request with a new payload."""
-        item = self.oarepo_requests_service.update(
-            id_=resource_requestctx.view_args["id"],
-            identity=g.identity,
-            data=resource_requestctx.data,
-            expand=resource_requestctx.args.get("expand", False),
-        )
-        return item.to_dict(), 200
-
-    @request_extra_args
-    @request_view_args
     @request_headers
     @request_data
     @response_handler()
@@ -101,17 +83,15 @@ class OARepoRequestsResource(RequestsResource, ErrorHandlersMixin):
                 ...payload
             }
         """
+
+        request_type_id = resource_requestctx.data.pop("request_type", None)
+        topic = resolve_reference_dict(string_to_reference(resource_requestctx.data.pop("topic", None)))
+
         items = self.oarepo_requests_service.create(
             identity=g.identity,
             data=resource_requestctx.data,
-            request_type=resource_requestctx.data.pop("request_type", None),
-            topic=(
-                resolve_reference_dict(
-                    stringify_first_val(resource_requestctx.data.pop("topic", None))
-                )
-                if resource_requestctx.data
-                else None
-            ),
+            request_type=request_type_id,
+            topic=topic,
             expand=resource_requestctx.args.get("expand", False),
         )
 
@@ -119,12 +99,60 @@ class OARepoRequestsResource(RequestsResource, ErrorHandlersMixin):
 
     @request_extra_args
     @request_view_args
+    @request_headers
+    @request_data
     @response_handler()
-    def read_extended(self) -> tuple[dict, int]:
-        """Read a request on this url."""
-        item = self.oarepo_requests_service.read(
-            id_=resource_requestctx.view_args["id"],
+    def create_args(self) -> tuple[dict, int]:
+        """Create a new request based on a request type.
+
+        The data is in the form of:
+            .. code-block:: json
+            {
+                "request_type": "request_type",
+                "topic": {
+                    "type": "pid",
+                    "value": "value"
+                },
+                ...payload
+            }
+        """
+        request_type_id = resource_requestctx.view_args["request_type"]
+        topic = resolve_reference_dict(string_to_reference(resource_requestctx.view_args["topic"]))
+
+        items = self.oarepo_requests_service.create(
             identity=g.identity,
+            data=resource_requestctx.data,
+            request_type=request_type_id,
+            topic=topic,
             expand=resource_requestctx.args.get("expand", False),
         )
-        return item.to_dict(), 200
+
+        return items.to_dict(), 201
+
+    @request_extra_args
+    @request_search_args
+    @request_view_args
+    @response_handler(many=True)
+    def search(self):
+        """Perform a search over the items."""
+        hits = self.service.search(
+            identity=g.identity,
+            params=resource_requestctx.args,
+            search_preference=search_preference(),
+            expand=resource_requestctx.args.get("expand", False),
+            topic=resource_requestctx.view_args["topic"],
+        )
+        return hits.to_dict(), 200
+
+    @request_search_args
+    @request_view_args
+    @response_handler(many=True)
+    def applicable_request_types(self) -> tuple[dict, int]:
+        """List request types."""
+        hits = self.service.applicable_request_types(
+            identity=g.identity,
+            topic=resolve_reference_dict(
+                stringify_first_val(resource_requestctx.args["topic"])
+            ),
+        )
+        return hits.to_dict(), 200

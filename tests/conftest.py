@@ -250,14 +250,6 @@ class DefaultRequests(WorkflowRequestPolicy):
             cancelled="published",
         ),
     )
-    delete_draft = WorkflowRequest(
-        requesters=[
-            IfInState("draft", [RecordOwners()]),
-            IfInState("publishing", [RecordOwners()]),
-        ],
-        recipients=[AutoApprove()],
-        transitions=WorkflowTransitions(),
-    )
     edit_published_record = WorkflowRequest(
         requesters=[IfNoEditDraft([IfInState("published", [RecordOwners()])])],
         recipients=[AutoApprove()],
@@ -843,10 +835,10 @@ def password():
 
 @pytest.fixture
 def more_users(app, db, UserFixture, password):  # noqa N803
-
     if db.engine.dialect.name == "postgresql":
         from sqlalchemy import text
         from invenio_accounts.models import User
+
         name = User.__table__.name
         sql = f'ALTER SEQUENCE "{name}_id_seq" RESTART WITH 1'
         db.session.execute(text(sql))

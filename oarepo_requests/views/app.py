@@ -9,7 +9,6 @@
 
 from __future__ import annotations
 
-from pathlib import Path
 from typing import TYPE_CHECKING
 
 from flask import Blueprint
@@ -24,28 +23,3 @@ def create_app_blueprint(app: Flask) -> Blueprint:  # noqa ARG001
     :param app: Flask application
     """
     return Blueprint("oarepo_requests_app", __name__, url_prefix="/requests/")
-
-
-def create_app_events_blueprint(app: Flask) -> Blueprint:  # noqa ARG001
-    """Create a blueprint for the requests events endpoint.
-
-    :param app: Flask application
-    """
-    return Blueprint("oarepo_requests_events_app", __name__, url_prefix="/requests/")
-
-
-def create_notifications(app: Flask) -> Blueprint:  # noqa ARG001
-    """Register blueprint routes on app."""
-    blueprint = Blueprint(
-        "oarepo_notifications",
-        __name__,
-        template_folder=Path(__file__).parent.parent / "templates",
-    )
-    from oarepo_requests.invenio_patches import (
-        override_invenio_notifications,
-    )
-
-    # adding notification patches for celery
-    blueprint.record_once(override_invenio_notifications)
-
-    return blueprint
