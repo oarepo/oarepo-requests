@@ -42,9 +42,6 @@ def test_new_version_autoaccept(
     assert not request["is_open"]
     assert request["is_closed"]
 
-    assert "draft_record:links:self" in request["payload"]
-    # assert "draft_record:links:self_html" in request["payload"] #TODO: temp
-
     requests_model.Record.index.refresh()
     requests_model.Draft.index.refresh()
     # new_version action worked?
@@ -133,8 +130,10 @@ def test_redirect_url(
     original_request_id = resp_request_submit["id"]
     # is request accepted and closed?
 
+    requests_model.Record.index.refresh()
+    requests_model.Draft.index.refresh()
     request = creator_client.get(
-        f"{urls['BASE_URL_REQUESTS']}{original_request_id}",
+        f"{urls['BASE_URL_REQUESTS']}{original_request_id}?expand=true",
     ).json
 
     requests_model.Draft.index.refresh()

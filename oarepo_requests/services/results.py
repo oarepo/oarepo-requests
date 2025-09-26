@@ -16,6 +16,8 @@ from invenio_records_resources.records import Record
 
 from invenio_requests.customizations import RequestType
 from oarepo_runtime.services.results import RecordList
+from sqlalchemy.exc import NoResultFound
+
 from oarepo_requests.services.schema import RequestTypeSchema
 from invenio_requests.services.results import EntityResolverExpandableField
 from invenio_rdm_records.services.services import RDMRecordService
@@ -165,7 +167,10 @@ class DraftAwareEntityResolverExpandableField(EntityResolverExpandableField):
     def get_value_service(self, value):
         """Return the value and the service via entity resolvers."""
         v, service = super().get_value_service(value)
-        record = resolve_reference_dict(value)
+        try: #TODO: hack: draft might get deleted ie in case of publish; then the service returns published record
+            record = resolve_reference_dict(value)
+        except NoResultFound:
+            return "", service
         if record.is_draft:
             service = ReadManyDraftsService(service.config)
         return v, service

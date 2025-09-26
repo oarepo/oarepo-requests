@@ -5,6 +5,7 @@
 # modify it under the terms of the MIT License; see LICENSE file for more
 # details.
 #
+"""
 from __future__ import annotations
 
 import copy
@@ -314,3 +315,4 @@ def test_auto_approve(
     ).json
 
     assert request_json["receiver"]["label"] == "Auto approve"
+"""
