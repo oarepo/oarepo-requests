@@ -10,7 +10,6 @@ from __future__ import annotations
 import copy
 
 
-
 def test_publish_service(
     requests_model,
     users,
@@ -104,14 +103,14 @@ def test_publish(
     requests_model.Draft.index.refresh()
 
     record = receiver_client.get(f"{urls['BASE_URL']}/{draft1_id}/draft?expand=true")
-    request = creator_client.get(
+    creator_client.get(
         f"{urls['BASE_URL_REQUESTS']}{resp_request_submit['id']}?expand=true",
     ).json
     assert record.json["expanded"]["requests"][0]["links"]["actions"].keys() == {
         "accept",
         "decline",
     }
-    publish = receiver_client.post(
+    receiver_client.post(
         link2testclient(
             record.json["expanded"]["requests"][0]["links"]["actions"]["accept"]
         ),

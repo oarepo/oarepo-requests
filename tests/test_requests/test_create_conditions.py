@@ -10,7 +10,6 @@
 from __future__ import annotations
 
 
-
 def test_can_create(
     logged_client,
     users,
@@ -74,7 +73,7 @@ def test_can_create(
     record = receiver_client.get(
         f"{urls['BASE_URL']}/{draft2_id}/draft?expand=true"
     ).json
-    decline = receiver_client.post(
+    receiver_client.post(
         link2testclient(
             record["expanded"]["requests"][0]["links"]["actions"]["decline"]
         ),
@@ -100,10 +99,10 @@ def test_can_possibly_create(
     receiver = users[1]
 
     creator_client = logged_client(creator)
-    receiver_client = logged_client(receiver)
+    logged_client(receiver)
 
     draft1 = draft_factory(creator.identity)
-    draft1_id = draft1["id"]
+    draft1["id"]
 
     record_resp_no_request = creator_client.get(
         link2testclient(draft1["links"]["applicable-requests"])

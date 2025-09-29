@@ -33,7 +33,7 @@ def test_search(
     link = link2testclient(requests_search["hits"]["hits"][0]["links"]["self"])
     #    extended_link = link.replace("/requests/", "/requests/extended/")
 
-    update = creator_client.put(
+    creator_client.put(
         link,
         json={"title": "tralala"},
     )

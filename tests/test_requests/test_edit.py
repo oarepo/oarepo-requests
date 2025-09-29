@@ -128,7 +128,7 @@ def test_redirect_url(
     receiver_publish_request = receiver_client.get(
         f"{urls['BASE_URL_REQUESTS']}{publish_request['id']}"
     ).json
-    accept = receiver_client.post(
+    receiver_client.post(
         link2testclient(receiver_publish_request["links"]["actions"]["accept"])
     )
     requests_model.Record.index.refresh()
