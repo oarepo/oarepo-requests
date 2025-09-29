@@ -171,7 +171,9 @@ class OARepoRequests:
         from . import config
 
         app.config.setdefault("OAREPO_REQUESTS_DEFAULT_RECEIVER", None)
-        app.config.setdefault("INVENIO_REQUESTS_SERVICE_CLASS", config.INVENIO_REQUESTS_SERVICE_CLASS)
+        app.config.setdefault(
+            "INVENIO_REQUESTS_SERVICE_CLASS", config.INVENIO_REQUESTS_SERVICE_CLASS
+        )
         app.config.setdefault("REQUESTS_ALLOWED_RECEIVERS", []).extend(
             config.REQUESTS_ALLOWED_RECEIVERS
         )
@@ -239,10 +241,10 @@ def finalize_app(app: Flask) -> None:
     rr_ext = app.extensions["invenio-records-resources"]
 
     # services
-    #rr_ext.registry.register(
+    # rr_ext.registry.register(
     #    ext.requests_service,
     #    service_id=ext.requests_service.config.service_id,
-    #)
+    # )
 
     # TODO: i have to do this cause there is bug in invenio-requests for events
     # but imo this is better than entrypoints

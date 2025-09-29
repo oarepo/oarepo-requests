@@ -76,6 +76,7 @@ from oarepo_requests.types import (
 from oarepo_requests.types.events.topic_update import TopicUpdateEventType
 from invenio_rdm_records.services.pids import providers
 from flask import Blueprint
+
 if TYPE_CHECKING:
     from invenio_requests.customizations.actions import RequestAction
 
@@ -98,6 +99,7 @@ def events_service():
 @pytest.fixture(scope="module", autouse=True)
 def location(location):
     return location
+
 
 @pytest.fixture(scope="module")
 def app(app):
@@ -122,7 +124,6 @@ def app(app):
 
     app.register_blueprint(bp)
     return app
-
 
 
 """
@@ -798,7 +799,6 @@ def app_config(app_config, requests_model):
     )
     app_config["RDM_RECORDS_ALLOW_RESTRICTION_AFTER_GRACE_PERIOD"] = True
 
-
     app_config["RDM_PERSISTENT_IDENTIFIER_PROVIDERS"] = [
         providers.OAIPIDProvider(
             "oai",
@@ -966,12 +966,14 @@ def model_types():
         "Metadata": {
             "properties": {
                 "title": {"type": "fulltext+keyword", "required": True},
-                "creators": {"type": "array",
+                "creators": {
+                    "type": "array",
                     "items": {"type": "keyword"},
                 },
-                "contributors": {"type": "array",
-                             "items": {"type": "keyword"},
-                }
+                "contributors": {
+                    "type": "array",
+                    "items": {"type": "keyword"},
+                },
             }
         }
     }
@@ -1032,6 +1034,7 @@ def requests_model(model_types):
 def record_service(requests_model):
     return requests_model.proxies.current_service
 
+
 @pytest.fixture
 def find_request_type():
     def _find_request_type(requests, type_):
@@ -1039,11 +1042,14 @@ def find_request_type():
             if request["type_id"] == type_:
                 return request
         return None
+
     return _find_request_type
+
 
 @pytest.fixture
 def get_action_url(find_request_type, link2testclient):
     def _create_action(requests, type_, action="create"):
         request = find_request_type(requests, type_)
         return link2testclient(request["links"]["actions"][action])
+
     return _create_action

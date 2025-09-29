@@ -43,7 +43,6 @@ def test_edit_autoaccept(
     assert not request["is_open"]
     assert request["is_closed"]
 
-
     requests_model.Record.index.refresh()
     requests_model.Draft.index.refresh()
     # edit action worked?
@@ -53,7 +52,7 @@ def test_edit_autoaccept(
     assert len(search) == 1
     # assert search[0]["links"]["self"].endswith( # TODO: should self after edit point to published or draft?
     #    "/draft"
-    #)
+    # )
     assert search[0]["id"] == id_
 
 
@@ -100,10 +99,15 @@ def test_redirect_url(
     ).json  # receiver should be able to get the request but not to edit the draft - should not receive edit link
 
     assert (
-        link2testclient(creator_edit_accepted["expanded"]["payload"]["created_topic"]["links"]["self_html"], ui=True)
+        link2testclient(
+            creator_edit_accepted["expanded"]["payload"]["created_topic"]["links"][
+                "self_html"
+            ],
+            ui=True,
+        )
         == f"/api/test-ui-links/preview/{record_id}"
     )
-    assert receiver_edit_accepted['expanded']['payload']['created_topic']['links'] == {}
+    assert receiver_edit_accepted["expanded"]["payload"]["created_topic"]["links"] == {}
 
     draft = creator_client.get(f"{urls['BASE_URL']}/{record_id}/draft").json
     publish_request = submit_request_on_draft(
@@ -114,8 +118,12 @@ def test_redirect_url(
     receiver_edit_request_after_publish_draft_submitted = receiver_client.get(
         f"{urls['BASE_URL_REQUESTS']}{edit_request_id}?expand=true"
     ).json  # now receiver should have a right to view but not edit the topic
-    assert receiver_edit_request_after_publish_draft_submitted["expanded"]["payload"]["created_topic"]["links"] == {} # receiver doesn't have permission to topic
-
+    assert (
+        receiver_edit_request_after_publish_draft_submitted["expanded"]["payload"][
+            "created_topic"
+        ]["links"]
+        == {}
+    )  # receiver doesn't have permission to topic
 
     receiver_publish_request = receiver_client.get(
         f"{urls['BASE_URL_REQUESTS']}{publish_request['id']}"
@@ -129,4 +137,9 @@ def test_redirect_url(
         f"{urls['BASE_URL_REQUESTS']}{edit_request_id}?expand=true",
     ).json
 
-    assert creator_edit_request_after_merge["expanded"]["payload"]["created_topic"]["links"] == {}
+    assert (
+        creator_edit_request_after_merge["expanded"]["payload"]["created_topic"][
+            "links"
+        ]
+        == {}
+    )

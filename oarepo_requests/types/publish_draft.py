@@ -32,7 +32,6 @@ class PublishDraftRequestType(PublishRequestType):
     type_id = "publish_draft"
     name = _("Publish draft")
 
-
     payload_schema: ClassVar[dict[str, ma.fields.Field]] = {
         **PublishRequestType.payload_schema,
         "version": ma.fields.Str(),

@@ -24,7 +24,11 @@ from invenio_records_resources.resources.records.resource import (
 from invenio_requests.proxies import current_requests_service
 from invenio_requests.resources import RequestsResource
 from invenio_records_resources.resources.records.utils import search_preference
-from oarepo_requests.utils import resolve_reference_dict, stringify_first_val, reference_to_tuple, string_to_reference
+from oarepo_requests.utils import (
+    resolve_reference_dict,
+    stringify_first_val,
+    string_to_reference,
+)
 
 if TYPE_CHECKING:
     from invenio_requests.services.requests import RequestsService
@@ -60,9 +64,7 @@ class OARepoRequestsResource(RequestsResource, ErrorHandlersMixin):
             route("GET", p(routes["list"]), self.search),
             route("POST", p(routes["list"]), self.create),
             route("POST", p(routes["list-args"]), self.create_args),
-            route(
-                "GET", p(routes["list-applicable"]), self.applicable_request_types
-            ),
+            route("GET", p(routes["list-applicable"]), self.applicable_request_types),
         ]
 
     @request_extra_args
@@ -120,7 +122,9 @@ class OARepoRequestsResource(RequestsResource, ErrorHandlersMixin):
             }
         """
         request_type_id = resource_requestctx.view_args["request_type"]
-        topic = resolve_reference_dict(string_to_reference(resource_requestctx.view_args["topic"]))
+        topic = resolve_reference_dict(
+            string_to_reference(resource_requestctx.view_args["topic"])
+        )
 
         items = self.oarepo_requests_service.create(
             identity=g.identity,

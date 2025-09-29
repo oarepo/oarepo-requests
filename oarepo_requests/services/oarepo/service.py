@@ -19,9 +19,15 @@ from invenio_requests.services import RequestsService
 from oarepo_requests.errors import CustomHTTPJSONException, UnknownRequestTypeError
 from oarepo_requests.proxies import current_oarepo_requests
 from invenio_records_resources.services.base.links import EndpointLink
-from oarepo_requests.utils import allowed_request_types_for_record, resolve_reference_dict
-from oarepo_requests.services.results import RequestTypesList, DraftAwareEntityResolverExpandableField, \
-    StringDraftAwareEntityResolverExpandableField
+from oarepo_requests.utils import (
+    allowed_request_types_for_record,
+    resolve_reference_dict,
+)
+from oarepo_requests.services.results import (
+    RequestTypesList,
+    DraftAwareEntityResolverExpandableField,
+    StringDraftAwareEntityResolverExpandableField,
+)
 from invenio_records_resources.services import LinksTemplate
 from invenio_drafts_resources.records.api import Record
 from invenio_requests.services.results import EntityResolverExpandableField
@@ -135,9 +141,7 @@ class OARepoRequestsService(RequestsService):
     ) -> RequestTypesList:
         """Get applicable request types for a record."""
         topic = (
-            resolve_reference_dict(topic)
-            if not isinstance(topic, Record)
-            else topic
+            resolve_reference_dict(topic) if not isinstance(topic, Record) else topic
         )  # type: ignore if isinstance(record, Record) else record
 
         allowed_request_types = allowed_request_types_for_record(identity, topic)

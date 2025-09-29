@@ -46,12 +46,10 @@ class PublishNewVersionRequestType(PublishRequestType):
     type_id = "publish_new_version"
     name = _("Publish new version")
 
-
     payload_schema: ClassVar[dict[str, ma.fields.Field]] = {
         **PublishRequestType.payload_schema,
         "version": ma.fields.Str(),
     }
-
 
     form: ClassVar[JsonValue] = {
         "field": "version",

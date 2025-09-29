@@ -9,7 +9,6 @@ from __future__ import annotations
 
 import copy
 
-from pytest_oarepo.fixtures import link2testclient
 
 
 def test_publish_service(
@@ -55,7 +54,9 @@ def test_publish_service(
     assert "self" in accept.data["expanded"]["created_by"]["links"]
     assert "self" in accept.data["expanded"]["receiver"]["links"]
     assert accept.data["expanded"]["topic"]["links"] == {}
-    assert accept.data["expanded"]["topic"]["metadata"] == {"title": "Deleted record"} # TODO: check how refresh works inside
+    assert accept.data["expanded"]["topic"]["metadata"] == {
+        "title": "Deleted record"
+    }  # TODO: check how refresh works inside
     assert "self_html" in accept.data["expanded"]["topic"]["links"]
     assert "self" in accept.data["expanded"]["payload"]["created_topic"]["links"]
     assert "self_html" in accept.data["expanded"]["payload"]["created_topic"]["links"]
@@ -104,7 +105,7 @@ def test_publish(
 
     record = receiver_client.get(f"{urls['BASE_URL']}/{draft1_id}/draft?expand=true")
     request = creator_client.get(
-        f"{urls['BASE_URL_REQUESTS']}{resp_request_submit["id"]}?expand=true",
+        f"{urls['BASE_URL_REQUESTS']}{resp_request_submit['id']}?expand=true",
     ).json
     assert record.json["expanded"]["requests"][0]["links"]["actions"].keys() == {
         "accept",
@@ -183,7 +184,11 @@ def test_create_fails_if_draft_not_validated(
 
     assert "publish_draft" not in draft.json["expanded"]["request_types"]
     resp_request_create = creator_client.post(
-        link2testclient(find_request_type(draft.json["expanded"]["request_types"], "publish_draft")["links"]["actions"]["create"])
+        link2testclient(
+            find_request_type(draft.json["expanded"]["request_types"], "publish_draft")[
+                "links"
+            ]["actions"]["create"]
+        )
     )
     assert resp_request_create.status_code == 400
     assert resp_request_create.json["message"] == "A validation error occurred."

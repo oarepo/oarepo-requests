@@ -12,14 +12,11 @@ from __future__ import annotations
 from typing import TYPE_CHECKING, Any, ClassVar, override
 
 import marshmallow as ma
-from invenio_drafts_resources.resources.records.errors import DraftNotCreatedError
 from invenio_i18n import gettext
 from invenio_i18n import lazy_gettext as _
-from invenio_records_resources.services.errors import PermissionDeniedError
 from invenio_records_resources.services.uow import RecordCommitOp, UnitOfWork
 from invenio_requests.proxies import current_requests_service
 from invenio_requests.records.api import Request
-from oarepo_runtime.proxies import current_runtime
 from oarepo_runtime.records.drafts import has_draft
 
 from oarepo_requests.actions.edit_topic import EditTopicAcceptAction
@@ -47,7 +44,6 @@ class EditPublishedRecordRequestType(NonDuplicableOARepoRequestType):
 
     type_id = "edit_published_record"
     name = _("Edit metadata")
-
 
     payload_schema: ClassVar[dict[str, ma.fields.Field]] = {
         "created_topic": ma.fields.Str()

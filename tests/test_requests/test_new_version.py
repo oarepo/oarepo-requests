@@ -147,7 +147,10 @@ def test_redirect_url(
     )
 
     assert (
-        link2testclient(request["expanded"]["payload"]["created_topic"]["links"]["self_html"], ui=True)
+        link2testclient(
+            request["expanded"]["payload"]["created_topic"]["links"]["self_html"],
+            ui=True,
+        )
         == f"/api/test-ui-links/preview/{new_draft['id']}"
     )
 

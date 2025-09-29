@@ -42,9 +42,17 @@ class RequestsServiceConfigPreset(Preset):
         # TODO: AutorequestComponent, RecordSnapshotComponent
         yield AddToDictionary(
             "record_links_item",
-            {"requests": RefEndpointLink("oarepo_requests.search", ref_querystring="topic")},
+            {
+                "requests": RefEndpointLink(
+                    "oarepo_requests.search", ref_querystring="topic"
+                )
+            },
         )
         yield AddToDictionary(
             "record_links_item",
-            {"applicable-requests": RefEndpointLink("oarepo_requests.applicable_request_types", ref_querystring="topic")},
+            {
+                "applicable-requests": RefEndpointLink(
+                    "oarepo_requests.applicable_request_types", ref_querystring="topic"
+                )
+            },
         )

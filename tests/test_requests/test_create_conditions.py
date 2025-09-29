@@ -9,7 +9,6 @@
 
 from __future__ import annotations
 
-from tests.conftest import find_request_type
 
 
 def test_can_create(
@@ -107,14 +106,16 @@ def test_can_possibly_create(
     draft1_id = draft1["id"]
 
     record_resp_no_request = creator_client.get(
-        link2testclient(draft1['links']['applicable-requests'])
+        link2testclient(draft1["links"]["applicable-requests"])
     ).json
     resp_request_create = creator_client.post(
-        link2testclient(record_resp_no_request['hits']['hits'][0]['links']['actions']['create'])
+        link2testclient(
+            record_resp_no_request["hits"]["hits"][0]["links"]["actions"]["create"]
+        )
     ).json
 
     record_resp_after_create = creator_client.get(
-        link2testclient(draft1['links']['applicable-requests'])
+        link2testclient(draft1["links"]["applicable-requests"])
     ).json
 
     creator_client.post(
@@ -122,23 +123,17 @@ def test_can_possibly_create(
     )
 
     record_resp_with_request = creator_client.get(
-        link2testclient(draft1['links']['applicable-requests'])
+        link2testclient(draft1["links"]["applicable-requests"])
     ).json
 
-    assert find_request_type(
-        record_resp_no_request["hits"]["hits"], "publish_draft"
-    )
+    assert find_request_type(record_resp_no_request["hits"]["hits"], "publish_draft")
 
     assert (
-        find_request_type(
-            record_resp_with_request["hits"]["hits"], "publish_draft"
-        )
+        find_request_type(record_resp_with_request["hits"]["hits"], "publish_draft")
         is None
     )
 
     assert (
-        find_request_type(
-            record_resp_after_create["hits"]["hits"], "publish_draft"
-        )
+        find_request_type(record_resp_after_create["hits"]["hits"], "publish_draft")
         is None
     )

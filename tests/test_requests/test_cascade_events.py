@@ -7,9 +7,7 @@
 #
 from __future__ import annotations
 
-from invenio_requests.records.api import RequestEvent
 
-from oarepo_requests.types.events import TopicDeleteEventType
 
 """
 # TODO: werkzeug.routing.exceptions.BuildError: Could not build url for endpoint 'requests_test.search_versions' with values ['page', 'size', 'sort']. Did you mean 'invenio_requests.static' instead? is an oarepo-ui todo

@@ -8,9 +8,7 @@
 
 from __future__ import annotations
 
-from typing import Any
 
-from invenio_requests.customizations.event_types import CommentEventType
 
 #
 # def test_publish_notifications(
