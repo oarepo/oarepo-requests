@@ -211,7 +211,7 @@ class OARepoRequests:
         )
 
         # can't set default config directly because it might be initialized to {} in invenio-notifications
-        app_notification_builders = app.config.setdefault("NOTIFICATIONS_BUILDERS", {})
+        app.config.setdefault("NOTIFICATIONS_BUILDERS", {})
         app_notification_backends = app.config.setdefault("NOTIFICATIONS_BACKENDS", {})
 
         app.config["NOTIFICATIONS_BACKENDS"] = conservative_merger.merge(
@@ -238,7 +238,7 @@ def finalize_app(app: Flask) -> None:
     # req.requests_resource.requests_service = ext.requests_service
     #
 
-    rr_ext = app.extensions["invenio-records-resources"]
+    app.extensions["invenio-records-resources"]
 
     # services
     # rr_ext.registry.register(

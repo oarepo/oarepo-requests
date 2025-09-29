@@ -39,7 +39,7 @@ def test_record(
     )
 
     record = receiver_client.get(f"{urls['BASE_URL']}/{record1_id}?expand=true")
-    accept = receiver_client.post(
+    receiver_client.post(
         link2testclient(
             record.json["expanded"]["requests"][0]["links"]["actions"]["accept"]
         )
@@ -71,13 +71,13 @@ def test_draft(
     resp_request_create = create_request_on_draft(
         creator.identity, draft1_id, "publish_draft"
     )
-    submit = creator_client.post(
+    creator_client.post(
         link2testclient(resp_request_create["links"]["actions"]["submit"]),
     )
     record = receiver_client.get(
         f"{urls['BASE_URL']}/{draft1_id}/draft?expand=true"
     ).json
-    accept = receiver_client.post(
+    receiver_client.post(
         link2testclient(record["expanded"]["requests"][0]["links"]["actions"]["accept"])
     )
     requests_model.Record.index.refresh()

@@ -8,7 +8,6 @@
 from __future__ import annotations
 
 
-
 def test_delete(
     requests_model,
     logged_client,
@@ -47,7 +46,7 @@ def test_delete(
         "accept",
         "decline",
     }
-    delete = receiver_client.post(
+    receiver_client.post(
         link2testclient(
             record.json["expanded"]["requests"][0]["links"]["actions"]["accept"]
         ),

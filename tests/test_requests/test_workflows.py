@@ -296,7 +296,7 @@ def test_workflow_events(
 
     request_id = read_from_record.json["expanded"]["requests"][0]["id"]
     with pytest.raises(PermissionDeniedError):
-        create_event_u1 = events_service.create(
+        events_service.create(
             identity=user1.identity,
             request_id=request_id,
             data=events_resource_data,

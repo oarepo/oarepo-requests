@@ -26,12 +26,18 @@ from oarepo_requests.utils import string_to_reference, resolve_reference_dict
 from invenio_records_permissions.api import permission_filter
 from invenio_search import current_search_client
 from invenio_search.engine import dsl
+from invenio_pidstore.errors import PIDDeletedError
+from oarepo_requests.services.schema import (
+    request_type_identity_ctx,
+    request_type_record_ctx,
+)
 
 
 if TYPE_CHECKING:
     from collections.abc import Iterator
     from invenio_records_resources.records.api import Record
     from marshmallow import Schema
+
 
 class ReadManyDraftsService(RDMRecordService):
     def __eq__(self, other: object) -> bool:
@@ -71,7 +77,7 @@ class ReadManyDraftsService(RDMRecordService):
         search = search_opts.search_cls(
             using=current_search_client,
             default_filter=default_filter,
-            index=record_cls.index._name, # TODO: changed
+            index=record_cls.index._name,  # TODO: changed
         )
 
         search = (
@@ -93,7 +99,6 @@ class ReadManyDraftsService(RDMRecordService):
         search = search.extra(**extras)
 
         return search
-
 
     def _read_many(
         self,
@@ -146,14 +151,16 @@ class ReadManyDraftsService(RDMRecordService):
             clauses.append(dsl.Q("term", **{"id": id_}))
         query = dsl.Q("bool", minimum_should_match=1, should=clauses)
 
-        results = self._read_many(identity,
-                                  query,
-                                  fields,
-                                  len(ids),
-                                  record_cls=self.draft_cls,
-                                  search_opts=self.config.search_drafts,
-                                  permission_action="read_draft",
-                                  **kwargs)
+        results = self._read_many(
+            identity,
+            query,
+            fields,
+            len(ids),
+            record_cls=self.draft_cls,
+            search_opts=self.config.search_drafts,
+            permission_action="read_draft",
+            **kwargs,
+        )
 
         return self.result_list(
             self,
@@ -162,20 +169,23 @@ class ReadManyDraftsService(RDMRecordService):
             links_item_tpl=self.links_item_tpl,
         )
 
-class DraftAwareEntityResolverExpandableField(EntityResolverExpandableField):
 
+class DraftAwareEntityResolverExpandableField(EntityResolverExpandableField):
     def get_value_service(self, value):
         """Return the value and the service via entity resolvers."""
         v, service = super().get_value_service(value)
-        try: #TODO: hack: draft might get deleted ie in case of publish; then the service returns published record
+        try:  # TODO: hack: draft might get deleted ie in case of publish; then the service returns published record
             record = resolve_reference_dict(value)
-        except NoResultFound:
+        except (NoResultFound, PIDDeletedError):
             return "", service
         if record.is_draft:
             service = ReadManyDraftsService(service.config)
         return v, service
 
-class StringDraftAwareEntityResolverExpandableField(DraftAwareEntityResolverExpandableField):
+
+class StringDraftAwareEntityResolverExpandableField(
+    DraftAwareEntityResolverExpandableField
+):
     """Expandable entity resolver field.
 
     It will use the Entity resolver registry to retrieve the service to
@@ -199,7 +209,13 @@ class RequestTypesListDict(dict):
 class RequestTypesList(RecordList):
     """An in-memory list of request types compatible with opensearch record list."""
 
-    def __init__(self, *args: Any, record: Record | None = None, schema: Schema | None=None, **kwargs: Any) -> None:
+    def __init__(
+        self,
+        *args: Any,
+        record: Record | None = None,
+        schema: Schema | None = None,
+        **kwargs: Any,
+    ) -> None:
         """Initialize the list of request types."""
         self._record = record
         super().__init__(*args, **kwargs)
@@ -214,7 +230,7 @@ class RequestTypesList(RecordList):
                 "total": self.total,
             }
         )
-        if self._links_tpl: # TODO: pass1: query params in link?
+        if self._links_tpl:  # TODO: pass1: query params in link?
             res["links"] = self._links_tpl.expand(self._identity, None)
         res.topic = self._record
         return res
@@ -224,14 +240,16 @@ class RequestTypesList(RecordList):
         """Iterator over the hits."""
         for hit in self._results:
             # Project the record
-            projection = self._schema(
-                context={
-                    "identity": self._identity,
-                    "record": self._record,
-                }
-            ).dump(
-                hit,
-            )
+            tok_identity = request_type_identity_ctx.set(self._identity)
+            tok_record = request_type_record_ctx.set(self._record)
+
+            try:
+                projection = self._schema().dump(hit)
+            finally:
+                # Reset contextvars to previous values to avoid leaking state
+                request_type_identity_ctx.reset(tok_identity)
+                request_type_record_ctx.reset(tok_record)
+
             if self._links_item_tpl:
                 projection["links"] = self._links_item_tpl.expand(self._identity, hit)
             yield projection
@@ -252,9 +270,16 @@ def serialize_request_types(
     :param record: Record for which the request types are serialized.
     :return: List of serialized request types.
     """
-    return [
-        RequestTypeSchema(context={"identity": identity, "record": record}).dump(
-            request_type
-        )
-        for request_type in request_types.values()
-    ]
+
+    # contextvars approach from gpt
+    tok_identity = request_type_identity_ctx.set(identity)
+    tok_record = request_type_record_ctx.set(record)
+    try:
+        return [
+            RequestTypeSchema().dump(request_type)
+            for request_type in request_types.values()
+        ]
+    finally:
+        # Reset contextvars to previous values to avoid leaking state
+        request_type_identity_ctx.reset(tok_identity)
+        request_type_record_ctx.reset(tok_record)
