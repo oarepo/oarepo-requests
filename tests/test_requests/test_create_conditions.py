@@ -9,6 +9,8 @@
 
 from __future__ import annotations
 
+from tests.conftest import find_request_type
+
 
 def test_can_create(
     logged_client,
@@ -91,6 +93,7 @@ def test_can_possibly_create(
     urls,
     draft_factory,
     link2testclient,
+    find_request_type,
     search_clear,
 ):
     print()
@@ -117,12 +120,6 @@ def test_can_possibly_create(
     creator_client.post(
         link2testclient(resp_request_create["links"]["actions"]["submit"]),
     )
-
-    def find_request_type(requests, type_) -> dict | None:
-        for request in requests:
-            if request["type_id"] == type_:
-                return request
-        return None
 
     record_resp_with_request = creator_client.get(
         link2testclient(draft1['links']['applicable-requests'])

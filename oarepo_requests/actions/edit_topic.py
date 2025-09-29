@@ -14,7 +14,7 @@ from typing import TYPE_CHECKING, Any, override
 from oarepo_runtime.proxies import current_runtime
 
 
-from .generic import AddTopicLinksOnPayloadMixin, OARepoAcceptAction
+from .generic import CreatedTopicMixin, OARepoAcceptAction
 
 if TYPE_CHECKING:
     from flask_principal import Identity
@@ -24,7 +24,7 @@ if TYPE_CHECKING:
 
 
 # TODO: snapshot
-class EditTopicAcceptAction(AddTopicLinksOnPayloadMixin, OARepoAcceptAction):
+class EditTopicAcceptAction(CreatedTopicMixin, OARepoAcceptAction):
     """Accept creation of a draft of a published record for editing metadata."""
 
     @override

@@ -46,18 +46,7 @@ class NewVersionRequestType(NonDuplicableOARepoRequestType):
     type_id = "new_version"
     name = _("New Version")
     payload_schema: ClassVar[dict[str, ma.fields.Field]] = {
-        "draft_record.links.self": ma.fields.Str(
-            attribute="draft_record:links:self",
-            data_key="draft_record:links:self",
-        ),
-        "draft_record.links.self_html": ma.fields.Str(
-            attribute="draft_record:links:self_html",
-            data_key="draft_record:links:self_html",
-        ),
-        "draft_record.id": ma.fields.Str(
-            attribute="draft_record:id",
-            data_key="draft_record:id",
-        ),
+        "created_topic": ma.fields.Str(),
         "keep_files": ma.fields.String(validate=OneOf(["yes", "no"])),
     }
 

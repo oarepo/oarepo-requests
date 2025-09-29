@@ -19,7 +19,7 @@ from oarepo_runtime.proxies import current_runtime
 from oarepo_requests.errors import UnresolvedRequestsError, VersionAlreadyExists
 
 from .generic import (
-    AddTopicLinksOnPayloadMixin,
+    CreatedTopicMixin,
     OARepoAcceptAction,
     OARepoDeclineAction,
     OARepoSubmitAction,
@@ -83,7 +83,7 @@ class PublishDraftSubmitAction(PublishMixin, OARepoSubmitAction):
 
 
 class PublishDraftAcceptAction(
-    PublishMixin, AddTopicLinksOnPayloadMixin, OARepoAcceptAction
+    PublishMixin, CreatedTopicMixin, OARepoAcceptAction
 ):
     """Accept action for publishing draft requests."""
 

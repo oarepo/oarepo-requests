@@ -159,13 +159,8 @@ class OARepoGenericActionMixin:
         )
 
 
-class AddTopicLinksOnPayloadMixin:
+class CreatedTopicMixin:
     """A mixin for action that takes links from the topic and stores them inside the payload."""
-
-    # self_link: str | None = None
-    # self_html_link: str | None = None
-    # self_created_topic_link: str | None = None
-    # self_created_topic_html_link: str | None = None
 
     def apply(
         self,
@@ -177,32 +172,13 @@ class AddTopicLinksOnPayloadMixin:
     ) -> Record:
         """Apply the action to the topic."""
         super().apply(identity, state, uow, *args, **kwargs)
-
         if not state.created_topic:
             return state.topic
-
         entity_ref = reference_entity(state.created_topic)
-
         request: Request = self.request
-
         if "payload" not in request:
             request["payload"] = {}
-
         request["payload"]["created_topic"] = ref_to_str(entity_ref)
-
-        # invenio does not allow non-string values in the payload, so using colon notation here
-        # client will need to handle this and convert to links structure
-        # can not use dot notation as marshmallow tries to be too smart and does not serialize dotted keys
-        """
-        if (
-            "self" in topic_dict["links"]
-        ):  # TODO: consider - this happens if receiver doesn't have read rights to the topic,
-            # like after a draft is created after edit
-            # if it's needed in all cases, we could do a system identity call here
-            request["payload"]["created_topic:links:self"] = topic_dict["links"]["self"]
-        if "self_html" in topic_dict["links"]:
-            request["payload"]["created_topic:links:self_html"] = topic_dict["links"]["self_html"]
-        """
         return state.topic
 
 

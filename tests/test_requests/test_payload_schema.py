@@ -15,12 +15,12 @@ def test_publish_request_payload_schema(app, db):
     assert ma_schema().dump(
         {
             "payload": {
-                "published_record:links:self": "http://localhost:5000/api/records/1"
+                "created_topic": "requests_draft:blab-blab"
             }
         }
     ) == {
         "payload": {
-            "published_record:links:self": "http://localhost:5000/api/records/1"
+            "created_topic": "requests_draft:blab-blab"
         },
         "links": {},
         "title": "",
