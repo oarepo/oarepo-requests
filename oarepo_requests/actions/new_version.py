@@ -14,7 +14,7 @@ from typing import TYPE_CHECKING, Any
 from oarepo_runtime.proxies import current_runtime
 
 
-from .generic import AddTopicLinksOnPayloadMixin, OARepoAcceptAction
+from .generic import CreatedTopicMixin, OARepoAcceptAction
 
 if TYPE_CHECKING:
     from flask_principal import Identity
@@ -25,11 +25,8 @@ if TYPE_CHECKING:
 
 
 # TODO: snapshot
-class NewVersionAcceptAction(AddTopicLinksOnPayloadMixin, OARepoAcceptAction):
+class NewVersionAcceptAction(CreatedTopicMixin, OARepoAcceptAction):
     """Accept creation of a new version of a published record."""
-
-    self_link = "draft_record:links:self"
-    self_html_link = "draft_record:links:self_html"
 
     def apply(
         self,
@@ -47,16 +44,12 @@ class NewVersionAcceptAction(AddTopicLinksOnPayloadMixin, OARepoAcceptAction):
         new_version_topic = topic_service.new_version(
             identity, state.topic["id"], uow=uow
         )
-        state.topic = new_version_topic._record  # noqa SLF001
+        state.created_topic = new_version_topic._record  # noqa SLF001
         if (
             "payload" in self.request
             and "keep_files" in self.request["payload"]
             and self.request["payload"]["keep_files"] == "yes"
         ):
             topic_service.import_files(identity, new_version_topic.id)
-
-        if "payload" not in self.request:
-            self.request["payload"] = {}
-        self.request["payload"]["draft_record:id"] = new_version_topic["id"]
 
         return super().apply(identity, state, uow, *args, **kwargs)

@@ -145,9 +145,10 @@ def test_redirect_url(
         for x in draft_search
         if x["parent"]["id"] == record1["parent"]["id"] and x["state"] == "draft"
     )
+
     assert (
-        link2testclient(request["links"]["ui_redirect_url"], ui=True)
-        == f"/requests-test/{new_draft['id']}/preview"
+        link2testclient(request["expanded"]["payload"]["created_topic"]["links"]["self_html"], ui=True)
+        == f"/api/test-ui-links/preview/{new_draft['id']}"
     )
 
     new_draft = creator_client.get(f"{urls['BASE_URL']}/{new_draft['id']}/draft").json

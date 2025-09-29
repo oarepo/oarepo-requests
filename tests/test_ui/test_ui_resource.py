@@ -26,7 +26,7 @@ def test_draft_publish_request_present(
 ):
     creator_client = logged_client(users[0])
     draft = draft_factory(users[0].identity)
-    with creator_client.get(f"/thesis/{draft['id']}/edit") as c:
+    with creator_client.get(f"/requests-test/{draft['id']}/edit") as c:
         assert c.status_code == 200
         data = json.loads(c.text)
         assert data["creatable_request_types"]["publish_draft"] == {
@@ -110,7 +110,7 @@ def test_request_detail_page(
     request = current_requests_service.create(
         creator_identity,
         {},
-        EditPublishedRecordRequestType,
+        "edit_published_record",
         topic=record,
         receiver=users[1].user,
         creator=users[0].user,

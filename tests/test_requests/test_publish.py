@@ -9,6 +9,8 @@ from __future__ import annotations
 
 import copy
 
+from pytest_oarepo.fixtures import link2testclient
+
 
 def test_publish_service(
     requests_model,
@@ -17,37 +19,46 @@ def test_publish_service(
     default_record_with_workflow_json,
     search_clear,
 ):
-    from invenio_requests.proxies import (
-        current_requests_service as current_invenio_requests_service,
-    )
-
-    from oarepo_requests.proxies import current_oarepo_requests_service
+    from invenio_requests.proxies import current_requests_service
 
     creator = users[0]
     receiver = users[1]
     draft = record_service.create(creator.identity, default_record_with_workflow_json)
-    request = current_oarepo_requests_service.create(
+    request = current_requests_service.create(
         identity=creator.identity,
         data={"payload": {"version": "1.0"}},
         request_type="publish_draft",
         topic=draft._record,  # noqa SLF001
+        expand=True,
     )
-    submit_result = current_invenio_requests_service.execute_action(
-        creator.identity, request.id, "submit"
+    requests_model.Draft.index.refresh()
+    submit_result = current_requests_service.execute_action(
+        creator.identity, request.id, "submit", expand=True
     )
-    assert "created_by" in request.links
-    assert "topic" in request.links
-    assert "self" in request.links["topic"]
-    # assert "self_html" in request.links["topic"] TODO: temp
+    # the entity links taken from expanded won't show in RequestItem.links if something's dependent on that
+    assert "self" in request.data["expanded"]["created_by"]["links"]
+    assert "self" in request.data["expanded"]["receiver"]["links"]
+    assert "self" in request.data["expanded"]["topic"]["links"]
+    assert "self_html" in request.data["expanded"]["topic"]["links"]
+    assert "payload" not in request.data["expanded"]
 
-    assert "created_by" in submit_result.links
-    assert "topic" in submit_result.links
-    assert "self" in submit_result.links["topic"]
-    # assert "self_html" in submit_result.links["topic"] TODO: temp
+    assert "self" in submit_result.data["expanded"]["created_by"]["links"]
+    assert "self" in submit_result.data["expanded"]["receiver"]["links"]
+    assert "self" in submit_result.data["expanded"]["topic"]["links"]
+    assert "self_html" in submit_result.data["expanded"]["topic"]["links"]
+    assert "payload" not in submit_result.data["expanded"]
 
-    current_invenio_requests_service.execute_action(
-        receiver.identity, request.id, "accept"
+    accept = current_requests_service.execute_action(
+        receiver.identity, request.id, "accept", expand=True
     )
+
+    assert "self" in accept.data["expanded"]["created_by"]["links"]
+    assert "self" in accept.data["expanded"]["receiver"]["links"]
+    assert accept.data["expanded"]["topic"]["links"] == {}
+    assert accept.data["expanded"]["topic"]["metadata"] == {"title": "Deleted record"} # TODO: check how refresh works inside
+    assert "self_html" in accept.data["expanded"]["topic"]["links"]
+    assert "self" in accept.data["expanded"]["payload"]["created_topic"]["links"]
+    assert "self_html" in accept.data["expanded"]["payload"]["created_topic"]["links"]
 
     record_service.read(
         creator.identity, draft["id"]
@@ -157,6 +168,8 @@ def test_create_fails_if_draft_not_validated(
     urls,
     draft_factory,
     default_record_with_workflow_json,
+    link2testclient,
+    find_request_type,
     search_clear,
 ):
     creator = users[0]
@@ -170,7 +183,7 @@ def test_create_fails_if_draft_not_validated(
 
     assert "publish_draft" not in draft.json["expanded"]["request_types"]
     resp_request_create = creator_client.post(
-        f"{urls['BASE_URL']}/{draft.json['id']}/draft/requests/publish_draft",
+        link2testclient(find_request_type(draft.json["expanded"]["request_types"], "publish_draft")["links"]["actions"]["create"])
     )
     assert resp_request_create.status_code == 400
     assert resp_request_create.json["message"] == "A validation error occurred."

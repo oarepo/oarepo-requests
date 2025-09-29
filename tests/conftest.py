@@ -966,6 +966,12 @@ def model_types():
         "Metadata": {
             "properties": {
                 "title": {"type": "fulltext+keyword", "required": True},
+                "creators": {"type": "array",
+                    "items": {"type": "keyword"},
+                },
+                "contributors": {"type": "array",
+                             "items": {"type": "keyword"},
+                }
             }
         }
     }
@@ -1022,6 +1028,22 @@ def requests_model(model_types):
     return workflow_model
 
 
-@pytest.fixture
+@pytest.fixture(scope="session")
 def record_service(requests_model):
     return requests_model.proxies.current_service
+
+@pytest.fixture
+def find_request_type():
+    def _find_request_type(requests, type_):
+        for request in requests:
+            if request["type_id"] == type_:
+                return request
+        return None
+    return _find_request_type
+
+@pytest.fixture
+def get_action_url(find_request_type, link2testclient):
+    def _create_action(requests, type_, action="create"):
+        request = find_request_type(requests, type_)
+        return link2testclient(request["links"]["actions"][action])
+    return _create_action

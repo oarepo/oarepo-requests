@@ -8,14 +8,13 @@
 from __future__ import annotations
 
 from typing import TYPE_CHECKING, ClassVar
-
+from flask_resources.serializers.base import MarshmallowSerializer
 from oarepo_ui.resources import (
     BabelComponent,
     RecordsUIResource,
     RecordsUIResourceConfig,
 )
 from oarepo_ui.resources.components import PermissionsComponent
-from thesis.resources.records.ui import ThesisUIJSONSerializer
 
 if TYPE_CHECKING:
     from collections.abc import Mapping
@@ -23,14 +22,15 @@ if TYPE_CHECKING:
 
 class ModelUIResourceConfig(RecordsUIResourceConfig):
     """Mock UI resource config."""
+    model_name = "requests-test"
 
     api_service = (
-        "thesis"  # must be something included in oarepo, as oarepo is used in tests
+        "requests-test"  # must be something included in oarepo, as oarepo is used in tests
     )
 
-    blueprint_name = "thesis"
-    url_prefix = "/thesis/"
-    ui_serializer_class = ThesisUIJSONSerializer
+    blueprint_name = "requests_test"
+    url_prefix = "/requests-test"
+    ui_serializer_class = MarshmallowSerializer
 
     templates: ClassVar[Mapping[str, str | None]] = {
         **RecordsUIResourceConfig.templates,

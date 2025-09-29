@@ -31,10 +31,10 @@ def test_search(
     assert len(requests_search["hits"]["hits"]) == 1
 
     link = link2testclient(requests_search["hits"]["hits"][0]["links"]["self"])
-    extended_link = link.replace("/requests/", "/requests/extended/")
+#    extended_link = link.replace("/requests/", "/requests/extended/")
 
-    creator_client.put(
-        extended_link,
+    update = creator_client.put(
+        link,
         json={"title": "tralala"},
     )
 

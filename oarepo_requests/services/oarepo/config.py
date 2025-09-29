@@ -39,7 +39,8 @@ class RedirectLink(Link):
 class OARepoRequestsServiceConfig(RequestsServiceConfig):
     """Configuration for the oarepo request service."""
 
-
+    """
     links_item: ClassVar[dict] = {
         "ui_redirect_url": RedirectLink(),
     }
+    """
