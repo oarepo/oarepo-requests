@@ -10,7 +10,7 @@
 from __future__ import annotations
 
 import logging
-from typing import TYPE_CHECKING, ClassVar
+from typing import TYPE_CHECKING
 
 from invenio_records_resources.services.base.links import Link
 from invenio_requests.services import RequestsServiceConfig

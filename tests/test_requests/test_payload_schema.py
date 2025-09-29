@@ -13,15 +13,9 @@ from oarepo_requests.types import PublishDraftRequestType
 def test_publish_request_payload_schema(app, db):
     ma_schema = PublishDraftRequestType.marshmallow_schema()
     assert ma_schema().dump(
-        {
-            "payload": {
-                "created_topic": "requests_draft:blab-blab"
-            }
-        }
+        {"payload": {"created_topic": "requests_draft:blab-blab"}}
     ) == {
-        "payload": {
-            "created_topic": "requests_draft:blab-blab"
-        },
+        "payload": {"created_topic": "requests_draft:blab-blab"},
         "links": {},
         "title": "",
     }

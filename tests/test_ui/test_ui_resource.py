@@ -11,7 +11,6 @@ import json
 
 from invenio_requests.proxies import current_requests_service
 
-from oarepo_requests.types import EditPublishedRecordRequestType
 
 allowed_actions = ["submit", "delete"]
 

@@ -7,8 +7,6 @@
 #
 from __future__ import annotations
 
-from flask import current_app
-from pytest_oarepo.functions import clear_babel_context
 
 from oarepo_requests.temp_utils import applicable_requests
 
@@ -33,7 +31,7 @@ def test_allowed_request_types_on_draft_service(
         {
             "links": {
                 "actions": {
-                    "create": f'https://127.0.0.1:5000/api/requests/requests_test_draft:{draft1_id}/publish_draft'
+                    "create": f"https://127.0.0.1:5000/api/requests/requests_test_draft:{draft1_id}/publish_draft"
                 }
             },
             "type_id": "publish_draft",
@@ -69,7 +67,7 @@ def test_allowed_request_types_on_draft_resource(
         {
             "links": {
                 "actions": {
-                    "create": f'https://127.0.0.1:5000/api/requests/requests_test_draft:{draft1_id}/publish_draft'
+                    "create": f"https://127.0.0.1:5000/api/requests/requests_test_draft:{draft1_id}/publish_draft"
                 }
             },
             "type_id": "publish_draft",
@@ -106,7 +104,7 @@ def test_allowed_request_types_on_published_resource(
         {
             "links": {
                 "actions": {
-                    "create": f'https://127.0.0.1:5000/api/requests/requests_test:{published1_id}/delete_published_record'
+                    "create": f"https://127.0.0.1:5000/api/requests/requests_test:{published1_id}/delete_published_record"
                 }
             },
             "type_id": "delete_published_record",
@@ -114,7 +112,7 @@ def test_allowed_request_types_on_published_resource(
         {
             "links": {
                 "actions": {
-                    "create": f'https://127.0.0.1:5000/api/requests/requests_test:{published1_id}/edit_published_record'
+                    "create": f"https://127.0.0.1:5000/api/requests/requests_test:{published1_id}/edit_published_record"
                 }
             },
             "type_id": "edit_published_record",
@@ -122,12 +120,13 @@ def test_allowed_request_types_on_published_resource(
         {
             "links": {
                 "actions": {
-                    "create": f'https://127.0.0.1:5000/api/requests/requests_test:{published1_id}/new_version'
+                    "create": f"https://127.0.0.1:5000/api/requests/requests_test:{published1_id}/new_version"
                 }
             },
             "type_id": "new_version",
         },
     ]
+
 
 """
 def test_ui_serialization(

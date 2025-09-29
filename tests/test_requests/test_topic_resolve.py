@@ -8,7 +8,6 @@
 from __future__ import annotations
 
 from invenio_access.permissions import system_identity
-from pytest_oarepo.functions import clear_babel_context
 
 
 def test_resolve_topic(
@@ -55,10 +54,11 @@ def test_resolve_topic(
             "creators": ["Creator 1", "Creator 2"],
             "title": "blabla",
         },
-        'links': {'latest_html': f'https://127.0.0.1:5000/api/test-ui-links/latest/{record1_id}',
-                  'self': f'https://127.0.0.1:5000/api/requests-test/{record1_id}',
-                  'self_html': f'https://127.0.0.1:5000/api/test-ui-links/detail/{record1_id}',
-                  }
+        "links": {
+            "latest_html": f"https://127.0.0.1:5000/api/test-ui-links/latest/{record1_id}",
+            "self": f"https://127.0.0.1:5000/api/requests-test/{record1_id}",
+            "self_html": f"https://127.0.0.1:5000/api/test-ui-links/detail/{record1_id}",
+        },
     }
 
     record_service.delete(system_identity, record1_id)
@@ -77,10 +77,11 @@ def test_resolve_topic(
     assert resp_expanded.status_code == 200
     assert resp_expanded.json["topic"] == {"requests_test": record1_id}
     assert resp_expanded.json["expanded"]["topic"] == {
-        "id": "", # TODO: ask - should id be shown?
+        "id": "",  # TODO: ask - should id be shown?
         "links": {},
         "metadata": {"title": "Deleted record"},
     }
+
 
 """
 def test_ui_resolve_topic(

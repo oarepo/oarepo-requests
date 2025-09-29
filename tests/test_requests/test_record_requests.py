@@ -46,15 +46,15 @@ def test_read_requests_on_draft(
     create_request_on_draft(creator.identity, draft1_id, "publish_draft")
     create_request_on_draft(creator.identity, draft2_id, "publish_draft")
 
-    resp1 = creator_client.get(f"{urls['BASE_URL_REQUESTS']}?topic=requests_test_draft:{draft1_id}").json[
-        "hits"
-    ]["hits"]
-    resp2 = creator_client.get(f"{urls['BASE_URL_REQUESTS']}?topic=requests_test_draft:{draft2_id}").json[
-        "hits"
-    ]["hits"]
-    resp3 = creator_client.get(f"{urls['BASE_URL_REQUESTS']}?topic=requests_test_draft:{draft3_id}").json[
-        "hits"
-    ]["hits"]
+    resp1 = creator_client.get(
+        f"{urls['BASE_URL_REQUESTS']}?topic=requests_test_draft:{draft1_id}"
+    ).json["hits"]["hits"]
+    resp2 = creator_client.get(
+        f"{urls['BASE_URL_REQUESTS']}?topic=requests_test_draft:{draft2_id}"
+    ).json["hits"]["hits"]
+    resp3 = creator_client.get(
+        f"{urls['BASE_URL_REQUESTS']}?topic=requests_test_draft:{draft3_id}"
+    ).json["hits"]["hits"]
 
     assert len(resp1) == 2
     assert len(resp2) == 1
@@ -110,15 +110,15 @@ def test_read_requests_on_record(
         additional_data={"payload": {"removal_reason": "test reason"}},
     )
 
-    resp1 = creator_client.get(f"{urls['BASE_URL_REQUESTS']}?topic=requests_test:{record1_id}").json[
-        "hits"
-    ]["hits"]
-    resp2 = creator_client.get(f"{urls['BASE_URL_REQUESTS']}?topic=requests_test:{record2_id}").json[
-        "hits"
-    ]["hits"]
-    resp3 = creator_client.get(f"{urls['BASE_URL_REQUESTS']}?topic=requests_test:{record3_id}").json[
-        "hits"
-    ]["hits"]
+    resp1 = creator_client.get(
+        f"{urls['BASE_URL_REQUESTS']}?topic=requests_test:{record1_id}"
+    ).json["hits"]["hits"]
+    resp2 = creator_client.get(
+        f"{urls['BASE_URL_REQUESTS']}?topic=requests_test:{record2_id}"
+    ).json["hits"]["hits"]
+    resp3 = creator_client.get(
+        f"{urls['BASE_URL_REQUESTS']}?topic=requests_test:{record3_id}"
+    ).json["hits"]["hits"]
 
     assert len(resp1) == 2
     assert len(resp2) == 1

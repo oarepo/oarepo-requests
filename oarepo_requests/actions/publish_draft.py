@@ -82,9 +82,7 @@ class PublishDraftSubmitAction(PublishMixin, OARepoSubmitAction):
         return super().apply(identity, state, uow, *args, **kwargs)
 
 
-class PublishDraftAcceptAction(
-    PublishMixin, CreatedTopicMixin, OARepoAcceptAction
-):
+class PublishDraftAcceptAction(PublishMixin, CreatedTopicMixin, OARepoAcceptAction):
     """Accept action for publishing draft requests."""
 
     name = _("Publish")

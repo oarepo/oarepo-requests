@@ -13,13 +13,11 @@ from dataclasses import dataclass
 from functools import cached_property
 from typing import TYPE_CHECKING, Any
 
-from invenio_access.permissions import system_identity
 from invenio_i18n import _
 from invenio_pidstore.errors import PersistentIdentifierError, PIDDoesNotExistError
 from invenio_records_resources.records import Record
 from invenio_requests.customizations import actions
 from invenio_requests.records.api import Request
-from oarepo_runtime.proxies import current_runtime
 
 from oarepo_requests.proxies import current_oarepo_requests
 from oarepo_requests.utils import reference_entity, ref_to_str
@@ -28,7 +26,6 @@ if TYPE_CHECKING:
     from flask_babel.speaklater import LazyString
     from flask_principal import Identity
     from invenio_records_resources.services.uow import UnitOfWork
-    from invenio_records_resources.services.records.results import RecordItem
     from oarepo_requests.actions.components import RequestActionComponent
 
 from invenio_requests.customizations import RequestAction, RequestType

@@ -15,9 +15,9 @@ import importlib_metadata
 from flask_resources import ResponseHandler
 from invenio_records_resources.services.base.config import ConfiguratorMixin
 from invenio_requests.resources import RequestsResourceConfig
-from invenio_requests.proxies import current_requests_resource
 from invenio_requests.resources.requests.config import request_error_handlers
 import marshmallow as ma
+
 
 class OARepoRequestsResourceConfig(RequestsResourceConfig, ConfiguratorMixin):
     """Config for the extended requests API."""
@@ -34,7 +34,10 @@ class OARepoRequestsResourceConfig(RequestsResourceConfig, ConfiguratorMixin):
 
     @property
     def request_view_args(self):
-        return super().request_view_args | {"topic": ma.fields.String(), "request_type": ma.fields.String()}
+        return super().request_view_args | {
+            "topic": ma.fields.String(),
+            "request_type": ma.fields.String(),
+        }
 
     @property
     def response_handlers(self) -> dict[str, ResponseHandler]:
@@ -47,7 +50,7 @@ class OARepoRequestsResourceConfig(RequestsResourceConfig, ConfiguratorMixin):
     @property
     def error_handlers(self) -> dict:
         """Get error handlers."""
-        entrypoint_error_handlers = request_error_handlers # TODO: import correctly
+        entrypoint_error_handlers = request_error_handlers  # TODO: import correctly
 
         for x in importlib_metadata.entry_points(
             group="oarepo_requests.error_handlers"

@@ -3,8 +3,9 @@ from invenio_requests.resolvers.registry import ResolverRegistry
 
 
 class RefEndpointLink(EndpointLink):
-
-    def __init__(self, endpoint, when=None, vars=None, params=None, ref_querystring=None):
+    def __init__(
+        self, endpoint, when=None, vars=None, params=None, ref_querystring=None
+    ):
         """Constructor.
 
         :param endpoint: str. endpoint of the URL
@@ -14,7 +15,6 @@ class RefEndpointLink(EndpointLink):
         """
         super().__init__(endpoint, when, vars, params)
         self._ref_querystring = ref_querystring
-
 
     def expand(self, obj, context):
         """Expand the endpoint.

@@ -7,7 +7,6 @@
 #
 from __future__ import annotations
 
-from pytest_oarepo.requests.functions import get_request_create_link
 
 
 def test_delete(

@@ -178,8 +178,10 @@ def resolve_reference_dict(reference_dict: EntityReference) -> Record:
     """Resolve the reference dict to the entity (such as Record, User, ...)."""
     return ResolverRegistry.resolve_entity_proxy(reference_dict).resolve()
 
-def reference_entity(entity: Any)->EntityReference:
+
+def reference_entity(entity: Any) -> EntityReference:
     return ResolverRegistry.reference_entity(entity)
+
 
 def get_matching_service_for_refdict(
     reference_dict: EntityReference,
@@ -231,10 +233,12 @@ def reference_to_tuple(reference: EntityReference) -> tuple[str, str]:
     """
     return next(iter(reference.items()))
 
+
 def string_to_reference(reference_str: str) -> EntityReference:
     """Convert the reference string to a reference dict."""
     split = reference_str.split(":")
     return {split[0]: split[1]}
+
 
 def ref_to_str(ref_dict: EntityReference) -> str:
     """Convert the reference string to a reference dict."""

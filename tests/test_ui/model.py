@@ -22,11 +22,10 @@ if TYPE_CHECKING:
 
 class ModelUIResourceConfig(RecordsUIResourceConfig):
     """Mock UI resource config."""
+
     model_name = "requests-test"
 
-    api_service = (
-        "requests-test"  # must be something included in oarepo, as oarepo is used in tests
-    )
+    api_service = "requests-test"  # must be something included in oarepo, as oarepo is used in tests
 
     blueprint_name = "requests_test"
     url_prefix = "/requests-test"

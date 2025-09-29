@@ -9,9 +9,6 @@ from __future__ import annotations
 
 import pytest
 from invenio_records_resources.services.errors import PermissionDeniedError
-from invenio_requests.customizations.event_types import LogEventType
-from invenio_requests.proxies import current_requests_service
-from invenio_requests.records.api import Request, RequestEvent
 
 from tests.conftest import TestEventType
 
