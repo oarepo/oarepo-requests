@@ -55,7 +55,7 @@ class OARepoRequestsResourceConfig(RequestsResourceConfig, ConfiguratorMixin):
         }
 
     @property
-    def error_handlers(self) -> dict[type, Any]:
+    def error_handlers(self) -> dict[type[Exception], Any]:
         """Get error handlers."""
         entrypoint_error_handlers = request_error_handlers  # TODO: import correctly
 

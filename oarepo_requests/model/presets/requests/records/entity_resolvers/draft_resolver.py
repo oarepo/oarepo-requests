@@ -48,15 +48,6 @@ def set_field(result: dict[str, Any], resolved_dict: dict[str, Any], field_name:
         result[field_name] = from_data
 
 
-"""
-from oarepo_runtime.records.entity_resolvers import (
-    DraftProxy,
-)
-
-from oarepo_runtime.records.entity_resolvers import RecordResolver as BaseRecordResolver
-"""
-
-
 # TODO: temp
 class RecordProxy(InvenioRecordProxy):
     """Resolver proxy for a record entity."""

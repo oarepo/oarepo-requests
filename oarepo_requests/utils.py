@@ -10,7 +10,7 @@
 from __future__ import annotations
 
 import copy
-from typing import TYPE_CHECKING, Any
+from typing import TYPE_CHECKING, Any, cast
 
 from flask_babel.speaklater import LazyString
 from invenio_access.permissions import system_identity
@@ -294,10 +294,7 @@ def request_identity_matches(entity_reference: EntityReference, identity: Identi
         return False
 
     try:
-        if isinstance(entity_reference, dict):
-            entity = ResolverRegistry.resolve_entity_proxy(entity_reference)
-        else:
-            entity = entity_reference
+        entity = ResolverRegistry.resolve_entity_proxy(entity_reference)
         if entity:
             needs = entity.get_needs()
             return bool(identity.provides.intersection(needs))
@@ -328,13 +325,16 @@ def has_rights_to_accept_request(request: Request, identity: Identity) -> bool:
     :param request: Request to check.
     :param identity: Identity to check.
     """
-    return current_requests_service.check_permission(
-        identity,
-        "action_accept",
-        request=request,
-        record=request.topic,
-        request_type=request.type,
-    )
+    return cast(
+        "bool",
+        current_requests_service.check_permission(
+            identity,
+            "action_accept",
+            request=request,
+            record=request.topic,
+            request_type=request.type,
+        ),
+    )  # TODO: the typing stubs should resolve this so that we don't need cast?
 
 
 def has_rights_to_submit_request(request: Request, identity: Identity) -> bool:
@@ -343,10 +343,13 @@ def has_rights_to_submit_request(request: Request, identity: Identity) -> bool:
     :param request: Request to check.
     :param identity: Identity to check.
     """
-    return current_requests_service.check_permission(
-        identity,
-        "action_submit",
-        request=request,
-        record=request.topic,
-        request_type=request.type,
+    return cast(
+        "bool",
+        current_requests_service.check_permission(
+            identity,
+            "action_submit",
+            request=request,
+            record=request.topic,
+            request_type=request.type,
+        ),
     )
