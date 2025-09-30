@@ -59,12 +59,8 @@ class IfRequestedBy(RecipientGeneratorMixin, ConditionalGenerator):
             needs = creator.get_needs()
 
         for condition in self.requesters:
-            condition_needs = set(
-                condition.needs(request_type=request_type, creator=creator, **kwargs)
-            )
-            condition_excludes = set(
-                condition.excludes(request_type=request_type, creator=creator, **kwargs)
-            )
+            condition_needs = set(condition.needs(request_type=request_type, creator=creator, **kwargs))
+            condition_excludes = set(condition.excludes(request_type=request_type, creator=creator, **kwargs))
 
             if not condition_needs.intersection(needs):
                 continue
@@ -89,30 +85,20 @@ class IfRequestedBy(RecipientGeneratorMixin, ConditionalGenerator):
         provide any receivers.
         """
         ret = []
-        for gen in self._generators(
-            record=record, request_type=request_type, **context
-        ):
+        for gen in self._generators(record=record, request_type=request_type, **context):
             if isinstance(gen, RecipientGeneratorMixin):
-                ret.extend(
-                    gen.reference_receivers(
-                        record=record, request_type=request_type, **context
-                    )
-                )
+                ret.extend(gen.reference_receivers(record=record, request_type=request_type, **context))
         return ret
 
     def query_filter(self, **context: Any) -> Query:
         """Search filters."""
-        raise NotImplementedError(
-            "Please use IfRequestedBy only in recipients, not elsewhere."
-        )
+        raise NotImplementedError("Please use IfRequestedBy only in recipients, not elsewhere.")
 
 
 class IfNoNewVersionDraft(ConditionalGenerator):
     """Generator that checks if the record has no new version draft."""
 
-    def __init__(
-        self, then_: list[Generator], else_: list[Generator] | None = None
-    ) -> None:
+    def __init__(self, then_: list[Generator], else_: list[Generator] | None = None) -> None:
         """Initialize the generator."""
         else_ = [] if else_ is None else else_
         super().__init__(then_, else_=else_)
@@ -133,9 +119,7 @@ class IfNoNewVersionDraft(ConditionalGenerator):
 class IfNoEditDraft(ConditionalGenerator):
     """Generator that checks if the record has no edit draft."""
 
-    def __init__(
-        self, then_: list[Generator], else_: list[Generator] | None = None
-    ) -> None:
+    def __init__(self, then_: list[Generator], else_: list[Generator] | None = None) -> None:
         """Initialize the generator."""
         else_ = [] if else_ is None else else_
         super().__init__(then_, else_=else_)
@@ -146,9 +130,7 @@ class IfNoEditDraft(ConditionalGenerator):
             return False
         records_service = current_runtime.get_record_service_for_record(record)
         try:
-            records_service.config.draft_cls.pid.resolve(
-                record["id"]
-            )  # by edit - has the same id as parent record
+            records_service.config.draft_cls.pid.resolve(record["id"])  # by edit - has the same id as parent record
             # I'm not sure what open unpublished means
         except NoResultFound:
             return True

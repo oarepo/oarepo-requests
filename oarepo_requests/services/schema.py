@@ -9,34 +9,28 @@
 
 from __future__ import annotations
 
+from contextvars import ContextVar
 from typing import Any
 
 import marshmallow as ma
+from invenio_drafts_resources.records.api import Record
 from invenio_records_resources.services.base.links import (
-    LinksTemplate,
     EndpointLink,
+    LinksTemplate,
 )
+from invenio_requests.resolvers.registry import ResolverRegistry
 from invenio_requests.services.schemas import GenericRequestSchema
 from marshmallow import fields
-from invenio_drafts_resources.records.api import Record
-from invenio_requests.resolvers.registry import ResolverRegistry
 
 from oarepo_requests.utils import ref_to_str
-from contextvars import ContextVar
 
-request_type_identity_ctx: ContextVar[Any] = ContextVar(
-    "oarepo_requests.request_type_identity", default=None
-)
-request_type_record_ctx: ContextVar[Any] = ContextVar(
-    "oarepo_requests.request_type_record", default=None
-)
+request_type_identity_ctx: ContextVar[Any] = ContextVar("oarepo_requests.request_type_identity", default=None)
+request_type_record_ctx: ContextVar[Any] = ContextVar("oarepo_requests.request_type_record", default=None)
 
 
 def get_links_schema() -> ma.fields.Dict:
     """Get links schema."""
-    return ma.fields.Dict(
-        keys=ma.fields.String()
-    )  # value is either string or dict of strings (for actions)
+    return ma.fields.Dict(keys=ma.fields.String())  # value is either string or dict of strings (for actions)
 
 
 class RequestTypeSchema(ma.Schema):
@@ -53,21 +47,12 @@ class RequestTypeSchema(ma.Schema):
         if "links" in data:
             return data
         type_id = data["type_id"]
-        # record = self.context["record"]
         identity = request_type_identity_ctx.get()
         record = request_type_record_ctx.get()
 
-        topic_ref = ref_to_str(
-            ResolverRegistry.reference_entity(record)
-            if isinstance(record, Record)
-            else record
-        )
-        link = EndpointLink(
-            "oarepo_requests.create_args", params=["topic", "request_type"]
-        )
-        template = LinksTemplate(
-            {"create": link}, context={"topic": topic_ref, "request_type": type_id}
-        )
+        topic_ref = ref_to_str(ResolverRegistry.reference_entity(record) if isinstance(record, Record) else record)
+        link = EndpointLink("oarepo_requests.create_args", params=["topic", "request_type"])
+        template = LinksTemplate({"create": link}, context={"topic": topic_ref, "request_type": type_id})
         data["links"] = {"actions": template.expand(identity, record)}
         return data
 

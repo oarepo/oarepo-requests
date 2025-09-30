@@ -13,9 +13,7 @@ if TYPE_CHECKING:
     from pytest_oarepo.fixtures import LoggedClient
 
 
-def _init(
-    users, logged_client, draft_factory, submit_request, urls
-) -> tuple[LoggedClient, LoggedClient]:
+def _init(users, logged_client, draft_factory, submit_request, urls) -> tuple[LoggedClient, LoggedClient]:
     user1 = users[0]
     user2 = users[1]
 
@@ -25,12 +23,8 @@ def _init(
     draft1 = draft_factory(user1.identity, custom_workflow="different_recipients")
     draft2 = draft_factory(user2.identity, custom_workflow="different_recipients")
 
-    submit_request(
-        user1.identity, draft1["id"], "publish_draft"
-    )  # recipient should be 2
-    submit_request(
-        user2.identity, draft2["id"], "another_topic_updating"
-    )  # should be 1
+    submit_request(user1.identity, draft1["id"], "publish_draft")  # recipient should be 2
+    submit_request(user2.identity, draft2["id"], "another_topic_updating")  # should be 1
 
     search_unfiltered = user2_client.get(urls["BASE_URL_REQUESTS"])
     assert len(search_unfiltered.json["hits"]["hits"]) == 2
@@ -45,9 +39,7 @@ def test_receiver_param_interpreter(
     submit_request_on_draft,
     search_clear,
 ):
-    user1_client, user2_client = _init(
-        users, logged_client, draft_factory, submit_request_on_draft, urls
-    )
+    _user1_client, user2_client = _init(users, logged_client, draft_factory, submit_request_on_draft, urls)
     search_receiver_only = user2_client.get(
         f"{urls['BASE_URL_REQUESTS']}?assigned=true"
     )  # creator of 1 and recipient of 2
@@ -64,9 +56,7 @@ def test_owner_param_interpreter(
     submit_request_on_draft,
     search_clear,
 ):
-    user1_client, user2_client = _init(
-        users, logged_client, draft_factory, submit_request_on_draft, urls
-    )
+    user1_client, user2_client = _init(users, logged_client, draft_factory, submit_request_on_draft, urls)
 
     search_user1_only = user1_client.get(f"{urls['BASE_URL_REQUESTS']}?mine=true")
     search_user2_only = user2_client.get(f"{urls['BASE_URL_REQUESTS']}?mine=true")
@@ -114,19 +104,11 @@ def test_open_param_interpreter(
     create_request_on_draft(user2.identity, draft3_id, "publish_draft")
 
     read = user2_client.get(f"{urls['BASE_URL']}/{draft1_id}/draft?expand=true")
-    user2_client.post(
-        link2testclient(
-            read.json["expanded"]["requests"][0]["links"]["actions"]["accept"]
-        )
-    )
+    user2_client.post(link2testclient(read.json["expanded"]["requests"][0]["links"]["actions"]["accept"]))
 
     search_unfiltered = user2_client.get(urls["BASE_URL_REQUESTS"]).json["hits"]["hits"]
-    search_open = user2_client.get(f"{urls['BASE_URL_REQUESTS']}?is_open=true").json[
-        "hits"
-    ]["hits"]
-    search_closed = user2_client.get(
-        f"{urls['BASE_URL_REQUESTS']}?is_closed=true"
-    ).json["hits"]["hits"]
+    search_open = user2_client.get(f"{urls['BASE_URL_REQUESTS']}?is_open=true").json["hits"]["hits"]
+    search_closed = user2_client.get(f"{urls['BASE_URL_REQUESTS']}?is_closed=true").json["hits"]["hits"]
 
     assert len(search_unfiltered) == 3
     assert len(search_open) == 2

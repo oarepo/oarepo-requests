@@ -12,15 +12,11 @@ from __future__ import annotations
 from typing import TYPE_CHECKING, Any, ClassVar, override
 
 import marshmallow as ma
-from invenio_drafts_resources.resources.records.errors import DraftNotCreatedError
 from invenio_i18n import gettext
 from invenio_i18n import lazy_gettext as _
-from invenio_pidstore.errors import PIDDoesNotExistError
-from invenio_records_resources.services.errors import PermissionDeniedError
 from invenio_records_resources.services.uow import RecordCommitOp, UnitOfWork
 from invenio_requests.proxies import current_requests_service
 from marshmallow.validate import OneOf
-from oarepo_runtime.proxies import current_runtime
 from oarepo_runtime.records.drafts import has_draft
 
 from ..actions.new_version import NewVersionAcceptAction
@@ -49,25 +45,6 @@ class NewVersionRequestType(NonDuplicableOARepoRequestType):
         "created_topic": ma.fields.Str(),
         "keep_files": ma.fields.String(validate=OneOf(["yes", "no"])),
     }
-
-    def get_ui_redirect_url(self, request: Request, ctx: dict) -> str:
-        """Return URL to redirect ui after the request action is executed."""
-        if request.status == "accepted":
-            service = current_runtime.get_record_service_for_record_class(
-                request.topic.record_cls
-            )
-            try:
-                result_item = service.read_draft(
-                    ctx["identity"], request["payload"]["draft_record:id"]
-                )
-            except (PermissionDeniedError, DraftNotCreatedError, PIDDoesNotExistError):
-                return None
-
-            if "edit_html" in result_item["links"]:
-                return result_item["links"]["edit_html"]
-            if "self_html" in result_item["links"]:
-                return result_item["links"]["self_html"]
-        return None
 
     @classproperty
     @override
@@ -100,9 +77,7 @@ class NewVersionRequestType(NonDuplicableOARepoRequestType):
     }
 
     @classmethod
-    def is_applicable_to(
-        cls, identity: Identity, topic: Record, *args: Any, **kwargs: Any
-    ) -> bool:
+    def is_applicable_to(cls, identity: Identity, topic: Record, *args: Any, **kwargs: Any) -> bool:
         """Check if the request type is applicable to the topic."""
         if topic.is_draft:
             return False
@@ -123,13 +98,9 @@ class NewVersionRequestType(NonDuplicableOARepoRequestType):
     ) -> None:
         """Check if the request can be created."""
         if topic.is_draft:
-            raise ValueError(
-                gettext("Trying to create new version request on draft record")
-            )
+            raise ValueError(gettext("Trying to create new version request on draft record"))
         if has_draft(topic):
-            raise ValueError(
-                gettext("Trying to create edit request on record with draft")
-            )
+            raise ValueError(gettext("Trying to create edit request on record with draft"))
         super().can_create(identity, data, receiver, topic, creator, *args, **kwargs)
 
     def topic_change(self, request: Request, new_topic: dict, uow: UnitOfWork) -> None:
@@ -187,9 +158,7 @@ class NewVersionRequestType(NonDuplicableOARepoRequestType):
                         "You have been asked to approve the request to update the record. "
                         "You can approve or reject the request."
                     )
-                return gettext(
-                    "Permission to update record (including files) requested. "
-                )
+                return gettext("Permission to update record (including files) requested. ")
             case _:
                 if request_identity_matches(request.created_by, identity):
                     return gettext("Submit request to get edit access to the record.")

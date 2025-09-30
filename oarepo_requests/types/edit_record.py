@@ -45,28 +45,7 @@ class EditPublishedRecordRequestType(NonDuplicableOARepoRequestType):
     type_id = "edit_published_record"
     name = _("Edit metadata")
 
-    payload_schema: ClassVar[dict[str, ma.fields.Field]] = {
-        "created_topic": ma.fields.Str()
-    }
-    """
-    def get_ui_redirect_url(self, request: Request, ctx: dict) -> str:
-        if request.status == "accepted":
-            service = current_runtime.get_record_service_for_record_class(
-                request.topic.record_cls
-            )
-            try:
-                result_item = service.read_draft(
-                    ctx["identity"], request.topic._parse_ref_dict_id()
-                )  # noqa SLF001
-            except (PermissionDeniedError, DraftNotCreatedError):
-                return None
-
-            if "edit_html" in result_item["links"]:
-                return result_item["links"]["edit_html"]
-            if "self_html" in result_item["links"]:
-                return result_item["links"]["self_html"]
-        return None
-    """
+    payload_schema: ClassVar[dict[str, ma.fields.Field]] = {"created_topic": ma.fields.Str()}
 
     @classproperty
     def available_actions(cls) -> dict[str, type[RequestAction]]:  # noqa N805
@@ -81,9 +60,7 @@ class EditPublishedRecordRequestType(NonDuplicableOARepoRequestType):
     allowed_topic_ref_types = ModelRefTypes(published=True, draft=True)
 
     @classmethod
-    def is_applicable_to(
-        cls, identity: Identity, topic: Record, *args: Any, **kwargs: Any
-    ) -> bool:
+    def is_applicable_to(cls, identity: Identity, topic: Record, *args: Any, **kwargs: Any) -> bool:
         """Check if the request type is applicable to the topic."""
         if topic.is_draft:
             return False
@@ -115,9 +92,7 @@ class EditPublishedRecordRequestType(NonDuplicableOARepoRequestType):
         if topic.is_draft:
             raise ValueError(gettext("Trying to create edit request on draft record"))
         if has_draft(topic):
-            raise ValueError(
-                gettext("Trying to create edit request on record with draft")
-            )
+            raise ValueError(gettext("Trying to create edit request on record with draft"))
         super().can_create(identity, data, receiver, topic, creator, *args, **kwargs)
 
     def topic_change(self, request: Request, new_topic: dict, uow: UnitOfWork) -> None:
@@ -159,21 +134,13 @@ class EditPublishedRecordRequestType(NonDuplicableOARepoRequestType):
             return gettext("Click to start editing the metadata of the record.")
 
         if not request:
-            return gettext(
-                "Request edit access to the record. You will be notified about the decision by email."
-            )
+            return gettext("Request edit access to the record. You will be notified about the decision by email.")
         match request.status:
             case "submitted":
                 if request_identity_matches(request.created_by, identity):
-                    return gettext(
-                        "Edit access requested. You will be notified about the decision by email."
-                    )
+                    return gettext("Edit access requested. You will be notified about the decision by email.")
                 if request_identity_matches(request.receiver, identity):
-                    return gettext(
-                        "You have been requested to grant edit access to the record."
-                    )
+                    return gettext("You have been requested to grant edit access to the record.")
                 return gettext("Edit access requested.")
             case _:
-                return gettext(
-                    "Request edit access to the record. You will be notified about the decision by email."
-                )
+                return gettext("Request edit access to the record. You will be notified about the decision by email.")

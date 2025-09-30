@@ -7,7 +7,6 @@
 #
 from __future__ import annotations
 
-
 from oarepo_requests.temp_utils import applicable_requests
 
 
@@ -25,9 +24,7 @@ def test_allowed_request_types_on_draft_service(
 
     draft = requests_model.Draft.pid.resolve(draft1["id"], registered_only=False)
     allowed_request_types = applicable_requests(identity, draft)
-    assert sorted(
-        allowed_request_types.to_dict()["hits"]["hits"], key=lambda x: x["type_id"]
-    ) == [
+    assert sorted(allowed_request_types.to_dict()["hits"]["hits"], key=lambda x: x["type_id"]) == [
         {
             "links": {
                 "actions": {
@@ -58,12 +55,8 @@ def test_allowed_request_types_on_draft_resource(
         applicable_requests_link
         == f"https://127.0.0.1:5000/api/requests/applicable?topic=requests_test_draft:{draft1_id}"
     )
-    allowed_request_types = creator_client.get(
-        link2testclient(applicable_requests_link)
-    )
-    assert sorted(
-        allowed_request_types.json["hits"]["hits"], key=lambda x: x["type_id"]
-    ) == [
+    allowed_request_types = creator_client.get(link2testclient(applicable_requests_link))
+    assert sorted(allowed_request_types.json["hits"]["hits"], key=lambda x: x["type_id"]) == [
         {
             "links": {
                 "actions": {
@@ -94,13 +87,9 @@ def test_allowed_request_types_on_published_resource(
         applicable_requests_link
         == f"https://127.0.0.1:5000/api/requests/applicable?topic=requests_test:{published1_id}"
     )
-    allowed_request_types = creator_client.get(
-        link2testclient(applicable_requests_link)
-    )
+    allowed_request_types = creator_client.get(link2testclient(applicable_requests_link))
     assert allowed_request_types.status_code == 200
-    assert sorted(
-        allowed_request_types.json["hits"]["hits"], key=lambda x: x["type_id"]
-    ) == [
+    assert sorted(allowed_request_types.json["hits"]["hits"], key=lambda x: x["type_id"]) == [
         {
             "links": {
                 "actions": {
@@ -119,9 +108,7 @@ def test_allowed_request_types_on_published_resource(
         },
         {
             "links": {
-                "actions": {
-                    "create": f"https://127.0.0.1:5000/api/requests/requests_test:{published1_id}/new_version"
-                }
+                "actions": {"create": f"https://127.0.0.1:5000/api/requests/requests_test:{published1_id}/new_version"}
             },
             "type_id": "new_version",
         },

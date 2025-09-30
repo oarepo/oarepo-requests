@@ -9,14 +9,18 @@
 
 from __future__ import annotations
 
-from typing import ClassVar
+from typing import TYPE_CHECKING, Any, ClassVar
 
 import importlib_metadata
-from flask_resources import ResponseHandler
+import marshmallow as ma
 from invenio_records_resources.services.base.config import ConfiguratorMixin
 from invenio_requests.resources import RequestsResourceConfig
 from invenio_requests.resources.requests.config import request_error_handlers
-import marshmallow as ma
+
+from oarepo_requests.services.search import ExtendedRequestSearchRequestArgsSchema
+
+if TYPE_CHECKING:
+    from flask_resources import ResponseHandler
 
 
 class OARepoRequestsResourceConfig(RequestsResourceConfig, ConfiguratorMixin):
@@ -32,8 +36,11 @@ class OARepoRequestsResourceConfig(RequestsResourceConfig, ConfiguratorMixin):
         "list-applicable": "/applicable",
     }
 
+    request_search_args = ExtendedRequestSearchRequestArgsSchema
+
     @property
-    def request_view_args(self):
+    def request_view_args(self) -> dict[str, ma.fields.Field]:
+        """Request view args for the requests API."""
         return super().request_view_args | {
             "topic": ma.fields.String(),
             "request_type": ma.fields.String(),
@@ -48,16 +55,12 @@ class OARepoRequestsResourceConfig(RequestsResourceConfig, ConfiguratorMixin):
         }
 
     @property
-    def error_handlers(self) -> dict:
+    def error_handlers(self) -> dict[type, Any]:
         """Get error handlers."""
         entrypoint_error_handlers = request_error_handlers  # TODO: import correctly
 
-        for x in importlib_metadata.entry_points(
-            group="oarepo_requests.error_handlers"
-        ):
+        for x in importlib_metadata.entry_points(group="oarepo_requests.error_handlers"):
             entrypoint_error_handlers.update(x.load())
-        for x in importlib_metadata.entry_points(
-            group="oarepo_requests.extended.error_handlers"
-        ):
+        for x in importlib_metadata.entry_points(group="oarepo_requests.extended.error_handlers"):
             entrypoint_error_handlers.update(x.load())
         return entrypoint_error_handlers

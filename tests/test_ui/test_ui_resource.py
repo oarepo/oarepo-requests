@@ -11,7 +11,6 @@ import json
 
 from invenio_requests.proxies import current_requests_service
 
-
 allowed_actions = ["submit", "delete"]
 
 
@@ -31,9 +30,7 @@ def test_draft_publish_request_present(
         assert data["creatable_request_types"]["publish_draft"] == {
             "description": "Request to publish a draft",
             "links": {
-                "actions": {
-                    "create": f"https://127.0.0.1:5000/api/thesis/{draft['id']}/draft/requests/publish_draft"
-                }
+                "actions": {"create": f"https://127.0.0.1:5000/api/thesis/{draft['id']}/draft/requests/publish_draft"}
             },
             "name": "Publish draft",
         }
@@ -56,9 +53,7 @@ def test_record_delete_request_present(
         assert data["creatable_request_types"]["edit_published_record"] == {
             "description": "Request re-opening of published record",
             "links": {
-                "actions": {
-                    "create": f"https://127.0.0.1:5000/api/thesis/{topic['id']}/requests/edit_published_record"
-                }
+                "actions": {"create": f"https://127.0.0.1:5000/api/thesis/{topic['id']}/requests/edit_published_record"}
             },
             "name": "Edit metadata",
         }

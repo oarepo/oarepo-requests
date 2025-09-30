@@ -18,13 +18,13 @@ from oarepo_runtime.proxies import current_runtime
 
 from oarepo_requests.errors import UnresolvedRequestsError, VersionAlreadyExists
 
+from ..temp_utils import search_requests
 from .generic import (
     CreatedTopicMixin,
     OARepoAcceptAction,
     OARepoDeclineAction,
     OARepoSubmitAction,
 )
-from ..temp_utils import search_requests
 
 if TYPE_CHECKING:
     from flask_principal import Identity
@@ -68,9 +68,7 @@ class PublishDraftSubmitAction(PublishMixin, OARepoSubmitAction):
         """Publish the draft."""
         if "payload" in self.request and "version" in self.request["payload"]:
             topic_service = current_runtime.get_record_service_for_record(state.topic)
-            versions = topic_service.search_versions(
-                identity, state.topic.pid.pid_value
-            )
+            versions = topic_service.search_versions(identity, state.topic.pid.pid_value)
             versions_hits = versions.to_dict()["hits"]["hits"]
             for rec in versions_hits:
                 if "version" in rec["metadata"]:
@@ -121,10 +119,8 @@ class PublishDraftAcceptAction(PublishMixin, CreatedTopicMixin, OARepoAcceptActi
                 raise UnresolvedRequestsError(action=str(self.name))
         id_ = state.topic["id"]
 
-        published_topic = topic_service.publish(
-            identity, id_, *args, uow=uow, expand=False, **kwargs
-        )
-        state.created_topic = published_topic._record
+        published_topic = topic_service.publish(identity, id_, *args, uow=uow, expand=False, **kwargs)
+        state.created_topic = published_topic._record  # noqa SLF001
         # TODO: topic update cascade?
         state.topic = published_topic._record  # noqa SLF001
         # TODO: notification

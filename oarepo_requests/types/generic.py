@@ -89,11 +89,7 @@ class OARepoRequestType(RequestType):
     def _create_marshmallow_schema(cls) -> type[Schema]:
         """Create a marshmallow schema for this request type with required payload field."""
         schema = super()._create_marshmallow_schema()
-        if (
-            cls.payload_schema is not None
-            and hasattr(schema, "fields")
-            and "payload" in schema.fields
-        ):
+        if cls.payload_schema is not None and hasattr(schema, "fields") and "payload" in schema.fields:
             schema.fields["payload"].required = True
 
         return schema
@@ -119,14 +115,10 @@ class OARepoRequestType(RequestType):
         :param args:            additional arguments
         :param kwargs:          additional keyword arguments
         """
-        current_requests_service.require_permission(
-            identity, "create", record=topic, request_type=self, **kwargs
-        )
+        current_requests_service.require_permission(identity, "create", record=topic, request_type=self, **kwargs)
 
     @classmethod
-    def is_applicable_to(
-        cls, identity: Identity, topic: Record, *args: Any, **kwargs: Any
-    ) -> bool:  # noqa ARG002
+    def is_applicable_to(cls, identity: Identity, topic: Record, *args: Any, **kwargs: Any) -> bool:  # noqa ARG002
         """Check if the request type is applicable to the topic.
 
         Used for checking whether there is any situation where the client can create
@@ -135,9 +127,7 @@ class OARepoRequestType(RequestType):
         method is used to check whether there is a possible situation a user might create
         this request eg. for the purpose of serializing a link on associated record
         """
-        return current_requests_service.check_permission(
-            identity, "create", record=topic, request_type=cls, **kwargs
-        )
+        return current_requests_service.check_permission(identity, "create", record=topic, request_type=cls, **kwargs)
 
     allowed_topic_ref_types = ModelRefTypes()
     allowed_receiver_ref_types = ReceiverRefTypes()
@@ -192,56 +182,16 @@ class OARepoRequestType(RequestType):
         topic: Record,
         request: Request | None = None,
         # strings
-        create: (
-            str
-            | LazyString
-            | Callable[[Identity, Record, Request | None], str | LazyString]
-        ),
-        create_autoapproved: (
-            str
-            | LazyString
-            | Callable[[Identity, Record, Request | None], str | LazyString]
-        ),
-        submit: (
-            str
-            | LazyString
-            | Callable[[Identity, Record, Request | None], str | LazyString]
-        ),
-        submitted_receiver: (
-            str
-            | LazyString
-            | Callable[[Identity, Record, Request | None], str | LazyString]
-        ),
-        submitted_creator: (
-            str
-            | LazyString
-            | Callable[[Identity, Record, Request | None], str | LazyString]
-        ),
-        submitted_others: (
-            str
-            | LazyString
-            | Callable[[Identity, Record, Request | None], str | LazyString]
-        ),
-        accepted: (
-            str
-            | LazyString
-            | Callable[[Identity, Record, Request | None], str | LazyString]
-        ),
-        declined: (
-            str
-            | LazyString
-            | Callable[[Identity, Record, Request | None], str | LazyString]
-        ),
-        cancelled: (
-            str
-            | LazyString
-            | Callable[[Identity, Record, Request | None], str | LazyString]
-        ),
-        created: (
-            str
-            | LazyString
-            | Callable[[Identity, Record, Request | None], str | LazyString]
-        ),
+        create: (str | LazyString | Callable[[Identity, Record, Request | None], str | LazyString]),
+        create_autoapproved: (str | LazyString | Callable[[Identity, Record, Request | None], str | LazyString]),
+        submit: (str | LazyString | Callable[[Identity, Record, Request | None], str | LazyString]),
+        submitted_receiver: (str | LazyString | Callable[[Identity, Record, Request | None], str | LazyString]),
+        submitted_creator: (str | LazyString | Callable[[Identity, Record, Request | None], str | LazyString]),
+        submitted_others: (str | LazyString | Callable[[Identity, Record, Request | None], str | LazyString]),
+        accepted: (str | LazyString | Callable[[Identity, Record, Request | None], str | LazyString]),
+        declined: (str | LazyString | Callable[[Identity, Record, Request | None], str | LazyString]),
+        cancelled: (str | LazyString | Callable[[Identity, Record, Request | None], str | LazyString]),
+        created: (str | LazyString | Callable[[Identity, Record, Request | None], str | LazyString]),
     ) -> str | LazyString:
         """Return a string that varies by the state of the request.
 
@@ -282,9 +232,7 @@ class OARepoRequestType(RequestType):
                         return get_string(submit, identity, topic, request)
                     return get_string(created, identity, topic, request)
                 case _:
-                    return (
-                        f'Unknown label for status "{request.status}" in "{__file__}"'
-                    )
+                    return f'Unknown label for status "{request.status}" in "{__file__}"'
 
         if is_auto_approved(self, identity=identity, topic=topic):
             return get_string(create_autoapproved, identity, topic, request)
@@ -322,9 +270,7 @@ class NonDuplicableOARepoRequestType(OARepoRequestType):
         super().can_create(identity, data, receiver, topic, creator, *args, **kwargs)
 
     @classmethod
-    def is_applicable_to(
-        cls, identity: Identity, topic: Record, *args: Any, **kwargs: Any
-    ) -> bool:
+    def is_applicable_to(cls, identity: Identity, topic: Record, *args: Any, **kwargs: Any) -> bool:
         """Check if the request type is applicable to the topic."""
         if open_request_exists(topic, cls.type_id):
             return False

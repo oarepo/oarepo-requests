@@ -9,8 +9,6 @@
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING
-
 from flask import g
 from flask_resources import resource_requestctx, response_handler, route
 from invenio_records_resources.resources.errors import ErrorHandlersMixin
@@ -18,38 +16,21 @@ from invenio_records_resources.resources.records.resource import (
     request_data,
     request_extra_args,
     request_headers,
-    request_view_args,
     request_search_args,
+    request_view_args,
 )
-from invenio_requests.proxies import current_requests_service
-from invenio_requests.resources import RequestsResource
 from invenio_records_resources.resources.records.utils import search_preference
+from invenio_requests.resources import RequestsResource
+
 from oarepo_requests.utils import (
     resolve_reference_dict,
-    stringify_first_val,
     string_to_reference,
+    stringify_first_val,
 )
-
-if TYPE_CHECKING:
-    from invenio_requests.services.requests import RequestsService
-
-    from ...services.oarepo.service import OARepoRequestsService
-    from .config import OARepoRequestsResourceConfig
 
 
 class OARepoRequestsResource(RequestsResource, ErrorHandlersMixin):
     """OARepo extensions to invenio requests resource."""
-
-    def __init__(
-        self,
-        config: OARepoRequestsResourceConfig,
-        oarepo_requests_service: OARepoRequestsService,
-        invenio_requests_service: RequestsService = current_requests_service,
-    ) -> None:
-        """Initialize the service."""
-        # so super methods can be used with original service
-        super().__init__(config, invenio_requests_service)
-        self.oarepo_requests_service = oarepo_requests_service
 
     def create_url_rules(self) -> list[dict]:
         """Create the URL rules for the record resource."""
@@ -85,14 +66,13 @@ class OARepoRequestsResource(RequestsResource, ErrorHandlersMixin):
                 ...payload
             }
         """
-
         request_type_id = resource_requestctx.data.pop("request_type", None)
         topic = resource_requestctx.data.pop("topic", None)
         if isinstance(topic, str):
             topic = string_to_reference(topic)
         topic = resolve_reference_dict(topic)
 
-        items = self.oarepo_requests_service.create(
+        items = self.service.create(
             identity=g.identity,
             data=resource_requestctx.data,
             request_type=request_type_id,
@@ -122,11 +102,9 @@ class OARepoRequestsResource(RequestsResource, ErrorHandlersMixin):
             }
         """
         request_type_id = resource_requestctx.view_args["request_type"]
-        topic = resolve_reference_dict(
-            string_to_reference(resource_requestctx.view_args["topic"])
-        )
+        topic = resolve_reference_dict(string_to_reference(resource_requestctx.view_args["topic"]))
 
-        items = self.oarepo_requests_service.create(
+        items = self.service.create(
             identity=g.identity,
             data=resource_requestctx.data,
             request_type=request_type_id,
@@ -140,7 +118,7 @@ class OARepoRequestsResource(RequestsResource, ErrorHandlersMixin):
     @request_search_args
     @request_view_args
     @response_handler(many=True)
-    def search(self):
+    def search(self) -> tuple[dict, int]:
         """Perform a search over the items."""
         hits = self.service.search(
             identity=g.identity,
@@ -157,8 +135,6 @@ class OARepoRequestsResource(RequestsResource, ErrorHandlersMixin):
         """List request types."""
         hits = self.service.applicable_request_types(
             identity=g.identity,
-            topic=resolve_reference_dict(
-                stringify_first_val(resource_requestctx.args["topic"])
-            ),
+            topic=resolve_reference_dict(stringify_first_val(resource_requestctx.args["topic"])),
         )
         return hits.to_dict(), 200

@@ -8,6 +8,7 @@
 from __future__ import annotations
 
 from typing import TYPE_CHECKING, ClassVar
+
 from flask_resources.serializers.base import MarshmallowSerializer
 from oarepo_ui.resources import (
     BabelComponent,

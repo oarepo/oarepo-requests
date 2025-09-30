@@ -13,7 +13,6 @@ from typing import TYPE_CHECKING, Any, override
 
 from oarepo_runtime.proxies import current_runtime
 
-
 from .generic import CreatedTopicMixin, OARepoAcceptAction
 
 if TYPE_CHECKING:
@@ -40,8 +39,6 @@ class EditTopicAcceptAction(CreatedTopicMixin, OARepoAcceptAction):
         topic_service = current_runtime.get_record_service_for_record(state.topic)
         if not topic_service:
             raise KeyError(f"topic {state.topic} service not found")
-        state.created_topic = topic_service.edit(
-            identity, state.topic["id"], uow=uow
-        )._record  # noqa SLF001
+        state.created_topic = topic_service.edit(identity, state.topic["id"], uow=uow)._record  # noqa SLF001
         # state.topic = topic_service.edit(identity, state.topic["id"], uow=uow)._record  # noqa SLF001
         super().apply(identity, state, uow, *args, **kwargs)

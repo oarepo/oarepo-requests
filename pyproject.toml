@@ -11,9 +11,9 @@ requires-python = ">=3.13,<3.14"
 dependencies = [
     "oarepo-runtime>=2.0.0dev13,<3.0.0",
     "graphlib",
-    "oarepo[rdm,tests]>=13.0.0,<15.0.0",
+    "oarepo[rdm,tests]>=14.0.0,<15.0.0",
     "oarepo-model>=0.1.0.dev5",
-    "oarepo-workflows>=2.0.0.dev2",
+    "oarepo-workflows>=2.0.0dev3,<3.0.0",
 ]
 
 [project.urls]
@@ -23,6 +23,7 @@ Homepage = "https://github.com/oarepo/oarepo-requests"
 dev = [
     "ruff>=0.11.13",
     "types-PyYAML",
+    "oarepo-invenio-typing-stubs"
 ]
 
 tests = [
@@ -31,6 +32,10 @@ tests = [
     "oarepo-ui>=6.0.0dev1", # remove once dev versions aren't used
     "deepdiff",
 ]
+oarepo14 = [
+    "oarepo[rdm,tests]>=14.0.0,<15.0.0",
+]
+
 # TODO missing entrypoints
 [project.entry-points."invenio_base.apps"]
 oarepo_requests = "oarepo_requests.ext:OARepoRequests"
@@ -81,9 +86,9 @@ requires = ["hatchling"]
 build-backend = "hatchling.build"
 
 [tool.hatch.version]
-path = "oarepo_workflows/__init__.py"
+path = "oarepo_requests/__init__.py"
 
 [tool.hatch.build.targets.sdist]
 include = [
-    "/oarepo_workflows",
+    "/oarepo_requests",
 ]

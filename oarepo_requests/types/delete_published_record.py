@@ -14,7 +14,6 @@ from typing import TYPE_CHECKING, Any, ClassVar, override
 import marshmallow as ma
 from invenio_i18n import gettext
 from invenio_i18n import lazy_gettext as _
-from oarepo_runtime.proxies import current_runtime
 
 from oarepo_requests.actions.delete_published_record import (
     DeletePublishedRecordAcceptAction,
@@ -25,8 +24,8 @@ from oarepo_requests.actions.delete_published_record import (
 from ..utils import (
     classproperty,
     is_auto_approved,
-    request_identity_matches,
     open_request_exists,
+    request_identity_matches,
 )
 from .generic import NonDuplicableOARepoRequestType
 from .ref_types import ModelRefTypes
@@ -53,9 +52,7 @@ class DeletePublishedRecordRequestType(NonDuplicableOARepoRequestType):
     }
 
     @classmethod
-    def is_applicable_to(
-        cls, identity: Identity, topic: Record, *args: Any, **kwargs: Any
-    ) -> bool:
+    def is_applicable_to(cls, identity: Identity, topic: Record, *args: Any, **kwargs: Any) -> bool:
         """Check if the request type is applicable to the topic."""
         if open_request_exists(topic, cls.type_id):
             return False
@@ -89,16 +86,6 @@ class DeletePublishedRecordRequestType(NonDuplicableOARepoRequestType):
     ]
 
     editable = False
-
-    def get_ui_redirect_url(
-        self, request: Request, context: dict
-    ) -> str:  # TODO: new way of link handling
-        """Return URL to redirect ui after the request action is executed."""
-        if request.status == "accepted":
-            topic_cls = request.topic.record_cls
-            current_runtime.get_record_service_for_record_class(topic_cls)
-            # return service.config.links_search["self_html"].expand(None, context) TODO: temp
-        return None
 
     dangerous = True
 
@@ -162,12 +149,8 @@ class DeletePublishedRecordRequestType(NonDuplicableOARepoRequestType):
                         "You have been asked to approve the request to permanently delete the record. "
                         "You can approve or reject the request."
                     )
-                return gettext(
-                    "Permission to delete record (including files) requested. "
-                )
+                return gettext("Permission to delete record (including files) requested. ")
             case _:
                 if request_identity_matches(request.created_by, identity):
-                    return gettext(
-                        "Submit request to get permission to delete the record."
-                    )
+                    return gettext("Submit request to get permission to delete the record.")
                 return gettext("You do not have permission to delete the record.")

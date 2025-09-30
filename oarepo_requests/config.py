@@ -23,8 +23,8 @@ from oarepo_requests.actions.components import (
     RequestIdentityComponent,
     WorkflowTransitionComponent,
 )
+from oarepo_requests.services.oarepo.config import OARepoRequestsServiceConfig
 from oarepo_requests.services.oarepo.service import OARepoRequestsService
-
 from oarepo_requests.types import (
     DeletePublishedRecordRequestType,
     EditPublishedRecordRequestType,
@@ -35,6 +35,7 @@ from oarepo_requests.types.events.escalation import EscalationEventType
 from oarepo_requests.types.events.record_snapshot import RecordSnapshotEventType
 from oarepo_requests.types.events.topic_update import TopicUpdateEventType
 
+# TODO: either leave here or in entrypoints
 REQUESTS_REGISTERED_TYPES = [
     DeletePublishedRecordRequestType(),
     EditPublishedRecordRequestType(),
@@ -52,24 +53,12 @@ REQUESTS_REGISTERED_EVENT_TYPES = (
 REQUESTS_ALLOWED_RECEIVERS = ["user", "group", "auto_approve"]
 
 DEFAULT_WORKFLOW_EVENTS = {
-    CommentEventType.type_id: WorkflowEvent(
-        submitters=InvenioRequestsPermissionPolicy.can_create_comment
-    ),
-    LogEventType.type_id: WorkflowEvent(
-        submitters=InvenioRequestsPermissionPolicy.can_create_comment
-    ),
-    TopicUpdateEventType.type_id: WorkflowEvent(
-        submitters=InvenioRequestsPermissionPolicy.can_create_comment
-    ),
-    TopicDeleteEventType.type_id: WorkflowEvent(
-        submitters=InvenioRequestsPermissionPolicy.can_create_comment
-    ),
-    EscalationEventType.type_id: WorkflowEvent(
-        submitters=InvenioRequestsPermissionPolicy.can_create_comment
-    ),
-    RecordSnapshotEventType.type_id: WorkflowEvent(
-        submitters=InvenioRequestsPermissionPolicy.can_create_comment
-    ),
+    CommentEventType.type_id: WorkflowEvent(submitters=InvenioRequestsPermissionPolicy.can_create_comment),
+    LogEventType.type_id: WorkflowEvent(submitters=InvenioRequestsPermissionPolicy.can_create_comment),
+    TopicUpdateEventType.type_id: WorkflowEvent(submitters=InvenioRequestsPermissionPolicy.can_create_comment),
+    TopicDeleteEventType.type_id: WorkflowEvent(submitters=InvenioRequestsPermissionPolicy.can_create_comment),
+    EscalationEventType.type_id: WorkflowEvent(submitters=InvenioRequestsPermissionPolicy.can_create_comment),
+    RecordSnapshotEventType.type_id: WorkflowEvent(submitters=InvenioRequestsPermissionPolicy.can_create_comment),
 }
 
 
@@ -115,5 +104,4 @@ NOTIFICATIONS_BACKENDS = {
 }
 
 INVENIO_REQUESTS_SERVICE_CLASS = OARepoRequestsService
-
-# INVENIO_REQUESTS_SERVICE_CONFIG_CLASS =
+INVENIO_REQUESTS_SERVICE_CONFIG_CLASS = OARepoRequestsServiceConfig

@@ -11,26 +11,26 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING, Any
 
+from invenio_drafts_resources.records.api import Record
 from invenio_i18n import _
+from invenio_records_resources.services import LinksTemplate
+from invenio_records_resources.services.base.links import EndpointLink
 from invenio_records_resources.services.uow import IndexRefreshOp, unit_of_work
 from invenio_requests import current_request_type_registry
 from invenio_requests.services import RequestsService
+from invenio_requests.services.results import EntityResolverExpandableField
 
 from oarepo_requests.errors import CustomHTTPJSONException, UnknownRequestTypeError
 from oarepo_requests.proxies import current_oarepo_requests
-from invenio_records_resources.services.base.links import EndpointLink
+from oarepo_requests.services.results import (
+    DraftAwareEntityResolverExpandableField,
+    RequestTypesList,
+    StringDraftAwareEntityResolverExpandableField,
+)
 from oarepo_requests.utils import (
     allowed_request_types_for_record,
     resolve_reference_dict,
 )
-from oarepo_requests.services.results import (
-    RequestTypesList,
-    DraftAwareEntityResolverExpandableField,
-    StringDraftAwareEntityResolverExpandableField,
-)
-from invenio_records_resources.services import LinksTemplate
-from invenio_drafts_resources.records.api import Record
-from invenio_requests.services.results import EntityResolverExpandableField
 
 if TYPE_CHECKING:
     from datetime import datetime
@@ -46,7 +46,7 @@ class OARepoRequestsService(RequestsService):
     """OARepo extension to invenio-requests service."""
 
     @property
-    def expandable_fields(self):
+    def expandable_fields(self) -> list[EntityResolverExpandableField]:
         """Get expandable fields."""
         return [
             EntityResolverExpandableField("created_by"),
@@ -106,18 +106,12 @@ class OARepoRequestsService(RequestsService):
         )
         if errors:
             raise CustomHTTPJSONException(
-                description=_(
-                    "Action could not be performed due to validation request fields validation errors."
-                ),
+                description=_("Action could not be performed due to validation request fields validation errors."),
                 request_payload_errors=errors,
                 code=400,
             )
 
-        error = (
-            type_.can_create(identity, data, receiver, topic, creator)
-            if hasattr(type_, "can_create")
-            else None
-        )
+        error = type_.can_create(identity, data, receiver, topic, creator) if hasattr(type_, "can_create") else None
 
         if not error:
             result = super().create(
@@ -130,27 +124,19 @@ class OARepoRequestsService(RequestsService):
                 expand=expand,
                 uow=uow,
             )
-            uow.register(
-                IndexRefreshOp(indexer=self.indexer, index=self.record_cls.index)
-            )
+            uow.register(IndexRefreshOp(indexer=self.indexer, index=self.record_cls.index))
             return result
         return None
 
-    def applicable_request_types(
-        self, identity: Identity, topic: Record | EntityReference
-    ) -> RequestTypesList:
+    def applicable_request_types(self, identity: Identity, topic: Record | EntityReference) -> RequestTypesList:
         """Get applicable request types for a record."""
-        topic = (
-            resolve_reference_dict(topic) if not isinstance(topic, Record) else topic
-        )  # type: ignore if isinstance(record, Record) else record
+        topic = resolve_reference_dict(topic) if not isinstance(topic, Record) else topic  # type: ignore if isinstance(record, Record) else record
 
         allowed_request_types = allowed_request_types_for_record(identity, topic)
         return RequestTypesList(
             service=self,  # TODO: unserious
             identity=identity,
             results=list(allowed_request_types.values()),
-            links_tpl=LinksTemplate(
-                {"self": EndpointLink("oarepo_requests.applicable_request_types")}
-            ),
+            links_tpl=LinksTemplate({"self": EndpointLink("oarepo_requests.applicable_request_types")}),
             record=topic,
         )

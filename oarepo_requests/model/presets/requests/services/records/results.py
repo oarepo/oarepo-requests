@@ -19,8 +19,8 @@ from oarepo_model.customizations import (
 from oarepo_model.presets import Preset
 
 from oarepo_requests.services.components.results import (
-    RequestTypesComponent,
     RequestsComponent,
+    RequestTypesComponent,
 )
 
 if TYPE_CHECKING:
