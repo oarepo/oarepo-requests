@@ -11,10 +11,13 @@ from __future__ import annotations
 
 import inspect
 from pathlib import Path
-from typing import TYPE_CHECKING, Any
+from typing import TYPE_CHECKING, Any, ClassVar
 
 import marshmallow as ma
 from flask import current_app
+
+# TODO: temp
+from flask_resources import ResourceConfig
 from invenio_base.utils import obj_or_import_string
 from invenio_pidstore.errors import (
     PIDDeletedError,
@@ -24,12 +27,7 @@ from invenio_pidstore.errors import (
 from invenio_records_resources.proxies import current_service_registry
 from invenio_records_resources.services.errors import PermissionDeniedError
 from invenio_requests import current_request_type_registry
-
-# from oarepo_runtime.services.custom_fields import CustomFields, InlinedCustomFields #TODO: temp
 from oarepo_ui.resources.components import AllowedHtmlTagsComponent
-
-# from oarepo_ui.resources.config import FormConfigResourceConfig, UIResourceConfig
-# from oarepo_ui.resources.links import UIRecordLink
 
 if TYPE_CHECKING:
     from collections.abc import Mapping
@@ -39,7 +37,7 @@ if TYPE_CHECKING:
     from invenio_requests.customizations.request_types import RequestType
 
 
-def _get_custom_fields_ui_config(key: str, **kwargs: Any) -> list[dict]:
+def _get_custom_fields_ui_config(key: str, **kwargs: Any) -> list[dict]:  # noqa ARG001
     return current_app.config.get(f"{key}_UI", [])
 
 
@@ -74,34 +72,29 @@ class RequestsFormConfigResourceConfig(FormConfigResourceConfig):
     }
 """
 
-# TODO: temp
-from flask_resources import ResourceConfig
-
 
 class UIResourceConfig(ResourceConfig):
+    """Base resource config for the UI."""
+
     components = None
     template_folder = None
 
-    def get_template_folder(self):
+    def get_template_folder(self) -> str | None:
+        """Get the template folder."""
         if not self.template_folder:
             return None
 
         tf = Path(self.template_folder)
         if not tf.is_absolute():
-            tf = (
-                Path(inspect.getfile(type(self)))
-                .parent.absolute()
-                .joinpath(tf)
-                .absolute()
-            )
+            tf = Path(inspect.getfile(type(self))).parent.absolute().joinpath(tf).absolute()
         return str(tf)
 
-    response_handlers = {"text/html": None, "application/json": None}
+    response_handlers: ClassVar[dict[str, Any]] = {"text/html": None, "application/json": None}
     default_accept_mimetype = "text/html"
 
     # Request parsing
-    request_read_args = {}
-    request_view_args = {}
+    request_read_args: ClassVar[dict[str, Any]] = {}
+    request_view_args: ClassVar[dict[str, Any]] = {}
 
 
 class RequestUIResourceConfig(UIResourceConfig):
@@ -111,17 +104,17 @@ class RequestUIResourceConfig(UIResourceConfig):
     api_service = "requests"
     blueprint_name = "oarepo_requests_ui"
     template_folder = "templates"
-    templates = {
+    templates: ClassVar[dict[str, Any]] = {
         "detail": "RequestDetail",
     }
-    routes = {
+    routes: ClassVar[dict[str, Any]] = {
         "detail": "/<pid_value>",
     }
     ui_serializer_class = "oarepo_requests.resources.ui.OARepoRequestsUIJSONSerializer"
-    ui_links_item = {}
-    components = [AllowedHtmlTagsComponent]
+    ui_links_item: ClassVar[dict[str, Any]] = {}
+    components = (AllowedHtmlTagsComponent,)
 
-    error_handlers = {
+    error_handlers: ClassVar[dict[type[Exception], Any]] = {
         PIDDeletedError: "tombstone",
         PIDDoesNotExistError: "not_found",
         PIDUnregistered: "not_found",
@@ -129,7 +122,7 @@ class RequestUIResourceConfig(UIResourceConfig):
         PermissionDeniedError: "permission_denied",
     }
 
-    request_view_args = {"pid_value": ma.fields.Str()}
+    request_view_args: ClassVar[dict[str, Any]] = {"pid_value": ma.fields.Str()}
 
     @property
     def ui_serializer(self) -> BaseSerializer:
@@ -166,14 +159,14 @@ class RequestUIResourceConfig(UIResourceConfig):
             if not ui_config:
                 continue
 
-            for section in ui_config:
-                ui.append(
+            for section in ui_config:  # TODO: ...
+                ui.append(  # noqa PERF401
                     {
                         **section,
                         "fields": [
                             {
                                 **field,
-                                "field": prefix + field["field"],
+                                "field": field["field"],  # TODO: original: "field": prefix + field["field"]
                             }
                             for field in section.get("fields", [])
                         ],

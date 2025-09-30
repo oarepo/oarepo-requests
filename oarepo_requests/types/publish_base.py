@@ -23,8 +23,8 @@ from oarepo_requests.actions.publish_draft import (
     PublishDraftDeclineAction,
     PublishDraftSubmitAction,
 )
-from ..temp_utils import search_requests
 
+from ..temp_utils import search_requests
 from ..utils import classproperty
 from .generic import NonDuplicableOARepoRequestType
 from .ref_types import ModelRefTypes
@@ -40,15 +40,14 @@ if TYPE_CHECKING:
 
 from invenio_access.permissions import system_identity
 from invenio_requests.records.api import Request
+
 from ..errors import UnresolvedRequestsError
 
 
 class PublishRequestType(NonDuplicableOARepoRequestType):
     """Publish draft request type."""
 
-    payload_schema: ClassVar[dict[str, ma.fields.Field]] = {
-        "created_topic": ma.fields.Str()
-    }
+    payload_schema: ClassVar[dict[str, ma.fields.Field]] = {"created_topic": ma.fields.Str()}
 
     @classproperty
     def available_actions(cls) -> dict[str, type[RequestAction]]:  # noqa N805
@@ -100,9 +99,7 @@ class PublishRequestType(NonDuplicableOARepoRequestType):
     ) -> None:
         """Check if the request can be created."""
         if not topic.is_draft:
-            raise ValueError(
-                gettext("Trying to create publish request on published record")
-            )
+            raise ValueError(gettext("Trying to create publish request on published record"))
         self.assert_no_pending_requests(topic)
         super().can_create(identity, data, receiver, topic, creator, *args, **kwargs)
         self.validate_topic(identity, topic)
@@ -121,9 +118,7 @@ class PublishRequestType(NonDuplicableOARepoRequestType):
 
         # if files support is enabled for this topic, check if there are any files
         if hasattr(topic, "files"):
-            can_toggle_files = topic_service.check_permission(
-                identity, "manage_files", record=topic
-            )
+            can_toggle_files = topic_service.check_permission(identity, "manage_files", record=topic)
             draft_files = topic.files
             if draft_files.enabled and not draft_files.items():
                 if can_toggle_files:
@@ -137,9 +132,7 @@ class PublishRequestType(NonDuplicableOARepoRequestType):
 
     @classmethod
     @override
-    def is_applicable_to(
-        cls, identity: Identity, topic: Record, *args: Any, **kwargs: Any
-    ) -> bool:
+    def is_applicable_to(cls, identity: Identity, topic: Record, *args: Any, **kwargs: Any) -> bool:
         """Check if the request type is applicable to the topic."""
         if not topic.is_draft:
             return False
@@ -152,9 +145,7 @@ class PublishRequestType(NonDuplicableOARepoRequestType):
         uow.register(RecordCommitOp(request, indexer=current_requests_service.indexer))
 
     @classmethod
-    def topic_type(
-        cls, topic: Record
-    ) -> Literal["initial", "new_version", "metadata", "published"]:
+    def topic_type(cls, topic: Record) -> Literal["initial", "new_version", "metadata", "published"]:
         """Return publish status type of the topic."""
         index = topic.versions.index
         is_latest = topic.versions.is_latest

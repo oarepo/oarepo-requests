@@ -12,11 +12,13 @@ import json
 import os
 import time
 from datetime import timedelta
-from typing import TYPE_CHECKING, ClassVar
+from typing import TYPE_CHECKING, Any, ClassVar
 
 import pytest
+from flask import Blueprint
 from invenio_i18n import _
 from invenio_rdm_records.services.generators import RecordOwners
+from invenio_rdm_records.services.pids import providers
 from invenio_records_permissions.generators import (
     AnyUser,
     AuthenticatedUser,
@@ -74,8 +76,6 @@ from oarepo_requests.types import (
     NonDuplicableOARepoRequestType,
 )
 from oarepo_requests.types.events.topic_update import TopicUpdateEventType
-from invenio_rdm_records.services.pids import providers
-from flask import Blueprint
 
 if TYPE_CHECKING:
     from invenio_requests.customizations.actions import RequestAction
@@ -105,22 +105,70 @@ def location(location):
 def app(app):
     bp = Blueprint("test_ui_links_ui", __name__)
 
+    @bp.route("/test-ui-links/preview/<pid_value>", methods=["GET"])
+    def preview(pid_value: str) -> str:
+        return "preview ok"
+
+    @bp.route("/test-ui-links/", methods=["GET"])
+    def search() -> str:
+        return "search ok"
+
+    @bp.route("/test-ui-links/uploads/<pid_value>", methods=["GET"])
+    def deposit_edit(pid_value: str) -> str:
+        return "deposit edit ok"
+
+    @bp.route("/test-ui-links/uploads/new", methods=["GET"])
+    def deposit_create() -> str:
+        return "deposit create ok"
+
+    @bp.route("/test-ui-links/records/<pid_value>")
+    def record_detail(pid_value) -> str:
+        return "detail ok"
+
+    @bp.route("/test-ui-links/records/<pid_value>/latest", methods=["GET"])
+    def record_latest(pid_value: str) -> str:
+        return "latest ok"
+
+    @bp.route("/test-ui-links/records/<pid_value>/export/<export_format>", methods=["GET"])
+    def export(pid_value, export_format: str) -> str:
+        return "export ok"
+
+    """
     # mock UI resource
     @bp.route("/test-ui-links/preview/<pid_value>", methods=["GET"])
     def preview(pid_value: str) -> str:
         return "preview ok"
 
+
     @bp.route("/test-ui-links/detail/<pid_value>", methods=["GET"])
     def detail(pid_value: str) -> str:
         return "detail ok"
 
-    @bp.route("/test-ui-links/latest/<pid_value>", methods=["GET"])
-    def latest(pid_value: str) -> str:
-        return "latest ok"
+
+    @bp.route("/test-ui-links/records/<pid_value>")
+    def record_detail(pid_value) -> str:
+        return "detail ok"
 
     @bp.route("/test-ui-links/search", methods=["GET"])
     def search() -> str:
         return "search ok"
+
+    @bp.route("/test-ui-links/uploads/<pid_value>", methods=["GET"])
+    def deposit_edit(pid_value: str) -> str:
+        return "deposit edit ok"
+
+    @bp.route("/test-ui-links/uploads/new", methods=["GET"])
+    def deposit_create() -> str:
+        return "deposit create ok"
+
+    @bp.route("/test-ui-links/records/<pid_value>/latest", methods=["GET"])
+    def record_latest(pid_value: str) -> str:
+        return "latest ok"
+
+    @bp.route("/test-ui-links/records/<pid_value>/export/<export_format>", methods=["GET"])
+    def export(pid_value, export_format: str) -> str:
+        return "export ok"
+    """
 
     app.register_blueprint(bp)
     return app
@@ -140,12 +188,8 @@ can_comment_only_receiver = [
 
 events_only_receiver_can_comment = {
     CommentEventType.type_id: WorkflowEvent(submitters=can_comment_only_receiver),
-    LogEventType.type_id: WorkflowEvent(
-        submitters=InvenioRequestsPermissionPolicy.can_create_comment
-    ),
-    TopicUpdateEventType.type_id: WorkflowEvent(
-        submitters=InvenioRequestsPermissionPolicy.can_create_comment
-    ),
+    LogEventType.type_id: WorkflowEvent(submitters=InvenioRequestsPermissionPolicy.can_create_comment),
+    TopicUpdateEventType.type_id: WorkflowEvent(submitters=InvenioRequestsPermissionPolicy.can_create_comment),
     TestEventType.type_id: WorkflowEvent(submitters=can_comment_only_receiver),
 }
 
@@ -472,9 +516,7 @@ class RequestsWithCT(WorkflowRequestPolicy):
 
     conditional_recipient_rt = WorkflowRequest(
         requesters=[AnyUser()],
-        recipients=[
-            IfRequestedBy(UserGenerator(1), [UserGenerator(2)], [UserGenerator(3)])
-        ],
+        recipients=[IfRequestedBy(UserGenerator(1), [UserGenerator(2)], [UserGenerator(3)])],
     )
     approve_draft = WorkflowRequest(
         requesters=[IfInState("draft", [RecordOwners()])],
@@ -498,79 +540,6 @@ class RequestsWithSystemIdentity(WorkflowRequestPolicy):
         requesters=[AnyUser()],
         recipients=[UserGenerator("system")],
     )
-
-
-class GenericTestableRequestType(NonDuplicableOARepoRequestType):
-    """Generic usable request type for tests."""
-
-    type_id = "generic"
-    name = _("Generic")
-
-    available_actions: ClassVar[dict[str, type[RequestAction]]] = {
-        **NonDuplicableOARepoRequestType.available_actions,
-        "accept": OARepoAcceptAction,
-        "submit": OARepoSubmitAction,
-        "decline": OARepoDeclineAction,
-    }
-    description = _("Generic request that doesn't do anything")
-    receiver_can_be_none = False
-    allowed_topic_ref_types = ModelRefTypes(published=True, draft=True)
-
-
-class ApproveRequestType(NonDuplicableOARepoRequestType):
-    """Request type for approving before publish."""
-
-    type_id = "approve_draft"
-    name = _("Approve draft")
-
-    available_actions: ClassVar[dict[str, type[RequestAction]]] = {
-        **NonDuplicableOARepoRequestType.available_actions,
-        "accept": OARepoAcceptAction,
-        "submit": OARepoSubmitAction,
-        "decline": OARepoDeclineAction,
-    }
-    description = _("Request approving of a draft")
-    receiver_can_be_none = True
-    allowed_topic_ref_types = ModelRefTypes(published=False, draft=True)
-
-
-class AnotherTopicUpdatingRequestType(NonDuplicableOARepoRequestType):
-    """Generic request type with topic change on topic update."""
-
-    type_id = "another_topic_updating"
-    name = _("Another topic updating")
-
-    available_actions: ClassVar[dict[str, type[RequestAction]]] = {
-        **NonDuplicableOARepoRequestType.available_actions,
-        "accept": OARepoAcceptAction,
-        "submit": OARepoSubmitAction,
-        "decline": OARepoDeclineAction,
-    }
-    description = _("Request to test cascade update of live topic")
-    receiver_can_be_none = True
-    allowed_topic_ref_types = ModelRefTypes(published=True, draft=True)
-
-    def topic_change(self, request: Request, new_topic: dict, uow):
-        """Update topic on topic update."""
-        request.topic = new_topic
-        uow.register(RecordCommitOp(request, indexer=current_requests_service.indexer))
-
-
-class ConditionalRecipientRequestType(NonDuplicableOARepoRequestType):
-    """Generic request type with conditional recipient."""
-
-    type_id = "conditional_recipient_rt"
-    name = _("Request type to test conditional recipients")
-
-    available_actions: ClassVar[dict[str, type[RequestAction]]] = {
-        **NonDuplicableOARepoRequestType.available_actions,
-        "accept": OARepoAcceptAction,
-        "submit": OARepoSubmitAction,
-        "decline": OARepoDeclineAction,
-    }
-    description = _("A no-op request to check conditional recipients")
-    receiver_can_be_none = False
-    allowed_topic_ref_types = ModelRefTypes(published=False, draft=True)
 
 
 class TestWorkflowPermissions(RequestBasedWorkflowPermissions):
@@ -644,9 +613,7 @@ WORKFLOWS = [
     ),
     Workflow(
         code="different_recipients",
-        label=_(
-            "Workflow with draft requests with different recipients to test param interpreters"
-        ),
+        label=_("Workflow with draft requests with different recipients to test param interpreters"),
         permission_policy_cls=TestWorkflowPermissions,
         request_policy_cls=RequestsWithDifferentRecipients,
     ),
@@ -682,9 +649,7 @@ def serialization_result():
         return {
             "id": request_id,
             "links": {
-                "actions": {
-                    "cancel": f"https://127.0.0.1:5000/api/requests/{request_id}/actions/cancel"
-                },
+                "actions": {"cancel": f"https://127.0.0.1:5000/api/requests/{request_id}/actions/cancel"},
                 "self": f"https://127.0.0.1:5000/api/requests/extended/{request_id}",
                 "comments": f"https://127.0.0.1:5000/api/requests/extended/{request_id}/comments",
                 "timeline": f"https://127.0.0.1:5000/api/requests/extended/{request_id}/timeline",
@@ -724,9 +689,7 @@ def ui_serialization_result():
             "is_expired": False,
             "is_open": True,
             "links": {
-                "actions": {
-                    "cancel": f"https://127.0.0.1:5000/api/requests/{request_id}/actions/cancel"
-                },
+                "actions": {"cancel": f"https://127.0.0.1:5000/api/requests/{request_id}/actions/cancel"},
                 "self": f"https://127.0.0.1:5000/api/requests/extended/{request_id}",
                 "comments": f"https://127.0.0.1:5000/api/requests/extended/{request_id}/comments",
                 "timeline": f"https://127.0.0.1:5000/api/requests/extended/{request_id}/timeline",
@@ -763,12 +726,8 @@ def app_config(app_config, requests_model):
         }
     ]
     app_config["JSONSCHEMAS_HOST"] = "localhost"
-    app_config["RECORDS_REFRESOLVER_CLS"] = (
-        "invenio_records.resolver.InvenioRefResolver"
-    )
-    app_config["RECORDS_REFRESOLVER_STORE"] = (
-        "invenio_jsonschemas.proxies.current_refresolver_store"
-    )
+    app_config["RECORDS_REFRESOLVER_CLS"] = "invenio_records.resolver.InvenioRefResolver"
+    app_config["RECORDS_REFRESOLVER_STORE"] = "invenio_jsonschemas.proxies.current_refresolver_store"
     app_config["CACHE_TYPE"] = "SimpleCache"
 
     app_config["OAREPO_REQUESTS_DEFAULT_RECEIVER"] = default_workflow_receiver_function
@@ -794,9 +753,7 @@ def app_config(app_config, requests_model):
     app_config["APP_THEME"] = ["oarepo", "semantic-ui"]
 
     app_config["REST_CSRF_ENABLED"] = False
-    app_config["RDM_OPTIONAL_DOI_VALIDATOR"] = (
-        lambda _draft, _previous_published, **_kwargs: True
-    )
+    app_config["RDM_OPTIONAL_DOI_VALIDATOR"] = lambda _draft, _previous_published, **_kwargs: True
     app_config["RDM_RECORDS_ALLOW_RESTRICTION_AFTER_GRACE_PERIOD"] = True
 
     app_config["RDM_PERSISTENT_IDENTIFIER_PROVIDERS"] = [
@@ -822,35 +779,21 @@ def app_config(app_config, requests_model):
 
 @pytest.fixture
 def check_publish_topic_update():
-    def _check_publish_topic_update(
-        creator_client, urls, record, before_update_response
-    ) -> None:
+    def _check_publish_topic_update(creator_client, urls, record, before_update_response) -> None:
         request_id = before_update_response["id"]
         record_id = record["id"]
 
-        after_update_response = creator_client.get(
-            f"{urls['BASE_URL_REQUESTS']}{request_id}"
-        ).json
+        after_update_response = creator_client.get(f"{urls['BASE_URL_REQUESTS']}{request_id}").json
         RequestEvent.index.refresh()
-        events = creator_client.get(
-            f"{urls['BASE_URL_REQUESTS']}extended/{request_id}/timeline"
-        ).json["hits"]["hits"]
+        events = creator_client.get(f"{urls['BASE_URL_REQUESTS']}extended/{request_id}/timeline").json["hits"]["hits"]
 
         assert before_update_response["topic"] == {"requests_test_draft": record_id}
         assert after_update_response["topic"] == {"requests_test": record_id}
 
-        topic_updated_events = [
-            e for e in events if e["type"] == TopicUpdateEventType.type_id
-        ]
+        topic_updated_events = [e for e in events if e["type"] == TopicUpdateEventType.type_id]
         assert len(topic_updated_events) == 1
-        assert (
-            topic_updated_events[0]["payload"]["old_topic"]
-            == f"requests_test_draft.{record_id}"
-        )
-        assert (
-            topic_updated_events[0]["payload"]["new_topic"]
-            == f"requests_test.{record_id}"
-        )
+        assert topic_updated_events[0]["payload"]["old_topic"] == f"requests_test_draft.{record_id}"
+        assert topic_updated_events[0]["payload"]["new_topic"] == f"requests_test.{record_id}"
 
     return _check_publish_topic_update
 
@@ -877,8 +820,8 @@ def password():
 @pytest.fixture
 def more_users(app, db, UserFixture, password):  # noqa N803
     if db.engine.dialect.name == "postgresql":
-        from sqlalchemy import text
         from invenio_accounts.models import User
+        from sqlalchemy import text
 
         name = User.__table__.name
         sql = f'ALTER SEQUENCE "{name}_id_seq" RESTART WITH 1'
@@ -1037,7 +980,7 @@ def record_service(requests_model):
 
 @pytest.fixture
 def find_request_type():
-    def _find_request_type(requests, type_):
+    def _find_request_type(requests, type_) -> dict[str, Any] | None:
         for request in requests:
             if request["type_id"] == type_:
                 return request
@@ -1048,8 +991,8 @@ def find_request_type():
 
 @pytest.fixture
 def get_action_url(find_request_type, link2testclient):
-    def _create_action(requests, type_, action="create"):
+    def _action_url(requests, type_, action="create") -> str:
         request = find_request_type(requests, type_)
         return link2testclient(request["links"]["actions"][action])
 
-    return _create_action
+    return _action_url

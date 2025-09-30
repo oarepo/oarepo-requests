@@ -73,13 +73,9 @@ class RecordResolverPreset(Preset):
 
             proxy_cls = RecordProxy
 
-            def __init__(
-                self, record_cls: type, service_id: str, type_key: str
-            ) -> None:
+            def __init__(self, record_cls: type, service_id: str, type_key: str) -> None:
                 """Construct the resolver."""
-                super().__init__(
-                    record_cls, service_id, type_key=type_key, proxy_cls=self.proxy_cls
-                )
+                super().__init__(record_cls, service_id, type_key=type_key, proxy_cls=self.proxy_cls)
 
         yield AddClass(
             "RecordResolver",

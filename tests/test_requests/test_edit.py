@@ -31,9 +31,7 @@ def test_edit_autoaccept(
     )
     assert direct_edit.status_code == 403
 
-    resp_request_submit = submit_request_on_record(
-        creator.identity, id_, "edit_published_record"
-    )
+    resp_request_submit = submit_request_on_record(creator.identity, id_, "edit_published_record")
     # is request accepted and closed?
     request = creator_client.get(
         f"{urls['BASE_URL_REQUESTS']}{resp_request_submit['id']}",
@@ -50,9 +48,9 @@ def test_edit_autoaccept(
         f"user{urls['BASE_URL']}",
     ).json["hits"]["hits"]
     assert len(search) == 1
-    # assert search[0]["links"]["self"].endswith( # TODO: should self after edit point to published or draft?
+    # mypy assert search[0]["links"]["self"].endswith( # TODO: should self after edit point to published or draft?
     #    "/draft"
-    # )
+    # mypy )
     assert search[0]["id"] == id_
 
 
@@ -76,15 +74,11 @@ def test_redirect_url(
     record1 = record_factory(creator.identity, custom_workflow="different_recipients")
     record_id = record1["id"]
 
-    resp_request_submit = submit_request_on_record(
-        creator.identity, record_id, "edit_published_record"
-    )
+    resp_request_submit = submit_request_on_record(creator.identity, record_id, "edit_published_record")
     edit_request_id = resp_request_submit["id"]
 
     receiver_get = receiver_client.get(f"{urls['BASE_URL_REQUESTS']}{edit_request_id}")
-    receiver_client.post(
-        link2testclient(receiver_get.json["links"]["actions"]["accept"])
-    )
+    receiver_client.post(link2testclient(receiver_get.json["links"]["actions"]["accept"]))
     # is request accepted and closed?
     creator_client.get(
         f"{urls['BASE_URL_REQUESTS']}{edit_request_id}",
@@ -100,46 +94,30 @@ def test_redirect_url(
 
     assert (
         link2testclient(
-            creator_edit_accepted["expanded"]["payload"]["created_topic"]["links"][
-                "self_html"
-            ],
+            creator_edit_accepted["expanded"]["payload"]["created_topic"]["links"]["self_html"],
             ui=True,
         )
-        == f"/api/test-ui-links/preview/{record_id}"
+        == f"/api/test-ui-links/uploads/{record_id}"  # draft self_html now goes to deposit_upload
     )
     assert receiver_edit_accepted["expanded"]["payload"]["created_topic"]["links"] == {}
 
     draft = creator_client.get(f"{urls['BASE_URL']}/{record_id}/draft").json
-    publish_request = submit_request_on_draft(
-        creator.identity, draft["id"], "publish_draft"
-    )
+    publish_request = submit_request_on_draft(creator.identity, draft["id"], "publish_draft")
     requests_model.Record.index.refresh()
     requests_model.Draft.index.refresh()
     receiver_edit_request_after_publish_draft_submitted = receiver_client.get(
         f"{urls['BASE_URL_REQUESTS']}{edit_request_id}?expand=true"
     ).json  # now receiver should have a right to view but not edit the topic
     assert (
-        receiver_edit_request_after_publish_draft_submitted["expanded"]["payload"][
-            "created_topic"
-        ]["links"]
-        == {}
+        receiver_edit_request_after_publish_draft_submitted["expanded"]["payload"]["created_topic"]["links"] == {}
     )  # receiver doesn't have permission to topic
 
-    receiver_publish_request = receiver_client.get(
-        f"{urls['BASE_URL_REQUESTS']}{publish_request['id']}"
-    ).json
-    receiver_client.post(
-        link2testclient(receiver_publish_request["links"]["actions"]["accept"])
-    )
+    receiver_publish_request = receiver_client.get(f"{urls['BASE_URL_REQUESTS']}{publish_request['id']}").json
+    receiver_client.post(link2testclient(receiver_publish_request["links"]["actions"]["accept"]))
     requests_model.Record.index.refresh()
     requests_model.Draft.index.refresh()
     creator_edit_request_after_merge = creator_client.get(
         f"{urls['BASE_URL_REQUESTS']}{edit_request_id}?expand=true",
     ).json
 
-    assert (
-        creator_edit_request_after_merge["expanded"]["payload"]["created_topic"][
-            "links"
-        ]
-        == {}
-    )
+    assert creator_edit_request_after_merge["expanded"]["payload"]["created_topic"]["links"] == {}

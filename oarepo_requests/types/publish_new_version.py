@@ -78,9 +78,7 @@ class PublishNewVersionRequestType(PublishRequestType):
     editable = False
 
     @classmethod
-    def is_applicable_to(
-        cls, identity: Identity, topic: Record, *args: Any, **kwargs: Any
-    ) -> bool:
+    def is_applicable_to(cls, identity: Identity, topic: Record, *args: Any, **kwargs: Any) -> bool:
         """Check if the request type is applicable to the topic."""
         if cls.topic_type(topic) != "new_version":
             return False
@@ -153,9 +151,7 @@ class PublishNewVersionRequestType(PublishRequestType):
             accepted=gettext("The new version has been published. "),
             declined=gettext("Publication of the new version has been declined."),
             cancelled=gettext("The new version has been cancelled. "),
-            created=gettext(
-                "Waiting for finishing the new version publication request."
-            ),
+            created=gettext("Waiting for finishing the new version publication request."),
         )
 
     def can_create(

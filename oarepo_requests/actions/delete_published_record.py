@@ -73,18 +73,13 @@ class DeletePublishedRecordAcceptAction(OARepoAcceptAction):
             from flask import current_app
 
             oarepo = current_app.extensions["oarepo-runtime"]
-            resource_config = oarepo.models_by_record_class[
-                topic_service.record_cls
-            ].resource_config
+            resource_config = oarepo.models_by_record_class[topic_service.record_cls].resource_config
 
             citation_text = "Citation unavailable."
-            if (
-                resource_config
-                and "text/x-iso-690+plain" in resource_config.response_handlers
-            ):
-                citation_text = resource_config.response_handlers[
-                    "text/x-iso-690+plain"
-                ].serializer.serialize_object(state.topic)
+            if resource_config and "text/x-iso-690+plain" in resource_config.response_handlers:
+                citation_text = resource_config.response_handlers["text/x-iso-690+plain"].serializer.serialize_object(
+                    state.topic
+                )
 
             data = {
                 "removal_reason": {"id": self.request["payload"]["removal_reason"]},
@@ -92,9 +87,7 @@ class DeletePublishedRecordAcceptAction(OARepoAcceptAction):
                 "note": self.request["payload"].get("note", ""),
                 "is_visible": True,
             }
-            deleted_topic = topic_service.delete_record(
-                identity, state.topic["id"], data
-            )._record  # noqa SLF001
+            deleted_topic = topic_service.delete_record(identity, state.topic["id"], data)._record  # noqa SLF001
             db.session.commit()
             state.topic = deleted_topic
         else:

@@ -11,7 +11,6 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
-# from oarepo_ui.resources.resource import FormConfigResource
 from oarepo_requests.ui.config import (
     RequestUIResourceConfig,
 )
@@ -21,7 +20,7 @@ if TYPE_CHECKING:
     from flask import Blueprint, Flask
 
 
-def create_blueprint(app: Flask) -> Blueprint:
+def create_blueprint(app: Flask) -> Blueprint:  # noqa ARG001
     """Register blueprint for this resource."""
     return RequestUIResource(RequestUIResourceConfig()).as_blueprint()
 

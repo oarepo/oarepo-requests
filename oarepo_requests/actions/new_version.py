@@ -13,7 +13,6 @@ from typing import TYPE_CHECKING, Any
 
 from oarepo_runtime.proxies import current_runtime
 
-
 from .generic import CreatedTopicMixin, OARepoAcceptAction
 
 if TYPE_CHECKING:
@@ -41,9 +40,7 @@ class NewVersionAcceptAction(CreatedTopicMixin, OARepoAcceptAction):
         if not topic_service:
             raise KeyError(f"topic {state.topic} service not found")
 
-        new_version_topic = topic_service.new_version(
-            identity, state.topic["id"], uow=uow
-        )
+        new_version_topic = topic_service.new_version(identity, state.topic["id"], uow=uow)
         state.created_topic = new_version_topic._record  # noqa SLF001
         if (
             "payload" in self.request

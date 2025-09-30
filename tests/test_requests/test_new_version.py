@@ -30,9 +30,7 @@ def test_new_version_autoaccept(
     )
     assert new_version_direct.status_code == 403
 
-    resp_request_submit = submit_request_on_record(
-        creator.identity, record1_id, "new_version"
-    )
+    resp_request_submit = submit_request_on_record(creator.identity, record1_id, "new_version")
     # is request accepted and closed?
     request = creator_client.get(
         f"{urls['BASE_URL_REQUESTS']}{resp_request_submit['id']}",
@@ -82,16 +80,8 @@ def test_new_version_files(
     draft_search = creator_client.get("/user/requests-test").json["hits"][
         "hits"
     ]  # a link is in another pull request for now
-    new_version_1 = [
-        x
-        for x in draft_search
-        if x["parent"]["id"] == record1["parent"]["id"] and x["state"] == "draft"
-    ]
-    new_version_2 = [
-        x
-        for x in draft_search
-        if x["parent"]["id"] == record2["parent"]["id"] and x["state"] == "draft"
-    ]
+    new_version_1 = [x for x in draft_search if x["parent"]["id"] == record1["parent"]["id"] and x["state"] == "draft"]
+    new_version_2 = [x for x in draft_search if x["parent"]["id"] == record2["parent"]["id"] and x["state"] == "draft"]
 
     assert len(new_version_1) == 1
     assert len(new_version_2) == 1
@@ -124,9 +114,7 @@ def test_redirect_url(
     record1 = record_factory(creator.identity)
     record1_id = record1["id"]
 
-    resp_request_submit = submit_request_on_record(
-        creator.identity, record1_id, "new_version"
-    )
+    resp_request_submit = submit_request_on_record(creator.identity, record1_id, "new_version")
     original_request_id = resp_request_submit["id"]
     # is request accepted and closed?
 
@@ -140,34 +128,22 @@ def test_redirect_url(
     draft_search = creator_client.get("/user/requests-test").json["hits"][
         "hits"
     ]  # a link is in another pull request for now
-    new_draft = next(
-        x
-        for x in draft_search
-        if x["parent"]["id"] == record1["parent"]["id"] and x["state"] == "draft"
-    )
+    new_draft = next(x for x in draft_search if x["parent"]["id"] == record1["parent"]["id"] and x["state"] == "draft")
 
     assert (
         link2testclient(
             request["expanded"]["payload"]["created_topic"]["links"]["self_html"],
             ui=True,
         )
-        == f"/api/test-ui-links/preview/{new_draft['id']}"
+        == f"/api/test-ui-links/uploads/{new_draft['id']}"  # draft self_html now goes to deposit_upload
     )
 
     new_draft = creator_client.get(f"{urls['BASE_URL']}/{new_draft['id']}/draft").json
-    publish_request = submit_request_on_draft(
-        creator.identity, new_draft["id"], "publish_draft"
-    )
-    receiver_request = receiver_client.get(
-        f"{urls['BASE_URL_REQUESTS']}{publish_request['id']}"
-    )
-    receiver_client.post(
-        link2testclient(receiver_request.json["links"]["actions"]["accept"])
-    )
+    publish_request = submit_request_on_draft(creator.identity, new_draft["id"], "publish_draft")
+    receiver_request = receiver_client.get(f"{urls['BASE_URL_REQUESTS']}{publish_request['id']}")
+    receiver_client.post(link2testclient(receiver_request.json["links"]["actions"]["accept"]))
 
     original_request = creator_client.get(
         f"{urls['BASE_URL_REQUESTS']}{original_request_id}",
     ).json
-    assert original_request["topic"] == {
-        "requests_test": record1_id
-    }  # check no weird topic kerfluffle happened here
+    assert original_request["topic"] == {"requests_test": record1_id}  # check no weird topic kerfluffle happened here

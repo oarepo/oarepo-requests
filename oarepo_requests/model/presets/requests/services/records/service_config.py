@@ -13,8 +13,8 @@ from __future__ import annotations
 from typing import TYPE_CHECKING, Any, override
 
 from oarepo_model.customizations import (
-    Customization,
     AddToDictionary,
+    Customization,
 )
 from oarepo_model.presets import Preset
 
@@ -42,11 +42,7 @@ class RequestsServiceConfigPreset(Preset):
         # TODO: AutorequestComponent, RecordSnapshotComponent
         yield AddToDictionary(
             "record_links_item",
-            {
-                "requests": RefEndpointLink(
-                    "oarepo_requests.search", ref_querystring="topic"
-                )
-            },
+            {"requests": RefEndpointLink("oarepo_requests.search", ref_querystring="topic")},
         )
         yield AddToDictionary(
             "record_links_item",

@@ -20,19 +20,18 @@ from invenio_requests.customizations import actions
 from invenio_requests.records.api import Request
 
 from oarepo_requests.proxies import current_oarepo_requests
-from oarepo_requests.utils import reference_entity, ref_to_str
+from oarepo_requests.utils import ref_to_str, reference_entity
 
 if TYPE_CHECKING:
     from flask_babel.speaklater import LazyString
     from flask_principal import Identity
     from invenio_records_resources.services.uow import UnitOfWork
+
     from oarepo_requests.actions.components import RequestActionComponent
 
 from invenio_requests.customizations import RequestAction, RequestType
 
-type ActionType = (
-    OARepoGenericActionMixin | RequestAction
-)  # should be a type intersection, not yet in python
+type ActionType = OARepoGenericActionMixin | RequestAction  # should be a type intersection, not yet in python
 
 
 @dataclass
@@ -49,17 +48,11 @@ class RequestActionState:
     def __post__init__(self):
         """Assert correct types after initializing."""
         if not isinstance(self.request, Request):
-            raise TypeError(
-                f"self.request is not instance of Request, got {type(self.request)=}"
-            )
+            raise TypeError(f"self.request is not instance of Request, got {type(self.request)=}")
         if not isinstance(self.request_type, RequestType):
-            raise TypeError(
-                f"self.request_type is not instance of Request, got {type(self.request_type)=}"
-            )
+            raise TypeError(f"self.request_type is not instance of Request, got {type(self.request_type)=}")
         if not isinstance(self.topic, Record):
-            raise TypeError(
-                f"self.topic is not instance of Record, got {type(self.topic)=}"
-            )
+            raise TypeError(f"self.topic is not instance of Record, got {type(self.topic)=}")
 
 
 class OARepoGenericActionMixin:
@@ -95,9 +88,7 @@ class OARepoGenericActionMixin:
         **kwargs: Any,
     ) -> None:
         """Execute action with components."""
-        self._execute_with_components(
-            self.components, identity, state, uow, *args, **kwargs
-        )
+        self._execute_with_components(self.components, identity, state, uow, *args, **kwargs)
 
     def _execute_with_components(
         self,
@@ -119,21 +110,14 @@ class OARepoGenericActionMixin:
             super().execute(identity, uow, *args, **kwargs)
         else:
             with components[0].apply(identity, state, uow, *args, **kwargs):
-                self._execute_with_components(
-                    components[1:], identity, state, uow, *args, **kwargs
-                )
+                self._execute_with_components(components[1:], identity, state, uow, *args, **kwargs)
 
     @cached_property
     def components(self) -> list[RequestActionComponent]:
         """Return a list of components for this action."""
-        return [
-            component_cls()
-            for component_cls in current_oarepo_requests.action_components(self)
-        ]
+        return [component_cls() for component_cls in current_oarepo_requests.action_components(self)]
 
-    def execute(
-        self, identity: Identity, uow: UnitOfWork, *args: Any, **kwargs: Any
-    ) -> None:
+    def execute(self, identity: Identity, uow: UnitOfWork, *args: Any, **kwargs: Any) -> None:
         """Execute the action."""
         request: Request = self.request
         request_type = request.type
@@ -151,9 +135,7 @@ class OARepoGenericActionMixin:
             action=self,
         )
 
-        self._execute_with_components(
-            self.components, identity, state, uow, *args, **kwargs
-        )
+        self._execute_with_components(self.components, identity, state, uow, *args, **kwargs)
 
 
 class CreatedTopicMixin:
