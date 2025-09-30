@@ -38,4 +38,12 @@ def test_search(
     )
 
     requests_search = creator_client.get(urls["BASE_URL_REQUESTS"]).json
+    assert requests_search["hits"]["hits"][0]["title"] != "tralala"
+
+    creator_client.put(
+        f"{link}?refresh=true",
+        json={"title": "tralala"},
+    )
+
+    requests_search = creator_client.get(urls["BASE_URL_REQUESTS"]).json
     assert requests_search["hits"]["hits"][0]["title"] == "tralala"

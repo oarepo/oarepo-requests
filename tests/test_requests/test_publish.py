@@ -51,8 +51,7 @@ def test_publish_service(
     assert accept.data["expanded"]["topic"]["links"] == {}
     assert accept.data["expanded"]["topic"]["metadata"] == {
         "title": "Deleted record"
-    }  # TODO: check how refresh works inside
-    assert "self_html" in accept.data["expanded"]["topic"]["links"]
+    }  # TODO: created topic is not indexed at the init of publish result
     assert "self" in accept.data["expanded"]["payload"]["created_topic"]["links"]
     assert "self_html" in accept.data["expanded"]["payload"]["created_topic"]["links"]
 
