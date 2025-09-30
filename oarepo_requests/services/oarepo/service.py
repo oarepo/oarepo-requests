@@ -94,7 +94,7 @@ class OARepoRequestsService(RequestsService):
                 identity, type_, topic, creator or identity, data
             )
 
-        if data is None: # TODO: data should not be None according to typing
+        if data is None:  # TODO: data should not be None according to typing
             data = {}
         if "payload" not in data and type_.payload_schema:
             data["payload"] = {}
