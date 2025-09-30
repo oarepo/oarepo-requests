@@ -33,7 +33,7 @@ def _extract_entity_email_data(entity: Any) -> dict[str, Any]:
             return v
         return None
 
-    ret = {}
+    ret: dict[str, Any] = {}
     email = _add(entity, "email", ret)
     if not email:
         log.error(

@@ -33,9 +33,9 @@ class CustomHTTPJSONException(HTTPJSONException):
     def __init__(
         self,
         code: int | None = None,
-        errors: dict[str, any] | list | None = None,
-        topic_errors: dict[str, any] | list | None = None,
-        request_payload_errors: dict[str, any] | list | None = None,
+        errors: dict[str, Any] | list | None = None,
+        topic_errors: dict[str, Any] | list | None = None,
+        request_payload_errors: dict[str, Any] | list | None = None,
         **kwargs: Any,
     ) -> None:
         """Initialize CustomHTTPJSONException."""
@@ -45,7 +45,7 @@ class CustomHTTPJSONException(HTTPJSONException):
         self.extra_kwargs = kwargs  # Save all kwargs
 
     @override
-    def get_body(self, environ: any | None = None, scope: any | None = None) -> str:
+    def get_body(self, environ: Any | None = None, scope: Any | None = None) -> str:
         """Get the request body."""
         body = {"status": self.code, "message": self.get_description(environ)}
 

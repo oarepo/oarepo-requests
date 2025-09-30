@@ -125,8 +125,8 @@ class ReadManyDraftsService(RDMRecordService):
         # being added to the query with using search_request().
         search = self.create_search(
             identity=identity,
-            record_cls=record_cls,
-            search_opts=search_opts,
+            record_cls=record_cls or self.draft_cls,
+            search_opts=search_opts or self.config.search_drafts,
             permission_action="read_draft",
             preference=preference,
             extra_filter=extra_filter,
