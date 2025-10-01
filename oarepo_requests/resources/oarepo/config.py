@@ -9,7 +9,7 @@
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Any, ClassVar
+from typing import TYPE_CHECKING, Any, ClassVar, cast
 
 import importlib_metadata
 import marshmallow as ma
@@ -32,7 +32,6 @@ class OARepoRequestsResourceConfig(RequestsResourceConfig, ConfiguratorMixin):
         **RequestsResourceConfig.routes,
         "list": "/",
         "list-args": "/<topic>/<request_type>",
-        # "list-applicable": "/applicable?=<topic>",
         "list-applicable": "/applicable",
     }
 
@@ -41,7 +40,10 @@ class OARepoRequestsResourceConfig(RequestsResourceConfig, ConfiguratorMixin):
     @property
     def request_view_args(self) -> dict[str, ma.fields.Field]:
         """Request view args for the requests API."""
-        return super().request_view_args | {
+        return cast(
+            "dict[str, ma.fields.Field]", super().request_view_args
+        ) | {  # TODO: resolve stub has type Mapping but is defined in the superclass as dict
+            # ; how this should be typed?
             "topic": ma.fields.String(),
             "request_type": ma.fields.String(),
         }
@@ -57,7 +59,7 @@ class OARepoRequestsResourceConfig(RequestsResourceConfig, ConfiguratorMixin):
     @property
     def error_handlers(self) -> dict[type[Exception], Any]:
         """Get error handlers."""
-        entrypoint_error_handlers = request_error_handlers  # TODO: import correctly
+        entrypoint_error_handlers = cast("dict[type[Exception], Any]", request_error_handlers)  # TODO: import correctly
 
         for x in importlib_metadata.entry_points(group="oarepo_requests.error_handlers"):
             entrypoint_error_handlers.update(x.load())

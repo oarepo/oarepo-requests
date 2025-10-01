@@ -13,7 +13,6 @@ These components are called as context managers when an action is executed.
 from __future__ import annotations
 
 import abc
-import contextlib
 import logging
 from typing import TYPE_CHECKING, Any, override
 
@@ -21,13 +20,10 @@ from invenio_requests.customizations import RequestActions
 from invenio_requests.errors import CannotExecuteActionError
 from invenio_requests.records.api import Request
 
-from oarepo_requests.services.permissions.identity import request_active
-
+from ..utils import ref_to_str, reference_entity
 from .generic import OARepoGenericActionMixin, RequestActionState
 
 if TYPE_CHECKING:
-    from collections.abc import Generator
-
     from flask_principal import Identity
     from invenio_records_resources.services.uow import UnitOfWork
 
@@ -45,7 +41,7 @@ class RequestActionComponent(abc.ABC):
         uow: UnitOfWork,
         *args: Any,
         **kwargs: Any,
-    ) -> contextlib.AbstractContextManager:
+    ) -> None:
         """Apply the component.
 
         Must return a context manager
@@ -60,27 +56,6 @@ class RequestActionComponent(abc.ABC):
         """
 
 
-class RequestIdentityComponent(RequestActionComponent):
-    """A component that adds a request active permission to the identity and removes it after processing."""
-
-    @override
-    @contextlib.contextmanager
-    def apply(
-        self,
-        identity: Identity,
-        state: RequestActionState,
-        uow: UnitOfWork,
-        *args: Any,
-        **kwargs: Any,
-    ) -> Generator[None]:
-        identity.provides.add(request_active)
-        try:
-            yield
-        finally:
-            if request_active in identity.provides:
-                identity.provides.remove(request_active)
-
-
 class WorkflowTransitionComponent(RequestActionComponent):
     """A component that applies a workflow transition after processing the action.
 
@@ -90,7 +65,6 @@ class WorkflowTransitionComponent(RequestActionComponent):
     """
 
     @override
-    @contextlib.contextmanager
     def apply(
         self,
         identity: Identity,
@@ -98,11 +72,10 @@ class WorkflowTransitionComponent(RequestActionComponent):
         uow: UnitOfWork,
         *args: Any,
         **kwargs: Any,
-    ) -> Generator[None]:
+    ) -> None:
         from oarepo_workflows.proxies import current_oarepo_workflows
         from sqlalchemy.exc import NoResultFound
 
-        yield
         if not state.topic:
             # for example if we are cancelling requests after deleting draft,
             # it does not make sense to attempt changing the state of the draft
@@ -125,11 +98,9 @@ class WorkflowTransitionComponent(RequestActionComponent):
             )
 
 
-class AutoAcceptComponent(RequestActionComponent):
-    """A component that auto-accepts the request if the receiver has auto-approve enabled."""
+class CreatedTopicComponent(RequestActionComponent):
+    """A component that saves new topic created within the request on payload."""
 
-    @override
-    @contextlib.contextmanager
     def apply(
         self,
         identity: Identity,
@@ -137,8 +108,30 @@ class AutoAcceptComponent(RequestActionComponent):
         uow: UnitOfWork,
         *args: Any,
         **kwargs: Any,
-    ) -> Generator[None]:
-        yield
+    ) -> None:
+        """Apply the action to the topic."""
+        if not state.created_topic:
+            return
+        entity_ref = reference_entity(state.created_topic)
+        request: Request = state.request
+        if "payload" not in request:
+            request["payload"] = {}
+        request["payload"]["created_topic"] = ref_to_str(entity_ref)
+        return
+
+
+class AutoAcceptComponent(RequestActionComponent):
+    """A component that auto-accepts the request if the receiver has auto-approve enabled."""
+
+    @override
+    def apply(
+        self,
+        identity: Identity,
+        state: RequestActionState,
+        uow: UnitOfWork,
+        *args: Any,
+        **kwargs: Any,
+    ) -> None:
         request: Request = state.action.request
         if request.status != "submitted":
             return
@@ -155,7 +148,7 @@ class AutoAcceptComponent(RequestActionComponent):
             try:
                 current_action_obj = state.action
                 state.action = action_obj
-                action_obj.execute_with_components(identity, state, uow, *args, **kwargs)
+                action_obj.execute_with_components(*args, identity, state, uow, **kwargs)
             finally:
                 state.action = current_action_obj
         else:

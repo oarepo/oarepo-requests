@@ -13,7 +13,7 @@ from __future__ import annotations
 from typing import TYPE_CHECKING, Any, override
 
 # TODO: temp
-from invenio_records_resources.references import RecordResolver
+from invenio_records_resources.references import RecordResolver as InvenioRecordResolver
 from oarepo_model.customizations import (
     AddClass,
     AddMixins,
@@ -28,28 +28,11 @@ from oarepo_requests.model.presets.requests.records.entity_resolvers.draft_resol
 if TYPE_CHECKING:
     from collections.abc import Generator
 
+    from invenio_records_resources.references import RecordResolver
     from oarepo_model.builder import InvenioModelBuilder
     from oarepo_model.model import InvenioModel
-
-
-"""
-{{ vars.record_resolver|generate_import }}
-{% if vars.record_resolver.custom_proxy_class %}
-{{ vars.record_resolver.custom_proxy_class|generate_import }}
-{% endif %}
-
-class {{ vars.record_resolver|class_header }}:
-    # invenio_requests.registry.TypeRegistry
-    # requires name of the resolver for the model; needs only to be unique for the model, so use the name of the model
-    type_id = "{{ vars.module.prefix_snake }}"
-{% if vars.record_resolver.custom_proxy_class %}
-    proxy_cls = {{ vars.record_resolver.custom_proxy_class|base_name }}
-    def __init__(
-        self, record_cls, service_id, type_key
-    ):
-        super().__init__(record_cls, service_id, type_key=type_key, proxy_cls=self.proxy_cls)
-{% endif %}
-"""
+else:
+    RecordResolver = object
 
 
 class RecordResolverPreset(Preset):
@@ -64,7 +47,7 @@ class RecordResolverPreset(Preset):
         model: InvenioModel,
         dependencies: dict[str, Any],
     ) -> Generator[Customization]:
-        class RecordResolverMixin:
+        class RecordResolverMixin(RecordResolver):
             """Mixin specifying published record resolver."""
 
             # requires name of the resolver for the model; needs only to be unique for the model,
@@ -79,7 +62,7 @@ class RecordResolverPreset(Preset):
 
         yield AddClass(
             "RecordResolver",
-            clazz=RecordResolver,
+            clazz=InvenioRecordResolver,
         )
         yield AddMixins(
             "RecordResolver",

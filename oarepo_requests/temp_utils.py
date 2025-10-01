@@ -21,16 +21,16 @@ if TYPE_CHECKING:
     from invenio_requests.services.requests.results import RequestList
 
     from oarepo_requests.services.results import RequestTypesList
-    from oarepo_requests.typing import EntityReference
 
 
-def search_requests(identity: Identity, record: Record | EntityReference, expand: bool = False) -> RequestList:
+def search_requests(identity: Identity, record: Record | dict[str, str], expand: bool = False) -> RequestList:
     """Search requests for a given record."""
     topic_ref = ResolverRegistry.reference_entity(record) if isinstance(record, Record) else record
     return cast("RequestList", current_requests_service.search(identity, topic=topic_ref, expand=expand))
 
 
-def applicable_requests(identity: Identity, record: Record | EntityReference) -> RequestTypesList:
+def applicable_requests(identity: Identity, record: Record | dict[str, str]) -> RequestTypesList:
     """Get applicable request types for a record."""
     topic_ref = ResolverRegistry.reference_entity(record) if isinstance(record, Record) else record
-    return current_requests_service.applicable_request_types(identity, topic=topic_ref)
+    # TODO: we are using oarepo requests service as the invenio one in the proxy
+    return current_requests_service.applicable_request_types(identity, topic=topic_ref)  # type: ignore[no-any-return]

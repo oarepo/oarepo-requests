@@ -24,8 +24,6 @@ if TYPE_CHECKING:
     from invenio_requests.customizations import RequestType
     from opensearch_dsl.query import Query
 
-    from oarepo_requests.typing import EntityReference
-
 
 class IfRequestedBy(RecipientGeneratorMixin, ConditionalGenerator):
     """Conditional generator that generates needs when a request is made by a given requester role."""
@@ -74,7 +72,7 @@ class IfRequestedBy(RecipientGeneratorMixin, ConditionalGenerator):
         record: Record | None = None,
         request_type: RequestType | None = None,
         **context: Any,
-    ) -> list[EntityReference]:  # pragma: no cover
+    ) -> list[dict[str, str]]:  # pragma: no cover
         """Return the reference receiver(s) of the request.
 
         This call requires the context to contain at least "record" and "request_type"

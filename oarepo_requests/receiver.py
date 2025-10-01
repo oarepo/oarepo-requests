@@ -9,7 +9,7 @@
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Any
+from typing import TYPE_CHECKING, Any, cast
 
 from oarepo_workflows.errors import RequestTypeNotInWorkflowError
 
@@ -20,12 +20,10 @@ if TYPE_CHECKING:
     from invenio_requests.customizations.request_types import RequestType
     from oarepo_workflows import WorkflowRequest
 
-    from oarepo_requests.typing import EntityReference
-
 
 def default_workflow_receiver_function(
     record: Record = None, request_type: RequestType = None, **kwargs: Any
-) -> EntityReference | None:
+) -> dict[str, str] | None:
     """Get the receiver of the request.
 
     This function is called by oarepo-requests when a new request is created. It should
@@ -48,4 +46,4 @@ def default_workflow_receiver_function(
     receiver = request.recipient_entity_reference(record=record, request_type=request_type, **kwargs)
     if not request_type.receiver_can_be_none and not receiver:
         raise ReceiverNonReferencableError(request_type=request_type, record=record, **kwargs)
-    return receiver
+    return cast("dict[str, str]", receiver)  # TODO: idk why it complains here

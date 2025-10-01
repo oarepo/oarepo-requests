@@ -13,7 +13,8 @@ from typing import TYPE_CHECKING, Any, override
 
 from oarepo_runtime.proxies import current_runtime
 
-from .generic import CreatedTopicMixin, OARepoAcceptAction
+from .components import CreatedTopicComponent
+from .generic import OARepoAcceptAction
 
 if TYPE_CHECKING:
     from flask_principal import Identity
@@ -23,8 +24,10 @@ if TYPE_CHECKING:
 
 
 # TODO: snapshot
-class EditTopicAcceptAction(CreatedTopicMixin, OARepoAcceptAction):
+class EditTopicAcceptAction(OARepoAcceptAction):
     """Accept creation of a draft of a published record for editing metadata."""
+
+    action_components = (CreatedTopicComponent,)
 
     @override
     def apply(

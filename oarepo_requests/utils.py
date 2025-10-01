@@ -41,7 +41,6 @@ if TYPE_CHECKING:
     from invenio_requests.records.api import Request
     from opensearch_dsl.query import Query
 
-    from oarepo_requests.typing import EntityReference
 
 # TODO: perhaps we could use centrally defined custom types in runtime?
 type JsonValue = str | LazyString | int | float | bool | None | dict[str, JsonValue] | list[JsonValue]
@@ -51,7 +50,7 @@ type JsonValue = str | LazyString | int | float | bool | None | dict[str, JsonVa
 class classproperty[T]:  # noqa N801
     """Class property decorator as decorator chaining for declaring class properties was deprecated in python 3.11."""
 
-    def __init__(self, func: Callable):
+    def __init__(self, func: Callable[[Any], T]):
         """Initialize the class property."""
         self.fget = func
 
@@ -91,7 +90,7 @@ def allowed_request_types_for_record(identity: Identity, record: Record) -> dict
     return ret
 
 
-def create_query_term_for_reference(field_name: str, reference: EntityReference) -> Query:
+def create_query_term_for_reference(field_name: str, reference: dict[str, str]) -> Query:
     """Create an opensearch query term for the reference.
 
     :param field_name: Field name to search in (can be "topic", "receiver", ...).
@@ -137,7 +136,7 @@ def search_requests_filter(
     )
 
 
-def open_request_exists(topic_or_reference: Record | EntityReference, type_id: str) -> bool:
+def open_request_exists(topic_or_reference: Record | dict[str, str], type_id: str) -> bool:
     """Check if there is an open request of a given type for the topic.
 
     :param topic_or_reference: Topic record or reference to the record in the form {"datasets": "id"}.
@@ -149,18 +148,18 @@ def open_request_exists(topic_or_reference: Record | EntityReference, type_id: s
     return bool(list(results))
 
 
-def resolve_reference_dict(reference_dict: EntityReference) -> Record:
+def resolve_reference_dict(reference_dict: dict[str, str]) -> Record:
     """Resolve the reference dict to the entity (such as Record, User, ...)."""
     return ResolverRegistry.resolve_entity_proxy(reference_dict).resolve()
 
 
-def reference_entity(entity: Any) -> EntityReference:
+def reference_entity(entity: Any) -> dict[str, str]:
     """Resolve the entity to the reference dict."""
-    return ResolverRegistry.reference_entity(entity)
+    return cast("dict[str, str]", ResolverRegistry.reference_entity(entity))  # TODO: why the stub doesn't work
 
 
 def get_matching_service_for_refdict(
-    reference_dict: EntityReference,
+    reference_dict: dict[str, str],
 ) -> RecordService | None:
     """Get the service that is responsible for entities matching the reference dict.
 
@@ -181,7 +180,9 @@ def get_entity_key_for_record_cls(record_cls: type[Record]) -> str:
     """
     for resolver in ResolverRegistry.get_registered_resolvers():
         if hasattr(resolver, "record_cls") and resolver.record_cls == record_cls:
-            return resolver.type_id
+            return cast(
+                "str", resolver.type_id
+            )  # TODO: type_id is defined in subclassed Resolvers (ie. UserResolver, <RecordName>Resolver) ...
     raise AttributeError(f"Record class {record_cls} does not have a registered entity resolver.")
 
 
@@ -199,7 +200,7 @@ def stringify_first_val[T](dct: T) -> T:
     return dct
 
 
-def reference_to_tuple(reference: EntityReference) -> tuple[str, str]:
+def reference_to_tuple(reference: dict[str, str]) -> tuple[str, str]:
     """Convert the reference dict to a tuple.
 
     :param reference: Reference dict in the form {"datasets": "id"}.
@@ -208,13 +209,13 @@ def reference_to_tuple(reference: EntityReference) -> tuple[str, str]:
     return next(iter(reference.items()))
 
 
-def string_to_reference(reference_str: str) -> EntityReference:
+def string_to_reference(reference_str: str) -> dict[str, str]:
     """Convert the reference string to a reference dict."""
     split = reference_str.split(":")
     return {split[0]: split[1]}
 
 
-def ref_to_str(ref_dict: EntityReference) -> str:
+def ref_to_str(ref_dict: dict[str, str]) -> str:
     """Convert the reference string to a reference dict."""
     return f"{next(iter(ref_dict.keys()))}:{next(iter(ref_dict.values()))}"
 
@@ -222,7 +223,7 @@ def ref_to_str(ref_dict: EntityReference) -> str:
 # TODO: consider moving to oarepo-workflows
 def get_receiver_for_request_type(
     request_type: RequestType, identity: Identity, topic: Record
-) -> EntityReference | None:
+) -> dict[str, str] | None:
     """Get the default receiver for the request type, identity and topic.
 
     This call gets the workflow from the topic, looks up the request inside the workflow
@@ -253,7 +254,7 @@ def get_receiver_for_request_type(
     if not receivers:
         return None
 
-    return receivers
+    return cast("dict[str, str]", receivers)  # TODO: idk why it complains here
 
 
 # TODO: consider moving to oarepo-workflows
@@ -279,7 +280,7 @@ def is_auto_approved(
     )
 
 
-def request_identity_matches(entity_reference: EntityReference, identity: Identity) -> bool:
+def request_identity_matches(entity_reference: dict[str, str], identity: Identity) -> bool:
     """Check if the identity matches the entity reference.
 
     Identity matches the entity reference if the needs provided by the entity reference
