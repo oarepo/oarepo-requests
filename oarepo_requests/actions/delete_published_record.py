@@ -9,13 +9,12 @@
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Any, override
+from typing import TYPE_CHECKING, Any, cast, override
 
 from .generic import OARepoAcceptAction, OARepoDeclineAction, OARepoSubmitAction
 
 if TYPE_CHECKING:
     from flask_principal import Identity
-    from invenio_drafts_resources.records import Record
 
 from typing import TYPE_CHECKING
 
@@ -25,13 +24,12 @@ from oarepo_runtime.proxies import current_runtime
 
 if TYPE_CHECKING:
     from flask_principal import Identity
-    from invenio_drafts_resources.records import Record
 
 
 if TYPE_CHECKING:
     from flask_principal import Identity
-    from invenio_drafts_resources.records import Record
-    from invenio_records_resources.services.uow import UnitOfWork
+    from invenio_db.uow import UnitOfWork
+    from invenio_rdm_records.services.services import RDMRecordService
 
     from .components import RequestActionState
 
@@ -46,7 +44,7 @@ class DeletePublishedRecordSubmitAction(OARepoSubmitAction):
         uow: UnitOfWork,
         *args: Any,
         **kwargs: Any,
-    ) -> Record:
+    ) -> None:
         """Publish the draft."""
         # TODO: notification
         return super().apply(identity, state, uow, *args, **kwargs)
@@ -70,6 +68,7 @@ class DeletePublishedRecordAcceptAction(OARepoAcceptAction):
         if not topic_service:
             raise KeyError(f"topic {state.topic} service not found")
         if hasattr(topic_service, "delete_record"):
+            topic_service = cast("RDMRecordService", topic_service)
             from flask import current_app
 
             oarepo = current_app.extensions["oarepo-runtime"]
@@ -108,7 +107,7 @@ class DeletePublishedRecordDeclineAction(OARepoDeclineAction):
         uow: UnitOfWork,
         *args: Any,
         **kwargs: Any,
-    ) -> Record:
+    ) -> None:
         """Publish the draft."""
         # TODO: notification
         return super().apply(identity, state, uow, *args, **kwargs)

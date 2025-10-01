@@ -112,7 +112,7 @@ class UnknownRequestTypeError(Exception):
     @property
     def description(self) -> str:
         """Exception's description."""
-        return gettext("Unknown request type %(request_type)s.") % {
+        return gettext("Unknown request type %(request_type)s.") % {  # type: ignore[no-any-return]
             "request_type": self.request_type,
         }
 
@@ -139,7 +139,7 @@ class ReceiverNonReferencableError(Exception):
         if self.kwargs:
             message += gettext("\n Additional keyword arguments:")
             message += f"\n{', '.join(self.kwargs)}"
-        return message
+        return message  # type: ignore[no-any-return]
 
 
 class VersionAlreadyExists(CustomHTTPJSONException):

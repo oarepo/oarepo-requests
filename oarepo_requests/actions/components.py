@@ -14,7 +14,7 @@ from __future__ import annotations
 
 import abc
 import logging
-from typing import TYPE_CHECKING, Any, override
+from typing import TYPE_CHECKING, Any, cast, override
 
 from invenio_requests.customizations import RequestActions
 from invenio_requests.errors import CannotExecuteActionError
@@ -24,8 +24,10 @@ from ..utils import ref_to_str, reference_entity
 from .generic import OARepoGenericActionMixin, RequestActionState
 
 if TYPE_CHECKING:
+    from uuid import UUID
+
     from flask_principal import Identity
-    from invenio_records_resources.services.uow import UnitOfWork
+    from invenio_db.uow import UnitOfWork
 
 log = logging.getLogger(__name__)
 
@@ -81,10 +83,13 @@ class WorkflowTransitionComponent(RequestActionComponent):
             # it does not make sense to attempt changing the state of the draft
             return
         try:
+            # TODO: does it make sense for transitions to possible return None?
             transitions = (
                 current_oarepo_workflows.get_workflow(state.topic).requests()[state.request_type.type_id].transitions
             )
         except NoResultFound:  # parent might be deleted - this is the case for delete_draft request type
+            return
+        if not transitions:
             return
         target_state = transitions[state.action.status_to]
 
@@ -101,6 +106,7 @@ class WorkflowTransitionComponent(RequestActionComponent):
 class CreatedTopicComponent(RequestActionComponent):
     """A component that saves new topic created within the request on payload."""
 
+    @override
     def apply(
         self,
         identity: Identity,
@@ -144,21 +150,21 @@ class AutoAcceptComponent(RequestActionComponent):
             raise CannotExecuteActionError("accept")
         if isinstance(action_obj, OARepoGenericActionMixin):
             # it is our action, just execute with components right away
-            current_action_obj = None
+            current_action_obj = state.action
+            state.action = action_obj
             try:
-                current_action_obj = state.action
-                state.action = action_obj
                 action_obj.execute_with_components(*args, identity, state, uow, **kwargs)
             finally:
                 state.action = current_action_obj
         else:
             action_obj.execute(identity, uow, *args, **kwargs)
             # we dont know if request/topic was changed, retrieve actual data
-            new_request: Request = Request.get_record(request.id)
+            new_request: Request = Request.get_record(
+                cast("UUID", request.id)
+            )  # TODO: request.id should not be None (Optional[UUID]) according to stubs?
             state.request = new_request
             try:
                 new_topic = new_request.topic.resolve()
                 state.topic = new_topic
             except Exception:
                 log.exception("Exception while resolving topic")
-                state.topic = None

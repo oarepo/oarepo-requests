@@ -35,10 +35,11 @@ if TYPE_CHECKING:
     from flask_resources.serializers.base import BaseSerializer
     from invenio_records_resources.records import Record
     from invenio_requests.customizations.request_types import RequestType
+    from oarepo_ui.resources.components.base import UIResourceComponent
 
 
 def _get_custom_fields_ui_config(key: str, **kwargs: Any) -> list[dict]:  # noqa ARG001
-    return current_app.config.get(f"{key}_UI", [])
+    return current_app.config.get(f"{key}_UI", [])  # type: ignore[no-any-return]
 
 
 class RequestTypeSchema(ma.fields.Str):
@@ -76,15 +77,15 @@ class RequestsFormConfigResourceConfig(FormConfigResourceConfig):
 class UIResourceConfig(ResourceConfig):
     """Base resource config for the UI."""
 
-    components = None
-    template_folder = None
+    components: tuple[type[UIResourceComponent], ...] = ()
+    template_folder = ""
 
     def get_template_folder(self) -> str | None:
         """Get the template folder."""
         if not self.template_folder:
             return None
 
-        tf = Path(self.template_folder)
+        tf = Path(self.template_folder)  # type: ignore[unreachable]
         if not tf.is_absolute():
             tf = Path(inspect.getfile(type(self))).parent.absolute().joinpath(tf).absolute()
         return str(tf)

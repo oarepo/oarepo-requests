@@ -28,17 +28,18 @@ from .generic import (
 
 if TYPE_CHECKING:
     from flask_principal import Identity
-    from invenio_drafts_resources.records import Record
-    from invenio_records_resources.services.uow import UnitOfWork
-    from invenio_requests.customizations.actions import RequestAction
+    from invenio_db.uow import UnitOfWork
+    from invenio_requests.customizations import RequestAction
 
     from .components import RequestActionState
+else:
+    RequestAction = object
 
 
-class PublishMixin:
+class PublishMixin(RequestAction):
     """Mixin for publish actions."""
 
-    def can_execute(self: RequestAction) -> bool:
+    def can_execute(self) -> bool:
         """Check if the action can be executed."""
         if not super().can_execute():
             return False
@@ -64,7 +65,7 @@ class PublishDraftSubmitAction(PublishMixin, OARepoSubmitAction):
         uow: UnitOfWork,
         *args: Any,
         **kwargs: Any,
-    ) -> Record:
+    ) -> None:
         """Publish the draft."""
         if "payload" in self.request and "version" in self.request["payload"]:
             topic_service = current_runtime.get_record_service_for_record(state.topic)
@@ -94,7 +95,7 @@ class PublishDraftAcceptAction(PublishMixin, OARepoAcceptAction):
         uow: UnitOfWork,
         *args: Any,
         **kwargs: Any,
-    ) -> Record:
+    ) -> None:
         """Publish the draft."""
         topic_service = current_runtime.get_record_service_for_record(state.topic)
         if not topic_service:
@@ -141,7 +142,7 @@ class PublishDraftDeclineAction(OARepoDeclineAction):
         uow: UnitOfWork,
         *args: Any,
         **kwargs: Any,
-    ) -> Record:
+    ) -> None:
         """Publish the draft."""
         # TODO: notification
         return super().apply(identity, state, uow, *args, **kwargs)

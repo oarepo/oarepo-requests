@@ -25,7 +25,7 @@ from oarepo_requests.services.permissions.identity import request_active
 if TYPE_CHECKING:
     from flask_babel.speaklater import LazyString
     from flask_principal import Identity
-    from invenio_records_resources.services.uow import UnitOfWork
+    from invenio_db.uow import UnitOfWork
     from invenio_requests.customizations import RequestAction
 
     from oarepo_requests.actions.components import RequestActionComponent
