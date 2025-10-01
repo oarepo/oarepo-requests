@@ -22,7 +22,9 @@ if TYPE_CHECKING:
 
 
 def default_workflow_receiver_function(
-    record: Record = None, request_type: RequestType = None, **kwargs: Any
+    record: Record,
+    request_type: RequestType,
+    **kwargs: Any,  # i suppose we can't have requests with None topic
 ) -> dict[str, str] | None:
     """Get the receiver of the request.
 

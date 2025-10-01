@@ -70,7 +70,7 @@ class RequestUIResource(UIResource):
         :param request: Request to get the links for
         """
         tpl = LinksTemplate(self.config.ui_links_item, {"url_prefix": self.config.url_prefix})
-        return tpl.expand(identity, request)
+        return tpl.expand(identity, request)  # type: ignore[no-any-return]
 
     def _get_custom_fields(self, **kwargs: Any) -> dict:
         """Get configuration of the custom fields.
@@ -156,7 +156,7 @@ class RequestUIResource(UIResource):
     @property
     def ui_model(self) -> dict[str, Any]:
         """Return the ui model for requests."""
-        return current_oarepo_ui.ui_models.get(self.config.api_service.replace("-", "_"), {})
+        return current_oarepo_ui.ui_models.get(self.config.api_service.replace("-", "_"), {})  # type: ignore[no-any-return]
 
     def get_jinjax_macro(
         self,
@@ -172,8 +172,8 @@ class RequestUIResource(UIResource):
         :return name of the macro, including optional namespace in the form of "namespace.Macro".
         """
         if default_macro:
-            return self.config.templates.get(template_type, default_macro)
-        return self.config.templates[template_type]
+            return self.config.templates.get(template_type, default_macro)  # type: ignore[no-any-return]
+        return self.config.templates[template_type]  # type: ignore[no-any-return]
 
     def tombstone(self, error: Exception, *args: Any, **kwargs: Any) -> Response:  # noqa ARG002
         """Render tombstone page for a deleted request.

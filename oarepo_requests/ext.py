@@ -10,7 +10,7 @@
 from __future__ import annotations
 
 from functools import cached_property
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, cast
 
 import importlib_metadata
 from deepmerge import conservative_merger
@@ -54,7 +54,7 @@ class OARepoRequests:
         These fields will be dereferenced, serialized to UI using one of the entity_reference_ui_resolvers
         and included in the serialized request.
         """
-        return self.app.config["REQUESTS_UI_SERIALIZATION_REFERENCED_FIELDS"]
+        return cast("list[str]", self.app.config["REQUESTS_UI_SERIALIZATION_REFERENCED_FIELDS"])
 
     def default_request_receiver(
         self,
@@ -77,7 +77,7 @@ class OARepoRequests:
         :param creator: Creator of the request.
         :param data: Payload of the request.
         """
-        return obj_or_import_string(self.app.config["OAREPO_REQUESTS_DEFAULT_RECEIVER"])(
+        return obj_or_import_string(self.app.config["OAREPO_REQUESTS_DEFAULT_RECEIVER"])(  # type: ignore[no-any-return]
             identity=identity,
             request_type=request_type,
             record=record,
@@ -91,7 +91,7 @@ class OARepoRequests:
 
         This value is taken from the configuration key REQUESTS_ALLOWED_RECEIVERS.
         """
-        return self.app.config.get("REQUESTS_ALLOWED_RECEIVERS", [])
+        return cast("list[str]", self.app.config.get("REQUESTS_ALLOWED_RECEIVERS", []))
 
     @cached_property
     def identity_to_entity_references_functions(self) -> list[Callable]:
@@ -132,7 +132,8 @@ class OARepoRequests:
         """Return components for the given action."""
         components = self.app.config["REQUESTS_ACTION_COMPONENTS"]
         if callable(components):
-            return components(action)
+            ret = components(action)
+            return cast("list[type[RequestActionComponent]]", ret)
         return [obj_or_import_string(component) for component in components[action.status_to]]
 
     def init_config(self, app: Flask) -> None:

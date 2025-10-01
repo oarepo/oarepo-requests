@@ -36,7 +36,7 @@ if TYPE_CHECKING:
     from datetime import datetime
 
     from flask_principal import Identity
-    from invenio_records_resources.services.uow import UnitOfWork
+    from invenio_db.uow import UnitOfWork
     from invenio_requests.services.requests.results import RequestItem
 
 

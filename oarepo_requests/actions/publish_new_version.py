@@ -17,7 +17,6 @@ from oarepo_runtime.proxies import current_runtime
 
 if TYPE_CHECKING:
     from flask_principal import Identity
-    from invenio_drafts_resources.records import Record
 
     from .components import RequestActionState
 
@@ -36,7 +35,7 @@ class PublishNewVersionAcceptAction(PublishDraftAcceptAction):
         uow: UnitOfWork,
         *args: Any,
         **kwargs: Any,
-    ) -> Record:
+    ) -> None:
         """Publish the draft."""
         topic_service = current_runtime.get_record_service_for_record(state.topic)
         if not topic_service:

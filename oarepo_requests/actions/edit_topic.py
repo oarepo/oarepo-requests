@@ -18,7 +18,7 @@ from .generic import OARepoAcceptAction
 
 if TYPE_CHECKING:
     from flask_principal import Identity
-    from invenio_records_resources.services.uow import UnitOfWork
+    from invenio_db.uow import UnitOfWork
 
     from .components import RequestActionState
 
@@ -39,9 +39,11 @@ class EditTopicAcceptAction(OARepoAcceptAction):
         **kwargs: Any,
     ) -> None:
         """Apply the action, creating a draft of the record for editing metadata."""
-        topic_service = current_runtime.get_record_service_for_record(state.topic)
+        topic_service = current_runtime.get_record_service_for_record(
+            state.topic
+        )  # TODO: this should be a draft service
         if not topic_service:
             raise KeyError(f"topic {state.topic} service not found")
-        state.created_topic = topic_service.edit(identity, state.topic["id"], uow=uow)._record  # noqa SLF001
-        # state.topic = topic_service.edit(identity, state.topic["id"], uow=uow)._record  # noqa SLF001
+        created_topic = topic_service.edit(identity, state.topic["id"], uow=uow)  # type: ignore[reportAttributeAccessIssue]
+        state.created_topic = created_topic._record  # noqa SLF001
         super().apply(identity, state, uow, *args, **kwargs)

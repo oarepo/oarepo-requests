@@ -18,8 +18,7 @@ from .generic import OARepoAcceptAction
 
 if TYPE_CHECKING:
     from flask_principal import Identity
-    from invenio_drafts_resources.records import Record
-    from invenio_records_resources.services.uow import UnitOfWork
+    from invenio_db.uow import UnitOfWork
 
     from .components import RequestActionState
 
@@ -37,7 +36,7 @@ class NewVersionAcceptAction(OARepoAcceptAction):
         uow: UnitOfWork,
         *args: Any,
         **kwargs: Any,
-    ) -> Record:
+    ) -> None:
         """Apply the action, creating a new version of the record."""
         topic_service = current_runtime.get_record_service_for_record(state.topic)
         if not topic_service:
