@@ -35,8 +35,6 @@ if TYPE_CHECKING:
     from invenio_requests.customizations.actions import RequestAction
     from invenio_requests.records.api import Request
 
-    from oarepo_requests.typing import EntityReference
-
     from ..utils import JsonValue
 
 
@@ -158,9 +156,9 @@ class PublishNewVersionRequestType(PublishRequestType):
         self,
         identity: Identity,
         data: dict,
-        receiver: EntityReference,
+        receiver: dict[str, str],
         topic: Record,
-        creator: EntityReference,
+        creator: dict[str, str],
         *args: Any,
         **kwargs: Any,
     ) -> None:

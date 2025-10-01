@@ -40,8 +40,6 @@ if TYPE_CHECKING:
     from marshmallow import Schema
     from opensearch_dsl.response import Response
 
-    from oarepo_requests.typing import EntityReference
-
 
 class ReadManyDraftsService(RDMRecordService):
     """Service rewriting read_many to return drafts instead of published records.
@@ -55,7 +53,10 @@ class ReadManyDraftsService(RDMRecordService):
             return True
         if type(self) is not type(other):
             return False
-        return self.config.service_id == other.config.service_id
+        return cast(
+            "bool",
+            self.config.service_id == other.config.service_id,  # type: ignore[attr-defined]
+        )  # TODO: service has no attribute config, also has service_id as Optional?
 
     def __hash__(self) -> int:
         """Hash based on service type and its config object identity."""
@@ -182,7 +183,7 @@ class ReadManyDraftsService(RDMRecordService):
 class DraftAwareEntityResolverExpandableField(EntityResolverExpandableField):
     """Expandable entity resolver field capable of resolving drafts."""
 
-    def get_value_service(self, value: EntityReference) -> tuple[str, RecordService]:
+    def get_value_service(self, value: dict[str, str]) -> tuple[str, RecordService]:
         """Return the value and the service via entity resolvers."""
         v, service = super().get_value_service(value)
         try:  # TODO: hack: draft might get deleted ie in case of publish; then the service returns published record
@@ -202,7 +203,10 @@ class StringDraftAwareEntityResolverExpandableField(DraftAwareEntityResolverExpa
     the referenced record.
     """
 
-    def get_value_service(self, value: str) -> tuple[str, RecordService]:
+    #  the message is: Argument 1 of "get_value_service" is incompatible with supertype
+    #  "DraftAwareEntityResolverExpandableField"; supertype defines the argument type as "dict[str, str]"  [override]
+    # invenio doesn't allow to implement this differently?
+    def get_value_service(self, value: str) -> tuple[str, RecordService]:  # type: ignore[override]
         """Return the value and the service via entity resolvers."""
         ref = string_to_reference(value)
         v, service = super().get_value_service(ref)

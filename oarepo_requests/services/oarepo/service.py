@@ -39,8 +39,6 @@ if TYPE_CHECKING:
     from invenio_records_resources.services.uow import UnitOfWork
     from invenio_requests.services.requests.results import RequestItem
 
-    from oarepo_requests.typing import EntityReference
-
 
 class OARepoRequestsService(RequestsService):
     """OARepo extension to invenio-requests service."""
@@ -59,10 +57,10 @@ class OARepoRequestsService(RequestsService):
     def create(  # noqa: PLR0913
         self,
         identity: Identity,
-        data: dict,
+        data: dict | None,
         request_type: str,
-        receiver: EntityReference | Any | None = None,
-        creator: EntityReference | Any | None = None,
+        receiver: dict[str, str] | Any | None = None,
+        creator: dict[str, str] | Any | None = None,
         topic: Record = None,
         expires_at: datetime | None = None,  # noqa ARG002
         uow: UnitOfWork = None,
@@ -87,15 +85,12 @@ class OARepoRequestsService(RequestsService):
         type_ = current_request_type_registry.lookup(request_type, quiet=True)
         if not type_:
             raise UnknownRequestTypeError(request_type)
-
+        data = data if data else {}
         if receiver is None:
             # if explicit creator is not passed, use current identity - this is in sync with invenio_requests
             receiver = current_oarepo_requests.default_request_receiver(
                 identity, type_, topic, creator or identity, data
             )
-
-        if data is None:  # TODO: data should not be None according to typing
-            data = {}
         if "payload" not in data and type_.payload_schema:
             data["payload"] = {}
         schema = self._wrap_schema(type_.marshmallow_schema())
@@ -128,9 +123,9 @@ class OARepoRequestsService(RequestsService):
             return result
         return None
 
-    def applicable_request_types(self, identity: Identity, topic: Record | EntityReference) -> RequestTypesList:
+    def applicable_request_types(self, identity: Identity, topic: Record | dict[str, str]) -> RequestTypesList:
         """Get applicable request types for a record."""
-        topic = resolve_reference_dict(topic) if not isinstance(topic, Record) else topic  # type: ignore if isinstance(record, Record) else record
+        topic = resolve_reference_dict(topic) if not isinstance(topic, Record) else topic
 
         allowed_request_types = allowed_request_types_for_record(identity, topic)
         return RequestTypesList(

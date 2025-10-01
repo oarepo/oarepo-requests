@@ -19,8 +19,8 @@ from oarepo_runtime.proxies import current_runtime
 from oarepo_requests.errors import UnresolvedRequestsError, VersionAlreadyExists
 
 from ..temp_utils import search_requests
+from .components import CreatedTopicComponent
 from .generic import (
-    CreatedTopicMixin,
     OARepoAcceptAction,
     OARepoDeclineAction,
     OARepoSubmitAction,
@@ -80,10 +80,12 @@ class PublishDraftSubmitAction(PublishMixin, OARepoSubmitAction):
         return super().apply(identity, state, uow, *args, **kwargs)
 
 
-class PublishDraftAcceptAction(PublishMixin, CreatedTopicMixin, OARepoAcceptAction):
+class PublishDraftAcceptAction(PublishMixin, OARepoAcceptAction):
     """Accept action for publishing draft requests."""
 
     name = _("Publish")
+
+    action_components = (CreatedTopicComponent,)
 
     def apply(
         self,

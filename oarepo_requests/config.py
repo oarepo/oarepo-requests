@@ -20,7 +20,6 @@ from oarepo_workflows.requests.events import WorkflowEvent
 
 from oarepo_requests.actions.components import (
     AutoAcceptComponent,
-    RequestIdentityComponent,
     WorkflowTransitionComponent,
 )
 from oarepo_requests.services.oarepo.config import OARepoRequestsServiceConfig
@@ -69,26 +68,21 @@ workflow_action_components = [WorkflowTransitionComponent]
 REQUESTS_ACTION_COMPONENTS = {
     "accepted": [
         *workflow_action_components,
-        RequestIdentityComponent,
     ],
     "submitted": [
         # AutoAcceptComponent must always be first, so that auto accept is called as the last
         # step in action handling
         AutoAcceptComponent,
         *workflow_action_components,
-        RequestIdentityComponent,
     ],
     "declined": [
         *workflow_action_components,
-        RequestIdentityComponent,
     ],
     "cancelled": [
         *workflow_action_components,
-        RequestIdentityComponent,
     ],
     "expired": [
         *workflow_action_components,
-        RequestIdentityComponent,
     ],
 }
 

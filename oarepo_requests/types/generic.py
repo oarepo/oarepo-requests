@@ -9,7 +9,7 @@
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Any
+from typing import TYPE_CHECKING, Any, cast
 
 from invenio_access.permissions import system_identity
 from invenio_requests.customizations import RequestType
@@ -42,8 +42,6 @@ if TYPE_CHECKING:
     from invenio_requests.customizations.actions import RequestAction
     from invenio_requests.records.api import Request
     from marshmallow.schema import Schema
-
-    from oarepo_requests.typing import EntityReference
 
 
 class OARepoRequestType(RequestType):
@@ -92,16 +90,16 @@ class OARepoRequestType(RequestType):
         if cls.payload_schema is not None and hasattr(schema, "fields") and "payload" in schema.fields:
             schema.fields["payload"].required = True
 
-        return schema
+        return cast("type[Schema]", schema)  # TODO: idk why it complains here
 
     # TODO: specify what can exactly come in the data dicts
     def can_create(
         self,
         identity: Identity,
         data: dict,  # noqa ARG002
-        receiver: EntityReference,  # noqa ARG002
+        receiver: dict[str, str],  # noqa ARG002
         topic: Record,
-        creator: EntityReference,  # noqa ARG002
+        creator: dict[str, str],  # noqa ARG002
         *args: Any,  # noqa ARG002
         **kwargs: Any,
     ) -> None:
@@ -127,7 +125,10 @@ class OARepoRequestType(RequestType):
         method is used to check whether there is a possible situation a user might create
         this request eg. for the purpose of serializing a link on associated record
         """
-        return current_requests_service.check_permission(identity, "create", record=topic, request_type=cls, **kwargs)
+        return cast(
+            "bool",
+            current_requests_service.check_permission(identity, "create", record=topic, request_type=cls, **kwargs),
+        )
 
     allowed_topic_ref_types = ModelRefTypes()
     allowed_receiver_ref_types = ReceiverRefTypes()
@@ -249,9 +250,9 @@ class NonDuplicableOARepoRequestType(OARepoRequestType):
         self,
         identity: Identity,
         data: dict,
-        receiver: EntityReference,
+        receiver: dict[str, str],
         topic: Record,
-        creator: EntityReference,
+        creator: dict[str, str],
         *args: Any,
         **kwargs: Any,
     ) -> None:

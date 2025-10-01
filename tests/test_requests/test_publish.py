@@ -45,13 +45,15 @@ def test_publish_service(
     assert "payload" not in submit_result.data["expanded"]
 
     accept = current_requests_service.execute_action(receiver.identity, request.id, "accept", expand=True)
-
+    # TODO: read_many used in expandable fields requires refreshed indices to work correctly
+    # the current implementation requires to call resolve() to differentiate between published and draft, making
+    # the optimization quite ineffective?
+    requests_model.Record.index.refresh()
+    requests_model.Draft.index.refresh()
     assert "self" in accept.data["expanded"]["created_by"]["links"]
     assert "self" in accept.data["expanded"]["receiver"]["links"]
     assert accept.data["expanded"]["topic"]["links"] == {}
-    assert accept.data["expanded"]["topic"]["metadata"] == {
-        "title": "Deleted record"
-    }  # TODO: created topic is not indexed at the init of publish result
+    assert accept.data["expanded"]["topic"]["metadata"] == {"title": "Deleted record"}
     assert "self" in accept.data["expanded"]["payload"]["created_topic"]["links"]
     assert "self_html" in accept.data["expanded"]["payload"]["created_topic"]["links"]
 

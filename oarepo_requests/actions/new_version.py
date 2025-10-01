@@ -13,7 +13,8 @@ from typing import TYPE_CHECKING, Any
 
 from oarepo_runtime.proxies import current_runtime
 
-from .generic import CreatedTopicMixin, OARepoAcceptAction
+from .components import CreatedTopicComponent
+from .generic import OARepoAcceptAction
 
 if TYPE_CHECKING:
     from flask_principal import Identity
@@ -24,8 +25,10 @@ if TYPE_CHECKING:
 
 
 # TODO: snapshot
-class NewVersionAcceptAction(CreatedTopicMixin, OARepoAcceptAction):
+class NewVersionAcceptAction(OARepoAcceptAction):
     """Accept creation of a new version of a published record."""
+
+    action_components = (CreatedTopicComponent,)
 
     def apply(
         self,

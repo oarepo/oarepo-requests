@@ -10,11 +10,11 @@
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Any, override
+from typing import TYPE_CHECKING, Any, cast, override
 
 from invenio_access.permissions import system_identity
 from invenio_pidstore.errors import PIDUnregistered
-from invenio_records_resources.references import RecordResolver
+from invenio_records_resources.references import RecordResolver as InvenioRecordResolver
 from invenio_records_resources.references.entity_resolvers.records import (
     RecordProxy as InvenioRecordProxy,
 )
@@ -33,8 +33,13 @@ if TYPE_CHECKING:
     from collections.abc import Generator
 
     from flask_principal import Identity
+    from invenio_drafts_resources.records import Record
+    from invenio_rdm_records.services.services import RDMRecordService
+    from invenio_records_resources.references import RecordResolver
     from oarepo_model.builder import InvenioModelBuilder
     from oarepo_model.model import InvenioModel
+else:
+    RecordResolver = object
 
 
 def set_field(result: dict[str, Any], resolved_dict: dict[str, Any], field_name: str) -> None:
@@ -56,7 +61,7 @@ class RecordProxy(InvenioRecordProxy):
 
     def pick_resolved_fields(self, identity: Identity, resolved_dict: dict[str, Any]) -> dict[str, Any]:
         """Select which fields to return when resolving the reference."""
-        resolved_fields = super().pick_resolved_fields(identity, resolved_dict)
+        resolved_fields: dict[str, Any] = super().pick_resolved_fields(identity, resolved_dict)
         resolved_fields["links"] = resolved_dict.get("links", {})
 
         for fld in self.picked_fields:
@@ -77,21 +82,27 @@ class RecordProxy(InvenioRecordProxy):
 class WithDeletedServiceResultProxy(InvenioServiceResultProxy):
     """Resolver proxy allowing deleted records."""
 
+    service: RDMRecordService
+
     @override
     def _resolve(self) -> dict[str, Any]:
         id_ = self._parse_ref_dict_id()
         # TODO: Make identity customizable
-        return self.service.read(system_identity, id_, include_deleted=True).to_dict()
+        return cast(
+            "dict[str, Any]", self.service.read(system_identity, id_, include_deleted=True).to_dict()
+        )  # TODO: idk why it complains here
 
 
 class DraftProxy(RecordProxy):
     """OARepo resolver proxy for drafts."""
 
     @override
-    def _resolve(self) -> dict[str, Any]:
+    def _resolve(self) -> Record:
         pid_value = self._parse_ref_dict_id()
         try:
-            return self.record_cls.pid.resolve(pid_value, registered_only=False)
+            return self.record_cls.pid.resolve(
+                pid_value, registered_only=False
+            )  # TODO: pid is actually PIDFieldContext
         except (PIDUnregistered, NoResultFound):
             # try checking if it is a published record before failing
             return self.record_cls.pid.resolve(pid_value)
@@ -109,19 +120,19 @@ class DraftResolverPreset(Preset):
         model: InvenioModel,
         dependencies: dict[str, Any],
     ) -> Generator[Customization]:
-        class DraftResolverMixin:
+        class DraftResolverMixin(RecordResolver):
             """Mixin specifying draft resolver."""
 
             type_id = f"{builder.model.base_name}_draft"
 
             proxy_cls = DraftProxy
 
-            def __init__(self, record_cls: type, service_id: str, type_key: str) -> None:
+            def __init__(self, record_cls: type[Record], service_id: str, type_key: str) -> None:
                 super().__init__(record_cls, service_id, type_key=type_key, proxy_cls=self.proxy_cls)
 
         yield AddClass(
             "DraftResolver",
-            clazz=RecordResolver,
+            clazz=InvenioRecordResolver,
         )
         yield AddMixins(
             "DraftResolver",

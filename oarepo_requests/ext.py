@@ -30,7 +30,6 @@ if TYPE_CHECKING:
     from invenio_requests.customizations import RequestType
 
     from oarepo_requests.actions.components import RequestActionComponent
-    from oarepo_requests.typing import EntityReference
 
 
 class OARepoRequests:
@@ -50,7 +49,7 @@ class OARepoRequests:
 
     @property
     def ui_serialization_referenced_fields(self) -> list[str]:
-        """Request fields containing EntityReference that should be serialized in the UI.
+        """Request fields containing  that should be serialized in the UI.
 
         These fields will be dereferenced, serialized to UI using one of the entity_reference_ui_resolvers
         and included in the serialized request.
@@ -62,9 +61,9 @@ class OARepoRequests:
         identity: Identity,
         request_type: RequestType,
         record: Record,
-        creator: EntityReference | Identity,
+        creator: dict[str, str] | Identity,
         data: dict,
-    ) -> EntityReference | None:
+    ) -> dict[str, str] | None:
         """Return the default receiver for the request.
 
         Gets the default receiver for the request based on the request type, record and data.
@@ -105,7 +104,7 @@ class OARepoRequests:
         group_name = "oarepo_requests.identity_to_entity_references"
         return [x.load() for x in importlib_metadata.entry_points().select(group=group_name)]
 
-    def identity_to_entity_references(self, identity: Identity) -> list[EntityReference]:
+    def identity_to_entity_references(self, identity: Identity) -> list[dict[str, str]]:
         """Map the identity to entity references."""
         ret = [
             mapping_fnc(identity)

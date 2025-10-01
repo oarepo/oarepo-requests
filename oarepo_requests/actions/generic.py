@@ -20,18 +20,19 @@ from invenio_requests.customizations import actions
 from invenio_requests.records.api import Request
 
 from oarepo_requests.proxies import current_oarepo_requests
-from oarepo_requests.utils import ref_to_str, reference_entity
+from oarepo_requests.services.permissions.identity import request_active
 
 if TYPE_CHECKING:
     from flask_babel.speaklater import LazyString
     from flask_principal import Identity
     from invenio_records_resources.services.uow import UnitOfWork
+    from invenio_requests.customizations import RequestAction
 
     from oarepo_requests.actions.components import RequestActionComponent
+else:
+    RequestAction = object
 
-from invenio_requests.customizations import RequestAction, RequestType
-
-type ActionType = OARepoGenericActionMixin | RequestAction  # should be a type intersection, not yet in python
+from invenio_requests.customizations import RequestType
 
 
 @dataclass
@@ -42,7 +43,7 @@ class RequestActionState:
     request_type: RequestType
     topic: Record
     created_by: Any
-    action: ActionType
+    action: RequestAction
     created_topic: Record | None = None
 
     def __post__init__(self):
@@ -55,7 +56,7 @@ class RequestActionState:
             raise TypeError(f"self.topic is not instance of Record, got {type(self.topic)=}")
 
 
-class OARepoGenericActionMixin:
+class OARepoGenericActionMixin(RequestAction):
     """Mixin for all oarepo actions."""
 
     name: str
@@ -79,43 +80,23 @@ class OARepoGenericActionMixin:
     ) -> None:
         """Apply the action to the topic."""
 
-    def execute_with_components(
-        self,
-        identity: Identity,
-        state: RequestActionState,
-        uow: UnitOfWork,
-        *args: Any,
-        **kwargs: Any,
-    ) -> None:
-        """Execute action with components."""
-        self._execute_with_components(self.components, identity, state, uow, *args, **kwargs)
-
-    def _execute_with_components(
-        self,
-        components: list[RequestActionComponent],
-        identity: Identity,
-        state: RequestActionState,
-        uow: UnitOfWork,
-        *args: Any,
-        **kwargs: Any,
-    ) -> None:
-        """Execute the action with the given components.
-
-        Each component has an apply method that must return a context manager.
-        The context manager is entered and exited in the order of the components
-        and the action is executed inside the most inner context manager.
-        """
-        if not components:
-            self.apply(identity, state, uow, *args, **kwargs)
-            super().execute(identity, uow, *args, **kwargs)
-        else:
-            with components[0].apply(identity, state, uow, *args, **kwargs):
-                self._execute_with_components(components[1:], identity, state, uow, *args, **kwargs)
+    action_components: tuple[type[RequestActionComponent], ...] = ()
 
     @cached_property
     def components(self) -> list[RequestActionComponent]:
         """Return a list of components for this action."""
-        return [component_cls() for component_cls in current_oarepo_requests.action_components(self)]
+        glbs = [component_cls() for component_cls in current_oarepo_requests.action_components(self)]
+        specific = [component_cls() for component_cls in self.action_components]
+        return glbs + specific
+
+    def execute_with_components(
+        self, identity: Identity, state: RequestActionState, uow: UnitOfWork, *args: Any, **kwargs: Any
+    ) -> None:
+        """Execute the action with components."""
+        self.apply(identity, state, uow, *args, **kwargs)
+        super().execute(identity, uow, *args, **kwargs)
+        for component in self.components:
+            component.apply(identity, state, uow, *args, **kwargs)
 
     def execute(self, identity: Identity, uow: UnitOfWork, *args: Any, **kwargs: Any) -> None:
         """Execute the action."""
@@ -135,11 +116,18 @@ class OARepoGenericActionMixin:
             action=self,
         )
 
-        self._execute_with_components(self.components, identity, state, uow, *args, **kwargs)
+        identity.provides.add(request_active)
+        try:
+            self.execute_with_components(
+                identity, state, uow, *args, **kwargs
+            )  # this can be called only once even in case of cascading actions due to request_active need management
+        finally:
+            # in case we are not running the actions in isolated state
+            identity.provides.remove(request_active)
 
 
+"""
 class CreatedTopicMixin:
-    """A mixin for action that takes links from the topic and stores them inside the payload."""
 
     def apply(
         self,
@@ -149,7 +137,6 @@ class CreatedTopicMixin:
         *args: Any,
         **kwargs: Any,
     ) -> Record:
-        """Apply the action to the topic."""
         super().apply(identity, state, uow, *args, **kwargs)
         if not state.created_topic:
             return state.topic
@@ -159,6 +146,7 @@ class CreatedTopicMixin:
             request["payload"] = {}
         request["payload"]["created_topic"] = ref_to_str(entity_ref)
         return state.topic
+"""
 
 
 class OARepoSubmitAction(OARepoGenericActionMixin, actions.SubmitAction):

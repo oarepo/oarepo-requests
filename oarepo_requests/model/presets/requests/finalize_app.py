@@ -38,7 +38,6 @@ class RequestsFinalizeAppPreset(Preset):
         model: InvenioModel,
         dependencies: dict[str, Any],
     ) -> Generator[Customization]:
-        @staticmethod
         def finalize_app(app: Flask) -> None:
             runtime_deps = builder.get_runtime_dependencies()
             service_id = builder.model.base_name
@@ -61,7 +60,7 @@ class RequestsFinalizeAppPreset(Preset):
                 requests.entity_resolvers_registry.register_type(resolver)
 
         yield AddModule("finalize", exists_ok=True)
-        yield AddToModule("finalize", "finalize_app", finalize_app)
+        yield AddToModule("finalize", "finalize_app", staticmethod(finalize_app))
         yield AddEntryPoint(
             group="invenio_base.finalize_app",
             name=f"{model.base_name}_requests",
