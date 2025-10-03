@@ -16,10 +16,14 @@ from invenio_records_permissions.generators import ConditionalGenerator, Generat
 from invenio_records_resources.references.entity_resolvers import EntityProxy
 from invenio_requests.resolvers.registry import ResolverRegistry
 from oarepo_runtime.proxies import current_runtime
+from oarepo_runtime.typing import require_kwargs
 from oarepo_workflows.requests import RecipientGeneratorMixin
 from sqlalchemy.exc import NoResultFound
 
 if TYPE_CHECKING:
+    from collections.abc import Mapping
+
+    from invenio_drafts_resources.records import Record as DraftRecord
     from invenio_records_resources.records import Record
     from invenio_requests.customizations import RequestType
     from opensearch_dsl.query import Query
@@ -72,7 +76,7 @@ class IfRequestedBy(RecipientGeneratorMixin, ConditionalGenerator):
         record: Record | None = None,
         request_type: RequestType | None = None,
         **context: Any,
-    ) -> list[dict[str, str]]:  # pragma: no cover
+    ) -> list[Mapping[str, str]]:  # pragma: no cover
         """Return the reference receiver(s) of the request.
 
         This call requires the context to contain at least "record" and "request_type"
@@ -102,7 +106,8 @@ class IfNoNewVersionDraft(ConditionalGenerator):
         super().__init__(then_, else_=else_)
 
     @override
-    def _condition(self, record: Record, **kwargs: Any) -> bool:
+    @require_kwargs("record")
+    def _condition(self, record: DraftRecord, **kwargs: Any) -> bool:
         if hasattr(record, "is_draft"):
             is_draft = record.is_draft
         else:
@@ -123,7 +128,8 @@ class IfNoEditDraft(ConditionalGenerator):
         super().__init__(then_, else_=else_)
 
     @override
-    def _condition(self, record: Record, **kwargs: Any) -> bool:
+    @require_kwargs("record")
+    def _condition(self, record: DraftRecord, **kwargs: Any) -> bool:
         if getattr(record, "is_draft", False):
             return False
         records_service = current_runtime.get_record_service_for_record(record)

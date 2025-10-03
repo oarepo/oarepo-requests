@@ -12,6 +12,7 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 
 from flask import current_app
+from invenio_requests.proxies import current_requests_service as current_invenio_requests_service
 from werkzeug.local import LocalProxy
 
 if TYPE_CHECKING:
@@ -25,6 +26,7 @@ current_oarepo_requests: OARepoRequests = LocalProxy(  # type: ignore[assignment
 current_oarepo_requests_service: OARepoRequestsService = LocalProxy(  # type: ignore[assignment]
     lambda: current_app.extensions["oarepo-requests"].requests_service
 )
+current_requests_service: OARepoRequestsService = current_invenio_requests_service  # type: ignore[assignment]
 current_oarepo_requests_resource: OARepoRequestsResource = LocalProxy(  # type: ignore[assignment]
     lambda: current_app.extensions["oarepo-requests"].requests_resource
 )

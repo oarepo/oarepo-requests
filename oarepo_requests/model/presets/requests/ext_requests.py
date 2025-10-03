@@ -14,11 +14,11 @@ from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
     from invenio_rdm_records.records.api import RDMDraft, RDMRecord
-    from invenio_records_resources.services.records.results import RecordItem
 
 from invenio_records_resources.references.entity_resolvers.results import (
     ServiceResultResolver,
 )
+from invenio_records_resources.services.records.results import RecordItem
 
 # TODO: notification entity resolvers
 
@@ -27,6 +27,5 @@ class RDMPIDServiceResultResolver(ServiceResultResolver):
     """Service result resolver for draft records."""
 
     def _reference_entity(self, entity: RDMRecord | RDMDraft | RecordItem) -> dict[str, str]:
-        """Create a reference dict for the given result item."""
-        pid = entity.id if isinstance(entity, self.item_cls) else entity.pid.pid_value
+        pid = entity.id if isinstance(entity, RecordItem) else entity.pid
         return {self.type_key: str(pid)}

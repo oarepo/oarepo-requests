@@ -14,7 +14,7 @@ from typing import TYPE_CHECKING, Any, ClassVar, override
 import marshmallow as ma
 from invenio_i18n import gettext
 from invenio_i18n import lazy_gettext as _
-from invenio_records_resources.services.uow import RecordCommitOp, UnitOfWork
+from invenio_records_resources.services.uow import RecordCommitOp
 from invenio_requests.proxies import current_requests_service
 from invenio_requests.records.api import Request
 from oarepo_runtime.records.drafts import has_draft
@@ -28,7 +28,8 @@ from .ref_types import ModelRefTypes
 if TYPE_CHECKING:
     from flask_babel.speaklater import LazyString
     from flask_principal import Identity
-    from invenio_drafts_resources.records import Record
+    from invenio_db.uow import UnitOfWork
+    from invenio_records_resources.records import Record
     from invenio_requests.customizations.actions import RequestAction
     from invenio_requests.records.api import Request
 

@@ -9,7 +9,7 @@
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Any, ClassVar, cast
+from typing import TYPE_CHECKING, Any, cast
 
 import importlib_metadata
 import marshmallow as ma
@@ -20,6 +20,8 @@ from invenio_requests.resources.requests.config import request_error_handlers
 from oarepo_requests.services.search import ExtendedRequestSearchRequestArgsSchema
 
 if TYPE_CHECKING:
+    from collections.abc import Mapping
+
     from flask_resources import ResponseHandler
 
 
@@ -28,7 +30,7 @@ class OARepoRequestsResourceConfig(RequestsResourceConfig, ConfiguratorMixin):
 
     blueprint_name = "oarepo_requests"
     url_prefix = "/requests"
-    routes: ClassVar[dict[str, str]] = {
+    routes: Mapping[str, str] = {
         **RequestsResourceConfig.routes,
         "list": "/",
         "list-args": "/<topic>/<request_type>",
@@ -37,11 +39,14 @@ class OARepoRequestsResourceConfig(RequestsResourceConfig, ConfiguratorMixin):
 
     request_search_args = ExtendedRequestSearchRequestArgsSchema
 
+    # TODO: using stubs - i think dict[str, ma.fields.Field] would fit better here
+    # "property" is not assignable to "Mapping[str, Any] ?
     @property
-    def request_view_args(self) -> dict[str, ma.fields.Field]:
+    def request_view_args(self) -> Mapping[str, Any]:  # type: ignore[reportIncompatibleVariableOverride]
         """Request view args for the requests API."""
+        # use **
         return cast(
-            "dict[str, ma.fields.Field]", super().request_view_args
+            "dict[str, Any]", super().request_view_args
         ) | {  # TODO: resolve stub has type Mapping but is defined in the superclass as dict
             # ; how this should be typed?
             "topic": ma.fields.String(),
@@ -49,7 +54,7 @@ class OARepoRequestsResourceConfig(RequestsResourceConfig, ConfiguratorMixin):
         }
 
     @property
-    def response_handlers(self) -> dict[str, ResponseHandler]:
+    def response_handlers(self) -> dict[str, ResponseHandler]:  # type: ignore[reportIncompatibleVariableOverride]
         """Response handlers for the extended requests API."""
         return {
             # TODO: UI serialization
@@ -57,7 +62,7 @@ class OARepoRequestsResourceConfig(RequestsResourceConfig, ConfiguratorMixin):
         }
 
     @property
-    def error_handlers(self) -> dict[type[Exception], Any]:
+    def error_handlers(self) -> dict[type[Exception], Any]:  # type: ignore[reportIncompatibleVariableOverride]
         """Get error handlers."""
         entrypoint_error_handlers = cast("dict[type[Exception], Any]", request_error_handlers)  # TODO: import correctly
 

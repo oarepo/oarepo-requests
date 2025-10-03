@@ -12,11 +12,12 @@ from __future__ import annotations
 from typing import TYPE_CHECKING, Any
 
 from invenio_i18n import _
-from invenio_records_resources.services.uow import RecordCommitOp, UnitOfWork
+from invenio_records_resources.services.uow import RecordCommitOp
 from oarepo_runtime.proxies import current_runtime
 
 if TYPE_CHECKING:
     from flask_principal import Identity
+    from invenio_db.uow import UnitOfWork
 
     from .components import RequestActionState
 

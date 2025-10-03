@@ -10,7 +10,7 @@
 from __future__ import annotations
 
 import json
-from typing import TYPE_CHECKING, Any, override
+from typing import TYPE_CHECKING, Any, cast, override
 
 from flask import g
 from flask_resources import (
@@ -22,7 +22,6 @@ from invenio_i18n import lazy_gettext as _
 from invenio_requests.errors import CannotExecuteActionError
 
 if TYPE_CHECKING:
-    from flask_babel.speaklater import LazyString
     from invenio_records_resources.records import Record
     from invenio_requests.customizations import RequestType
 
@@ -33,9 +32,9 @@ class CustomHTTPJSONException(HTTPJSONException):
     def __init__(
         self,
         code: int | None = None,
-        errors: dict[str, Any] | list | None = None,
-        topic_errors: dict[str, Any] | list | None = None,
-        request_payload_errors: dict[str, Any] | list | None = None,
+        errors: list[dict[str, Any]] | None = None,
+        topic_errors: list[dict[str, Any]] | None = None,
+        request_payload_errors: list[dict[str, Any]] | None = None,
         **kwargs: Any,
     ) -> None:
         """Initialize CustomHTTPJSONException."""
@@ -73,17 +72,22 @@ class OpenRequestAlreadyExistsError(CannotExecuteActionError):
         self.request_type = request_type
         self.record = record
 
+    # TODO: how to type these gettext lazystrings things - retype to str
     def __str__(self):
         """Return str representation."""
         return self.description
 
     @property
-    def description(self) -> LazyString:
+    def description(self) -> str:
         """Exception's description."""
-        return gettext("There is already an open request of %(request_type)s on %(record_id)s.") % {
-            "request_type": self.request_type.name,
-            "record_id": self.record.id,
-        }
+        return cast(
+            "str",
+            gettext("There is already an open request of %(request_type)s on %(record_id)s.")
+            % {
+                "request_type": self.request_type.name,
+                "record_id": self.record.id,
+            },
+        )
 
 
 class UnresolvedRequestsError(CannotExecuteActionError):

@@ -15,18 +15,20 @@ from typing import TYPE_CHECKING, override
 from invenio_records_resources.services.records.params import FilterParam, ParamInterpreter
 from invenio_requests.services.requests.params import IsOpenParam
 from invenio_search.engine import dsl
-from opensearch_dsl.query import Bool, Query
 
 if TYPE_CHECKING:
     from flask_principal import Identity
     from invenio_records_resources.services import SearchOptions
+    from invenio_search.api import RecordsSearchV2
 
 
 class RequestOwnerFilterParam(FilterParam):
     """Filter requests by owner."""
 
+    # TODO: I think we can't use mapping as in the stubs because it does not
+    #  support deleteting elements (support for immutability)
     @override
-    def apply(self, identity: Identity, search: Query, params: dict[str, str]) -> Query:
+    def apply(self, identity: Identity, search: RecordsSearchV2, params: dict[str, str]) -> RecordsSearchV2:  # type: ignore[reportIncompatibleMethodOverride]
         """Apply the filter to the search."""
         value = params.pop(self.param_name, None)
         if value is not None:
@@ -48,7 +50,7 @@ class RequestAllAvailableFilterParam(ParamInterpreter):
         return partial(cls, param)
 
     @override
-    def apply(self, identity: Identity, search: Query, params: dict[str, str]) -> Query:
+    def apply(self, identity: Identity, search: RecordsSearchV2, params: dict[str, str]) -> RecordsSearchV2:  # type: ignore[reportIncompatibleMethodOverride]
         """Apply the filter to the search - does nothing."""
         params.pop(self.param_name, None)
         return search
@@ -63,11 +65,11 @@ class RequestNotOwnerFilterParam(FilterParam):
     """
 
     @override
-    def apply(self, identity: Identity, search: Query, params: dict[str, str]) -> Query:
+    def apply(self, identity: Identity, search: RecordsSearchV2, params: dict[str, str]) -> RecordsSearchV2:  # type: ignore[reportIncompatibleMethodOverride]
         """Apply the filter to the search."""
         value = params.pop(self.param_name, None)
         if value is not None:
-            search = search.filter(Bool(must_not=[dsl.Q("term", **{self.field_name: identity.id})]))
+            search = search.filter(dsl.query.Bool(must_not=[dsl.Q("term", **{self.field_name: identity.id})]))
         return search
 
 
@@ -75,7 +77,7 @@ class IsClosedParam(IsOpenParam):
     """Get just the closed requests."""
 
     @override
-    def apply(self, identity: Identity, search: Query, params: dict[str, str]) -> Query:
+    def apply(self, identity: Identity, search: RecordsSearchV2, params: dict[str, str]) -> RecordsSearchV2:  # type: ignore[reportIncompatibleMethodOverride]
         """Evaluate the is_closed parameter on the search."""
         if params.get("is_closed") is True:
             search = search.filter("term", **{self.field_name: True})

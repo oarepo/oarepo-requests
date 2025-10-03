@@ -33,8 +33,8 @@ if TYPE_CHECKING:
     from collections.abc import Generator
 
     from flask_principal import Identity
-    from invenio_drafts_resources.records import Record
     from invenio_rdm_records.services.services import RDMRecordService
+    from invenio_records_resources.records import Record
     from invenio_records_resources.references import RecordResolver
     from oarepo_model.builder import InvenioModelBuilder
     from oarepo_model.model import InvenioModel
@@ -71,6 +71,8 @@ class RecordProxy(InvenioRecordProxy):
 
     def ghost_record(self, value: dict[str, Any]) -> dict[str, Any]:
         """Return a ghost record."""
+        # Try draft with system_identity
+        # TODO: important!!! security implications on sensitive metadata
         return {
             **value,
             "metadata": {
@@ -82,15 +84,17 @@ class RecordProxy(InvenioRecordProxy):
 class WithDeletedServiceResultProxy(InvenioServiceResultProxy):
     """Resolver proxy allowing deleted records."""
 
-    service: RDMRecordService
+    # Override type "RDMRecordService[Unknown]" is not the same as base type "Service[Unknown]"
+    # mypy ok (reportIncompatibleVariableOverride)
+    # mypy ok service: RDMRecordService
 
     @override
     def _resolve(self) -> dict[str, Any]:
+        service = cast("RDMRecordService", self.service)
         id_ = self._parse_ref_dict_id()
+        # TODO: idk why it complains here
         # TODO: Make identity customizable
-        return cast(
-            "dict[str, Any]", self.service.read(system_identity, id_, include_deleted=True).to_dict()
-        )  # TODO: idk why it complains here
+        return service.read(system_identity, id_, include_deleted=True).to_dict()  # type: ignore[no-any-return]
 
 
 class DraftProxy(RecordProxy):
@@ -102,7 +106,9 @@ class DraftProxy(RecordProxy):
         try:
             return self.record_cls.pid.resolve(
                 pid_value, registered_only=False
-            )  # TODO: pid is actually PIDFieldContext
+            )  # TODO: pid is actually PIDFieldContext; - use type: ignore or retype
+            # InvenioRecordProxy stub implies record from records resources is returned;
+            # do we want this as <superclass of record/draft?>
         except (PIDUnregistered, NoResultFound):
             # try checking if it is a published record before failing
             return self.record_cls.pid.resolve(pid_value)

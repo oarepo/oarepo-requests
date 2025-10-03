@@ -28,6 +28,7 @@ if TYPE_CHECKING:
     from flask_principal import Identity
     from invenio_records_resources.records.api import Record
     from invenio_requests.customizations import RequestType
+    from invenio_requests.customizations.actions import RequestAction
 
     from oarepo_requests.actions.components import RequestActionComponent
 
@@ -35,7 +36,7 @@ if TYPE_CHECKING:
 class OARepoRequests:
     """OARepo-Requests extension."""
 
-    def __init__(self, app: Flask = None) -> None:
+    def __init__(self, app: Flask | None = None) -> None:
         """Extension initialization."""
         if app:
             self.init_app(app)
@@ -126,15 +127,23 @@ class OARepoRequests:
         )
         # TODO: event resource
 
-    from invenio_requests.customizations.actions import RequestAction
-
+    # TODO: do we want this configurable by actual actions? - ie. vs the "specific" hardcoded in action code
     def action_components(self, action: RequestAction) -> list[type[RequestActionComponent]]:
         """Return components for the given action."""
-        components = self.app.config["REQUESTS_ACTION_COMPONENTS"]
+        components: (
+            dict[str, list[type[RequestActionComponent]]]
+            | Callable[[RequestAction], list[type[RequestActionComponent]]]
+        ) = self.app.config["REQUESTS_ACTION_COMPONENTS"]
         if callable(components):
-            ret = components(action)
-            return cast("list[type[RequestActionComponent]]", ret)
-        return [obj_or_import_string(component) for component in components[action.status_to]]
+            """
+             Type "object | list[type[RequestActionComponent]]" is not assignable to return type
+             "list[type[RequestActionComponent]]"
+                Type "object | list[type[RequestActionComponent]]" is not assignable to type
+                "list[type[RequestActionComponent]]" "object" is not assignable to "list[type[RequestActionComponent]]"
+            idk why it complains about this, why object | ...
+            """
+            return components(action)  # type: ignore[reportReturnType]
+        return components[action.status_to]
 
     def init_config(self, app: Flask) -> None:
         """Initialize configuration."""

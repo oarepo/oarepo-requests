@@ -9,7 +9,7 @@
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Any
+from typing import TYPE_CHECKING, Any, cast
 
 from invenio_access.permissions import system_identity
 from invenio_i18n import _
@@ -29,6 +29,7 @@ from .generic import (
 if TYPE_CHECKING:
     from flask_principal import Identity
     from invenio_db.uow import UnitOfWork
+    from invenio_drafts_resources.services.records.service import RecordService
     from invenio_requests.customizations import RequestAction
 
     from .components import RequestActionState
@@ -68,7 +69,7 @@ class PublishDraftSubmitAction(PublishMixin, OARepoSubmitAction):
     ) -> None:
         """Publish the draft."""
         if "payload" in self.request and "version" in self.request["payload"]:
-            topic_service = current_runtime.get_record_service_for_record(state.topic)
+            topic_service = cast("RecordService", current_runtime.get_record_service_for_record(state.topic))
             versions = topic_service.search_versions(identity, state.topic.pid.pid_value)
             versions_hits = versions.to_dict()["hits"]["hits"]
             for rec in versions_hits:
@@ -97,7 +98,7 @@ class PublishDraftAcceptAction(PublishMixin, OARepoAcceptAction):
         **kwargs: Any,
     ) -> None:
         """Publish the draft."""
-        topic_service = current_runtime.get_record_service_for_record(state.topic)
+        topic_service = cast("RecordService", current_runtime.get_record_service_for_record(state.topic))
         if not topic_service:
             raise KeyError(f"topic {state.topic} service not found")
         requests = search_requests(system_identity, state.topic)

@@ -11,6 +11,7 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING, Any, override
 
+from invenio_drafts_resources.services.records.service import RecordService
 from oarepo_runtime.proxies import current_runtime
 
 from .components import CreatedTopicComponent
@@ -42,8 +43,11 @@ class EditTopicAcceptAction(OARepoAcceptAction):
         topic_service = current_runtime.get_record_service_for_record(
             state.topic
         )  # TODO: this should be a draft service
+
         if not topic_service:
             raise KeyError(f"topic {state.topic} service not found")
-        created_topic = topic_service.edit(identity, state.topic["id"], uow=uow)  # type: ignore[reportAttributeAccessIssue]
+        if not isinstance(topic_service, RecordService):
+            raise TypeError("Draft service required for editing records.")
+        created_topic = topic_service.edit(identity, state.topic["id"], uow=uow)
         state.created_topic = created_topic._record  # noqa SLF001
         super().apply(identity, state, uow, *args, **kwargs)
