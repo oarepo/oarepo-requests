@@ -32,7 +32,7 @@ from oarepo_workflows.errors import MissingWorkflowError
 from oarepo_workflows.proxies import current_oarepo_workflows
 
 if TYPE_CHECKING:
-    from collections.abc import Callable
+    from collections.abc import Callable, Mapping
 
     from flask_principal import Identity
     from invenio_records_resources.records import Record
@@ -148,7 +148,7 @@ def open_request_exists(topic_or_reference: Record | dict[str, str], type_id: st
     return bool(list(results))
 
 
-def resolve_reference_dict(reference_dict: dict[str, str]) -> Record:
+def resolve_reference_dict(reference_dict: dict[str, str]) -> Any:
     """Resolve the reference dict to the entity (such as Record, User, ...)."""
     return ResolverRegistry.resolve_entity_proxy(reference_dict).resolve()
 
@@ -180,9 +180,10 @@ def get_entity_key_for_record_cls(record_cls: type[Record]) -> str:
     """
     for resolver in ResolverRegistry.get_registered_resolvers():
         if hasattr(resolver, "record_cls") and resolver.record_cls == record_cls:
-            return cast(
-                "str", resolver.type_id
-            )  # TODO: type_id is defined in subclassed Resolvers (ie. UserResolver, <RecordName>Resolver) ...
+            type_id: str | None = getattr(resolver, "type_id", None)
+            if type_id is None:
+                raise ValueError(f"Entity resolver {type(resolver)} does not have an associated type_id")
+            return type_id
     raise AttributeError(f"Record class {record_cls} does not have a registered entity resolver.")
 
 
@@ -220,10 +221,9 @@ def ref_to_str(ref_dict: dict[str, str]) -> str:
     return f"{next(iter(ref_dict.keys()))}:{next(iter(ref_dict.values()))}"
 
 
-# TODO: consider moving to oarepo-workflows
 def get_receiver_for_request_type(
     request_type: RequestType, identity: Identity, topic: Record
-) -> dict[str, str] | None:
+) -> Mapping[str, str] | None:
     """Get the default receiver for the request type, identity and topic.
 
     This call gets the workflow from the topic, looks up the request inside the workflow
@@ -248,13 +248,9 @@ def get_receiver_for_request_type(
     except KeyError:
         return None
 
-    receivers = workflow_request.recipient_entity_reference(
+    return workflow_request.recipient_entity_reference(  # type: ignore[no-any-return]
         identity=identity, record=topic, request_type=request_type, creator=identity
     )
-    if not receivers:
-        return None
-
-    return cast("dict[str, str]", receivers)  # TODO: idk why it complains here
 
 
 # TODO: consider moving to oarepo-workflows

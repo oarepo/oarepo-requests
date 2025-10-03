@@ -9,7 +9,7 @@
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Any
+from typing import TYPE_CHECKING, Any, cast
 
 from oarepo_runtime.proxies import current_runtime
 
@@ -19,6 +19,7 @@ from .generic import OARepoAcceptAction
 if TYPE_CHECKING:
     from flask_principal import Identity
     from invenio_db.uow import UnitOfWork
+    from invenio_drafts_resources.services.records.service import RecordService
 
     from .components import RequestActionState
 
@@ -38,7 +39,8 @@ class NewVersionAcceptAction(OARepoAcceptAction):
         **kwargs: Any,
     ) -> None:
         """Apply the action, creating a new version of the record."""
-        topic_service = current_runtime.get_record_service_for_record(state.topic)
+        # TODO: due to draft methods; do this more .. systematically?
+        topic_service = cast("RecordService", current_runtime.get_record_service_for_record(state.topic))
         if not topic_service:
             raise KeyError(f"topic {state.topic} service not found")
 

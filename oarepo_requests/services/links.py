@@ -44,8 +44,10 @@ class RefEndpointLink(EndpointLink):
         self._ref_querystring = ref_querystring
 
     @override
-    def expand(self, obj: Any, context: dict[str, Any]) -> str:  # TODO: obj should be smth like 'referencable entity'?
+    def expand(self, obj: Any, context: dict[str, Any]) -> str:
         """Expand the endpoint."""
         ret = super().expand(obj, context)
         topic_ref = ResolverRegistry.reference_entity(obj)
+        if topic_ref is None:
+            raise ValueError(f"Can't create link with unresolvable entity {obj}")
         return f"{ret}?{self._ref_querystring}={next(iter(topic_ref.keys()))}:{next(iter(topic_ref.values()))}"

@@ -12,7 +12,7 @@ from __future__ import annotations
 from typing import TYPE_CHECKING, Any, override
 
 from invenio_records_permissions.generators import Generator
-from opensearch_dsl.query import Query
+from invenio_search.engine import dsl
 
 from oarepo_requests.services.permissions.identity import request_active
 
@@ -33,6 +33,6 @@ class RequestActive(Generator):
         return [request_active]
 
     @override
-    def query_filter(self, **context: Any) -> Query:
+    def query_filter(self, **context: Any) -> dsl.query.Query:
         """Return the query filter for the action."""
-        return Query("match_none")
+        return dsl.Q("match_none")

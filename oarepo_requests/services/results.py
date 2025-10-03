@@ -15,6 +15,7 @@ from invenio_pidstore.errors import PIDDeletedError
 from invenio_rdm_records.services.services import RDMRecordService
 from invenio_records_permissions.api import permission_filter
 from invenio_records_resources.records import Record
+from invenio_records_resources.services.records.schema import ServiceSchemaWrapper
 from invenio_requests.services.results import EntityResolverExpandableField
 from invenio_search import current_search_client
 from invenio_search.engine import dsl
@@ -37,7 +38,6 @@ if TYPE_CHECKING:
     from invenio_records_resources.services.records.service import RecordService
     from invenio_requests.customizations import RequestType
     from invenio_search import RecordsSearchV2
-    from marshmallow import Schema
     from opensearch_dsl.response import Response
 
 
@@ -70,7 +70,7 @@ class ReadManyDraftsService(RDMRecordService):
         search_opts: type[SearchOptions],
         permission_action: str = "read",
         preference: str | None = None,
-        extra_filter: dsl.query.Query = None,
+        extra_filter: dsl.query.Query | None = None,
         versioning: bool = True,
     ) -> RecordsSearchV2:
         """Instantiate a search class."""
@@ -116,7 +116,7 @@ class ReadManyDraftsService(RDMRecordService):
         max_records: int = 150,
         record_cls: type[Record] | None = None,
         search_opts: type[SearchOptions] | None = None,
-        extra_filter: dsl.query.Query = None,
+        extra_filter: dsl.query.Query | None = None,
         preference: str | None = None,
         sort: str | None = None,  # TODO: ?
         **kwargs: Any,
@@ -216,7 +216,7 @@ class StringDraftAwareEntityResolverExpandableField(DraftAwareEntityResolverExpa
 class RequestTypesListDict(dict):
     """List of request types dictionary with additional topic."""
 
-    topic = None
+    topic: Record | None = None
 
 
 class RequestTypesList(RecordList):
@@ -226,13 +226,13 @@ class RequestTypesList(RecordList):
         self,
         *args: Any,
         record: Record | None = None,
-        schema: Schema | None = None,
+        schema: ServiceSchemaWrapper | None = None,
         **kwargs: Any,
     ) -> None:
         """Initialize the list of request types."""
         self._record = record
         super().__init__(*args, **kwargs)
-        self._schema = schema or RequestTypeSchema
+        self._schema = schema or ServiceSchemaWrapper(self._service, RequestTypeSchema)
 
     def to_dict(self) -> dict:
         """Return result as a dictionary."""
@@ -255,9 +255,10 @@ class RequestTypesList(RecordList):
             # Project the record
             tok_identity = request_type_identity_ctx.set(self._identity)
             tok_record = request_type_record_ctx.set(self._record)
-
             try:
-                projection = self._schema().dump(hit)
+                # identity in context is hardcoded in ServiceSchemaWrapper
+                # which we have to use if we want to subclass RecordList
+                projection = self._schema.dump(hit, context={"identity": self._identity})
             finally:
                 # Reset contextvars to previous values to avoid leaking state
                 request_type_identity_ctx.reset(tok_identity)
@@ -275,7 +276,7 @@ class RequestTypesList(RecordList):
 
 def serialize_request_types(
     request_types: dict[str, RequestType], identity: Identity, record: Record
-) -> list[RequestTypeSchema]:
+) -> list[dict[str, Any]]:
     """Serialize request types.
 
     :param request_types: Request types to serialize.

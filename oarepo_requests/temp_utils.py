@@ -13,8 +13,9 @@ from __future__ import annotations
 from typing import TYPE_CHECKING, cast
 
 from invenio_drafts_resources.records.api import Record
-from invenio_requests.proxies import current_requests_service
 from invenio_requests.resolvers.registry import ResolverRegistry
+
+from oarepo_requests.proxies import current_requests_service
 
 if TYPE_CHECKING:
     from flask_principal import Identity
@@ -32,5 +33,4 @@ def search_requests(identity: Identity, record: Record | dict[str, str], expand:
 def applicable_requests(identity: Identity, record: Record | dict[str, str]) -> RequestTypesList:
     """Get applicable request types for a record."""
     topic_ref = ResolverRegistry.reference_entity(record) if isinstance(record, Record) else record
-    # TODO: we are using oarepo requests service as the invenio one in the proxy
-    return current_requests_service.applicable_request_types(identity, topic=topic_ref)  # type: ignore[no-any-return]
+    return current_requests_service.applicable_request_types(identity, topic=topic_ref)

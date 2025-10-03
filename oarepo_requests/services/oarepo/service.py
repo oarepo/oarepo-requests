@@ -9,7 +9,7 @@
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Any
+from typing import TYPE_CHECKING, Any, cast, override
 
 from invenio_drafts_resources.records.api import Record
 from invenio_i18n import _
@@ -18,7 +18,7 @@ from invenio_records_resources.services.base.links import EndpointLink
 from invenio_records_resources.services.uow import IndexRefreshOp, unit_of_work
 from invenio_requests import current_request_type_registry
 from invenio_requests.services import RequestsService
-from invenio_requests.services.results import EntityResolverExpandableField
+from invenio_requests.services.results import EntityResolverExpandableField, MultiEntityResolverExpandableField
 
 from oarepo_requests.errors import CustomHTTPJSONException, UnknownRequestTypeError
 from oarepo_requests.proxies import current_oarepo_requests
@@ -44,7 +44,7 @@ class OARepoRequestsService(RequestsService):
     """OARepo extension to invenio-requests service."""
 
     @property
-    def expandable_fields(self) -> list[EntityResolverExpandableField]:
+    def expandable_fields(self) -> list[EntityResolverExpandableField | MultiEntityResolverExpandableField]:
         """Get expandable fields."""
         return [
             EntityResolverExpandableField("created_by"),
@@ -54,20 +54,21 @@ class OARepoRequestsService(RequestsService):
         ]
 
     @unit_of_work()
-    def create(  # noqa: PLR0913
+    @override
+    def create(
         self,
         identity: Identity,
-        data: dict | None,
+        data: dict[str, Any] | None,
         request_type: str,
         receiver: dict[str, str] | Any | None = None,
         creator: dict[str, str] | Any | None = None,
-        topic: Record = None,
-        expires_at: datetime | None = None,  # noqa ARG002
-        uow: UnitOfWork = None,
+        topic: Record | None = None,
+        expires_at: datetime | None = None,
+        uow: UnitOfWork | None = None,
         expand: bool = False,
-        *args: Any,  # noqa ARG002
-        **kwargs: Any,  # noqa ARG002
-    ) -> RequestItem:
+        *args: Any,
+        **kwargs: Any,
+    ) -> RequestItem | None:
         """Create a request.
 
         :param identity: Identity of the user creating the request.
@@ -82,6 +83,9 @@ class OARepoRequestsService(RequestsService):
         :param args: Additional arguments.
         :param kwargs: Additional keyword arguments.
         """
+        # TODO: invenio signature issue; check for none record explicitly
+        if topic is None:
+            raise ValueError("")
         type_ = current_request_type_registry.lookup(request_type, quiet=True)
         if not type_:
             raise UnknownRequestTypeError(request_type)
@@ -93,7 +97,8 @@ class OARepoRequestsService(RequestsService):
             )
         if "payload" not in data and type_.payload_schema:
             data["payload"] = {}
-        schema = self._wrap_schema(type_.marshmallow_schema())
+        # TODO: missing in stubs
+        schema = self._wrap_schema(type_.marshmallow_schema())  # type: ignore[reportAttributeAccessIssue]
         data, errors = schema.load(
             data,
             context={"identity": identity},
@@ -111,21 +116,22 @@ class OARepoRequestsService(RequestsService):
         if not error:
             result = super().create(
                 identity=identity,
-                data=data,
+                data=data,  # type: ignore[reportArgumentType]
                 request_type=type_,
-                receiver=receiver,
+                receiver=receiver,  # type: ignore[reportArgumentType]
                 creator=creator,
                 topic=topic,
                 expand=expand,
                 uow=uow,
             )
-            uow.register(IndexRefreshOp(indexer=self.indexer, index=self.record_cls.index))
-            return result
+            # TODO: should be resolved by dummy uow?
+            uow.register(IndexRefreshOp(indexer=self.indexer, index=self.record_cls.index))  # type: ignore[union-attr, reportArgumentType]
+            return cast("RequestItem", result)  # TODO: prob should return RequestItem in stub?
         return None
 
     def applicable_request_types(self, identity: Identity, topic: Record | dict[str, str]) -> RequestTypesList:
         """Get applicable request types for a record."""
-        topic = resolve_reference_dict(topic) if not isinstance(topic, Record) else topic
+        topic = cast("Record", resolve_reference_dict(topic)) if not isinstance(topic, Record) else topic
 
         allowed_request_types = allowed_request_types_for_record(identity, topic)
         return RequestTypesList(

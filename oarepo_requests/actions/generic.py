@@ -108,10 +108,12 @@ class OARepoGenericActionMixin(RequestAction):
             topic = None
 
         # create a shared state between different actions to track changes in topic/requests etc.
+        # TODO: decide whether topic in RequestActionState can be None
+        # TODO: unify draft and published reference, scrap state
         state: RequestActionState = RequestActionState(
             request=request,
             request_type=request_type,
-            topic=topic,
+            topic=topic,  # type: ignore[reportArgumentType]
             created_by=request.created_by,
             action=self,
         )
@@ -124,29 +126,6 @@ class OARepoGenericActionMixin(RequestAction):
         finally:
             # in case we are not running the actions in isolated state
             identity.provides.remove(request_active)
-
-
-"""
-class CreatedTopicMixin:
-
-    def apply(
-        self,
-        identity: Identity,
-        state: RequestActionState,
-        uow: UnitOfWork,
-        *args: Any,
-        **kwargs: Any,
-    ) -> Record:
-        super().apply(identity, state, uow, *args, **kwargs)
-        if not state.created_topic:
-            return state.topic
-        entity_ref = reference_entity(state.created_topic)
-        request: Request = self.request
-        if "payload" not in request:
-            request["payload"] = {}
-        request["payload"]["created_topic"] = ref_to_str(entity_ref)
-        return state.topic
-"""
 
 
 class OARepoSubmitAction(OARepoGenericActionMixin, actions.SubmitAction):
@@ -172,5 +151,6 @@ class OARepoCancelAction(OARepoGenericActionMixin, actions.CancelAction):
 
     name = _("Cancel")
 
-    status_from = ("created", "submitted")
+    # TODO: this is defined as list in invenio
+    status_from = ("created", "submitted")  # type: ignore[reportAssignmentType]
     status_to = "cancelled"

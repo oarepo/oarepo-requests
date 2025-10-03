@@ -31,9 +31,11 @@ from .generic import NonDuplicableOARepoRequestType
 from .ref_types import ModelRefTypes
 
 if TYPE_CHECKING:
+    from collections.abc import Mapping
+
     from flask_babel.speaklater import LazyString
     from flask_principal import Identity
-    from invenio_drafts_resources.records import Record
+    from invenio_records_resources.records import Record
     from invenio_requests.customizations.actions import RequestAction
     from invenio_requests.records.api import Request
 
@@ -44,9 +46,9 @@ class DeletePublishedRecordRequestType(NonDuplicableOARepoRequestType):
     """Request type for requesting deletion of a published record."""
 
     type_id = "delete_published_record"
-    name = _("Delete record")
+    name = _("Delete record")  # type: ignore[reportAssignmentType]
 
-    payload_schema: ClassVar[dict[str, ma.fields.Field]] = {
+    payload_schema: Mapping[str, ma.fields.Field] | None = {
         "removal_reason": ma.fields.Str(required=True),
         "note": ma.fields.Str(),
     }
