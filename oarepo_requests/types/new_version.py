@@ -44,6 +44,8 @@ class NewVersionRequestType(NonDuplicableOARepoRequestType):
         "keep_files": ma.fields.String(validate=OneOf(["yes", "no"])),
     }
 
+    allowed_on_draft = False
+
     @classproperty
     @override
     def available_actions(cls) -> dict[str, type[RequestAction]]:  # noqa N805
@@ -54,7 +56,7 @@ class NewVersionRequestType(NonDuplicableOARepoRequestType):
         }
 
     description = _("Request requesting creation of new version of a published record.")
-    allowed_topic_ref_types = ModelRefTypes(published=True, draft=True)
+    allowed_topic_ref_types = ModelRefTypes(published=True, draft=True) # TODO: new version makes no sense on drafts?
     editable = False
 
     form: ClassVar[JsonValue] = {

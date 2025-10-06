@@ -39,20 +39,15 @@ class RequestsFinalizeAppPreset(Preset):
         dependencies: dict[str, Any],
     ) -> Generator[Customization]:
         def finalize_app(app: Flask) -> None:
+            # TODO: ask about depends on
             runtime_deps = builder.get_runtime_dependencies()
             service_id = builder.model.base_name
-            type_key_published = service_id
-            type_key_draft = f"{service_id}_draft"
             REQUESTS_ENTITY_RESOLVERS = [
                 runtime_deps.get("RecordResolver")(
                     record_cls=runtime_deps.get("Record"),
+                    draft_cls=runtime_deps.get("Draft"),
                     service_id=service_id,
-                    type_key=type_key_published,
-                ),
-                runtime_deps.get("DraftResolver")(
-                    record_cls=runtime_deps.get("Draft"),
-                    service_id=service_id,
-                    type_key=type_key_draft,
+                    type_key=service_id,
                 ),
             ]
             requests = app.extensions["invenio-requests"]

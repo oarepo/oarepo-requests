@@ -42,12 +42,10 @@ class EditTopicAcceptAction(OARepoAcceptAction):
         """Apply the action, creating a draft of the record for editing metadata."""
         topic_service = current_runtime.get_record_service_for_record(
             state.topic
-        )  # TODO: this should be a draft service
-
+        )
         if not topic_service:
             raise KeyError(f"topic {state.topic} service not found")
         if not isinstance(topic_service, RecordService):
             raise TypeError("Draft service required for editing records.")
-        created_topic = topic_service.edit(identity, state.topic["id"], uow=uow)
-        state.created_topic = created_topic._record  # noqa SLF001
+        topic_service.edit(identity, state.topic["id"], uow=uow)
         super().apply(identity, state, uow, *args, **kwargs)

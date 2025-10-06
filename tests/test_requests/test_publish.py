@@ -45,9 +45,7 @@ def test_publish_service(
     assert "payload" not in submit_result.data["expanded"]
 
     accept = current_requests_service.execute_action(receiver.identity, request.id, "accept", expand=True)
-    # TODO: read_many used in expandable fields requires refreshed indices to work correctly
-    # the current implementation requires to call resolve() to differentiate between published and draft, making
-    # the optimization quite ineffective?
+    # TODO: the links show because topic now points to published record; created topic_topic is the same - seems relevant only with new_version
     requests_model.Record.index.refresh()
     requests_model.Draft.index.refresh()
     assert "self" in accept.data["expanded"]["created_by"]["links"]

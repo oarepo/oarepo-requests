@@ -25,7 +25,7 @@ from oarepo_requests.proxies import current_oarepo_requests
 from oarepo_requests.services.results import (
     DraftAwareEntityResolverExpandableField,
     RequestTypesList,
-    StringDraftAwareEntityResolverExpandableField,
+    StringEntityResolverExpandableField,
 )
 from oarepo_requests.utils import (
     allowed_request_types_for_record,
@@ -47,10 +47,8 @@ class OARepoRequestsService(RequestsService):
     def expandable_fields(self) -> list[EntityResolverExpandableField | MultiEntityResolverExpandableField]:
         """Get expandable fields."""
         return [
-            EntityResolverExpandableField("created_by"),
-            EntityResolverExpandableField("receiver"),
-            DraftAwareEntityResolverExpandableField("topic"),
-            StringDraftAwareEntityResolverExpandableField("payload.created_topic"),
+            *super().expandable_fields,
+            StringEntityResolverExpandableField("payload.created_topic"),
         ]
 
     @unit_of_work()

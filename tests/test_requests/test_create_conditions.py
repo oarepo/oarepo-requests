@@ -31,11 +31,11 @@ def test_can_create(
     draft2_id = draft2["id"]
 
     resp_request_create = creator_client.post(
-        f"{urls['BASE_URL_REQUESTS']}requests_test_draft:{draft1_id}/publish_draft"
+        f"{urls['BASE_URL_REQUESTS']}requests_test:{draft1_id}/publish_draft"
     ).json
 
     resp = creator_client.post(  # create request after create
-        f"{urls['BASE_URL_REQUESTS']}requests_test_draft:{draft1_id}/publish_draft"
+        f"{urls['BASE_URL_REQUESTS']}requests_test:{draft1_id}/publish_draft"
     )
     assert resp.status_code == 400
     assert "There is already an open request of Publish draft" in resp.json["message"]
@@ -45,14 +45,14 @@ def test_can_create(
     )
 
     resp = creator_client.post(  # create request after submit
-        f"{urls['BASE_URL_REQUESTS']}requests_test_draft:{draft1_id}/publish_draft"
+        f"{urls['BASE_URL_REQUESTS']}requests_test:{draft1_id}/publish_draft"
     )
     assert resp.status_code == 400
     assert "There is already an open request of Publish draft" in resp.json["message"]
 
     # should still be creatable for draft2
     create_for_request_draft2 = creator_client.post(
-        f"{urls['BASE_URL_REQUESTS']}requests_test_draft:{draft2_id}/publish_draft"
+        f"{urls['BASE_URL_REQUESTS']}requests_test:{draft2_id}/publish_draft"
     )
     assert create_for_request_draft2.status_code == 201
 
@@ -62,7 +62,7 @@ def test_can_create(
     )
 
     create_for_request_draft2 = creator_client.post(
-        f"{urls['BASE_URL_REQUESTS']}requests_test_draft:{draft2_id}/publish_draft"
+        f"{urls['BASE_URL_REQUESTS']}requests_test:{draft2_id}/publish_draft"
     )
     assert create_for_request_draft2.status_code == 400
     assert "There is already an open request of Publish draft" in create_for_request_draft2.json["message"]
@@ -73,7 +73,7 @@ def test_can_create(
     )
 
     resp_request_create_again = creator_client.post(
-        f"{urls['BASE_URL_REQUESTS']}requests_test_draft:{draft2_id}/publish_draft"
+        f"{urls['BASE_URL_REQUESTS']}requests_test:{draft2_id}/publish_draft"
     )
     assert resp_request_create_again.status_code == 201
 

@@ -25,8 +25,6 @@ if TYPE_CHECKING:
 class RequestOwnerFilterParam(FilterParam):
     """Filter requests by owner."""
 
-    # TODO: I think we can't use mapping as in the stubs because it does not
-    #  support deleteting elements (support for immutability)
     @override
     def apply(self, identity: Identity, search: RecordsSearchV2, params: dict[str, str]) -> RecordsSearchV2:  # type: ignore[reportIncompatibleMethodOverride]
         """Apply the filter to the search."""

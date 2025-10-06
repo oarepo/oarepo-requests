@@ -122,7 +122,7 @@ class OARepoRequests:
         """Init resources."""
         # TODO: import invenio
         self.requests_resource = OARepoRequestsResource(
-            service=config.INVENIO_REQUESTS_SERVICE_CLASS(config.INVENIO_REQUESTS_SERVICE_CONFIG_CLASS.build(app)),
+            service=config.REQUESTS_SERVICE_CLASS(config.REQUESTS_SERVICE_CONFIG_CLASS.build(app)),
             config=OARepoRequestsResourceConfig.build(app),
         )
         # TODO: event resource
@@ -150,7 +150,8 @@ class OARepoRequests:
         from . import config
 
         app.config.setdefault("OAREPO_REQUESTS_DEFAULT_RECEIVER", None)
-        app.config.setdefault("INVENIO_REQUESTS_SERVICE_CLASS", config.INVENIO_REQUESTS_SERVICE_CLASS)
+        app.config.setdefault("REQUESTS_SERVICE_CLASS", config.REQUESTS_SERVICE_CLASS)
+        app.config.setdefault("REQUESTS_SERVICE_CONFIG_CLASS", config.REQUESTS_SERVICE_CONFIG_CLASS)
         app.config.setdefault("REQUESTS_ALLOWED_RECEIVERS", []).extend(config.REQUESTS_ALLOWED_RECEIVERS)
         app.config.setdefault("REQUESTS_UI_SERIALIZATION_REFERENCED_FIELDS", []).extend(
             config.REQUESTS_UI_SERIALIZATION_REFERENCED_FIELDS

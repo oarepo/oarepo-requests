@@ -97,5 +97,5 @@ NOTIFICATIONS_BACKENDS = {
     EmailNotificationBackend.id: EmailNotificationBackend(),
 }
 
-INVENIO_REQUESTS_SERVICE_CLASS = OARepoRequestsService
-INVENIO_REQUESTS_SERVICE_CONFIG_CLASS = OARepoRequestsServiceConfig
+REQUESTS_SERVICE_CLASS = OARepoRequestsService
+REQUESTS_SERVICE_CONFIG_CLASS = OARepoRequestsServiceConfig
