@@ -20,6 +20,8 @@ from oarepo_workflows.requests.events import WorkflowEvent
 
 from oarepo_requests.actions.components import (
     AutoAcceptComponent,
+    CreatedTopicComponent,
+    RequestActionComponent,
     WorkflowTransitionComponent,
 )
 from oarepo_requests.services.oarepo.config import OARepoRequestsServiceConfig
@@ -63,28 +65,11 @@ DEFAULT_WORKFLOW_EVENTS = {
 
 REQUESTS_UI_SERIALIZATION_REFERENCED_FIELDS = ["created_by", "receiver", "topic"]
 
-workflow_action_components = [WorkflowTransitionComponent]
-
-REQUESTS_ACTION_COMPONENTS = {
-    "accepted": [
-        *workflow_action_components,
-    ],
-    "submitted": [
-        # AutoAcceptComponent must always be first, so that auto accept is called as the last
-        # step in action handling
-        AutoAcceptComponent,
-        *workflow_action_components,
-    ],
-    "declined": [
-        *workflow_action_components,
-    ],
-    "cancelled": [
-        *workflow_action_components,
-    ],
-    "expired": [
-        *workflow_action_components,
-    ],
-}
+REQUESTS_ACTION_COMPONENTS: tuple[type[RequestActionComponent], ...] = (
+    AutoAcceptComponent,
+    CreatedTopicComponent,
+    WorkflowTransitionComponent,
+)
 
 # TODO: notifications config
 

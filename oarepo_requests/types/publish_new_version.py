@@ -15,7 +15,6 @@ import marshmallow as ma
 from invenio_i18n import gettext
 from invenio_i18n import lazy_gettext as _
 from invenio_requests.records.api import Request
-from oarepo_runtime.proxies import current_runtime
 
 from oarepo_requests.actions.publish_draft import (
     PublishDraftDeclineAction,
@@ -24,14 +23,17 @@ from oarepo_requests.actions.publish_draft import (
 from oarepo_requests.errors import VersionAlreadyExists
 
 from ..actions.publish_new_version import PublishNewVersionAcceptAction
+from ..temp_utils import get_draft_record_service
 from ..utils import classproperty
 from .publish_base import PublishRequestType
 from .ref_types import ModelRefTypes
 
 if TYPE_CHECKING:
+    from collections.abc import Mapping
+
     from flask_babel.speaklater import LazyString
     from flask_principal import Identity
-    from invenio_drafts_resources.records import Record
+    from invenio_records_resources.records import Record
     from invenio_requests.customizations.actions import RequestAction
     from invenio_requests.records.api import Request
 
@@ -44,8 +46,7 @@ class PublishNewVersionRequestType(PublishRequestType):
     type_id = "publish_new_version"
     name = _("Publish new version")
 
-    payload_schema: ClassVar[dict[str, ma.fields.Field]] = {
-        **PublishRequestType.payload_schema,
+    payload_schema: Mapping[str, ma.fields.Field] | None = {
         "version": ma.fields.Str(),
     }
 
@@ -163,7 +164,7 @@ class PublishNewVersionRequestType(PublishRequestType):
         **kwargs: Any,
     ) -> None:
         """Check if the request can be created."""
-        topic_service = current_runtime.get_record_service_for_record(topic)
+        topic_service = get_draft_record_service(topic)
         # Only needed in case of new version as when you are publishing
         # draft for the first time, there are no previous versions with
         # which you can have collision

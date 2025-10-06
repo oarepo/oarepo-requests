@@ -7,8 +7,6 @@
 #
 from __future__ import annotations
 
-from invenio_access.permissions import system_identity
-
 
 def test_resolve_topic(
     db,
@@ -59,7 +57,6 @@ def test_resolve_topic(
         },
     }
 
-    # TODO
     receiver_read = receiver_client.get(f"{urls['BASE_URL_REQUESTS']}{resp_request_submit['id']}")
     receiver_client.post(link2testclient(receiver_read.json["links"]["actions"]["accept"]))
     requests_model.Record.index.refresh()
@@ -77,7 +74,7 @@ def test_resolve_topic(
     assert resp_expanded.status_code == 200
     assert resp_expanded.json["topic"] == {"requests_test": record1_id}
     assert resp_expanded.json["expanded"]["topic"] == {
-        "id": record1_id ,  # TODO: ask - should id be shown?
+        "id": record1_id,  # TODO: ask - should id be shown?
         "links": {},
         "metadata": {"title": "Deleted record"},
     }

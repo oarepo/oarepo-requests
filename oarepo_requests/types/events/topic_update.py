@@ -9,7 +9,7 @@
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, ClassVar
 
 from invenio_requests.customizations.event_types import EventType
 from marshmallow import fields
@@ -17,7 +17,7 @@ from marshmallow import fields
 from oarepo_requests.types.events.validation import _serialized_topic_validator
 
 if TYPE_CHECKING:
-    from typing import ClassVar
+    from collections.abc import Callable, Mapping
 
     import marshmallow as ma
 
@@ -27,7 +27,7 @@ class TopicUpdateEventType(EventType):
 
     type_id = "T"
 
-    payload_schema: ClassVar[dict[str, ma.fields.Field]] = {
+    payload_schema: ClassVar[Mapping[str, ma.fields.Field] | Callable[[], Mapping[str, fields.Field]] | None] = {  # type: ignore[reportIncompatibleVariableOverride]
         "old_topic": fields.Str(validate=[_serialized_topic_validator]),
         "new_topic": fields.Str(validate=[_serialized_topic_validator]),
     }

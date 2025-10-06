@@ -59,6 +59,7 @@ class RequestActionState:
 class OARepoGenericActionMixin(RequestAction):
     """Mixin for all oarepo actions."""
 
+    type_id: str
     name: str
 
     @classmethod
@@ -85,9 +86,7 @@ class OARepoGenericActionMixin(RequestAction):
     @cached_property
     def components(self) -> list[RequestActionComponent]:
         """Return a list of components for this action."""
-        glbs = [component_cls() for component_cls in current_oarepo_requests.action_components(self)]
-        specific = [component_cls() for component_cls in self.action_components]
-        return glbs + specific
+        return [component_cls() for component_cls in current_oarepo_requests.action_components()]
 
     def execute_with_components(
         self, identity: Identity, state: RequestActionState, uow: UnitOfWork, *args: Any, **kwargs: Any
@@ -95,8 +94,13 @@ class OARepoGenericActionMixin(RequestAction):
         """Execute the action with components."""
         self.apply(identity, state, uow, *args, **kwargs)
         super().execute(identity, uow, *args, **kwargs)
-        for component in self.components:
-            component.apply(identity, state, uow, *args, **kwargs)
+        if isinstance(state.action, OARepoGenericActionMixin):
+            for component in self.components:
+                if hasattr(component, state.action.type_id):
+                    # Done like this to avoid breaking API changes.
+                    # uow should eventually be passed directly to the component
+                    # so service/component method signature matches.
+                    getattr(component, state.action.type_id)(identity, state, uow, *args, **kwargs)
 
     def execute(self, identity: Identity, uow: UnitOfWork, *args: Any, **kwargs: Any) -> None:
         """Execute the action."""
@@ -131,24 +135,28 @@ class OARepoGenericActionMixin(RequestAction):
 class OARepoSubmitAction(OARepoGenericActionMixin, actions.SubmitAction):
     """Submit action extended for oarepo requests."""
 
+    type_id = "submit"
     name = _("Submit")
 
 
 class OARepoDeclineAction(OARepoGenericActionMixin, actions.DeclineAction):
     """Decline action extended for oarepo requests."""
 
+    type_id = "decline"
     name = _("Decline")
 
 
 class OARepoAcceptAction(OARepoGenericActionMixin, actions.AcceptAction):
     """Accept action extended for oarepo requests."""
 
+    type_id = "accept"
     name = _("Accept")
 
 
 class OARepoCancelAction(OARepoGenericActionMixin, actions.CancelAction):
     """Cancel action extended for oarepo requests."""
 
+    type_id = "cancel"
     name = _("Cancel")
 
     # TODO: this is defined as list in invenio

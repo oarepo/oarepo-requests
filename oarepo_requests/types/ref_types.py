@@ -11,10 +11,12 @@ from __future__ import annotations
 
 from typing import Self
 
+from invenio_communities.communities.entity_resolvers import CommunityResolver
 from invenio_records_resources.references import RecordResolver
 from invenio_requests.proxies import current_requests
-from invenio_communities.communities.entity_resolvers import CommunityResolver
+
 from oarepo_requests.proxies import current_oarepo_requests
+
 
 # TODO: we have to develop different method to allow only published_records/drafts; type_key loses discriminative value
 class ModelRefTypes:
@@ -30,9 +32,14 @@ class ModelRefTypes:
 
     def __get__(self, obj: Self, owner: type[Self]) -> list[str]:
         """Property getter, returns the list of allowed reference types."""
-        ret = []
-        for resolver in current_requests.entity_resolvers_registry:
-            if not isinstance(resolver, RecordResolver) or isinstance(resolver, CommunityResolver): # TODO: CommunityResolver technically is a RecordResolver
+        ret: list[str] = []
+        resolvers = current_requests.entity_resolvers_registry
+        if resolvers is None:
+            return ret
+        for resolver in resolvers:
+            if not isinstance(resolver, RecordResolver) or isinstance(
+                resolver, CommunityResolver
+            ):  # TODO: CommunityResolver technically is a RecordResolver
                 continue
             ret.append(resolver.type_key)
             """

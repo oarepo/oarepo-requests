@@ -18,12 +18,10 @@ from invenio_records_resources.services.base.links import EndpointLink
 from invenio_records_resources.services.uow import IndexRefreshOp, unit_of_work
 from invenio_requests import current_request_type_registry
 from invenio_requests.services import RequestsService
-from invenio_requests.services.results import EntityResolverExpandableField, MultiEntityResolverExpandableField
 
 from oarepo_requests.errors import CustomHTTPJSONException, UnknownRequestTypeError
 from oarepo_requests.proxies import current_oarepo_requests
 from oarepo_requests.services.results import (
-    DraftAwareEntityResolverExpandableField,
     RequestTypesList,
     StringEntityResolverExpandableField,
 )
@@ -38,6 +36,7 @@ if TYPE_CHECKING:
     from flask_principal import Identity
     from invenio_db.uow import UnitOfWork
     from invenio_requests.services.requests.results import RequestItem
+    from invenio_requests.services.results import EntityResolverExpandableField, MultiEntityResolverExpandableField
 
 
 class OARepoRequestsService(RequestsService):
@@ -58,13 +57,13 @@ class OARepoRequestsService(RequestsService):
         identity: Identity,
         data: dict[str, Any] | None,
         request_type: str,
+        *args: Any,
         receiver: dict[str, str] | Any | None = None,
         creator: dict[str, str] | Any | None = None,
         topic: Record | None = None,
         expires_at: datetime | None = None,
-        uow: UnitOfWork | None = None,
+        uow: UnitOfWork,
         expand: bool = False,
-        *args: Any,
         **kwargs: Any,
     ) -> RequestItem | None:
         """Create a request.

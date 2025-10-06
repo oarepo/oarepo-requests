@@ -12,10 +12,9 @@ from __future__ import annotations
 from typing import TYPE_CHECKING, Any, ClassVar, override
 
 import marshmallow as ma
+from invenio_drafts_resources.records import Record as RecordWithDraft
 from invenio_i18n import gettext
 from invenio_i18n import lazy_gettext as _
-from invenio_records_resources.services.uow import RecordCommitOp, UnitOfWork
-from invenio_requests.proxies import current_requests_service
 from marshmallow.validate import OneOf
 from oarepo_runtime.records.drafts import has_draft
 
@@ -25,9 +24,11 @@ from .generic import NonDuplicableOARepoRequestType
 from .ref_types import ModelRefTypes
 
 if TYPE_CHECKING:
+    from collections.abc import Mapping
+
     from flask_babel.speaklater import LazyString
     from flask_principal import Identity
-    from invenio_drafts_resources.records import Record
+    from invenio_records_resources.records import Record
     from invenio_requests.customizations.actions import RequestAction
     from invenio_requests.records.api import Request
 
@@ -39,7 +40,7 @@ class NewVersionRequestType(NonDuplicableOARepoRequestType):
 
     type_id = "new_version"
     name = _("New Version")
-    payload_schema: ClassVar[dict[str, ma.fields.Field]] = {
+    payload_schema: Mapping[str, ma.fields.Field] | None = {
         "created_topic": ma.fields.Str(),
         "keep_files": ma.fields.String(validate=OneOf(["yes", "no"])),
     }
@@ -48,15 +49,15 @@ class NewVersionRequestType(NonDuplicableOARepoRequestType):
 
     @classproperty
     @override
-    def available_actions(cls) -> dict[str, type[RequestAction]]:  # noqa N805
+    def available_actions(cls) -> dict[str, type[RequestAction]]:  # noqa N805 type: ignore[reportIncompatibleVariableOverride]
         """Return available actions for the request type."""
         return {
             **super().available_actions,
             "accept": NewVersionAcceptAction,
         }
 
-    description = _("Request requesting creation of new version of a published record.")
-    allowed_topic_ref_types = ModelRefTypes(published=True, draft=True) # TODO: new version makes no sense on drafts?
+    description = _("Request requesting creation of new version of a published record.")  # type: ignore[reportAssignmentType]
+    allowed_topic_ref_types = ModelRefTypes(published=True, draft=True)  # TODO: new version makes no sense on drafts?
     editable = False
 
     form: ClassVar[JsonValue] = {
@@ -79,6 +80,8 @@ class NewVersionRequestType(NonDuplicableOARepoRequestType):
     @classmethod
     def is_applicable_to(cls, identity: Identity, topic: Record, *args: Any, **kwargs: Any) -> bool:
         """Check if the request type is applicable to the topic."""
+        if not isinstance(topic, RecordWithDraft):
+            raise TypeError(gettext("Trying to create edit request on record without draft support"))
         if topic.is_draft:
             return False
         # if already editing metadata or a new version, we don't want to create a new request
@@ -97,16 +100,13 @@ class NewVersionRequestType(NonDuplicableOARepoRequestType):
         **kwargs: Any,
     ) -> None:
         """Check if the request can be created."""
+        if not isinstance(topic, RecordWithDraft):
+            raise TypeError(gettext("Trying to create edit request on record without draft support"))
         if topic.is_draft:
             raise ValueError(gettext("Trying to create new version request on draft record"))
         if has_draft(topic):
             raise ValueError(gettext("Trying to create edit request on record with draft"))
         super().can_create(identity, data, receiver, topic, creator, *args, **kwargs)
-
-    def topic_change(self, request: Request, new_topic: dict, uow: UnitOfWork) -> None:
-        """Change the topic of the request."""
-        request.topic = new_topic
-        uow.register(RecordCommitOp(request, indexer=current_requests_service.indexer))
 
     @override
     def stateful_name(

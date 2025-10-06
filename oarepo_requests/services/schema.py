@@ -18,11 +18,10 @@ from invenio_records_resources.services.base.links import (
     EndpointLink,
     LinksTemplate,
 )
-from invenio_requests.resolvers.registry import ResolverRegistry
 from invenio_requests.services.schemas import GenericRequestSchema
 from marshmallow import fields
 
-from oarepo_requests.utils import ref_to_str
+from oarepo_requests.utils import ref_to_str, reference_entity
 
 request_type_identity_ctx: ContextVar[Any] = ContextVar("oarepo_requests.request_type_identity", default=None)
 request_type_record_ctx: ContextVar[Any] = ContextVar("oarepo_requests.request_type_record", default=None)
@@ -49,8 +48,10 @@ class RequestTypeSchema(ma.Schema):
         type_id = data["type_id"]
         identity = request_type_identity_ctx.get()
         record = request_type_record_ctx.get()
-
-        topic_ref = ref_to_str(ResolverRegistry.reference_entity(record) if isinstance(record, Record) else record)
+        # TODO: lint ResolverRegistry.reference_entity(record) should always work here but idk
+        #  whether crashing on link generation is justified
+        # ReferenceEntity thinks it returns dict[str, Any]
+        topic_ref = ref_to_str(reference_entity(record) if isinstance(record, Record) else record)
         link = EndpointLink("oarepo_requests.create_args", params=["topic", "request_type"])
         template = LinksTemplate({"create": link}, context={"topic": topic_ref, "request_type": type_id})
         data["links"] = {"actions": template.expand(identity, record)}

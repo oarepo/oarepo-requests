@@ -9,16 +9,15 @@
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Any, cast
+from typing import TYPE_CHECKING, Any
 
 from invenio_access.permissions import system_identity
 from invenio_i18n import _
 from invenio_requests.records.api import Request
-from oarepo_runtime.proxies import current_runtime
 
 from oarepo_requests.errors import UnresolvedRequestsError, VersionAlreadyExists
 
-from ..temp_utils import search_requests
+from ..temp_utils import get_draft_record_service, search_requests
 from .components import CreatedTopicComponent
 from .generic import (
     OARepoAcceptAction,
@@ -29,7 +28,6 @@ from .generic import (
 if TYPE_CHECKING:
     from flask_principal import Identity
     from invenio_db.uow import UnitOfWork
-    from invenio_drafts_resources.services.records.service import RecordService
     from invenio_requests.customizations import RequestAction
 
     from .components import RequestActionState
@@ -69,13 +67,7 @@ class PublishDraftSubmitAction(PublishMixin, OARepoSubmitAction):
     ) -> None:
         """Publish the draft."""
         if "payload" in self.request and "version" in self.request["payload"]:
-            topic_service = current_runtime.get_record_service_for_record(
-                state.topic
-            )
-            if not topic_service:
-                raise KeyError(f"topic {state.topic} service not found")
-            if not isinstance(topic_service, RecordService):
-                raise TypeError("Draft service required for requesting new record versions.")
+            topic_service = get_draft_record_service(state.topic)
             versions = topic_service.search_versions(identity, state.topic.pid.pid_value)
             versions_hits = versions.to_dict()["hits"]["hits"]
             for rec in versions_hits:
@@ -104,13 +96,7 @@ class PublishDraftAcceptAction(PublishMixin, OARepoAcceptAction):
         **kwargs: Any,
     ) -> None:
         """Publish the draft."""
-        topic_service = current_runtime.get_record_service_for_record(
-            state.topic
-        )
-        if not topic_service:
-            raise KeyError(f"topic {state.topic} service not found")
-        if not isinstance(topic_service, RecordService):
-            raise TypeError("Draft service required for requesting new record versions.")
+        topic_service = get_draft_record_service(state.topic)
         requests = search_requests(system_identity, state.topic)
 
         for result in requests._results:  # noqa SLF001
