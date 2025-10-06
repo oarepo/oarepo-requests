@@ -195,7 +195,7 @@ class DraftAwareEntityResolverExpandableField(EntityResolverExpandableField):
         return v, service
 
 
-class StringDraftAwareEntityResolverExpandableField(DraftAwareEntityResolverExpandableField):
+class StringEntityResolverExpandableField(EntityResolverExpandableField):
     """Expandable entity resolver field.
 
     It will use the Entity resolver registry to retrieve the service to

@@ -56,7 +56,7 @@ class EditPublishedRecordRequestType(NonDuplicableOARepoRequestType):
 
     description = _("Request re-opening of published record")
     receiver_can_be_none = True
-    allowed_topic_ref_types = ModelRefTypes(published=True, draft=True)
+    allowed_topic_ref_types = ModelRefTypes(published=True, draft=True) # TODO: edit should be allowed on drafts, just edit the directly?
 
     @classmethod
     def is_applicable_to(cls, identity: Identity, topic: Record, *args: Any, **kwargs: Any) -> bool:

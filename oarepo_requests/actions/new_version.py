@@ -39,11 +39,13 @@ class NewVersionAcceptAction(OARepoAcceptAction):
         **kwargs: Any,
     ) -> None:
         """Apply the action, creating a new version of the record."""
-        # TODO: due to draft methods; do this more .. systematically?
-        topic_service = cast("RecordService", current_runtime.get_record_service_for_record(state.topic))
+        topic_service = current_runtime.get_record_service_for_record(
+            state.topic
+        )
         if not topic_service:
             raise KeyError(f"topic {state.topic} service not found")
-
+        if not isinstance(topic_service, RecordService):
+            raise TypeError("Draft service required for requesting new record versions.")
         new_version_topic = topic_service.new_version(identity, state.topic["id"], uow=uow)
         state.created_topic = new_version_topic._record  # noqa SLF001
         if (

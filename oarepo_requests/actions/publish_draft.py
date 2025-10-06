@@ -69,7 +69,13 @@ class PublishDraftSubmitAction(PublishMixin, OARepoSubmitAction):
     ) -> None:
         """Publish the draft."""
         if "payload" in self.request and "version" in self.request["payload"]:
-            topic_service = cast("RecordService", current_runtime.get_record_service_for_record(state.topic))
+            topic_service = current_runtime.get_record_service_for_record(
+                state.topic
+            )
+            if not topic_service:
+                raise KeyError(f"topic {state.topic} service not found")
+            if not isinstance(topic_service, RecordService):
+                raise TypeError("Draft service required for requesting new record versions.")
             versions = topic_service.search_versions(identity, state.topic.pid.pid_value)
             versions_hits = versions.to_dict()["hits"]["hits"]
             for rec in versions_hits:
@@ -98,9 +104,13 @@ class PublishDraftAcceptAction(PublishMixin, OARepoAcceptAction):
         **kwargs: Any,
     ) -> None:
         """Publish the draft."""
-        topic_service = cast("RecordService", current_runtime.get_record_service_for_record(state.topic))
+        topic_service = current_runtime.get_record_service_for_record(
+            state.topic
+        )
         if not topic_service:
             raise KeyError(f"topic {state.topic} service not found")
+        if not isinstance(topic_service, RecordService):
+            raise TypeError("Draft service required for requesting new record versions.")
         requests = search_requests(system_identity, state.topic)
 
         for result in requests._results:  # noqa SLF001

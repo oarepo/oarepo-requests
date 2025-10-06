@@ -21,12 +21,8 @@ from __future__ import annotations
 from oarepo_requests.model.presets.requests.finalize_app import (
     RequestsFinalizeAppPreset,
 )
-from oarepo_requests.model.presets.requests.records.entity_resolvers.draft_resolver import (
-    DraftResolverPreset,
-)
-from oarepo_requests.model.presets.requests.records.entity_resolvers.resolver import (
-    RecordResolverPreset,
-)
+from oarepo_requests.model.presets.requests.records.entity_resolvers.resolver import RequestsResolverPreset
+
 from oarepo_requests.model.presets.requests.records.metadata_mapping import (
     RequestsMetadataMappingPreset,
 )
@@ -40,9 +36,8 @@ from oarepo_requests.model.presets.requests.services.records.service_config impo
 # Collection of all request-related presets in proper initialization order
 requests_preset = [
     RequestsMetadataMappingPreset,  # Configure metadata mapping for requests
-    RecordResolverPreset,  # Configure record entity resolver
     RequestsServiceConfigPreset,  # Configure service with request components
     RequestsRecordItemPreset,  # Configure record item results
-    DraftResolverPreset,  # Configure draft entity resolver
+    RequestsResolverPreset,
     RequestsFinalizeAppPreset,  # Final application setup
 ]

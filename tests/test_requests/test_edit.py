@@ -92,6 +92,14 @@ def test_redirect_url(
         f"{urls['BASE_URL_REQUESTS']}{edit_request_id}?expand=true",
     ).json  # receiver should be able to get the request but not to edit the draft - should not receive edit link
 
+    # also why it shows receiver links?
+    # TODO: test links now give 404/ wait for ui implementation?
+    test = creator_client.get(link2testclient(
+            creator_edit_accepted["expanded"]["payload"]["created_topic"]["links"]["self_html"],
+            ui=True,
+        ))
+    # TODO: i assume using will be a tweak on ui side
+    # the problem here is that link to draft_html isn't in search_links?
     assert (
         link2testclient(
             creator_edit_accepted["expanded"]["payload"]["created_topic"]["links"]["self_html"],
@@ -99,6 +107,7 @@ def test_redirect_url(
         )
         == f"/api/test-ui-links/uploads/{record_id}"  # draft self_html now goes to deposit_upload
     )
+
     assert receiver_edit_accepted["expanded"]["payload"]["created_topic"]["links"] == {}
 
     draft = creator_client.get(f"{urls['BASE_URL']}/{record_id}/draft").json

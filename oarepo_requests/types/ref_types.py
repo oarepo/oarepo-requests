@@ -13,10 +13,10 @@ from typing import Self
 
 from invenio_records_resources.references import RecordResolver
 from invenio_requests.proxies import current_requests
-
+from invenio_communities.communities.entity_resolvers import CommunityResolver
 from oarepo_requests.proxies import current_oarepo_requests
 
-
+# TODO: we have to develop different method to allow only published_records/drafts; type_key loses discriminative value
 class ModelRefTypes:
     """Class is used to define the allowed reference types for the topic reference.
 
@@ -31,12 +31,15 @@ class ModelRefTypes:
     def __get__(self, obj: Self, owner: type[Self]) -> list[str]:
         """Property getter, returns the list of allowed reference types."""
         ret = []
-        for ref_type in current_requests.entity_resolvers_registry:
-            if not isinstance(ref_type, RecordResolver):
+        for resolver in current_requests.entity_resolvers_registry:
+            if not isinstance(resolver, RecordResolver) or isinstance(resolver, CommunityResolver): # TODO: CommunityResolver technically is a RecordResolver
                 continue
-            is_draft: bool = getattr(ref_type.record_cls, "is_draft", False)
-            if (self.published and not is_draft) or (self.draft and is_draft):
-                ret.append(ref_type.type_key)
+            ret.append(resolver.type_key)
+            """
+            supports_drafts: bool = hasattr(resolver, "draft_cls")
+            if (self.published and not supports_drafts) or (self.draft and supports_drafts):
+                ret.append(resolver.type_key)
+            """
         return ret
 
 

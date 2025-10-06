@@ -32,6 +32,7 @@ from ..utils import (
     request_identity_matches,
 )
 from .ref_types import ModelRefTypes, ReceiverRefTypes
+from invenio_records_resources.services.errors import PermissionDeniedError
 
 if TYPE_CHECKING:
     from collections.abc import Callable
@@ -50,6 +51,10 @@ class OARepoRequestType(RequestType):
     description = None
 
     dangerous = False
+
+    allowed_on_draft = True
+
+    allowed_on_published = True
 
     # TODO: due to possible override on subclass that might do something with the topic?
     def on_topic_delete(self, request: Request, **kwargs: Any) -> None:  # noqa ARG002
@@ -92,6 +97,18 @@ class OARepoRequestType(RequestType):
 
         return cast("type[Schema]", schema)  # TODO: idk why it complains here
 
+
+    @classmethod
+    def _allowed_by_publication_status(cls, record: Record)->bool:
+        if not hasattr(record, "publication_status"):
+            return True if cls.allowed_on_published else False
+        if cls.allowed_on_draft and record.publication_status == "draft":
+            return True
+        elif cls.allowed_on_published and record.publication_status == "published":
+            return True
+        else:
+            return False
+
     # TODO: specify what can exactly come in the data dicts
     def can_create(
         self,
@@ -113,6 +130,8 @@ class OARepoRequestType(RequestType):
         :param args:            additional arguments
         :param kwargs:          additional keyword arguments
         """
+        if not self._allowed_by_publication_status(record=topic):
+            raise PermissionDeniedError("create")
         current_requests_service.require_permission(identity, "create", record=topic, request_type=self, **kwargs)
 
     @classmethod
@@ -125,6 +144,8 @@ class OARepoRequestType(RequestType):
         method is used to check whether there is a possible situation a user might create
         this request eg. for the purpose of serializing a link on associated record
         """
+        if not cls._allowed_by_publication_status(record=topic):
+            return False
         return cast(
             "bool",
             current_requests_service.check_permission(identity, "create", record=topic, request_type=cls, **kwargs),

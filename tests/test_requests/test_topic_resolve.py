@@ -25,7 +25,7 @@ def test_resolve_topic(
     creator = users[0]
     receiver = users[1]
     creator_client = logged_client(creator)
-    logged_client(receiver)
+    receiver_client = logged_client(receiver)
 
     record1 = record_factory(creator.identity)
     record1_id = record1["id"]
@@ -45,7 +45,7 @@ def test_resolve_topic(
         query_string={"expand": "true"},
     )
     assert resp.status_code == 200
-    assert resp.json["expanded"]["topic"] == {  # TODO: why is there a test creators and contributors in metadata?
+    assert resp.json["expanded"]["topic"] == {
         "id": record1_id,
         "metadata": {
             "contributors": ["Contributor 1"],
@@ -59,7 +59,9 @@ def test_resolve_topic(
         },
     }
 
-    record_service.delete(system_identity, record1_id)
+    # TODO
+    receiver_read = receiver_client.get(f"{urls['BASE_URL_REQUESTS']}{resp_request_submit['id']}")
+    receiver_client.post(link2testclient(receiver_read.json["links"]["actions"]["accept"]))
     requests_model.Record.index.refresh()
 
     resp = creator_client.get(
@@ -75,7 +77,7 @@ def test_resolve_topic(
     assert resp_expanded.status_code == 200
     assert resp_expanded.json["topic"] == {"requests_test": record1_id}
     assert resp_expanded.json["expanded"]["topic"] == {
-        "id": "",  # TODO: ask - should id be shown?
+        "id": record1_id ,  # TODO: ask - should id be shown?
         "links": {},
         "metadata": {"title": "Deleted record"},
     }
