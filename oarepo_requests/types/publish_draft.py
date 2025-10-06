@@ -18,9 +18,11 @@ from invenio_i18n import lazy_gettext as _
 from .publish_base import PublishRequestType
 
 if TYPE_CHECKING:
+    from collections.abc import Mapping
+
     from flask_babel.speaklater import LazyString
     from flask_principal import Identity
-    from invenio_drafts_resources.records import Record
+    from invenio_records_resources.records import Record
     from invenio_requests.records.api import Request
 
     from ..utils import JsonValue
@@ -32,8 +34,7 @@ class PublishDraftRequestType(PublishRequestType):
     type_id = "publish_draft"
     name = _("Publish draft")
 
-    payload_schema: ClassVar[dict[str, ma.fields.Field]] = {
-        **PublishRequestType.payload_schema,
+    payload_schema: Mapping[str, ma.fields.Field] | None = {
         "version": ma.fields.Str(),
     }
 

@@ -101,7 +101,8 @@ class DeletePublishedRecordRequestType(NonDuplicableOARepoRequestType):
             "decline": DeletePublishedRecordDeclineAction,
         }
 
-    description = _("Request deletion of published record")
+    # TODO: lint: LazyStr
+    description = _("Request deletion of published record")  # type: ignore[reportAssignmentType]
     receiver_can_be_none = True
 
     allowed_on_draft = False

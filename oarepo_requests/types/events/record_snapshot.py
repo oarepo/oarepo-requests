@@ -9,13 +9,13 @@
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, ClassVar
 
 from invenio_requests.customizations.event_types import EventType
 from marshmallow import fields
 
 if TYPE_CHECKING:
-    from typing import ClassVar
+    from collections.abc import Callable, Mapping
 
     import marshmallow as ma
 
@@ -28,7 +28,7 @@ class RecordSnapshotEventType(EventType):
 
     type_id = "S"
 
-    payload_schema: ClassVar[dict[str, ma.fields.Field]] = {
+    payload_schema: ClassVar[Mapping[str, ma.fields.Field] | Callable[[], Mapping[str, fields.Field]] | None] = {  # type: ignore[reportIncompatibleVariableOverride]
         "old_version": fields.Str(),
         "new_version": fields.Str(),
         "diff": fields.Str(),

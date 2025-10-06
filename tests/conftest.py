@@ -113,7 +113,7 @@ def app(app):
     def search() -> str:
         return "search ok"
 
-    @bp.route("/test-ui-links/uploads/<pid_value>", methods=["GET"]) # draft self_html
+    @bp.route("/test-ui-links/uploads/<pid_value>", methods=["GET"])  # draft self_html
     def deposit_edit(pid_value: str) -> str:
         return "deposit edit ok"
 

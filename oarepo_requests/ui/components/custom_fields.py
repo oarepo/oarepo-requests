@@ -52,7 +52,8 @@ class FormConfigRequestTypePropertiesComponent(UIResourceComponent):
 
     def form_config(self, *, view_args: dict[str, Any], form_config: dict, **kwargs: Any) -> None:  # noqa ARG002
         """Add request type properties to the form config (dangerous, editable, has_form)."""
-        type_: RequestType = view_args.get("request_type")
+        # TODO: lint: correct
+        type_: RequestType = view_args.get("request_type")  # type: ignore[reportAssignmentType]
 
         request_type_properties = {}
         if type_ and isinstance(type_, OARepoRequestType):

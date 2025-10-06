@@ -15,7 +15,6 @@ from typing import TYPE_CHECKING, Any, cast
 from flask_babel.speaklater import LazyString
 from invenio_access.permissions import system_identity
 from invenio_pidstore.errors import PersistentIdentifierError
-from invenio_records_resources.proxies import current_service_registry
 from invenio_requests.proxies import (
     current_request_type_registry,
     current_requests_service,
@@ -80,7 +79,7 @@ def allowed_request_types_for_record(identity: Identity, record: Record) -> dict
         # so returning all matching request types
         pass
 
-    record_ref = next(iter(ResolverRegistry.reference_entity(record).keys()))
+    record_ref = next(iter(reference_entity(record).keys()))
 
     ret = {}
     for rt in current_request_type_registry:
@@ -130,8 +129,9 @@ def search_requests_filter(
     if topic_reference:
         must.append(create_query_term_for_reference("topic", topic_reference))
 
+    # TODO: lint: correct
     return dsl.query.Bool(
-        "must",
+        "must",  # type: ignore[reportArgumentType]
         must=must,
     )
 
@@ -148,16 +148,21 @@ def open_request_exists(topic_or_reference: Record | dict[str, str], type_id: st
     return bool(list(results))
 
 
+# TODO: lint: raise_?
+# how do we plan for things to behave when None is returned
 def resolve_reference_dict(reference_dict: dict[str, str]) -> Any:
     """Resolve the reference dict to the entity (such as Record, User, ...)."""
-    return ResolverRegistry.resolve_entity_proxy(reference_dict).resolve()
+    return ResolverRegistry.resolve_entity_proxy(reference_dict, raise_=True).resolve()  # type: ignore[reportOptionalMemberAccess]
 
 
 def reference_entity(entity: Any) -> dict[str, str]:
     """Resolve the entity to the reference dict."""
-    return cast("dict[str, str]", ResolverRegistry.reference_entity(entity))  # TODO: why the stub doesn't work
+    return cast(
+        "dict[str, str]", ResolverRegistry.reference_entity(entity, raise_=True)
+    )  # TODO: why the stub doesn't work
 
 
+# TODO: is this used somewhere
 def get_matching_service_for_refdict(
     reference_dict: dict[str, str],
 ) -> RecordService | None:
@@ -168,7 +173,7 @@ def get_matching_service_for_refdict(
     """
     for resolver in ResolverRegistry.get_registered_resolvers():
         if resolver.matches_reference_dict(reference_dict):
-            return current_service_registry.get(resolver._service_id)  # noqa SLF001
+            return cast("RecordService", resolver.get_service())
     return None
 
 
@@ -179,7 +184,9 @@ def get_entity_key_for_record_cls(record_cls: type[Record]) -> str:
     :return: Entity type id
     """
     for resolver in ResolverRegistry.get_registered_resolvers():
-        if hasattr(resolver, "record_cls") and resolver.record_cls == record_cls:
+        if not hasattr(resolver, "record_cls"):
+            continue
+        if hasattr(resolver, "record_cls") and resolver.record_cls == record_cls:  # type: ignore[reportAttributeAccessIssue]
             type_id: str | None = getattr(resolver, "type_id", None)
             if type_id is None:
                 raise ValueError(f"Entity resolver {type(resolver)} does not have an associated type_id")

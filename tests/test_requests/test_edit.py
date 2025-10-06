@@ -94,10 +94,12 @@ def test_redirect_url(
 
     # also why it shows receiver links?
     # TODO: test links now give 404/ wait for ui implementation?
-    test = creator_client.get(link2testclient(
+    creator_client.get(
+        link2testclient(
             creator_edit_accepted["expanded"]["payload"]["created_topic"]["links"]["self_html"],
             ui=True,
-        ))
+        )
+    )
     # TODO: i assume using will be a tweak on ui side
     # the problem here is that link to draft_html isn't in search_links?
     assert (

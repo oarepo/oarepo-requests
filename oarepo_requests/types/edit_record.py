@@ -9,9 +9,10 @@
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Any, ClassVar, override
+from typing import TYPE_CHECKING, Any, override
 
 import marshmallow as ma
+from invenio_drafts_resources.records import Record as RecordWithDraft
 from invenio_i18n import gettext
 from invenio_i18n import lazy_gettext as _
 from invenio_records_resources.services.uow import RecordCommitOp
@@ -26,6 +27,8 @@ from .generic import NonDuplicableOARepoRequestType
 from .ref_types import ModelRefTypes
 
 if TYPE_CHECKING:
+    from collections.abc import Mapping
+
     from flask_babel.speaklater import LazyString
     from flask_principal import Identity
     from invenio_db.uow import UnitOfWork
@@ -44,7 +47,8 @@ class EditPublishedRecordRequestType(NonDuplicableOARepoRequestType):
     type_id = "edit_published_record"
     name = _("Edit metadata")
 
-    payload_schema: ClassVar[dict[str, ma.fields.Field]] = {"created_topic": ma.fields.Str()}
+    # TODO: pass: i think unneccessary here
+    payload_schema: Mapping[str, ma.fields.Field] | None = {"created_topic": ma.fields.Str()}
 
     @classproperty
     def available_actions(cls) -> dict[str, type[RequestAction]]:  # noqa N805
@@ -54,13 +58,18 @@ class EditPublishedRecordRequestType(NonDuplicableOARepoRequestType):
             "accept": EditTopicAcceptAction,
         }
 
-    description = _("Request re-opening of published record")
+    # TODO: lint: LazyStr
+    description = _("Request re-opening of published record")  # type: ignore[reportAssignmentType]
     receiver_can_be_none = True
-    allowed_topic_ref_types = ModelRefTypes(published=True, draft=True) # TODO: edit should be allowed on drafts, just edit the directly?
+    allowed_topic_ref_types = ModelRefTypes(
+        published=True, draft=True
+    )  # TODO: edit should be allowed on drafts, just edit the directly?
 
     @classmethod
     def is_applicable_to(cls, identity: Identity, topic: Record, *args: Any, **kwargs: Any) -> bool:
         """Check if the request type is applicable to the topic."""
+        if not isinstance(topic, RecordWithDraft):
+            return False
         if topic.is_draft:
             return False
         # if already editing metadata or a new version, we don't want to create a new request
@@ -71,7 +80,7 @@ class EditPublishedRecordRequestType(NonDuplicableOARepoRequestType):
     def can_create(
         self,
         identity: Identity,
-        data: dict,
+        data: dict[str, Any],
         receiver: dict[str, str],
         topic: Record,
         creator: dict[str, str],
@@ -88,6 +97,8 @@ class EditPublishedRecordRequestType(NonDuplicableOARepoRequestType):
         :param args:            additional arguments
         :param kwargs:          additional keyword arguments
         """
+        if not isinstance(topic, RecordWithDraft):
+            raise TypeError(gettext("Trying to create edit request on record without draft support"))
         if topic.is_draft:
             raise ValueError(gettext("Trying to create edit request on draft record"))
         if has_draft(topic):

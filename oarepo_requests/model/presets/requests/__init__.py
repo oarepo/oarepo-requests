@@ -22,7 +22,6 @@ from oarepo_requests.model.presets.requests.finalize_app import (
     RequestsFinalizeAppPreset,
 )
 from oarepo_requests.model.presets.requests.records.entity_resolvers.resolver import RequestsResolverPreset
-
 from oarepo_requests.model.presets.requests.records.metadata_mapping import (
     RequestsMetadataMappingPreset,
 )

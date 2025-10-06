@@ -26,12 +26,16 @@ from invenio_pidstore.errors import (
 )
 from invenio_records_resources.proxies import current_service_registry
 from invenio_records_resources.services.errors import PermissionDeniedError
+from invenio_records_resources.services.records.service import RecordService
 from invenio_requests import current_request_type_registry
 from oarepo_ui.resources.components import AllowedHtmlTagsComponent
 
 if TYPE_CHECKING:
-    from collections.abc import Mapping
+    from collections.abc import Callable, Mapping
+    from http.client import HTTPException
 
+    from flask import Response
+    from flask_resources.responses import ResponseHandler
     from flask_resources.serializers.base import BaseSerializer
     from invenio_records_resources.records import Record
     from invenio_requests.customizations.request_types import RequestType
@@ -90,7 +94,8 @@ class UIResourceConfig(ResourceConfig):
             tf = Path(inspect.getfile(type(self))).parent.absolute().joinpath(tf).absolute()
         return str(tf)
 
-    response_handlers: ClassVar[dict[str, Any]] = {"text/html": None, "application/json": None}
+    # TODO: lint: allowing None here?
+    response_handlers: Mapping[str, ResponseHandler] = {"text/html": None, "application/json": None}  # type: ignore[reportAssignmentType]
     default_accept_mimetype = "text/html"
 
     # Request parsing
@@ -113,14 +118,19 @@ class RequestUIResourceConfig(UIResourceConfig):
     }
     ui_serializer_class = "oarepo_requests.resources.ui.OARepoRequestsUIJSONSerializer"
     ui_links_item: ClassVar[dict[str, Any]] = {}
-    components = (AllowedHtmlTagsComponent,)
+    # TODO: lint: correct
+    components = (AllowedHtmlTagsComponent,)  # type: ignore[reportAssignmentType]
 
-    error_handlers: ClassVar[dict[type[Exception], Any]] = {
-        PIDDeletedError: "tombstone",
-        PIDDoesNotExistError: "not_found",
-        PIDUnregistered: "not_found",
-        KeyError: "not_found",
-        PermissionDeniedError: "permission_denied",
+    # TODO: lint: this typing from stubs; idk whether strings are allowed here
+    error_handlers: Mapping[
+        type[HTTPException | BaseException] | int,
+        Callable[[Exception], Response],
+    ] = {
+        PIDDeletedError: "tombstone",  # type: ignore[dict-item]
+        PIDDoesNotExistError: "not_found",  # type: ignore[dict-item]
+        PIDUnregistered: "not_found",  # type: ignore[dict-item]
+        KeyError: "not_found",  # type: ignore[dict-item]
+        PermissionDeniedError: "permission_denied",  # type: ignore[dict-item]
     }
 
     request_view_args: ClassVar[dict[str, Any]] = {"pid_value": ma.fields.Str()}
@@ -128,7 +138,8 @@ class RequestUIResourceConfig(UIResourceConfig):
     @property
     def ui_serializer(self) -> BaseSerializer:
         """Return the UI serializer for the request."""
-        return obj_or_import_string(self.ui_serializer_class)()
+        # TODO: lint: correct
+        return obj_or_import_string(self.ui_serializer_class)()  # type: ignore[reportOptionalCal]
 
     def custom_fields(self, **kwargs: Any) -> dict:
         """Get the custom fields for the request."""
@@ -140,7 +151,7 @@ class RequestUIResourceConfig(UIResourceConfig):
         }
 
         # get the record class
-        if not hasattr(api_service, "record_cls"):
+        if not isinstance(api_service, RecordService):
             return ret
         record_class: type[Record] = api_service.record_cls
         if not record_class:

@@ -11,7 +11,7 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING, Any, cast
 
-from invenio_access.permissions import system_identity
+from invenio_records_resources.services.errors import PermissionDeniedError
 from invenio_requests.customizations import RequestType
 from invenio_requests.customizations.states import RequestState
 from invenio_requests.proxies import current_requests_service
@@ -32,7 +32,6 @@ from ..utils import (
     request_identity_matches,
 )
 from .ref_types import ModelRefTypes, ReceiverRefTypes
-from invenio_records_resources.services.errors import PermissionDeniedError
 
 if TYPE_CHECKING:
     from collections.abc import Callable
@@ -48,7 +47,7 @@ if TYPE_CHECKING:
 class OARepoRequestType(RequestType):
     """Base request type for OARepo requests."""
 
-    description = None
+    description: str = ""
 
     dangerous = False
 
@@ -56,17 +55,9 @@ class OARepoRequestType(RequestType):
 
     allowed_on_published = True
 
-    # TODO: due to possible override on subclass that might do something with the topic?
-    def on_topic_delete(self, request: Request, **kwargs: Any) -> None:  # noqa ARG002
-        """Cancel the request when the topic is deleted.
-
-        :param request:         the request
-        :param topic:           the topic
-        """
-        current_requests_service.execute_action(system_identity, request.id, "cancel")
-
+    # TODO: lint: classproperty issue
     @classproperty[dict[str, RequestState]]
-    def available_statuses(cls) -> dict[str, RequestState]:  # noqa N805
+    def available_statuses(self) -> dict[str, RequestState]:  # type: ignore[reportIncompatibleVariableOverride]
         """Return available statuses for the request type.
 
         The status (open, closed, undefined) are used for request filtering.
@@ -92,22 +83,21 @@ class OARepoRequestType(RequestType):
     def _create_marshmallow_schema(cls) -> type[Schema]:
         """Create a marshmallow schema for this request type with required payload field."""
         schema = super()._create_marshmallow_schema()
-        if cls.payload_schema is not None and hasattr(schema, "fields") and "payload" in schema.fields:
-            schema.fields["payload"].required = True
+        # TODO: lint: idk why .fields
+        if cls.payload_schema is not None and hasattr(schema, "fields") and "payload" in schema.fields:  # type: ignore[reportAttributeAccessIssue]
+            schema.fields["payload"].required = True  # type: ignore[reportAttributeAccessIssue]
 
         return cast("type[Schema]", schema)  # TODO: idk why it complains here
 
-
     @classmethod
-    def _allowed_by_publication_status(cls, record: Record)->bool:
+    def _allowed_by_publication_status(cls, record: Record) -> bool:
         if not hasattr(record, "publication_status"):
-            return True if cls.allowed_on_published else False
-        if cls.allowed_on_draft and record.publication_status == "draft":
-            return True
-        elif cls.allowed_on_published and record.publication_status == "published":
-            return True
-        else:
-            return False
+            return bool(cls.allowed_on_published)
+        # TODO: lint: protocol for .publication_status?
+        return bool(
+            (cls.allowed_on_draft and record.publication_status == "draft")  # type: ignore[reportAttributeAccessIssue]
+            or (cls.allowed_on_published and record.publication_status == "published")  # type: ignore[reportAttributeAccessIssue]
+        )
 
     # TODO: specify what can exactly come in the data dicts
     def can_create(
@@ -151,11 +141,15 @@ class OARepoRequestType(RequestType):
             current_requests_service.check_permission(identity, "create", record=topic, request_type=cls, **kwargs),
         )
 
-    allowed_topic_ref_types = ModelRefTypes()
-    allowed_receiver_ref_types = ReceiverRefTypes()
+    # TODO: lint: __get__
+    allowed_topic_ref_types = ModelRefTypes()  # type: ignore[reportAssignmentType]
+    allowed_receiver_ref_types = ReceiverRefTypes()  # type: ignore[reportAssignmentType]
 
+    # TODO: lint: classproperty issue
     @classproperty
-    def available_actions(cls) -> dict[str, type[RequestAction]]:  # noqa N805
+    def available_actions(  # type: ignore[reportIncompatibleVariableOverride]
+        self,
+    ) -> dict[str, type[RequestAction]]:
         """Return available actions for the request type."""
         return {
             **super().available_actions,
@@ -226,7 +220,7 @@ class OARepoRequestType(RequestType):
         """
 
         def get_string(
-            string: str | LazyString,
+            string: str | LazyString | Callable[[Identity, Record, Request | None], str | LazyString],
             identity: Identity,
             topic: Record,
             request: Request | None = None,
@@ -291,6 +285,7 @@ class NonDuplicableOARepoRequestType(OARepoRequestType):
             raise OpenRequestAlreadyExistsError(self, topic)
         super().can_create(identity, data, receiver, topic, creator, *args, **kwargs)
 
+    # TODO: decide whether OARepoRequests could possible be allowed on models without drafts
     @classmethod
     def is_applicable_to(cls, identity: Identity, topic: Record, *args: Any, **kwargs: Any) -> bool:
         """Check if the request type is applicable to the topic."""

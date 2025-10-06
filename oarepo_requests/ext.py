@@ -28,7 +28,6 @@ if TYPE_CHECKING:
     from flask_principal import Identity
     from invenio_records_resources.records.api import Record
     from invenio_requests.customizations import RequestType
-    from invenio_requests.customizations.actions import RequestAction
 
     from oarepo_requests.actions.components import RequestActionComponent
 
@@ -127,23 +126,9 @@ class OARepoRequests:
         )
         # TODO: event resource
 
-    # TODO: do we want this configurable by actual actions? - ie. vs the "specific" hardcoded in action code
-    def action_components(self, action: RequestAction) -> list[type[RequestActionComponent]]:
+    def action_components(self) -> list[type[RequestActionComponent]]:
         """Return components for the given action."""
-        components: (
-            dict[str, list[type[RequestActionComponent]]]
-            | Callable[[RequestAction], list[type[RequestActionComponent]]]
-        ) = self.app.config["REQUESTS_ACTION_COMPONENTS"]
-        if callable(components):
-            """
-             Type "object | list[type[RequestActionComponent]]" is not assignable to return type
-             "list[type[RequestActionComponent]]"
-                Type "object | list[type[RequestActionComponent]]" is not assignable to type
-                "list[type[RequestActionComponent]]" "object" is not assignable to "list[type[RequestActionComponent]]"
-            idk why it complains about this, why object | ...
-            """
-            return components(action)  # type: ignore[reportReturnType]
-        return components[action.status_to]
+        return cast("list[type[RequestActionComponent]]", self.app.config["REQUESTS_ACTION_COMPONENTS"])
 
     def init_config(self, app: Flask) -> None:
         """Initialize configuration."""
@@ -167,10 +152,7 @@ class OARepoRequests:
                 app_default_workflow_events[k] = v
 
         # let the user override the action components
-        rac = app.config.setdefault("REQUESTS_ACTION_COMPONENTS", {})
-        for k, v in config.REQUESTS_ACTION_COMPONENTS.items():
-            if k not in rac:
-                rac[k] = v
+        app.config.setdefault("REQUESTS_ACTION_COMPONENTS", []).extend(config.REQUESTS_ACTION_COMPONENTS)
 
         app_registered_event_types = app.config.setdefault("REQUESTS_REGISTERED_EVENT_TYPES", [])
         for event_type in config.REQUESTS_REGISTERED_EVENT_TYPES:
