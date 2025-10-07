@@ -9,7 +9,8 @@
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Any, cast
+from types import MappingProxyType
+from typing import TYPE_CHECKING
 
 import importlib_metadata
 import marshmallow as ma
@@ -20,9 +21,12 @@ from invenio_requests.resources.requests.config import request_error_handlers
 from oarepo_requests.services.search import ExtendedRequestSearchRequestArgsSchema
 
 if TYPE_CHECKING:
-    from collections.abc import Mapping
+    from collections.abc import Callable, Mapping
+    from http.client import HTTPException
 
+    from flask import Response
     from flask_resources import ResponseHandler
+    from marshmallow import fields
 
 
 class OARepoRequestsResourceConfig(RequestsResourceConfig, ConfiguratorMixin):
@@ -39,22 +43,17 @@ class OARepoRequestsResourceConfig(RequestsResourceConfig, ConfiguratorMixin):
 
     request_search_args = ExtendedRequestSearchRequestArgsSchema
 
-    # TODO: using stubs - i think dict[str, ma.fields.Field] would fit better here
-    # "property" is not assignable to "Mapping[str, Any] ?
     @property
-    def request_view_args(self) -> Mapping[str, Any]:  # type: ignore[reportIncompatibleVariableOverride]
+    def request_view_args(self) -> Mapping[str, fields.Field]:  # type: ignore[reportIncompatibleVariableOverride]
         """Request view args for the requests API."""
-        # use **
-        return cast(
-            "dict[str, Any]", super().request_view_args
-        ) | {  # TODO: resolve stub has type Mapping but is defined in the superclass as dict
-            # ; how this should be typed?
+        return {
+            **super().request_view_args,
             "topic": ma.fields.String(),
             "request_type": ma.fields.String(),
         }
 
     @property
-    def response_handlers(self) -> dict[str, ResponseHandler]:  # type: ignore[reportIncompatibleVariableOverride]
+    def response_handlers(self) -> Mapping[str, ResponseHandler]:  # type: ignore[reportIncompatibleVariableOverride]
         """Response handlers for the extended requests API."""
         return {
             # TODO: UI serialization
@@ -62,12 +61,21 @@ class OARepoRequestsResourceConfig(RequestsResourceConfig, ConfiguratorMixin):
         }
 
     @property
-    def error_handlers(self) -> dict[type[Exception], Any]:  # type: ignore[reportIncompatibleVariableOverride]
+    def error_handlers(  # type: ignore[reportIncompatibleVariableOverride]
+        self,
+    ) -> Mapping[
+        type[HTTPException | BaseException] | int,
+        Callable[[Exception], Response],
+    ]:
+        # I'm sorry It's 11am and i can't remember the point of this
         """Get error handlers."""
-        entrypoint_error_handlers = cast("dict[type[Exception], Any]", request_error_handlers)  # TODO: import correctly
+        # TODO: lint: this probably isn't ideal; ie request error handlers have different type
+        # than error handlers in the stubs
+        # TODO: import correctly - use the lazy object pattern
+        entrypoint_error_handlers = dict(request_error_handlers)
 
         for x in importlib_metadata.entry_points(group="oarepo_requests.error_handlers"):
             entrypoint_error_handlers.update(x.load())
         for x in importlib_metadata.entry_points(group="oarepo_requests.extended.error_handlers"):
             entrypoint_error_handlers.update(x.load())
-        return entrypoint_error_handlers
+        return MappingProxyType(entrypoint_error_handlers)  # type: ignore[reportReturnType]

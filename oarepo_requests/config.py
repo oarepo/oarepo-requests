@@ -26,22 +26,10 @@ from oarepo_requests.actions.components import (
 )
 from oarepo_requests.services.oarepo.config import OARepoRequestsServiceConfig
 from oarepo_requests.services.oarepo.service import OARepoRequestsService
-from oarepo_requests.types import (
-    DeletePublishedRecordRequestType,
-    EditPublishedRecordRequestType,
-    PublishDraftRequestType,
-)
 from oarepo_requests.types.events import TopicDeleteEventType
 from oarepo_requests.types.events.escalation import EscalationEventType
 from oarepo_requests.types.events.record_snapshot import RecordSnapshotEventType
 from oarepo_requests.types.events.topic_update import TopicUpdateEventType
-
-# TODO: either leave here or in entrypoints
-REQUESTS_REGISTERED_TYPES = [
-    DeletePublishedRecordRequestType(),
-    EditPublishedRecordRequestType(),
-    PublishDraftRequestType(),
-]
 
 REQUESTS_REGISTERED_EVENT_TYPES = (
     TopicUpdateEventType(),
@@ -62,7 +50,6 @@ DEFAULT_WORKFLOW_EVENTS = {
     RecordSnapshotEventType.type_id: WorkflowEvent(submitters=InvenioRequestsPermissionPolicy.can_create_comment),
 }
 
-
 REQUESTS_UI_SERIALIZATION_REFERENCED_FIELDS = ["created_by", "receiver", "topic"]
 
 REQUESTS_ACTION_COMPONENTS: tuple[type[RequestActionComponent], ...] = (
@@ -75,6 +62,7 @@ REQUESTS_ACTION_COMPONENTS: tuple[type[RequestActionComponent], ...] = (
 
 SNAPSHOT_CLEANUP_DAYS = 365
 
+# TODO: where is this used?
 PUBLISH_REQUEST_TYPES = ["publish_draft", "publish_new_version"]
 
 

@@ -21,13 +21,13 @@ def test_conditional_receiver_creator_matches(
     # /for mypy - this is not code/ user[0] is not a creator, user[2] is receiver
 
     creator = users[0]
-    assert creator.id == "1"
+
 
     draft1 = draft_factory(creator.identity, custom_workflow="with_ct")
 
     resp_request_create = create_request_on_draft(creator.identity, draft1["id"], "conditional_recipient_rt")
 
-    assert resp_request_create["receiver"] == {"user": "2"}
+    assert resp_request_create["receiver"] == {"user": str(users[1].id)}
 
 
 def test_conditional_receiver_creator_does_not_match(
@@ -39,14 +39,11 @@ def test_conditional_receiver_creator_does_not_match(
     draft_factory,
     search_clear,
 ):
-    # /for mypy - this is not code/ user[0] is creator, user[1] is receiver
-    # /for mypy - this is not code/ user[0] is not a creator, user[2] is receiver
 
     creator = users[1]
-    assert creator.id != 1
 
     draft1 = draft_factory(creator.identity, custom_workflow="with_ct")
 
     resp_request_create = create_request_on_draft(creator.identity, draft1["id"], "conditional_recipient_rt")
 
-    assert resp_request_create["receiver"] == {"user": "3"}
+    assert resp_request_create["receiver"] == {"user": str(users[2].id)}

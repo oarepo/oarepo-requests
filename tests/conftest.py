@@ -34,9 +34,7 @@ from invenio_requests.services.permissions import (
 )
 from invenio_users_resources.records import UserAggregate
 from oarepo_model.customizations import AddFileToModule
-from oarepo_model.presets.ui import ui_preset
-from oarepo_model.presets.ui_links import ui_links_preset
-from oarepo_rdm import rdm_preset
+from oarepo_rdm import rdm_minimal_preset
 from oarepo_workflows import (
     AutoApprove,
     AutoRequest,
@@ -52,7 +50,7 @@ from oarepo_workflows.requests.events import WorkflowEvent
 from pytest_oarepo.requests.classes import (
     CSLocaleUserGenerator,
     TestEventType,
-    UserGenerator,
+    UserGenerator, SystemUserGenerator,
 )
 from pytest_oarepo.users import _create_user
 
@@ -246,7 +244,7 @@ class DefaultRequests(WorkflowRequestPolicy):
 
     publish_draft = WorkflowRequest(
         requesters=[IfInState("draft", [RecordOwners()])],
-        recipients=[UserGenerator(2)],
+        recipients=[UserGenerator("user2@example.org")],
         transitions=WorkflowTransitions(
             submitted="publishing",
             accepted="published",
@@ -257,26 +255,26 @@ class DefaultRequests(WorkflowRequestPolicy):
             WorkflowRequestEscalation(
                 after=timedelta(seconds=2),
                 recipients=[
-                    UserGenerator(3),
+                    UserGenerator("user3@example.org"),
                 ],
             ),
             WorkflowRequestEscalation(
                 after=timedelta(seconds=6),
                 recipients=[
-                    UserGenerator(4),
+                    UserGenerator("user4@example.org"),
                 ],
             ),
             WorkflowRequestEscalation(
                 after=timedelta(seconds=10),
                 recipients=[
-                    UserGenerator(5),
+                    UserGenerator("user5@example.org"),
                 ],
             ),
         ],
     )
     delete_published_record = WorkflowRequest(
         requesters=[IfInState("published", [RecordOwners()])],
-        recipients=[UserGenerator(2)],
+        recipients=[UserGenerator("user2@example.org")],
         transitions=WorkflowTransitions(
             submitted="deleting",
             accepted="deleted",
@@ -311,7 +309,7 @@ class DifferentLocalesPublish(WorkflowRequestPolicy):
     )
     delete_published_record = WorkflowRequest(
         requesters=[AnyUser()],
-        recipients=[UserGenerator(1), CSLocaleUserGenerator()],
+        recipients=[UserGenerator("user1@example.org"), CSLocaleUserGenerator()],
         transitions=WorkflowTransitions(
             submitted="deleting",
             accepted="deleted",
@@ -327,7 +325,7 @@ class RequestWithMultipleRecipients(WorkflowRequestPolicy):
 
     publish_draft = WorkflowRequest(
         requesters=[IfInState("draft", [RecordOwners()])],
-        recipients=[UserGenerator(2), UserGenerator(1)],
+        recipients=[UserGenerator("user2@example.org"), UserGenerator("user1@example.org")],
         transitions=WorkflowTransitions(
             submitted="publishing",
             accepted="published",
@@ -337,25 +335,25 @@ class RequestWithMultipleRecipients(WorkflowRequestPolicy):
         escalations=[
             WorkflowRequestEscalation(
                 after=timedelta(seconds=2),
-                recipients=[UserGenerator(3), UserGenerator(7)],
+                recipients=[UserGenerator("user3@example.org"), UserGenerator("user7@example.org")],
             ),
             WorkflowRequestEscalation(
                 after=timedelta(seconds=6),
                 recipients=[
-                    UserGenerator(4),
+                    UserGenerator("user4@example.org"),
                 ],
             ),
             WorkflowRequestEscalation(
                 after=timedelta(seconds=10),
                 recipients=[
-                    UserGenerator(5),
+                    UserGenerator("user5@example.org"),
                 ],
             ),
             WorkflowRequestEscalation(
                 after=timedelta(seconds=14),
                 recipients=[
-                    UserGenerator(5),
-                    UserGenerator(6),
+                    UserGenerator("user5@example.org"),
+                    UserGenerator("user6@example.org"),
                 ],
             ),
         ],
@@ -367,16 +365,16 @@ class RequestsWithDifferentRecipients(DefaultRequests):
 
     another_topic_updating = WorkflowRequest(
         requesters=[AnyUser()],
-        recipients=[UserGenerator(1)],
+        recipients=[UserGenerator("user1@example.org")],
     )
     edit_published_record = WorkflowRequest(
         requesters=[IfNoEditDraft([IfInState("published", [RecordOwners()])])],
-        recipients=[UserGenerator(2)],
+        recipients=[UserGenerator("user2@example.org")],
         transitions=WorkflowTransitions(),
     )
     new_version = WorkflowRequest(
         requesters=[IfNoNewVersionDraft([IfInState("published", [RecordOwners()])])],
-        recipients=[UserGenerator(2)],
+        recipients=[UserGenerator("user2@example.org")],
         transitions=WorkflowTransitions(),
     )
 
@@ -386,7 +384,7 @@ class RequestsWithApproveWithoutGeneric(WorkflowRequestPolicy):
 
     publish_draft = WorkflowRequest(
         requesters=[IfInState("approved", [AutoRequest()])],
-        recipients=[UserGenerator(1)],
+        recipients=[UserGenerator("user1@example.org")],
         transitions=WorkflowTransitions(
             submitted="publishing",
             accepted="published",
@@ -398,7 +396,7 @@ class RequestsWithApproveWithoutGeneric(WorkflowRequestPolicy):
 
     approve_draft = WorkflowRequest(
         requesters=[IfInState("draft", [RecordOwners()])],
-        recipients=[UserGenerator(2)],
+        recipients=[UserGenerator("user2@example.org")],
         transitions=WorkflowTransitions(
             submitted="approving",
             accepted="approved",
@@ -409,7 +407,7 @@ class RequestsWithApproveWithoutGeneric(WorkflowRequestPolicy):
     )
     delete_published_record = WorkflowRequest(
         requesters=[IfInState("published", [RecordOwners()])],
-        recipients=[UserGenerator(2)],
+        recipients=[UserGenerator("user2@example.org")],
         transitions=WorkflowTransitions(
             submitted="deleting",
             accepted="deleted",
@@ -431,7 +429,7 @@ class RequestsWithApprove(WorkflowRequestPolicy):
 
     publish_draft = WorkflowRequest(
         requesters=[IfInState("approved", [AutoRequest()])],
-        recipients=[UserGenerator(1)],
+        recipients=[UserGenerator("user1@example.org")],
         transitions=WorkflowTransitions(
             submitted="publishing",
             accepted="published",
@@ -442,11 +440,11 @@ class RequestsWithApprove(WorkflowRequestPolicy):
     )
     generic = WorkflowRequest(
         requesters=[IfInState("draft", [AutoRequest()])],
-        recipients=[UserGenerator(1)],
+        recipients=[UserGenerator("user1@example.org")],
     )
     approve_draft = WorkflowRequest(
         requesters=[IfInState("draft", [RecordOwners()])],
-        recipients=[UserGenerator(2)],
+        recipients=[UserGenerator("user2@example.org")],
         transitions=WorkflowTransitions(
             submitted="approving",
             accepted="approved",
@@ -457,7 +455,7 @@ class RequestsWithApprove(WorkflowRequestPolicy):
     )
     delete_published_record = WorkflowRequest(
         requesters=[IfInState("published", [RecordOwners()])],
-        recipients=[UserGenerator(2)],
+        recipients=[UserGenerator("user2@example.org")],
         transitions=WorkflowTransitions(
             submitted="deleting",
             accepted="deleted",
@@ -479,7 +477,13 @@ class RequestsWithCT(WorkflowRequestPolicy):
 
     conditional_recipient_rt = WorkflowRequest(
         requesters=[AnyUser()],
-        recipients=[IfRequestedBy(UserGenerator(1), [UserGenerator(2)], [UserGenerator(3)])],
+        recipients=[
+            IfRequestedBy(
+                UserGenerator("user1@example.org"),
+                [UserGenerator("user2@example.org")],
+                [UserGenerator("user3@example.org")],
+            )
+        ],
     )
     approve_draft = WorkflowRequest(
         requesters=[IfInState("draft", [RecordOwners()])],
@@ -492,7 +496,7 @@ class RequestsWithAnotherTopicUpdatingRequestType(DefaultRequests):
 
     another_topic_updating = WorkflowRequest(
         requesters=[AnyUser()],
-        recipients=[UserGenerator(2)],
+        recipients=[UserGenerator("user2@example.org")],
     )
 
 
@@ -501,7 +505,7 @@ class RequestsWithSystemIdentity(WorkflowRequestPolicy):
 
     publish_draft = WorkflowRequest(
         requesters=[AnyUser()],
-        recipients=[UserGenerator("system")],
+        recipients=[SystemUserGenerator()],
     )
 
 
@@ -510,7 +514,7 @@ class TestWorkflowPermissions(RequestBasedWorkflowPermissions):
 
     can_read = (
         IfInState("draft", [RecordOwners()]),
-        IfInState("publishing", [RecordOwners(), UserGenerator(2)]),
+        IfInState("publishing", [RecordOwners(), UserGenerator("user2@example.org")]),
         IfInState("published", [AnyUser()]),
         IfInState("published", [AuthenticatedUser()]),
         IfInState("deleting", [AnyUser()]),
@@ -523,9 +527,9 @@ class WithApprovalPermissions(TestWorkflowPermissions):
 
     can_read = (
         IfInState("draft", [RecordOwners()]),
-        IfInState("approving", [RecordOwners(), UserGenerator(2)]),
-        IfInState("approved", [RecordOwners(), UserGenerator(2)]),
-        IfInState("publishing", [RecordOwners(), UserGenerator(2)]),
+        IfInState("approving", [RecordOwners(), UserGenerator("user2@example.org")]),
+        IfInState("approved", [RecordOwners(), UserGenerator("user2@example.org")]),
+        IfInState("publishing", [RecordOwners(), UserGenerator("user2@example.org")]),
         IfInState("published", [AuthenticatedUser()]),
         IfInState("deleting", [AuthenticatedUser()]),
     )
@@ -782,14 +786,6 @@ def password():
 
 @pytest.fixture
 def more_users(app, db, UserFixture, password):  # noqa N803
-    if db.engine.dialect.name == "postgresql":
-        from invenio_accounts.models import User
-        from sqlalchemy import text
-
-        name = User.__table__.name
-        sql = f'ALTER SEQUENCE "{name}_id_seq" RESTART WITH 1'
-        db.session.execute(text(sql))
-        db.session.commit()
 
     user1 = UserFixture(
         email="user1@example.org",
@@ -851,17 +847,17 @@ def more_users(app, db, UserFixture, password):  # noqa N803
     )
     _create_user(user7, app, db)
 
-    user10 = UserFixture(
-        email="user10@example.org",
+    user8 = UserFixture(
+        email="user8@example.org",
         password=password,
         active=True,
         confirmed=True,
     )
-    _create_user(user10, app, db)
+    _create_user(user8, app, db)
 
     db.session.commit()
     UserAggregate.index.refresh()
-    return [user1, user2, user3, user4, user5, user6, user7, user10]
+    return [user1, user2, user3, user4, user5, user6, user7, user8]
 
 
 @pytest.fixture(scope="session")
@@ -888,8 +884,6 @@ def model_types():
 @pytest.fixture(scope="session")
 def requests_model(model_types):
     from oarepo_model.api import model
-    from oarepo_model.presets.drafts import drafts_preset
-    from oarepo_model.presets.records_resources import records_resources_preset
 
     time.time()
 
@@ -897,11 +891,7 @@ def requests_model(model_types):
         name="requests_test",
         version="1.0.0",
         presets=[
-            records_resources_preset,
-            drafts_preset,
-            ui_preset,
-            ui_links_preset,
-            rdm_preset,
+            rdm_minimal_preset,
             workflows_preset,
             requests_preset,
         ],

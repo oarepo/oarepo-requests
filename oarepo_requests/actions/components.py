@@ -42,7 +42,7 @@ class RequestActionComponent:
         *args: Any,
         **kwargs: Any,
     ) -> None:
-        """Apply the component.
+        """Apply the component on the create action.
 
         Must return a context manager
 
@@ -63,7 +63,7 @@ class RequestActionComponent:
         *args: Any,
         **kwargs: Any,
     ) -> None:
-        """Apply the component.
+        """Apply the component on the submit action.
 
         Must return a context manager
 
@@ -84,7 +84,7 @@ class RequestActionComponent:
         *args: Any,
         **kwargs: Any,
     ) -> None:
-        """Apply the component.
+        """Apply the component on the accept action.
 
         Must return a context manager
 
@@ -105,7 +105,7 @@ class RequestActionComponent:
         *args: Any,
         **kwargs: Any,
     ) -> None:
-        """Apply the component.
+        """Apply the component on the decline action.
 
         Must return a context manager
 
@@ -126,7 +126,7 @@ class RequestActionComponent:
         *args: Any,
         **kwargs: Any,
     ) -> None:
-        """Apply the component.
+        """Apply the component on the cancel action.
 
         Must return a context manager
 
@@ -147,7 +147,7 @@ class RequestActionComponent:
         *args: Any,
         **kwargs: Any,
     ) -> None:
-        """Apply the component.
+        """Apply the component on the expire action.
 
         Must return a context manager
 
@@ -178,13 +178,10 @@ class WorkflowTransitionComponent(RequestActionComponent):
             # it does not make sense to attempt changing the state of the draft
             return
         try:
-            # TODO: does it make sense for transitions to possible return None?
             transitions = (
                 current_oarepo_workflows.get_workflow(state.topic).requests()[state.request_type.type_id].transitions
             )
         except NoResultFound:  # parent might be deleted - this is the case for delete_draft request type
-            return
-        if not transitions:
             return
         target_state = transitions[state.action.status_to]
 
@@ -264,11 +261,10 @@ class AutoAcceptComponent(RequestActionComponent):
             finally:
                 state.action = current_action_obj
         else:
+            # TODO: consider reconceptualizing this whole RequestActionState thing
             action_obj.execute(identity, uow, *args, **kwargs)
             # we dont know if request/topic was changed, retrieve actual data
-            new_request: Request = Request.get_record(
-                cast("UUID", request.id)
-            )  # TODO: request.id should not be None (Optional[UUID]) according to stubs?
+            new_request: Request = Request.get_record(cast("UUID", request.id))
             state.request = new_request
             try:
                 new_topic = new_request.topic.resolve()

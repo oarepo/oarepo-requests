@@ -45,7 +45,7 @@ if TYPE_CHECKING:
 type JsonValue = str | LazyString | int | float | bool | None | dict[str, JsonValue] | list[JsonValue]
 
 
-# TODO: move to runtime
+# TODO: move to runtime; type properly
 class classproperty[T]:  # noqa N801
     """Class property decorator as decorator chaining for declaring class properties was deprecated in python 3.11."""
 
@@ -155,14 +155,13 @@ def resolve_reference_dict(reference_dict: dict[str, str]) -> Any:
     return ResolverRegistry.resolve_entity_proxy(reference_dict, raise_=True).resolve()  # type: ignore[reportOptionalMemberAccess]
 
 
+# TODO: pass1: discuss the consequences of throwing exception at None
 def reference_entity(entity: Any) -> dict[str, str]:
     """Resolve the entity to the reference dict."""
-    return cast(
-        "dict[str, str]", ResolverRegistry.reference_entity(entity, raise_=True)
-    )  # TODO: why the stub doesn't work
+    return cast("dict[str, str]", ResolverRegistry.reference_entity(entity, raise_=True))
 
 
-# TODO: is this used somewhere
+# TODO: pass1: is this used somewhere
 def get_matching_service_for_refdict(
     reference_dict: dict[str, str],
 ) -> RecordService | None:

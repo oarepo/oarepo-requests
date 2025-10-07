@@ -66,38 +66,41 @@ def test_multiple_recipients(
     creator = users[0]
     creator_client = logged_client(creator)
 
+    recipient1_id = str(users[0].id)
+    recipient2_id = str(users[1].id)
+
     record1 = draft_factory(creator.identity, custom_workflow="multiple_recipients")
     resp_request_submit = create_request_on_draft(creator.identity, record1["id"], "publish_draft")
     request = creator_client.get(f"{urls['BASE_URL_REQUESTS']}{resp_request_submit['id']}?expand=true").json
     assert request["expanded"]["receiver"] == {
         "user": {
-            "1": {
+            recipient1_id: {
                 "active": True,
                 "blocked_at": None,
                 "confirmed_at": None,
                 "email": "user1@example.org",
-                "id": "1",
+                "id": recipient1_id,
                 "is_current_user": True,
                 "links": {
-                    "avatar": "https://127.0.0.1:5000/api/users/1/avatar.svg",
-                    "records_html": "https://127.0.0.1:5000/search/records?q=parent.access.owned_by.user:1",
-                    "self": "https://127.0.0.1:5000/api/users/1",
+                    "avatar": f"https://127.0.0.1:5000/api/users/{recipient1_id}/avatar.svg",
+                    "records_html": f"https://127.0.0.1:5000/search/records?q=parent.access.owned_by.user:{recipient1_id}",
+                    "self": f"https://127.0.0.1:5000/api/users/{recipient1_id}",
                 },
                 "profile": {"affiliations": "CERN", "full_name": ""},
                 "username": None,
                 "verified_at": None,
             },
-            "2": {
+            recipient2_id: {
                 "active": None,
                 "blocked_at": None,
                 "confirmed_at": None,
                 "email": "",
-                "id": "2",
+                "id": recipient2_id,
                 "is_current_user": False,
                 "links": {
-                    "avatar": "https://127.0.0.1:5000/api/users/2/avatar.svg",
-                    "records_html": "https://127.0.0.1:5000/search/records?q=parent.access.owned_by.user:2",
-                    "self": "https://127.0.0.1:5000/api/users/2",
+                    "avatar": f"https://127.0.0.1:5000/api/users/{recipient2_id}/avatar.svg",
+                    "records_html": f"https://127.0.0.1:5000/search/records?q=parent.access.owned_by.user:{recipient2_id}",
+                    "self": f"https://127.0.0.1:5000/api/users/{recipient2_id}",
                 },
                 "profile": {"affiliations": "CERN", "full_name": ""},
                 "username": "beetlesmasher",

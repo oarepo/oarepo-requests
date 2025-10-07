@@ -119,7 +119,7 @@ class OARepoRequests:
 
     def init_resources(self, app: Flask) -> None:
         """Init resources."""
-        # TODO: import invenio
+        # TODO: import invenio - reference the service instead of initializing it again
         self.requests_resource = OARepoRequestsResource(
             service=config.REQUESTS_SERVICE_CLASS(config.REQUESTS_SERVICE_CONFIG_CLASS.build(app)),
             config=OARepoRequestsResourceConfig.build(app),

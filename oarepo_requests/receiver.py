@@ -16,6 +16,8 @@ from oarepo_workflows.errors import RequestTypeNotInWorkflowError
 from oarepo_requests.errors import ReceiverNonReferencableError
 
 if TYPE_CHECKING:
+    from collections.abc import Mapping
+
     from invenio_records_resources.records.api import Record
     from invenio_requests.customizations.request_types import RequestType
     from oarepo_workflows import WorkflowRequest
@@ -25,7 +27,7 @@ def default_workflow_receiver_function(
     record: Record,
     request_type: RequestType,
     **kwargs: Any,  # i suppose we can't have requests with None topic
-) -> dict[str, str] | None:
+) -> Mapping[str, str] | None:
     """Get the receiver of the request.
 
     This function is called by oarepo-requests when a new request is created. It should
@@ -48,4 +50,4 @@ def default_workflow_receiver_function(
     receiver = request.recipient_entity_reference(record=record, request_type=request_type, **kwargs)
     if not request_type.receiver_can_be_none and not receiver:
         raise ReceiverNonReferencableError(request_type=request_type, record=record, **kwargs)
-    return cast("dict[str, str]", receiver)  # TODO: idk why it complains here
+    return cast("Mapping[str, str]", receiver)  # TODO: pass1: idk why it complains here
