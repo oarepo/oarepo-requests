@@ -48,9 +48,6 @@ class RequestTypeSchema(ma.Schema):
         type_id = data["type_id"]
         identity = request_type_identity_ctx.get()
         record = request_type_record_ctx.get()
-        # TODO: lint ResolverRegistry.reference_entity(record) should always work here but idk
-        #  whether crashing on link generation is justified
-        # ReferenceEntity thinks it returns dict[str, Any]
         topic_ref = ref_to_str(reference_entity(record) if isinstance(record, Record) else record)
         link = EndpointLink("oarepo_requests.create_args", params=["topic", "request_type"])
         template = LinksTemplate({"create": link}, context={"topic": topic_ref, "request_type": type_id})

@@ -72,7 +72,6 @@ class OpenRequestAlreadyExistsError(CannotExecuteActionError):
         self.request_type = request_type
         self.record = record
 
-    # TODO: how to type these gettext lazystrings things - retype to str
     def __str__(self):
         """Return str representation."""
         return self.description

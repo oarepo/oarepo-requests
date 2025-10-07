@@ -103,7 +103,7 @@ class OARepoRequestType(RequestType):
     def can_create(
         self,
         identity: Identity,
-        data: dict,  # noqa ARG002
+        data: dict[str, Any],  # noqa ARG002
         receiver: dict[str, str],  # noqa ARG002
         topic: Record,
         creator: dict[str, str],  # noqa ARG002
@@ -120,6 +120,7 @@ class OARepoRequestType(RequestType):
         :param args:            additional arguments
         :param kwargs:          additional keyword arguments
         """
+        # TODO: pass1: discuss this mechanism
         if not self._allowed_by_publication_status(record=topic):
             raise PermissionDeniedError("create")
         current_requests_service.require_permission(identity, "create", record=topic, request_type=self, **kwargs)
@@ -285,7 +286,6 @@ class NonDuplicableOARepoRequestType(OARepoRequestType):
             raise OpenRequestAlreadyExistsError(self, topic)
         super().can_create(identity, data, receiver, topic, creator, *args, **kwargs)
 
-    # TODO: decide whether OARepoRequests could possible be allowed on models without drafts
     @classmethod
     def is_applicable_to(cls, identity: Identity, topic: Record, *args: Any, **kwargs: Any) -> bool:
         """Check if the request type is applicable to the topic."""

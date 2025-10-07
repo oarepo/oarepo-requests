@@ -106,7 +106,7 @@ class DeletePublishedRecordRequestType(NonDuplicableOARepoRequestType):
     receiver_can_be_none = True
 
     allowed_on_draft = False
-    allowed_topic_ref_types = ModelRefTypes(published=True, draft=False)
+    allowed_topic_ref_types = ModelRefTypes()
 
     @override
     def stateful_name(

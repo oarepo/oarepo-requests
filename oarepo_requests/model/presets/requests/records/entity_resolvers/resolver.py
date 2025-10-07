@@ -46,12 +46,14 @@ def set_field(result: dict[str, Any], resolved_dict: dict[str, Any], field_name:
 
 
 # TODO: get_needs is implemented in RDM but I think we need workflow aware approach anyway
-# TODO: Resolve how to lint using drafts_resources records and what to do in cases without drafts
+# TODO: pass1: discuss the need for separate resolver/proxy for records without drafts
 class DraftRecordProxy(RecordProxy):
     """Resolver proxy for a OARepo record entity.
 
     Based on RDMRecordProxy, supports customizable record and draft classes.
     """
+
+    picked_fields = ("title", "creators", "contributors")
 
     @override
     def __init__(
@@ -61,8 +63,6 @@ class DraftRecordProxy(RecordProxy):
         # this should be record resolver?
         super().__init__(resolver, ref_dict, record_cls)
         self.draft_cls = draft_cls
-
-    picked_fields = ("title", "creators", "contributors")
 
     def _get_record(self, pid_value: str) -> Record:
         """Fetch the published record."""
@@ -128,7 +128,7 @@ class DraftRecordResolver(RecordResolver):
     """
 
     # TODO: subclassed records_resources instead of RDM because of __init__ hardcoded
-    #  record_cls and draft_cls, discuss maintainability
+    # record_cls and draft_cls, discuss maintainability
     # perhaps make proxy_cls customizable
     proxy_cls = DraftRecordProxy
 

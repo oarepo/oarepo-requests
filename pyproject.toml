@@ -1,6 +1,6 @@
 [project]
 name = "oarepo-requests"
-version = "3.0.0"
+dynamic = ["version"]
 description = "Add your description here"
 readme = "README.md"
 authors = [
@@ -28,6 +28,7 @@ dev = [
 
 tests = [
     "pytest-invenio",
+    "pytest-oarepo",
     "oarepo-rdm>=1.0.0.dev4",
     "oarepo-ui>=6.0.0dev1", # remove once dev versions aren't used
     "deepdiff",

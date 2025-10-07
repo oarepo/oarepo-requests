@@ -106,14 +106,16 @@ class OARepoGenericActionMixin(RequestAction):
         """Execute the action."""
         request: Request = self.request
         request_type = request.type
+        # TODO: decide whether topic in RequestActionState can be None
+        # TODO: pass1: since ditching delete draft, using tombstones and unifying record/draft entity ref
+        #  this should not happen anymore i think
+        #  still have we considered cascade delete?
         try:
             topic = request.topic.resolve()
         except (PersistentIdentifierError, PIDDoesNotExistError):
             topic = None
 
         # create a shared state between different actions to track changes in topic/requests etc.
-        # TODO: decide whether topic in RequestActionState can be None
-        # TODO: unify draft and published reference, scrap state
         state: RequestActionState = RequestActionState(
             request=request,
             request_type=request_type,
@@ -159,6 +161,5 @@ class OARepoCancelAction(OARepoGenericActionMixin, actions.CancelAction):
     type_id = "cancel"
     name = _("Cancel")
 
-    # TODO: this is defined as list in invenio
     status_from = ("created", "submitted")  # type: ignore[reportAssignmentType]
     status_to = "cancelled"

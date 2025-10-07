@@ -57,9 +57,12 @@ class NewVersionRequestType(NonDuplicableOARepoRequestType):
         }
 
     description = _("Request requesting creation of new version of a published record.")  # type: ignore[reportAssignmentType]
-    allowed_topic_ref_types = ModelRefTypes(published=True, draft=True)  # TODO: new version makes no sense on drafts?
+    allowed_topic_ref_types = ModelRefTypes(
+        published=True, draft=True
+    )  # TODO: pass1: new version makes no sense on drafts?
     editable = False
 
+    # TODO: do we need this?
     form: ClassVar[JsonValue] = {
         "field": "keep_files",
         "ui_widget": "Dropdown",

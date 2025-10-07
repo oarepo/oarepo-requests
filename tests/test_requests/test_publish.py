@@ -51,10 +51,7 @@ def test_publish_service(
     requests_model.Draft.index.refresh()
     assert "self" in accept.data["expanded"]["created_by"]["links"]
     assert "self" in accept.data["expanded"]["receiver"]["links"]
-    assert accept.data["expanded"]["topic"]["links"] == {}
-    assert accept.data["expanded"]["topic"]["metadata"] == {"title": "Deleted record"}
-    assert "self" in accept.data["expanded"]["payload"]["created_topic"]["links"]
-    assert "self_html" in accept.data["expanded"]["payload"]["created_topic"]["links"]
+    assert "self" in accept.data["expanded"]["topic"]["links"]
 
     record_service.read(creator.identity, draft["id"])  # will throw exception if record isn't published
 

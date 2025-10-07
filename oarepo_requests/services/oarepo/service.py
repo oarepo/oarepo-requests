@@ -9,7 +9,7 @@
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Any, cast, override
+from typing import TYPE_CHECKING, Any, override
 
 from invenio_drafts_resources.records.api import Record
 from invenio_i18n import _
@@ -80,7 +80,7 @@ class OARepoRequestsService(RequestsService):
         :param args: Additional arguments.
         :param kwargs: Additional keyword arguments.
         """
-        # TODO: invenio signature issue; check for none record explicitly
+        # TODO: lint: invenio suggest None topic can be here but we do not expect it
         if topic is None:
             raise ValueError("")
         type_ = current_request_type_registry.lookup(request_type, quiet=True)
@@ -94,8 +94,7 @@ class OARepoRequestsService(RequestsService):
             )
         if "payload" not in data and type_.payload_schema:
             data["payload"] = {}
-        # TODO: missing in stubs
-        schema = self._wrap_schema(type_.marshmallow_schema())  # type: ignore[reportAttributeAccessIssue]
+        schema = self._wrap_schema(type_.marshmallow_schema())
         data, errors = schema.load(
             data,
             context={"identity": identity},
@@ -110,10 +109,11 @@ class OARepoRequestsService(RequestsService):
 
         error = type_.can_create(identity, data, receiver, topic, creator) if hasattr(type_, "can_create") else None
 
+        # TODO: lint: stubs do not allow receiver to be None even if I think invenio suggests it
         if not error:
             result = super().create(
                 identity=identity,
-                data=data,  # type: ignore[reportArgumentType]
+                data=data,
                 request_type=type_,
                 receiver=receiver,  # type: ignore[reportArgumentType]
                 creator=creator,
@@ -121,18 +121,19 @@ class OARepoRequestsService(RequestsService):
                 expand=expand,
                 uow=uow,
             )
-            # TODO: should be resolved by dummy uow?
-            uow.register(IndexRefreshOp(indexer=self.indexer, index=self.record_cls.index))  # type: ignore[union-attr, reportArgumentType]
-            return cast("RequestItem", result)  # TODO: prob should return RequestItem in stub?
+            uow.register(IndexRefreshOp(indexer=self.indexer, index=self.record_cls.index))  # type: ignore[reportArgumentType]
+            return result
         return None
 
     def applicable_request_types(self, identity: Identity, topic: Record | dict[str, str]) -> RequestTypesList:
         """Get applicable request types for a record."""
-        topic = cast("Record", resolve_reference_dict(topic)) if not isinstance(topic, Record) else topic
+        topic = resolve_reference_dict(topic) if not isinstance(topic, Record) else topic
+        if not isinstance(topic, Record):
+            raise TypeError("Trying to find applicable request types on non-record entity")
 
         allowed_request_types = allowed_request_types_for_record(identity, topic)
         return RequestTypesList(
-            service=self,  # TODO: unserious
+            service=self,
             identity=identity,
             results=list(allowed_request_types.values()),
             links_tpl=LinksTemplate({"self": EndpointLink("oarepo_requests.applicable_request_types")}),

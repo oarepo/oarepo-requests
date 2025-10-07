@@ -44,7 +44,7 @@ def test_receiver_param_interpreter(
         f"{urls['BASE_URL_REQUESTS']}?assigned=true"
     )  # creator of 1 and recipient of 2
     assert len(search_receiver_only.json["hits"]["hits"]) == 1
-    assert search_receiver_only.json["hits"]["hits"][0]["receiver"] == {"user": "2"}
+    assert search_receiver_only.json["hits"]["hits"][0]["receiver"] == {"user": str(users[1].id)}
     assert search_receiver_only.json["hits"]["hits"][0]["type"] == "publish_draft"
 
 
@@ -57,6 +57,8 @@ def test_owner_param_interpreter(
     search_clear,
 ):
     user1_client, user2_client = _init(users, logged_client, draft_factory, submit_request_on_draft, urls)
+    user1_id = str(users[0].id)
+    user2_id = str(users[1].id)
 
     search_user1_only = user1_client.get(f"{urls['BASE_URL_REQUESTS']}?mine=true")
     search_user2_only = user2_client.get(f"{urls['BASE_URL_REQUESTS']}?mine=true")
@@ -64,16 +66,16 @@ def test_owner_param_interpreter(
     assert len(search_user1_only.json["hits"]["hits"]) == 1
     assert len(search_user2_only.json["hits"]["hits"]) == 1
 
-    assert search_user1_only.json["hits"]["hits"][0]["created_by"] == {"user": "1"}
+    assert search_user1_only.json["hits"]["hits"][0]["created_by"] == {"user": user1_id}
     assert search_user1_only.json["hits"]["hits"][0]["type"] == "publish_draft"
 
-    assert search_user2_only.json["hits"]["hits"][0]["created_by"] == {"user": "2"}
+    assert search_user2_only.json["hits"]["hits"][0]["created_by"] == {"user": user2_id}
     assert search_user2_only.json["hits"]["hits"][0]["type"] == "another_topic_updating"
 
     # mine requests should be in all=true as well
     search_user1_only = user1_client.get(f"{urls['BASE_URL_REQUESTS']}?all=true")
     for hit in search_user1_only.json["hits"]["hits"]:
-        assert hit["created_by"] == {"user": "1"} or hit["receiver"] == {"user": "1"}
+        assert hit["created_by"] == {"user": user1_id} or hit["receiver"] == {"user": user1_id}
 
 
 def test_open_param_interpreter(
