@@ -14,7 +14,6 @@ from functools import cached_property
 from typing import TYPE_CHECKING, Any
 
 from invenio_i18n import _
-from invenio_pidstore.errors import PersistentIdentifierError, PIDDoesNotExistError
 from invenio_records_resources.records import Record
 from invenio_requests.customizations import actions
 from invenio_requests.records.api import Request
@@ -110,20 +109,15 @@ class OARepoGenericActionMixin(RequestAction):
         # TODO: pass1: since ditching delete draft, using tombstones and unifying record/draft entity ref
         #  this should not happen anymore i think
         #  still have we considered cascade delete?
-        try:
-            topic = request.topic.resolve()
-        except (PersistentIdentifierError, PIDDoesNotExistError):
-            topic = None
-
+        topic = request.topic.resolve()
         # create a shared state between different actions to track changes in topic/requests etc.
         state: RequestActionState = RequestActionState(
             request=request,
             request_type=request_type,
-            topic=topic,  # type: ignore[reportArgumentType]
+            topic=topic,
             created_by=request.created_by,
             action=self,
         )
-
         identity.provides.add(request_active)
         try:
             self.execute_with_components(

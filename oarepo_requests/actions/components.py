@@ -171,20 +171,11 @@ class WorkflowTransitionComponent(RequestActionComponent):
 
     def _workflow_transition(self, identity: Identity, state: RequestActionState, uow: UnitOfWork) -> None:
         from oarepo_workflows.proxies import current_oarepo_workflows
-        from sqlalchemy.exc import NoResultFound
 
-        if not state.topic:
-            # for example if we are cancelling requests after deleting draft,
-            # it does not make sense to attempt changing the state of the draft
-            return
-        try:
-            transitions = (
-                current_oarepo_workflows.get_workflow(state.topic).requests()[state.request_type.type_id].transitions
-            )
-        except NoResultFound:  # parent might be deleted - this is the case for delete_draft request type
-            return
+        transitions = (
+            current_oarepo_workflows.get_workflow(state.topic).requests()[state.request_type.type_id].transitions
+        )
         target_state = transitions[state.action.status_to]
-
         if target_state and not state.topic.is_deleted:  # commit doesn't work on deleted record?
             current_oarepo_workflows.set_state(
                 identity,
