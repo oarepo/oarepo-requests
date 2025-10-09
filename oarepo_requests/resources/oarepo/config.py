@@ -16,7 +16,6 @@ import importlib_metadata
 import marshmallow as ma
 from invenio_records_resources.services.base.config import ConfiguratorMixin
 from invenio_requests.resources import RequestsResourceConfig
-from invenio_requests.resources.requests.config import request_error_handlers
 
 from oarepo_requests.services.search import ExtendedRequestSearchRequestArgsSchema
 
@@ -67,15 +66,8 @@ class OARepoRequestsResourceConfig(RequestsResourceConfig, ConfiguratorMixin):
         type[HTTPException | BaseException] | int,
         Callable[[Exception], Response],
     ]:
-        # I'm sorry It's 11am and i can't remember the point of this
         """Get error handlers."""
-        # TODO: lint: this probably isn't ideal; ie request error handlers have different type
-        # than error handlers in the stubs
-        # TODO: import correctly - use the lazy object pattern
-        entrypoint_error_handlers = dict(request_error_handlers)
-
+        error_handlers = dict(super().error_handlers)
         for x in importlib_metadata.entry_points(group="oarepo_requests.error_handlers"):
-            entrypoint_error_handlers.update(x.load())
-        for x in importlib_metadata.entry_points(group="oarepo_requests.extended.error_handlers"):
-            entrypoint_error_handlers.update(x.load())
-        return MappingProxyType(entrypoint_error_handlers)  # type: ignore[reportReturnType]
+            error_handlers.update(x.load())
+        return MappingProxyType(error_handlers)  # type: ignore[reportReturnType]
