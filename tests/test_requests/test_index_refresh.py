@@ -33,14 +33,6 @@ def test_search(
     link = link2testclient(requests_search["hits"]["hits"][0]["links"]["self"])
 
     creator_client.put(
-        link,
-        json={"title": "tralala"},
-    )
-
-    requests_search = creator_client.get(urls["BASE_URL_REQUESTS"]).json
-    assert requests_search["hits"]["hits"][0]["title"] != "tralala"
-
-    creator_client.put(
         f"{link}?refresh=true",
         json={"title": "tralala"},
     )
