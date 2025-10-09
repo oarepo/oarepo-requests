@@ -49,8 +49,9 @@ from oarepo_workflows.model.presets import workflows_preset
 from oarepo_workflows.requests.events import WorkflowEvent
 from pytest_oarepo.requests.classes import (
     CSLocaleUserGenerator,
+    SystemUserGenerator,
     TestEventType,
-    UserGenerator, SystemUserGenerator,
+    UserGenerator,
 )
 from pytest_oarepo.users import _create_user
 
@@ -88,10 +89,17 @@ pytest_plugins = [
 
 
 @pytest.fixture
-def events_service():
+def requests_events_service():
     from invenio_requests.proxies import current_events_service
 
     return current_events_service
+
+
+@pytest.fixture
+def requests_service():
+    from oarepo_requests.proxies import current_requests_service
+
+    return current_requests_service
 
 
 @pytest.fixture(scope="module", autouse=True)
@@ -786,7 +794,6 @@ def password():
 
 @pytest.fixture
 def more_users(app, db, UserFixture, password):  # noqa N803
-
     user1 = UserFixture(
         email="user1@example.org",
         password=password,
