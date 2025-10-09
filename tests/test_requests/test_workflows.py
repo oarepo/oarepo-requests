@@ -181,7 +181,7 @@ def test_workflow_events(
     ui_serialization_result,
     events_resource_data,
     draft_factory,
-    events_service,
+    requests_events_service,
     link2testclient,
     search_clear,
 ):
@@ -202,13 +202,13 @@ def test_workflow_events(
 
     request_id = read_from_record.json["expanded"]["requests"][0]["id"]
     with pytest.raises(PermissionDeniedError):
-        events_service.create(
+        requests_events_service.create(
             identity=user1.identity,
             request_id=request_id,
             data=events_resource_data,
             event_type=TestEventType,
         )
-    create_event_u2 = events_service.create(
+    create_event_u2 = requests_events_service.create(
         identity=user2.identity,
         request_id=request_id,
         data=events_resource_data,
