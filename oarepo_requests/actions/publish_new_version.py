@@ -11,24 +11,23 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING, Any
 
-from invenio_records_resources.services.uow import RecordCommitOp, UnitOfWork
-from oarepo_runtime.datastreams.utils import get_record_service_for_record
-from oarepo_runtime.i18n import lazy_gettext as _
+from invenio_i18n import _
+from invenio_records_resources.services.uow import RecordCommitOp
+
+from ..temp_utils import get_draft_record_service
 
 if TYPE_CHECKING:
     from flask_principal import Identity
-    from invenio_drafts_resources.records import Record
+    from invenio_db.uow import UnitOfWork
 
     from .components import RequestActionState
+
 
 from .publish_draft import PublishDraftAcceptAction
 
 
 class PublishNewVersionAcceptAction(PublishDraftAcceptAction):
     """Accept action for publishing draft requests."""
-
-    self_link = "published_record:links:self"
-    self_html_link = "published_record:links:self_html"
 
     name = _("Publish")
 
@@ -39,11 +38,9 @@ class PublishNewVersionAcceptAction(PublishDraftAcceptAction):
         uow: UnitOfWork,
         *args: Any,
         **kwargs: Any,
-    ) -> Record:
+    ) -> None:
         """Publish the draft."""
-        topic_service = get_record_service_for_record(state.topic)
-        if not topic_service:
-            raise KeyError(f"topic {state.topic} service not found")
+        topic_service = get_draft_record_service(state.topic)
 
         if "payload" in self.request and "version" in self.request["payload"]:
             state.topic.metadata["version"] = self.request["payload"]["version"]

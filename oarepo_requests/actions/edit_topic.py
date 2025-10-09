@@ -11,21 +11,22 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING, Any, override
 
-from oarepo_runtime.datastreams.utils import get_record_service_for_record
-from oarepo_requests.actions.record_snapshot_mixin import RecordSnapshotMixin
-from .generic import AddTopicLinksOnPayloadMixin, OARepoAcceptAction
+from ..temp_utils import get_draft_record_service
+from .components import CreatedTopicComponent
+from .generic import OARepoAcceptAction
 
 if TYPE_CHECKING:
     from flask_principal import Identity
+    from invenio_db.uow import UnitOfWork
+
     from .components import RequestActionState
-    from invenio_records_resources.services.uow import UnitOfWork
 
 
-class EditTopicAcceptAction(AddTopicLinksOnPayloadMixin, RecordSnapshotMixin, OARepoAcceptAction):
+# TODO: snapshot
+class EditTopicAcceptAction(OARepoAcceptAction):
     """Accept creation of a draft of a published record for editing metadata."""
 
-    self_link = "draft_record:links:self"
-    self_html_link = "draft_record:links:self_html"
+    action_components = (CreatedTopicComponent,)
 
     @override
     def apply(
@@ -37,8 +38,6 @@ class EditTopicAcceptAction(AddTopicLinksOnPayloadMixin, RecordSnapshotMixin, OA
         **kwargs: Any,
     ) -> None:
         """Apply the action, creating a draft of the record for editing metadata."""
-        topic_service = get_record_service_for_record(state.topic)
-        if not topic_service:
-            raise KeyError(f"topic {state.topic} service not found")
-        state.topic = topic_service.edit(identity, state.topic["id"], uow=uow)._record
+        topic_service = get_draft_record_service(state.topic)
+        topic_service.edit(identity, state.topic["id"], uow=uow)
         super().apply(identity, state, uow, *args, **kwargs)

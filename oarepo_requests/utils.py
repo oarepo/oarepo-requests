@@ -10,11 +10,11 @@
 from __future__ import annotations
 
 import copy
-from typing import TYPE_CHECKING, Any, Callable
+from typing import TYPE_CHECKING, Any, cast
 
+from flask_babel.speaklater import LazyString
 from invenio_access.permissions import system_identity
 from invenio_pidstore.errors import PersistentIdentifierError
-from invenio_records_resources.proxies import current_service_registry
 from invenio_requests.proxies import (
     current_request_type_registry,
     current_requests_service,
@@ -31,6 +31,8 @@ from oarepo_workflows.errors import MissingWorkflowError
 from oarepo_workflows.proxies import current_oarepo_workflows
 
 if TYPE_CHECKING:
+    from collections.abc import Callable, Mapping
+
     from flask_principal import Identity
     from invenio_records_resources.records import Record
     from invenio_records_resources.services import RecordService
@@ -38,15 +40,16 @@ if TYPE_CHECKING:
     from invenio_requests.records.api import Request
     from opensearch_dsl.query import Query
 
-    from oarepo_requests.typing import EntityReference
 
-    from .services.record.service import RecordRequestsService
+# TODO: perhaps we could use centrally defined custom types in runtime?
+type JsonValue = str | LazyString | int | float | bool | None | dict[str, JsonValue] | list[JsonValue]
 
 
-class classproperty[T]:
+# TODO: move to runtime; type properly
+class classproperty[T]:  # noqa N801
     """Class property decorator as decorator chaining for declaring class properties was deprecated in python 3.11."""
 
-    def __init__(self, func: Callable):
+    def __init__(self, func: Callable[[Any], T]):
         """Initialize the class property."""
         self.fget = func
 
@@ -55,9 +58,7 @@ class classproperty[T]:
         return self.fget(owner)
 
 
-def allowed_request_types_for_record(
-    identity: Identity, record: Record
-) -> dict[str, RequestType]:
+def allowed_request_types_for_record(identity: Identity, record: Record) -> dict[str, RequestType]:
     """Return allowed request types for the record.
 
     If there is a workflow defined on the record, only request types allowed by the workflow are returned.
@@ -71,16 +72,14 @@ def allowed_request_types_for_record(
         workflow_requests = current_oarepo_workflows.get_workflow(record).requests()
         return {
             type_id: wr.request_type
-            for (type_id, wr) in workflow_requests.applicable_workflow_requests(
-                identity, record=record
-            )
+            for (type_id, wr) in workflow_requests.applicable_workflow_requests(identity, record=record)
         }
     except MissingWorkflowError:
         # workflow not defined on the record, probably not a workflow-enabled record
         # so returning all matching request types
         pass
 
-    record_ref = list(ResolverRegistry.reference_entity(record).keys())[0]
+    record_ref = next(iter(reference_entity(record).keys()))
 
     ret = {}
     for rt in current_request_type_registry:
@@ -90,9 +89,7 @@ def allowed_request_types_for_record(
     return ret
 
 
-def create_query_term_for_reference(
-    field_name: str, reference: EntityReference
-) -> Query:
+def create_query_term_for_reference(field_name: str, reference: dict[str, str]) -> Query:
     """Create an opensearch query term for the reference.
 
     :param field_name: Field name to search in (can be "topic", "receiver", ...).
@@ -101,7 +98,7 @@ def create_query_term_for_reference(
     """
     return dsl.Q(
         "term",
-        **{f"{field_name}.{list(reference.keys())[0]}": list(reference.values())[0]},
+        **{f"{field_name}.{next(iter(reference.keys()))}": next(iter(reference.values()))},
     )
 
 
@@ -121,10 +118,10 @@ def search_requests_filter(
     :param is_open: Whether the request is open or closed. If not set, both open and closed requests are returned.
     """
     must = [
-        dsl.Q("term", **{"type": type_id}),
+        dsl.Q("term", type=type_id),
     ]
     if is_open is not None:
-        must.append(dsl.Q("term", **{"is_open": is_open}))
+        must.append(dsl.Q("term", is_open=is_open))
     if receiver_reference:
         must.append(create_query_term_for_reference("receiver", receiver_reference))
     if creator_reference:
@@ -132,40 +129,41 @@ def search_requests_filter(
     if topic_reference:
         must.append(create_query_term_for_reference("topic", topic_reference))
 
-    extra_filter = dsl.query.Bool(
-        "must",
+    # TODO: lint: correct
+    return dsl.query.Bool(
+        "must",  # type: ignore[reportArgumentType]
         must=must,
     )
 
-    return extra_filter
 
-
-def open_request_exists(
-    topic_or_reference: Record | EntityReference, type_id: str
-) -> bool:
+def open_request_exists(topic_or_reference: Record | dict[str, str], type_id: str) -> bool:
     """Check if there is an open request of a given type for the topic.
 
     :param topic_or_reference: Topic record or reference to the record in the form {"datasets": "id"}.
     :param type_id: Request type id.
     """
     topic_reference = ResolverRegistry.reference_entity(topic_or_reference, raise_=True)
-    base_filter = search_requests_filter(
-        type_id=type_id, topic_reference=topic_reference, is_open=True
-    )
-    results = current_requests_service.search(
-        system_identity, extra_filter=base_filter
-    ).hits
-    request_exists = bool(list(results))
-    return request_exists
+    base_filter = search_requests_filter(type_id=type_id, topic_reference=topic_reference, is_open=True)
+    results = current_requests_service.search(system_identity, extra_filter=base_filter).hits
+    return bool(list(results))
 
 
-def resolve_reference_dict(reference_dict: EntityReference) -> Record:
+# TODO: lint: raise_?
+# how do we plan for things to behave when None is returned
+def resolve_reference_dict(reference_dict: dict[str, str]) -> Any:
     """Resolve the reference dict to the entity (such as Record, User, ...)."""
-    return ResolverRegistry.resolve_entity_proxy(reference_dict).resolve()
+    return ResolverRegistry.resolve_entity_proxy(reference_dict, raise_=True).resolve()  # type: ignore[reportOptionalMemberAccess]
 
 
+# TODO: pass1: discuss the consequences of throwing exception at None
+def reference_entity(entity: Any) -> dict[str, str]:
+    """Resolve the entity to the reference dict."""
+    return cast("dict[str, str]", ResolverRegistry.reference_entity(entity, raise_=True))
+
+
+# TODO: pass1: is this used somewhere
 def get_matching_service_for_refdict(
-    reference_dict: EntityReference,
+    reference_dict: dict[str, str],
 ) -> RecordService | None:
     """Get the service that is responsible for entities matching the reference dict.
 
@@ -174,7 +172,7 @@ def get_matching_service_for_refdict(
     """
     for resolver in ResolverRegistry.get_registered_resolvers():
         if resolver.matches_reference_dict(reference_dict):
-            return current_service_registry.get(resolver._service_id)
+            return cast("RecordService", resolver.get_service())
     return None
 
 
@@ -185,22 +183,14 @@ def get_entity_key_for_record_cls(record_cls: type[Record]) -> str:
     :return: Entity type id
     """
     for resolver in ResolverRegistry.get_registered_resolvers():
-        if hasattr(resolver, "record_cls") and resolver.record_cls == record_cls:
-            return resolver.type_id
-    raise AttributeError(
-        f"Record class {record_cls} does not have a registered entity resolver."
-    )
-
-
-def get_requests_service_for_records_service(
-    records_service: RecordService,
-) -> RecordRequestsService:
-    """Get the requests service for the records service.
-
-    :param records_service: Records service.
-    :return: Requests service for the records service.
-    """
-    return current_service_registry.get(f"{records_service.config.service_id}_requests")
+        if not hasattr(resolver, "record_cls"):
+            continue
+        if hasattr(resolver, "record_cls") and resolver.record_cls == record_cls:  # type: ignore[reportAttributeAccessIssue]
+            type_id: str | None = getattr(resolver, "type_id", None)
+            if type_id is None:
+                raise ValueError(f"Entity resolver {type(resolver)} does not have an associated type_id")
+            return type_id
+    raise AttributeError(f"Record class {record_cls} does not have a registered entity resolver.")
 
 
 def stringify_first_val[T](dct: T) -> T:
@@ -217,7 +207,7 @@ def stringify_first_val[T](dct: T) -> T:
     return dct
 
 
-def reference_to_tuple(reference: EntityReference) -> tuple[str, str]:
+def reference_to_tuple(reference: dict[str, str]) -> tuple[str, str]:
     """Convert the reference dict to a tuple.
 
     :param reference: Reference dict in the form {"datasets": "id"}.
@@ -226,10 +216,20 @@ def reference_to_tuple(reference: EntityReference) -> tuple[str, str]:
     return next(iter(reference.items()))
 
 
-# TODO: consider moving to oarepo-workflows
+def string_to_reference(reference_str: str) -> dict[str, str]:
+    """Convert the reference string to a reference dict."""
+    split = reference_str.split(":")
+    return {split[0]: split[1]}
+
+
+def ref_to_str(ref_dict: dict[str, str]) -> str:
+    """Convert the reference string to a reference dict."""
+    return f"{next(iter(ref_dict.keys()))}:{next(iter(ref_dict.values()))}"
+
+
 def get_receiver_for_request_type(
     request_type: RequestType, identity: Identity, topic: Record
-) -> EntityReference | None:
+) -> Mapping[str, str] | None:
     """Get the default receiver for the request type, identity and topic.
 
     This call gets the workflow from the topic, looks up the request inside the workflow
@@ -254,13 +254,9 @@ def get_receiver_for_request_type(
     except KeyError:
         return None
 
-    receivers = workflow_request.recipient_entity_reference(
+    return workflow_request.recipient_entity_reference(  # type: ignore[no-any-return]
         identity=identity, record=topic, request_type=request_type, creator=identity
     )
-    if not receivers:
-        return None
-
-    return receivers
 
 
 # TODO: consider moving to oarepo-workflows
@@ -278,23 +274,15 @@ def is_auto_approved(
     if not current_oarepo_workflows:
         return False
 
-    receiver = get_receiver_for_request_type(
-        request_type=request_type, identity=identity, topic=topic
-    )
+    receiver = get_receiver_for_request_type(request_type=request_type, identity=identity, topic=topic)
 
     return bool(
         receiver
-        and (
-            isinstance(receiver, AutoApprove)
-            or isinstance(receiver, dict)
-            and receiver.get("auto_approve")
-        )
+        and (isinstance(receiver, AutoApprove) or (isinstance(receiver, dict) and receiver.get("auto_approve")))
     )
 
 
-def request_identity_matches(
-    entity_reference: EntityReference, identity: Identity
-) -> bool:
+def request_identity_matches(entity_reference: dict[str, str], identity: Identity) -> bool:
     """Check if the identity matches the entity reference.
 
     Identity matches the entity reference if the needs provided by the entity reference
@@ -309,10 +297,7 @@ def request_identity_matches(
         return False
 
     try:
-        if isinstance(entity_reference, dict):
-            entity = ResolverRegistry.resolve_entity_proxy(entity_reference)
-        else:
-            entity = entity_reference
+        entity = ResolverRegistry.resolve_entity_proxy(entity_reference)
         if entity:
             needs = entity.get_needs()
             return bool(identity.provides.intersection(needs))
@@ -343,13 +328,16 @@ def has_rights_to_accept_request(request: Request, identity: Identity) -> bool:
     :param request: Request to check.
     :param identity: Identity to check.
     """
-    return current_requests_service.check_permission(
-        identity,
-        "action_accept",
-        request=request,
-        record=request.topic,
-        request_type=request.type,
-    )
+    return cast(
+        "bool",
+        current_requests_service.check_permission(
+            identity,
+            "action_accept",
+            request=request,
+            record=request.topic,
+            request_type=request.type,
+        ),
+    )  # TODO: the typing stubs should resolve this so that we don't need cast?
 
 
 def has_rights_to_submit_request(request: Request, identity: Identity) -> bool:
@@ -358,10 +346,13 @@ def has_rights_to_submit_request(request: Request, identity: Identity) -> bool:
     :param request: Request to check.
     :param identity: Identity to check.
     """
-    return current_requests_service.check_permission(
-        identity,
-        "action_submit",
-        request=request,
-        record=request.topic,
-        request_type=request.type,
+    return cast(
+        "bool",
+        current_requests_service.check_permission(
+            identity,
+            "action_submit",
+            request=request,
+            record=request.topic,
+            request_type=request.type,
+        ),
     )

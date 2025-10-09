@@ -9,17 +9,17 @@
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Any
+from typing import TYPE_CHECKING, Any, override
 
-from invenio_i18n import gettext, lazy_gettext as _
-from typing_extensions import override
+from invenio_i18n import gettext
+from invenio_i18n import lazy_gettext as _
 
 from .publish_base import PublishRequestType
 
 if TYPE_CHECKING:
     from flask_babel.speaklater import LazyString
     from flask_principal import Identity
-    from invenio_drafts_resources.records import Record
+    from invenio_records_resources.records import Record
     from invenio_requests.records.api import Request
 
 
@@ -30,9 +30,7 @@ class PublishChangedMetadataRequestType(PublishRequestType):
     name = _("Publish changed metadata")
 
     @classmethod
-    def is_applicable_to(
-        cls, identity: Identity, topic: Record, *args: Any, **kwargs: Any
-    ) -> bool:
+    def is_applicable_to(cls, identity: Identity, topic: Record, *args: Any, **kwargs: Any) -> bool:
         """Check if the request type is applicable to the topic."""
         if cls.topic_type(topic) != "metadata":
             return False
@@ -80,7 +78,8 @@ class PublishChangedMetadataRequestType(PublishRequestType):
             topic=topic,
             request=request,
             create=gettext(
-                "By submitting the changed metadata for review you are requesting the publication of the changed metadata. "
+                "By submitting the changed metadata for review you are requesting the publication of the "
+                "changed metadata. "
                 "The draft will become locked and no further changes will be possible until the request "
                 "is accepted or declined. You will be notified about the decision by email."
             ),
@@ -102,13 +101,9 @@ class PublishChangedMetadataRequestType(PublishRequestType):
                 "It is now locked and no further changes are possible. "
                 "You will be notified about the decision by email."
             ),
-            submitted_others=gettext(
-                "The record with changed metadata has been submitted for review. "
-            ),
+            submitted_others=gettext("The record with changed metadata has been submitted for review. "),
             accepted=gettext("Accepted changed metadata publication"),
             declined=gettext("Declined changed metadata publication"),
             cancelled=gettext("Cancelled changed metadata publication"),
-            created=gettext(
-                "Waiting for finishing the changed metadata publication request."
-            ),
+            created=gettext("Waiting for finishing the changed metadata publication request."),
         )

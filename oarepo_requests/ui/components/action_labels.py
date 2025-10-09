@@ -30,12 +30,14 @@ class ActionLabelsComponent(UIResourceComponent):
         **kwargs: Any,
     ) -> None:
         """Add action labels to the form config."""
-        type_: RequestType = view_args.get("request_type")
+        # TODO: lint: correct
+        type_: RequestType = view_args.get("request_type")  # type: ignore[reportAssignmentType]
         action_labels = {}
         if type_:
             for action_type, action in type_.available_actions.items():
+                # TODO: lint: why is it complaining on attribute access 'protected by' hasattr?
                 if hasattr(action, "stateful_name"):
-                    name = action.stateful_name(identity, **kwargs)
+                    name = action.stateful_name(identity, **kwargs)  # type: ignore[reportAttributeAccessIssue]
                 else:
                     name = action_type.capitalize()
                 action_labels[action_type] = name

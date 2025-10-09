@@ -13,6 +13,7 @@ export const CallbackContextProvider = ({ children, value }) => {
 
 CallbackContextProvider.propTypes = {
   value: PropTypes.object.isRequired,
+  // eslint-disable-next-line react/require-default-props
   children: PropTypes.node,
 };
 

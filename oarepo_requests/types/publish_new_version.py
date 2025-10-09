@@ -9,12 +9,12 @@
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Any, override
+from typing import TYPE_CHECKING, Any, ClassVar, override
 
 import marshmallow as ma
+from invenio_i18n import gettext
+from invenio_i18n import lazy_gettext as _
 from invenio_requests.records.api import Request
-from oarepo_runtime.datastreams.utils import get_record_service_for_record
-from invenio_i18n import gettext, lazy_gettext as _
 
 from oarepo_requests.actions.publish_draft import (
     PublishDraftDeclineAction,
@@ -23,18 +23,21 @@ from oarepo_requests.actions.publish_draft import (
 from oarepo_requests.errors import VersionAlreadyExists
 
 from ..actions.publish_new_version import PublishNewVersionAcceptAction
+from ..temp_utils import get_draft_record_service
 from ..utils import classproperty
 from .publish_base import PublishRequestType
 from .ref_types import ModelRefTypes
 
 if TYPE_CHECKING:
+    from collections.abc import Mapping
+
     from flask_babel.speaklater import LazyString
     from flask_principal import Identity
-    from invenio_drafts_resources.records import Record
+    from invenio_records_resources.records import Record
     from invenio_requests.customizations.actions import RequestAction
     from invenio_requests.records.api import Request
 
-    from oarepo_requests.typing import EntityReference
+    from ..utils import JsonValue
 
 
 class PublishNewVersionRequestType(PublishRequestType):
@@ -42,12 +45,12 @@ class PublishNewVersionRequestType(PublishRequestType):
 
     type_id = "publish_new_version"
     name = _("Publish new version")
-    payload_schema = {
-        **PublishRequestType.payload_schema,
+
+    payload_schema: Mapping[str, ma.fields.Field] | None = {
         "version": ma.fields.Str(),
     }
 
-    form = {
+    form: ClassVar[JsonValue] = {
         "field": "version",
         "ui_widget": "Input",
         "props": {
@@ -58,7 +61,7 @@ class PublishNewVersionRequestType(PublishRequestType):
     }
 
     @classproperty
-    def available_actions(cls) -> dict[str, type[RequestAction]]:
+    def available_actions(cls) -> dict[str, type[RequestAction]]:  # noqa N805
         """Return available actions for the request type."""
         return {
             **super().available_actions,
@@ -71,12 +74,10 @@ class PublishNewVersionRequestType(PublishRequestType):
     receiver_can_be_none = True
     allowed_topic_ref_types = ModelRefTypes(published=True, draft=True)
 
-    editable = False  # type: ignore
+    editable = False
 
     @classmethod
-    def is_applicable_to(
-        cls, identity: Identity, topic: Record, *args: Any, **kwargs: Any
-    ) -> bool:
+    def is_applicable_to(cls, identity: Identity, topic: Record, *args: Any, **kwargs: Any) -> bool:
         """Check if the request type is applicable to the topic."""
         if cls.topic_type(topic) != "new_version":
             return False
@@ -138,8 +139,7 @@ class PublishNewVersionRequestType(PublishRequestType):
                 "it will be locked and no further modifications will be possible."
             ),
             submitted_receiver=gettext(
-                "The new version has been submitted for review. "
-                "You can now accept or decline the request."
+                "The new version has been submitted for review. You can now accept or decline the request."
             ),
             submitted_creator=gettext(
                 "The new version has been submitted for review. "
@@ -157,14 +157,14 @@ class PublishNewVersionRequestType(PublishRequestType):
         self,
         identity: Identity,
         data: dict,
-        receiver: EntityReference,
+        receiver: dict[str, str],
         topic: Record,
-        creator: EntityReference,
+        creator: dict[str, str],
         *args: Any,
         **kwargs: Any,
     ) -> None:
         """Check if the request can be created."""
-        topic_service = get_record_service_for_record(topic)
+        topic_service = get_draft_record_service(topic)
         # Only needed in case of new version as when you are publishing
         # draft for the first time, there are no previous versions with
         # which you can have collision
@@ -175,6 +175,6 @@ class PublishNewVersionRequestType(PublishRequestType):
                 if "version" in rec["metadata"]:
                     version = rec["metadata"]["version"]
                     if version == data["payload"]["version"]:
-                        raise VersionAlreadyExists()
+                        raise VersionAlreadyExists
 
         super().can_create(identity, data, receiver, topic, creator, *args, **kwargs)

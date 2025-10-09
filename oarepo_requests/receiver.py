@@ -9,21 +9,25 @@
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Any
+from typing import TYPE_CHECKING, Any, cast
 
-from oarepo_requests.errors import ReceiverNonReferencable, RequestTypeNotInWorkflow
+from oarepo_workflows.errors import RequestTypeNotInWorkflowError
+
+from oarepo_requests.errors import ReceiverNonReferencableError
 
 if TYPE_CHECKING:
+    from collections.abc import Mapping
+
     from invenio_records_resources.records.api import Record
     from invenio_requests.customizations.request_types import RequestType
     from oarepo_workflows import WorkflowRequest
 
-    from oarepo_requests.typing import EntityReference
-
 
 def default_workflow_receiver_function(
-    record: Record = None, request_type: RequestType = None, **kwargs: Any
-) -> EntityReference | None:
+    record: Record,
+    request_type: RequestType,
+    **kwargs: Any,  # i suppose we can't have requests with None topic
+) -> Mapping[str, str] | None:
     """Get the receiver of the request.
 
     This function is called by oarepo-requests when a new request is created. It should
@@ -32,23 +36,18 @@ def default_workflow_receiver_function(
     """
     from oarepo_workflows.proxies import current_oarepo_workflows
 
-    workflow_id = current_oarepo_workflows.get_workflow_from_record(record)
-    if not workflow_id:
+    workflow = current_oarepo_workflows.get_workflow(record)
+    if not workflow:
         return None  # exception?
 
     try:
-        request: WorkflowRequest = getattr(
-            current_oarepo_workflows.record_workflows[workflow_id].requests(),
-            request_type.type_id,
-        )
-    except AttributeError as e:
-        raise RequestTypeNotInWorkflow(request_type.type_id, workflow_id) from e
+        request: WorkflowRequest = workflow.requests().requests_by_id[request_type.type_id]
+    except KeyError as e:
+        raise RequestTypeNotInWorkflowError(
+            request_type.type_id, current_oarepo_workflows.get_workflow(record).code
+        ) from e
 
-    receiver = request.recipient_entity_reference(
-        record=record, request_type=request_type, **kwargs
-    )
+    receiver = request.recipient_entity_reference(record=record, request_type=request_type, **kwargs)
     if not request_type.receiver_can_be_none and not receiver:
-        raise ReceiverNonReferencable(
-            request_type=request_type, record=record, **kwargs
-        )
-    return receiver
+        raise ReceiverNonReferencableError(request_type=request_type, record=record, **kwargs)
+    return cast("Mapping[str, str]", receiver)  # TODO: pass1: idk why it complains here

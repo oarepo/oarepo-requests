@@ -7,6 +7,9 @@
 #
 
 
+from __future__ import annotations
+
+
 def test_search(
     logged_client,
     users,
@@ -21,19 +24,16 @@ def test_search(
 
     draft1 = draft_factory(creator.identity)
 
-    resp_request_create = create_request_on_draft(
-        creator.identity, draft1["id"], "publish_draft"
-    )
+    create_request_on_draft(creator.identity, draft1["id"], "publish_draft")
     # should work without refreshing requests index
     requests_search = creator_client.get(urls["BASE_URL_REQUESTS"]).json
 
     assert len(requests_search["hits"]["hits"]) == 1
 
     link = link2testclient(requests_search["hits"]["hits"][0]["links"]["self"])
-    extended_link = link.replace("/requests/", "/requests/extended/")
 
-    update = creator_client.put(
-        extended_link,
+    creator_client.put(
+        f"{link}?refresh=true",
         json={"title": "tralala"},
     )
 

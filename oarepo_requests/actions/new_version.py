@@ -11,23 +11,22 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING, Any
 
-from oarepo_runtime.datastreams.utils import get_record_service_for_record
-from oarepo_requests.actions.record_snapshot_mixin import RecordSnapshotMixin
-from .generic import AddTopicLinksOnPayloadMixin, OARepoAcceptAction
+from ..temp_utils import get_draft_record_service
+from .components import CreatedTopicComponent
+from .generic import OARepoAcceptAction
 
 if TYPE_CHECKING:
     from flask_principal import Identity
+    from invenio_db.uow import UnitOfWork
+
     from .components import RequestActionState
-    from invenio_drafts_resources.records import Record
-    from invenio_records_resources.services.uow import UnitOfWork
-    from invenio_requests.customizations import RequestType
 
 
-class NewVersionAcceptAction(AddTopicLinksOnPayloadMixin, RecordSnapshotMixin, OARepoAcceptAction):
+# TODO: snapshot
+class NewVersionAcceptAction(OARepoAcceptAction):
     """Accept creation of a new version of a published record."""
 
-    self_link = "draft_record:links:self"
-    self_html_link = "draft_record:links:self_html"
+    action_components = (CreatedTopicComponent,)
 
     def apply(
         self,
@@ -36,14 +35,11 @@ class NewVersionAcceptAction(AddTopicLinksOnPayloadMixin, RecordSnapshotMixin, O
         uow: UnitOfWork,
         *args: Any,
         **kwargs: Any,
-    ) -> Record:
+    ) -> None:
         """Apply the action, creating a new version of the record."""
-        topic_service = get_record_service_for_record(state.topic)
-        if not topic_service:
-            raise KeyError(f"topic {state.topic} service not found")
-
+        topic_service = get_draft_record_service(state.topic)
         new_version_topic = topic_service.new_version(identity, state.topic["id"], uow=uow)
-        state.topic = new_version_topic._record
+        state.created_topic = new_version_topic._record  # noqa SLF001
         if (
             "payload" in self.request
             and "keep_files" in self.request["payload"]
@@ -51,10 +47,4 @@ class NewVersionAcceptAction(AddTopicLinksOnPayloadMixin, RecordSnapshotMixin, O
         ):
             topic_service.import_files(identity, new_version_topic.id)
 
-        if "payload" not in self.request:
-            self.request["payload"] = {}
-        self.request["payload"]["draft_record:id"] = new_version_topic["id"]
-
-        return super().apply(
-            identity, state, uow, *args, **kwargs
-        )
+        return super().apply(identity, state, uow, *args, **kwargs)

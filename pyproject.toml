@@ -1,3 +1,95 @@
-[build_system]
-requires = ["setuptools", "wheel", "babel>2.8"]
-build-backend = "setuptools.build_meta"
+[project]
+name = "oarepo-requests"
+dynamic = ["version"]
+description = "Add your description here"
+readme = "README.md"
+authors = [
+    { name = "Ronald Krist", email = "krist@cesnet.cz" }
+]
+requires-python = ">=3.13,<3.14"
+
+dependencies = [
+    "oarepo-runtime>=2.0.0dev13,<3.0.0",
+    "graphlib",
+    "oarepo[rdm,tests]>=14.0.0,<15.0.0",
+    "oarepo-model>=0.1.0.dev5",
+    "oarepo-workflows>=2.0.0dev3,<3.0.0",
+]
+
+[project.urls]
+Homepage = "https://github.com/oarepo/oarepo-requests"
+
+[project.optional-dependencies]
+dev = [
+    "ruff>=0.11.13",
+    "types-PyYAML",
+    "oarepo-invenio-typing-stubs"
+]
+
+tests = [
+    "pytest-invenio",
+    "pytest-oarepo",
+    "oarepo-rdm>=1.0.0.dev4",
+    "oarepo-ui>=6.0.0dev1", # remove once dev versions aren't used
+    "deepdiff",
+]
+oarepo14 = [
+    "oarepo[rdm,tests]>=14.0.0,<15.0.0",
+]
+
+# TODO missing entrypoints
+[project.entry-points."invenio_base.apps"]
+oarepo_requests = "oarepo_requests.ext:OARepoRequests"
+[project.entry-points."invenio_base.api_apps"]
+oarepo_requests = "oarepo_requests.ext:OARepoRequests"
+[project.entry-points."invenio_base.api_blueprints"]
+oarepo_requests = "oarepo_requests.views.api:create_oarepo_requests"
+# oarepo_requests_events = "oarepo_requests.views.api:create_oarepo_requests_events"
+# oarepo_notifications = "oarepo_requests.views.api:create_notifications"
+[project.entry-points."invenio_base.blueprints"]
+oarepo_requests = "oarepo_requests.views.app:create_app_blueprint"
+# oarepo_requests_events = "oarepo_requests.views.app:create_app_events_blueprint"
+# oarepo_requests_ui = "oarepo_requests.ui.views:create_blueprint"
+# oarepo_notifications = "oarepo_requests.views.app:create_notifications"
+[project.entry-points."invenio_assets.webpack"]
+oarepo_requests_ui_theme = "oarepo_requests.ui.theme.webpack:theme"
+[project.entry-points."invenio_i18n.translations"]
+oarepo_requests_ui = "oarepo_requests"
+[project.entry-points."invenio_requests.types"]
+delete_published_record = "oarepo_requests.types.delete_published_record:DeletePublishedRecordRequestType"
+edit_published_record = "oarepo_requests.types.edit_record:EditPublishedRecordRequestType"
+publish_draft = "oarepo_requests.types.publish_draft:PublishDraftRequestType"
+new_version = "oarepo_requests.types.new_version:NewVersionRequestType"
+publish_new_version = "oarepo_requests.types.publish_new_version:PublishNewVersionRequestType"
+publish_changed_metadata = "oarepo_requests.types.publish_changed_metadata:PublishChangedMetadataRequestType"
+[project.entry-points."invenio_base.finalize_app"]
+oarepo_requests = "oarepo_requests.ext:finalize_app"
+[project.entry-points."invenio_base.api_finalize_app"]
+oarepo_requests = "oarepo_requests.ext:api_finalize_app"
+[project.entry-points."oarepo_requests.identity_to_entity_references"]
+user = "oarepo_requests.identity_to_entity_references:user_mappings"
+group = "oarepo_requests.identity_to_entity_references:group_mappings"
+# [project.entry-points."invenio_db.models"]
+# record_snapshots = "oarepo_requests.models"
+[project.entry-points."invenio_db.alembic"]
+oarepo_requests = "oarepo_requests:alembic"
+# [project.entry-points."oarepo_workflows.state_changed_notifiers"]
+# auto_requester = "oarepo_requests.services.permissions.requester:auto_request_state_change_notifier"
+
+
+[[tool.mypy.overrides]]
+module = ["untyped_package.*"]
+follow_untyped_imports = true
+
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.version]
+path = "oarepo_requests/__init__.py"
+
+[tool.hatch.build.targets.sdist]
+include = [
+    "/oarepo_requests",
+]

@@ -26,6 +26,7 @@ export const CreateRequestButtonGroup = ({
     content = (
       <Placeholder>
         {Array.from({ length: 2 }).map((_, index) => (
+          // eslint-disable-next-line react/no-array-index-key
           <Placeholder.Paragraph key={index}>
             <Placeholder.Line length="full" />
             <Placeholder.Line length="medium" />
@@ -69,6 +70,7 @@ export const CreateRequestButtonGroup = ({
 };
 
 CreateRequestButtonGroup.propTypes = {
-  applicableRequestsLoading: PropTypes.bool,
+  applicableRequestsLoading: PropTypes.bool.isRequired,
+  // eslint-disable-next-line react/require-default-props -- Error object or null by default
   applicableRequestsLoadingError: PropTypes.object,
 };

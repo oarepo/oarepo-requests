@@ -6,3 +6,5 @@
 # details.
 #
 """Request actions."""
+
+from __future__ import annotations

@@ -6,3 +6,8 @@
 # details.
 #
 """Invenio extension for better handling of requests."""
+
+from __future__ import annotations
+
+__version__ = "3.0.0dev1"
+"""Version of the library."""

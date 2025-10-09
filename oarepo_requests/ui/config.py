@@ -10,10 +10,14 @@
 from __future__ import annotations
 
 import inspect
-from typing import TYPE_CHECKING, Any
+from pathlib import Path
+from typing import TYPE_CHECKING, Any, ClassVar
 
 import marshmallow as ma
 from flask import current_app
+
+# TODO: temp
+from flask_resources import ResourceConfig
 from invenio_base.utils import obj_or_import_string
 from invenio_pidstore.errors import (
     PIDDeletedError,
@@ -22,28 +26,24 @@ from invenio_pidstore.errors import (
 )
 from invenio_records_resources.proxies import current_service_registry
 from invenio_records_resources.services.errors import PermissionDeniedError
+from invenio_records_resources.services.records.service import RecordService
 from invenio_requests import current_request_type_registry
-from oarepo_runtime.services.custom_fields import CustomFields, InlinedCustomFields
 from oarepo_ui.resources.components import AllowedHtmlTagsComponent
-from oarepo_ui.resources.config import FormConfigResourceConfig, UIResourceConfig
-from oarepo_ui.resources.links import UIRecordLink
-
-from oarepo_requests.ui.components import (
-    ActionLabelsComponent,
-    FormConfigCustomFieldsComponent,
-    FormConfigRequestTypePropertiesComponent,
-)
 
 if TYPE_CHECKING:
-    from collections.abc import Mapping
+    from collections.abc import Callable, Mapping
+    from http.client import HTTPException
 
+    from flask import Response
+    from flask_resources.responses import ResponseHandler
     from flask_resources.serializers.base import BaseSerializer
     from invenio_records_resources.records import Record
     from invenio_requests.customizations.request_types import RequestType
+    from oarepo_ui.resources.components.base import UIResourceComponent
 
 
-def _get_custom_fields_ui_config(key: str, **kwargs: Any) -> list[dict]:
-    return current_app.config.get(f"{key}_UI", [])
+def _get_custom_fields_ui_config(key: str, **kwargs: Any) -> list[dict]:  # noqa ARG001
+    return current_app.config.get(f"{key}_UI", [])  # type: ignore[no-any-return]
 
 
 class RequestTypeSchema(ma.fields.Str):
@@ -61,9 +61,8 @@ class RequestTypeSchema(ma.fields.Str):
         return current_request_type_registry.lookup(ret, quiet=True)
 
 
+"""
 class RequestsFormConfigResourceConfig(FormConfigResourceConfig):
-    """Config for the requests form config resource."""
-
     url_prefix = "/requests"
     blueprint_name = "oarepo_requests_form_config"
     components = [
@@ -76,6 +75,32 @@ class RequestsFormConfigResourceConfig(FormConfigResourceConfig):
     routes = {
         "form_config": "/configs/<request_type>",
     }
+"""
+
+
+class UIResourceConfig(ResourceConfig):
+    """Base resource config for the UI."""
+
+    components: tuple[type[UIResourceComponent], ...] = ()
+    template_folder = ""
+
+    def get_template_folder(self) -> str | None:
+        """Get the template folder."""
+        if not self.template_folder:
+            return None
+
+        tf = Path(self.template_folder)  # type: ignore[unreachable]
+        if not tf.is_absolute():
+            tf = Path(inspect.getfile(type(self))).parent.absolute().joinpath(tf).absolute()
+        return str(tf)
+
+    # TODO: lint: allowing None here?
+    response_handlers: Mapping[str, ResponseHandler] = {"text/html": None, "application/json": None}  # type: ignore[reportAssignmentType]
+    default_accept_mimetype = "text/html"
+
+    # Request parsing
+    request_read_args: ClassVar[dict[str, Any]] = {}
+    request_view_args: ClassVar[dict[str, Any]] = {}
 
 
 class RequestUIResourceConfig(UIResourceConfig):
@@ -85,32 +110,36 @@ class RequestUIResourceConfig(UIResourceConfig):
     api_service = "requests"
     blueprint_name = "oarepo_requests_ui"
     template_folder = "templates"
-    templates = {
+    templates: ClassVar[dict[str, Any]] = {
         "detail": "RequestDetail",
     }
-    routes = {
+    routes: ClassVar[dict[str, Any]] = {
         "detail": "/<pid_value>",
     }
     ui_serializer_class = "oarepo_requests.resources.ui.OARepoRequestsUIJSONSerializer"
-    ui_links_item = {
-        "self": UIRecordLink("{+ui}{+url_prefix}/{id}"),
-    }
-    components = [AllowedHtmlTagsComponent]
+    ui_links_item: ClassVar[dict[str, Any]] = {}
+    # TODO: lint: correct
+    components = (AllowedHtmlTagsComponent,)  # type: ignore[reportAssignmentType]
 
-    error_handlers = {
-        PIDDeletedError: "tombstone",
-        PIDDoesNotExistError: "not_found",
-        PIDUnregistered: "not_found",
-        KeyError: "not_found",
-        PermissionDeniedError: "permission_denied",
+    # TODO: lint: this typing from stubs; idk whether strings are allowed here
+    error_handlers: Mapping[
+        type[HTTPException | BaseException] | int,
+        Callable[[Exception], Response],
+    ] = {
+        PIDDeletedError: "tombstone",  # type: ignore[dict-item]
+        PIDDoesNotExistError: "not_found",  # type: ignore[dict-item]
+        PIDUnregistered: "not_found",  # type: ignore[dict-item]
+        KeyError: "not_found",  # type: ignore[dict-item]
+        PermissionDeniedError: "permission_denied",  # type: ignore[dict-item]
     }
 
-    request_view_args = {"pid_value": ma.fields.Str()}
+    request_view_args: ClassVar[dict[str, Any]] = {"pid_value": ma.fields.Str()}
 
     @property
     def ui_serializer(self) -> BaseSerializer:
         """Return the UI serializer for the request."""
-        return obj_or_import_string(self.ui_serializer_class)()
+        # TODO: lint: correct
+        return obj_or_import_string(self.ui_serializer_class)()  # type: ignore[reportOptionalCal]
 
     def custom_fields(self, **kwargs: Any) -> dict:
         """Get the custom fields for the request."""
@@ -122,32 +151,34 @@ class RequestUIResourceConfig(UIResourceConfig):
         }
 
         # get the record class
-        if not hasattr(api_service, "record_cls"):
+        if not isinstance(api_service, RecordService):
             return ret
         record_class: type[Record] = api_service.record_cls
         if not record_class:
             return ret
         # try to get custom fields from the record
         for _fld_name, fld in sorted(inspect.getmembers(record_class)):
+            """
             if isinstance(fld, InlinedCustomFields):
                 prefix = ""
             elif isinstance(fld, CustomFields):
                 prefix = fld.key + "."
             else:
                 continue
+            """
 
             ui_config = _get_custom_fields_ui_config(fld.config_key, **kwargs)
             if not ui_config:
                 continue
 
-            for section in ui_config:
-                ui.append(
+            for section in ui_config:  # TODO: ...
+                ui.append(  # noqa PERF401
                     {
                         **section,
                         "fields": [
                             {
                                 **field,
-                                "field": prefix + field["field"],
+                                "field": field["field"],  # TODO: original: "field": prefix + field["field"]
                             }
                             for field in section.get("fields", [])
                         ],

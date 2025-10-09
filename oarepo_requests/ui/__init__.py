@@ -6,3 +6,5 @@
 # details.
 #
 """Requests UI pages and components."""
+
+from __future__ import annotations

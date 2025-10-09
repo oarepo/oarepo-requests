@@ -9,45 +9,63 @@
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Any
+from typing import TYPE_CHECKING, Any, override
 
+from invenio_drafts_resources.records.api import Record
+from invenio_i18n import _
+from invenio_records_resources.services import LinksTemplate
+from invenio_records_resources.services.base.links import EndpointLink
 from invenio_records_resources.services.uow import IndexRefreshOp, unit_of_work
 from invenio_requests import current_request_type_registry
 from invenio_requests.services import RequestsService
-from oarepo_runtime.i18n import lazy_gettext as _
 
-from oarepo_requests.errors import CustomHTTPJSONException, UnknownRequestType
+from oarepo_requests.errors import CustomHTTPJSONException, UnknownRequestTypeError
 from oarepo_requests.proxies import current_oarepo_requests
+from oarepo_requests.services.results import (
+    RequestTypesList,
+    StringEntityResolverExpandableField,
+)
+from oarepo_requests.utils import (
+    allowed_request_types_for_record,
+    resolve_reference_dict,
+)
 
 if TYPE_CHECKING:
     from datetime import datetime
 
     from flask_principal import Identity
-    from invenio_records.api import RecordBase
-    from invenio_records_resources.services.uow import UnitOfWork
+    from invenio_db.uow import UnitOfWork
     from invenio_requests.services.requests.results import RequestItem
-
-    from oarepo_requests.typing import EntityReference
+    from invenio_requests.services.results import EntityResolverExpandableField, MultiEntityResolverExpandableField
 
 
 class OARepoRequestsService(RequestsService):
     """OARepo extension to invenio-requests service."""
 
+    @property
+    def expandable_fields(self) -> list[EntityResolverExpandableField | MultiEntityResolverExpandableField]:
+        """Get expandable fields."""
+        return [
+            *super().expandable_fields,
+            StringEntityResolverExpandableField("payload.created_topic"),
+        ]
+
     @unit_of_work()
+    @override
     def create(
         self,
         identity: Identity,
-        data: dict,
+        data: dict[str, Any] | None,
         request_type: str,
-        receiver: EntityReference | Any | None = None,
-        creator: EntityReference | Any | None = None,
-        topic: RecordBase = None,
-        expires_at: datetime | None = None,
-        uow: UnitOfWork = None,
-        expand: bool = False,
         *args: Any,
+        receiver: dict[str, str] | Any | None = None,
+        creator: dict[str, str] | Any | None = None,
+        topic: Record | None = None,
+        expires_at: datetime | None = None,
+        uow: UnitOfWork,
+        expand: bool = False,
         **kwargs: Any,
-    ) -> RequestItem:
+    ) -> RequestItem | None:
         """Create a request.
 
         :param identity: Identity of the user creating the request.
@@ -62,18 +80,18 @@ class OARepoRequestsService(RequestsService):
         :param args: Additional arguments.
         :param kwargs: Additional keyword arguments.
         """
+        # TODO: lint: invenio suggest None topic can be here but we do not expect it
+        if topic is None:
+            raise ValueError("")
         type_ = current_request_type_registry.lookup(request_type, quiet=True)
         if not type_:
-            raise UnknownRequestType(request_type)
-
+            raise UnknownRequestTypeError(request_type)
+        data = data if data else {}
         if receiver is None:
             # if explicit creator is not passed, use current identity - this is in sync with invenio_requests
             receiver = current_oarepo_requests.default_request_receiver(
                 identity, type_, topic, creator or identity, data
             )
-
-        if data is None:
-            data = {}
         if "payload" not in data and type_.payload_schema:
             data["payload"] = {}
         schema = self._wrap_schema(type_.marshmallow_schema())
@@ -84,53 +102,40 @@ class OARepoRequestsService(RequestsService):
         )
         if errors:
             raise CustomHTTPJSONException(
-                description=_(
-                    "Action could not be performed due to validation request fields validation errors."
-                ),
+                description=_("Action could not be performed due to validation request fields validation errors."),
                 request_payload_errors=errors,
                 code=400,
             )
 
-        if hasattr(type_, "can_create"):
-            error = type_.can_create(identity, data, receiver, topic, creator)
-        else:
-            error = None
+        error = type_.can_create(identity, data, receiver, topic, creator) if hasattr(type_, "can_create") else None
 
+        # TODO: lint: stubs do not allow receiver to be None even if I think invenio suggests it
         if not error:
             result = super().create(
                 identity=identity,
                 data=data,
                 request_type=type_,
-                receiver=receiver,
+                receiver=receiver,  # type: ignore[reportArgumentType]
                 creator=creator,
                 topic=topic,
                 expand=expand,
                 uow=uow,
             )
-            uow.register(
-                IndexRefreshOp(indexer=self.indexer, index=self.record_cls.index)
-            )
+            uow.register(IndexRefreshOp(indexer=self.indexer, index=self.record_cls.index))  # type: ignore[reportArgumentType]
             return result
+        return None
 
-    def read(self, identity: Identity, id_: str, expand: bool = False) -> RequestItem:
-        """Retrieve a request."""
-        api_request = super().read(identity, id_, expand)
-        return api_request
+    def applicable_request_types(self, identity: Identity, topic: Record | dict[str, str]) -> RequestTypesList:
+        """Get applicable request types for a record."""
+        topic = resolve_reference_dict(topic) if not isinstance(topic, Record) else topic
+        if not isinstance(topic, Record):
+            raise TypeError("Trying to find applicable request types on non-record entity")
 
-    @unit_of_work()
-    def update(
-        self,
-        identity: Identity,
-        id_: str,
-        data: dict,
-        revision_id: int | None = None,
-        uow: UnitOfWork | None = None,
-        expand: bool = False,
-    ) -> RequestItem:
-        """Update a request."""
-        assert uow is not None
-        result = super().update(
-            identity, id_, data, revision_id=revision_id, uow=uow, expand=expand
+        allowed_request_types = allowed_request_types_for_record(identity, topic)
+        return RequestTypesList(
+            service=self,
+            identity=identity,
+            results=list(allowed_request_types.values()),
+            links_tpl=LinksTemplate({"self": EndpointLink("oarepo_requests.applicable_request_types")}),
+            record=topic,
         )
-        uow.register(IndexRefreshOp(indexer=self.indexer, index=self.record_cls.index))
-        return result

@@ -9,137 +9,79 @@
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Any, cast
+from typing import TYPE_CHECKING, Any
 
-from invenio_records_resources.services import LinksTemplate
-from invenio_records_resources.services.errors import PermissionDeniedError
-from oarepo_runtime.datastreams.utils import get_record_service_for_record
-from oarepo_runtime.services.results import RecordList, ResultsComponent
+from invenio_records_resources.records import Record
+from invenio_records_resources.services.records.schema import ServiceSchemaWrapper
+from invenio_requests.services.results import EntityResolverExpandableField
+from oarepo_runtime.services.results import RecordList
 
-from oarepo_requests.services.draft.service import DraftRecordRequestsService
-from oarepo_requests.services.schema import RequestTypeSchema
-from oarepo_requests.utils import (
-    allowed_request_types_for_record,
-    get_requests_service_for_records_service,
+from oarepo_requests.services.schema import (
+    RequestTypeSchema,
+    request_type_identity_ctx,
+    request_type_record_ctx,
 )
+from oarepo_requests.utils import string_to_reference
 
 if TYPE_CHECKING:
     from collections.abc import Iterator
 
     from flask_principal import Identity
     from invenio_records_resources.records.api import Record
-    from invenio_requests.customizations.request_types import RequestType
+    from invenio_records_resources.services.records.service import RecordService
+    from invenio_requests.customizations import RequestType
 
 
-class RequestTypesComponent(ResultsComponent):
-    """Component for expanding request types."""
+class StringEntityResolverExpandableField(EntityResolverExpandableField):
+    """Expandable entity resolver field.
 
-    def update_data(
-        self, identity: Identity, record: Record, projection: dict, expand: bool
-    ) -> None:
-        """Expand request types if requested."""
-        if not expand:
-            return
-        allowed_request_types = allowed_request_types_for_record(identity, record)
-        request_types_list = serialize_request_types(
-            allowed_request_types, identity, record
-        )
-        projection["expanded"]["request_types"] = request_types_list
-
-
-def serialize_request_types(
-    request_types: dict[str, RequestType], identity: Identity, record: Record
-) -> list[dict]:
-    """Serialize request types.
-
-    :param request_types: Request types to serialize.
-    :param identity: Identity of the user.
-    :param record: Record for which the request types are serialized.
-    :return: List of serialized request types.
+    It will use the Entity resolver registry to retrieve the service to
+    use to fetch records and the fields to return when serializing
+    the referenced record.
     """
-    request_types_list = []
-    for request_type in request_types.values():
-        request_types_list.append(
-            serialize_request_type(request_type, identity, record)
-        )
-    return request_types_list
 
-
-def serialize_request_type(
-    request_type: RequestType, identity: Identity, record: Record
-) -> dict:
-    """Serialize a request type.
-
-    :param request_type: Request type to serialize.
-    :param identity: Identity of the caller.
-    :param record: Record for which the request type is serialized.
-    """
-    return RequestTypeSchema(context={"identity": identity, "record": record}).dump(
-        request_type
-    )
-
-
-class RequestsComponent(ResultsComponent):
-    """Component for expanding requests on a record."""
-
-    def update_data(
-        self, identity: Identity, record: Record, projection: dict, expand: bool
-    ) -> None:
-        """Expand requests if requested."""
-        if not expand:
-            return
-
-        service = get_requests_service_for_records_service(
-            get_record_service_for_record(record)
-        )
-        reader = (
-            cast(DraftRecordRequestsService, service).search_requests_for_draft
-            if getattr(record, "is_draft", False)
-            else service.search_requests_for_record
-        )
-        try:
-            requests = list(reader(identity, record["id"]).hits)
-        except PermissionDeniedError:
-            requests = []
-        projection["expanded"]["requests"] = requests
+    #  the message is: Argument 1 of "get_value_service" is incompatible with supertype
+    #  "DraftAwareEntityResolverExpandableField"; supertype defines the argument type as "dict[str, str]"  [override]
+    # invenio doesn't allow to implement this differently?
+    def get_value_service(self, value: str) -> tuple[str, RecordService]:  # type: ignore[override]
+        """Return the value and the service via entity resolvers."""
+        ref = string_to_reference(value)
+        v, service = super().get_value_service(ref)
+        return v, service
 
 
 class RequestTypesListDict(dict):
     """List of request types dictionary with additional topic."""
 
-    topic = None
+    topic: Record | None = None
 
 
 class RequestTypesList(RecordList):
     """An in-memory list of request types compatible with opensearch record list."""
 
-    def __init__(self, *args: Any, record: Record | None = None, **kwargs: Any) -> None:
+    def __init__(
+        self,
+        *args: Any,
+        record: Record | None = None,
+        schema: ServiceSchemaWrapper | None = None,
+        **kwargs: Any,
+    ) -> None:
         """Initialize the list of request types."""
         self._record = record
         super().__init__(*args, **kwargs)
+        self._schema = schema or ServiceSchemaWrapper(self._service, RequestTypeSchema)
 
     def to_dict(self) -> dict:
         """Return result as a dictionary."""
         hits = list(self.hits)
-
-        record_links = self._service.config.links_item
-        rendered_record_links = LinksTemplate(record_links, context={}).expand(
-            self._identity, self._record
-        )
-        links_tpl = LinksTemplate(
-            self._links_tpl._links,
-            context={
-                **{f"record_link_{k}": v for k, v in rendered_record_links.items()}
-            },
-        )
         res = RequestTypesListDict(
             hits={
                 "hits": hits,
                 "total": self.total,
             }
         )
-        if self._links_tpl:
-            res["links"] = links_tpl.expand(self._identity, None)
+        if self._links_tpl:  # TODO: pass1: query params in link?
+            res["links"] = self._links_tpl.expand(self._identity, None)
         res.topic = self._record
         return res
 
@@ -148,14 +90,17 @@ class RequestTypesList(RecordList):
         """Iterator over the hits."""
         for hit in self._results:
             # Project the record
-            projection = self._schema(
-                context=dict(
-                    identity=self._identity,
-                    record=self._record,
-                )
-            ).dump(
-                hit,
-            )
+            tok_identity = request_type_identity_ctx.set(self._identity)
+            tok_record = request_type_record_ctx.set(self._record)
+            try:
+                # identity in context is hardcoded in ServiceSchemaWrapper
+                # which we have to use if we want to subclass RecordList
+                projection = self._schema.dump(hit, context={"identity": self._identity})
+            finally:
+                # Reset contextvars to previous values to avoid leaking state
+                request_type_identity_ctx.reset(tok_identity)
+                request_type_record_ctx.reset(tok_record)
+
             if self._links_item_tpl:
                 projection["links"] = self._links_item_tpl.expand(self._identity, hit)
             yield projection
@@ -164,3 +109,25 @@ class RequestTypesList(RecordList):
     def total(self) -> int:
         """Total number of hits."""
         return len(self._results)
+
+
+def serialize_request_types(
+    request_types: dict[str, RequestType], identity: Identity, record: Record
+) -> list[dict[str, Any]]:
+    """Serialize request types.
+
+    :param request_types: Request types to serialize.
+    :param identity: Identity of the user.
+    :param record: Record for which the request types are serialized.
+    :return: List of serialized request types.
+    """
+    # contextvars approach from gpt
+    tok_identity = request_type_identity_ctx.set(identity)
+    tok_record = request_type_record_ctx.set(record)
+    # TODO: lint: we would have to retype RequestTypeSchema().dump()?
+    try:
+        return [RequestTypeSchema().dump(request_type) for request_type in request_types.values()]  # type: ignore[reportReturnType]
+    finally:
+        # Reset contextvars to previous values to avoid leaking state
+        request_type_identity_ctx.reset(tok_identity)
+        request_type_record_ctx.reset(tok_record)

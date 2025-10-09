@@ -6,11 +6,13 @@
 # details.
 #
 
-from thesis.records.api import ThesisDraft, ThesisRecord
+
+# TODO: since inline is now the default way to create records, these might be redundant
+from __future__ import annotations
 
 
-# todo since inline is now the default way to create records, these might be redundant
 def test_record(
+    requests_model,
     logged_client,
     record_factory,
     users,
@@ -27,25 +29,25 @@ def test_record(
     record1 = record_factory(creator.identity)
     record1_id = record1["id"]
     resp_request_create = create_request_on_record(
-        creator.identity, record1_id, "delete_published_record", additional_data={"payload": {"removal_reason": "test reason"}}
+        creator.identity,
+        record1_id,
+        "delete_published_record",
+        additional_data={"payload": {"removal_reason": "test reason"}},
     )
-    resp_request_submit = creator_client.post(
+    creator_client.post(
         link2testclient(resp_request_create["links"]["actions"]["submit"]),
     )
 
-    record = receiver_client.get(f"{urls['BASE_URL']}{record1_id}?expand=true")
-    delete = receiver_client.post(
-        link2testclient(
-            record.json["expanded"]["requests"][0]["links"]["actions"]["accept"]
-        )
-    )
-    ThesisRecord.index.refresh()
-    ThesisDraft.index.refresh()
+    record = receiver_client.get(f"{urls['BASE_URL']}/{record1_id}?expand=true")
+    receiver_client.post(link2testclient(record.json["expanded"]["requests"][0]["links"]["actions"]["accept"]))
+    requests_model.Record.index.refresh()
+    requests_model.Draft.index.refresh()
     lst = creator_client.get(urls["BASE_URL"])
     assert len(lst.json["hits"]["hits"]) == 0
 
 
 def test_draft(
+    requests_model,
     logged_client,
     users,
     urls,
@@ -62,19 +64,13 @@ def test_draft(
     draft1 = draft_factory(creator.identity)
     draft1_id = draft1["id"]
 
-    resp_request_create = create_request_on_draft(
-        creator.identity, draft1_id, "publish_draft"
-    )
-    resp_request_submit = creator_client.post(
+    resp_request_create = create_request_on_draft(creator.identity, draft1_id, "publish_draft")
+    creator_client.post(
         link2testclient(resp_request_create["links"]["actions"]["submit"]),
     )
-    record = receiver_client.get(
-        f"{urls['BASE_URL']}{draft1_id}/draft?expand=true"
-    ).json
-    receiver_client.post(
-        link2testclient(record["expanded"]["requests"][0]["links"]["actions"]["accept"])
-    )
-    ThesisRecord.index.refresh()
-    ThesisDraft.index.refresh()
+    record = receiver_client.get(f"{urls['BASE_URL']}/{draft1_id}/draft?expand=true").json
+    receiver_client.post(link2testclient(record["expanded"]["requests"][0]["links"]["actions"]["accept"]))
+    requests_model.Record.index.refresh()
+    requests_model.Draft.index.refresh()
     lst = creator_client.get(urls["BASE_URL"]).json
     assert len(lst["hits"]["hits"]) == 1

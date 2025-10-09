@@ -6,3 +6,5 @@
 # details.
 #
 """OARepo extended request API."""
+
+from __future__ import annotations

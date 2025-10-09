@@ -5,10 +5,13 @@
 # modify it under the terms of the MIT License; see LICENSE file for more
 # details.
 #
-from thesis.records.api import ThesisDraft, ThesisRecord
+
+
+from __future__ import annotations
 
 
 def test_read_requests_on_draft(
+    requests_model,
     logged_client,
     users,
     urls,
@@ -29,31 +32,19 @@ def test_read_requests_on_draft(
     draft1_id = draft1["id"]
     draft2_id = draft2["id"]
     draft3_id = draft3["id"]
-    ThesisRecord.index.refresh()
-    ThesisDraft.index.refresh()
+    requests_model.Record.index.refresh()
+    requests_model.Draft.index.refresh()
 
-    resp_request_submit = submit_request_on_draft(
-        creator.identity, draft1_id, "publish_draft"
-    )
-    record = receiver_client.get(f"{urls['BASE_URL']}{draft1_id}/draft?expand=true")
-    decline = receiver_client.post(
-        link2testclient(
-            record.json["expanded"]["requests"][0]["links"]["actions"]["decline"]
-        )
-    )
+    submit_request_on_draft(creator.identity, draft1_id, "publish_draft")
+    record = receiver_client.get(f"{urls['BASE_URL']}/{draft1_id}/draft?expand=true")
+    receiver_client.post(link2testclient(record.json["expanded"]["requests"][0]["links"]["actions"]["decline"]))
 
-    r2 = create_request_on_draft(creator.identity, draft1_id, "publish_draft")
-    r3 = create_request_on_draft(creator.identity, draft2_id, "publish_draft")
+    create_request_on_draft(creator.identity, draft1_id, "publish_draft")
+    create_request_on_draft(creator.identity, draft2_id, "publish_draft")
 
-    resp1 = creator_client.get(f"{urls['BASE_URL']}{draft1_id}/draft/requests").json[
-        "hits"
-    ]["hits"]
-    resp2 = creator_client.get(f"{urls['BASE_URL']}{draft2_id}/draft/requests").json[
-        "hits"
-    ]["hits"]
-    resp3 = creator_client.get(f"{urls['BASE_URL']}{draft3_id}/draft/requests").json[
-        "hits"
-    ]["hits"]
+    resp1 = creator_client.get(f"{urls['BASE_URL_REQUESTS']}?topic=requests_test:{draft1_id}").json["hits"]["hits"]
+    resp2 = creator_client.get(f"{urls['BASE_URL_REQUESTS']}?topic=requests_test:{draft2_id}").json["hits"]["hits"]
+    resp3 = creator_client.get(f"{urls['BASE_URL_REQUESTS']}?topic=requests_test:{draft3_id}").json["hits"]["hits"]
 
     assert len(resp1) == 2
     assert len(resp2) == 1
@@ -61,6 +52,7 @@ def test_read_requests_on_draft(
 
 
 def test_read_requests_on_record(
+    requests_model,
     logged_client,
     record_factory,
     users,
@@ -81,33 +73,34 @@ def test_read_requests_on_record(
     record1_id = record1["id"]
     record2_id = record2["id"]
     record3_id = record3["id"]
-    ThesisRecord.index.refresh()
-    ThesisDraft.index.refresh()
-    resp_request_submit = submit_request_on_record(
-        creator.identity, record1_id, "delete_published_record", create_additional_data={"payload": {"removal_reason": "test reason"}}
+    requests_model.Record.index.refresh()
+    requests_model.Draft.index.refresh()
+    submit_request_on_record(
+        creator.identity,
+        record1_id,
+        "delete_published_record",
+        create_additional_data={"payload": {"removal_reason": "test reason"}},
     )
-    record = receiver_client.get(f"{urls['BASE_URL']}{record1_id}?expand=true")
-    decline = receiver_client.post(
-        link2testclient(
-            record.json["expanded"]["requests"][0]["links"]["actions"]["decline"]
-        ),
+    record = receiver_client.get(f"{urls['BASE_URL']}/{record1_id}?expand=true")
+    receiver_client.post(
+        link2testclient(record.json["expanded"]["requests"][0]["links"]["actions"]["decline"]),
     )
-    r2 = create_request_on_record(
-        creator.identity, record1_id, "delete_published_record", additional_data={"payload": {"removal_reason": "test reason"}}
+    create_request_on_record(
+        creator.identity,
+        record1_id,
+        "delete_published_record",
+        additional_data={"payload": {"removal_reason": "test reason"}},
     )
-    r3 = create_request_on_record(
-        creator.identity, record2_id, "delete_published_record", additional_data={"payload": {"removal_reason": "test reason"}}
+    create_request_on_record(
+        creator.identity,
+        record2_id,
+        "delete_published_record",
+        additional_data={"payload": {"removal_reason": "test reason"}},
     )
 
-    resp1 = creator_client.get(f"{urls['BASE_URL']}{record1_id}/requests").json["hits"][
-        "hits"
-    ]
-    resp2 = creator_client.get(f"{urls['BASE_URL']}{record2_id}/requests").json["hits"][
-        "hits"
-    ]
-    resp3 = creator_client.get(f"{urls['BASE_URL']}{record3_id}/requests").json["hits"][
-        "hits"
-    ]
+    resp1 = creator_client.get(f"{urls['BASE_URL_REQUESTS']}?topic=requests_test:{record1_id}").json["hits"]["hits"]
+    resp2 = creator_client.get(f"{urls['BASE_URL_REQUESTS']}?topic=requests_test:{record2_id}").json["hits"]["hits"]
+    resp3 = creator_client.get(f"{urls['BASE_URL_REQUESTS']}?topic=requests_test:{record3_id}").json["hits"]["hits"]
 
     assert len(resp1) == 2
     assert len(resp2) == 1

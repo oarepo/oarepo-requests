@@ -5,11 +5,20 @@
 # modify it under the terms of the MIT License; see LICENSE file for more
 # details.
 #
+from __future__ import annotations
+
+import base64
+import json
 import os
+import time
 from datetime import timedelta
-from typing import Dict
+from typing import TYPE_CHECKING, Any, ClassVar
 
 import pytest
+from flask import Blueprint
+from invenio_i18n import _
+from invenio_rdm_records.services.generators import RecordOwners
+from invenio_rdm_records.services.pids import providers
 from invenio_records_permissions.generators import (
     AnyUser,
     AuthenticatedUser,
@@ -24,8 +33,8 @@ from invenio_requests.services.permissions import (
     PermissionPolicy as InvenioRequestsPermissionPolicy,
 )
 from invenio_users_resources.records import UserAggregate
-from oarepo_runtime.i18n import lazy_gettext as _
-from oarepo_runtime.services.permissions import RecordOwners
+from oarepo_model.customizations import AddFileToModule
+from oarepo_rdm import rdm_minimal_preset
 from oarepo_workflows import (
     AutoApprove,
     AutoRequest,
@@ -36,19 +45,22 @@ from oarepo_workflows import (
     WorkflowTransitions,
 )
 from oarepo_workflows.base import Workflow
+from oarepo_workflows.model.presets import workflows_preset
 from oarepo_workflows.requests.events import WorkflowEvent
 from pytest_oarepo.requests.classes import (
     CSLocaleUserGenerator,
+    SystemUserGenerator,
     TestEventType,
     UserGenerator,
 )
-from thesis.proxies import current_service
+from pytest_oarepo.users import _create_user
 
 from oarepo_requests.actions.generic import (
     OARepoAcceptAction,
     OARepoDeclineAction,
     OARepoSubmitAction,
 )
+from oarepo_requests.model.presets.requests import requests_preset
 from oarepo_requests.receiver import default_workflow_receiver_function
 from oarepo_requests.services.permissions.generators.conditional import (
     IfNoEditDraft,
@@ -58,8 +70,14 @@ from oarepo_requests.services.permissions.generators.conditional import (
 from oarepo_requests.services.permissions.workflow_policies import (
     RequestBasedWorkflowPermissions,
 )
-from oarepo_requests.types import ModelRefTypes, NonDuplicableOARepoRequestType
+from oarepo_requests.types import (
+    ModelRefTypes,
+    NonDuplicableOARepoRequestType,
+)
 from oarepo_requests.types.events.topic_update import TopicUpdateEventType
+
+if TYPE_CHECKING:
+    from invenio_requests.customizations.actions import RequestAction
 
 pytest_plugins = [
     "pytest_oarepo.requests.fixtures",
@@ -69,24 +87,68 @@ pytest_plugins = [
     "pytest_oarepo.files",
 ]
 
-@pytest.fixture(scope="module")
-def record_service():
-    return current_service
 
 @pytest.fixture
-def events_service():
+def requests_events_service():
     from invenio_requests.proxies import current_events_service
 
     return current_events_service
+
+
+@pytest.fixture
+def requests_service():
+    from oarepo_requests.proxies import current_requests_service
+
+    return current_requests_service
 
 
 @pytest.fixture(scope="module", autouse=True)
 def location(location):
     return location
 
+
+@pytest.fixture(scope="module")
+def app(app):
+    bp = Blueprint("test_ui_links_ui", __name__)
+
+    @bp.route("/test-ui-links/preview/<pid_value>", methods=["GET"])
+    def preview(pid_value: str) -> str:
+        return "preview ok"
+
+    @bp.route("/test-ui-links/", methods=["GET"])
+    def search() -> str:
+        return "search ok"
+
+    @bp.route("/test-ui-links/uploads/<pid_value>", methods=["GET"])  # draft self_html
+    def deposit_edit(pid_value: str) -> str:
+        return "deposit edit ok"
+
+    @bp.route("/test-ui-links/uploads/new", methods=["GET"])
+    def deposit_create() -> str:
+        return "deposit create ok"
+
+    @bp.route("/test-ui-links/records/<pid_value>")
+    def record_detail(pid_value) -> str:
+        return "detail ok"
+
+    @bp.route("/test-ui-links/records/<pid_value>/latest", methods=["GET"])
+    def record_latest(pid_value: str) -> str:
+        return "latest ok"
+
+    @bp.route("/test-ui-links/records/<pid_value>/export/<export_format>", methods=["GET"])
+    def export(pid_value, export_format: str) -> str:
+        return "export ok"
+
+    app.register_blueprint(bp)
+    return app
+
+
+"""
 @pytest.fixture(autouse=True)
 def vocab_cf(vocab_cf):
     return vocab_cf
+"""
+
 
 can_comment_only_receiver = [
     Receiver(),
@@ -95,20 +157,102 @@ can_comment_only_receiver = [
 
 events_only_receiver_can_comment = {
     CommentEventType.type_id: WorkflowEvent(submitters=can_comment_only_receiver),
-    LogEventType.type_id: WorkflowEvent(
-        submitters=InvenioRequestsPermissionPolicy.can_create_comment
-    ),
-    TopicUpdateEventType.type_id: WorkflowEvent(
-        submitters=InvenioRequestsPermissionPolicy.can_create_comment
-    ),
+    LogEventType.type_id: WorkflowEvent(submitters=InvenioRequestsPermissionPolicy.can_create_comment),
+    TopicUpdateEventType.type_id: WorkflowEvent(submitters=InvenioRequestsPermissionPolicy.can_create_comment),
     TestEventType.type_id: WorkflowEvent(submitters=can_comment_only_receiver),
 }
 
+"""
+def _override(original: tuple[WorkflowRequest], *new_):
+    to_remove = []
+    for n in new_:
+        for o in original:
+            if n.request_type == o.request_type:
+                to_remove.append(o)
+    o_keep = [o for o in original if o not in to_remove]
+    return (*o_keep, *new_)
+"""
+
+
+class GenericTestableRequestType(NonDuplicableOARepoRequestType):
+    """Generic usable request type for tests."""
+
+    type_id = "generic"
+    name = _("Generic")
+
+    available_actions: ClassVar[dict[str, type[RequestAction]]] = {
+        **NonDuplicableOARepoRequestType.available_actions,
+        "accept": OARepoAcceptAction,
+        "submit": OARepoSubmitAction,
+        "decline": OARepoDeclineAction,
+    }
+    description = _("Generic request that doesn't do anything")
+    receiver_can_be_none = False
+    allowed_topic_ref_types = ModelRefTypes(published=True, draft=True)
+
+
+class ApproveRequestType(NonDuplicableOARepoRequestType):
+    """Request type for approving before publish."""
+
+    type_id = "approve_draft"
+    name = _("Approve draft")
+
+    available_actions: ClassVar[dict[str, type[RequestAction]]] = {
+        **NonDuplicableOARepoRequestType.available_actions,
+        "accept": OARepoAcceptAction,
+        "submit": OARepoSubmitAction,
+        "decline": OARepoDeclineAction,
+    }
+    description = _("Request approving of a draft")
+    receiver_can_be_none = True
+    allowed_topic_ref_types = ModelRefTypes(published=False, draft=True)
+
+
+class AnotherTopicUpdatingRequestType(NonDuplicableOARepoRequestType):
+    """Generic request type with topic change on topic update."""
+
+    type_id = "another_topic_updating"
+    name = _("Another topic updating")
+
+    available_actions: ClassVar[dict[str, type[RequestAction]]] = {
+        **NonDuplicableOARepoRequestType.available_actions,
+        "accept": OARepoAcceptAction,
+        "submit": OARepoSubmitAction,
+        "decline": OARepoDeclineAction,
+    }
+    description = _("Request to test cascade update of live topic")
+    receiver_can_be_none = True
+    allowed_topic_ref_types = ModelRefTypes(published=True, draft=True)
+
+    def topic_change(self, request: Request, new_topic: dict, uow):
+        """Update topic on topic update."""
+        request.topic = new_topic
+        uow.register(RecordCommitOp(request, indexer=current_requests_service.indexer))
+
+
+class ConditionalRecipientRequestType(NonDuplicableOARepoRequestType):
+    """Generic request type with conditional recipient."""
+
+    type_id = "conditional_recipient_rt"
+    name = _("Request type to test conditional recipients")
+
+    available_actions: ClassVar[dict[str, type[RequestAction]]] = {
+        **NonDuplicableOARepoRequestType.available_actions,
+        "accept": OARepoAcceptAction,
+        "submit": OARepoSubmitAction,
+        "decline": OARepoDeclineAction,
+    }
+    description = _("A no-op request to check conditional recipients")
+    receiver_can_be_none = False
+    allowed_topic_ref_types = ModelRefTypes(published=False, draft=True)
+
 
 class DefaultRequests(WorkflowRequestPolicy):
+    """Default test requests workflow."""
+
     publish_draft = WorkflowRequest(
         requesters=[IfInState("draft", [RecordOwners()])],
-        recipients=[UserGenerator(2)],
+        recipients=[UserGenerator("user2@example.org")],
         transitions=WorkflowTransitions(
             submitted="publishing",
             accepted="published",
@@ -119,40 +263,32 @@ class DefaultRequests(WorkflowRequestPolicy):
             WorkflowRequestEscalation(
                 after=timedelta(seconds=2),
                 recipients=[
-                    UserGenerator(3),
+                    UserGenerator("user3@example.org"),
                 ],
             ),
             WorkflowRequestEscalation(
                 after=timedelta(seconds=6),
                 recipients=[
-                    UserGenerator(4),
+                    UserGenerator("user4@example.org"),
                 ],
             ),
             WorkflowRequestEscalation(
                 after=timedelta(seconds=10),
                 recipients=[
-                    UserGenerator(5),
+                    UserGenerator("user5@example.org"),
                 ],
             ),
         ],
     )
     delete_published_record = WorkflowRequest(
         requesters=[IfInState("published", [RecordOwners()])],
-        recipients=[UserGenerator(2)],
+        recipients=[UserGenerator("user2@example.org")],
         transitions=WorkflowTransitions(
             submitted="deleting",
             accepted="deleted",
             declined="published",
             cancelled="published",
         ),
-    )
-    delete_draft = WorkflowRequest(
-        requesters=[
-            IfInState("draft", [RecordOwners()]),
-            IfInState("publishing", [RecordOwners()]),
-        ],
-        recipients=[AutoApprove()],
-        transitions=WorkflowTransitions(),
     )
     edit_published_record = WorkflowRequest(
         requesters=[IfNoEditDraft([IfInState("published", [RecordOwners()])])],
@@ -167,6 +303,8 @@ class DefaultRequests(WorkflowRequestPolicy):
 
 
 class DifferentLocalesPublish(WorkflowRequestPolicy):
+    """Different locales test requests workflow."""
+
     publish_draft = WorkflowRequest(
         requesters=[IfInState("draft", [RecordOwners()])],
         recipients=[CSLocaleUserGenerator()],
@@ -179,7 +317,7 @@ class DifferentLocalesPublish(WorkflowRequestPolicy):
     )
     delete_published_record = WorkflowRequest(
         requesters=[AnyUser()],
-        recipients=[UserGenerator(1), CSLocaleUserGenerator()],
+        recipients=[UserGenerator("user1@example.org"), CSLocaleUserGenerator()],
         transitions=WorkflowTransitions(
             submitted="deleting",
             accepted="deleted",
@@ -191,9 +329,11 @@ class DifferentLocalesPublish(WorkflowRequestPolicy):
 
 
 class RequestWithMultipleRecipients(WorkflowRequestPolicy):
+    """Multiple recipients test requests workflow."""
+
     publish_draft = WorkflowRequest(
         requesters=[IfInState("draft", [RecordOwners()])],
-        recipients=[UserGenerator(2), UserGenerator(1)],
+        recipients=[UserGenerator("user2@example.org"), UserGenerator("user1@example.org")],
         transitions=WorkflowTransitions(
             submitted="publishing",
             accepted="published",
@@ -203,25 +343,25 @@ class RequestWithMultipleRecipients(WorkflowRequestPolicy):
         escalations=[
             WorkflowRequestEscalation(
                 after=timedelta(seconds=2),
-                recipients=[UserGenerator(3), UserGenerator(7)],
+                recipients=[UserGenerator("user3@example.org"), UserGenerator("user7@example.org")],
             ),
             WorkflowRequestEscalation(
                 after=timedelta(seconds=6),
                 recipients=[
-                    UserGenerator(4),
+                    UserGenerator("user4@example.org"),
                 ],
             ),
             WorkflowRequestEscalation(
                 after=timedelta(seconds=10),
                 recipients=[
-                    UserGenerator(5),
+                    UserGenerator("user5@example.org"),
                 ],
             ),
             WorkflowRequestEscalation(
                 after=timedelta(seconds=14),
                 recipients=[
-                    UserGenerator(5),
-                    UserGenerator(6),
+                    UserGenerator("user5@example.org"),
+                    UserGenerator("user6@example.org"),
                 ],
             ),
         ],
@@ -229,26 +369,30 @@ class RequestWithMultipleRecipients(WorkflowRequestPolicy):
 
 
 class RequestsWithDifferentRecipients(DefaultRequests):
+    """Alternative recipients to default test requests workflow."""
+
     another_topic_updating = WorkflowRequest(
         requesters=[AnyUser()],
-        recipients=[UserGenerator(1)],
+        recipients=[UserGenerator("user1@example.org")],
     )
     edit_published_record = WorkflowRequest(
         requesters=[IfNoEditDraft([IfInState("published", [RecordOwners()])])],
-        recipients=[UserGenerator(2)],
+        recipients=[UserGenerator("user2@example.org")],
         transitions=WorkflowTransitions(),
     )
     new_version = WorkflowRequest(
         requesters=[IfNoNewVersionDraft([IfInState("published", [RecordOwners()])])],
-        recipients=[UserGenerator(2)],
+        recipients=[UserGenerator("user2@example.org")],
         transitions=WorkflowTransitions(),
     )
 
 
 class RequestsWithApproveWithoutGeneric(WorkflowRequestPolicy):
+    """Publish needs approval before publishing test requests workflow."""
+
     publish_draft = WorkflowRequest(
         requesters=[IfInState("approved", [AutoRequest()])],
-        recipients=[UserGenerator(1)],
+        recipients=[UserGenerator("user1@example.org")],
         transitions=WorkflowTransitions(
             submitted="publishing",
             accepted="published",
@@ -260,7 +404,7 @@ class RequestsWithApproveWithoutGeneric(WorkflowRequestPolicy):
 
     approve_draft = WorkflowRequest(
         requesters=[IfInState("draft", [RecordOwners()])],
-        recipients=[UserGenerator(2)],
+        recipients=[UserGenerator("user2@example.org")],
         transitions=WorkflowTransitions(
             submitted="approving",
             accepted="approved",
@@ -271,7 +415,7 @@ class RequestsWithApproveWithoutGeneric(WorkflowRequestPolicy):
     )
     delete_published_record = WorkflowRequest(
         requesters=[IfInState("published", [RecordOwners()])],
-        recipients=[UserGenerator(2)],
+        recipients=[UserGenerator("user2@example.org")],
         transitions=WorkflowTransitions(
             submitted="deleting",
             accepted="deleted",
@@ -289,9 +433,11 @@ class RequestsWithApproveWithoutGeneric(WorkflowRequestPolicy):
 
 
 class RequestsWithApprove(WorkflowRequestPolicy):
+    """Publish needs approval before publishing test requests workflow."""
+
     publish_draft = WorkflowRequest(
         requesters=[IfInState("approved", [AutoRequest()])],
-        recipients=[UserGenerator(1)],
+        recipients=[UserGenerator("user1@example.org")],
         transitions=WorkflowTransitions(
             submitted="publishing",
             accepted="published",
@@ -302,11 +448,11 @@ class RequestsWithApprove(WorkflowRequestPolicy):
     )
     generic = WorkflowRequest(
         requesters=[IfInState("draft", [AutoRequest()])],
-        recipients=[UserGenerator(1)],
+        recipients=[UserGenerator("user1@example.org")],
     )
     approve_draft = WorkflowRequest(
         requesters=[IfInState("draft", [RecordOwners()])],
-        recipients=[UserGenerator(2)],
+        recipients=[UserGenerator("user2@example.org")],
         transitions=WorkflowTransitions(
             submitted="approving",
             accepted="approved",
@@ -317,7 +463,7 @@ class RequestsWithApprove(WorkflowRequestPolicy):
     )
     delete_published_record = WorkflowRequest(
         requesters=[IfInState("published", [RecordOwners()])],
-        recipients=[UserGenerator(2)],
+        recipients=[UserGenerator("user2@example.org")],
         transitions=WorkflowTransitions(
             submitted="deleting",
             accepted="deleted",
@@ -335,10 +481,16 @@ class RequestsWithApprove(WorkflowRequestPolicy):
 
 
 class RequestsWithCT(WorkflowRequestPolicy):
+    """With conditional recipient test requests workflow."""
+
     conditional_recipient_rt = WorkflowRequest(
         requesters=[AnyUser()],
         recipients=[
-            IfRequestedBy(UserGenerator(1), [UserGenerator(2)], [UserGenerator(3)])
+            IfRequestedBy(
+                UserGenerator("user1@example.org"),
+                [UserGenerator("user2@example.org")],
+                [UserGenerator("user3@example.org")],
+            )
         ],
     )
     approve_draft = WorkflowRequest(
@@ -348,180 +500,131 @@ class RequestsWithCT(WorkflowRequestPolicy):
 
 
 class RequestsWithAnotherTopicUpdatingRequestType(DefaultRequests):
+    """Test requests workflow with another topic updating request."""
+
     another_topic_updating = WorkflowRequest(
         requesters=[AnyUser()],
-        recipients=[UserGenerator(2)],
+        recipients=[UserGenerator("user2@example.org")],
     )
 
 
 class RequestsWithSystemIdentity(WorkflowRequestPolicy):
+    """Test requests workflow with publish only by system identity."""
+
     publish_draft = WorkflowRequest(
         requesters=[AnyUser()],
-        recipients=[UserGenerator("system")],
+        recipients=[SystemUserGenerator()],
     )
 
 
-class GenericTestableRequestType(NonDuplicableOARepoRequestType):
-    type_id = "generic"
-    name = _("Generic")
-
-    available_actions = {
-        **NonDuplicableOARepoRequestType.available_actions,
-        "accept": OARepoAcceptAction,
-        "submit": OARepoSubmitAction,
-        "decline": OARepoDeclineAction,
-    }
-    description = _("Generic request that doesn't do anything")
-    receiver_can_be_none = False
-    allowed_topic_ref_types = ModelRefTypes(published=True, draft=True)
-
-
-class ApproveRequestType(NonDuplicableOARepoRequestType):
-    type_id = "approve_draft"
-    name = _("Approve draft")
-
-    available_actions = {
-        **NonDuplicableOARepoRequestType.available_actions,
-        "accept": OARepoAcceptAction,
-        "submit": OARepoSubmitAction,
-        "decline": OARepoDeclineAction,
-    }
-    description = _("Request approving of a draft")
-    receiver_can_be_none = True
-    allowed_topic_ref_types = ModelRefTypes(published=False, draft=True)
-
-
-class AnotherTopicUpdatingRequestType(NonDuplicableOARepoRequestType):
-    type_id = "another_topic_updating"
-    name = _("Another topic updating")
-
-    available_actions = {
-        **NonDuplicableOARepoRequestType.available_actions,
-        "accept": OARepoAcceptAction,
-        "submit": OARepoSubmitAction,
-        "decline": OARepoDeclineAction,
-    }
-    description = _("Request to test cascade update of live topic")
-    receiver_can_be_none = True
-    allowed_topic_ref_types = ModelRefTypes(published=True, draft=True)
-
-    def topic_change(self, request: Request, new_topic: Dict, uow):
-        request.topic = new_topic
-        uow.register(RecordCommitOp(request, indexer=current_requests_service.indexer))
-
-
-class ConditionalRecipientRequestType(NonDuplicableOARepoRequestType):
-    type_id = "conditional_recipient_rt"
-    name = _("Request type to test conditional recipients")
-
-    available_actions = {
-        **NonDuplicableOARepoRequestType.available_actions,
-        "accept": OARepoAcceptAction,
-        "submit": OARepoSubmitAction,
-        "decline": OARepoDeclineAction,
-    }
-    description = _("A no-op request to check conditional recipients")
-    receiver_can_be_none = False
-    allowed_topic_ref_types = ModelRefTypes(published=False, draft=True)
-
-
 class TestWorkflowPermissions(RequestBasedWorkflowPermissions):
-    can_read = [
+    """Default workflow permissions for testing."""
+
+    can_read = (
         IfInState("draft", [RecordOwners()]),
-        IfInState("publishing", [RecordOwners(), UserGenerator(2)]),
+        IfInState("publishing", [RecordOwners(), UserGenerator("user2@example.org")]),
         IfInState("published", [AnyUser()]),
         IfInState("published", [AuthenticatedUser()]),
         IfInState("deleting", [AnyUser()]),
-    ]
+    )
+    can_manage_files = (RecordOwners(),)
 
 
-class WithApprovalPermissions(RequestBasedWorkflowPermissions):
-    can_read = [
+class WithApprovalPermissions(TestWorkflowPermissions):
+    """Default workflow permissions for testing requests with publish approval."""
+
+    can_read = (
         IfInState("draft", [RecordOwners()]),
-        IfInState("approving", [RecordOwners(), UserGenerator(2)]),
-        IfInState("approved", [RecordOwners(), UserGenerator(2)]),
-        IfInState("publishing", [RecordOwners(), UserGenerator(2)]),
+        IfInState("approving", [RecordOwners(), UserGenerator("user2@example.org")]),
+        IfInState("approved", [RecordOwners(), UserGenerator("user2@example.org")]),
+        IfInState("publishing", [RecordOwners(), UserGenerator("user2@example.org")]),
         IfInState("published", [AuthenticatedUser()]),
         IfInState("deleting", [AuthenticatedUser()]),
-    ]
+    )
 
 
-class DifferentLocalesPermissions(RequestBasedWorkflowPermissions):
-    can_read = [
+class DifferentLocalesPermissions(TestWorkflowPermissions):
+    """Default workflow permissions for testing with multiple locales."""
+
+    can_read = (
         IfInState("draft", [RecordOwners()]),
         IfInState("publishing", [RecordOwners(), CSLocaleUserGenerator()]),
         IfInState("published", [AnyUser()]),
         IfInState("published", [AuthenticatedUser()]),
         IfInState("deleting", [AnyUser()]),
-    ]
+    )
 
 
-WORKFLOWS = {
-    "default": Workflow(
+WORKFLOWS = [
+    Workflow(
+        code="default",
         label=_("Default workflow"),
         permission_policy_cls=TestWorkflowPermissions,
         request_policy_cls=DefaultRequests,
     ),
-    "with_approve": Workflow(
+    Workflow(
+        code="with_approve",
         label=_("Workflow with approval process"),
         permission_policy_cls=WithApprovalPermissions,
         request_policy_cls=RequestsWithApprove,
     ),
-    "with_approve_without_generic": Workflow(
+    Workflow(
+        code="with_approve_without_generic",
         label=_("Workflow with approval process"),
         permission_policy_cls=WithApprovalPermissions,
         request_policy_cls=RequestsWithApproveWithoutGeneric,
     ),
-    "with_ct": Workflow(
+    Workflow(
+        code="with_ct",
         label=_("Workflow with approval process"),
         permission_policy_cls=WithApprovalPermissions,
         request_policy_cls=RequestsWithCT,
     ),
-    "cascade_update": Workflow(
+    Workflow(
+        code="cascade_update",
         label=_("Workflow to test update of live topic"),
         permission_policy_cls=WithApprovalPermissions,
         request_policy_cls=RequestsWithAnotherTopicUpdatingRequestType,
     ),
-    "different_recipients": Workflow(
-        label=_(
-            "Workflow with draft requests with different recipients to test param interpreters"
-        ),
+    Workflow(
+        code="different_recipients",
+        label=_("Workflow with draft requests with different recipients to test param interpreters"),
         permission_policy_cls=TestWorkflowPermissions,
         request_policy_cls=RequestsWithDifferentRecipients,
     ),
-    "multiple_recipients": Workflow(
+    Workflow(
+        code="multiple_recipients",
         label=_("Workflow with multiple recipient to test escalation of the request"),
         permission_policy_cls=TestWorkflowPermissions,
         request_policy_cls=RequestWithMultipleRecipients,
     ),
-    "system_identity": Workflow(
+    Workflow(
+        code="system_identity",
         label=_("Workflow with system identity"),
         permission_policy_cls=TestWorkflowPermissions,
         request_policy_cls=RequestsWithSystemIdentity,
     ),
-    "different_locales": Workflow(
+    Workflow(
+        code="different_locales",
         label=_("User with id 3 prefers cs locale."),
         permission_policy_cls=DifferentLocalesPermissions,
         request_policy_cls=DifferentLocalesPublish,
     ),
-}
+]
 
 
-@pytest.fixture()
+@pytest.fixture
 def urls():
-    return {"BASE_URL": "/thesis/", "BASE_URL_REQUESTS": "/requests/"}
+    return {"BASE_URL": "/requests-test", "BASE_URL_REQUESTS": "/requests/"}
 
 
-@pytest.fixture()
+@pytest.fixture
 def serialization_result():
-    def _result(topic_id, request_id):
+    def _result(topic_id: str, request_id: str) -> dict[str, str | bool | int]:
         return {
-            "id": request_id,  #'created': '2024-01-29T22:09:13.931722',
-            #'updated': '2024-01-29T22:09:13.954850',
+            "id": request_id,
             "links": {
-                "actions": {
-                    "cancel": f"https://127.0.0.1:5000/api/requests/{request_id}/actions/cancel"
-                },
+                "actions": {"cancel": f"https://127.0.0.1:5000/api/requests/{request_id}/actions/cancel"},
                 "self": f"https://127.0.0.1:5000/api/requests/extended/{request_id}",
                 "comments": f"https://127.0.0.1:5000/api/requests/extended/{request_id}/comments",
                 "timeline": f"https://127.0.0.1:5000/api/requests/extended/{request_id}/timeline",
@@ -537,18 +640,17 @@ def serialization_result():
             "is_expired": False,
             "created_by": {"user": "1"},
             "receiver": {"user": "2"},
-            "topic": {"thesis_draft": topic_id},
+            "topic": {"requests_test_draft": topic_id},
         }
 
     return _result
 
 
-@pytest.fixture()
+@pytest.fixture
 def ui_serialization_result():
-    # TODO correct time formats, translations etc
-    def _result(topic_id, request_id):
+    # TODO: correct time formats, translations etc
+    def _result(topic_id, request_id) -> dict[str, str | bool | int]:
         return {
-            # 'created': '2024-01-26T10:06:17.945916',
             "created_by": {
                 "label": "id: 1",
                 "links": {"self": "https://127.0.0.1:5000/api/users/1"},
@@ -562,9 +664,7 @@ def ui_serialization_result():
             "is_expired": False,
             "is_open": True,
             "links": {
-                "actions": {
-                    "cancel": f"https://127.0.0.1:5000/api/requests/{request_id}/actions/cancel"
-                },
+                "actions": {"cancel": f"https://127.0.0.1:5000/api/requests/{request_id}/actions/cancel"},
                 "self": f"https://127.0.0.1:5000/api/requests/extended/{request_id}",
                 "comments": f"https://127.0.0.1:5000/api/requests/extended/{request_id}/comments",
                 "timeline": f"https://127.0.0.1:5000/api/requests/extended/{request_id}/timeline",
@@ -575,24 +675,22 @@ def ui_serialization_result():
             "status": "Submitted",
             "title": "",
             "topic": {
-                # "label": f"id: {topic_id}",
                 "label": "blabla",
                 "links": {
-                    "self": f"https://127.0.0.1:5000/api/thesis/{topic_id}/draft",
-                    "self_html": f"https://127.0.0.1:5000/thesis/{topic_id}/preview",
+                    "self": f"https://127.0.0.1:5000/api/requests_test/{topic_id}/draft",
+                    "self_html": f"https://127.0.0.1:5000/requests_test/{topic_id}/preview",
                 },
-                "reference": {"thesis_draft": topic_id},
-                "type": "thesis_draft",
+                "reference": {"requests_test_draft": topic_id},
+                "type": "requests_test_draft",
             },
             "type": "publish_draft",
-            # 'updated': '2024-01-26T10:06:18.084317'
         }
 
     return _result
 
 
 @pytest.fixture(scope="module")
-def app_config(app_config):
+def app_config(app_config, requests_model):
     app_config["REQUESTS_REGISTERED_EVENT_TYPES"] = [
         TestEventType(),  # remaining are loaded from .config
     ]
@@ -603,12 +701,8 @@ def app_config(app_config):
         }
     ]
     app_config["JSONSCHEMAS_HOST"] = "localhost"
-    app_config["RECORDS_REFRESOLVER_CLS"] = (
-        "invenio_records.resolver.InvenioRefResolver"
-    )
-    app_config["RECORDS_REFRESOLVER_STORE"] = (
-        "invenio_jsonschemas.proxies.current_refresolver_store"
-    )
+    app_config["RECORDS_REFRESOLVER_CLS"] = "invenio_records.resolver.InvenioRefResolver"
+    app_config["RECORDS_REFRESOLVER_STORE"] = "invenio_jsonschemas.proxies.current_refresolver_store"
     app_config["CACHE_TYPE"] = "SimpleCache"
 
     app_config["OAREPO_REQUESTS_DEFAULT_RECEIVER"] = default_workflow_receiver_function
@@ -633,44 +727,55 @@ def app_config(app_config):
 
     app_config["APP_THEME"] = ["oarepo", "semantic-ui"]
 
+    app_config["REST_CSRF_ENABLED"] = False
+    app_config["RDM_OPTIONAL_DOI_VALIDATOR"] = lambda _draft, _previous_published, **_kwargs: True
+    app_config["RDM_RECORDS_ALLOW_RESTRICTION_AFTER_GRACE_PERIOD"] = True
+
+    app_config["RDM_PERSISTENT_IDENTIFIER_PROVIDERS"] = [
+        providers.OAIPIDProvider(
+            "oai",
+            label=_("OAI ID"),
+        ),
+    ]
+    app_config["RDM_PERSISTENT_IDENTIFIERS"] = {
+        "oai": {
+            "providers": ["oai"],
+            "required": True,
+            "label": _("OAI"),
+            "is_enabled": providers.OAIPIDProvider.is_enabled,
+        },
+    }
+
+    app_config["CELERY_ALWAYS_EAGER"] = True
+    app_config["CELERY_TASK_ALWAYS_EAGER"] = True
+
     return app_config
 
 
 @pytest.fixture
 def check_publish_topic_update():
-    def _check_publish_topic_update(
-        creator_client, urls, record, before_update_response
-    ):
+    def _check_publish_topic_update(creator_client, urls, record, before_update_response) -> None:
         request_id = before_update_response["id"]
         record_id = record["id"]
 
-        after_update_response = creator_client.get(
-            f"{urls['BASE_URL_REQUESTS']}{request_id}"
-        ).json
+        after_update_response = creator_client.get(f"{urls['BASE_URL_REQUESTS']}{request_id}").json
         RequestEvent.index.refresh()
-        events = creator_client.get(
-            f"{urls['BASE_URL_REQUESTS']}extended/{request_id}/timeline"
-        ).json["hits"]["hits"]
+        events = creator_client.get(f"{urls['BASE_URL_REQUESTS']}extended/{request_id}/timeline").json["hits"]["hits"]
 
-        assert before_update_response["topic"] == {"thesis_draft": record_id}
-        assert after_update_response["topic"] == {"thesis": record_id}
+        assert before_update_response["topic"] == {"requests_test_draft": record_id}
+        assert after_update_response["topic"] == {"requests_test": record_id}
 
-        topic_updated_events = [
-            e for e in events if e["type"] == TopicUpdateEventType.type_id
-        ]
+        topic_updated_events = [e for e in events if e["type"] == TopicUpdateEventType.type_id]
         assert len(topic_updated_events) == 1
-        assert (
-            topic_updated_events[0]["payload"]["old_topic"]
-            == f"thesis_draft.{record_id}"
-        )
-        assert topic_updated_events[0]["payload"]["new_topic"] == f"thesis.{record_id}"
+        assert topic_updated_events[0]["payload"]["old_topic"] == f"requests_test_draft.{record_id}"
+        assert topic_updated_events[0]["payload"]["new_topic"] == f"requests_test.{record_id}"
 
     return _check_publish_topic_update
 
 
 @pytest.fixture
 def user_links():
-    def _user_links(user_id):
+    def _user_links(user_id) -> dict[str, str]:
         return {
             "avatar": f"https://127.0.0.1:5000/api/users/{user_id}/avatar.svg",
             "records_html": f"https://127.0.0.1:5000/search/records?q=parent.access.owned_by.user:{user_id}",
@@ -680,27 +785,34 @@ def user_links():
     return _user_links
 
 
+# TODO: use pytest-oarepo instead of this
 @pytest.fixture
-def more_users(app, db, UserFixture):
+def password():
+    """Password fixture."""
+    return base64.b64encode(os.urandom(16)).decode("utf-8")
+
+
+@pytest.fixture
+def more_users(app, db, UserFixture, password):  # noqa N803
     user1 = UserFixture(
         email="user1@example.org",
-        password="password",  # NOSONAR
+        password=password,
         active=True,
         confirmed=True,
     )
-    user1.create(app, db)
+    _create_user(user1, app, db)
 
     user2 = UserFixture(
         email="user2@example.org",
-        password="beetlesmasher",  # NOSONAR
+        password=password,
         active=True,
         confirmed=True,
     )
-    user2.create(app, db)
+    _create_user(user2, app, db)
 
     user3 = UserFixture(
         email="user3@example.org",
-        password="beetlesmasher",  # NOSONAR
+        password=password,
         user_profile={
             "full_name": "Maxipes Fik",
             "affiliations": "CERN",
@@ -708,48 +820,139 @@ def more_users(app, db, UserFixture):
         active=True,
         confirmed=True,
     )
-    user3.create(app, db)
+    _create_user(user3, app, db)
 
     user4 = UserFixture(
         email="user4@example.org",
-        password="password",  # NOSONAR
+        password=password,
         active=True,
         confirmed=True,
     )
-    user4.create(app, db)
+    _create_user(user4, app, db)
 
     user5 = UserFixture(
         email="user5@example.org",
-        password="password",  # NOSONAR
+        password=password,
         active=True,
         confirmed=True,
     )
-    user5.create(app, db)
+    _create_user(user5, app, db)
 
     user6 = UserFixture(
         email="user6@example.org",
-        password="password",  # NOSONAR
+        password=password,
         active=True,
         confirmed=True,
     )
-    user6.create(app, db)
+    _create_user(user6, app, db)
 
     user7 = UserFixture(
         email="user7@example.org",
-        password="password",  # NOSONAR
+        password=password,
         active=True,
         confirmed=True,
     )
-    user7.create(app, db)
+    _create_user(user7, app, db)
 
-    user10 = UserFixture(
-        email="user10@example.org",
-        password="password",  # NOSONAR
+    user8 = UserFixture(
+        email="user8@example.org",
+        password=password,
         active=True,
         confirmed=True,
     )
-    user10.create(app, db)
+    _create_user(user8, app, db)
 
     db.session.commit()
     UserAggregate.index.refresh()
-    return [user1, user2, user3, user4, user5, user6, user7, user10]
+    return [user1, user2, user3, user4, user5, user6, user7, user8]
+
+
+@pytest.fixture(scope="session")
+def model_types():
+    """Model types fixture."""
+    # Define the model types used in the tests
+    return {
+        "Metadata": {
+            "properties": {
+                "title": {"type": "fulltext+keyword", "required": True},
+                "creators": {
+                    "type": "array",
+                    "items": {"type": "keyword"},
+                },
+                "contributors": {
+                    "type": "array",
+                    "items": {"type": "keyword"},
+                },
+            }
+        }
+    }
+
+
+@pytest.fixture(scope="session")
+def requests_model(model_types):
+    from oarepo_model.api import model
+
+    time.time()
+
+    workflow_model = model(
+        name="requests_test",
+        version="1.0.0",
+        presets=[
+            rdm_minimal_preset,
+            workflows_preset,
+            requests_preset,
+        ],
+        types=[model_types],
+        metadata_type="Metadata",
+        customizations=[
+            AddFileToModule(
+                "parent-jsonschema",
+                "jsonschemas",
+                "parent-v1.0.0.json",
+                json.dumps(
+                    {
+                        "$schema": "http://json-schema.org/draft-07/schema#",
+                        "$id": "local://parent-v1.0.0.json",
+                        "type": "object",
+                        "properties": {"id": {"type": "string"}},
+                    }
+                ),
+            ),
+        ],
+        configuration={"ui_blueprint_name": "test_ui_links_ui"},
+    )
+    workflow_model.register()
+
+    time.time()
+
+    try:
+        yield workflow_model
+    finally:
+        workflow_model.unregister()
+
+    return workflow_model
+
+
+@pytest.fixture(scope="session")
+def record_service(requests_model):
+    return requests_model.proxies.current_service
+
+
+@pytest.fixture
+def find_request_type():
+    def _find_request_type(requests, type_) -> dict[str, Any] | None:
+        for request in requests:
+            if request["type_id"] == type_:
+                return request
+        return None
+
+    return _find_request_type
+
+
+@pytest.fixture
+def get_action_url(find_request_type, link2testclient):
+    def _action_url(requests, type_, action="create") -> str:
+        request = find_request_type(requests, type_)
+        return link2testclient(request["links"]["actions"][action])
+
+    return _action_url

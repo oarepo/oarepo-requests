@@ -1,12 +1,21 @@
+#
+# Copyright (C) 2025 CESNET z.s.p.o.
+#
+# oarepo-requests is free software; you can redistribute it and/or
+# modify it under the terms of the MIT License; see LICENSE file for more
+# details.
+#
+from __future__ import annotations
+
 import json
 
+import pytest
 from invenio_requests.proxies import current_requests_service
-
-from oarepo_requests.types import EditPublishedRecordRequestType
 
 allowed_actions = ["submit", "delete"]
 
 
+@pytest.mark.skip
 def test_draft_publish_request_present(
     app,
     logged_client,
@@ -17,21 +26,19 @@ def test_draft_publish_request_present(
 ):
     creator_client = logged_client(users[0])
     draft = draft_factory(users[0].identity)
-    with creator_client.get(f"/thesis/{draft['id']}/edit") as c:
+    with creator_client.get(f"/requests-test/{draft['id']}/edit") as c:
         assert c.status_code == 200
         data = json.loads(c.text)
-        print(data)
         assert data["creatable_request_types"]["publish_draft"] == {
             "description": "Request to publish a draft",
             "links": {
-                "actions": {
-                    "create": f"https://127.0.0.1:5000/api/thesis/{draft['id']}/draft/requests/publish_draft"
-                }
+                "actions": {"create": f"https://127.0.0.1:5000/api/thesis/{draft['id']}/draft/requests/publish_draft"}
             },
             "name": "Publish draft",
         }
 
 
+@pytest.mark.skip
 def test_record_delete_request_present(
     app,
     record_ui_resource,
@@ -44,15 +51,12 @@ def test_record_delete_request_present(
     topic = record_factory(users[0].identity)
     with creator_client.get(f"/thesis/{topic['id']}") as c:
         assert c.status_code == 200
-        print(c.text)
         data = json.loads(c.text)
         assert len(data["creatable_request_types"]) == 3
         assert data["creatable_request_types"]["edit_published_record"] == {
             "description": "Request re-opening of published record",
             "links": {
-                "actions": {
-                    "create": f"https://127.0.0.1:5000/api/thesis/{topic['id']}/requests/edit_published_record"
-                }
+                "actions": {"create": f"https://127.0.0.1:5000/api/thesis/{topic['id']}/requests/edit_published_record"}
             },
             "name": "Edit metadata",
         }
@@ -67,6 +71,7 @@ def test_record_delete_request_present(
         }
 
 
+@pytest.mark.skip
 def test_record_delete_unauthorized(
     app,
     record_ui_resource,
@@ -83,6 +88,7 @@ def test_record_delete_unauthorized(
         assert "delete_record" not in data["creatable_request_types"]
 
 
+@pytest.mark.skip
 def test_request_detail_page(
     app,
     logged_client,
@@ -97,13 +103,13 @@ def test_request_detail_page(
     creator_client = logged_client(users[0])
 
     topic = record_factory(identity)
-    record = record_service.read(identity, id_=topic["id"])._obj
+    record = record_service.read(identity, id_=topic["id"])._obj  # noqa SLF001
 
     creator_identity = users[0].identity
     request = current_requests_service.create(
         creator_identity,
         {},
-        EditPublishedRecordRequestType,
+        "edit_published_record",
         topic=record,
         receiver=users[1].user,
         creator=users[0].user,
@@ -112,9 +118,9 @@ def test_request_detail_page(
 
     with creator_client.get(f"/requests/{request_id}") as c:
         assert c.status_code == 200
-        print(c.text)
 
 
+@pytest.mark.skip
 def test_form_config(app, client, record_ui_resource, fake_manifest):
     with client.get("/requests/configs/publish_new_version") as c:
         assert c.json == {

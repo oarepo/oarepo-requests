@@ -5,37 +5,45 @@
 # modify it under the terms of the MIT License; see LICENSE file for more
 # details.
 #
-from flask import g
-from flask_principal import PermissionDenied
+from __future__ import annotations
+
+from typing import TYPE_CHECKING, ClassVar
+
+from flask_resources.serializers.base import MarshmallowSerializer
 from oarepo_ui.resources import (
     BabelComponent,
     RecordsUIResource,
     RecordsUIResourceConfig,
 )
 from oarepo_ui.resources.components import PermissionsComponent
-from thesis.resources.records.ui import ThesisUIJSONSerializer
-from werkzeug.exceptions import Forbidden
+
+if TYPE_CHECKING:
+    from collections.abc import Mapping
 
 
 class ModelUIResourceConfig(RecordsUIResourceConfig):
-    api_service = (
-        "thesis"  # must be something included in oarepo, as oarepo is used in tests
-    )
+    """Mock UI resource config."""
 
-    blueprint_name = "thesis"
-    url_prefix = "/thesis/"
-    ui_serializer_class = ThesisUIJSONSerializer
+    model_name = "requests-test"
 
-    templates = {
+    api_service = "requests-test"  # must be something included in oarepo, as oarepo is used in tests
+
+    blueprint_name = "requests_test"
+    url_prefix = "/requests-test"
+    ui_serializer_class = MarshmallowSerializer
+
+    templates: ClassVar[Mapping[str, str | None]] = {
         **RecordsUIResourceConfig.templates,
         "detail": "TestDetail",
         "search": "TestDetail",
         "edit": "TestEdit",
     }
 
-    components = [BabelComponent, PermissionsComponent]
+    components = (BabelComponent, PermissionsComponent)
 
 
 class ModelUIResource(RecordsUIResource):
-    def _exportable_handlers(self):
+    """Mock UI resource."""
+
+    def _exportable_handlers(self) -> list:
         return []

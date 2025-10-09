@@ -12,41 +12,142 @@ These components are called as context managers when an action is executed.
 
 from __future__ import annotations
 
-import abc
-import contextlib
-from typing import TYPE_CHECKING, Any, override
-from dataclasses import dataclass
-
-from invenio_requests.customizations import RequestAction, RequestActions, RequestType
-from invenio_requests.errors import CannotExecuteActionError
-
-from oarepo_requests.services.permissions.identity import request_active
-from .generic import OARepoGenericActionMixin
 import logging
+from typing import TYPE_CHECKING, Any, cast, override
+
+from invenio_requests.customizations import RequestActions
+from invenio_requests.errors import CannotExecuteActionError
+from invenio_requests.records.api import Request
+
+from ..utils import ref_to_str, reference_entity
+from .generic import OARepoGenericActionMixin, RequestActionState
+
 if TYPE_CHECKING:
-    from collections.abc import Generator
-    from invenio_drafts_resources.records import Record
+    from uuid import UUID
+
     from flask_principal import Identity
-    from invenio_records_resources.services.uow import UnitOfWork
-    from invenio_requests.records.api import Request
+    from invenio_db.uow import UnitOfWork
 
-from .generic import RequestActionState
-
+log = logging.getLogger(__name__)
 
 
-class RequestActionComponent(abc.ABC):
+class RequestActionComponent:
     """Abstract request action component."""
-    
-    @abc.abstractmethod
-    def apply(
+
+    def create(
         self,
         identity: Identity,
         state: RequestActionState,
         uow: UnitOfWork,
         *args: Any,
         **kwargs: Any,
-    ) -> contextlib.AbstractContextManager:
-        """Apply the component.
+    ) -> None:
+        """Apply the component on the create action.
+
+        Must return a context manager
+
+        :param identity: Identity of the user.
+        :param request_type: Request type.
+        :param action: Action being executed.
+        :param topic: Topic of the request.
+        :param uow: Unit of work.
+        :param args: Additional arguments.
+        :param kwargs: Additional keyword arguments.
+        """
+
+    def submit(
+        self,
+        identity: Identity,
+        state: RequestActionState,
+        uow: UnitOfWork,
+        *args: Any,
+        **kwargs: Any,
+    ) -> None:
+        """Apply the component on the submit action.
+
+        Must return a context manager
+
+        :param identity: Identity of the user.
+        :param request_type: Request type.
+        :param action: Action being executed.
+        :param topic: Topic of the request.
+        :param uow: Unit of work.
+        :param args: Additional arguments.
+        :param kwargs: Additional keyword arguments.
+        """
+
+    def accept(
+        self,
+        identity: Identity,
+        state: RequestActionState,
+        uow: UnitOfWork,
+        *args: Any,
+        **kwargs: Any,
+    ) -> None:
+        """Apply the component on the accept action.
+
+        Must return a context manager
+
+        :param identity: Identity of the user.
+        :param request_type: Request type.
+        :param action: Action being executed.
+        :param topic: Topic of the request.
+        :param uow: Unit of work.
+        :param args: Additional arguments.
+        :param kwargs: Additional keyword arguments.
+        """
+
+    def decline(
+        self,
+        identity: Identity,
+        state: RequestActionState,
+        uow: UnitOfWork,
+        *args: Any,
+        **kwargs: Any,
+    ) -> None:
+        """Apply the component on the decline action.
+
+        Must return a context manager
+
+        :param identity: Identity of the user.
+        :param request_type: Request type.
+        :param action: Action being executed.
+        :param topic: Topic of the request.
+        :param uow: Unit of work.
+        :param args: Additional arguments.
+        :param kwargs: Additional keyword arguments.
+        """
+
+    def cancel(
+        self,
+        identity: Identity,
+        state: RequestActionState,
+        uow: UnitOfWork,
+        *args: Any,
+        **kwargs: Any,
+    ) -> None:
+        """Apply the component on the cancel action.
+
+        Must return a context manager
+
+        :param identity: Identity of the user.
+        :param request_type: Request type.
+        :param action: Action being executed.
+        :param topic: Topic of the request.
+        :param uow: Unit of work.
+        :param args: Additional arguments.
+        :param kwargs: Additional keyword arguments.
+        """
+
+    def expire(
+        self,
+        identity: Identity,
+        state: RequestActionState,
+        uow: UnitOfWork,
+        *args: Any,
+        **kwargs: Any,
+    ) -> None:
+        """Apply the component on the expire action.
 
         Must return a context manager
 
@@ -60,27 +161,6 @@ class RequestActionComponent(abc.ABC):
         """
 
 
-class RequestIdentityComponent(RequestActionComponent):
-    """A component that adds a request active permission to the identity and removes it after processing."""
-
-    @override
-    @contextlib.contextmanager
-    def apply(
-        self,
-        identity: Identity,
-        state: RequestActionState,
-        uow: UnitOfWork,
-        *args: Any,
-        **kwargs: Any,
-    ) -> Generator[None, None, None]:
-        identity.provides.add(request_active)
-        try:
-            yield
-        finally:
-            if request_active in identity.provides:
-                identity.provides.remove(request_active)
-
-
 class WorkflowTransitionComponent(RequestActionComponent):
     """A component that applies a workflow transition after processing the action.
 
@@ -89,63 +169,71 @@ class WorkflowTransitionComponent(RequestActionComponent):
     to the target state.
     """
 
-    @override
-    @contextlib.contextmanager
-    def apply(
-        self,
-        identity: Identity,
-        state: RequestActionState,
-        uow: UnitOfWork,
-        *args: Any,
-        **kwargs: Any,
-    ) -> Generator[None, None, None]:
+    def _workflow_transition(self, identity: Identity, state: RequestActionState, uow: UnitOfWork) -> None:
         from oarepo_workflows.proxies import current_oarepo_workflows
-        from sqlalchemy.exc import NoResultFound
 
-        yield
-        if (
-            not state.topic
-        ):  # for example if we are cancelling requests after deleting draft, it does not make sense to attempt changing the state of the draft
-            return
-        try:
-            transitions = (
-                current_oarepo_workflows.get_workflow(state.topic)
-                .requests()[state.request_type.type_id]
-                .transitions
-            )
-        except (
-            NoResultFound
-        ):  # parent might be deleted - this is the case for delete_draft request type
-            return
-        target_state = transitions[state.action.status_to]  # type: ignore
-        
-        if (
-            target_state and not state.topic.is_deleted
-        ):  # commit doesn't work on deleted record?
+        transitions = (
+            current_oarepo_workflows.get_workflow(state.topic).requests()[state.request_type.type_id].transitions
+        )
+        target_state = transitions[state.action.status_to]
+        if target_state and not state.topic.is_deleted:  # commit doesn't work on deleted record?
             current_oarepo_workflows.set_state(
                 identity,
                 state.topic,
                 target_state,
-                request=state.action.request,  # type: ignore
+                request=state.action.request,
                 uow=uow,
             )
+
+    @override
+    def create(self, identity: Identity, state: RequestActionState, uow: UnitOfWork, *args: Any, **kwargs: Any) -> None:
+        self._workflow_transition(identity, state, uow)
+
+    @override
+    def submit(self, identity: Identity, state: RequestActionState, uow: UnitOfWork, *args: Any, **kwargs: Any) -> None:
+        self._workflow_transition(identity, state, uow)
+
+    @override
+    def accept(self, identity: Identity, state: RequestActionState, uow: UnitOfWork, *args: Any, **kwargs: Any) -> None:
+        self._workflow_transition(identity, state, uow)
+
+    @override
+    def decline(
+        self, identity: Identity, state: RequestActionState, uow: UnitOfWork, *args: Any, **kwargs: Any
+    ) -> None:
+        self._workflow_transition(identity, state, uow)
+
+    @override
+    def cancel(self, identity: Identity, state: RequestActionState, uow: UnitOfWork, *args: Any, **kwargs: Any) -> None:
+        self._workflow_transition(identity, state, uow)
+
+    @override
+    def expire(self, identity: Identity, state: RequestActionState, uow: UnitOfWork, *args: Any, **kwargs: Any) -> None:
+        self._workflow_transition(identity, state, uow)
+
+
+class CreatedTopicComponent(RequestActionComponent):
+    """A component that saves new topic created within the request on payload."""
+
+    @override
+    def accept(self, identity: Identity, state: RequestActionState, uow: UnitOfWork, *args: Any, **kwargs: Any) -> None:
+        """Apply the action to the topic."""
+        if not state.created_topic:
+            return
+        entity_ref = reference_entity(state.created_topic)
+        request: Request = state.request
+        if "payload" not in request:
+            request["payload"] = {}
+        request["payload"]["created_topic"] = ref_to_str(entity_ref)
+        return
 
 
 class AutoAcceptComponent(RequestActionComponent):
     """A component that auto-accepts the request if the receiver has auto-approve enabled."""
 
     @override
-    @contextlib.contextmanager
-    def apply(
-        self,
-        identity: Identity,
-        state: RequestActionState,
-        uow: UnitOfWork,
-        *args: Any,
-        **kwargs: Any,
-    ) -> Generator[None, None, None]:
-        yield
-        request: Request = state.action.request  # type: ignore
+    def submit(self, identity: Identity, state: RequestActionState, uow: UnitOfWork, *args: Any, **kwargs: Any) -> None:
+        request: Request = state.action.request
         if request.status != "submitted":
             return
         receiver_ref = state.request.receiver  # this is <x>proxy, not dict
@@ -157,21 +245,20 @@ class AutoAcceptComponent(RequestActionComponent):
             raise CannotExecuteActionError("accept")
         if isinstance(action_obj, OARepoGenericActionMixin):
             # it is our action, just execute with components right away
-            current_action_obj = None
+            current_action_obj = state.action
+            state.action = action_obj
             try:
-                current_action_obj = state.action
-                state.action = action_obj
-                action_obj.execute_with_components(identity, state, uow, *args, **kwargs)
+                action_obj.execute_with_components(*args, identity, state, uow, **kwargs)
             finally:
                 state.action = current_action_obj
         else:
+            # TODO: consider reconceptualizing this whole RequestActionState thing
             action_obj.execute(identity, uow, *args, **kwargs)
             # we dont know if request/topic was changed, retrieve actual data
-            new_request: Request = Request.get_record(request.id)
+            new_request: Request = Request.get_record(cast("UUID", request.id))
             state.request = new_request
             try:
                 new_topic = new_request.topic.resolve()
                 state.topic = new_topic
-            except Exception as e:
-                logging.error(e)
-                state.topic = None    
+            except Exception:
+                log.exception("Exception while resolving topic")

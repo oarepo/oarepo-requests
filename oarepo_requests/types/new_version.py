@@ -9,33 +9,30 @@
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Any
+from typing import TYPE_CHECKING, Any, ClassVar, override
 
 import marshmallow as ma
-from invenio_drafts_resources.resources.records.errors import DraftNotCreatedError
-from invenio_records_resources.services.errors import PermissionDeniedError
-from invenio_records_resources.services.uow import RecordCommitOp, UnitOfWork
-from invenio_requests.proxies import current_requests_service
+from invenio_drafts_resources.records import Record as RecordWithDraft
+from invenio_i18n import gettext
+from invenio_i18n import lazy_gettext as _
 from marshmallow.validate import OneOf
-from oarepo_runtime.datastreams.utils import get_record_service_for_record_class
-from invenio_i18n import gettext, lazy_gettext as _
 from oarepo_runtime.records.drafts import has_draft
-from typing_extensions import override
 
 from ..actions.new_version import NewVersionAcceptAction
 from ..utils import classproperty, is_auto_approved, request_identity_matches
 from .generic import NonDuplicableOARepoRequestType
 from .ref_types import ModelRefTypes
-from invenio_pidstore.errors import PIDDoesNotExistError
 
 if TYPE_CHECKING:
+    from collections.abc import Mapping
+
     from flask_babel.speaklater import LazyString
     from flask_principal import Identity
-    from invenio_drafts_resources.records import Record
+    from invenio_records_resources.records import Record
     from invenio_requests.customizations.actions import RequestAction
     from invenio_requests.records.api import Request
 
-    from oarepo_requests.typing import EntityReference
+    from ..utils import JsonValue
 
 
 class NewVersionRequestType(NonDuplicableOARepoRequestType):
@@ -43,57 +40,38 @@ class NewVersionRequestType(NonDuplicableOARepoRequestType):
 
     type_id = "new_version"
     name = _("New Version")
-    payload_schema = {
-        "draft_record.links.self": ma.fields.Str(
-            attribute="draft_record:links:self",
-            data_key="draft_record:links:self",
-        ),
-        "draft_record.links.self_html": ma.fields.Str(
-            attribute="draft_record:links:self_html",
-            data_key="draft_record:links:self_html",
-        ),
-        "draft_record.id": ma.fields.Str(
-            attribute="draft_record:id",
-            data_key="draft_record:id",
-        ),
+    payload_schema: Mapping[str, ma.fields.Field] | None = {
+        "created_topic": ma.fields.Str(),
         "keep_files": ma.fields.String(validate=OneOf(["yes", "no"])),
     }
 
-    def get_ui_redirect_url(self, request: Request, ctx: dict) -> str:
-        if request.status == "accepted":
-            service = get_record_service_for_record_class(request.topic.record_cls)
-            try:
-                result_item = service.read_draft(
-                    ctx["identity"], request["payload"]["draft_record:id"]
-                )
-            except (PermissionDeniedError, DraftNotCreatedError, PIDDoesNotExistError):
-                return None
-
-            if "edit_html" in result_item["links"]:
-                return result_item["links"]["edit_html"]
-            elif "self_html" in result_item["links"]:
-                return result_item["links"]["self_html"]
+    allowed_on_draft = False
 
     @classproperty
-    def available_actions(cls) -> dict[str, type[RequestAction]]:
+    @override
+    def available_actions(cls) -> dict[str, type[RequestAction]]:  # noqa N805 type: ignore[reportIncompatibleVariableOverride]
         """Return available actions for the request type."""
         return {
             **super().available_actions,
             "accept": NewVersionAcceptAction,
         }
 
-    description = _("Request requesting creation of new version of a published record.")
-    allowed_topic_ref_types = ModelRefTypes(published=True, draft=True)
+    description = _("Request requesting creation of new version of a published record.")  # type: ignore[reportAssignmentType]
+    allowed_topic_ref_types = ModelRefTypes(
+        published=True, draft=True
+    )  # TODO: pass1: new version makes no sense on drafts?
     editable = False
 
-    form = {
+    # TODO: do we need this?
+    form: ClassVar[JsonValue] = {
         "field": "keep_files",
         "ui_widget": "Dropdown",
         "props": {
             "label": _("Keep files"),
             "placeholder": _("Yes or no"),
             "description": _(
-                "If you choose yes, the current record's files will be linked to the new version of the record. Then you will be able to add/remove files in the form."
+                "If you choose yes, the current record's files will be linked to the new version of the record. "
+                "Then you will be able to add/remove files in the form."
             ),
             "options": [
                 {"id": "yes", "title_l10n": _("Yes")},
@@ -103,10 +81,10 @@ class NewVersionRequestType(NonDuplicableOARepoRequestType):
     }
 
     @classmethod
-    def is_applicable_to(
-        cls, identity: Identity, topic: Record, *args: Any, **kwargs: Any
-    ) -> bool:
+    def is_applicable_to(cls, identity: Identity, topic: Record, *args: Any, **kwargs: Any) -> bool:
         """Check if the request type is applicable to the topic."""
+        if not isinstance(topic, RecordWithDraft):
+            raise TypeError(gettext("Trying to create edit request on record without draft support"))
         if topic.is_draft:
             return False
         # if already editing metadata or a new version, we don't want to create a new request
@@ -118,23 +96,20 @@ class NewVersionRequestType(NonDuplicableOARepoRequestType):
         self,
         identity: Identity,
         data: dict,
-        receiver: EntityReference,
+        receiver: dict[str, str],
         topic: Record,
-        creator: EntityReference,
+        creator: dict[str, str],
         *args: Any,
         **kwargs: Any,
     ) -> None:
         """Check if the request can be created."""
+        if not isinstance(topic, RecordWithDraft):
+            raise TypeError(gettext("Trying to create edit request on record without draft support"))
         if topic.is_draft:
             raise ValueError(gettext("Trying to create new version request on draft record"))
         if has_draft(topic):
             raise ValueError(gettext("Trying to create edit request on record with draft"))
         super().can_create(identity, data, receiver, topic, creator, *args, **kwargs)
-
-    def topic_change(self, request: Request, new_topic: dict, uow: UnitOfWork) -> None:
-        """Change the topic of the request."""
-        request.topic = new_topic
-        uow.register(RecordCommitOp(request, indexer=current_requests_service.indexer))
 
     @override
     def stateful_name(
@@ -157,7 +132,7 @@ class NewVersionRequestType(NonDuplicableOARepoRequestType):
                 return gettext("Request new version access")
 
     @override
-    def stateful_description(
+    def stateful_description(  # noqa PLR0911
         self,
         identity: Identity,
         *,

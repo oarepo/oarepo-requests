@@ -9,22 +9,27 @@
 
 from __future__ import annotations
 
+from contextvars import ContextVar
 from typing import Any
 
 import marshmallow as ma
-from invenio_records_resources.services import ConditionalLink
-from invenio_records_resources.services.base.links import Link, LinksTemplate
+from invenio_drafts_resources.records.api import Record
+from invenio_records_resources.services.base.links import (
+    EndpointLink,
+    LinksTemplate,
+)
 from invenio_requests.services.schemas import GenericRequestSchema
 from marshmallow import fields
-from oarepo_runtime.datastreams.utils import get_record_service_for_record
-from oarepo_runtime.records import is_published_record
+
+from oarepo_requests.utils import ref_to_str, reference_entity
+
+request_type_identity_ctx: ContextVar[Any] = ContextVar("oarepo_requests.request_type_identity", default=None)
+request_type_record_ctx: ContextVar[Any] = ContextVar("oarepo_requests.request_type_record", default=None)
 
 
 def get_links_schema() -> ma.fields.Dict:
     """Get links schema."""
-    return ma.fields.Dict(
-        keys=ma.fields.String()
-    )  # value is either string or dict of strings (for actions)
+    return ma.fields.Dict(keys=ma.fields.String())  # value is either string or dict of strings (for actions)
 
 
 class RequestTypeSchema(ma.Schema):
@@ -37,26 +42,16 @@ class RequestTypeSchema(ma.Schema):
     """Links to the request type."""
 
     @ma.post_dump
-    def _create_link(self, data: dict, **kwargs: Any) -> dict:
+    def _create_link(self, data: dict, **kwargs: Any) -> dict:  # noqa ARG002
         if "links" in data:
             return data
-        if "record" not in self.context:
-            raise ma.ValidationError(
-                "record not in context for request types serialization"
-            )
         type_id = data["type_id"]
-        # current_request_type_registry.lookup(type_id, quiet=True)
-        record = self.context["record"]
-        service = get_record_service_for_record(record)
-        link = ConditionalLink(
-            cond=is_published_record,
-            if_=Link(f"{{+api}}{service.config.url_prefix}{{id}}/requests/{type_id}"),
-            else_=Link(
-                f"{{+api}}{service.config.url_prefix}{{id}}/draft/requests/{type_id}"
-            ),
-        )
-        template = LinksTemplate({"create": link}, context={"id": record["id"]})
-        data["links"] = {"actions": template.expand(self.context["identity"], record)}
+        identity = request_type_identity_ctx.get()
+        record = request_type_record_ctx.get()
+        topic_ref = ref_to_str(reference_entity(record) if isinstance(record, Record) else record)
+        link = EndpointLink("oarepo_requests.create_args", params=["topic", "request_type"])
+        template = LinksTemplate({"create": link}, context={"topic": topic_ref, "request_type": type_id})
+        data["links"] = {"actions": template.expand(identity, record)}
         return data
 
 

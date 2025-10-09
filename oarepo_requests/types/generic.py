@@ -9,15 +9,14 @@
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Any, Callable
+from typing import TYPE_CHECKING, Any, cast
 
-from invenio_access.permissions import system_identity
 from invenio_records_resources.services.errors import PermissionDeniedError
 from invenio_requests.customizations import RequestType
 from invenio_requests.customizations.states import RequestState
 from invenio_requests.proxies import current_requests_service
 
-from oarepo_requests.errors import OpenRequestAlreadyExists
+from oarepo_requests.errors import OpenRequestAlreadyExistsError
 from oarepo_requests.utils import classproperty, open_request_exists
 
 from ..actions.generic import (
@@ -35,32 +34,30 @@ from ..utils import (
 from .ref_types import ModelRefTypes, ReceiverRefTypes
 
 if TYPE_CHECKING:
+    from collections.abc import Callable
+
     from flask_babel.speaklater import LazyString
     from flask_principal import Identity
     from invenio_records_resources.records import Record
     from invenio_requests.customizations.actions import RequestAction
     from invenio_requests.records.api import Request
-
-    from oarepo_requests.typing import EntityReference
+    from marshmallow.schema import Schema
 
 
 class OARepoRequestType(RequestType):
     """Base request type for OARepo requests."""
 
-    description = None
+    description: str = ""
 
     dangerous = False
 
-    def on_topic_delete(self, request: Request, topic: Record) -> None:
-        """Cancel the request when the topic is deleted.
+    allowed_on_draft = True
 
-        :param request:         the request
-        :param topic:           the topic
-        """
-        current_requests_service.execute_action(system_identity, request.id, "cancel")
+    allowed_on_published = True
 
+    # TODO: lint: classproperty issue
     @classproperty[dict[str, RequestState]]
-    def available_statuses(cls) -> dict[str, RequestState]:
+    def available_statuses(self) -> dict[str, RequestState]:  # type: ignore[reportIncompatibleVariableOverride]
         """Return available statuses for the request type.
 
         The status (open, closed, undefined) are used for request filtering.
@@ -68,7 +65,7 @@ class OARepoRequestType(RequestType):
         return {**super().available_statuses, "created": RequestState.OPEN}
 
     @classproperty[bool]
-    def has_form(cls) -> bool:
+    def has_form(cls) -> bool:  # noqa N805
         """Return whether the request type has a form."""
         return hasattr(cls, "form")
 
@@ -76,33 +73,41 @@ class OARepoRequestType(RequestType):
     """Whether the request type can be edited multiple times before it is submitted."""
 
     @classproperty[bool]
-    def is_editable(cls) -> bool:
+    def is_editable(cls) -> bool:  # noqa N805
         """Return whether the request type is editable."""
         if cls.editable is not None:
             return cls.editable
-        return cls.has_form  # noqa
+        return cls.has_form
 
     @classmethod
-    def _create_marshmallow_schema(cls):
+    def _create_marshmallow_schema(cls) -> type[Schema]:
         """Create a marshmallow schema for this request type with required payload field."""
         schema = super()._create_marshmallow_schema()
-        if (
-            cls.payload_schema is not None
-            and hasattr(schema, "fields")
-            and "payload" in schema.fields
-        ):
-            schema.fields["payload"].required = True
+        # TODO: lint: idk why .fields
+        if cls.payload_schema is not None and hasattr(schema, "fields") and "payload" in schema.fields:  # type: ignore[reportAttributeAccessIssue]
+            schema.fields["payload"].required = True  # type: ignore[reportAttributeAccessIssue]
 
-        return schema
+        return cast("type[Schema]", schema)  # TODO: idk why it complains here
 
+    @classmethod
+    def _allowed_by_publication_status(cls, record: Record) -> bool:
+        if not hasattr(record, "publication_status"):
+            return bool(cls.allowed_on_published)
+        # TODO: lint: protocol for .publication_status?
+        return bool(
+            (cls.allowed_on_draft and record.publication_status == "draft")  # type: ignore[reportAttributeAccessIssue]
+            or (cls.allowed_on_published and record.publication_status == "published")  # type: ignore[reportAttributeAccessIssue]
+        )
+
+    # TODO: specify what can exactly come in the data dicts
     def can_create(
         self,
         identity: Identity,
-        data: dict,
-        receiver: EntityReference,
+        data: dict[str, Any],  # noqa ARG002
+        receiver: dict[str, str],  # noqa ARG002
         topic: Record,
-        creator: EntityReference,
-        *args: Any,
+        creator: dict[str, str],  # noqa ARG002
+        *args: Any,  # noqa ARG002
         **kwargs: Any,
     ) -> None:
         """Check if the request can be created.
@@ -115,14 +120,13 @@ class OARepoRequestType(RequestType):
         :param args:            additional arguments
         :param kwargs:          additional keyword arguments
         """
-        current_requests_service.require_permission(
-            identity, "create", record=topic, request_type=self, **kwargs
-        )
+        # TODO: pass1: discuss this mechanism
+        if not self._allowed_by_publication_status(record=topic):
+            raise PermissionDeniedError("create")
+        current_requests_service.require_permission(identity, "create", record=topic, request_type=self, **kwargs)
 
     @classmethod
-    def is_applicable_to(
-        cls, identity: Identity, topic: Record, *args: Any, **kwargs: Any
-    ) -> bool:
+    def is_applicable_to(cls, identity: Identity, topic: Record, *args: Any, **kwargs: Any) -> bool:  # noqa ARG002
         """Check if the request type is applicable to the topic.
 
         Used for checking whether there is any situation where the client can create
@@ -131,19 +135,22 @@ class OARepoRequestType(RequestType):
         method is used to check whether there is a possible situation a user might create
         this request eg. for the purpose of serializing a link on associated record
         """
-        try:
-            current_requests_service.require_permission(
-                identity, "create", record=topic, request_type=cls, **kwargs
-            )
-        except PermissionDeniedError:
+        if not cls._allowed_by_publication_status(record=topic):
             return False
-        return True
+        return cast(
+            "bool",
+            current_requests_service.check_permission(identity, "create", record=topic, request_type=cls, **kwargs),
+        )
 
-    allowed_topic_ref_types = ModelRefTypes()
-    allowed_receiver_ref_types = ReceiverRefTypes()
+    # TODO: lint: __get__
+    allowed_topic_ref_types = ModelRefTypes()  # type: ignore[reportAssignmentType]
+    allowed_receiver_ref_types = ReceiverRefTypes()  # type: ignore[reportAssignmentType]
 
+    # TODO: lint: classproperty issue
     @classproperty
-    def available_actions(cls) -> dict[str, type[RequestAction]]:
+    def available_actions(  # type: ignore[reportIncompatibleVariableOverride]
+        self,
+    ) -> dict[str, type[RequestAction]]:
         """Return available actions for the request type."""
         return {
             **super().available_actions,
@@ -155,11 +162,11 @@ class OARepoRequestType(RequestType):
 
     def stateful_name(
         self,
-        identity: Identity,
+        identity: Identity,  # noqa ARG002
         *,
-        topic: Record,
-        request: Request | None = None,
-        **kwargs: Any,
+        topic: Record,  # noqa ARG002
+        request: Request | None = None,  # noqa ARG002
+        **kwargs: Any,  # noqa ARG002
     ) -> str | LazyString:
         """Return the name of the request that reflects its current state.
 
@@ -171,11 +178,11 @@ class OARepoRequestType(RequestType):
 
     def stateful_description(
         self,
-        identity: Identity,
+        identity: Identity,  # noqa ARG002
         *,
-        topic: Record,
-        request: Request | None = None,
-        **kwargs: Any,
+        topic: Record,  # noqa ARG002
+        request: Request | None = None,  # noqa ARG002
+        **kwargs: Any,  # noqa ARG002
     ) -> str | LazyString:
         """Return the description of the request that reflects its current state.
 
@@ -185,63 +192,23 @@ class OARepoRequestType(RequestType):
         """
         return self.description
 
-    def string_by_state(
+    def string_by_state(  # noqa C901, PLR0913, PLR0911
         self,
         identity: Identity,
         *,
         topic: Record,
         request: Request | None = None,
         # strings
-        create: (
-            str
-            | LazyString
-            | Callable[[Identity, Record, Request | None], str | LazyString]
-        ),
-        create_autoapproved: (
-            str
-            | LazyString
-            | Callable[[Identity, Record, Request | None], str | LazyString]
-        ),
-        submit: (
-            str
-            | LazyString
-            | Callable[[Identity, Record, Request | None], str | LazyString]
-        ),
-        submitted_receiver: (
-            str
-            | LazyString
-            | Callable[[Identity, Record, Request | None], str | LazyString]
-        ),
-        submitted_creator: (
-            str
-            | LazyString
-            | Callable[[Identity, Record, Request | None], str | LazyString]
-        ),
-        submitted_others: (
-            str
-            | LazyString
-            | Callable[[Identity, Record, Request | None], str | LazyString]
-        ),
-        accepted: (
-            str
-            | LazyString
-            | Callable[[Identity, Record, Request | None], str | LazyString]
-        ),
-        declined: (
-            str
-            | LazyString
-            | Callable[[Identity, Record, Request | None], str | LazyString]
-        ),
-        cancelled: (
-            str
-            | LazyString
-            | Callable[[Identity, Record, Request | None], str | LazyString]
-        ),
-        created: (
-            str
-            | LazyString
-            | Callable[[Identity, Record, Request | None], str | LazyString]
-        ),
+        create: (str | LazyString | Callable[[Identity, Record, Request | None], str | LazyString]),
+        create_autoapproved: (str | LazyString | Callable[[Identity, Record, Request | None], str | LazyString]),
+        submit: (str | LazyString | Callable[[Identity, Record, Request | None], str | LazyString]),
+        submitted_receiver: (str | LazyString | Callable[[Identity, Record, Request | None], str | LazyString]),
+        submitted_creator: (str | LazyString | Callable[[Identity, Record, Request | None], str | LazyString]),
+        submitted_others: (str | LazyString | Callable[[Identity, Record, Request | None], str | LazyString]),
+        accepted: (str | LazyString | Callable[[Identity, Record, Request | None], str | LazyString]),
+        declined: (str | LazyString | Callable[[Identity, Record, Request | None], str | LazyString]),
+        cancelled: (str | LazyString | Callable[[Identity, Record, Request | None], str | LazyString]),
+        created: (str | LazyString | Callable[[Identity, Record, Request | None], str | LazyString]),
     ) -> str | LazyString:
         """Return a string that varies by the state of the request.
 
@@ -254,7 +221,7 @@ class OARepoRequestType(RequestType):
         """
 
         def get_string(
-            string: str | LazyString,
+            string: str | LazyString | Callable[[Identity, Record, Request | None], str | LazyString],
             identity: Identity,
             topic: Record,
             request: Request | None = None,
@@ -282,9 +249,7 @@ class OARepoRequestType(RequestType):
                         return get_string(submit, identity, topic, request)
                     return get_string(created, identity, topic, request)
                 case _:
-                    return (
-                        f'Unknown label for status "{request.status}" in "{__file__}"'
-                    )
+                    return f'Unknown label for status "{request.status}" in "{__file__}"'
 
         if is_auto_approved(self, identity=identity, topic=topic):
             return get_string(create_autoapproved, identity, topic, request)
@@ -301,9 +266,9 @@ class NonDuplicableOARepoRequestType(OARepoRequestType):
         self,
         identity: Identity,
         data: dict,
-        receiver: EntityReference,
+        receiver: dict[str, str],
         topic: Record,
-        creator: EntityReference,
+        creator: dict[str, str],
         *args: Any,
         **kwargs: Any,
     ) -> None:
@@ -318,13 +283,11 @@ class NonDuplicableOARepoRequestType(OARepoRequestType):
         :param kwargs:          additional keyword arguments
         """
         if open_request_exists(topic, self.type_id):
-            raise OpenRequestAlreadyExists(self, topic)
+            raise OpenRequestAlreadyExistsError(self, topic)
         super().can_create(identity, data, receiver, topic, creator, *args, **kwargs)
 
     @classmethod
-    def is_applicable_to(
-        cls, identity: Identity, topic: Record, *args: Any, **kwargs: Any
-    ) -> bool:
+    def is_applicable_to(cls, identity: Identity, topic: Record, *args: Any, **kwargs: Any) -> bool:
         """Check if the request type is applicable to the topic."""
         if open_request_exists(topic, cls.type_id):
             return False
