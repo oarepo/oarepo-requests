@@ -176,6 +176,8 @@ def get_matching_service_for_refdict(
     return None
 
 
+# TODO: pass1: is this used somewhere
+# it was in deprecated record request services
 def get_entity_key_for_record_cls(record_cls: type[Record]) -> str:
     """Get the entity type id for the record_cls.
 
