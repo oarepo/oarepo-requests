@@ -46,7 +46,7 @@ def test_receiver_param_interpreter(
     print(type(current_requests.requests_service), file=sys.stderr)  # noqa
     print(type(current_requests.requests_service.config), file=sys.stderr)  # noqa
     print(type(current_requests.requests_service.config).__mro__, file=sys.stderr)  # noqa
-    print(type(current_requests.requests_service.config.search.params_interpreters_cls), file=sys.stderr)  # noqa
+    print(current_requests.requests_service.config.search.params_interpreters_cls, file=sys.stderr)  # noqa
     search_receiver_only = user2_client.get(
         f"{urls['BASE_URL_REQUESTS']}?assigned=true"
     )  # creator of 1 and recipient of 2
