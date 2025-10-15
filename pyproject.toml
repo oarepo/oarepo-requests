@@ -75,6 +75,8 @@ group = "oarepo_requests.identity_to_entity_references:group_mappings"
 oarepo_requests = "oarepo_requests:alembic"
 # [project.entry-points."oarepo_workflows.state_changed_notifiers"]
 # auto_requester = "oarepo_requests.services.permissions.requester:auto_request_state_change_notifier"
+[project.entry-points."invenio_config.module"]
+oarepo_requests = "oarepo_requests.initial_config"
 
 
 [[tool.mypy.overrides]]
