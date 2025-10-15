@@ -7,7 +7,10 @@
 #
 from __future__ import annotations
 
+import sys
 from typing import TYPE_CHECKING
+
+from invenio_requests.proxies import current_requests
 
 if TYPE_CHECKING:
     from pytest_oarepo.fixtures import LoggedClient
@@ -40,6 +43,10 @@ def test_receiver_param_interpreter(
     search_clear,
 ):
     _user1_client, user2_client = _init(users, logged_client, draft_factory, submit_request_on_draft, urls)
+    print(type(current_requests.requests_service), file=sys.stderr)  # noqa
+    print(type(current_requests.requests_service.config), file=sys.stderr)  # noqa
+    print(type(current_requests.requests_service.config).__mro__, file=sys.stderr)  # noqa
+    print(type(current_requests.requests_service.config.search.params_interpreters_cls), file=sys.stderr)  # noqa
     search_receiver_only = user2_client.get(
         f"{urls['BASE_URL_REQUESTS']}?assigned=true"
     )  # creator of 1 and recipient of 2
