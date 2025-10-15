@@ -186,29 +186,69 @@ class WorkflowTransitionComponent(RequestActionComponent):
             )
 
     @override
-    def create(self, identity: Identity, state: RequestActionState, uow: UnitOfWork, *args: Any, **kwargs: Any) -> None:
-        self._workflow_transition(identity, state, uow)
-
-    @override
-    def submit(self, identity: Identity, state: RequestActionState, uow: UnitOfWork, *args: Any, **kwargs: Any) -> None:
-        self._workflow_transition(identity, state, uow)
-
-    @override
-    def accept(self, identity: Identity, state: RequestActionState, uow: UnitOfWork, *args: Any, **kwargs: Any) -> None:
-        self._workflow_transition(identity, state, uow)
-
-    @override
-    def decline(
-        self, identity: Identity, state: RequestActionState, uow: UnitOfWork, *args: Any, **kwargs: Any
+    def create(
+        self,
+        identity: Identity,
+        state: RequestActionState,
+        uow: UnitOfWork,
+        *args: Any,
+        **kwargs: Any,
     ) -> None:
         self._workflow_transition(identity, state, uow)
 
     @override
-    def cancel(self, identity: Identity, state: RequestActionState, uow: UnitOfWork, *args: Any, **kwargs: Any) -> None:
+    def submit(
+        self,
+        identity: Identity,
+        state: RequestActionState,
+        uow: UnitOfWork,
+        *args: Any,
+        **kwargs: Any,
+    ) -> None:
         self._workflow_transition(identity, state, uow)
 
     @override
-    def expire(self, identity: Identity, state: RequestActionState, uow: UnitOfWork, *args: Any, **kwargs: Any) -> None:
+    def accept(
+        self,
+        identity: Identity,
+        state: RequestActionState,
+        uow: UnitOfWork,
+        *args: Any,
+        **kwargs: Any,
+    ) -> None:
+        self._workflow_transition(identity, state, uow)
+
+    @override
+    def decline(
+        self,
+        identity: Identity,
+        state: RequestActionState,
+        uow: UnitOfWork,
+        *args: Any,
+        **kwargs: Any,
+    ) -> None:
+        self._workflow_transition(identity, state, uow)
+
+    @override
+    def cancel(
+        self,
+        identity: Identity,
+        state: RequestActionState,
+        uow: UnitOfWork,
+        *args: Any,
+        **kwargs: Any,
+    ) -> None:
+        self._workflow_transition(identity, state, uow)
+
+    @override
+    def expire(
+        self,
+        identity: Identity,
+        state: RequestActionState,
+        uow: UnitOfWork,
+        *args: Any,
+        **kwargs: Any,
+    ) -> None:
         self._workflow_transition(identity, state, uow)
 
 
@@ -216,7 +256,14 @@ class CreatedTopicComponent(RequestActionComponent):
     """A component that saves new topic created within the request on payload."""
 
     @override
-    def accept(self, identity: Identity, state: RequestActionState, uow: UnitOfWork, *args: Any, **kwargs: Any) -> None:
+    def accept(
+        self,
+        identity: Identity,
+        state: RequestActionState,
+        uow: UnitOfWork,
+        *args: Any,
+        **kwargs: Any,
+    ) -> None:
         """Apply the action to the topic."""
         if not state.created_topic:
             return
@@ -232,7 +279,14 @@ class AutoAcceptComponent(RequestActionComponent):
     """A component that auto-accepts the request if the receiver has auto-approve enabled."""
 
     @override
-    def submit(self, identity: Identity, state: RequestActionState, uow: UnitOfWork, *args: Any, **kwargs: Any) -> None:
+    def submit(
+        self,
+        identity: Identity,
+        state: RequestActionState,
+        uow: UnitOfWork,
+        *args: Any,
+        **kwargs: Any,
+    ) -> None:
         request: Request = state.action.request
         if request.status != "submitted":
             return
