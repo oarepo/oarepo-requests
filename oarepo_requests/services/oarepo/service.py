@@ -36,14 +36,19 @@ if TYPE_CHECKING:
     from flask_principal import Identity
     from invenio_db.uow import UnitOfWork
     from invenio_requests.services.requests.results import RequestItem
-    from invenio_requests.services.results import EntityResolverExpandableField, MultiEntityResolverExpandableField
+    from invenio_requests.services.results import (
+        EntityResolverExpandableField,
+        MultiEntityResolverExpandableField,
+    )
 
 
 class OARepoRequestsService(RequestsService):
     """OARepo extension to invenio-requests service."""
 
     @property
-    def expandable_fields(self) -> list[EntityResolverExpandableField | MultiEntityResolverExpandableField]:
+    def expandable_fields(
+        self,
+    ) -> list[EntityResolverExpandableField | MultiEntityResolverExpandableField]:
         """Get expandable fields."""
         return [
             *super().expandable_fields,

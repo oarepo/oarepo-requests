@@ -12,7 +12,10 @@ from __future__ import annotations
 from functools import partial
 from typing import TYPE_CHECKING, override
 
-from invenio_records_resources.services.records.params import FilterParam, ParamInterpreter
+from invenio_records_resources.services.records.params import (
+    FilterParam,
+    ParamInterpreter,
+)
 from invenio_requests.services.requests.params import IsOpenParam
 from invenio_search.engine import dsl
 

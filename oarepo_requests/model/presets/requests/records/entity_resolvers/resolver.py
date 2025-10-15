@@ -57,7 +57,11 @@ class DraftRecordProxy(RecordProxy):
 
     @override
     def __init__(
-        self, resolver: RecordResolver, ref_dict: dict[str, str], record_cls: type[Record], draft_cls: type[Draft]
+        self,
+        resolver: RecordResolver,
+        ref_dict: dict[str, str],
+        record_cls: type[Record],
+        draft_cls: type[Draft],
     ):
         """Create the proxy."""
         # this should be record resolver?
@@ -133,7 +137,13 @@ class DraftRecordResolver(RecordResolver):
     proxy_cls = DraftRecordProxy
 
     @override
-    def __init__(self, record_cls: type[Record], draft_cls: type[Draft], service_id: str, type_key: str) -> None:
+    def __init__(
+        self,
+        record_cls: type[Record],
+        draft_cls: type[Draft],
+        service_id: str,
+        type_key: str,
+    ) -> None:
         super().__init__(record_cls, service_id, type_key=type_key, proxy_cls=self.proxy_cls)
         self.draft_cls = draft_cls
 

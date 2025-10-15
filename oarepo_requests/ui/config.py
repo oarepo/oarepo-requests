@@ -95,7 +95,10 @@ class UIResourceConfig(ResourceConfig):
         return str(tf)
 
     # TODO: lint: allowing None here?
-    response_handlers: Mapping[str, ResponseHandler] = {"text/html": None, "application/json": None}  # type: ignore[reportAssignmentType]
+    response_handlers: Mapping[str, ResponseHandler] = {
+        "text/html": None,
+        "application/json": None,
+    }  # type: ignore[reportAssignmentType]
     default_accept_mimetype = "text/html"
 
     # Request parsing
