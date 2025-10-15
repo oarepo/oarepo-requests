@@ -910,21 +910,7 @@ def requests_model(model_types):
         ],
         types=[model_types],
         metadata_type="Metadata",
-        customizations=[
-            AddFileToModule(
-                "parent-jsonschema",
-                "jsonschemas",
-                "parent-v1.0.0.json",
-                json.dumps(
-                    {
-                        "$schema": "http://json-schema.org/draft-07/schema#",
-                        "$id": "local://parent-v1.0.0.json",
-                        "type": "object",
-                        "properties": {"id": {"type": "string"}},
-                    }
-                ),
-            ),
-        ],
+        customizations=[],
         configuration={"ui_blueprint_name": "test_ui_links_ui"},
     )
     workflow_model.register()
