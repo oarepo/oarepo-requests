@@ -16,10 +16,11 @@ import importlib_metadata
 from deepmerge import conservative_merger
 from invenio_base.utils import obj_or_import_string
 
-from oarepo_requests import config
 from oarepo_requests.cli import oarepo_requests  # noqa
 from oarepo_requests.resources.oarepo.config import OARepoRequestsResourceConfig
 from oarepo_requests.resources.oarepo.resource import OARepoRequestsResource
+from oarepo_requests.services.oarepo.config import OARepoRequestsServiceConfig
+from oarepo_requests.services.oarepo.service import OARepoRequestsService
 
 if TYPE_CHECKING:
     from collections.abc import Callable
@@ -120,23 +121,32 @@ class OARepoRequests:
     def init_resources(self, app: Flask) -> None:
         """Init resources."""
         # TODO: import invenio - reference the service instead of initializing it again
+
         self.requests_resource = OARepoRequestsResource(
-            service=config.REQUESTS_SERVICE_CLASS(config.REQUESTS_SERVICE_CONFIG_CLASS.build(app)),
+            service=obj_or_import_string(app.config.get("REQUESTS_SERVICE_CLASS", OARepoRequestsService))(  # type: ignore[reportOptionalCall]
+                obj_or_import_string(
+                    app.config.get("REQUESTS_SERVICE_CLASS_CONFIG", OARepoRequestsServiceConfig)
+                ).build(app)  # type: ignore[reportOptionalMemberAccess]
+            ),
             config=OARepoRequestsResourceConfig.build(app),
         )
+
         # TODO: event resource
 
     def action_components(self) -> list[type[RequestActionComponent]]:
         """Return components for the given action."""
-        return cast("list[type[RequestActionComponent]]", self.app.config["REQUESTS_ACTION_COMPONENTS"])
+        return cast(
+            "list[type[RequestActionComponent]]",
+            self.app.config["REQUESTS_ACTION_COMPONENTS"],
+        )
 
     def init_config(self, app: Flask) -> None:
         """Initialize configuration."""
         from . import config
 
         app.config.setdefault("OAREPO_REQUESTS_DEFAULT_RECEIVER", None)
-        app.config.setdefault("REQUESTS_SERVICE_CLASS", config.REQUESTS_SERVICE_CLASS)
-        app.config.setdefault("REQUESTS_SERVICE_CONFIG_CLASS", config.REQUESTS_SERVICE_CONFIG_CLASS)
+        # app.config.setdefault("REQUESTS_SERVICE_CLASS", config.REQUESTS_SERVICE_CLASS) # noqa
+        # app.config.setdefault("REQUESTS_SERVICE_CONFIG_CLASS", config.REQUESTS_SERVICE_CONFIG_CLASS) # noqa
         app.config.setdefault("REQUESTS_ALLOWED_RECEIVERS", []).extend(config.REQUESTS_ALLOWED_RECEIVERS)
         app.config.setdefault("REQUESTS_UI_SERIALIZATION_REFERENCED_FIELDS", []).extend(
             config.REQUESTS_UI_SERIALIZATION_REFERENCED_FIELDS

@@ -30,7 +30,10 @@ if TYPE_CHECKING:
 def search_requests(identity: Identity, record: RecordWithDraft | dict[str, str], expand: bool = False) -> RequestList:
     """Search requests for a given record."""
     topic_ref = reference_entity(record) if isinstance(record, RecordWithDraft) else record
-    return cast("RequestList", current_requests_service.search(identity, topic=topic_ref, expand=expand))
+    return cast(
+        "RequestList",
+        current_requests_service.search(identity, topic=topic_ref, expand=expand),
+    )
 
 
 def applicable_requests(identity: Identity, record: RecordWithDraft | dict[str, str]) -> RequestTypesList:

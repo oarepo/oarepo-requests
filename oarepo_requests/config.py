@@ -24,8 +24,6 @@ from oarepo_requests.actions.components import (
     RequestActionComponent,
     WorkflowTransitionComponent,
 )
-from oarepo_requests.services.oarepo.config import OARepoRequestsServiceConfig
-from oarepo_requests.services.oarepo.service import OARepoRequestsService
 from oarepo_requests.types.events import TopicDeleteEventType
 from oarepo_requests.types.events.escalation import EscalationEventType
 from oarepo_requests.types.events.record_snapshot import RecordSnapshotEventType
@@ -69,6 +67,3 @@ PUBLISH_REQUEST_TYPES = ["publish_draft", "publish_new_version"]
 NOTIFICATIONS_BACKENDS = {
     EmailNotificationBackend.id: EmailNotificationBackend(),
 }
-
-REQUESTS_SERVICE_CLASS = OARepoRequestsService
-REQUESTS_SERVICE_CONFIG_CLASS = OARepoRequestsServiceConfig

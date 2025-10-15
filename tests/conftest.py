@@ -333,7 +333,10 @@ class RequestWithMultipleRecipients(WorkflowRequestPolicy):
 
     publish_draft = WorkflowRequest(
         requesters=[IfInState("draft", [RecordOwners()])],
-        recipients=[UserGenerator("user2@example.org"), UserGenerator("user1@example.org")],
+        recipients=[
+            UserGenerator("user2@example.org"),
+            UserGenerator("user1@example.org"),
+        ],
         transitions=WorkflowTransitions(
             submitted="publishing",
             accepted="published",
@@ -343,7 +346,10 @@ class RequestWithMultipleRecipients(WorkflowRequestPolicy):
         escalations=[
             WorkflowRequestEscalation(
                 after=timedelta(seconds=2),
-                recipients=[UserGenerator("user3@example.org"), UserGenerator("user7@example.org")],
+                recipients=[
+                    UserGenerator("user3@example.org"),
+                    UserGenerator("user7@example.org"),
+                ],
             ),
             WorkflowRequestEscalation(
                 after=timedelta(seconds=6),

@@ -88,7 +88,12 @@ class OARepoGenericActionMixin(RequestAction):
         return [component_cls() for component_cls in current_oarepo_requests.action_components()]
 
     def execute_with_components(
-        self, identity: Identity, state: RequestActionState, uow: UnitOfWork, *args: Any, **kwargs: Any
+        self,
+        identity: Identity,
+        state: RequestActionState,
+        uow: UnitOfWork,
+        *args: Any,
+        **kwargs: Any,
     ) -> None:
         """Execute the action with components."""
         self.apply(identity, state, uow, *args, **kwargs)
