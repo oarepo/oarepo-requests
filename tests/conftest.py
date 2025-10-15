@@ -8,7 +8,6 @@
 from __future__ import annotations
 
 import base64
-import json
 import os
 import time
 from datetime import timedelta
@@ -33,7 +32,6 @@ from invenio_requests.services.permissions import (
     PermissionPolicy as InvenioRequestsPermissionPolicy,
 )
 from invenio_users_resources.records import UserAggregate
-from oarepo_model.customizations import AddFileToModule
 from oarepo_rdm import rdm_minimal_preset
 from oarepo_workflows import (
     AutoApprove,
