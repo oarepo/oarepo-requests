@@ -11,7 +11,14 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING, Any, cast, override
 
-from .generic import OARepoAcceptAction, OARepoDeclineAction
+from invenio_notifications.services.uow import NotificationOp
+
+from ..notifications.builders.delete_published_record import (
+    DeletePublishedRecordRequestAcceptNotificationBuilder,
+    DeletePublishedRecordRequestDeclineNotificationBuilder,
+    DeletePublishedRecordRequestSubmitNotificationBuilder,
+)
+from .generic import OARepoAcceptAction, OARepoDeclineAction, OARepoSubmitAction
 
 if TYPE_CHECKING:
     from flask_principal import Identity
@@ -31,6 +38,21 @@ if TYPE_CHECKING:
     from flask_principal import Identity
     from invenio_db.uow import UnitOfWork
     from invenio_rdm_records.services.services import RDMRecordService
+
+
+class DeletePublishedRecordSubmitAction(OARepoSubmitAction):
+    """Submit the delete published record request."""
+
+    @override
+    def apply(
+        self,
+        identity: Identity,
+        state: RequestActionState,
+        uow: UnitOfWork,
+        *args: Any,
+        **kwargs: Any,
+    ) -> None:
+        uow.register(NotificationOp(DeletePublishedRecordRequestSubmitNotificationBuilder.build(request=self.request)))
 
 
 class DeletePublishedRecordAcceptAction(OARepoAcceptAction):
@@ -74,10 +96,21 @@ class DeletePublishedRecordAcceptAction(OARepoAcceptAction):
         else:
             topic_service.delete(identity, topic["id"], *args, uow=uow, **kwargs)
 
-        # TODO: notifications, cascade cancel?
+        uow.register(NotificationOp(DeletePublishedRecordRequestAcceptNotificationBuilder.build(request=self.request)))
+        # TODO: cascade cancel?
 
 
 class DeletePublishedRecordDeclineAction(OARepoDeclineAction):
     """Decline request for deletion of a published record."""
 
     name = _("Keep the record")
+
+    def apply(
+        self,
+        identity: Identity,
+        state: RequestActionState,
+        uow: UnitOfWork,
+        *args: Any,
+        **kwargs: Any,
+    ) -> None:
+        uow.register(NotificationOp(DeletePublishedRecordRequestDeclineNotificationBuilder.build(request=self.request)))

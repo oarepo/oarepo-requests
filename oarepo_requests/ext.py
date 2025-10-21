@@ -121,8 +121,6 @@ class OARepoRequests:
 
     def init_config(self, app: Flask) -> None:
         """Initialize configuration."""
-        from . import config
-
         app.config.setdefault("OAREPO_REQUESTS_DEFAULT_RECEIVER", None)
         app.config.setdefault("REQUESTS_ALLOWED_RECEIVERS", []).extend(config.REQUESTS_ALLOWED_RECEIVERS)
 
@@ -151,6 +149,22 @@ def api_finalize_app(app: Flask) -> None:
 def finalize_app(app: Flask) -> None:
     """Finalize app."""
     from invenio_requests.proxies import current_event_type_registry
+
+    # TODO: unified protocol for <config loading creates race condition with initialization> situations
+    # initial config + entrypoints / just entrypoints (entrypoints not always available + worse customizability)
+    # otherwise collecting config + finalize_app hacks?
+
+    ext = app.extensions["oarepo-requests"]
+
+    ext.notification_recipients_resolvers_registry = app.config["NOTIFICATION_RECIPIENTS_RESOLVERS"]
+
+    """
+    invenio_notifications = app.extensions[
+        "invenio-notifications"
+    ]  # initialized during ext in invenio notifications, our config might not be loaded
+    notification_resolvers = {er.type_key: er for er in app.config["NOTIFICATIONS_ENTITY_RESOLVERS"]}
+    invenio_notifications.entity_resolvers = notification_resolvers
+    """
 
     # TODO: unified protocol for <config loading creates race condition with initialization> situations
     # initial config + entrypoints / just entrypoints (entrypoints not always available + worse customizability)
