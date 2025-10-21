@@ -100,7 +100,6 @@ class DraftRecordProxy(RecordProxy):
 
         return resolved_fields
 
-    # TODO: test
     def ghost_record(self, value: dict[str, Any]) -> dict[str, Any]:
         """Ghost representation of a record.
 

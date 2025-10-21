@@ -108,3 +108,20 @@ def test_multiple_recipients(
             },
         }
     }
+
+
+def test_draft_topic(
+    logged_client,
+    users,
+    urls,
+    draft_factory,
+    submit_request_on_draft,
+    link2testclient,
+    search_clear,
+):
+    creator = users[0]
+    creator_client = logged_client(creator)
+    draft1 = draft_factory(creator.identity)
+    request = submit_request_on_draft(creator.identity, draft1["id"], "publish_draft")
+    expanded_record = creator_client.get(f"{urls['BASE_URL_REQUESTS']}{request['id']}?expand=true").json
+    assert "topic" in expanded_record["expanded"]

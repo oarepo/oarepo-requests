@@ -42,7 +42,7 @@ from ..errors import UnresolvedRequestsError
 class PublishRequestType(NonDuplicableOARepoRequestType):
     """Publish draft request type."""
 
-    allowed_on_published = True
+    allowed_on_published = False
 
     @classproperty
     def available_actions(cls) -> dict[str, type[RequestAction]]:  # noqa N805

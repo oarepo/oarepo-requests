@@ -109,7 +109,7 @@ def test_redirect_url(
             creator_edit_accepted["expanded"]["payload"]["created_topic"]["links"]["self_html"],
             ui=True,
         )
-        == f"/api/test-ui-links/uploads/{record_id}"  # draft self_html now goes to deposit_upload
+        == f"/api/test-requests/uploads/{record_id}"  # draft self_html now goes to deposit_upload
     )
 
     assert receiver_edit_accepted["expanded"]["payload"]["created_topic"]["links"] == {}

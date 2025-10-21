@@ -51,9 +51,9 @@ def test_resolve_topic(
             "title": "blabla",
         },
         "links": {
-            "latest_html": f"https://127.0.0.1:5000/api/test-ui-links/records/{record1_id}/latest",
+            "latest_html": f"https://127.0.0.1:5000/api/test-requests/records/{record1_id}/latest",
             "self": f"https://127.0.0.1:5000/api/requests-test/{record1_id}",
-            "self_html": f"https://127.0.0.1:5000/api/test-ui-links/records/{record1_id}",
+            "self_html": f"https://127.0.0.1:5000/api/test-requests/records/{record1_id}",
         },
     }
 
