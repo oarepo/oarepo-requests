@@ -13,11 +13,18 @@ from typing import TYPE_CHECKING, Any, override
 
 from invenio_access.permissions import system_identity
 from invenio_i18n import _
+from invenio_notifications.services.uow import NotificationOp
 from invenio_requests.records.api import Request
 from oarepo_runtime.typing import record_from_result
 
 from oarepo_requests.errors import UnresolvedRequestsError, VersionAlreadyExists
 
+from ..notifications.builders.publish import (
+    PublishDraftRequestAcceptNotificationBuilder,
+    PublishDraftRequestDeclineNotificationBuilder,
+    PublishDraftRequestSubmitNotificationBuilder,
+)
+from .components import CreatedTopicComponent
 from ..utils import get_draft_record_service, search_requests
 from .generic import (
     OARepoAcceptAction,
@@ -73,7 +80,7 @@ class PublishDraftSubmitAction(PublishMixin, OARepoSubmitAction):
                     if version == self.request["payload"]["version"]:
                         raise VersionAlreadyExists
             self.topic.metadata["version"] = self.request["payload"]["version"]
-
+        uow.register(NotificationOp(PublishDraftRequestSubmitNotificationBuilder.build(request=self.request)))
 
 class PublishDraftAcceptAction(PublishMixin, OARepoAcceptAction):
     """Accept action for publishing draft requests."""
@@ -111,9 +118,20 @@ class PublishDraftAcceptAction(PublishMixin, OARepoAcceptAction):
                 raise UnresolvedRequestsError(action=str(self.name))
         id_ = self.topic["id"]
         self.topic = record_from_result(topic_service.publish(identity, id_, *args, uow=uow, expand=False, **kwargs))
-
+        uow.register(NotificationOp(PublishDraftRequestAcceptNotificationBuilder.build(request=self.request)))
 
 class PublishDraftDeclineAction(OARepoDeclineAction):
     """Decline action for publishing draft requests."""
 
     name = _("Return for correction")
+
+    @override
+    def apply(
+        self,
+        identity: Identity,
+        uow: UnitOfWork,
+        *args: Any,
+        **kwargs: Any,
+    ) -> None:
+        """Publish the draft."""
+        uow.register(NotificationOp(PublishDraftRequestDeclineNotificationBuilder.build(request=self.request)))

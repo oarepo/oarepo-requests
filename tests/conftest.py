@@ -49,6 +49,7 @@ from pytest_oarepo.requests.classes import (
     UserGenerator,
 )
 
+from oarepo_requests import initial_config
 from oarepo_requests.actions.generic import (
     OARepoAcceptAction,
     OARepoDeclineAction,
@@ -712,7 +713,8 @@ def ui_serialization_result():
 @pytest.fixture(scope="module")
 def app_config(app_config, requests_model):
     app_config["REQUESTS_REGISTERED_EVENT_TYPES"] = [
-        TestEventType(),  # remaining are loaded from .config
+        TestEventType(),
+        *initial_config.REQUESTS_REGISTERED_EVENT_TYPES,
     ]
     app_config["SEARCH_HOSTS"] = [
         {
