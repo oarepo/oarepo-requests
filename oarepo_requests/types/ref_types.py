@@ -37,11 +37,6 @@ class ModelRefTypes:
             ):  # TODO: CommunityResolver technically is a RecordResolver; add resolver to Model?
                 continue
             ret.append(resolver.type_key)
-            """
-            supports_drafts: bool = hasattr(resolver, "draft_cls")
-            if (self.published and not supports_drafts) or (self.draft and supports_drafts):
-                ret.append(resolver.type_key)
-            """
         return ret
 
 
