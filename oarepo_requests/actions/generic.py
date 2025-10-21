@@ -110,10 +110,6 @@ class OARepoGenericActionMixin(RequestAction):
         """Execute the action."""
         request: Request = self.request
         request_type = request.type
-        # TODO: decide whether topic in RequestActionState can be None
-        # TODO: pass1: since ditching delete draft, using tombstones and unifying record/draft entity ref
-        #  this should not happen anymore i think
-        #  still have we considered cascade delete?
         topic = request.topic.resolve()
         # create a shared state between different actions to track changes in topic/requests etc.
         state: RequestActionState = RequestActionState(

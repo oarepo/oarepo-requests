@@ -26,7 +26,6 @@ from ..actions.publish_new_version import PublishNewVersionAcceptAction
 from ..temp_utils import get_draft_record_service
 from ..utils import classproperty
 from .publish_base import PublishRequestType
-from .ref_types import ModelRefTypes
 
 if TYPE_CHECKING:
     from collections.abc import Mapping
@@ -72,7 +71,6 @@ class PublishNewVersionRequestType(PublishRequestType):
 
     description = _("Request publishing of a draft")
     receiver_can_be_none = True
-    allowed_topic_ref_types = ModelRefTypes(published=True, draft=True)
 
     editable = False
 

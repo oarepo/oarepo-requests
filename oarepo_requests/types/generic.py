@@ -52,8 +52,26 @@ class OARepoRequestType(RequestType):
     dangerous = False
 
     allowed_on_draft = True
-
     allowed_on_published = True
+
+    editable: bool | None = None
+    """Whether the request type can be edited multiple times before it is submitted."""
+
+    # TODO: lint: __get__
+    allowed_topic_ref_types = ModelRefTypes()  # type: ignore[reportAssignmentType]
+    allowed_receiver_ref_types = ReceiverRefTypes()  # type: ignore[reportAssignmentType]
+
+    @classproperty[bool]
+    def has_form(cls) -> bool:  # noqa N805
+        """Return whether the request type has a form."""
+        return hasattr(cls, "form")
+
+    @classproperty[bool]
+    def is_editable(cls) -> bool:  # noqa N805
+        """Return whether the request type is editable."""
+        if cls.editable is not None:
+            return cls.editable
+        return cls.has_form
 
     # TODO: lint: classproperty issue
     @classproperty[dict[str, RequestState]]
@@ -63,21 +81,6 @@ class OARepoRequestType(RequestType):
         The status (open, closed, undefined) are used for request filtering.
         """
         return {**super().available_statuses, "created": RequestState.OPEN}
-
-    @classproperty[bool]
-    def has_form(cls) -> bool:  # noqa N805
-        """Return whether the request type has a form."""
-        return hasattr(cls, "form")
-
-    editable: bool | None = None
-    """Whether the request type can be edited multiple times before it is submitted."""
-
-    @classproperty[bool]
-    def is_editable(cls) -> bool:  # noqa N805
-        """Return whether the request type is editable."""
-        if cls.editable is not None:
-            return cls.editable
-        return cls.has_form
 
     @classmethod
     def _create_marshmallow_schema(cls) -> type[Schema]:
@@ -99,7 +102,6 @@ class OARepoRequestType(RequestType):
             or (cls.allowed_on_published and record.publication_status == "published")  # type: ignore[reportAttributeAccessIssue]
         )
 
-    # TODO: specify what can exactly come in the data dicts
     def can_create(
         self,
         identity: Identity,
@@ -120,7 +122,7 @@ class OARepoRequestType(RequestType):
         :param args:            additional arguments
         :param kwargs:          additional keyword arguments
         """
-        # TODO: pass1: discuss this mechanism
+        # TODO: R03 - alternate way for allowing request on the basis of publication status
         if not self._allowed_by_publication_status(record=topic):
             raise PermissionDeniedError("create")
         current_requests_service.require_permission(identity, "create", record=topic, request_type=self, **kwargs)
@@ -141,10 +143,6 @@ class OARepoRequestType(RequestType):
             "bool",
             current_requests_service.check_permission(identity, "create", record=topic, request_type=cls, **kwargs),
         )
-
-    # TODO: lint: __get__
-    allowed_topic_ref_types = ModelRefTypes()  # type: ignore[reportAssignmentType]
-    allowed_receiver_ref_types = ReceiverRefTypes()  # type: ignore[reportAssignmentType]
 
     # TODO: lint: classproperty issue
     @classproperty

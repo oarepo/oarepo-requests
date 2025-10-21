@@ -80,7 +80,7 @@ class RequestTypesList(RecordList):
                 "total": self.total,
             }
         )
-        if self._links_tpl:  # TODO: pass1: query params in link?
+        if self._links_tpl:
             res["links"] = self._links_tpl.expand(self._identity, None)
         res.topic = self._record
         return res

@@ -25,7 +25,6 @@ from oarepo_requests.actions.publish_draft import (
 from ..temp_utils import get_draft_record_service, search_requests
 from ..utils import classproperty
 from .generic import NonDuplicableOARepoRequestType
-from .ref_types import ModelRefTypes
 
 if TYPE_CHECKING:
     from flask_principal import Identity
@@ -43,6 +42,8 @@ from ..errors import UnresolvedRequestsError
 class PublishRequestType(NonDuplicableOARepoRequestType):
     """Publish draft request type."""
 
+    allowed_on_published = True
+
     @classproperty
     def available_actions(cls) -> dict[str, type[RequestAction]]:  # noqa N805
         """Return available actions for the request type."""
@@ -55,7 +56,6 @@ class PublishRequestType(NonDuplicableOARepoRequestType):
 
     description = _("Request to publish a draft")  # type: ignore[reportAssignmentType]
     receiver_can_be_none = True
-    allowed_topic_ref_types = ModelRefTypes(published=True, draft=True)
 
     editable = False
 
@@ -94,8 +94,6 @@ class PublishRequestType(NonDuplicableOARepoRequestType):
         """Check if the request can be created."""
         if not isinstance(topic, RecordWithDraft):
             raise TypeError(f"Topic type {type(topic)} does not support drafts")
-        if not topic.is_draft:
-            raise ValueError(gettext("Trying to create publish request on published record"))
         self.assert_no_pending_requests(topic)
         super().can_create(identity, data, receiver, topic, creator, *args, **kwargs)
         self.validate_topic(identity, topic)
@@ -132,8 +130,6 @@ class PublishRequestType(NonDuplicableOARepoRequestType):
         """Check if the request type is applicable to the topic."""
         if not isinstance(topic, RecordWithDraft):
             raise TypeError(f"Topic type {type(topic)} does not support drafts")
-        if not topic.is_draft:
-            return False
         return super().is_applicable_to(identity, topic, *args, **kwargs)
 
     @classmethod

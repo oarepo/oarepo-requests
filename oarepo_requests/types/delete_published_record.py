@@ -28,7 +28,6 @@ from ..utils import (
     request_identity_matches,
 )
 from .generic import NonDuplicableOARepoRequestType
-from .ref_types import ModelRefTypes
 
 if TYPE_CHECKING:
     from collections.abc import Mapping
@@ -47,6 +46,8 @@ class DeletePublishedRecordRequestType(NonDuplicableOARepoRequestType):
 
     type_id = "delete_published_record"
     name = _("Delete record")  # type: ignore[reportAssignmentType]
+
+    allowed_on_draft = False
 
     payload_schema: Mapping[str, ma.fields.Field] | None = {
         "removal_reason": ma.fields.Str(required=True),
@@ -101,12 +102,8 @@ class DeletePublishedRecordRequestType(NonDuplicableOARepoRequestType):
             "decline": DeletePublishedRecordDeclineAction,
         }
 
-    # TODO: lint: LazyStr
     description = _("Request deletion of published record")  # type: ignore[reportAssignmentType]
     receiver_can_be_none = True
-
-    allowed_on_draft = False
-    allowed_topic_ref_types = ModelRefTypes()
 
     @override
     def stateful_name(
