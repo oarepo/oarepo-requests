@@ -135,7 +135,7 @@ def test_redirect_url(
             request["expanded"]["payload"]["created_topic"]["links"]["self_html"],
             ui=True,
         )
-        == f"/api/test-ui-links/uploads/{new_draft['id']}"  # draft self_html now goes to deposit_upload
+        == f"/api/test-requests/uploads/{new_draft['id']}"  # draft self_html now goes to deposit_upload
     )
 
     new_draft = creator_client.get(f"{urls['BASE_URL']}/{new_draft['id']}/draft").json

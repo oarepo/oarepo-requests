@@ -69,7 +69,6 @@ from oarepo_requests.services.permissions.workflow_policies import (
     RequestBasedWorkflowPermissions,
 )
 from oarepo_requests.types import (
-    ModelRefTypes,
     NonDuplicableOARepoRequestType,
 )
 from oarepo_requests.types.events.topic_update import TopicUpdateEventType
@@ -168,7 +167,6 @@ class GenericTestableRequestType(NonDuplicableOARepoRequestType):
     }
     description = _("Generic request that doesn't do anything")
     receiver_can_be_none = False
-    allowed_topic_ref_types = ModelRefTypes(published=True, draft=True)
 
 
 class ApproveRequestType(NonDuplicableOARepoRequestType):
@@ -185,7 +183,7 @@ class ApproveRequestType(NonDuplicableOARepoRequestType):
     }
     description = _("Request approving of a draft")
     receiver_can_be_none = True
-    allowed_topic_ref_types = ModelRefTypes(published=False, draft=True)
+    allowed_on_published = False
 
 
 class AnotherTopicUpdatingRequestType(NonDuplicableOARepoRequestType):
@@ -202,7 +200,6 @@ class AnotherTopicUpdatingRequestType(NonDuplicableOARepoRequestType):
     }
     description = _("Request to test cascade update of live topic")
     receiver_can_be_none = True
-    allowed_topic_ref_types = ModelRefTypes(published=True, draft=True)
 
     def topic_change(self, request: Request, new_topic: dict, uow):
         """Update topic on topic update."""
@@ -224,7 +221,7 @@ class ConditionalRecipientRequestType(NonDuplicableOARepoRequestType):
     }
     description = _("A no-op request to check conditional recipients")
     receiver_can_be_none = False
-    allowed_topic_ref_types = ModelRefTypes(published=False, draft=True)
+    allowed_on_published = False
 
 
 class DefaultRequests(WorkflowRequestPolicy):
@@ -891,7 +888,7 @@ def requests_model(model_types):
         types=[model_types],
         metadata_type="Metadata",
         customizations=[],
-        configuration={"ui_blueprint_name": "test_ui_links_ui"},
+        configuration={"ui_blueprint_name": "test_requests_ui"},
     )
     workflow_model.register()
 

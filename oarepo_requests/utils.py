@@ -161,7 +161,7 @@ def reference_entity(entity: Any) -> dict[str, str]:
     return cast("dict[str, str]", ResolverRegistry.reference_entity(entity, raise_=True))
 
 
-# TODO: pass1: is this used somewhere
+# TODO: pass1: is this used somewhere - or mark as deprecated
 def get_matching_service_for_refdict(
     reference_dict: dict[str, str],
 ) -> RecordService | None:
