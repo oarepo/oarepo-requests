@@ -21,7 +21,6 @@ from oarepo_runtime.records.drafts import has_draft
 from ..actions.new_version import NewVersionAcceptAction
 from ..utils import classproperty, is_auto_approved, request_identity_matches
 from .generic import NonDuplicableOARepoRequestType
-from .ref_types import ModelRefTypes
 
 if TYPE_CHECKING:
     from collections.abc import Mapping
@@ -57,9 +56,6 @@ class NewVersionRequestType(NonDuplicableOARepoRequestType):
         }
 
     description = _("Request requesting creation of new version of a published record.")  # type: ignore[reportAssignmentType]
-    allowed_topic_ref_types = ModelRefTypes(
-        published=True, draft=True
-    )  # TODO: pass1: new version makes no sense on drafts?
     editable = False
 
     # TODO: do we need this?
@@ -85,8 +81,6 @@ class NewVersionRequestType(NonDuplicableOARepoRequestType):
         """Check if the request type is applicable to the topic."""
         if not isinstance(topic, RecordWithDraft):
             raise TypeError(gettext("Trying to create edit request on record without draft support"))
-        if topic.is_draft:
-            return False
         # if already editing metadata or a new version, we don't want to create a new request
         if has_draft(topic):
             return False
@@ -105,8 +99,6 @@ class NewVersionRequestType(NonDuplicableOARepoRequestType):
         """Check if the request can be created."""
         if not isinstance(topic, RecordWithDraft):
             raise TypeError(gettext("Trying to create edit request on record without draft support"))
-        if topic.is_draft:
-            raise ValueError(gettext("Trying to create new version request on draft record"))
         if has_draft(topic):
             raise ValueError(gettext("Trying to create edit request on record with draft"))
         super().can_create(identity, data, receiver, topic, creator, *args, **kwargs)

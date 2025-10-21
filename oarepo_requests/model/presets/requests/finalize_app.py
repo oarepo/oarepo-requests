@@ -10,7 +10,7 @@
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Any, override
+from typing import TYPE_CHECKING, Any, cast, override
 
 from oarepo_model.customizations import (
     AddEntryPoint,
@@ -24,12 +24,15 @@ if TYPE_CHECKING:
     from collections.abc import Generator
 
     from flask import Flask
+    from invenio_records_resources.references import RecordResolver
     from oarepo_model.builder import InvenioModelBuilder
     from oarepo_model.model import InvenioModel
 
 
 class RequestsFinalizeAppPreset(Preset):
     """Preset for extension class."""
+
+    depends_on = ("RecordResolver", "Record", "Draft")
 
     @override
     def apply(
@@ -39,13 +42,12 @@ class RequestsFinalizeAppPreset(Preset):
         dependencies: dict[str, Any],
     ) -> Generator[Customization]:
         def finalize_app(app: Flask) -> None:
-            # TODO: ask about depends on
-            runtime_deps = builder.get_runtime_dependencies()
             service_id = builder.model.base_name
             REQUESTS_ENTITY_RESOLVERS = [
-                runtime_deps.get("RecordResolver")(
-                    record_cls=runtime_deps.get("Record"),
-                    draft_cls=runtime_deps.get("Draft"),
+                cast("type[RecordResolver]", dependencies.get("RecordResolver"))(
+                    record_cls=dependencies.get("Record"),
+                    # TODO: R01
+                    draft_cls=dependencies.get("Draft"),  # type: ignore[reportCallIssue]
                     service_id=service_id,
                     type_key=service_id,
                 ),

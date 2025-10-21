@@ -41,7 +41,7 @@ if TYPE_CHECKING:
     from opensearch_dsl.query import Query
 
 
-# TODO: perhaps we could use centrally defined custom types in runtime?
+# TODO: perhaps we could use centrally defined custom types in runtime?; if this is permitable
 type JsonValue = str | LazyString | int | float | bool | None | dict[str, JsonValue] | list[JsonValue]
 
 
@@ -148,14 +148,14 @@ def open_request_exists(topic_or_reference: Record | dict[str, str], type_id: st
     return bool(list(results))
 
 
-# TODO: lint: raise_?
+# TODO: R04
 # how do we plan for things to behave when None is returned
 def resolve_reference_dict(reference_dict: dict[str, str]) -> Any:
     """Resolve the reference dict to the entity (such as Record, User, ...)."""
     return ResolverRegistry.resolve_entity_proxy(reference_dict, raise_=True).resolve()  # type: ignore[reportOptionalMemberAccess]
 
 
-# TODO: pass1: discuss the consequences of throwing exception at None
+# TODO: R04
 def reference_entity(entity: Any) -> dict[str, str]:
     """Resolve the entity to the reference dict."""
     return cast("dict[str, str]", ResolverRegistry.reference_entity(entity, raise_=True))
@@ -193,20 +193,6 @@ def get_entity_key_for_record_cls(record_cls: type[Record]) -> str:
                 raise ValueError(f"Entity resolver {type(resolver)} does not have an associated type_id")
             return type_id
     raise AttributeError(f"Record class {record_cls} does not have a registered entity resolver.")
-
-
-def stringify_first_val[T](dct: T) -> T:
-    """Convert the top-level value in a dictionary to string.
-
-    Does nothing if the value is not a dictionary.
-
-    :param dct: Dictionary to convert (or a value of any other type).
-    :return dct with the top-level value converted to string.
-    """
-    if isinstance(dct, dict):
-        for k, v in dct.items():
-            dct[k] = str(v)
-    return dct
 
 
 def reference_to_tuple(reference: dict[str, str]) -> tuple[str, str]:
@@ -339,7 +325,7 @@ def has_rights_to_accept_request(request: Request, identity: Identity) -> bool:
             record=request.topic,
             request_type=request.type,
         ),
-    )  # TODO: the typing stubs should resolve this so that we don't need cast?
+    )
 
 
 def has_rights_to_submit_request(request: Request, identity: Identity) -> bool:

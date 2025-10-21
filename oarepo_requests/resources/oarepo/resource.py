@@ -25,7 +25,6 @@ from invenio_requests.resources import RequestsResource
 from oarepo_requests.utils import (
     resolve_reference_dict,
     string_to_reference,
-    stringify_first_val,
 )
 
 
@@ -88,19 +87,7 @@ class OARepoRequestsResource(RequestsResource, ErrorHandlersMixin):
     @request_data
     @response_handler()
     def create_args(self) -> tuple[dict, int]:
-        """Create a new request based on a request type.
-
-        The data is in the form of:
-            .. code-block:: json
-            {
-                "request_type": "request_type",
-                "topic": {
-                    "type": "pid",
-                    "value": "value"
-                },
-                ...payload
-            }
-        """
+        """Create a new request based on a request type and topic from view_args arguments."""
         request_type_id = resource_requestctx.view_args["request_type"]
         topic = resolve_reference_dict(string_to_reference(resource_requestctx.view_args["topic"]))
 
@@ -135,6 +122,6 @@ class OARepoRequestsResource(RequestsResource, ErrorHandlersMixin):
         """List request types."""
         hits = self.service.applicable_request_types(
             identity=g.identity,
-            topic=resolve_reference_dict(stringify_first_val(resource_requestctx.args["topic"])),
+            topic=resolve_reference_dict(resource_requestctx.args["topic"]),
         )
         return hits.to_dict(), 200

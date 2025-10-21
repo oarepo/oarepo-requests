@@ -45,8 +45,8 @@ def set_field(result: dict[str, Any], resolved_dict: dict[str, Any], field_name:
         result[field_name] = from_data
 
 
-# TODO: get_needs is implemented in RDM but I think we need workflow aware approach anyway
-# TODO: pass1: discuss the need for separate resolver/proxy for records without drafts
+# TODO: if used somewhere, get_needs is implemented in RDM but it would not work with workflows
+# TODO: R01 - separate version for records without drafts?
 class DraftRecordProxy(RecordProxy):
     """Resolver proxy for a OARepo record entity.
 
