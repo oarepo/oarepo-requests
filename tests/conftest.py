@@ -49,6 +49,7 @@ from pytest_oarepo.requests.classes import (
     UserGenerator,
 )
 
+from oarepo_requests import initial_config
 from oarepo_requests.actions.generic import (
     OARepoAcceptAction,
     OARepoDeclineAction,
