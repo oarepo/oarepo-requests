@@ -107,45 +107,38 @@ def location(location):
 
 @pytest.fixture(scope="module")
 def app(app):
-    bp = Blueprint("test_ui_links_ui", __name__)
+    bp = Blueprint("test_requests_ui", __name__)
 
-    @bp.route("/test-ui-links/preview/<pid_value>", methods=["GET"])
+    @bp.route("/test-requests/preview/<pid_value>", methods=["GET"])
     def preview(pid_value: str) -> str:
         return "preview ok"
 
-    @bp.route("/test-ui-links/", methods=["GET"])
+    @bp.route("/test-requests/", methods=["GET"])
     def search() -> str:
         return "search ok"
 
-    @bp.route("/test-ui-links/uploads/<pid_value>", methods=["GET"])  # draft self_html
+    @bp.route("/test-requests/uploads/<pid_value>", methods=["GET"])  # draft self_html
     def deposit_edit(pid_value: str) -> str:
         return "deposit edit ok"
 
-    @bp.route("/test-ui-links/uploads/new", methods=["GET"])
+    @bp.route("/test-requests/uploads/new", methods=["GET"])
     def deposit_create() -> str:
         return "deposit create ok"
 
-    @bp.route("/test-ui-links/records/<pid_value>")
+    @bp.route("/test-requests/records/<pid_value>")
     def record_detail(pid_value) -> str:
         return "detail ok"
 
-    @bp.route("/test-ui-links/records/<pid_value>/latest", methods=["GET"])
+    @bp.route("/test-requests/records/<pid_value>/latest", methods=["GET"])
     def record_latest(pid_value: str) -> str:
         return "latest ok"
 
-    @bp.route("/test-ui-links/records/<pid_value>/export/<export_format>", methods=["GET"])
+    @bp.route("/test-requests/records/<pid_value>/export/<export_format>", methods=["GET"])
     def export(pid_value, export_format: str) -> str:
         return "export ok"
 
     app.register_blueprint(bp)
     return app
-
-
-"""
-@pytest.fixture(autouse=True)
-def vocab_cf(vocab_cf):
-    return vocab_cf
-"""
 
 
 can_comment_only_receiver = [
@@ -159,17 +152,6 @@ events_only_receiver_can_comment = {
     TopicUpdateEventType.type_id: WorkflowEvent(submitters=InvenioRequestsPermissionPolicy.can_create_comment),
     TestEventType.type_id: WorkflowEvent(submitters=can_comment_only_receiver),
 }
-
-"""
-def _override(original: tuple[WorkflowRequest], *new_):
-    to_remove = []
-    for n in new_:
-        for o in original:
-            if n.request_type == o.request_type:
-                to_remove.append(o)
-    o_keep = [o for o in original if o not in to_remove]
-    return (*o_keep, *new_)
-"""
 
 
 class GenericTestableRequestType(NonDuplicableOARepoRequestType):
