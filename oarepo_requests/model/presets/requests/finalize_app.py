@@ -28,6 +28,7 @@ if TYPE_CHECKING:
     from collections.abc import Generator
 
     from flask import Flask
+    from invenio_drafts_resources.records.api import Draft
     from invenio_rdm_records.records.api import RDMDraft, RDMRecord
     from invenio_records_resources.references import RecordResolver
     from invenio_records_resources.services.records.results import RecordItem
@@ -45,11 +46,11 @@ class DraftServiceResultResolver(ServiceResultResolver):
         return {self.type_key: str(pid)}
 
     @property
-    def draft_cls(self):
+    def draft_cls(self) -> type[Draft]:
         """Get specified draft class or from service."""
         return self.get_service().draft_cls
 
-    def matches_entity(self, entity):
+    def matches_entity(self, entity: Any) -> bool:
         """Check if the entity is a draft."""
         if isinstance(entity, self.draft_cls):
             return True

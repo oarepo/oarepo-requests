@@ -18,18 +18,19 @@ from oarepo_requests.proxies import current_notification_recipients_resolvers_re
 log = logging.getLogger("oarepo_requests.notifications.generators")
 
 if TYPE_CHECKING:
+    from collections.abc import Callable
     from typing import Any
 
     from invenio_notifications.models import Notification
 
 
 def _extract_entity_email_data(entity: Any) -> dict[str, Any]:
-    def _get(entity, key):
+    def _get(entity: Any, key: Any) -> Any:
         if isinstance(entity, dict) and key in entity:
             return entity.get(key, None)
         return getattr(entity, key, None)
 
-    def _add(entity, key, res, transform=lambda x: x):
+    def _add(entity: Any, key: Any, res: dict, transform: Callable = lambda x: x) -> Any:
         v = _get(entity, key)
         if v:
             res[key] = transform(v)
@@ -57,9 +58,11 @@ class EntityRecipient(RecipientGenerator):
     def __init__(self, key: str):
         self.key = key
 
-    def __call__(self, notification: Notification, recipients: dict[str, Recipient], backend_ids: list[str] = None):
+    def __call__(
+        self, notification: Notification, recipients: dict[str, Recipient], backend_ids: list[str] | None = None
+    ):
         """"""
-        backend_ids = notification.context["backend_ids"] if not backend_ids else backend_ids
+        backend_ids = backend_ids if backend_ids else notification.context["backend_ids"]
         entity_ref_or_entity = dict_lookup(notification.context, self.key)
 
         if len(entity_ref_or_entity) != 1:
@@ -68,7 +71,7 @@ class EntityRecipient(RecipientGenerator):
         if not entity_ref_or_entity:
             return
 
-        entity_type = list(entity_ref_or_entity.keys())[0]
+        entity_type = next(iter(entity_ref_or_entity.keys()))
 
         for backend_id in backend_ids:
             generator_cls = current_notification_recipients_resolvers_registry.get(entity_type, {}).get(backend_id)
@@ -76,7 +79,7 @@ class EntityRecipient(RecipientGenerator):
                 generator = generator_cls(entity_ref_or_entity)
                 generator(notification, recipients)
 
-    def _get_unresolved_entity_from_resolved(self, context, key):
+    def _get_unresolved_entity_from_resolved(self, context: dict[str, Any], key: str) -> dict[str, Any] | None:
         """Get the unresolved entity from the resolved one."""
         match key.split(".", maxsplit=1):
             case "request", field:
@@ -92,10 +95,10 @@ class EntityRecipient(RecipientGenerator):
 class SpecificEntityRecipient(RecipientGenerator):
     """Superclass for implementations of recipient generators for specific entities."""
 
-    def __init__(self, key):
-        self.key = key  # TODO this is entity_reference, not path to entity as EntityRecipient, might be confusing
+    def __init__(self, key: dict[str, str]):
+        self.key = key  # TODO: this is entity_reference, not path to entity as EntityRecipient, might be confusing
 
-    def __call__(self, notification: Notification, recipients: dict[str, Recipient]):
+    def __call__(self, notification: Notification, recipients: dict[str, Recipient]):  # NOQA ARG002
         entity = self._resolve_entity()
         recipients.update(self._get_recipients(entity))
         return recipients
@@ -105,14 +108,13 @@ class SpecificEntityRecipient(RecipientGenerator):
         raise NotImplementedError
 
     def _resolve_entity(self) -> Any:
-        entity_type = list(self.key)[0]
+        entity_type = next(iter(self.key))
         registry = current_requests.entity_resolvers_registry
 
-        registered_resolvers = registry._registered_types
+        registered_resolvers = registry._registered_types  # noqa SLF001
         resolver = registered_resolvers.get(entity_type)
         proxy = resolver.get_entity_proxy(self.key)
-        entity = proxy.resolve()
-        return entity
+        return proxy.resolve()
 
 
 class UserEmailRecipient(SpecificEntityRecipient):
@@ -160,17 +162,18 @@ class MultipleRecipientsEmailRecipients(SpecificEntityRecipient):
                 continue
         return final_recipients
 
-    def __call__(self, notification: Notification, recipients: dict[str, Recipient]):
-        """Get the emails from the multiple recipients entity."""
-        entity = self._resolve_entity()
-        recipients.update(self._get_recipients(entity))
-        return recipients
+
+def __call__(self, notification: Notification, recipients: dict[str, Recipient]):  # noqa ARG002
+    """Get the emails from the multiple recipients entity."""
+    entity = self._resolve_entity()
+    recipients.update(self._get_recipients(entity))
+    return recipients
 
 
 class RequestEntityResolve(EntityResolve):
     """Entity resolver that adds the correct title if it is missing."""
 
-    def __call__(self, notification):
+    def __call__(self, notification: Notification):
         notification = super().__call__(notification)
         request_dict = notification.context["request"]
         if request_dict.get("title"):

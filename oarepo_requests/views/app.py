@@ -19,9 +19,8 @@ if TYPE_CHECKING:
 
 def create_notifications(app: Flask) -> Blueprint:
     """Register blueprint routes on app."""
-    blueprint = Blueprint(
+    return Blueprint(
         "oarepo_notifications",
         __name__,
         template_folder=Path(__file__).parent.parent / "templates",
     )
-    return blueprint

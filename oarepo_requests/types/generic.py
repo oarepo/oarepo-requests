@@ -89,6 +89,16 @@ class OARepoRequestType(RequestType):
 
         return cast("type[Schema]", schema)
 
+    @classmethod
+    def _allowed_by_publication_status(cls, record: Record) -> bool:
+        if not hasattr(record, "publication_status"):
+            return bool(cls.allowed_on_published)
+        # TODO: R08 protocol for .publication_status?/ or systemfields are untypable?
+        return bool(
+            (cls.allowed_on_draft and record.publication_status == "draft")  # type: ignore[reportAttributeAccessIssue]
+            or (cls.allowed_on_published and record.publication_status == "published")  # type: ignore[reportAttributeAccessIssue]
+        )
+
     def can_create(
         self,
         identity: Identity,
