@@ -158,10 +158,12 @@ def finalize_app(app: Flask) -> None:
 
     ext.notification_recipients_resolvers_registry = app.config["NOTIFICATION_RECIPIENTS_RESOLVERS"]
 
-    """
     invenio_notifications = app.extensions[
         "invenio-notifications"
-    ]  # initialized during ext in invenio notifications, our config might not be loaded
+    ]
+    invenio_notifications.init_manager(app)  # TODO: R05 race condition between config init and original init_manager
+
+    """
     notification_resolvers = {er.type_key: er for er in app.config["NOTIFICATIONS_ENTITY_RESOLVERS"]}
     invenio_notifications.entity_resolvers = notification_resolvers
     """

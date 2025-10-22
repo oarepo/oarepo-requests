@@ -62,6 +62,7 @@ from oarepo_requests.types.new_version import NewVersionRequestType
 from oarepo_requests.types.publish_changed_metadata import PublishChangedMetadataRequestType
 from oarepo_requests.types.publish_new_version import PublishNewVersionRequestType
 
+# TODO: R05
 REQUESTS_REGISTERED_TYPES = [
     DeletePublishedRecordRequestType(),
     EditPublishedRecordRequestType(),

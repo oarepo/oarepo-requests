@@ -5,4 +5,4 @@ from .oarepo import OARepoRequestActionNotificationBuilder
 class EscalateRequestSubmitNotificationBuilder(OARepoRequestActionNotificationBuilder):
     type = "escalate-request-event.submit"
 
-    recipients = [EntityRecipient(key="request.receiver")]  # email only
+    recipients = (EntityRecipient(key="request.receiver"),)  # email only

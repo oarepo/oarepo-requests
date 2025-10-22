@@ -40,4 +40,5 @@ requests_preset = [
     RequestsServiceConfigPreset,  # Configure service with request components
     RequestsRecordItemPreset,  # Configure record item results
     RequestsResolverPreset,
+    RegisterResolversPreset,
 ]
