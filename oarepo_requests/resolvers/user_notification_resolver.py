@@ -1,10 +1,12 @@
+from typing import Any
+
 from invenio_access.permissions import system_identity, system_user_id
 from invenio_users_resources.entity_resolvers import UserProxy, UserResolver
 from invenio_users_resources.proxies import current_users_service
 
 
 class UserNotificationProxy(UserProxy):
-    def _resolve(self):
+    def _resolve(self) -> dict[str, Any]:
         """Resolve the User from the proxy's reference dict, or system_identity."""
         user_id = self._parse_ref_dict_id()
         if user_id == system_user_id:  # system_user_id is a string: "system"
@@ -16,6 +18,6 @@ class UserNotificationProxy(UserProxy):
 
 
 class UserNotificationResolver(UserResolver):
-    def _get_entity_proxy(self, ref_dict):
+    def _get_entity_proxy(self, ref_dict: dict[str, str]) -> UserNotificationProxy:
         """Return a UserProxy for the given reference dict."""
         return UserNotificationProxy(self, ref_dict)
