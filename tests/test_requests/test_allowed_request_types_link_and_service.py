@@ -10,7 +10,6 @@ from __future__ import annotations
 from oarepo_requests.utils import applicable_requests
 
 
-# def test_workflow_read(workflow_model, users, logged_client, default_workflow_json, location, search_clear):
 def test_allowed_request_types_on_draft_service(
     requests_model,
     users,

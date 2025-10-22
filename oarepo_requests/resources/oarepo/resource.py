@@ -41,7 +41,6 @@ class OARepoRequestsResource(RequestsResource, ErrorHandlersMixin):
         routes = self.config.routes
 
         return [
-            route("GET", p(routes["list"]), self.search),
             route("POST", p(routes["list"]), self.create),
             route("POST", p(routes["list-args"]), self.create_args),
             route("GET", p(routes["list-applicable"]), self.applicable_request_types),
@@ -100,20 +99,6 @@ class OARepoRequestsResource(RequestsResource, ErrorHandlersMixin):
         )
 
         return items.to_dict(), 201
-
-    @request_extra_args
-    @request_search_args
-    @request_view_args
-    @response_handler(many=True)
-    def search(self) -> tuple[dict, int]:
-        """Perform a search over the items."""
-        hits = self.service.search(
-            identity=g.identity,
-            params=resource_requestctx.args,
-            search_preference=search_preference(),
-            expand=resource_requestctx.args.get("expand", False),
-        )
-        return hits.to_dict(), 200
 
     @request_search_args
     @request_view_args
