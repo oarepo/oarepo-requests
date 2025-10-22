@@ -9,7 +9,7 @@
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Any
+from typing import TYPE_CHECKING, Any, override
 
 from invenio_access.permissions import system_identity
 from invenio_i18n import _
@@ -57,6 +57,7 @@ class PublishMixin(RequestAction):
 class PublishDraftSubmitAction(PublishMixin, OARepoSubmitAction):
     """Submit action for publishing draft requests."""
 
+    @override
     def apply(
         self,
         identity: Identity,
@@ -65,7 +66,6 @@ class PublishDraftSubmitAction(PublishMixin, OARepoSubmitAction):
         *args: Any,
         **kwargs: Any,
     ) -> None:
-        """Publish the draft."""
         if "payload" in self.request and "version" in self.request["payload"]:
             topic_service = get_draft_record_service(state.topic)
             versions = topic_service.search_versions(identity, state.topic.pid.pid_value)
@@ -85,8 +85,7 @@ class PublishDraftAcceptAction(PublishMixin, OARepoAcceptAction):
 
     name = _("Publish")
 
-    action_components = (CreatedTopicComponent,)
-
+    @override
     def apply(
         self,
         identity: Identity,
@@ -95,7 +94,6 @@ class PublishDraftAcceptAction(PublishMixin, OARepoAcceptAction):
         *args: Any,
         **kwargs: Any,
     ) -> None:
-        """Publish the draft."""
         topic_service = get_draft_record_service(state.topic)
         requests = search_requests(system_identity, state.topic)
 
@@ -131,6 +129,7 @@ class PublishDraftDeclineAction(OARepoDeclineAction):
 
     name = _("Return for correction")
 
+    @override
     def apply(
         self,
         identity: Identity,
@@ -139,6 +138,5 @@ class PublishDraftDeclineAction(OARepoDeclineAction):
         *args: Any,
         **kwargs: Any,
     ) -> None:
-        """Publish the draft."""
         # TODO: notification
         return super().apply(identity, state, uow, *args, **kwargs)

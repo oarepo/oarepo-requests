@@ -6,7 +6,7 @@
 # oarepo-model is free software; you can redistribute it and/or modify it
 # under the terms of the MIT License; see LICENSE file for more details.
 #
-"""Module providing preset for defining finalize_app entrypoints."""
+"""Module providing preset for registering resolvers."""
 
 from __future__ import annotations
 
@@ -30,7 +30,7 @@ if TYPE_CHECKING:
 
 
 class RegisterResolversPreset(Preset):
-    """Preset for extension class."""
+    """Preset for registering resolvers."""
 
     @override
     def apply(
