@@ -10,7 +10,7 @@
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Any, cast, override
+from typing import TYPE_CHECKING, Any, override
 
 from oarepo_model.customizations import (
     AddEntryPoint,
@@ -19,20 +19,18 @@ from oarepo_model.customizations import (
     Customization,
 )
 from oarepo_model.presets import Preset
+from oarepo_model.presets.drafts.records.resolver import DraftRecordResolver
 
 if TYPE_CHECKING:
     from collections.abc import Generator
 
-    from flask import Flask
     from invenio_records_resources.references import RecordResolver
     from oarepo_model.builder import InvenioModelBuilder
     from oarepo_model.model import InvenioModel
 
 
-class RequestsFinalizeAppPreset(Preset):
+class RegisterResolversPreset(Preset):
     """Preset for extension class."""
-
-    depends_on = ("RecordResolver", "Record", "Draft")
 
     @override
     def apply(
@@ -41,32 +39,28 @@ class RequestsFinalizeAppPreset(Preset):
         model: InvenioModel,
         dependencies: dict[str, Any],
     ) -> Generator[Customization]:
-        def finalize_app(app: Flask) -> None:
+        def register_entity_resolver() -> RecordResolver:
             service_id = builder.model.base_name
-            REQUESTS_ENTITY_RESOLVERS = [
-                cast("type[RecordResolver]", dependencies.get("RecordResolver"))(
-                    record_cls=dependencies.get("Record"),
-                    # TODO: R01
-                    draft_cls=dependencies.get("Draft"),  # type: ignore[reportCallIssue]
+            runtime_dependencies = builder.get_runtime_dependencies()
+            resolver = runtime_dependencies.get("RecordResolver")
+            if issubclass(resolver, DraftRecordResolver):
+                return resolver(
+                    record_cls=runtime_dependencies.get("Record"),
+                    draft_cls=runtime_dependencies.get("Draft"),
                     service_id=service_id,
                     type_key=service_id,
-                ),
-            ]
-            requests = app.extensions["invenio-requests"]
-            for resolver in REQUESTS_ENTITY_RESOLVERS:
-                requests.entity_resolvers_registry.register_type(resolver)
+                )
+            return resolver(
+                record_cls=runtime_dependencies.get("Record"),
+                service_id=service_id,
+                type_key=service_id,
+            )
 
-        yield AddModule("finalize", exists_ok=True)
-        yield AddToModule("finalize", "finalize_app", staticmethod(finalize_app))
+        yield AddModule("resolvers", exists_ok=True)
+        yield AddToModule("resolvers", "register_entity_resolver", staticmethod(register_entity_resolver))
         yield AddEntryPoint(
-            group="invenio_base.finalize_app",
+            group="invenio_requests.entity_resolvers",
             name=f"{model.base_name}_requests",
-            value="finalize:finalize_app",
-            separator=".",
-        )
-        yield AddEntryPoint(
-            group="invenio_base.api_finalize_app",
-            name=f"{model.base_name}_requests",
-            value="finalize:finalize_app",
+            value="resolvers:register_entity_resolver",
             separator=".",
         )

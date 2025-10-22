@@ -85,7 +85,7 @@ class OARepoRequestsService(RequestsService):
         :param args: Additional arguments.
         :param kwargs: Additional keyword arguments.
         """
-        # TODO: lint: invenio suggest None topic can be here but we do not expect it
+        # TODO: invenio suggest None topic can be here but we do not expect it
         if topic is None:
             raise ValueError("")
         type_ = current_request_type_registry.lookup(request_type, quiet=True)
@@ -114,7 +114,7 @@ class OARepoRequestsService(RequestsService):
 
         error = type_.can_create(identity, data, receiver, topic, creator) if hasattr(type_, "can_create") else None
 
-        # TODO: lint: stubs do not allow receiver to be None even if I think invenio suggests it
+        # TODO: stubs do not allow receiver to be None even if I think invenio suggests it
         if not error:
             result = super().create(
                 identity=identity,

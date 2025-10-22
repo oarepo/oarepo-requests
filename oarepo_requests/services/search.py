@@ -24,7 +24,7 @@ from oarepo_requests.services.facets.params import (
 class EnhancedRequestSearchOptions(RequestSearchOptions):
     """Searched options enhanced with additional filters."""
 
-    # TODO: lint: params_interpreters_cls: tuple[type[ParamInterpreter], ...]
+    # TODO: params_interpreters_cls: tuple[type[ParamInterpreter], ...]
     #  in stubs is not assignable to partial[ParamInterpreter]
     params_interpreters_cls = (  # type: ignore[reportAssignmentType]
         *RequestSearchOptions.params_interpreters_cls,

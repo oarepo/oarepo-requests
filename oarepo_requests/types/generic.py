@@ -57,8 +57,6 @@ class OARepoRequestType(RequestType):
     editable: bool | None = None
     """Whether the request type can be edited multiple times before it is submitted."""
 
-    # TODO: lint: __get__
-    allowed_topic_ref_types = ModelRefTypes()  # type: ignore[reportAssignmentType]
     allowed_receiver_ref_types = ReceiverRefTypes()  # type: ignore[reportAssignmentType]
 
     @classproperty[bool]
@@ -73,7 +71,7 @@ class OARepoRequestType(RequestType):
             return cls.editable
         return cls.has_form
 
-    # TODO: lint: classproperty issue
+    # TODO: R06 classproperty issue
     @classproperty[dict[str, RequestState]]
     def available_statuses(self) -> dict[str, RequestState]:  # type: ignore[reportIncompatibleVariableOverride]
         """Return available statuses for the request type.
@@ -91,16 +89,6 @@ class OARepoRequestType(RequestType):
             schema.fields["payload"].required = True  # type: ignore[reportAttributeAccessIssue]
 
         return cast("type[Schema]", schema)  # TODO: idk why it complains here
-
-    @classmethod
-    def _allowed_by_publication_status(cls, record: Record) -> bool:
-        if not hasattr(record, "publication_status"):
-            return bool(cls.allowed_on_published)
-        # TODO: lint: protocol for .publication_status?
-        return bool(
-            (cls.allowed_on_draft and record.publication_status == "draft")  # type: ignore[reportAttributeAccessIssue]
-            or (cls.allowed_on_published and record.publication_status == "published")  # type: ignore[reportAttributeAccessIssue]
-        )
 
     def can_create(
         self,
@@ -122,9 +110,6 @@ class OARepoRequestType(RequestType):
         :param args:            additional arguments
         :param kwargs:          additional keyword arguments
         """
-        # TODO: R03 - alternate way for allowing request on the basis of publication status
-        if not self._allowed_by_publication_status(record=topic):
-            raise PermissionDeniedError("create")
         current_requests_service.require_permission(identity, "create", record=topic, request_type=self, **kwargs)
 
     @classmethod
@@ -137,14 +122,12 @@ class OARepoRequestType(RequestType):
         method is used to check whether there is a possible situation a user might create
         this request eg. for the purpose of serializing a link on associated record
         """
-        if not cls._allowed_by_publication_status(record=topic):
-            return False
         return cast(
             "bool",
             current_requests_service.check_permission(identity, "create", record=topic, request_type=cls, **kwargs),
         )
 
-    # TODO: lint: classproperty issue
+    # TODO: R06 classproperty issue
     @classproperty
     def available_actions(  # type: ignore[reportIncompatibleVariableOverride]
         self,
@@ -158,6 +141,7 @@ class OARepoRequestType(RequestType):
             "cancel": OARepoCancelAction,
         }
 
+    # TODO: move these to RecordRequestType too?
     def stateful_name(
         self,
         identity: Identity,  # noqa ARG002
@@ -254,7 +238,63 @@ class OARepoRequestType(RequestType):
         return get_string(create, identity, topic, request)
 
 
-class NonDuplicableOARepoRequestType(OARepoRequestType):
+class OARepoRecordRequestType(OARepoRequestType):
+    """Base request type for OARepo requests that can be created on a record."""
+
+    # TODO: R08 __get__
+    allowed_topic_ref_types = ModelRefTypes()  # type: ignore[reportAssignmentType]
+
+    @classmethod
+    def _allowed_by_publication_status(cls, record: Record) -> bool:
+        if not hasattr(record, "publication_status"):
+            return bool(cls.allowed_on_published)
+        # TODO: R08 protocol for .publication_status?/ or systemfields are untypable?
+        return bool(
+            (cls.allowed_on_draft and record.publication_status == "draft")  # type: ignore[reportAttributeAccessIssue]
+            or (cls.allowed_on_published and record.publication_status == "published")  # type: ignore[reportAttributeAccessIssue]
+        )
+
+    def can_create(
+        self,
+        identity: Identity,
+        data: dict[str, Any],
+        receiver: dict[str, str],
+        topic: Record,
+        creator: dict[str, str],
+        *args: Any,
+        **kwargs: Any,
+    ) -> None:
+        """Check if the request can be created.
+
+        :param identity:        identity of the caller
+        :param data:            data of the request
+        :param receiver:        receiver of the request
+        :param topic:           topic of the request
+        :param creator:         creator of the request
+        :param args:            additional arguments
+        :param kwargs:          additional keyword arguments
+        """
+        # TODO: R03 - alternate way for allowing request on the basis of publication status
+        if not self._allowed_by_publication_status(record=topic):
+            raise PermissionDeniedError("create")
+        super().can_create(identity, data, receiver, topic, creator, *args, **kwargs)
+
+    @classmethod
+    def is_applicable_to(cls, identity: Identity, topic: Record, *args: Any, **kwargs: Any) -> bool:
+        """Check if the request type is applicable to the topic.
+
+        Used for checking whether there is any situation where the client can create
+        a request of this type it's different to just using can create with no receiver
+        and data because that checks specifically for situation without them while this
+        method is used to check whether there is a possible situation a user might create
+        this request eg. for the purpose of serializing a link on associated record
+        """
+        if not cls._allowed_by_publication_status(record=topic):
+            return False
+        return super().is_applicable_to(identity, topic, *args, **kwargs)
+
+
+class NonDuplicableOARepoRecordRequestType(OARepoRecordRequestType):
     """Base request type for OARepo requests that cannot be duplicated.
 
     This means that on a single topic there can be only one open request of this type.

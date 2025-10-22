@@ -92,7 +92,7 @@ class DeletePublishedRecordAcceptAction(OARepoAcceptAction):
         else:
             topic_service.delete(identity, state.topic["id"], *args, uow=uow, **kwargs)
 
-        # TODO: notifications, cascade cancel
+        # TODO: notifications, cascade cancel?
 
 
 class DeletePublishedRecordDeclineAction(OARepoDeclineAction):

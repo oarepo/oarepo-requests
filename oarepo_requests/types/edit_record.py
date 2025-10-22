@@ -14,26 +14,23 @@ from typing import TYPE_CHECKING, Any, override
 from invenio_drafts_resources.records import Record as RecordWithDraft
 from invenio_i18n import gettext
 from invenio_i18n import lazy_gettext as _
-from invenio_records_resources.services.uow import RecordCommitOp
-from invenio_requests.proxies import current_requests_service
 from invenio_requests.records.api import Request
 from oarepo_runtime.records.drafts import has_draft
 
 from oarepo_requests.actions.edit_topic import EditTopicAcceptAction
 
 from ..utils import classproperty, is_auto_approved, request_identity_matches
-from .generic import NonDuplicableOARepoRequestType
+from .generic import NonDuplicableOARepoRecordRequestType
 
 if TYPE_CHECKING:
     from flask_babel.speaklater import LazyString
     from flask_principal import Identity
-    from invenio_db.uow import UnitOfWork
     from invenio_records_resources.records import Record
     from invenio_requests.customizations.actions import RequestAction
     from invenio_requests.records.api import Request
 
 
-class EditPublishedRecordRequestType(NonDuplicableOARepoRequestType):
+class EditPublishedRecordRequestType(NonDuplicableOARepoRecordRequestType):
     """Request type for requesting edit of a published record.
 
     This request type is used to request edit access to a published record. This access
@@ -42,8 +39,9 @@ class EditPublishedRecordRequestType(NonDuplicableOARepoRequestType):
 
     type_id = "edit_published_record"
     name = _("Edit metadata")
-
+    description = _("Request re-opening of published record")  # type: ignore[reportAssignmentType]
     allowed_on_draft = False
+    receiver_can_be_none = True
 
     @classproperty
     def available_actions(cls) -> dict[str, type[RequestAction]]:  # noqa N805
@@ -52,19 +50,6 @@ class EditPublishedRecordRequestType(NonDuplicableOARepoRequestType):
             **super().available_actions,
             "accept": EditTopicAcceptAction,
         }
-
-    description = _("Request re-opening of published record")  # type: ignore[reportAssignmentType]
-    receiver_can_be_none = True
-
-    @classmethod
-    def is_applicable_to(cls, identity: Identity, topic: Record, *args: Any, **kwargs: Any) -> bool:
-        """Check if the request type is applicable to the topic."""
-        if not isinstance(topic, RecordWithDraft):
-            return False
-        # if already editing metadata or a new version, we don't want to create a new request
-        if has_draft(topic):
-            return False
-        return super().is_applicable_to(identity, topic, *args, **kwargs)
 
     def can_create(
         self,
@@ -92,11 +77,17 @@ class EditPublishedRecordRequestType(NonDuplicableOARepoRequestType):
             raise ValueError(gettext("Trying to create edit request on record with draft"))
         super().can_create(identity, data, receiver, topic, creator, *args, **kwargs)
 
-    def topic_change(self, request: Request, new_topic: dict, uow: UnitOfWork) -> None:
-        """Change the topic of the request."""
-        request.topic = new_topic
-        uow.register(RecordCommitOp(request, indexer=current_requests_service.indexer))
+    @classmethod
+    def is_applicable_to(cls, identity: Identity, topic: Record, *args: Any, **kwargs: Any) -> bool:
+        """Check if the request type is applicable to the topic."""
+        if not isinstance(topic, RecordWithDraft):
+            return False
+        # if already editing metadata or a new version, we don't want to create a new request
+        if has_draft(topic):
+            return False
+        return super().is_applicable_to(identity, topic, *args, **kwargs)
 
+    # TODO: used in ui
     @override
     def stateful_name(
         self,

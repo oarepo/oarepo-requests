@@ -27,8 +27,7 @@ from invenio_records_resources.services.errors import PermissionDeniedError
 from oarepo_runtime.services.results import ResultComponent
 
 from oarepo_requests.services.results import serialize_request_types
-from oarepo_requests.temp_utils import search_requests
-from oarepo_requests.utils import allowed_request_types_for_record
+from oarepo_requests.utils import allowed_request_types_for_record, search_requests
 
 if TYPE_CHECKING:
     from flask_principal import Identity
