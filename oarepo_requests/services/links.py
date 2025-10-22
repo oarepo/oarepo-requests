@@ -19,7 +19,6 @@ if TYPE_CHECKING:
     from collections.abc import Callable
 
 
-# TODO: R02
 class RefEndpointLink(EndpointLink):
     """Endpoint link that adds reference query string parameter to the URL."""
 

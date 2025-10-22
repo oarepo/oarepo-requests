@@ -7,7 +7,6 @@
 #
 from __future__ import annotations
 
-import base64
 import os
 import time
 from datetime import timedelta
@@ -31,7 +30,6 @@ from invenio_requests.services.generators import Receiver
 from invenio_requests.services.permissions import (
     PermissionPolicy as InvenioRequestsPermissionPolicy,
 )
-from invenio_users_resources.records import UserAggregate
 from oarepo_rdm import rdm_minimal_preset
 from oarepo_workflows import (
     AutoApprove,
@@ -51,7 +49,6 @@ from pytest_oarepo.requests.classes import (
     TestEventType,
     UserGenerator,
 )
-from pytest_oarepo.users import _create_user
 
 from oarepo_requests.actions.generic import (
     OARepoAcceptAction,
@@ -69,7 +66,7 @@ from oarepo_requests.services.permissions.workflow_policies import (
     RequestBasedWorkflowPermissions,
 )
 from oarepo_requests.types import (
-    NonDuplicableOARepoRequestType,
+    NonDuplicableOARepoRecordRequestType,
 )
 from oarepo_requests.types.events.topic_update import TopicUpdateEventType
 
@@ -153,14 +150,14 @@ events_only_receiver_can_comment = {
 }
 
 
-class GenericTestableRequestType(NonDuplicableOARepoRequestType):
+class GenericTestableRecordRequestType(NonDuplicableOARepoRecordRequestType):
     """Generic usable request type for tests."""
 
     type_id = "generic"
     name = _("Generic")
 
     available_actions: ClassVar[dict[str, type[RequestAction]]] = {
-        **NonDuplicableOARepoRequestType.available_actions,
+        **NonDuplicableOARepoRecordRequestType.available_actions,
         "accept": OARepoAcceptAction,
         "submit": OARepoSubmitAction,
         "decline": OARepoDeclineAction,
@@ -169,14 +166,14 @@ class GenericTestableRequestType(NonDuplicableOARepoRequestType):
     receiver_can_be_none = False
 
 
-class ApproveRequestType(NonDuplicableOARepoRequestType):
+class ApproveRecordRequestType(NonDuplicableOARepoRecordRequestType):
     """Request type for approving before publish."""
 
     type_id = "approve_draft"
     name = _("Approve draft")
 
     available_actions: ClassVar[dict[str, type[RequestAction]]] = {
-        **NonDuplicableOARepoRequestType.available_actions,
+        **NonDuplicableOARepoRecordRequestType.available_actions,
         "accept": OARepoAcceptAction,
         "submit": OARepoSubmitAction,
         "decline": OARepoDeclineAction,
@@ -186,14 +183,14 @@ class ApproveRequestType(NonDuplicableOARepoRequestType):
     allowed_on_published = False
 
 
-class AnotherTopicUpdatingRequestType(NonDuplicableOARepoRequestType):
+class AnotherTopicUpdatingRecordRequestType(NonDuplicableOARepoRecordRequestType):
     """Generic request type with topic change on topic update."""
 
     type_id = "another_topic_updating"
     name = _("Another topic updating")
 
     available_actions: ClassVar[dict[str, type[RequestAction]]] = {
-        **NonDuplicableOARepoRequestType.available_actions,
+        **NonDuplicableOARepoRecordRequestType.available_actions,
         "accept": OARepoAcceptAction,
         "submit": OARepoSubmitAction,
         "decline": OARepoDeclineAction,
@@ -207,14 +204,14 @@ class AnotherTopicUpdatingRequestType(NonDuplicableOARepoRequestType):
         uow.register(RecordCommitOp(request, indexer=current_requests_service.indexer))
 
 
-class ConditionalRecipientRequestType(NonDuplicableOARepoRequestType):
+class ConditionalRecipientRecordRequestType(NonDuplicableOARepoRecordRequestType):
     """Generic request type with conditional recipient."""
 
     type_id = "conditional_recipient_rt"
     name = _("Request type to test conditional recipients")
 
     available_actions: ClassVar[dict[str, type[RequestAction]]] = {
-        **NonDuplicableOARepoRequestType.available_actions,
+        **NonDuplicableOARepoRecordRequestType.available_actions,
         "accept": OARepoAcceptAction,
         "submit": OARepoSubmitAction,
         "decline": OARepoDeclineAction,
@@ -692,10 +689,10 @@ def app_config(app_config, requests_model):
 
     app_config["WORKFLOWS"] = WORKFLOWS
     app_config["REQUESTS_REGISTERED_TYPES"] = [
-        ApproveRequestType(),
-        ConditionalRecipientRequestType(),
-        AnotherTopicUpdatingRequestType(),
-        GenericTestableRequestType(),
+        ApproveRecordRequestType(),
+        ConditionalRecipientRecordRequestType(),
+        AnotherTopicUpdatingRecordRequestType(),
+        GenericTestableRecordRequestType(),
     ]
     app_config["FILES_REST_STORAGE_CLASS_LIST"] = {
         "L": "Local",
@@ -766,88 +763,6 @@ def user_links():
         }
 
     return _user_links
-
-
-# TODO: use pytest-oarepo instead of this
-@pytest.fixture
-def password():
-    """Password fixture."""
-    return base64.b64encode(os.urandom(16)).decode("utf-8")
-
-
-@pytest.fixture
-def more_users(app, db, UserFixture, password):  # noqa N803
-    user1 = UserFixture(
-        email="user1@example.org",
-        password=password,
-        active=True,
-        confirmed=True,
-    )
-    _create_user(user1, app, db)
-
-    user2 = UserFixture(
-        email="user2@example.org",
-        password=password,
-        active=True,
-        confirmed=True,
-    )
-    _create_user(user2, app, db)
-
-    user3 = UserFixture(
-        email="user3@example.org",
-        password=password,
-        user_profile={
-            "full_name": "Maxipes Fik",
-            "affiliations": "CERN",
-        },
-        active=True,
-        confirmed=True,
-    )
-    _create_user(user3, app, db)
-
-    user4 = UserFixture(
-        email="user4@example.org",
-        password=password,
-        active=True,
-        confirmed=True,
-    )
-    _create_user(user4, app, db)
-
-    user5 = UserFixture(
-        email="user5@example.org",
-        password=password,
-        active=True,
-        confirmed=True,
-    )
-    _create_user(user5, app, db)
-
-    user6 = UserFixture(
-        email="user6@example.org",
-        password=password,
-        active=True,
-        confirmed=True,
-    )
-    _create_user(user6, app, db)
-
-    user7 = UserFixture(
-        email="user7@example.org",
-        password=password,
-        active=True,
-        confirmed=True,
-    )
-    _create_user(user7, app, db)
-
-    user8 = UserFixture(
-        email="user8@example.org",
-        password=password,
-        active=True,
-        confirmed=True,
-    )
-    _create_user(user8, app, db)
-
-    db.session.commit()
-    UserAggregate.index.refresh()
-    return [user1, user2, user3, user4, user5, user6, user7, user8]
 
 
 @pytest.fixture(scope="session")

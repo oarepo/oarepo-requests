@@ -23,8 +23,7 @@ from oarepo_requests.actions.publish_draft import (
 from oarepo_requests.errors import VersionAlreadyExists
 
 from ..actions.publish_new_version import PublishNewVersionAcceptAction
-from ..temp_utils import get_draft_record_service
-from ..utils import classproperty
+from ..utils import classproperty, get_draft_record_service
 from .publish_base import PublishRequestType
 
 if TYPE_CHECKING:
@@ -44,10 +43,49 @@ class PublishNewVersionRequestType(PublishRequestType):
 
     type_id = "publish_new_version"
     name = _("Publish new version")
+    description = _("Request publishing of a draft")
+    receiver_can_be_none = True
+    editable = False
 
     payload_schema: Mapping[str, ma.fields.Field] | None = {
         "version": ma.fields.Str(),
     }
+
+    def can_create(
+        self,
+        identity: Identity,
+        data: dict,
+        receiver: dict[str, str],
+        topic: Record,
+        creator: dict[str, str],
+        *args: Any,
+        **kwargs: Any,
+    ) -> None:
+        """Check if the request can be created."""
+        topic_service = get_draft_record_service(topic)
+        # Only needed in case of new version as when you are publishing
+        # draft for the first time, there are no previous versions with
+        # which you can have collision
+        if "payload" in data and "version" in data["payload"]:
+            versions = topic_service.search_versions(identity, topic.pid.pid_value)
+            versions_hits = versions.to_dict()["hits"]["hits"]
+            for rec in versions_hits:
+                if "version" in rec["metadata"]:
+                    version = rec["metadata"]["version"]
+                    if version == data["payload"]["version"]:
+                        raise VersionAlreadyExists
+
+        super().can_create(identity, data, receiver, topic, creator, *args, **kwargs)
+
+    @classmethod
+    def is_applicable_to(cls, identity: Identity, topic: Record, *args: Any, **kwargs: Any) -> bool:
+        """Check if the request type is applicable to the topic."""
+        if cls.topic_type(topic) != "new_version":
+            return False
+
+        return super().is_applicable_to(identity, topic, *args, **kwargs)
+
+    # TODO: used in ui
 
     form: ClassVar[JsonValue] = {
         "field": "version",
@@ -68,19 +106,6 @@ class PublishNewVersionRequestType(PublishRequestType):
             "accept": PublishNewVersionAcceptAction,
             "decline": PublishDraftDeclineAction,
         }
-
-    description = _("Request publishing of a draft")
-    receiver_can_be_none = True
-
-    editable = False
-
-    @classmethod
-    def is_applicable_to(cls, identity: Identity, topic: Record, *args: Any, **kwargs: Any) -> bool:
-        """Check if the request type is applicable to the topic."""
-        if cls.topic_type(topic) != "new_version":
-            return False
-
-        return super().is_applicable_to(identity, topic, *args, **kwargs)
 
     @override
     def stateful_name(
@@ -150,29 +175,3 @@ class PublishNewVersionRequestType(PublishRequestType):
             cancelled=gettext("The new version has been cancelled. "),
             created=gettext("Waiting for finishing the new version publication request."),
         )
-
-    def can_create(
-        self,
-        identity: Identity,
-        data: dict,
-        receiver: dict[str, str],
-        topic: Record,
-        creator: dict[str, str],
-        *args: Any,
-        **kwargs: Any,
-    ) -> None:
-        """Check if the request can be created."""
-        topic_service = get_draft_record_service(topic)
-        # Only needed in case of new version as when you are publishing
-        # draft for the first time, there are no previous versions with
-        # which you can have collision
-        if "payload" in data and "version" in data["payload"]:
-            versions = topic_service.search_versions(identity, topic.pid.pid_value)
-            versions_hits = versions.to_dict()["hits"]["hits"]
-            for rec in versions_hits:
-                if "version" in rec["metadata"]:
-                    version = rec["metadata"]["version"]
-                    if version == data["payload"]["version"]:
-                        raise VersionAlreadyExists
-
-        super().can_create(identity, data, receiver, topic, creator, *args, **kwargs)

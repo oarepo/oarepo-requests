@@ -38,6 +38,15 @@ class PublishDraftRequestType(PublishRequestType):
         "version": ma.fields.Str(),
     }
 
+    @classmethod
+    def is_applicable_to(cls, identity: Identity, topic: Record, *args: Any, **kwargs: Any) -> bool:
+        """Check if the request type is applicable to the topic."""
+        if cls.topic_type(topic) != "initial":
+            return False
+
+        return super().is_applicable_to(identity, topic, *args, **kwargs)
+
+    # TODO: used in ui
     form: ClassVar[JsonValue] = {
         "field": "version",
         "ui_widget": "Input",
@@ -47,14 +56,6 @@ class PublishDraftRequestType(PublishRequestType):
             "required": False,
         },
     }
-
-    @classmethod
-    def is_applicable_to(cls, identity: Identity, topic: Record, *args: Any, **kwargs: Any) -> bool:
-        """Check if the request type is applicable to the topic."""
-        if cls.topic_type(topic) != "initial":
-            return False
-
-        return super().is_applicable_to(identity, topic, *args, **kwargs)
 
     @override
     def stateful_name(

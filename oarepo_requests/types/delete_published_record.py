@@ -27,7 +27,7 @@ from ..utils import (
     open_request_exists,
     request_identity_matches,
 )
-from .generic import NonDuplicableOARepoRequestType
+from .generic import NonDuplicableOARepoRecordRequestType
 
 if TYPE_CHECKING:
     from collections.abc import Mapping
@@ -41,13 +41,16 @@ if TYPE_CHECKING:
     from ..utils import JsonValue
 
 
-class DeletePublishedRecordRequestType(NonDuplicableOARepoRequestType):
+class DeletePublishedRecordRequestType(NonDuplicableOARepoRecordRequestType):
     """Request type for requesting deletion of a published record."""
 
     type_id = "delete_published_record"
     name = _("Delete record")  # type: ignore[reportAssignmentType]
-
+    description = _("Request deletion of published record")  # type: ignore[reportAssignmentType]
     allowed_on_draft = False
+    editable = False
+    dangerous = True
+    receiver_can_be_none = True
 
     payload_schema: Mapping[str, ma.fields.Field] | None = {
         "removal_reason": ma.fields.Str(required=True),
@@ -61,6 +64,17 @@ class DeletePublishedRecordRequestType(NonDuplicableOARepoRequestType):
             return False
         return super().is_applicable_to(identity, topic, *args, **kwargs)
 
+    @classproperty
+    def available_actions(cls) -> dict[str, type[RequestAction]]:  # noqa N805
+        """Return available actions for the request type."""
+        return {
+            **super().available_actions,
+            "submit": DeletePublishedRecordSubmitAction,
+            "accept": DeletePublishedRecordAcceptAction,
+            "decline": DeletePublishedRecordDeclineAction,
+        }
+
+    # TODO: used in ui
     form: ClassVar[JsonValue] = [
         {
             "section": "",
@@ -87,23 +101,6 @@ class DeletePublishedRecordRequestType(NonDuplicableOARepoRequestType):
             ],
         }
     ]
-
-    editable = False
-
-    dangerous = True
-
-    @classproperty
-    def available_actions(cls) -> dict[str, type[RequestAction]]:  # noqa N805
-        """Return available actions for the request type."""
-        return {
-            **super().available_actions,
-            "submit": DeletePublishedRecordSubmitAction,
-            "accept": DeletePublishedRecordAcceptAction,
-            "decline": DeletePublishedRecordDeclineAction,
-        }
-
-    description = _("Request deletion of published record")  # type: ignore[reportAssignmentType]
-    receiver_can_be_none = True
 
     @override
     def stateful_name(

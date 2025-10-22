@@ -50,4 +50,4 @@ def default_workflow_receiver_function(
     receiver = request.recipient_entity_reference(record=record, request_type=request_type, **kwargs)
     if not request_type.receiver_can_be_none and not receiver:
         raise ReceiverNonReferencableError(request_type=request_type, record=record, **kwargs)
-    return cast("Mapping[str, str]", receiver)  # TODO: pass1: idk why it complains here
+    return cast("Mapping[str, str]", receiver)  # TODO: unknown linter issue, possibly a bug

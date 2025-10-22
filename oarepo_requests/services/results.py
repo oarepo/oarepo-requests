@@ -9,7 +9,7 @@
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Any
+from typing import TYPE_CHECKING, Any, cast
 
 from invenio_records_resources.records import Record
 from invenio_records_resources.services.records.schema import ServiceSchemaWrapper
@@ -124,9 +124,10 @@ def serialize_request_types(
     # contextvars approach from gpt
     tok_identity = request_type_identity_ctx.set(identity)
     tok_record = request_type_record_ctx.set(record)
-    # TODO: lint: we would have to retype RequestTypeSchema().dump()?
     try:
-        return [RequestTypeSchema().dump(request_type) for request_type in request_types.values()]  # type: ignore[reportReturnType]
+        return [
+            cast("dict[str, Any]", RequestTypeSchema().dump(request_type)) for request_type in request_types.values()
+        ]
     finally:
         # Reset contextvars to previous values to avoid leaking state
         request_type_identity_ctx.reset(tok_identity)

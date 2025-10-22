@@ -37,6 +37,7 @@ class PublishChangedMetadataRequestType(PublishRequestType):
 
         return super().is_applicable_to(identity, topic, *args, **kwargs)
 
+    # TODO: used in ui
     @override
     def stateful_name(
         self,

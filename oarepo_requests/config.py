@@ -48,8 +48,6 @@ DEFAULT_WORKFLOW_EVENTS = {
     RecordSnapshotEventType.type_id: WorkflowEvent(submitters=InvenioRequestsPermissionPolicy.can_create_comment),
 }
 
-REQUESTS_UI_SERIALIZATION_REFERENCED_FIELDS = ["created_by", "receiver", "topic"]
-
 REQUESTS_ACTION_COMPONENTS: tuple[type[RequestActionComponent], ...] = (
     AutoAcceptComponent,
     CreatedTopicComponent,
@@ -60,7 +58,7 @@ REQUESTS_ACTION_COMPONENTS: tuple[type[RequestActionComponent], ...] = (
 
 SNAPSHOT_CLEANUP_DAYS = 365
 
-# TODO: where is this used?
+# TODO: possibly not used outside ui
 PUBLISH_REQUEST_TYPES = ["publish_draft", "publish_new_version"]
 
 

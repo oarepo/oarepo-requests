@@ -14,13 +14,13 @@ from typing import TYPE_CHECKING, Any, cast
 
 from flask_babel.speaklater import LazyString
 from invenio_access.permissions import system_identity
+from invenio_drafts_resources.records import Record as RecordWithDraft
+from invenio_drafts_resources.services import RecordService as DraftRecordService
 from invenio_pidstore.errors import PersistentIdentifierError
-from invenio_requests.proxies import (
-    current_request_type_registry,
-    current_requests_service,
-)
+from invenio_requests.proxies import current_request_type_registry
 from invenio_requests.resolvers.registry import ResolverRegistry
 from invenio_search.engine import dsl
+from oarepo_runtime import current_runtime
 from oarepo_workflows import (
     AutoApprove,
     Workflow,
@@ -30,6 +30,8 @@ from oarepo_workflows import (
 from oarepo_workflows.errors import MissingWorkflowError
 from oarepo_workflows.proxies import current_oarepo_workflows
 
+from oarepo_requests.proxies import current_requests_service
+
 if TYPE_CHECKING:
     from collections.abc import Callable, Mapping
 
@@ -38,14 +40,15 @@ if TYPE_CHECKING:
     from invenio_records_resources.services import RecordService
     from invenio_requests.customizations.request_types import RequestType
     from invenio_requests.records.api import Request
+    from invenio_requests.services.requests import RequestList
     from opensearch_dsl.query import Query
 
+    from oarepo_requests.services.results import RequestTypesList
 
-# TODO: perhaps we could use centrally defined custom types in runtime?; if this is permitable
 type JsonValue = str | LazyString | int | float | bool | None | dict[str, JsonValue] | list[JsonValue]
 
 
-# TODO: move to runtime; type properly
+# TODO: move to runtime; typing issues
 class classproperty[T]:  # noqa N801
     """Class property decorator as decorator chaining for declaring class properties was deprecated in python 3.11."""
 
@@ -129,9 +132,7 @@ def search_requests_filter(
     if topic_reference:
         must.append(create_query_term_for_reference("topic", topic_reference))
 
-    # TODO: lint: correct
     return dsl.query.Bool(
-        "must",  # type: ignore[reportArgumentType]
         must=must,
     )
 
@@ -148,20 +149,23 @@ def open_request_exists(topic_or_reference: Record | dict[str, str], type_id: st
     return bool(list(results))
 
 
-# TODO: R04
-# how do we plan for things to behave when None is returned
 def resolve_reference_dict(reference_dict: dict[str, str]) -> Any:
-    """Resolve the reference dict to the entity (such as Record, User, ...)."""
+    """Resolve the reference dict to the entity (such as Record, User, ...).
+
+    Raises ValueError if the reference cannot be resolved.
+    """
     return ResolverRegistry.resolve_entity_proxy(reference_dict, raise_=True).resolve()  # type: ignore[reportOptionalMemberAccess]
 
 
-# TODO: R04
 def reference_entity(entity: Any) -> dict[str, str]:
-    """Resolve the entity to the reference dict."""
+    """Resolve the entity to the reference dict.
+
+    Raises ValueError if the reference cannot be resolved.
+    """
     return cast("dict[str, str]", ResolverRegistry.reference_entity(entity, raise_=True))
 
 
-# TODO: pass1: is this used somewhere - or mark as deprecated
+# TODO: possibly not used
 def get_matching_service_for_refdict(
     reference_dict: dict[str, str],
 ) -> RecordService | None:
@@ -176,8 +180,6 @@ def get_matching_service_for_refdict(
     return None
 
 
-# TODO: pass1: is this used somewhere
-# it was in deprecated record request services
 def get_entity_key_for_record_cls(record_cls: type[Record]) -> str:
     """Get the entity type id for the record_cls.
 
@@ -344,3 +346,28 @@ def has_rights_to_submit_request(request: Request, identity: Identity) -> bool:
             request_type=request.type,
         ),
     )
+
+
+def search_requests(identity: Identity, record: RecordWithDraft | dict[str, str], expand: bool = False) -> RequestList:
+    """Search requests for a given record."""
+    topic_ref = reference_entity(record) if isinstance(record, RecordWithDraft) else record
+    return cast(
+        "RequestList",
+        current_requests_service.search(identity, topic=topic_ref, expand=expand),
+    )
+
+
+def applicable_requests(identity: Identity, record: RecordWithDraft | dict[str, str]) -> RequestTypesList:
+    """Get applicable request types for a record."""
+    topic_ref = reference_entity(record) if isinstance(record, RecordWithDraft) else record
+    return current_requests_service.applicable_request_types(identity, topic=topic_ref)
+
+
+def get_draft_record_service(record: Record) -> DraftRecordService:
+    """Get the draft record service for a record and checks it supports drafts."""
+    topic_service = current_runtime.get_record_service_for_record(record)
+    if not topic_service:
+        raise KeyError(f"Record {record} service not found")
+    if not isinstance(topic_service, DraftRecordService):
+        raise TypeError("Draft service required for editing records.")
+    return topic_service
