@@ -37,7 +37,6 @@ class EditTopicAcceptAction(OARepoAcceptAction):
         *args: Any,
         **kwargs: Any,
     ) -> None:
-        """Apply the action, creating a draft of the record for editing metadata."""
         topic_service = get_draft_record_service(state.topic)
         topic_service.edit(identity, state.topic["id"], uow=uow)
         super().apply(identity, state, uow, *args, **kwargs)

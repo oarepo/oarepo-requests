@@ -23,7 +23,7 @@ if TYPE_CHECKING:
 
 
 class RequestsMetadataMappingPreset(Preset):
-    """Preset for record service class."""
+    """Preset for applying requests-related record mapping changes."""
 
     modifies = ("record-mapping",)
 

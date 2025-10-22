@@ -5,10 +5,7 @@
 # modify it under the terms of the MIT License; see LICENSE file for more
 # details.
 #
-"""Request action components.
-
-These components are called as context managers when an action is executed.
-"""
+"""Request action components."""
 
 from __future__ import annotations
 
@@ -44,8 +41,6 @@ class RequestActionComponent:
     ) -> None:
         """Apply the component on the create action.
 
-        Must return a context manager
-
         :param identity: Identity of the user.
         :param request_type: Request type.
         :param action: Action being executed.
@@ -64,8 +59,6 @@ class RequestActionComponent:
         **kwargs: Any,
     ) -> None:
         """Apply the component on the submit action.
-
-        Must return a context manager
 
         :param identity: Identity of the user.
         :param request_type: Request type.
@@ -86,8 +79,6 @@ class RequestActionComponent:
     ) -> None:
         """Apply the component on the accept action.
 
-        Must return a context manager
-
         :param identity: Identity of the user.
         :param request_type: Request type.
         :param action: Action being executed.
@@ -106,8 +97,6 @@ class RequestActionComponent:
         **kwargs: Any,
     ) -> None:
         """Apply the component on the decline action.
-
-        Must return a context manager
 
         :param identity: Identity of the user.
         :param request_type: Request type.
@@ -128,8 +117,6 @@ class RequestActionComponent:
     ) -> None:
         """Apply the component on the cancel action.
 
-        Must return a context manager
-
         :param identity: Identity of the user.
         :param request_type: Request type.
         :param action: Action being executed.
@@ -148,8 +135,6 @@ class RequestActionComponent:
         **kwargs: Any,
     ) -> None:
         """Apply the component on the expire action.
-
-        Must return a context manager
 
         :param identity: Identity of the user.
         :param request_type: Request type.

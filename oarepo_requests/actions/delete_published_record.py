@@ -35,8 +35,9 @@ if TYPE_CHECKING:
 
 
 class DeletePublishedRecordSubmitAction(OARepoSubmitAction):
-    """Submit action for publishing draft requests."""
+    """Submit the delete published record request."""
 
+    @override
     def apply(
         self,
         identity: Identity,
@@ -45,7 +46,6 @@ class DeletePublishedRecordSubmitAction(OARepoSubmitAction):
         *args: Any,
         **kwargs: Any,
     ) -> None:
-        """Publish the draft."""
         # TODO: notification
         return super().apply(identity, state, uow, *args, **kwargs)
 

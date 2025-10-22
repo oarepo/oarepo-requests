@@ -5,11 +5,11 @@
 # modify it under the terms of the MIT License; see LICENSE file for more
 # details.
 #
-"""Actions for publishing draft requests."""
+"""Actions for publishing new version draft requests."""
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Any
+from typing import TYPE_CHECKING, Any, override
 
 from invenio_i18n import _
 from invenio_records_resources.services.uow import RecordCommitOp
@@ -27,10 +27,11 @@ from .publish_draft import PublishDraftAcceptAction
 
 
 class PublishNewVersionAcceptAction(PublishDraftAcceptAction):
-    """Accept action for publishing draft requests."""
+    """Accept action for publishing new version draft requests."""
 
     name = _("Publish")
 
+    @override
     def apply(
         self,
         identity: Identity,
@@ -39,7 +40,6 @@ class PublishNewVersionAcceptAction(PublishDraftAcceptAction):
         *args: Any,
         **kwargs: Any,
     ) -> None:
-        """Publish the draft."""
         topic_service = get_draft_record_service(state.topic)
 
         if "payload" in self.request and "version" in self.request["payload"]:
