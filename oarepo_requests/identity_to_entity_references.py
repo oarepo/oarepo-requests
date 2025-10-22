@@ -11,7 +11,7 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
-# TODO: I'm not sure this used anywhere
+# TODO: possibly not used
 if TYPE_CHECKING:
     from flask_principal import Identity
 

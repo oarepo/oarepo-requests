@@ -20,7 +20,7 @@ from oarepo_runtime.records.drafts import has_draft
 
 from ..actions.new_version import NewVersionAcceptAction
 from ..utils import classproperty, is_auto_approved, request_identity_matches
-from .generic import NonDuplicableOARepoRequestType
+from .generic import NonDuplicableOARepoRecordRequestType
 
 if TYPE_CHECKING:
     from collections.abc import Mapping
@@ -34,17 +34,18 @@ if TYPE_CHECKING:
     from ..utils import JsonValue
 
 
-class NewVersionRequestType(NonDuplicableOARepoRequestType):
+class NewVersionRequestType(NonDuplicableOARepoRecordRequestType):
     """Request type for requesting new version of a published record."""
 
     type_id = "new_version"
     name = _("New Version")
+    description = _("Request requesting creation of new version of a published record.")  # type: ignore[reportAssignmentType]
+    allowed_on_draft = False
+    editable = False
     payload_schema: Mapping[str, ma.fields.Field] | None = {
         "created_topic": ma.fields.Str(),
         "keep_files": ma.fields.String(validate=OneOf(["yes", "no"])),
     }
-
-    allowed_on_draft = False
 
     @classproperty
     @override
@@ -54,37 +55,6 @@ class NewVersionRequestType(NonDuplicableOARepoRequestType):
             **super().available_actions,
             "accept": NewVersionAcceptAction,
         }
-
-    description = _("Request requesting creation of new version of a published record.")  # type: ignore[reportAssignmentType]
-    editable = False
-
-    # TODO: do we need this?
-    form: ClassVar[JsonValue] = {
-        "field": "keep_files",
-        "ui_widget": "Dropdown",
-        "props": {
-            "label": _("Keep files"),
-            "placeholder": _("Yes or no"),
-            "description": _(
-                "If you choose yes, the current record's files will be linked to the new version of the record. "
-                "Then you will be able to add/remove files in the form."
-            ),
-            "options": [
-                {"id": "yes", "title_l10n": _("Yes")},
-                {"id": "no", "title_l10n": _("No")},
-            ],
-        },
-    }
-
-    @classmethod
-    def is_applicable_to(cls, identity: Identity, topic: Record, *args: Any, **kwargs: Any) -> bool:
-        """Check if the request type is applicable to the topic."""
-        if not isinstance(topic, RecordWithDraft):
-            raise TypeError(gettext("Trying to create edit request on record without draft support"))
-        # if already editing metadata or a new version, we don't want to create a new request
-        if has_draft(topic):
-            return False
-        return super().is_applicable_to(identity, topic, *args, **kwargs)
 
     def can_create(
         self,
@@ -102,6 +72,34 @@ class NewVersionRequestType(NonDuplicableOARepoRequestType):
         if has_draft(topic):
             raise ValueError(gettext("Trying to create edit request on record with draft"))
         super().can_create(identity, data, receiver, topic, creator, *args, **kwargs)
+
+    @classmethod
+    def is_applicable_to(cls, identity: Identity, topic: Record, *args: Any, **kwargs: Any) -> bool:
+        """Check if the request type is applicable to the topic."""
+        if not isinstance(topic, RecordWithDraft):
+            raise TypeError(gettext("Trying to create edit request on record without draft support"))
+        # if already editing metadata or a new version, we don't want to create a new request
+        if has_draft(topic):
+            return False
+        return super().is_applicable_to(identity, topic, *args, **kwargs)
+
+    # TODO: used in ui
+    form: ClassVar[JsonValue] = {
+        "field": "keep_files",
+        "ui_widget": "Dropdown",
+        "props": {
+            "label": _("Keep files"),
+            "placeholder": _("Yes or no"),
+            "description": _(
+                "If you choose yes, the current record's files will be linked to the new version of the record. "
+                "Then you will be able to add/remove files in the form."
+            ),
+            "options": [
+                {"id": "yes", "title_l10n": _("Yes")},
+                {"id": "no", "title_l10n": _("No")},
+            ],
+        },
+    }
 
     @override
     def stateful_name(

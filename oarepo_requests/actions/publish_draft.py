@@ -17,7 +17,7 @@ from invenio_requests.records.api import Request
 
 from oarepo_requests.errors import UnresolvedRequestsError, VersionAlreadyExists
 
-from ..temp_utils import get_draft_record_service, search_requests
+from ..utils import get_draft_record_service, search_requests
 from .components import CreatedTopicComponent
 from .generic import (
     OARepoAcceptAction,
@@ -121,7 +121,6 @@ class PublishDraftAcceptAction(PublishMixin, OARepoAcceptAction):
 
         published_topic = topic_service.publish(identity, id_, *args, uow=uow, expand=False, **kwargs)
         state.created_topic = published_topic._record  # noqa SLF001
-        # TODO: topic update cascade?
         state.topic = published_topic._record  # noqa SLF001
         # TODO: notification
         return super().apply(identity, state, uow, *args, **kwargs)

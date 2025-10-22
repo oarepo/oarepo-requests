@@ -11,14 +11,11 @@ from __future__ import annotations
 
 from typing import Self
 
-from invenio_communities.communities.entity_resolvers import CommunityResolver
-from invenio_records_resources.references import RecordResolver
-from invenio_requests.proxies import current_requests
+from oarepo_runtime import current_runtime
 
 from oarepo_requests.proxies import current_oarepo_requests
 
 
-# TODO: R03
 class ModelRefTypes:
     """Class is used to define the allowed reference types for the topic reference.
 
@@ -27,17 +24,7 @@ class ModelRefTypes:
 
     def __get__(self, obj: Self, owner: type[Self]) -> list[str]:
         """Property getter, returns the list of allowed reference types."""
-        ret: list[str] = []
-        resolvers = current_requests.entity_resolvers_registry
-        if resolvers is None:
-            return ret
-        for resolver in resolvers:
-            if not isinstance(resolver, RecordResolver) or isinstance(
-                resolver, CommunityResolver
-            ):  # TODO: CommunityResolver technically is a RecordResolver; add resolver to Model?
-                continue
-            ret.append(resolver.type_key)
-        return ret
+        return [model.entity_type for model in current_runtime.models.values() if model.entity_type]
 
 
 class ReceiverRefTypes:

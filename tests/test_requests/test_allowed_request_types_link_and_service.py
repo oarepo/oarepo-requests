@@ -7,7 +7,7 @@
 #
 from __future__ import annotations
 
-from oarepo_requests.temp_utils import applicable_requests
+from oarepo_requests.utils import applicable_requests
 
 
 # def test_workflow_read(workflow_model, users, logged_client, default_workflow_json, location, search_clear):

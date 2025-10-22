@@ -306,7 +306,7 @@ class AutoAcceptComponent(RequestActionComponent):
             finally:
                 state.action = current_action_obj
         else:
-            # TODO: consider reconceptualizing this whole RequestActionState thing
+            # TODO: consider whether state is necessary and request_identity add in generic; could be simpler?
             action_obj.execute(identity, uow, *args, **kwargs)
             # we dont know if request/topic was changed, retrieve actual data
             new_request: Request = Request.get_record(cast("UUID", request.id))

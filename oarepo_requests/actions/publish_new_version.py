@@ -14,7 +14,7 @@ from typing import TYPE_CHECKING, Any
 from invenio_i18n import _
 from invenio_records_resources.services.uow import RecordCommitOp
 
-from ..temp_utils import get_draft_record_service
+from ..utils import get_draft_record_service
 
 if TYPE_CHECKING:
     from flask_principal import Identity

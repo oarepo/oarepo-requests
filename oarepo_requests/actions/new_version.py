@@ -11,7 +11,7 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING, Any
 
-from ..temp_utils import get_draft_record_service
+from ..utils import get_draft_record_service
 from .components import CreatedTopicComponent
 from .generic import OARepoAcceptAction
 

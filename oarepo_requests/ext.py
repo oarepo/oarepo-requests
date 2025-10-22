@@ -13,7 +13,6 @@ from functools import cached_property
 from typing import TYPE_CHECKING, cast
 
 import importlib_metadata
-from deepmerge import conservative_merger
 from invenio_base.utils import obj_or_import_string
 
 from oarepo_requests.cli import oarepo_requests  # noqa
@@ -94,6 +93,7 @@ class OARepoRequests:
         """
         return cast("list[str]", self.app.config.get("REQUESTS_ALLOWED_RECEIVERS", []))
 
+    # TODO: possible not used
     @cached_property
     def identity_to_entity_references_functions(self) -> list[Callable]:
         """Return a list of functions that map identity to entity references.
@@ -105,6 +105,7 @@ class OARepoRequests:
         group_name = "oarepo_requests.identity_to_entity_references"
         return [x.load() for x in importlib_metadata.entry_points().select(group=group_name)]
 
+    # TODO: possible not used
     def identity_to_entity_references(self, identity: Identity) -> list[dict[str, str]]:
         """Map the identity to entity references."""
         ret = [
@@ -120,7 +121,7 @@ class OARepoRequests:
 
     def init_resources(self, app: Flask) -> None:
         """Init resources."""
-        # TODO: import invenio - reference the service instead of initializing it again
+        # TODO: import invenio - reference the service instead of initializing it again if possible
 
         self.requests_resource = OARepoRequestsResource(
             service=obj_or_import_string(app.config.get("REQUESTS_SERVICE_CLASS", OARepoRequestsService))(  # type: ignore[reportOptionalCall]
@@ -145,12 +146,7 @@ class OARepoRequests:
         from . import config
 
         app.config.setdefault("OAREPO_REQUESTS_DEFAULT_RECEIVER", None)
-        # app.config.setdefault("REQUESTS_SERVICE_CLASS", config.REQUESTS_SERVICE_CLASS) # noqa
-        # app.config.setdefault("REQUESTS_SERVICE_CONFIG_CLASS", config.REQUESTS_SERVICE_CONFIG_CLASS) # noqa
         app.config.setdefault("REQUESTS_ALLOWED_RECEIVERS", []).extend(config.REQUESTS_ALLOWED_RECEIVERS)
-        app.config.setdefault("REQUESTS_UI_SERIALIZATION_REFERENCED_FIELDS", []).extend(
-            config.REQUESTS_UI_SERIALIZATION_REFERENCED_FIELDS
-        )
         app.config.setdefault("SNAPSHOT_CLEANUP_DAYS", config.SNAPSHOT_CLEANUP_DAYS)
 
         app.config.setdefault("PUBLISH_REQUEST_TYPES", config.PUBLISH_REQUEST_TYPES)
@@ -170,15 +166,6 @@ class OARepoRequests:
                 app_registered_event_types.append(event_type)
 
         # TODO: notifications config
-        app_registered_event_types = app.config.setdefault("NOTIFICATION_RECIPIENTS_RESOLVERS", {})
-
-        # can't set default config directly because it might be initialized to {} in invenio-notifications
-        app.config.setdefault("NOTIFICATIONS_BUILDERS", {})
-        app_notification_backends = app.config.setdefault("NOTIFICATIONS_BACKENDS", {})
-
-        app.config["NOTIFICATIONS_BACKENDS"] = conservative_merger.merge(
-            app_notification_backends, config.NOTIFICATIONS_BACKENDS
-        )
 
 
 def api_finalize_app(app: Flask) -> None:
@@ -193,18 +180,7 @@ def finalize_app(app: Flask) -> None:
     # Register services - cannot be done in extension because
     # Invenio-Records-Resources might not have been initialized.
 
-    ext = app.extensions["oarepo-requests"]
+    app.extensions["oarepo-requests"]
 
-    # TODO: i have to do this cause there is bug in invenio-requests for events
-    # but imo this is better than entrypoints
     for type_ in app.config["REQUESTS_REGISTERED_EVENT_TYPES"]:
         current_event_type_registry.register_type(type_)
-
-    ext.notification_recipients_resolvers_registry = app.config["NOTIFICATION_RECIPIENTS_RESOLVERS"]
-
-    invenio_notifications = app.extensions[
-        "invenio-notifications"
-    ]  # initialized during ext in invenio notifications, our config might not be loaded
-    notification_resolvers = {er.type_key: er for er in app.config["NOTIFICATIONS_ENTITY_RESOLVERS"]}
-    invenio_notifications.entity_resolvers = notification_resolvers
-    invenio_notifications.init_manager(app)  # race condition between config init and original init_manager
