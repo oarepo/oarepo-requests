@@ -24,7 +24,7 @@ class ModelRefTypes:
 
     def __get__(self, obj: Self, owner: type[Self]) -> list[str]:
         """Property getter, returns the list of allowed reference types."""
-        return [model.entity_type for model in current_runtime.models.values() if model.entity_type]
+        return [model.entity_type for model in current_runtime.rdm_models]
 
 
 class ReceiverRefTypes:

@@ -19,7 +19,6 @@ from oarepo_model.customizations import (
     Customization,
 )
 from oarepo_model.presets import Preset
-from oarepo_model.presets.drafts.records.resolver import DraftRecordResolver
 
 if TYPE_CHECKING:
     from collections.abc import Generator
@@ -43,17 +42,11 @@ class RegisterResolversPreset(Preset):
             service_id = builder.model.base_name
             runtime_dependencies = builder.get_runtime_dependencies()
             resolver = runtime_dependencies.get("RecordResolver")
-            if issubclass(resolver, DraftRecordResolver):
-                return resolver(
-                    record_cls=runtime_dependencies.get("Record"),
-                    draft_cls=runtime_dependencies.get("Draft"),
-                    service_id=service_id,
-                    type_key=service_id,
-                )
             return resolver(
                 record_cls=runtime_dependencies.get("Record"),
                 service_id=service_id,
                 type_key=service_id,
+                proxy_cls=runtime_dependencies.get("RecordProxy"),
             )
 
         yield AddModule("resolvers", exists_ok=True)

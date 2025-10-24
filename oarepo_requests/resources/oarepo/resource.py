@@ -19,7 +19,6 @@ from invenio_records_resources.resources.records.resource import (
     request_search_args,
     request_view_args,
 )
-from invenio_records_resources.resources.records.utils import search_preference
 from invenio_requests.resources import RequestsResource
 
 from oarepo_requests.utils import (
