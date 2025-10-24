@@ -126,6 +126,8 @@ class OARepoRequests:
 
     def init_config(self, app: Flask) -> None:
         """Initialize configuration."""
+        from . import config
+
         app.config.setdefault("OAREPO_REQUESTS_DEFAULT_RECEIVER", None)
         app.config.setdefault("REQUESTS_ALLOWED_RECEIVERS", []).extend(config.REQUESTS_ALLOWED_RECEIVERS)
 

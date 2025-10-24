@@ -18,9 +18,6 @@ application during model building.
 
 from __future__ import annotations
 
-from oarepo_requests.model.presets.requests.records.entity_resolvers.resolver import (
-    RequestsResolverPreset,
-)
 from oarepo_requests.model.presets.requests.records.metadata_mapping import (
     RequestsMetadataMappingPreset,
 )
@@ -39,6 +36,5 @@ requests_preset = [
     RequestsMetadataMappingPreset,  # Configure metadata mapping for requests
     RequestsServiceConfigPreset,  # Configure service with request components
     RequestsRecordItemPreset,  # Configure record item results
-    RequestsResolverPreset,
-    RegisterResolversPreset,
+    RegisterResolversPreset,  # Final application setup
 ]
