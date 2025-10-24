@@ -121,6 +121,8 @@ class OARepoRequests:
 
     def init_config(self, app: Flask) -> None:
         """Initialize configuration."""
+        from . import config
+
         app.config.setdefault("OAREPO_REQUESTS_DEFAULT_RECEIVER", None)
         app.config.setdefault("REQUESTS_ALLOWED_RECEIVERS", []).extend(config.REQUESTS_ALLOWED_RECEIVERS)
 
@@ -155,6 +157,10 @@ def finalize_app(app: Flask) -> None:
     # otherwise collecting config + finalize_app hacks?
 
     ext = app.extensions["oarepo-requests"]
+
+    # TODO: look if needed
+    for type_ in app.config["REQUESTS_REGISTERED_EVENT_TYPES"]:
+        current_event_type_registry.register_type(type_)
 
     ext.notification_recipients_resolvers_registry = app.config["NOTIFICATION_RECIPIENTS_RESOLVERS"]
 
