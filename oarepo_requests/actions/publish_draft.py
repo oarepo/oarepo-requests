@@ -18,7 +18,6 @@ from invenio_requests.records.api import Request
 from oarepo_requests.errors import UnresolvedRequestsError, VersionAlreadyExists
 
 from ..utils import get_draft_record_service, search_requests
-from .components import CreatedTopicComponent
 from .generic import (
     OARepoAcceptAction,
     OARepoDeclineAction,
