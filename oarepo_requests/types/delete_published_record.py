@@ -18,6 +18,7 @@ from invenio_i18n import lazy_gettext as _
 from oarepo_requests.actions.delete_published_record import (
     DeletePublishedRecordAcceptAction,
     DeletePublishedRecordDeclineAction,
+    DeletePublishedRecordSubmitAction,
 )
 
 from ..utils import (
@@ -68,6 +69,7 @@ class DeletePublishedRecordRequestType(NonDuplicableOARepoRecordRequestType):
         """Return available actions for the request type."""
         return {
             **super().available_actions,
+            "submit": DeletePublishedRecordSubmitAction,
             "accept": DeletePublishedRecordAcceptAction,
             "decline": DeletePublishedRecordDeclineAction,
         }

@@ -188,7 +188,7 @@ class RequestEntityResolve(EntityResolve):
         return notification
 
 
-class OARepoRequestParticipantsRecipient(RecipientGenerator):
+class GeneralRequestParticipantsRecipient(RecipientGenerator):
     """Recipient generator based on request and it's events."""
 
     def __init__(self, key: str):

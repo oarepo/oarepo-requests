@@ -1,16 +1,16 @@
 from invenio_notifications.services.generators import EntityResolve
 
 from ..generators import EntityRecipient
-from .oarepo import OARepoRequestActionNotificationBuilder
+from .base import RequestActionNotificationBuilder
 
 
-class DeletePublishedRecordRequestSubmitNotificationBuilder(OARepoRequestActionNotificationBuilder):
+class DeletePublishedRecordRequestSubmitNotificationBuilder(RequestActionNotificationBuilder):
     type = "delete-published-record-request-event.submit"
 
     recipients = (EntityRecipient(key="request.receiver"),)  # email only
 
 
-class DeletePublishedRecordRequestAcceptNotificationBuilder(OARepoRequestActionNotificationBuilder):
+class DeletePublishedRecordRequestAcceptNotificationBuilder(RequestActionNotificationBuilder):
     type = "delete-published-record-request-event.accept"
 
     recipients = (EntityRecipient(key="request.created_by"),)
@@ -18,7 +18,7 @@ class DeletePublishedRecordRequestAcceptNotificationBuilder(OARepoRequestActionN
     context = (EntityResolve(key="request"),)
 
 
-class DeletePublishedRecordRequestDeclineNotificationBuilder(OARepoRequestActionNotificationBuilder):
+class DeletePublishedRecordRequestDeclineNotificationBuilder(RequestActionNotificationBuilder):
     type = "delete-published-record-request-event.decline"
 
     recipients = (EntityRecipient(key="request.created_by"),)

@@ -1,20 +1,20 @@
 from ..generators import EntityRecipient
-from .oarepo import OARepoRequestActionNotificationBuilder
+from .base import RequestActionNotificationBuilder
 
 
-class PublishDraftRequestSubmitNotificationBuilder(OARepoRequestActionNotificationBuilder):
+class PublishDraftRequestSubmitNotificationBuilder(RequestActionNotificationBuilder):
     type = "publish-draft-request-event.submit"
 
     recipients = (EntityRecipient(key="request.receiver"),)  # email only
 
 
-class PublishDraftRequestAcceptNotificationBuilder(OARepoRequestActionNotificationBuilder):
+class PublishDraftRequestAcceptNotificationBuilder(RequestActionNotificationBuilder):
     type = "publish-draft-request-event.accept"
 
     recipients = (EntityRecipient(key="request.created_by"),)
 
 
-class PublishDraftRequestDeclineNotificationBuilder(OARepoRequestActionNotificationBuilder):
+class PublishDraftRequestDeclineNotificationBuilder(RequestActionNotificationBuilder):
     type = "publish-draft-request-event.decline"
 
     recipients = (EntityRecipient(key="request.created_by"),)
