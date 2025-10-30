@@ -12,10 +12,8 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING, Any, override
 
-from invenio_drafts_resources.records import Draft
-from invenio_rdm_records.records import RDMRecord, RDMDraft
-from invenio_rdm_records.requests.entity_resolvers import RDMRecordServiceResultResolver, RDMRecordServiceResultProxy
-from invenio_records_resources.references.entity_resolvers import ServiceResultResolver, ServiceResultProxy
+from invenio_rdm_records.requests.entity_resolvers import RDMRecordServiceResultProxy, RDMRecordServiceResultResolver
+from invenio_records_resources.references.entity_resolvers import ServiceResultProxy, ServiceResultResolver
 from oarepo_model.customizations import (
     AddEntryPoint,
     AddModule,
@@ -23,7 +21,6 @@ from oarepo_model.customizations import (
     Customization,
 )
 from oarepo_model.presets import Preset
-from oarepo_runtime.services.results import RecordItem
 
 if TYPE_CHECKING:
     from collections.abc import Generator
@@ -32,13 +29,15 @@ if TYPE_CHECKING:
     from oarepo_model.builder import InvenioModelBuilder
     from oarepo_model.model import InvenioModel
 
+
 class ServiceResultResolver(RDMRecordServiceResultResolver):
     """Service result resolver for draft records."""
 
     def __init__(self, service_id, type_key, proxy_cls=ServiceResultProxy, item_cls=None, record_cls=None):
         super(RDMRecordServiceResultResolver, self).__init__(service_id, type_key, proxy_cls, item_cls, record_cls)
 
-"""        
+
+"""
 class RDMRecordServiceResultResolver(ServiceResultResolver):
 
 
@@ -63,6 +62,7 @@ class RDMRecordServiceResultResolver(ServiceResultResolver):
 
         return ServiceResultResolver.matches_entity(self, entity=entity)
 """
+
 
 class RegisterResolversPreset(Preset):
     """Preset for registering resolvers."""
@@ -93,8 +93,7 @@ class RegisterResolversPreset(Preset):
                 proxy_cls=RDMRecordServiceResultProxy,
             )
 
-        register_notification_resolver.type_key = builder.model.base_name # just invenio things
-
+        register_notification_resolver.type_key = builder.model.base_name  # just invenio things
 
         yield AddModule("resolvers", exists_ok=True)
         yield AddToModule("resolvers", "register_entity_resolver", staticmethod(register_entity_resolver))

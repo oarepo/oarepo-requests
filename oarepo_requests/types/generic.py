@@ -17,6 +17,7 @@ from invenio_requests.customizations.states import RequestState
 from invenio_requests.proxies import current_requests_service
 
 from oarepo_requests.errors import OpenRequestAlreadyExistsError
+from oarepo_requests.notifications.builders.comment import CommentRequestEventCreateNotificationBuilder
 from oarepo_requests.utils import classproperty, open_request_exists
 
 from ..actions.generic import (
@@ -58,6 +59,8 @@ class OARepoRequestType(RequestType):
     """Whether the request type can be edited multiple times before it is submitted."""
 
     allowed_receiver_ref_types = ReceiverRefTypes()  # type: ignore[reportAssignmentType]
+
+    comment_notification_builder = CommentRequestEventCreateNotificationBuilder
 
     @classproperty
     def has_form(cls) -> bool:  # noqa N805
