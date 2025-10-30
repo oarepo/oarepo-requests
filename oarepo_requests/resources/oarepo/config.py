@@ -35,7 +35,6 @@ class OARepoRequestsResourceConfig(RequestsResourceConfig, ConfiguratorMixin):
     url_prefix = "/requests"
     routes: Mapping[str, str] = {
         **RequestsResourceConfig.routes,
-        "list": "/",
         "list-args": "/<topic>/<request_type>",
         "list-applicable": "/applicable",
     }

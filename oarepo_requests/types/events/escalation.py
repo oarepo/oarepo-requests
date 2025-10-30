@@ -20,12 +20,11 @@ if TYPE_CHECKING:
     import marshmallow as ma
 
 
-# TODO: we forgot events resource in subissues
 class EscalationEventType(EventType):
     """Comment event type."""
 
     type_id = "E"
-    # TODO: R08 Callable can be mutable
+    # TODO: Callable can be mutable
     payload_schema: ClassVar[Mapping[str, ma.fields.Field] | Callable[[], Mapping[str, fields.Field]] | None] = {  # type: ignore[reportIncompatibleVariableOverride]
         "old_receiver": fields.Str(),
         "new_receiver": fields.Str(),
