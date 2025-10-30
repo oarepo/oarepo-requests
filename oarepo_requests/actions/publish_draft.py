@@ -24,7 +24,6 @@ from ..notifications.builders.publish import (
     PublishDraftRequestDeclineNotificationBuilder,
     PublishDraftRequestSubmitNotificationBuilder,
 )
-from .components import CreatedTopicComponent
 from ..utils import get_draft_record_service, search_requests
 from .generic import (
     OARepoAcceptAction,

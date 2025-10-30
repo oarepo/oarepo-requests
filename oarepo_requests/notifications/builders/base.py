@@ -6,17 +6,19 @@ from invenio_notifications.backends import EmailNotificationBackend
 from invenio_notifications.models import Notification
 from invenio_notifications.registry import EntityResolverRegistry
 from invenio_notifications.services.builders import NotificationBuilder
-from invenio_notifications.services.generators import EntityResolve, UserEmailBackend
+from invenio_notifications.services.generators import EntityResolve
+from invenio_notifications.services.generators import UserEmailBackend as InvenioUserEmailBackend
 
 if TYPE_CHECKING:
     from invenio_requests.records.api import Request
 
 
-class OARepoUserEmailBackend(UserEmailBackend):
+# TODO: is there any plan to support other backends?
+class UserEmailBackend(InvenioUserEmailBackend):
     backend_id = EmailNotificationBackend.id
 
 
-class OARepoRequestActionNotificationBuilder(NotificationBuilder):
+class RequestActionNotificationBuilder(NotificationBuilder):
     @classmethod
     def build(cls, request: Request):
         """Build notification with context."""
@@ -34,4 +36,4 @@ class OARepoRequestActionNotificationBuilder(NotificationBuilder):
         EntityResolve(key="request.created_by"),
     )
 
-    recipient_backends = (OARepoUserEmailBackend(),)
+    recipient_backends = (UserEmailBackend(),)

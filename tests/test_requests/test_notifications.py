@@ -1,7 +1,7 @@
 from typing import Any
 
-import pytest
 from invenio_requests.customizations.event_types import CommentEventType
+from invenio_requests.proxies import current_events_service
 
 
 def test_publish_notifications(
@@ -248,7 +248,6 @@ def test_locale_multiple_recipients(
         assert sent_mail_en[0].subject == "❗️ Request to delete published record blabla"
 
 
-@pytest.mark.skip
 def test_comment_notifications(
     app,
     users,
@@ -257,11 +256,10 @@ def test_comment_notifications(
     submit_request_on_draft,
     add_user_in_role,
     role,
-    events_service,
     link2testclient,
     urls,
 ):
-    """Test notification being built on review submit."""
+    """Test notification being built on publish draft submit."""
     mail = app.extensions.get("mail")
     creator = users[0]
     draft1 = draft_factory(creator.identity)  # so i don't have to create a new workflow
@@ -269,7 +267,7 @@ def test_comment_notifications(
 
     with mail.record_messages() as outbox:
         content = "ceci nes pa une comment"
-        events_service.create(
+        current_events_service.create(
             creator.identity,
             submit["id"],
             {"payload": {"content": "ceci nes pa une comment"}},
