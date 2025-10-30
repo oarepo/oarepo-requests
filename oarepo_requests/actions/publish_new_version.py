@@ -45,5 +45,3 @@ class PublishNewVersionAcceptAction(PublishDraftAcceptAction):
         if "payload" in self.request and "version" in self.request["payload"]:
             state.topic.metadata["version"] = self.request["payload"]["version"]
             uow.register(RecordCommitOp(state.topic, indexer=topic_service.indexer))
-
-        return super().apply(identity, state, uow, *args, **kwargs)

@@ -590,6 +590,12 @@ WORKFLOWS = [
         permission_policy_cls=DifferentLocalesPermissions,
         request_policy_cls=DifferentLocalesPublish,
     ),
+    Workflow(
+        code="edit_accept_crash",
+        label=_(""),
+        permission_policy_cls=type("EditAcceptCrashPermissions", (TestWorkflowPermissions,), {"can_edit": []}),
+        request_policy_cls=DefaultRequests,
+    ),
 ]
 
 
