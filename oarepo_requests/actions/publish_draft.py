@@ -76,7 +76,6 @@ class PublishDraftSubmitAction(PublishMixin, OARepoSubmitAction):
                         raise VersionAlreadyExists
             state.topic.metadata["version"] = self.request["payload"]["version"]
         # TODO: notification
-        return super().apply(identity, state, uow, *args, **kwargs)
 
 
 class PublishDraftAcceptAction(PublishMixin, OARepoAcceptAction):
@@ -120,22 +119,9 @@ class PublishDraftAcceptAction(PublishMixin, OARepoAcceptAction):
         state.created_topic = published_topic._record  # noqa SLF001
         state.topic = published_topic._record  # noqa SLF001
         # TODO: notification
-        return super().apply(identity, state, uow, *args, **kwargs)
 
 
 class PublishDraftDeclineAction(OARepoDeclineAction):
     """Decline action for publishing draft requests."""
 
     name = _("Return for correction")
-
-    @override
-    def apply(
-        self,
-        identity: Identity,
-        state: RequestActionState,
-        uow: UnitOfWork,
-        *args: Any,
-        **kwargs: Any,
-    ) -> None:
-        # TODO: notification
-        return super().apply(identity, state, uow, *args, **kwargs)
