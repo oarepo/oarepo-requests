@@ -105,6 +105,7 @@ class DeletePublishedRecordDeclineAction(OARepoDeclineAction):
 
     name = _("Keep the record")
 
+    @override
     def apply(
         self,
         identity: Identity,

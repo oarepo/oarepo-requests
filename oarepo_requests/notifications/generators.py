@@ -1,8 +1,18 @@
+#
+# Copyright (c) 2025 CESNET z.s.p.o.
+#
+# This file is a part of oarepo-requests (see http://github.com/oarepo/oarepo-requests).
+#
+# oarepo-requests is free software; you can redistribute it and/or modify it
+# under the terms of the MIT License; see LICENSE file for more details.
+#
+"""Recipient generators for notifications."""
+
 from __future__ import annotations
 
 import logging
 from abc import abstractmethod
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, cast, override
 
 from invenio_access.permissions import system_identity
 from invenio_notifications.models import Recipient
@@ -37,7 +47,7 @@ def _extract_entity_email_data(entity: Any) -> dict[str, Any]:
             return v
         return None
 
-    ret = {}
+    ret: dict[str, Any] = {}
     email = _add(entity, "email", ret)
     if not email:
         log.error(
@@ -56,12 +66,13 @@ class EntityRecipient(RecipientGenerator):
     """Recipient generator working as handler for generic entity."""
 
     def __init__(self, key: str):
+        """Initialize the generator."""
         self.key = key
 
     def __call__(
         self, notification: Notification, recipients: dict[str, Recipient], backend_ids: list[str] | None = None
     ):
-        """"""
+        """Generate recipients for the given entity."""
         backend_ids = backend_ids if backend_ids else notification.context["backend_ids"]
         entity_ref_or_entity = dict_lookup(notification.context, self.key)
 
@@ -79,14 +90,14 @@ class EntityRecipient(RecipientGenerator):
                 generator = generator_cls(entity_ref_or_entity)
                 generator(notification, recipients)
 
-    def _get_unresolved_entity_from_resolved(self, context: dict[str, Any], key: str) -> dict[str, Any] | None:
+    def _get_unresolved_entity_from_resolved(self, context: dict[str, Any], key: str) -> dict[str, str] | None:
         """Get the unresolved entity from the resolved one."""
         match key.split(".", maxsplit=1):
             case "request", field:
                 req = Request.get_record(context["request"]["id"])
                 field_value = getattr(req, field)
                 if field_value is not None:
-                    return field_value.reference_dict
+                    return cast("dict[str, str]", field_value.reference_dict)
                 return None
             case _:
                 raise NotImplementedError(f"Can not resolve entity from key: {key}")
@@ -96,6 +107,7 @@ class SpecificEntityRecipient(RecipientGenerator):
     """Superclass for implementations of recipient generators for specific entities."""
 
     def __init__(self, key: dict[str, str]):
+        """Initialize the generator."""
         self.key = key  # TODO: this is entity_reference, not path to entity as EntityRecipient, might be confusing
 
     def __call__(self, notification: Notification, recipients: dict[str, Recipient]):  # NOQA ARG002
@@ -111,7 +123,8 @@ class SpecificEntityRecipient(RecipientGenerator):
         entity_type = next(iter(self.key))
         registry = current_requests.entity_resolvers_registry
 
-        registered_resolvers = registry._registered_types  # noqa SLF001
+        # _registered_types missing in typing
+        registered_resolvers = registry._registered_types  # noqa SLF001 # type: ignore[reportAttributeAccessIssue]
         resolver = registered_resolvers.get(entity_type)
         proxy = resolver.get_entity_proxy(self.key)
         return proxy.resolve()
@@ -173,6 +186,7 @@ def __call__(self, notification: Notification, recipients: dict[str, Recipient])
 class RequestEntityResolve(EntityResolve):
     """Entity resolver that adds the correct title if it is missing."""
 
+    @override
     def __call__(self, notification: Notification):
         notification = super().__call__(notification)
         request_dict = notification.context["request"]
@@ -184,7 +198,7 @@ class RequestEntityResolve(EntityResolve):
             # If the request type has a stateful name, use it
             # note: do not have better identity here, so using system_identity
             # as a fallback
-            request_dict["title"] = request.type.stateful_name(system_identity, topic=None)
+            request_dict["title"] = request.type.stateful_name(system_identity, topic=None)  # type: ignore[reportAttributeAccessIssue]
         return notification
 
 
@@ -199,7 +213,7 @@ class GeneralRequestParticipantsRecipient(RecipientGenerator):
         """Fetch users involved in request and add as recipients."""
         request = dict_lookup(notification.context, self.key)
 
-        # hack for invenio compatibility
+        # for invenio compatibility
         before_keys = set(recipients.keys())
         EntityRecipient("request.created_by")(notification, recipients, backend_ids=["email"])
         EntityRecipient("request.receiver")(notification, recipients, backend_ids=["email"])
