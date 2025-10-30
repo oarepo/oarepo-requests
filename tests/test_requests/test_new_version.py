@@ -139,7 +139,7 @@ def test_redirect_url(
     )
 
     new_draft = creator_client.get(f"{urls['BASE_URL']}/{new_draft['id']}/draft").json
-    publish_request = submit_request_on_draft(creator.identity, new_draft["id"], "publish_draft")
+    publish_request = submit_request_on_draft(creator.identity, new_draft["id"], "publish_new_version")
     receiver_request = receiver_client.get(f"{urls['BASE_URL_REQUESTS']}{publish_request['id']}")
     receiver_client.post(link2testclient(receiver_request.json["links"]["actions"]["accept"]))
 

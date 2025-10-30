@@ -40,9 +40,6 @@ class StringEntityResolverExpandableField(EntityResolverExpandableField):
     the referenced record.
     """
 
-    #  the message is: Argument 1 of "get_value_service" is incompatible with supertype
-    #  "DraftAwareEntityResolverExpandableField"; supertype defines the argument type as "dict[str, str]"  [override]
-    # invenio doesn't allow to implement this differently?
     def get_value_service(self, value: str) -> tuple[str, RecordService]:  # type: ignore[override]
         """Return the value and the service via entity resolvers."""
         ref = string_to_reference(value)
