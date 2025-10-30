@@ -11,7 +11,7 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING, Any, cast, override
 
-from .generic import OARepoAcceptAction, OARepoDeclineAction, OARepoSubmitAction
+from .generic import OARepoAcceptAction, OARepoDeclineAction
 
 if TYPE_CHECKING:
     from flask_principal import Identity
@@ -32,22 +32,6 @@ if TYPE_CHECKING:
     from invenio_rdm_records.services.services import RDMRecordService
 
     from .components import RequestActionState
-
-
-class DeletePublishedRecordSubmitAction(OARepoSubmitAction):
-    """Submit the delete published record request."""
-
-    @override
-    def apply(
-        self,
-        identity: Identity,
-        state: RequestActionState,
-        uow: UnitOfWork,
-        *args: Any,
-        **kwargs: Any,
-    ) -> None:
-        # TODO: notification
-        return super().apply(identity, state, uow, *args, **kwargs)
 
 
 class DeletePublishedRecordAcceptAction(OARepoAcceptAction):
@@ -99,15 +83,3 @@ class DeletePublishedRecordDeclineAction(OARepoDeclineAction):
     """Decline request for deletion of a published record."""
 
     name = _("Keep the record")
-
-    def apply(
-        self,
-        identity: Identity,
-        state: RequestActionState,
-        uow: UnitOfWork,
-        *args: Any,
-        **kwargs: Any,
-    ) -> None:
-        """Publish the draft."""
-        # TODO: notification
-        return super().apply(identity, state, uow, *args, **kwargs)

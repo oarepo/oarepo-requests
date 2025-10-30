@@ -166,7 +166,7 @@ class WorkflowTransitionComponent(RequestActionComponent):
                 identity,
                 state.topic,
                 target_state,
-                request=state.action.request,
+                request=state.request,
                 uow=uow,
             )
 
@@ -272,20 +272,36 @@ class AutoAcceptComponent(RequestActionComponent):
         *args: Any,
         **kwargs: Any,
     ) -> None:
-        request: Request = state.action.request
+        request: Request = state.request
         if request.status != "submitted":
             return
         receiver_ref = state.request.receiver  # this is <x>proxy, not dict
         if not receiver_ref.reference_dict.get("auto_approve"):
             return
 
+        """
+        # i suppose this idea won't work because execute_action creates new instance of request
+        # and after that we have no simple way to change the request that's commited in the original submit action
+
+        uow.register(RecordCommitOp(request, indexer=current_requests_service.indexer))
+        request_item = current_requests_service.execute_action(identity, id_=str(request.id), action="accept", uow=uow)
+        identity.provides.add(request_active)
+        state.action.request = request_item._obj
+        """
+
         action_obj = RequestActions.get_action(request, "accept")
-        if not action_obj.can_execute():
+
+        # TODO: if something crashes here, what behavior to expect?
+        if not action_obj.can_execute():  # this is only supposed to check correct transition states per invenio
             raise CannotExecuteActionError("accept")
         if isinstance(action_obj, OARepoGenericActionMixin):
             # it is our action, just execute with components right away
             current_action_obj = state.action
             state.action = action_obj
+            # TODO: if something crashes here, what behavior to expect?
+            # rollback both the submit and accept or just accept - supposing both and the program crashes on execute?
+            # should be tested
+            # raise specific error?
             try:
                 action_obj.execute_with_components(*args, identity, state, uow, **kwargs)
             finally:

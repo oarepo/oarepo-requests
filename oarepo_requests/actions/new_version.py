@@ -33,8 +33,8 @@ class NewVersionAcceptAction(OARepoAcceptAction):
         identity: Identity,
         state: RequestActionState,
         uow: UnitOfWork,
-        *args: Any,
-        **kwargs: Any,
+        *args: Any,  # noqa ARG002
+        **kwargs: Any,  # noqa ARG002
     ) -> None:
         """Apply the action, creating a new version of the record."""
         topic_service = get_draft_record_service(state.topic)
@@ -46,5 +46,3 @@ class NewVersionAcceptAction(OARepoAcceptAction):
             and self.request["payload"]["keep_files"] == "yes"
         ):
             topic_service.import_files(identity, new_version_topic.id)
-
-        return super().apply(identity, state, uow, *args, **kwargs)

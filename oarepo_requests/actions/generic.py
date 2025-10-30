@@ -96,22 +96,21 @@ class OARepoGenericActionMixin(RequestAction):
         **kwargs: Any,
     ) -> None:
         """Execute the action with components."""
-        self.apply(identity, state, uow, *args, **kwargs)
+        self.apply(identity, state, uow, *args, **kwargs)  # execute the action itself
         super().execute(identity, uow, *args, **kwargs)
-        if isinstance(state.action, OARepoGenericActionMixin):
-            for component in self.components:
-                if hasattr(component, state.action.type_id):
-                    # Done like this to avoid breaking API changes.
-                    # uow should eventually be passed directly to the component
-                    # so service/component method signature matches.
-                    getattr(component, state.action.type_id)(identity, state, uow, *args, **kwargs)
+        for component in self.components:
+            if hasattr(component, self.type_id):
+                # TODO: invenio adds uow as attribute to the component with comment that
+                #  it's just to not break api changes
+                # and to eventually do it like this
+                # should be ok for us?
+                getattr(component, self.type_id)(identity, state, uow, *args, **kwargs)
 
     def execute(self, identity: Identity, uow: UnitOfWork, *args: Any, **kwargs: Any) -> None:
         """Execute the action."""
         request: Request = self.request
         request_type = request.type
         topic = request.topic.resolve()
-        # create a shared state between different actions to track changes in topic/requests etc.
         state: RequestActionState = RequestActionState(
             request=request,
             request_type=request_type,
