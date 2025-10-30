@@ -134,4 +134,4 @@ def test_redirect_url(
     ).json
 
     assert creator_edit_request_after_merge["expanded"]["payload"]["created_topic"]["links"] == {}
-    """
+"""

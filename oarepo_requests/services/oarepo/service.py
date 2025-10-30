@@ -114,7 +114,7 @@ class OARepoRequestsService(RequestsService):
 
         error = type_.can_create(identity, data, receiver, topic, creator) if hasattr(type_, "can_create") else None
 
-        # TODO: stubs do not allow receiver to be None even if I think invenio suggests it
+        # TODO: typing does not allow receiver to be None even though invenio code suggests it
         if not error:
             result = super().create(
                 identity=identity,

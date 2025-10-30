@@ -59,20 +59,19 @@ class OARepoRequestType(RequestType):
 
     allowed_receiver_ref_types = ReceiverRefTypes()  # type: ignore[reportAssignmentType]
 
-    @classproperty[bool]
+    @classproperty
     def has_form(cls) -> bool:  # noqa N805
         """Return whether the request type has a form."""
         return hasattr(cls, "form")
 
-    @classproperty[bool]
+    @classproperty
     def is_editable(cls) -> bool:  # noqa N805
         """Return whether the request type is editable."""
         if cls.editable is not None:
             return cls.editable
         return cls.has_form
 
-    # TODO: R06 classproperty issue
-    @classproperty[dict[str, RequestState]]
+    @classproperty
     def available_statuses(self) -> dict[str, RequestState]:  # type: ignore[reportIncompatibleVariableOverride]
         """Return available statuses for the request type.
 
@@ -84,11 +83,11 @@ class OARepoRequestType(RequestType):
     def _create_marshmallow_schema(cls) -> type[Schema]:
         """Create a marshmallow schema for this request type with required payload field."""
         schema = super()._create_marshmallow_schema()
-        # TODO: lint: idk why .fields
+        # TODO: idk why .fields
         if cls.payload_schema is not None and hasattr(schema, "fields") and "payload" in schema.fields:  # type: ignore[reportAttributeAccessIssue]
             schema.fields["payload"].required = True  # type: ignore[reportAttributeAccessIssue]
 
-        return cast("type[Schema]", schema)  # TODO: idk why it complains here
+        return cast("type[Schema]", schema)
 
     def can_create(
         self,
@@ -127,7 +126,6 @@ class OARepoRequestType(RequestType):
             current_requests_service.check_permission(identity, "create", record=topic, request_type=cls, **kwargs),
         )
 
-    # TODO: R06 classproperty issue
     @classproperty
     def available_actions(  # type: ignore[reportIncompatibleVariableOverride]
         self,
@@ -241,14 +239,12 @@ class OARepoRequestType(RequestType):
 class OARepoRecordRequestType(OARepoRequestType):
     """Base request type for OARepo requests that can be created on a record."""
 
-    # TODO: R08 __get__
     allowed_topic_ref_types = ModelRefTypes()  # type: ignore[reportAssignmentType]
 
     @classmethod
     def _allowed_by_publication_status(cls, record: Record) -> bool:
         if not hasattr(record, "publication_status"):
             return bool(cls.allowed_on_published)
-        # TODO: R08 protocol for .publication_status?/ or systemfields are untypable?
         return bool(
             (cls.allowed_on_draft and record.publication_status == "draft")  # type: ignore[reportAttributeAccessIssue]
             or (cls.allowed_on_published and record.publication_status == "published")  # type: ignore[reportAttributeAccessIssue]
@@ -274,7 +270,6 @@ class OARepoRecordRequestType(OARepoRequestType):
         :param args:            additional arguments
         :param kwargs:          additional keyword arguments
         """
-        # TODO: R03 - alternate way for allowing request on the basis of publication status
         if not self._allowed_by_publication_status(record=topic):
             raise PermissionDeniedError("create")
         super().can_create(identity, data, receiver, topic, creator, *args, **kwargs)

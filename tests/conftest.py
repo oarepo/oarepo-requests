@@ -254,6 +254,16 @@ class DefaultRequests(WorkflowRequestPolicy):
             ),
         ],
     )
+    publish_new_version = WorkflowRequest(
+        requesters=[IfInState("draft", [RecordOwners()])],
+        recipients=[UserGenerator("user2@example.org")],
+        transitions=WorkflowTransitions(
+            submitted="publishing",
+            accepted="published",
+            declined="draft",
+            cancelled="draft",
+        ),
+    )
     delete_published_record = WorkflowRequest(
         requesters=[IfInState("published", [RecordOwners()])],
         recipients=[UserGenerator("user2@example.org")],

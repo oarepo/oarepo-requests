@@ -1,3 +1,12 @@
+#
+# Copyright (c) 2025 CESNET z.s.p.o.
+#
+# This file is a part of oarepo-requests (see https://github.com/oarepo/oarepo-requests).
+#
+# oarepo-requests is free software; you can redistribute it and/or modify it
+# under the terms of the MIT License; see LICENSE file for more details.
+#
+
 """Components for request type and request expansion in record responses.
 
 This module provides service components that handle the expansion of request-related
@@ -9,15 +18,6 @@ information when records are retrieved. The components are used to:
 Both components work with the 'expand' parameter in record retrieval operations
 and add their data under the 'expanded' section of the response.
 """
-
-#
-# Copyright (c) 2025 CESNET z.s.p.o.
-#
-# This file is a part of oarepo-requests (see https://github.com/oarepo/oarepo-requests).
-#
-# oarepo-requests is free software; you can redistribute it and/or modify it
-# under the terms of the MIT License; see LICENSE file for more details.
-#
 
 from __future__ import annotations
 
