@@ -9,14 +9,11 @@
 
 from __future__ import annotations
 
-from dataclasses import dataclass
 from functools import cached_property
 from typing import TYPE_CHECKING, Any
 
 from invenio_i18n import _
-from invenio_records_resources.records import Record
 from invenio_requests.customizations import actions
-from invenio_requests.records.api import Request
 
 from oarepo_requests.proxies import current_oarepo_requests
 from oarepo_requests.services.permissions.identity import request_active
@@ -25,34 +22,13 @@ if TYPE_CHECKING:
     from flask_babel.speaklater import LazyString
     from flask_principal import Identity
     from invenio_db.uow import UnitOfWork
+    from invenio_records_resources.records import Record
     from invenio_requests.customizations import RequestAction
+    from invenio_requests.records.api import Request
 
     from oarepo_requests.actions.components import RequestActionComponent
 else:
     RequestAction = object
-
-from invenio_requests.customizations import RequestType
-
-
-@dataclass
-class RequestActionState:
-    """RequestActionState dataclass to update possibly changed record between actions steps."""
-
-    request: Request
-    request_type: RequestType
-    topic: Record
-    created_by: Any
-    action: RequestAction
-    created_topic: Record | None = None
-
-    def __post__init__(self):
-        """Assert correct types after initializing."""
-        if not isinstance(self.request, Request):
-            raise TypeError(f"self.request is not instance of Request, got {type(self.request)=}")
-        if not isinstance(self.request_type, RequestType):
-            raise TypeError(f"self.request_type is not instance of Request, got {type(self.request_type)=}")
-        if not isinstance(self.topic, Record):
-            raise TypeError(f"self.topic is not instance of Record, got {type(self.topic)=}")
 
 
 class OARepoGenericActionMixin(RequestAction):
@@ -73,7 +49,7 @@ class OARepoGenericActionMixin(RequestAction):
     def apply(
         self,
         identity: Identity,
-        state: RequestActionState,
+        topic: Record,
         uow: UnitOfWork,
         *args: Any,
         **kwargs: Any,
@@ -87,45 +63,23 @@ class OARepoGenericActionMixin(RequestAction):
         """Return a list of components for this action."""
         return [component_cls() for component_cls in current_oarepo_requests.action_components()]
 
-    def execute_with_components(
-        self,
-        identity: Identity,
-        state: RequestActionState,
-        uow: UnitOfWork,
-        *args: Any,
-        **kwargs: Any,
-    ) -> None:
-        """Execute the action with components."""
-        self.apply(identity, state, uow, *args, **kwargs)  # execute the action itself
-        super().execute(identity, uow, *args, **kwargs)
-        for component in self.components:
-            if hasattr(component, self.type_id):
-                # TODO: invenio adds uow as attribute to the component with comment that
-                #  it's just to not break api changes
-                # and to eventually do it like this
-                # should be ok for us?
-                getattr(component, self.type_id)(identity, state, uow, *args, **kwargs)
-
     def execute(self, identity: Identity, uow: UnitOfWork, *args: Any, **kwargs: Any) -> None:
         """Execute the action."""
         request: Request = self.request
-        request_type = request.type
         topic = request.topic.resolve()
-        state: RequestActionState = RequestActionState(
-            request=request,
-            request_type=request_type,
-            topic=topic,
-            created_by=request.created_by,
-            action=self,
-        )
-        identity.provides.add(request_active)
+        was_request_active = request_active in identity.provides
+        if not was_request_active:
+            identity.provides.add(request_active)
         try:
-            self.execute_with_components(
-                identity, state, uow, *args, **kwargs
-            )  # this can be called only once even in case of cascading actions due to request_active need management
+            self.apply(identity, topic, uow, *args, **kwargs)  # execute the action itself
+            super().execute(identity, uow, *args, **kwargs)
+            for component in self.components:
+                if hasattr(component, self.type_id):
+                    getattr(component, self.type_id)(identity, request, topic, self, uow, *args, **kwargs)
         finally:
             # in case we are not running the actions in isolated state
-            identity.provides.remove(request_active)
+            if not was_request_active:
+                identity.provides.remove(request_active)
 
 
 class OARepoSubmitAction(OARepoGenericActionMixin, actions.SubmitAction):

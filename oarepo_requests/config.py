@@ -10,7 +10,6 @@
 from __future__ import annotations
 
 import invenio_requests.config
-import oarepo_workflows  # noqa
 from invenio_notifications.backends.email import EmailNotificationBackend
 from invenio_requests.customizations import CommentEventType, LogEventType
 from invenio_requests.services.permissions import (
@@ -20,7 +19,6 @@ from oarepo_workflows.requests.events import WorkflowEvent
 
 from oarepo_requests.actions.components import (
     AutoAcceptComponent,
-    CreatedTopicComponent,
     RequestActionComponent,
     WorkflowTransitionComponent,
 )
@@ -49,12 +47,9 @@ DEFAULT_WORKFLOW_EVENTS = {
 }
 
 REQUESTS_ACTION_COMPONENTS: tuple[type[RequestActionComponent], ...] = (
-    AutoAcceptComponent,
-    CreatedTopicComponent,
     WorkflowTransitionComponent,
+    AutoAcceptComponent,
 )
-
-# TODO: notifications config
 
 SNAPSHOT_CLEANUP_DAYS = 365
 
