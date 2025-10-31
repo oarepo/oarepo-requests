@@ -15,8 +15,6 @@ from typing import TYPE_CHECKING, cast
 import importlib_metadata
 from invenio_base.utils import obj_or_import_string
 
-from oarepo_requests.cli import oarepo_requests  # noqa
-
 if TYPE_CHECKING:
     from collections.abc import Callable
 
@@ -155,10 +153,10 @@ def finalize_app(app: Flask) -> None:
     """Finalize app."""
     from invenio_requests.proxies import current_event_type_registry
 
-    # Register services - cannot be done in extension because
-    # Invenio-Records-Resources might not have been initialized.
+    # TODO: unified protocol for <config loading creates race condition with initialization> situations
+    # initial config + entrypoints / just entrypoints (entrypoints not always available + worse customizability)
+    # otherwise collecting config + finalize_app hacks?
 
-    app.extensions["oarepo-requests"]
-
+    # we can use entrypoints here; leaving as reminder to decide
     for type_ in app.config["REQUESTS_REGISTERED_EVENT_TYPES"]:
         current_event_type_registry.register_type(type_)
