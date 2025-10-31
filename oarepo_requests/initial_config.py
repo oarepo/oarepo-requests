@@ -33,9 +33,6 @@ from oarepo_requests.notifications.generators import (
     MultipleRecipientsEmailRecipients,
     UserEmailRecipient,
 )
-from oarepo_requests.resolvers.user_notification_resolver import UserNotificationResolver
-from oarepo_requests.resources.oarepo.config import OARepoRequestsResourceConfig
-from oarepo_requests.resources.oarepo.resource import OARepoRequestsResource
 from oarepo_requests.notifications.user_notification_resolver import UserNotificationResolver
 from oarepo_requests.resources.oarepo.config import OARepoRequestsResourceConfig
 from oarepo_requests.resources.oarepo.resource import OARepoRequestsResource
@@ -75,6 +72,3 @@ NOTIFICATIONS_BUILDERS = {
     PublishDraftRequestDeclineNotificationBuilder.type: PublishDraftRequestDeclineNotificationBuilder,
     CommentRequestEventCreateNotificationBuilder.type: CommentRequestEventCreateNotificationBuilder,
 }
-
-REQUESTS_RESOURCE_CLASS = OARepoRequestsResource
-REQUESTS_RESOURCE_CONFIG_CLASS = OARepoRequestsResourceConfig

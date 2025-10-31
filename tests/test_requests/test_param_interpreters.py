@@ -31,7 +31,6 @@ def _init(users, logged_client, draft_factory, submit_request, urls) -> tuple[Lo
     return user1_client, user2_client
 
 
-
 def test_receiver_param_interpreter(
     logged_client,
     users,
@@ -47,7 +46,6 @@ def test_receiver_param_interpreter(
     assert len(search_receiver_only.json["hits"]["hits"]) == 1
     assert search_receiver_only.json["hits"]["hits"][0]["receiver"] == {"user": str(users[1].id)}
     assert search_receiver_only.json["hits"]["hits"][0]["type"] == "publish_draft"
-
 
 
 def test_owner_param_interpreter(
@@ -78,7 +76,6 @@ def test_owner_param_interpreter(
     search_user1_only = user1_client.get(f"{urls['BASE_URL_REQUESTS']}?all=true")
     for hit in search_user1_only.json["hits"]["hits"]:
         assert hit["created_by"] == {"user": user1_id} or hit["receiver"] == {"user": user1_id}
-
 
 
 def test_open_param_interpreter(
