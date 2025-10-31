@@ -46,9 +46,5 @@ class RequestsServiceConfigPreset(Preset):
         )
         yield AddToDictionary(
             "record_links_item",
-            {
-                "applicable-requests": RefEndpointLink(
-                    "requests.applicable_request_types", ref_querystring="topic"
-                )
-            },
+            {"applicable-requests": RefEndpointLink("requests.applicable_request_types", ref_querystring="topic")},
         )

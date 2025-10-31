@@ -17,7 +17,8 @@ from flask import Blueprint
 if TYPE_CHECKING:
     from flask import Flask
 
-def create_notifications(app: Flask) -> Blueprint:
+
+def create_notifications(app: Flask) -> Blueprint:  # noqa ARG001
     """Register blueprint routes on app."""
     return Blueprint(
         "oarepo_notifications",
