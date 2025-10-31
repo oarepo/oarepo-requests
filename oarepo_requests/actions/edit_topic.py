@@ -12,30 +12,26 @@ from __future__ import annotations
 from typing import TYPE_CHECKING, Any, override
 
 from ..utils import get_draft_record_service
-from .components import CreatedTopicComponent
 from .generic import OARepoAcceptAction
 
 if TYPE_CHECKING:
     from flask_principal import Identity
     from invenio_db.uow import UnitOfWork
-
-    from .components import RequestActionState
+    from invenio_records_resources.records import Record
 
 
 # TODO: snapshot
 class EditTopicAcceptAction(OARepoAcceptAction):
     """Accept creation of a draft of a published record for editing metadata."""
 
-    action_components = (CreatedTopicComponent,)
-
     @override
     def apply(
         self,
         identity: Identity,
-        state: RequestActionState,
+        topic: Record,
         uow: UnitOfWork,
         *args: Any,
         **kwargs: Any,
     ) -> None:
-        topic_service = get_draft_record_service(state.topic)
-        topic_service.edit(identity, state.topic["id"], uow=uow)
+        topic_service = get_draft_record_service(topic)
+        topic_service.edit(identity, topic["id"], uow=uow)

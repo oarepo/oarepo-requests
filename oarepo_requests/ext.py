@@ -145,8 +145,6 @@ class OARepoRequests:
             if event_type not in app_registered_event_types:
                 app_registered_event_types.append(event_type)
 
-        # TODO: notifications config
-
 
 def api_finalize_app(app: Flask) -> None:
     """Finalize app."""

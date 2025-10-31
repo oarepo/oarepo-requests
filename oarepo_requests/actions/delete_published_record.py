@@ -15,6 +15,7 @@ from .generic import OARepoAcceptAction, OARepoDeclineAction
 
 if TYPE_CHECKING:
     from flask_principal import Identity
+    from invenio_records_resources.records import Record
 
 from typing import TYPE_CHECKING
 
@@ -31,8 +32,6 @@ if TYPE_CHECKING:
     from invenio_db.uow import UnitOfWork
     from invenio_rdm_records.services.services import RDMRecordService
 
-    from .components import RequestActionState
-
 
 class DeletePublishedRecordAcceptAction(OARepoAcceptAction):
     """Accept request for deletion of a published record and delete the record."""
@@ -43,14 +42,14 @@ class DeletePublishedRecordAcceptAction(OARepoAcceptAction):
     def apply(
         self,
         identity: Identity,
-        state: RequestActionState,
+        topic: Record,
         uow: UnitOfWork,
         *args: Any,
         **kwargs: Any,
     ) -> None:
-        topic_service = current_runtime.get_record_service_for_record(state.topic)
+        topic_service = current_runtime.get_record_service_for_record(topic)
         if not topic_service:
-            raise KeyError(f"topic {state.topic} service not found")
+            raise KeyError(f"topic {topic} service not found")
         if hasattr(topic_service, "delete_record"):
             topic_service = cast("RDMRecordService", topic_service)
             from flask import current_app
@@ -61,7 +60,7 @@ class DeletePublishedRecordAcceptAction(OARepoAcceptAction):
             citation_text = "Citation unavailable."
             if resource_config and "text/x-iso-690+plain" in resource_config.response_handlers:
                 citation_text = resource_config.response_handlers["text/x-iso-690+plain"].serializer.serialize_object(
-                    state.topic
+                    topic
                 )
 
             data = {
@@ -70,11 +69,10 @@ class DeletePublishedRecordAcceptAction(OARepoAcceptAction):
                 "note": self.request["payload"].get("note", ""),
                 "is_visible": True,
             }
-            deleted_topic = topic_service.delete_record(identity, state.topic["id"], data)._record  # noqa SLF001
+            deleted_topic = topic_service.delete_record(identity, topic["id"], data)._record  # noqa SLF001
             db.session.commit()
-            state.topic = deleted_topic
         else:
-            topic_service.delete(identity, state.topic["id"], *args, uow=uow, **kwargs)
+            topic_service.delete(identity, topic["id"], *args, uow=uow, **kwargs)
 
         # TODO: notifications, cascade cancel?
 

@@ -19,8 +19,7 @@ from ..utils import get_draft_record_service
 if TYPE_CHECKING:
     from flask_principal import Identity
     from invenio_db.uow import UnitOfWork
-
-    from .components import RequestActionState
+    from invenio_records_resources.records import Record
 
 
 from .publish_draft import PublishDraftAcceptAction
@@ -35,13 +34,13 @@ class PublishNewVersionAcceptAction(PublishDraftAcceptAction):
     def apply(
         self,
         identity: Identity,
-        state: RequestActionState,
+        topic: Record,
         uow: UnitOfWork,
         *args: Any,
         **kwargs: Any,
     ) -> None:
-        topic_service = get_draft_record_service(state.topic)
+        topic_service = get_draft_record_service(topic)
 
         if "payload" in self.request and "version" in self.request["payload"]:
-            state.topic.metadata["version"] = self.request["payload"]["version"]
-            uow.register(RecordCommitOp(state.topic, indexer=topic_service.indexer))
+            topic.metadata["version"] = self.request["payload"]["version"]
+            uow.register(RecordCommitOp(topic, indexer=topic_service.indexer))
