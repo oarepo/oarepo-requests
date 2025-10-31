@@ -45,11 +45,6 @@ def test_resolve_topic(
     assert resp.status_code == 200
     assert resp.json["expanded"]["topic"] == {
         "id": record1_id,
-        "metadata": {
-            "contributors": ["Contributor 1"],
-            "creators": ["Creator 1", "Creator 2"],
-            "title": "blabla",
-        },
         "links": {
             "latest_html": f"https://127.0.0.1:5000/api/test-requests/records/{record1_id}/latest",
             "self": f"https://127.0.0.1:5000/api/requests-test/{record1_id}",
@@ -74,7 +69,6 @@ def test_resolve_topic(
     assert resp_expanded.status_code == 200
     assert resp_expanded.json["topic"] == {"requests_test": record1_id}
     assert resp_expanded.json["expanded"]["topic"] == {
-        "id": record1_id,  # TODO: ask - should id be shown?
+        "id": record1_id,
         "links": {},
-        "metadata": {"title": "Deleted record"},
     }
