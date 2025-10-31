@@ -37,11 +37,15 @@ from oarepo_requests.resolvers.user_notification_resolver import UserNotificatio
 from oarepo_requests.resources.oarepo.config import OARepoRequestsResourceConfig
 from oarepo_requests.resources.oarepo.resource import OARepoRequestsResource
 from oarepo_requests.notifications.user_notification_resolver import UserNotificationResolver
+from oarepo_requests.resources.oarepo.config import OARepoRequestsResourceConfig
+from oarepo_requests.resources.oarepo.resource import OARepoRequestsResource
 from oarepo_requests.services.oarepo.config import OARepoRequestsServiceConfig
 from oarepo_requests.services.oarepo.service import OARepoRequestsService
 
 REQUESTS_SERVICE_CLASS = OARepoRequestsService
 REQUESTS_SERVICE_CONFIG_CLASS = OARepoRequestsServiceConfig
+REQUESTS_RESOURCE_CLASS = OARepoRequestsResource
+REQUESTS_RESOURCE_CONFIG_CLASS = OARepoRequestsResourceConfig
 
 
 NOTIFICATION_RECIPIENTS_RESOLVERS = {
