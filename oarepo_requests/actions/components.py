@@ -13,6 +13,7 @@ import logging
 from typing import TYPE_CHECKING, Any, override
 
 from invenio_requests.customizations import RequestActions
+from invenio_requests.errors import CannotExecuteActionError
 
 if TYPE_CHECKING:
     from flask_principal import Identity
@@ -282,4 +283,6 @@ class AutoAcceptComponent(RequestActionComponent):
             return
 
         action_obj = RequestActions.get_action(request, "accept")
+        if not action_obj.can_execute():
+            raise CannotExecuteActionError("accept")
         action_obj.execute(identity, uow, *args, **kwargs)

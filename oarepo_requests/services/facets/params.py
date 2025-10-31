@@ -28,6 +28,7 @@ if TYPE_CHECKING:
 class RequestOwnerFilterParam(FilterParam):
     """Filter requests by owner."""
 
+    # params have to be dict; support for pop operation required
     @override
     def apply(self, identity: Identity, search: RecordsSearchV2, params: dict[str, str]) -> RecordsSearchV2:  # type: ignore[reportIncompatibleMethodOverride]
         """Apply the filter to the search."""

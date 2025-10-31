@@ -72,7 +72,7 @@ class OARepoRequestType(RequestType):
         return cls.has_form
 
     @classproperty
-    def available_statuses(self) -> dict[str, RequestState]:  # type: ignore[reportIncompatibleVariableOverride]
+    def available_statuses(cls) -> dict[str, RequestState]:  # type: ignore[reportIncompatibleVariableOverride] # noqa N805
         """Return available statuses for the request type.
 
         The status (open, closed, undefined) are used for request filtering.
