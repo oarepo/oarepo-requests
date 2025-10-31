@@ -16,10 +16,6 @@ import importlib_metadata
 from invenio_base.utils import obj_or_import_string
 
 from oarepo_requests.cli import oarepo_requests  # noqa
-from oarepo_requests.resources.oarepo.config import OARepoRequestsResourceConfig
-from oarepo_requests.resources.oarepo.resource import OARepoRequestsResource
-from oarepo_requests.services.oarepo.config import OARepoRequestsServiceConfig
-from oarepo_requests.services.oarepo.service import OARepoRequestsService
 
 if TYPE_CHECKING:
     from collections.abc import Callable
@@ -44,7 +40,6 @@ class OARepoRequests:
         """Flask application initialization."""
         self.app = app
         self.init_config(app)
-        self.init_resources(app)
         app.extensions["oarepo-requests"] = self
 
     @property
@@ -118,21 +113,6 @@ class OARepoRequests:
             if mapping_result:
                 flattened_ret += mapping_result
         return flattened_ret
-
-    def init_resources(self, app: Flask) -> None:
-        """Init resources."""
-        # TODO: import invenio - reference the service instead of initializing it again if possible
-
-        self.requests_resource = OARepoRequestsResource(
-            service=obj_or_import_string(app.config.get("REQUESTS_SERVICE_CLASS", OARepoRequestsService))(  # type: ignore[reportOptionalCall]
-                obj_or_import_string(
-                    app.config.get("REQUESTS_SERVICE_CLASS_CONFIG", OARepoRequestsServiceConfig)
-                ).build(app)  # type: ignore[reportOptionalMemberAccess]
-            ),
-            config=OARepoRequestsResourceConfig.build(app),
-        )
-
-        # TODO: event resource
 
     def action_components(self) -> list[type[RequestActionComponent]]:
         """Return components for the given action."""

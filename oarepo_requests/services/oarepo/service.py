@@ -139,6 +139,6 @@ class OARepoRequestsService(RequestsService):
             service=self,
             identity=identity,
             results=list(allowed_request_types.values()),
-            links_tpl=LinksTemplate({"self": EndpointLink("oarepo_requests.applicable_request_types")}),
+            links_tpl=LinksTemplate({"self": EndpointLink("requests.applicable_request_types")}),
             record=topic,
         )
