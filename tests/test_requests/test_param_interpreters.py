@@ -9,8 +9,6 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
-import pytest
-
 if TYPE_CHECKING:
     from pytest_oarepo.fixtures import LoggedClient
 
@@ -33,7 +31,6 @@ def _init(users, logged_client, draft_factory, submit_request, urls) -> tuple[Lo
     return user1_client, user2_client
 
 
-@pytest.mark.skip
 def test_receiver_param_interpreter(
     logged_client,
     users,
@@ -51,7 +48,6 @@ def test_receiver_param_interpreter(
     assert search_receiver_only.json["hits"]["hits"][0]["type"] == "publish_draft"
 
 
-@pytest.mark.skip
 def test_owner_param_interpreter(
     logged_client,
     users,
@@ -82,7 +78,6 @@ def test_owner_param_interpreter(
         assert hit["created_by"] == {"user": user1_id} or hit["receiver"] == {"user": user1_id}
 
 
-@pytest.mark.skip
 def test_open_param_interpreter(
     logged_client,
     users,
