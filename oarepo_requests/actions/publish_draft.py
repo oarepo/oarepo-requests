@@ -27,9 +27,8 @@ from .generic import (
 if TYPE_CHECKING:
     from flask_principal import Identity
     from invenio_db.uow import UnitOfWork
+    from invenio_records_resources.records import Record
     from invenio_requests.customizations import RequestAction
-
-    from .components import RequestActionState
 else:
     RequestAction = object
 
@@ -60,21 +59,21 @@ class PublishDraftSubmitAction(PublishMixin, OARepoSubmitAction):
     def apply(
         self,
         identity: Identity,
-        state: RequestActionState,
+        topic: Record,
         uow: UnitOfWork,
         *args: Any,
         **kwargs: Any,
     ) -> None:
         if "payload" in self.request and "version" in self.request["payload"]:
-            topic_service = get_draft_record_service(state.topic)
-            versions = topic_service.search_versions(identity, state.topic.pid.pid_value)
+            topic_service = get_draft_record_service(topic)
+            versions = topic_service.search_versions(identity, topic.pid.pid_value)
             versions_hits = versions.to_dict()["hits"]["hits"]
             for rec in versions_hits:
                 if "version" in rec["metadata"]:
                     version = rec["metadata"]["version"]
                     if version == self.request["payload"]["version"]:
                         raise VersionAlreadyExists
-            state.topic.metadata["version"] = self.request["payload"]["version"]
+            topic.metadata["version"] = self.request["payload"]["version"]
         # TODO: notification
 
 
@@ -87,13 +86,13 @@ class PublishDraftAcceptAction(PublishMixin, OARepoAcceptAction):
     def apply(
         self,
         identity: Identity,
-        state: RequestActionState,
+        topic: Record,
         uow: UnitOfWork,
         *args: Any,
         **kwargs: Any,
     ) -> None:
-        topic_service = get_draft_record_service(state.topic)
-        requests = search_requests(system_identity, state.topic)
+        topic_service = get_draft_record_service(topic)
+        requests = search_requests(system_identity, topic)
 
         for result in requests._results:  # noqa SLF001
             if (
@@ -113,11 +112,9 @@ class PublishDraftAcceptAction(PublishMixin, OARepoAcceptAction):
                 # note: we can not use solely the result.is_open because changes may not be committed yet
                 # to opensearch index. That's why we need to get the record from DB and re-check.
                 raise UnresolvedRequestsError(action=str(self.name))
-        id_ = state.topic["id"]
+        id_ = topic["id"]
 
-        published_topic = topic_service.publish(identity, id_, *args, uow=uow, expand=False, **kwargs)
-        state.created_topic = published_topic._record  # noqa SLF001
-        state.topic = published_topic._record  # noqa SLF001
+        topic_service.publish(identity, id_, *args, uow=uow, expand=False, **kwargs)
         # TODO: notification
 
 

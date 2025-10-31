@@ -10,20 +10,17 @@
 from __future__ import annotations
 
 import logging
-from typing import TYPE_CHECKING, Any, cast, override
+from typing import TYPE_CHECKING, Any, override
 
 from invenio_requests.customizations import RequestActions
-from invenio_requests.errors import CannotExecuteActionError
-from invenio_requests.records.api import Request
-
-from ..utils import ref_to_str, reference_entity
-from .generic import OARepoGenericActionMixin, RequestActionState
 
 if TYPE_CHECKING:
-    from uuid import UUID
-
     from flask_principal import Identity
     from invenio_db.uow import UnitOfWork
+    from invenio_records_resources.records import Record
+    from invenio_requests.records.api import Request
+
+    from .generic import OARepoGenericActionMixin
 
 log = logging.getLogger(__name__)
 
@@ -34,7 +31,9 @@ class RequestActionComponent:
     def create(
         self,
         identity: Identity,
-        state: RequestActionState,
+        request: Request,
+        topic: Record,
+        action: OARepoGenericActionMixin,
         uow: UnitOfWork,
         *args: Any,
         **kwargs: Any,
@@ -53,7 +52,9 @@ class RequestActionComponent:
     def submit(
         self,
         identity: Identity,
-        state: RequestActionState,
+        request: Request,
+        topic: Record,
+        action: OARepoGenericActionMixin,
         uow: UnitOfWork,
         *args: Any,
         **kwargs: Any,
@@ -72,7 +73,9 @@ class RequestActionComponent:
     def accept(
         self,
         identity: Identity,
-        state: RequestActionState,
+        request: Request,
+        topic: Record,
+        action: OARepoGenericActionMixin,
         uow: UnitOfWork,
         *args: Any,
         **kwargs: Any,
@@ -91,7 +94,9 @@ class RequestActionComponent:
     def decline(
         self,
         identity: Identity,
-        state: RequestActionState,
+        request: Request,
+        topic: Record,
+        action: OARepoGenericActionMixin,
         uow: UnitOfWork,
         *args: Any,
         **kwargs: Any,
@@ -110,7 +115,9 @@ class RequestActionComponent:
     def cancel(
         self,
         identity: Identity,
-        state: RequestActionState,
+        request: Request,
+        topic: Record,
+        action: OARepoGenericActionMixin,
         uow: UnitOfWork,
         *args: Any,
         **kwargs: Any,
@@ -129,7 +136,9 @@ class RequestActionComponent:
     def expire(
         self,
         identity: Identity,
-        state: RequestActionState,
+        request: Request,
+        topic: Record,
+        action: OARepoGenericActionMixin,
         uow: UnitOfWork,
         *args: Any,
         **kwargs: Any,
@@ -154,19 +163,19 @@ class WorkflowTransitionComponent(RequestActionComponent):
     to the target state.
     """
 
-    def _workflow_transition(self, identity: Identity, state: RequestActionState, uow: UnitOfWork) -> None:
+    def _workflow_transition(
+        self, identity: Identity, request: Request, topic: Record, action: OARepoGenericActionMixin, uow: UnitOfWork
+    ) -> None:
         from oarepo_workflows.proxies import current_oarepo_workflows
 
-        transitions = (
-            current_oarepo_workflows.get_workflow(state.topic).requests()[state.request_type.type_id].transitions
-        )
-        target_state = transitions[state.action.status_to]
-        if target_state and not state.topic.is_deleted:  # commit doesn't work on deleted record?
+        transitions = current_oarepo_workflows.get_workflow(topic).requests()[request.type.type_id].transitions
+        target_state = transitions[action.status_to]
+        if target_state and not topic.is_deleted:  # commit doesn't work on deleted record?
             current_oarepo_workflows.set_state(
                 identity,
-                state.topic,
+                topic,
                 target_state,
-                request=state.request,
+                request=request,
                 uow=uow,
             )
 
@@ -174,146 +183,103 @@ class WorkflowTransitionComponent(RequestActionComponent):
     def create(
         self,
         identity: Identity,
-        state: RequestActionState,
+        request: Request,
+        topic: Record,
+        action: OARepoGenericActionMixin,
         uow: UnitOfWork,
         *args: Any,
         **kwargs: Any,
     ) -> None:
-        self._workflow_transition(identity, state, uow)
+        self._workflow_transition(identity, request, topic, action, uow)
 
     @override
     def submit(
         self,
         identity: Identity,
-        state: RequestActionState,
+        request: Request,
+        topic: Record,
+        action: OARepoGenericActionMixin,
         uow: UnitOfWork,
         *args: Any,
         **kwargs: Any,
     ) -> None:
-        self._workflow_transition(identity, state, uow)
+        self._workflow_transition(identity, request, topic, action, uow)
 
     @override
     def accept(
         self,
         identity: Identity,
-        state: RequestActionState,
+        request: Request,
+        topic: Record,
+        action: OARepoGenericActionMixin,
         uow: UnitOfWork,
         *args: Any,
         **kwargs: Any,
     ) -> None:
-        self._workflow_transition(identity, state, uow)
+        self._workflow_transition(identity, request, topic, action, uow)
 
     @override
     def decline(
         self,
         identity: Identity,
-        state: RequestActionState,
+        request: Request,
+        topic: Record,
+        action: OARepoGenericActionMixin,
         uow: UnitOfWork,
         *args: Any,
         **kwargs: Any,
     ) -> None:
-        self._workflow_transition(identity, state, uow)
+        self._workflow_transition(identity, request, topic, action, uow)
 
     @override
     def cancel(
         self,
         identity: Identity,
-        state: RequestActionState,
+        request: Request,
+        topic: Record,
+        action: OARepoGenericActionMixin,
         uow: UnitOfWork,
         *args: Any,
         **kwargs: Any,
     ) -> None:
-        self._workflow_transition(identity, state, uow)
+        self._workflow_transition(identity, request, topic, action, uow)
 
     @override
     def expire(
         self,
         identity: Identity,
-        state: RequestActionState,
+        request: Request,
+        topic: Record,
+        action: OARepoGenericActionMixin,
         uow: UnitOfWork,
         *args: Any,
         **kwargs: Any,
     ) -> None:
-        self._workflow_transition(identity, state, uow)
-
-
-class CreatedTopicComponent(RequestActionComponent):
-    """A component that saves new topic created within the request on payload."""
-
-    @override
-    def accept(
-        self,
-        identity: Identity,
-        state: RequestActionState,
-        uow: UnitOfWork,
-        *args: Any,
-        **kwargs: Any,
-    ) -> None:
-        """Apply the action to the topic."""
-        if not state.created_topic:
-            return
-        entity_ref = reference_entity(state.created_topic)
-        request: Request = state.request
-        if "payload" not in request:
-            request["payload"] = {}
-        request["payload"]["created_topic"] = ref_to_str(entity_ref)
-        return
+        self._workflow_transition(identity, request, topic, action, uow)
 
 
 class AutoAcceptComponent(RequestActionComponent):
-    """A component that auto-accepts the request if the receiver has auto-approve enabled."""
+    """A component that auto-accepts the request if the receiver has auto-approve enabled.
+
+    IMPORTANT: This component should only be used on the end.
+    """
 
     @override
     def submit(
         self,
         identity: Identity,
-        state: RequestActionState,
+        request: Request,
+        topic: Record,
+        action: OARepoGenericActionMixin,
         uow: UnitOfWork,
         *args: Any,
         **kwargs: Any,
     ) -> None:
-        request: Request = state.request
         if request.status != "submitted":
             return
-        receiver_ref = state.request.receiver  # this is <x>proxy, not dict
+        receiver_ref = request.receiver  # this is <x>proxy, not dict
         if not receiver_ref.reference_dict.get("auto_approve"):
             return
 
-        """
-        # i suppose this idea won't work because execute_action creates new instance of request
-        # and after that we have no simple way to change the request that's commited in the original submit action
-
-        uow.register(RecordCommitOp(request, indexer=current_requests_service.indexer))
-        request_item = current_requests_service.execute_action(identity, id_=str(request.id), action="accept", uow=uow)
-        identity.provides.add(request_active)
-        state.action.request = request_item._obj
-        """
-
         action_obj = RequestActions.get_action(request, "accept")
-
-        # TODO: if something crashes here, what behavior to expect?
-        if not action_obj.can_execute():  # this is only supposed to check correct transition states per invenio
-            raise CannotExecuteActionError("accept")
-        if isinstance(action_obj, OARepoGenericActionMixin):
-            # it is our action, just execute with components right away
-            current_action_obj = state.action
-            state.action = action_obj
-            # TODO: if something crashes here, what behavior to expect?
-            # rollback both the submit and accept or just accept - supposing both and the program crashes on execute?
-            # should be tested
-            # raise specific error?
-            try:
-                action_obj.execute_with_components(*args, identity, state, uow, **kwargs)
-            finally:
-                state.action = current_action_obj
-        else:
-            # TODO: consider whether state is necessary and request_identity add in generic; could be simpler?
-            action_obj.execute(identity, uow, *args, **kwargs)
-            # we dont know if request/topic was changed, retrieve actual data
-            new_request: Request = Request.get_record(cast("UUID", request.id))
-            state.request = new_request
-            try:
-                new_topic = new_request.topic.resolve()
-                state.topic = new_topic
-            except Exception:
-                log.exception("Exception while resolving topic")
+        action_obj.execute(identity, uow, *args, **kwargs)
