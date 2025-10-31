@@ -8,14 +8,14 @@
 """API views."""
 
 from __future__ import annotations
+
 from pathlib import Path
 from typing import TYPE_CHECKING
 
+from flask import Blueprint
+
 if TYPE_CHECKING:
-    from flask import Blueprint, Flask
-
-
-
+    from flask import Flask
 
 
 def create_notifications(app: Flask) -> Blueprint:  # noqa ARG001
