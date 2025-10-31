@@ -70,7 +70,7 @@ class OARepoRequestsService(RequestsService):
         uow: UnitOfWork,
         expand: bool = False,
         **kwargs: Any,
-    ) -> RequestItem | None:
+    ) -> RequestItem:
         """Create a request.
 
         :param identity: Identity of the user creating the request.
@@ -111,24 +111,22 @@ class OARepoRequestsService(RequestsService):
                 request_payload_errors=errors,
                 code=400,
             )
-
-        error = type_.can_create(identity, data, receiver, topic, creator) if hasattr(type_, "can_create") else None
-
+        if hasattr(type_, "can_create"):
+            # raise exception if can't
+            type_.can_create(identity, data, receiver, topic, creator)
         # TODO: typing does not allow receiver to be None even though invenio code suggests it
-        if not error:
-            result = super().create(
-                identity=identity,
-                data=data,
-                request_type=type_,
-                receiver=receiver,  # type: ignore[reportArgumentType]
-                creator=creator,
-                topic=topic,
-                expand=expand,
-                uow=uow,
-            )
-            uow.register(IndexRefreshOp(indexer=self.indexer, index=self.record_cls.index))  # type: ignore[reportArgumentType]
-            return result
-        return None
+        result = super().create(
+            identity=identity,
+            data=data,
+            request_type=type_,
+            receiver=receiver,  # type: ignore[reportArgumentType]
+            creator=creator,
+            topic=topic,
+            expand=expand,
+            uow=uow,
+        )
+        uow.register(IndexRefreshOp(indexer=self.indexer, index=self.record_cls.index))  # type: ignore[reportArgumentType]
+        return result
 
     def applicable_request_types(self, identity: Identity, topic: Record | dict[str, str]) -> RequestTypesList:
         """Get applicable request types for a record."""
