@@ -29,10 +29,8 @@ if TYPE_CHECKING:
 
 
 class OARepoRequestsResourceConfig(RequestsResourceConfig, ConfiguratorMixin):
-    """Config for the extended requests API."""
+    """Config for the oarepo requests API."""
 
-    blueprint_name = "oarepo_requests"
-    url_prefix = "/requests"
     routes: Mapping[str, str] = {
         **RequestsResourceConfig.routes,
         "list-args": "/<topic>/<request_type>",
