@@ -44,7 +44,7 @@ class OARepoRequestsResource(RequestsResource, ErrorHandlersMixin):
             route("POST", p(routes["list"]), self.create),
             route("POST", p(routes["create"]), self.create_via_url),
             route("GET", p(routes["list-applicable"]), self.applicable_request_types),
-        ]
+        ] + super().create_url_rules()
 
     @request_extra_args
     @request_headers
