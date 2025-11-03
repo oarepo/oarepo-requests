@@ -27,7 +27,11 @@ log = logging.getLogger(__name__)
 
 
 class RequestActionComponent:
-    """Abstract request action component."""
+    """Abstract request action component.
+
+    Implementation warning: calling actions reloading and recommiting request or topic (eg. topic publish) within
+    components may cause incorrect behavior due to the fact that changes on the new (reloaded) instance do not
+    propagate to commit ops in the stack below."""
 
     def create(
         self,
@@ -171,7 +175,7 @@ class WorkflowTransitionComponent(RequestActionComponent):
 
         transitions = current_oarepo_workflows.get_workflow(topic).requests()[request.type.type_id].transitions
         target_state = transitions[action.status_to]
-        if target_state and not topic.is_deleted:  # commit doesn't work on deleted record?
+        if target_state and not topic.is_deleted:
             current_oarepo_workflows.set_state(
                 identity,
                 topic,

@@ -63,7 +63,7 @@ class PublishDraftSubmitAction(PublishMixin, OARepoSubmitAction):
         uow: UnitOfWork,
         *args: Any,
         **kwargs: Any,
-    ) -> None:
+    ) -> Record:
         if "payload" in self.request and "version" in self.request["payload"]:
             topic_service = get_draft_record_service(topic)
             versions = topic_service.search_versions(identity, topic.pid.pid_value)
@@ -74,6 +74,7 @@ class PublishDraftSubmitAction(PublishMixin, OARepoSubmitAction):
                     if version == self.request["payload"]["version"]:
                         raise VersionAlreadyExists
             topic.metadata["version"] = self.request["payload"]["version"]
+        return topic
         # TODO: notification
 
 
@@ -90,7 +91,7 @@ class PublishDraftAcceptAction(PublishMixin, OARepoAcceptAction):
         uow: UnitOfWork,
         *args: Any,
         **kwargs: Any,
-    ) -> None:
+    ) -> Record:
         topic_service = get_draft_record_service(topic)
         requests = search_requests(system_identity, topic)
 
@@ -114,7 +115,7 @@ class PublishDraftAcceptAction(PublishMixin, OARepoAcceptAction):
                 raise UnresolvedRequestsError(action=str(self.name))
         id_ = topic["id"]
 
-        topic_service.publish(identity, id_, *args, uow=uow, expand=False, **kwargs)
+        return topic_service.publish(identity, id_, *args, uow=uow, expand=False, **kwargs)._record  # noqa SLF001
         # TODO: notification
 
 

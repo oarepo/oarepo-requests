@@ -32,6 +32,6 @@ class EditTopicAcceptAction(OARepoAcceptAction):
         uow: UnitOfWork,
         *args: Any,
         **kwargs: Any,
-    ) -> None:
+    ) -> Record:
         topic_service = get_draft_record_service(topic)
-        topic_service.edit(identity, topic["id"], uow=uow)
+        return topic_service.edit(identity, topic["id"], uow=uow)._record  # noqa SLF001
