@@ -48,13 +48,14 @@ class OARepoGenericActionMixin(RequestAction):
 
     def apply(
         self,
-        identity: Identity,
+        identity: Identity,  # noqa ARG002
         topic: Record,
-        uow: UnitOfWork,
-        *args: Any,
-        **kwargs: Any,
-    ) -> None:
+        uow: UnitOfWork,  # noqa ARG002
+        *args: Any,  # noqa ARG002
+        **kwargs: Any,  # noqa ARG002
+    ) -> Record:
         """Apply the action to the topic."""
+        return topic
 
     action_components: tuple[type[RequestActionComponent], ...] = ()
 
@@ -71,7 +72,7 @@ class OARepoGenericActionMixin(RequestAction):
         if not was_request_active:
             identity.provides.add(request_active)
         try:
-            self.apply(identity, topic, uow, *args, **kwargs)  # execute the action itself
+            topic = self.apply(identity, topic, uow, *args, **kwargs)  # execute the action itself
             super().execute(identity, uow, *args, **kwargs)
             for component in self.components:
                 if hasattr(component, self.type_id):

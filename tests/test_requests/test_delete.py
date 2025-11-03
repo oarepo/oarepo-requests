@@ -55,6 +55,9 @@ def test_delete(
     lst = creator_client.get(urls["BASE_URL"])
     assert len(lst.json["hits"]["hits"]) == 2
 
+    deleted_record_api_response = creator_client.get(f"{urls['BASE_URL']}/{record1_id}")
+    assert deleted_record_api_response.status_code == 410
+
     resp_request_submit = submit_request_on_record(
         creator.identity,
         record2_id,

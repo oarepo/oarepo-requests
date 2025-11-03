@@ -30,12 +30,13 @@ def test_new_version_autoaccept(
     )
     assert new_version_direct.status_code == 403
 
-    resp_request_submit = submit_request_on_record(creator.identity, record1_id, "new_version")
+    resp_request_submit = submit_request_on_record(creator.identity, record1_id, "new_version", expand=True)
     # is request accepted and closed?
     request = creator_client.get(
         f"{urls['BASE_URL_REQUESTS']}{resp_request_submit['id']}",
     ).json
 
+    print()
     assert request["status"] == "accepted"
     assert not request["is_open"]
     assert request["is_closed"]
@@ -125,25 +126,55 @@ def test_redirect_url(
     ).json
 
     requests_model.Draft.index.refresh()
-    draft_search = creator_client.get("/user/requests-test").json["hits"][
-        "hits"
-    ]  # a link is in another pull request for now
-    new_draft = next(x for x in draft_search if x["parent"]["id"] == record1["parent"]["id"] and x["state"] == "draft")
+    new_id = request["expanded"]["payload"]["created_topic"]["id"]
 
     assert (
         link2testclient(
             request["expanded"]["payload"]["created_topic"]["links"]["self_html"],
             ui=True,
         )
-        == f"/api/test-requests/uploads/{new_draft['id']}"  # draft self_html now goes to deposit_upload
+        == f"/api/test-requests/uploads/{new_id}"  # draft self_html now goes to deposit_upload
     )
 
-    new_draft = creator_client.get(f"{urls['BASE_URL']}/{new_draft['id']}/draft").json
-    publish_request = submit_request_on_draft(creator.identity, new_draft["id"], "publish_new_version")
+    creator_client.get(f"{urls['BASE_URL']}/{new_id}/draft")
+    publish_request = submit_request_on_draft(creator.identity, new_id, "publish_new_version")
     receiver_request = receiver_client.get(f"{urls['BASE_URL_REQUESTS']}{publish_request['id']}")
     receiver_client.post(link2testclient(receiver_request.json["links"]["actions"]["accept"]))
 
     original_request = creator_client.get(
         f"{urls['BASE_URL_REQUESTS']}{original_request_id}",
     ).json
-    assert original_request["topic"] == {"requests_test": record1_id}  # check no weird topic kerfluffle happened here
+    assert original_request["topic"] == {"requests_test": record1_id}
+
+
+def test_publish(
+    requests_model,
+    logged_client,
+    users,
+    urls,
+    submit_request_on_record,
+    submit_request_on_draft,
+    record_with_files_factory,
+    link2testclient,
+    search_clear,
+):
+    creator = users[0]
+    creator_client = logged_client(creator)
+    receiver_client = logged_client(users[1])
+    record1 = record_with_files_factory(creator.identity)
+    record1_id = record1["id"]
+
+    resp_request = submit_request_on_record(creator.identity, record1_id, "new_version",
+                                            create_additional_data={"payload": {"keep_files": "yes"}}, expand=True)
+    # publish the new draft
+    new_id = resp_request.data["expanded"]["payload"]["created_topic"]["id"]
+    creator_client.put(f"{urls['BASE_URL']}/{new_id}/draft", json={"metadata": {"title": "edited"}})
+    publish_request = submit_request_on_draft(creator.identity, new_id, "publish_new_version")
+    receiver_request = receiver_client.get(f"{urls['BASE_URL_REQUESTS']}{publish_request['id']}")
+    receiver_client.post(link2testclient(receiver_request.json["links"]["actions"]["accept"]))
+
+    # check it's published
+    new_record = creator_client.get(f"{urls['BASE_URL']}/{new_id}")
+    assert new_record.status_code == 200
+    assert new_record.json["is_published"]
+    assert new_record.json["metadata"]["title"] == "edited"

@@ -38,9 +38,9 @@ class PublishNewVersionAcceptAction(PublishDraftAcceptAction):
         uow: UnitOfWork,
         *args: Any,
         **kwargs: Any,
-    ) -> None:
-        topic_service = get_draft_record_service(topic)
-
+    ) -> Record:
         if "payload" in self.request and "version" in self.request["payload"]:
+            topic_service = get_draft_record_service(topic)
             topic.metadata["version"] = self.request["payload"]["version"]
             uow.register(RecordCommitOp(topic, indexer=topic_service.indexer))
+        return super().apply(identity, topic, uow, *args, **kwargs)

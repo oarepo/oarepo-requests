@@ -264,6 +264,16 @@ class DefaultRequests(WorkflowRequestPolicy):
             cancelled="draft",
         ),
     )
+    publish_changed_metadata = WorkflowRequest(
+        requesters=[IfInState("draft", [RecordOwners()])],
+        recipients=[UserGenerator("user2@example.org")],
+        transitions=WorkflowTransitions(
+            submitted="publishing",
+            accepted="published",
+            declined="draft",
+            cancelled="draft",
+        ),
+    )
     delete_published_record = WorkflowRequest(
         requesters=[IfInState("published", [RecordOwners()])],
         recipients=[UserGenerator("user2@example.org")],
@@ -510,12 +520,13 @@ class RequestsWithSystemIdentity(WorkflowRequestPolicy):
 class TestWorkflowPermissions(RequestBasedWorkflowPermissions):
     """Default workflow permissions for testing."""
 
+    # publication status rather than state
     can_read = (
         IfInState("draft", [RecordOwners()]),
         IfInState("publishing", [RecordOwners(), UserGenerator("user2@example.org")]),
         IfInState("published", [AnyUser()]),
-        IfInState("published", [AuthenticatedUser()]),
         IfInState("deleting", [AnyUser()]),
+        IfInState("deleted", [AnyUser()]),  # invenio doesn't seem to control this on can_read level
     )
     can_manage_files = (RecordOwners(),)
 
@@ -540,8 +551,8 @@ class DifferentLocalesPermissions(TestWorkflowPermissions):
         IfInState("draft", [RecordOwners()]),
         IfInState("publishing", [RecordOwners(), CSLocaleUserGenerator()]),
         IfInState("published", [AnyUser()]),
-        IfInState("published", [AuthenticatedUser()]),
         IfInState("deleting", [AnyUser()]),
+        IfInState("deleted", [AnyUser()]),
     )
 
 
