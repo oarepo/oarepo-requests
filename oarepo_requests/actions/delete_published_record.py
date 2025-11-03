@@ -46,7 +46,7 @@ class DeletePublishedRecordAcceptAction(OARepoAcceptAction):
         uow: UnitOfWork,
         *args: Any,
         **kwargs: Any,
-    ) -> None:
+    ) -> Record:
         topic_service = current_runtime.get_record_service_for_record(topic)
         if not topic_service:
             raise KeyError(f"topic {topic} service not found")
@@ -71,8 +71,9 @@ class DeletePublishedRecordAcceptAction(OARepoAcceptAction):
             }
             deleted_topic = topic_service.delete_record(identity, topic["id"], data)._record  # noqa SLF001
             db.session.commit()
-        else:
-            topic_service.delete(identity, topic["id"], *args, uow=uow, **kwargs)
+            return deleted_topic
+        topic_service.delete(identity, topic["id"], *args, uow=uow, **kwargs)
+        return topic
 
         # TODO: notifications, cascade cancel?
 
