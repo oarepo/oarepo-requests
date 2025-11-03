@@ -36,7 +36,6 @@ def test_new_version_autoaccept(
         f"{urls['BASE_URL_REQUESTS']}{resp_request_submit['id']}",
     ).json
 
-    print()
     assert request["status"] == "accepted"
     assert not request["is_open"]
     assert request["is_closed"]
@@ -164,8 +163,13 @@ def test_publish(
     record1 = record_with_files_factory(creator.identity)
     record1_id = record1["id"]
 
-    resp_request = submit_request_on_record(creator.identity, record1_id, "new_version",
-                                            create_additional_data={"payload": {"keep_files": "yes"}}, expand=True)
+    resp_request = submit_request_on_record(
+        creator.identity,
+        record1_id,
+        "new_version",
+        create_additional_data={"payload": {"keep_files": "yes"}},
+        expand=True,
+    )
     # publish the new draft
     new_id = resp_request.data["expanded"]["payload"]["created_topic"]["id"]
     creator_client.put(f"{urls['BASE_URL']}/{new_id}/draft", json={"metadata": {"title": "edited"}})
