@@ -13,6 +13,7 @@ from typing import TYPE_CHECKING, Any, override
 
 from ..utils import get_draft_record_service
 from .generic import OARepoAcceptAction
+from oarepo_runtime.typing import record_from_result
 
 if TYPE_CHECKING:
     from flask_principal import Identity
@@ -34,4 +35,4 @@ class EditTopicAcceptAction(OARepoAcceptAction):
         **kwargs: Any,
     ) -> Record:
         topic_service = get_draft_record_service(topic)
-        return topic_service.edit(identity, topic["id"], uow=uow)._record  # noqa SLF001
+        return record_from_result(topic_service.edit(identity, topic["id"], uow=uow))

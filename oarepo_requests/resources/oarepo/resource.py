@@ -42,12 +42,13 @@ class OARepoRequestsResource(RequestsResource, ErrorHandlersMixin):
         return [
             *super().create_url_rules(),
             route("POST", p(routes["list"]), self.create),
-            route("POST", p(routes["list-args"]), self.create_args),
+            route("POST", p(routes["list-args"]), self.create, endpoint="create_args"),
             route("GET", p(routes["list-applicable"]), self.applicable_request_types),
         ]
 
     @request_extra_args
     @request_headers
+    @request_view_args
     @request_data
     @response_handler()
     def create(self) -> tuple[dict, int]:
@@ -64,11 +65,17 @@ class OARepoRequestsResource(RequestsResource, ErrorHandlersMixin):
                 ...payload
             }
         """
-        request_type_id = resource_requestctx.data.pop("request_type", None)
-        topic = resource_requestctx.data.pop("topic", None)
-        if isinstance(topic, str):
-            topic = string_to_reference(topic)
+        if resource_requestctx.view_args:
+            request_type_id = resource_requestctx.view_args["request_type"]
+            topic = string_to_reference(resource_requestctx.view_args["topic"])
+        else:
+            request_type_id = resource_requestctx.data.pop("request_type", None)
+            topic = resource_requestctx.data.pop("topic", None)
+            if isinstance(topic, str):
+                topic = string_to_reference(topic)
         topic = resolve_reference_dict(topic)
+
+
 
         items = self.service.create(
             identity=g.identity,

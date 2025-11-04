@@ -23,6 +23,7 @@ from .generic import (
     OARepoDeclineAction,
     OARepoSubmitAction,
 )
+from oarepo_runtime.typing import record_from_result
 
 if TYPE_CHECKING:
     from flask_principal import Identity
@@ -115,7 +116,7 @@ class PublishDraftAcceptAction(PublishMixin, OARepoAcceptAction):
                 raise UnresolvedRequestsError(action=str(self.name))
         id_ = topic["id"]
 
-        return topic_service.publish(identity, id_, *args, uow=uow, expand=False, **kwargs)._record  # noqa SLF001
+        return record_from_result(topic_service.publish(identity, id_, *args, uow=uow, expand=False, **kwargs))  # noqa SLF001
         # TODO: notification
 
 
