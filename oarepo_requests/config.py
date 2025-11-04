@@ -22,18 +22,8 @@ from oarepo_requests.actions.components import (
     RequestActionComponent,
     WorkflowTransitionComponent,
 )
-from oarepo_requests.types.events import TopicDeleteEventType
-from oarepo_requests.types.events.escalation import EscalationEventType
-from oarepo_requests.types.events.record_snapshot import RecordSnapshotEventType
-from oarepo_requests.types.events.topic_update import TopicUpdateEventType
 
-REQUESTS_REGISTERED_EVENT_TYPES = (
-    TopicUpdateEventType(),
-    TopicDeleteEventType(),
-    EscalationEventType(),
-    RecordSnapshotEventType(),
-    *invenio_requests.config.REQUESTS_REGISTERED_EVENT_TYPES,
-)
+REQUESTS_REGISTERED_EVENT_TYPES = (*invenio_requests.config.REQUESTS_REGISTERED_EVENT_TYPES,)
 
 REQUESTS_ALLOWED_RECEIVERS = ["user", "group", "auto_approve"]
 
@@ -46,8 +36,6 @@ REQUESTS_ACTION_COMPONENTS: tuple[type[RequestActionComponent], ...] = (
     WorkflowTransitionComponent,
     AutoAcceptComponent,
 )
-
-SNAPSHOT_CLEANUP_DAYS = 365
 
 # TODO: possibly not used outside ui
 PUBLISH_REQUEST_TYPES = ["publish_draft", "publish_new_version"]

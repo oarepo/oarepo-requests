@@ -11,14 +11,14 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING, Any, override
 
+from oarepo_runtime.typing import record_from_result
+
 from ..utils import get_draft_record_service
 from .generic import OARepoAcceptAction
-from oarepo_runtime.typing import record_from_result
 
 if TYPE_CHECKING:
     from flask_principal import Identity
     from invenio_db.uow import UnitOfWork
-    from invenio_records_resources.records import Record
 
 
 # TODO: snapshot
@@ -29,10 +29,9 @@ class EditTopicAcceptAction(OARepoAcceptAction):
     def apply(
         self,
         identity: Identity,
-        topic: Record,
         uow: UnitOfWork,
         *args: Any,
         **kwargs: Any,
-    ) -> Record:
-        topic_service = get_draft_record_service(topic)
-        return record_from_result(topic_service.edit(identity, topic["id"], uow=uow))
+    ) -> None:
+        topic_service = get_draft_record_service(self.topic)
+        self.topic = record_from_result(topic_service.edit(identity, self.topic["id"], uow=uow))

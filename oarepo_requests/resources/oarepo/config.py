@@ -33,7 +33,7 @@ class OARepoRequestsResourceConfig(RequestsResourceConfig, ConfiguratorMixin):
 
     routes: Mapping[str, str] = {
         **RequestsResourceConfig.routes,
-        "list-args": "/<topic>/<request_type>",
+        "create": "/<topic>/<request_type>",
         "list-applicable": "/applicable",
     }
 

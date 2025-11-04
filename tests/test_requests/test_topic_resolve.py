@@ -53,7 +53,7 @@ def test_resolve_topic(
     }
 
     receiver_read = receiver_client.get(f"{urls['BASE_URL_REQUESTS']}{resp_request_submit['id']}")
-    accept = receiver_client.post(link2testclient(receiver_read.json["links"]["actions"]["accept"]))
+    receiver_client.post(link2testclient(receiver_read.json["links"]["actions"]["accept"]))
     requests_model.Record.index.refresh()
 
     resp = creator_client.get(
@@ -70,5 +70,9 @@ def test_resolve_topic(
     assert resp_expanded.json["topic"] == {"requests_test": record1_id}
     assert resp_expanded.json["expanded"]["topic"] == {
         "id": record1_id,
-        "links": {},
+        "links": {
+            "latest_html": f"https://127.0.0.1:5000/api/test-requests/records/{record1_id}/latest",
+            "self": f"https://127.0.0.1:5000/api/requests-test/{record1_id}",
+            "self_html": f"https://127.0.0.1:5000/api/test-requests/records/{record1_id}",
+        },
     }
