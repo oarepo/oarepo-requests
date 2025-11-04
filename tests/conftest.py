@@ -25,7 +25,6 @@ from invenio_records_permissions.generators import (
 from invenio_records_resources.services.uow import RecordCommitOp
 from invenio_requests.customizations import CommentEventType, LogEventType
 from invenio_requests.proxies import current_requests_service
-from invenio_requests.records.api import Request, RequestEvent
 from invenio_requests.services.generators import Receiver
 from invenio_requests.services.permissions import (
     PermissionPolicy as InvenioRequestsPermissionPolicy,
@@ -71,6 +70,7 @@ from oarepo_requests.types import (
 
 if TYPE_CHECKING:
     from invenio_requests.customizations.actions import RequestAction
+    from invenio_requests.records.api import Request
 
 pytest_plugins = [
     "pytest_oarepo.requests.fixtures",
