@@ -15,7 +15,6 @@ from .generic import OARepoAcceptAction, OARepoDeclineAction
 
 if TYPE_CHECKING:
     from flask_principal import Identity
-    from invenio_records_resources.records import Record
 
 from typing import TYPE_CHECKING
 
@@ -43,11 +42,11 @@ class DeletePublishedRecordAcceptAction(OARepoAcceptAction):
     def apply(
         self,
         identity: Identity,
-        topic: Record,
         uow: UnitOfWork,
         *args: Any,
         **kwargs: Any,
-    ) -> Record:
+    ) -> None:
+        topic = self.topic
         topic_service = current_runtime.get_record_service_for_record(topic)
         if not topic_service:
             raise KeyError(f"topic {topic} service not found")
@@ -70,11 +69,10 @@ class DeletePublishedRecordAcceptAction(OARepoAcceptAction):
                 "note": self.request["payload"].get("note", ""),
                 "is_visible": True,
             }
-            deleted_topic = record_from_result(topic_service.delete_record(identity, topic["id"], data))
+            self.topic = record_from_result(topic_service.delete_record(identity, topic["id"], data))
             db.session.commit()
-            return deleted_topic
-        topic_service.delete(identity, topic["id"], *args, uow=uow, **kwargs)
-        return topic
+        else:
+            topic_service.delete(identity, topic["id"], *args, uow=uow, **kwargs)
 
         # TODO: notifications, cascade cancel?
 

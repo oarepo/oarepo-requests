@@ -14,6 +14,7 @@ from typing import TYPE_CHECKING, Any, override
 from invenio_access.permissions import system_identity
 from invenio_i18n import _
 from invenio_requests.records.api import Request
+from oarepo_runtime.typing import record_from_result
 
 from oarepo_requests.errors import UnresolvedRequestsError, VersionAlreadyExists
 
@@ -23,12 +24,10 @@ from .generic import (
     OARepoDeclineAction,
     OARepoSubmitAction,
 )
-from oarepo_runtime.typing import record_from_result
 
 if TYPE_CHECKING:
     from flask_principal import Identity
     from invenio_db.uow import UnitOfWork
-    from invenio_records_resources.records import Record
     from invenio_requests.customizations import RequestAction
 else:
     RequestAction = object
@@ -60,23 +59,20 @@ class PublishDraftSubmitAction(PublishMixin, OARepoSubmitAction):
     def apply(
         self,
         identity: Identity,
-        topic: Record,
         uow: UnitOfWork,
         *args: Any,
         **kwargs: Any,
-    ) -> Record:
+    ) -> None:
         if "payload" in self.request and "version" in self.request["payload"]:
-            topic_service = get_draft_record_service(topic)
-            versions = topic_service.search_versions(identity, topic.pid.pid_value)
+            topic_service = get_draft_record_service(self.topic)
+            versions = topic_service.search_versions(identity, self.topic.pid.pid_value)
             versions_hits = versions.to_dict()["hits"]["hits"]
             for rec in versions_hits:
                 if "version" in rec["metadata"]:
                     version = rec["metadata"]["version"]
                     if version == self.request["payload"]["version"]:
                         raise VersionAlreadyExists
-            topic.metadata["version"] = self.request["payload"]["version"]
-        return topic
-        # TODO: notification
+            self.topic.metadata["version"] = self.request["payload"]["version"]
 
 
 class PublishDraftAcceptAction(PublishMixin, OARepoAcceptAction):
@@ -88,13 +84,12 @@ class PublishDraftAcceptAction(PublishMixin, OARepoAcceptAction):
     def apply(
         self,
         identity: Identity,
-        topic: Record,
         uow: UnitOfWork,
         *args: Any,
         **kwargs: Any,
-    ) -> Record:
-        topic_service = get_draft_record_service(topic)
-        requests = search_requests(system_identity, topic)
+    ) -> None:
+        topic_service = get_draft_record_service(self.topic)
+        requests = search_requests(system_identity, self.topic)
 
         for result in requests._results:  # noqa SLF001
             if (
@@ -114,10 +109,8 @@ class PublishDraftAcceptAction(PublishMixin, OARepoAcceptAction):
                 # note: we can not use solely the result.is_open because changes may not be committed yet
                 # to opensearch index. That's why we need to get the record from DB and re-check.
                 raise UnresolvedRequestsError(action=str(self.name))
-        id_ = topic["id"]
-
-        return record_from_result(topic_service.publish(identity, id_, *args, uow=uow, expand=False, **kwargs))  # noqa SLF001
-        # TODO: notification
+        id_ = self.topic["id"]
+        self.topic = record_from_result(topic_service.publish(identity, id_, *args, uow=uow, expand=False, **kwargs))
 
 
 class PublishDraftDeclineAction(OARepoDeclineAction):

@@ -68,7 +68,6 @@ from oarepo_requests.services.permissions.workflow_policies import (
 from oarepo_requests.types import (
     NonDuplicableOARepoRecordRequestType,
 )
-from oarepo_requests.types.events.topic_update import TopicUpdateEventType
 
 if TYPE_CHECKING:
     from invenio_requests.customizations.actions import RequestAction
@@ -145,7 +144,6 @@ can_comment_only_receiver = [
 events_only_receiver_can_comment = {
     CommentEventType.type_id: WorkflowEvent(submitters=can_comment_only_receiver),
     LogEventType.type_id: WorkflowEvent(submitters=InvenioRequestsPermissionPolicy.can_create_comment),
-    TopicUpdateEventType.type_id: WorkflowEvent(submitters=InvenioRequestsPermissionPolicy.can_create_comment),
     TestEventType.type_id: WorkflowEvent(submitters=can_comment_only_receiver),
 }
 
@@ -293,6 +291,21 @@ class DefaultRequests(WorkflowRequestPolicy):
         requesters=[IfNoNewVersionDraft([IfInState("published", [RecordOwners()])])],
         recipients=[AutoApprove()],
         transitions=WorkflowTransitions(),
+    )
+
+
+class PublishAutoAcceptRequests(DefaultRequests):
+    """Publish requests with auto accept."""
+
+    publish_draft = WorkflowRequest(
+        requesters=[IfInState("draft", [RecordOwners()])],
+        recipients=[AutoApprove()],
+        transitions=WorkflowTransitions(
+            submitted="publishing",
+            accepted="published",
+            declined="draft",
+            cancelled="draft",
+        ),
     )
 
 
@@ -615,7 +628,7 @@ WORKFLOWS = [
         code="edit_accept_crash",
         label=_(""),
         permission_policy_cls=type("EditAcceptCrashPermissions", (TestWorkflowPermissions,), {"can_edit": []}),
-        request_policy_cls=DefaultRequests,
+        request_policy_cls=PublishAutoAcceptRequests,
     ),
 ]
 
@@ -757,27 +770,6 @@ def app_config(app_config, requests_model):
     app_config["CELERY_TASK_ALWAYS_EAGER"] = True
 
     return app_config
-
-
-@pytest.fixture
-def check_publish_topic_update():
-    def _check_publish_topic_update(creator_client, urls, record, before_update_response) -> None:
-        request_id = before_update_response["id"]
-        record_id = record["id"]
-
-        after_update_response = creator_client.get(f"{urls['BASE_URL_REQUESTS']}{request_id}").json
-        RequestEvent.index.refresh()
-        events = creator_client.get(f"{urls['BASE_URL_REQUESTS']}extended/{request_id}/timeline").json["hits"]["hits"]
-
-        assert before_update_response["topic"] == {"requests_test_draft": record_id}
-        assert after_update_response["topic"] == {"requests_test": record_id}
-
-        topic_updated_events = [e for e in events if e["type"] == TopicUpdateEventType.type_id]
-        assert len(topic_updated_events) == 1
-        assert topic_updated_events[0]["payload"]["old_topic"] == f"requests_test_draft.{record_id}"
-        assert topic_updated_events[0]["payload"]["new_topic"] == f"requests_test.{record_id}"
-
-    return _check_publish_topic_update
 
 
 @pytest.fixture

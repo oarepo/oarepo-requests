@@ -125,7 +125,6 @@ class OARepoRequests:
 
         app.config.setdefault("OAREPO_REQUESTS_DEFAULT_RECEIVER", None)
         app.config.setdefault("REQUESTS_ALLOWED_RECEIVERS", []).extend(config.REQUESTS_ALLOWED_RECEIVERS)
-        app.config.setdefault("SNAPSHOT_CLEANUP_DAYS", config.SNAPSHOT_CLEANUP_DAYS)
 
         app.config.setdefault("PUBLISH_REQUEST_TYPES", config.PUBLISH_REQUEST_TYPES)
 

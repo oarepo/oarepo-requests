@@ -37,6 +37,31 @@ class OARepoGenericActionMixin(RequestAction):
     type_id: str
     name: str
 
+    def __init__(self, request: Request):
+        """Initialize the action."""
+        super().__init__(request)
+        self._topic = request.topic.resolve()
+
+    @property
+    def topic(self) -> Record:
+        """Get the topic."""
+        return self._topic
+
+    @topic.setter
+    def topic(self, value: Record) -> None:
+        """Set the topic."""
+        self._topic = value
+
+    @property
+    def request(self) -> Request:
+        """Get the request."""
+        return self._request
+
+    @request.setter
+    def request(self, value: Request) -> None:  # type: ignore[reportIncompatibleVariableOverride]
+        """Set the topic."""
+        self._request = value
+
     @classmethod
     def stateful_name(cls, identity: Identity, **kwargs: Any) -> str | LazyString:  # noqa ARG003
         """Return the name of the action.
@@ -48,14 +73,12 @@ class OARepoGenericActionMixin(RequestAction):
 
     def apply(
         self,
-        identity: Identity,  # noqa ARG002
-        topic: Record,
-        uow: UnitOfWork,  # noqa ARG002
-        *args: Any,  # noqa ARG002
-        **kwargs: Any,  # noqa ARG002
-    ) -> Record:
+        identity: Identity,
+        uow: UnitOfWork,
+        *args: Any,
+        **kwargs: Any,
+    ) -> None:
         """Apply the action to the topic."""
-        return topic
 
     action_components: tuple[type[RequestActionComponent], ...] = ()
 
@@ -66,45 +89,43 @@ class OARepoGenericActionMixin(RequestAction):
 
     def execute(self, identity: Identity, uow: UnitOfWork, *args: Any, **kwargs: Any) -> None:
         """Execute the action."""
-        request: Request = self.request
-        topic = request.topic.resolve()
         was_request_active = request_active in identity.provides
         if not was_request_active:
             identity.provides.add(request_active)
         try:
-            topic = self.apply(identity, topic, uow, *args, **kwargs)  # execute the action itself
+            self.apply(identity, uow, *args, **kwargs)  # execute the action itself
             super().execute(identity, uow, *args, **kwargs)
             for component in self.components:
                 if hasattr(component, self.type_id):
-                    getattr(component, self.type_id)(identity, request, topic, self, uow, *args, **kwargs)
+                    getattr(component, self.type_id)(identity, self, uow, *args, **kwargs)
         finally:
             # in case we are not running the actions in isolated state
             if not was_request_active:
                 identity.provides.remove(request_active)
 
 
-class OARepoSubmitAction(OARepoGenericActionMixin, actions.SubmitAction):
+class OARepoSubmitAction(OARepoGenericActionMixin, actions.SubmitAction):  # type: ignore[reportIncompatibleVariableOverride]
     """Submit action extended for oarepo requests."""
 
     type_id = "submit"
     name = _("Submit")
 
 
-class OARepoDeclineAction(OARepoGenericActionMixin, actions.DeclineAction):
+class OARepoDeclineAction(OARepoGenericActionMixin, actions.DeclineAction):  # type: ignore[reportIncompatibleVariableOverride]
     """Decline action extended for oarepo requests."""
 
     type_id = "decline"
     name = _("Decline")
 
 
-class OARepoAcceptAction(OARepoGenericActionMixin, actions.AcceptAction):
+class OARepoAcceptAction(OARepoGenericActionMixin, actions.AcceptAction):  # type: ignore[reportIncompatibleVariableOverride]
     """Accept action extended for oarepo requests."""
 
     type_id = "accept"
     name = _("Accept")
 
 
-class OARepoCancelAction(OARepoGenericActionMixin, actions.CancelAction):
+class OARepoCancelAction(OARepoGenericActionMixin, actions.CancelAction):  # type: ignore[reportIncompatibleVariableOverride]
     """Cancel action extended for oarepo requests."""
 
     type_id = "cancel"
