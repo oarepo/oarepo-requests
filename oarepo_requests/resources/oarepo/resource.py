@@ -42,7 +42,7 @@ class OARepoRequestsResource(RequestsResource, ErrorHandlersMixin):
         return [
             *super().create_url_rules(),
             route("POST", p(routes["list"]), self.create),
-            route("POST", p(routes["list-args"]), self.create, endpoint="create_args"),
+            route("POST", p(routes["create"]), self.create_via_url),
             route("GET", p(routes["list-applicable"]), self.applicable_request_types),
         ]
 
@@ -65,17 +65,11 @@ class OARepoRequestsResource(RequestsResource, ErrorHandlersMixin):
                 ...payload
             }
         """
-        if resource_requestctx.view_args:
-            request_type_id = resource_requestctx.view_args["request_type"]
-            topic = string_to_reference(resource_requestctx.view_args["topic"])
-        else:
-            request_type_id = resource_requestctx.data.pop("request_type", None)
-            topic = resource_requestctx.data.pop("topic", None)
-            if isinstance(topic, str):
-                topic = string_to_reference(topic)
+        request_type_id = resource_requestctx.data.pop("request_type", None)
+        topic = resource_requestctx.data.pop("topic", None)
+        if isinstance(topic, str):
+            topic = string_to_reference(topic)
         topic = resolve_reference_dict(topic)
-
-
 
         items = self.service.create(
             identity=g.identity,
@@ -92,7 +86,7 @@ class OARepoRequestsResource(RequestsResource, ErrorHandlersMixin):
     @request_headers
     @request_data
     @response_handler()
-    def create_args(self) -> tuple[dict, int]:
+    def create_via_url(self) -> tuple[dict, int]:
         """Create a new request based on a request type and topic from view_args arguments."""
         request_type_id = resource_requestctx.view_args["request_type"]
         topic = resolve_reference_dict(string_to_reference(resource_requestctx.view_args["topic"]))

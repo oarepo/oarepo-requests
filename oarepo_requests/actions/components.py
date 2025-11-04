@@ -18,8 +18,6 @@ from invenio_requests.errors import CannotExecuteActionError
 if TYPE_CHECKING:
     from flask_principal import Identity
     from invenio_db.uow import UnitOfWork
-    from invenio_records_resources.records import Record
-    from invenio_requests.records.api import Request
 
     from .generic import OARepoGenericActionMixin
 
@@ -37,8 +35,6 @@ class RequestActionComponent:
     def create(
         self,
         identity: Identity,
-        request: Request,
-        topic: Record,
         action: OARepoGenericActionMixin,
         uow: UnitOfWork,
         *args: Any,
@@ -58,8 +54,6 @@ class RequestActionComponent:
     def submit(
         self,
         identity: Identity,
-        request: Request,
-        topic: Record,
         action: OARepoGenericActionMixin,
         uow: UnitOfWork,
         *args: Any,
@@ -79,8 +73,6 @@ class RequestActionComponent:
     def accept(
         self,
         identity: Identity,
-        request: Request,
-        topic: Record,
         action: OARepoGenericActionMixin,
         uow: UnitOfWork,
         *args: Any,
@@ -100,8 +92,6 @@ class RequestActionComponent:
     def decline(
         self,
         identity: Identity,
-        request: Request,
-        topic: Record,
         action: OARepoGenericActionMixin,
         uow: UnitOfWork,
         *args: Any,
@@ -121,8 +111,6 @@ class RequestActionComponent:
     def cancel(
         self,
         identity: Identity,
-        request: Request,
-        topic: Record,
         action: OARepoGenericActionMixin,
         uow: UnitOfWork,
         *args: Any,
@@ -142,8 +130,6 @@ class RequestActionComponent:
     def expire(
         self,
         identity: Identity,
-        request: Request,
-        topic: Record,
         action: OARepoGenericActionMixin,
         uow: UnitOfWork,
         *args: Any,
@@ -169,11 +155,11 @@ class WorkflowTransitionComponent(RequestActionComponent):
     to the target state.
     """
 
-    def _workflow_transition(
-        self, identity: Identity, request: Request, topic: Record, action: OARepoGenericActionMixin, uow: UnitOfWork
-    ) -> None:
+    def _workflow_transition(self, identity: Identity, action: OARepoGenericActionMixin, uow: UnitOfWork) -> None:
         from oarepo_workflows.proxies import current_oarepo_workflows
 
+        topic = action.topic
+        request = action.request
         transitions = current_oarepo_workflows.get_workflow(topic).requests()[request.type.type_id].transitions
         target_state = transitions[action.status_to]
         if target_state and not topic.is_deleted:
@@ -189,79 +175,67 @@ class WorkflowTransitionComponent(RequestActionComponent):
     def create(
         self,
         identity: Identity,
-        request: Request,
-        topic: Record,
         action: OARepoGenericActionMixin,
         uow: UnitOfWork,
         *args: Any,
         **kwargs: Any,
     ) -> None:
-        self._workflow_transition(identity, request, topic, action, uow)
+        self._workflow_transition(identity, action, uow)
 
     @override
     def submit(
         self,
         identity: Identity,
-        request: Request,
-        topic: Record,
         action: OARepoGenericActionMixin,
         uow: UnitOfWork,
         *args: Any,
         **kwargs: Any,
     ) -> None:
-        self._workflow_transition(identity, request, topic, action, uow)
+        self._workflow_transition(identity, action, uow)
 
     @override
     def accept(
         self,
         identity: Identity,
-        request: Request,
-        topic: Record,
         action: OARepoGenericActionMixin,
         uow: UnitOfWork,
         *args: Any,
         **kwargs: Any,
     ) -> None:
-        self._workflow_transition(identity, request, topic, action, uow)
+        self._workflow_transition(identity, action, uow)
 
     @override
     def decline(
         self,
         identity: Identity,
-        request: Request,
-        topic: Record,
         action: OARepoGenericActionMixin,
         uow: UnitOfWork,
         *args: Any,
         **kwargs: Any,
     ) -> None:
-        self._workflow_transition(identity, request, topic, action, uow)
+        self._workflow_transition(identity, action, uow)
 
     @override
     def cancel(
         self,
         identity: Identity,
-        request: Request,
-        topic: Record,
         action: OARepoGenericActionMixin,
         uow: UnitOfWork,
         *args: Any,
         **kwargs: Any,
     ) -> None:
-        self._workflow_transition(identity, request, topic, action, uow)
+        self._workflow_transition(identity, action, uow)
 
     @override
     def expire(
         self,
         identity: Identity,
-        request: Request,
-        topic: Record,
         action: OARepoGenericActionMixin,
         uow: UnitOfWork,
         *args: Any,
         **kwargs: Any,
     ) -> None:
-        self._workflow_transition(identity, request, topic, action, uow)
+        self._workflow_transition(identity, action, uow)
 
 
 class AutoAcceptComponent(RequestActionComponent):
@@ -274,20 +248,18 @@ class AutoAcceptComponent(RequestActionComponent):
     def submit(
         self,
         identity: Identity,
-        request: Request,
-        topic: Record,
         action: OARepoGenericActionMixin,
         uow: UnitOfWork,
         *args: Any,
         **kwargs: Any,
     ) -> None:
-        if request.status != "submitted":
+        if action.request.status != "submitted":
             return
-        receiver_ref = request.receiver  # this is <x>proxy, not dict
+        receiver_ref = action.request.receiver  # this is <x>proxy, not dict
         if not receiver_ref.reference_dict.get("auto_approve"):
             return
 
-        action_obj = RequestActions.get_action(request, "accept")
+        action_obj = RequestActions.get_action(action.request, "accept")
         if not action_obj.can_execute():
             raise CannotExecuteActionError("accept")
         action_obj.execute(identity, uow, *args, **kwargs)
