@@ -22,6 +22,7 @@ from typing import TYPE_CHECKING
 from invenio_db import db
 from invenio_i18n import _
 from oarepo_runtime.proxies import current_runtime
+from oarepo_runtime.typing import record_from_result
 
 if TYPE_CHECKING:
     from flask_principal import Identity
@@ -69,7 +70,7 @@ class DeletePublishedRecordAcceptAction(OARepoAcceptAction):
                 "note": self.request["payload"].get("note", ""),
                 "is_visible": True,
             }
-            deleted_topic = topic_service.delete_record(identity, topic["id"], data)._record  # noqa SLF001
+            deleted_topic = record_from_result(topic_service.delete_record(identity, topic["id"], data))
             db.session.commit()
             return deleted_topic
         topic_service.delete(identity, topic["id"], *args, uow=uow, **kwargs)
