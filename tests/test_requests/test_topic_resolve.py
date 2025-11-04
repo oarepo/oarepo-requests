@@ -53,7 +53,7 @@ def test_resolve_topic(
     }
 
     receiver_read = receiver_client.get(f"{urls['BASE_URL_REQUESTS']}{resp_request_submit['id']}")
-    receiver_client.post(link2testclient(receiver_read.json["links"]["actions"]["accept"]))
+    accept = receiver_client.post(link2testclient(receiver_read.json["links"]["actions"]["accept"]))
     requests_model.Record.index.refresh()
 
     resp = creator_client.get(

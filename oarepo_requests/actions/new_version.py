@@ -13,6 +13,7 @@ from typing import TYPE_CHECKING, Any, override
 
 from ..utils import get_draft_record_service, ref_to_str, reference_entity
 from .generic import OARepoAcceptAction
+from oarepo_runtime.typing import record_from_result
 
 if TYPE_CHECKING:
     from flask_principal import Identity
@@ -36,7 +37,7 @@ class NewVersionAcceptAction(OARepoAcceptAction):
         """Apply the action, creating a new version of the record."""
         topic_service = get_draft_record_service(topic)
         new_version_topic = topic_service.new_version(identity, topic["id"], uow=uow)
-        created_topic = new_version_topic._record  # noqa SLF001
+        created_topic = record_from_result(new_version_topic)  # noqa SLF001
         if (
             "payload" in self.request
             and "keep_files" in self.request["payload"]
