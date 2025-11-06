@@ -79,6 +79,7 @@ class PublishRequestType(NonDuplicableOARepoRequestType):
     def assert_no_pending_requests(
         self,
         topic: Record,
+        action: str | None = None,
     ) -> None:
         topic_service = get_record_service_for_record(topic)
 
@@ -101,7 +102,7 @@ class PublishRequestType(NonDuplicableOARepoRequestType):
                     "created",
                 )
             ):
-                raise UnresolvedRequestsError(action=str(self.name))
+                raise UnresolvedRequestsError(action=action or str(self.name))
 
     def can_create(
         self,
