@@ -13,12 +13,10 @@ from typing import TYPE_CHECKING, Any
 
 from invenio_access.permissions import system_identity
 from invenio_notifications.services.uow import NotificationOp
-from invenio_requests.records.api import Request
 from oarepo_runtime.datastreams.utils import get_record_service_for_record
 from oarepo_runtime.i18n import lazy_gettext as _
 
-from oarepo_requests.errors import VersionAlreadyExists, UnresolvedRequestsError
-from oarepo_requests.utils import get_requests_service_for_records_service
+from oarepo_requests.errors import VersionAlreadyExists
 
 from ..notifications.builders.publish import (
     PublishDraftRequestAcceptNotificationBuilder,
@@ -115,20 +113,9 @@ class PublishDraftAcceptAction(
         topic_service = get_record_service_for_record(state.topic)
         if not topic_service:
             raise KeyError(f"topic {state.topic} service not found")
-        request_service = get_requests_service_for_records_service(topic_service)
-        requests = request_service.search_requests_for_draft(
-            system_identity, state.topic.pid.pid_value
-        )
 
-        for result in requests._results:
-            if result.type not in ["publish_draft","publish_new_version", "publish_changed_metadata"] and result.is_open:
-                # note: we can not use solely the result.is_open because changes may not be committed yet
-                # to opensearch index. That's why we need to get the record from DB and re-check.
-                if Request.get_record(result.uuid)["status"] in (
-                    "submitted",
-                    "created",
-                ):
-                    raise UnresolvedRequestsError(action=str(self.name))
+        self.request.type.assert_no_pending_requests(state.topic, action=str(self.name))
+
         id_ = state.topic["id"]
 
         published_topic = topic_service.publish(
