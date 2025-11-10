@@ -47,7 +47,6 @@ class DeletePublishedRecordSubmitAction(OARepoSubmitAction):
     def apply(
         self,
         identity: Identity,
-        topic: Record,
         uow: UnitOfWork,
         *args: Any,
         **kwargs: Any,
@@ -109,7 +108,6 @@ class DeletePublishedRecordDeclineAction(OARepoDeclineAction):
     def apply(
         self,
         identity: Identity,
-        topic: Record,
         uow: UnitOfWork,
         *args: Any,
         **kwargs: Any,
