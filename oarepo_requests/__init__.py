@@ -9,5 +9,5 @@
 
 from __future__ import annotations
 
-__version__ = "3.0.0dev0"
+__version__ = "3.0.0dev1"
 """Version of the library."""
