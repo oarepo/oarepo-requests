@@ -20,9 +20,6 @@ from oarepo_requests.notifications.builders.delete_published_record import (
     DeletePublishedRecordRequestDeclineNotificationBuilder,
     DeletePublishedRecordRequestSubmitNotificationBuilder,
 )
-from oarepo_requests.notifications.builders.escalate import (
-    EscalateRequestSubmitNotificationBuilder,
-)
 from oarepo_requests.notifications.builders.publish import (
     PublishDraftRequestAcceptNotificationBuilder,
     PublishDraftRequestDeclineNotificationBuilder,
@@ -66,7 +63,6 @@ NOTIFICATIONS_BUILDERS = {
     DeletePublishedRecordRequestSubmitNotificationBuilder.type: DeletePublishedRecordRequestSubmitNotificationBuilder,
     DeletePublishedRecordRequestAcceptNotificationBuilder.type: DeletePublishedRecordRequestAcceptNotificationBuilder,
     DeletePublishedRecordRequestDeclineNotificationBuilder.type: DeletePublishedRecordRequestDeclineNotificationBuilder,
-    EscalateRequestSubmitNotificationBuilder.type: EscalateRequestSubmitNotificationBuilder,
     PublishDraftRequestSubmitNotificationBuilder.type: PublishDraftRequestSubmitNotificationBuilder,
     PublishDraftRequestAcceptNotificationBuilder.type: PublishDraftRequestAcceptNotificationBuilder,
     PublishDraftRequestDeclineNotificationBuilder.type: PublishDraftRequestDeclineNotificationBuilder,
