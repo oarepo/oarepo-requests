@@ -81,6 +81,7 @@ class PublishDraftSubmitAction(PublishMixin, OARepoSubmitAction):
             self.topic.metadata["version"] = self.request["payload"]["version"]
         uow.register(NotificationOp(PublishDraftRequestSubmitNotificationBuilder.build(request=self.request)))
 
+
 class PublishDraftAcceptAction(PublishMixin, OARepoAcceptAction):
     """Accept action for publishing draft requests."""
 
@@ -118,6 +119,7 @@ class PublishDraftAcceptAction(PublishMixin, OARepoAcceptAction):
         id_ = self.topic["id"]
         self.topic = record_from_result(topic_service.publish(identity, id_, *args, uow=uow, expand=False, **kwargs))
         uow.register(NotificationOp(PublishDraftRequestAcceptNotificationBuilder.build(request=self.request)))
+
 
 class PublishDraftDeclineAction(OARepoDeclineAction):
     """Decline action for publishing draft requests."""
