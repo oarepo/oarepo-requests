@@ -57,9 +57,10 @@ class PublishMixin(RequestAction):
         return True
 
 
-# TODO: snapshot
 class PublishDraftSubmitAction(PublishMixin, OARepoSubmitAction):
     """Submit action for publishing draft requests."""
+
+    snapshot = True
 
     @override
     def apply(

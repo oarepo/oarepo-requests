@@ -15,6 +15,8 @@ from typing import TYPE_CHECKING, Any, override
 from invenio_requests.customizations import RequestActions
 from invenio_requests.errors import CannotExecuteActionError
 
+from oarepo_requests.snapshots import create_snapshot_and_possible_event
+
 if TYPE_CHECKING:
     from flask_principal import Identity
     from invenio_db.uow import UnitOfWork
@@ -145,6 +147,53 @@ class RequestActionComponent:
         :param args: Additional arguments.
         :param kwargs: Additional keyword arguments.
         """
+
+
+class RecordSnapshotComponent(RequestActionComponent):
+    """A component that creates a snapshot of the record."""
+
+    def _snapshot(self, identity: Identity, action: OARepoGenericActionMixin, uow: UnitOfWork) -> None:  # noqa ARG002
+        """Take snapshot of the record."""
+        if action.snapshot:
+            topic = action.record_to_snapshot() if hasattr(action, "record_to_snapshot") else action.topic  # type: ignore[reportOptionalMemberAccess]
+
+            # TODO: why just not use topic metadata stright from topic without the service call? permissions?
+            """
+            service = current_runtime.get_record_service_for_record(topic)
+            with suppress(PermissionDenied):
+                if not topic.is_draft:
+                    ret = service.read(identity, topic.pid.pid_value)
+                else:
+                    ret = service.read_draft(identity, topic.pid.pid_value)
+
+
+            create_snapshot_and_possible_event(topic, ret.to_dict()["metadata"], action.request.id, uow=uow)
+            """
+            create_snapshot_and_possible_event(topic, topic.metadata, action.request.id, uow=uow)
+
+    @override
+    def submit(
+        self,
+        identity: Identity,
+        action: OARepoGenericActionMixin,
+        uow: UnitOfWork,
+        *args: Any,
+        **kwargs: Any,
+    ) -> None:
+        """Take snapshot of the record."""
+        self._snapshot(identity, action, uow)
+
+    @override
+    def accept(
+        self,
+        identity: Identity,
+        action: OARepoGenericActionMixin,
+        uow: UnitOfWork,
+        *args: Any,
+        **kwargs: Any,
+    ) -> None:
+        """Take snapshot of the record."""
+        self._snapshot(identity, action, uow)
 
 
 class WorkflowTransitionComponent(RequestActionComponent):

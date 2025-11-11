@@ -13,17 +13,23 @@ from typing import TYPE_CHECKING, Any, override
 
 from oarepo_runtime.typing import record_from_result
 
-from ..utils import get_draft_record_service, ref_to_str, reference_entity
+from ..utils import get_draft_record_service, ref_to_str, reference_entity, resolve_reference_dict, string_to_reference
 from .generic import OARepoAcceptAction
 
 if TYPE_CHECKING:
     from flask_principal import Identity
     from invenio_db.uow import UnitOfWork
+    from invenio_records_resources.records import Record
 
 
-# TODO: snapshot
 class NewVersionAcceptAction(OARepoAcceptAction):
     """Accept creation of a new version of a published record."""
+
+    snapshot = True
+
+    def record_to_snapshot(self) -> Record:
+        """Convert the record to a snapshot."""
+        return resolve_reference_dict(string_to_reference(self.request["payload"]["created_topic"]))
 
     @override
     def apply(

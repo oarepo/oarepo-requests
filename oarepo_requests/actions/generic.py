@@ -36,6 +36,7 @@ class OARepoGenericActionMixin(RequestAction):
 
     type_id: str
     name: str
+    snapshot: bool = False
 
     def __init__(self, request: Request):
         """Initialize the action."""

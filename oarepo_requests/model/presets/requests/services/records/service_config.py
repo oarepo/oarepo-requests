@@ -14,10 +14,12 @@ from typing import TYPE_CHECKING, Any, override
 
 from oarepo_model.customizations import (
     AddToDictionary,
+    AddToList,
     Customization,
 )
 from oarepo_model.presets import Preset
 
+from oarepo_requests.services.components.snapshot_component import RecordSnapshotComponent
 from oarepo_requests.services.links import RefEndpointLink
 
 if TYPE_CHECKING:
@@ -39,7 +41,7 @@ class RequestsServiceConfigPreset(Preset):
         model: InvenioModel,
         dependencies: dict[str, Any],
     ) -> Generator[Customization]:
-        # TODO: AutorequestComponent, RecordSnapshotComponent
+        # TODO: AutorequestComponent
         yield AddToDictionary(
             "record_links_item",
             {"requests": RefEndpointLink("requests.search", ref_querystring="topic")},
@@ -48,3 +50,4 @@ class RequestsServiceConfigPreset(Preset):
             "record_links_item",
             {"applicable-requests": RefEndpointLink("requests.applicable_request_types", ref_querystring="topic")},
         )
+        yield AddToList("record_service_components", RecordSnapshotComponent)

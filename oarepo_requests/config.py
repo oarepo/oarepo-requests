@@ -19,11 +19,16 @@ from oarepo_workflows.requests.events import WorkflowEvent
 
 from oarepo_requests.actions.components import (
     AutoAcceptComponent,
+    RecordSnapshotComponent,
     RequestActionComponent,
     WorkflowTransitionComponent,
 )
+from oarepo_requests.types.events import RecordSnapshotEventType
 
-REQUESTS_REGISTERED_EVENT_TYPES = (*invenio_requests.config.REQUESTS_REGISTERED_EVENT_TYPES,)
+REQUESTS_REGISTERED_EVENT_TYPES = (
+    *invenio_requests.config.REQUESTS_REGISTERED_EVENT_TYPES,
+    RecordSnapshotEventType(),
+)
 
 REQUESTS_ALLOWED_RECEIVERS = ["user", "group", "auto_approve"]
 
@@ -33,6 +38,7 @@ DEFAULT_WORKFLOW_EVENTS = {
 }
 
 REQUESTS_ACTION_COMPONENTS: tuple[type[RequestActionComponent], ...] = (
+    RecordSnapshotComponent,
     WorkflowTransitionComponent,
     AutoAcceptComponent,
 )
@@ -44,3 +50,5 @@ PUBLISH_REQUEST_TYPES = ["publish_draft", "publish_new_version"]
 NOTIFICATIONS_BACKENDS = {
     EmailNotificationBackend.id: EmailNotificationBackend(),
 }
+
+SNAPSHOT_CLEANUP_DAYS = 365
