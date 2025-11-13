@@ -50,10 +50,8 @@ class ServiceResultProxy(RDMRecordServiceResultProxy):
             except (PIDDoesNotExistError, NoResultFound):
                 record = self._get_record(pid_value)
             else:
-                # no exception raised. If published, get the published record instead
-                # Difference between is_published and publication_status?
                 record = (
-                    draft if record_from_result(draft).publication_status == "draft" else self._get_record(pid_value)  # type: ignore[reportAttributeAccessIssue]
+                    draft if not record_from_result(draft).is_published else self._get_record(pid_value)  # type: ignore[reportAttributeAccessIssue]
                 )
         else:
             record = self._get_record(pid_value)

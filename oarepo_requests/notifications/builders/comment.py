@@ -42,6 +42,7 @@ class CommentRequestEventCreateNotificationBuilder(InvenioCommentRequestEventCre
         return tuple(recipients)
 
 
+# TODO: if anything remaining in this is useful?
 """
 def override_invenio_notifications(
     state: BlueprintSetupState, *args: Any, **kwargs: Any
@@ -54,20 +55,8 @@ def override_invenio_notifications(
 
         from oarepo_requests.notifications.generators import RequestEntityResolve
 
-        for r in CommentRequestEventCreateNotificationBuilder.context:
-            if isinstance(r, EntityResolve) and r.key == "request.topic":
-                break
-        else:
-            CommentRequestEventCreateNotificationBuilder.context.append(
-                EntityResolve(key="request.topic"),
-            )
 
 
-        for r in CommentRequestEventCreateNotificationBuilder.recipients:
-            if isinstance(r, RequestParticipantsRecipient):
-                CommentRequestEventCreateNotificationBuilder.recipients.remove(r)
-                CommentRequestEventCreateNotificationBuilder.recipients.append(OARepoRequestParticipantsRecipient(key="request"))
-                break
 
         for idx, r in list(
             enumerate(CommentRequestEventCreateNotificationBuilder.context)
