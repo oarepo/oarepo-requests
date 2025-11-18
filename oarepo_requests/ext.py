@@ -13,6 +13,8 @@ from functools import cached_property
 from typing import TYPE_CHECKING, cast
 
 import importlib_metadata
+import invenio_notifications
+from deepmerge import conservative_merger
 from invenio_base.utils import obj_or_import_string
 from invenio_requests.customizations import EventType
 from invenio_requests.proxies import (
@@ -143,6 +145,31 @@ class OARepoRequests:
         app.config.setdefault("REQUESTS_ACTION_COMPONENTS", []).extend(config.REQUESTS_ACTION_COMPONENTS)
 
 
+        app_registered_event_types = app.config.setdefault(
+            "NOTIFICATION_RECIPIENTS_RESOLVERS", {}
+        )
+        app.config["NOTIFICATION_RECIPIENTS_RESOLVERS"] = conservative_merger.merge(
+            app_registered_event_types, config.NOTIFICATION_RECIPIENTS_RESOLVERS
+        )
+
+        app.config.setdefault("NOTIFICATIONS_ENTITY_RESOLVERS", [])
+        app.config["NOTIFICATIONS_ENTITY_RESOLVERS"] += config.NOTIFICATIONS_ENTITY_RESOLVERS
+
+        app_notification_builders = app.config.setdefault( # can't set default config directly because it might be initialized to {} in invenio-notifications
+            "NOTIFICATIONS_BUILDERS", {}
+        )
+        app_notification_backends = app.config.setdefault(
+            "NOTIFICATIONS_BACKENDS", {}
+        )
+
+        app.config["NOTIFICATIONS_BUILDERS"] = conservative_merger.merge(
+            app_notification_builders, config.NOTIFICATIONS_BUILDERS
+        )
+        app.config["NOTIFICATIONS_BACKENDS"] = conservative_merger.merge(
+            app_notification_backends, config.NOTIFICATIONS_BACKENDS
+        )
+
+
 def api_finalize_app(app: Flask) -> None:
     """Finalize app."""
     finalize_app(app)
@@ -155,3 +182,10 @@ def finalize_app(app: Flask) -> None:  # noqa ARG001
     for type_ in to_remove:
         current_request_type_registry._registered_types.pop(type_.type_id)  # noqa SLF001 # type: ignore[reportAttributeAccessIssue]
         current_event_type_registry.register_type(type_)
+
+
+    ext = app.extensions["oarepo-requests"]
+    ext.notification_recipients_resolvers_registry = app.config["NOTIFICATION_RECIPIENTS_RESOLVERS"]
+
+    invenio_notifications = app.extensions["invenio-notifications"]
+    invenio_notifications.init_manager(app)

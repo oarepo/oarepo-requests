@@ -106,9 +106,9 @@ class EntityRecipient(RecipientGenerator):
 class SpecificEntityRecipient(RecipientGenerator):
     """Superclass for implementations of recipient generators for specific entities."""
 
-    def __init__(self, key: dict[str, str]):
+    def __init__(self, entity_reference: dict[str, str]):
         """Initialize the generator."""
-        self.key = key  # TODO: this is entity_reference, not path to entity as EntityRecipient, might be confusing
+        self._entity_reference = entity_reference
 
     def __call__(self, notification: Notification, recipients: dict[str, Recipient]):  # NOQA ARG002
         entity = self._resolve_entity()
@@ -120,13 +120,13 @@ class SpecificEntityRecipient(RecipientGenerator):
         raise NotImplementedError
 
     def _resolve_entity(self) -> Any:
-        entity_type = next(iter(self.key))
+        entity_type = next(iter(self._entity_reference))
         registry = current_requests.entity_resolvers_registry
 
         # _registered_types missing in typing
         registered_resolvers = registry._registered_types  # noqa SLF001 # type: ignore[reportAttributeAccessIssue]
         resolver = registered_resolvers.get(entity_type)
-        proxy = resolver.get_entity_proxy(self.key)
+        proxy = resolver.get_entity_proxy(self._entity_reference)
         return proxy.resolve()
 
 
@@ -203,7 +203,10 @@ class RequestEntityResolve(EntityResolve):
 
 
 class GeneralRequestParticipantsRecipient(RecipientGenerator):
-    """Recipient generator based on request and it's events."""
+    """Generalization of invenio RequestParticipantsRecipient capable of working with general entities.
+
+    RequestParticipantsRecipient supports only users.
+    """
 
     def __init__(self, key: str):
         """Ctor."""
