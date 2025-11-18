@@ -136,26 +136,3 @@ class OARepoRequests:
 
         # let the user override the action components
         app.config.setdefault("REQUESTS_ACTION_COMPONENTS", []).extend(config.REQUESTS_ACTION_COMPONENTS)
-
-        app_registered_event_types = app.config.setdefault("REQUESTS_REGISTERED_EVENT_TYPES", [])
-        for event_type in config.REQUESTS_REGISTERED_EVENT_TYPES:
-            if event_type not in app_registered_event_types:
-                app_registered_event_types.append(event_type)
-
-
-def api_finalize_app(app: Flask) -> None:
-    """Finalize app."""
-    finalize_app(app)
-
-
-def finalize_app(app: Flask) -> None:
-    """Finalize app."""
-    from invenio_requests.proxies import current_event_type_registry
-
-    # TODO: unified protocol for <config loading creates race condition with initialization> situations
-    # initial config + entrypoints / just entrypoints (entrypoints not always available + worse customizability)
-    # otherwise collecting config + finalize_app hacks?
-
-    # we can use entrypoints here; leaving as reminder to decide
-    for type_ in app.config["REQUESTS_REGISTERED_EVENT_TYPES"]:
-        current_event_type_registry.register_type(type_)

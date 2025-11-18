@@ -23,8 +23,6 @@ from oarepo_requests.actions.components import (
     WorkflowTransitionComponent,
 )
 
-REQUESTS_REGISTERED_EVENT_TYPES = (*invenio_requests.config.REQUESTS_REGISTERED_EVENT_TYPES,)
-
 REQUESTS_ALLOWED_RECEIVERS = ["user", "group", "auto_approve"]
 
 DEFAULT_WORKFLOW_EVENTS = {
