@@ -6,7 +6,7 @@
 # details.
 #
 from __future__ import annotations
-
+from invenio_requests.config import REQUESTS_REGISTERED_EVENT_TYPES
 import os
 import time
 from datetime import timedelta
@@ -712,7 +712,8 @@ def ui_serialization_result():
 @pytest.fixture(scope="module")
 def app_config(app_config, requests_model):
     app_config["REQUESTS_REGISTERED_EVENT_TYPES"] = [
-        TestEventType(),  # remaining are loaded from .config
+        *REQUESTS_REGISTERED_EVENT_TYPES,
+        TestEventType(),
     ]
     app_config["SEARCH_HOSTS"] = [
         {
