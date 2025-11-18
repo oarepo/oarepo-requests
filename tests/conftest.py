@@ -709,13 +709,17 @@ def ui_serialization_result():
 
     return _result
 
+# TODO: invenio bug - eventtype entrypoint registration registers into requesttypes
+@pytest.fixture(scope="module")
+def extra_entry_points():
+    return {
+        "invenio_requests.event_types": [
+            "T = pytest_oarepo.requests.classes:TestEventType",
+        ],
+    }
 
 @pytest.fixture(scope="module")
 def app_config(app_config, requests_model):
-    app_config["REQUESTS_REGISTERED_EVENT_TYPES"] = [
-        *REQUESTS_REGISTERED_EVENT_TYPES,
-        TestEventType(),
-    ]
     app_config["SEARCH_HOSTS"] = [
         {
             "host": os.environ.get("OPENSEARCH_HOST", "localhost"),
