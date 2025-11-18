@@ -11,7 +11,7 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING, cast
 
-from deepmerge import conservative_merger
+import importlib_metadata
 from invenio_base.utils import obj_or_import_string
 from invenio_requests.customizations import EventType
 from invenio_requests.proxies import (
@@ -93,23 +93,12 @@ class _OARepoRequestsState:
 class OARepoRequests:
     """OARepo-Requests extension."""
 
-    def __init__(self, app: Flask | None = None) -> None:
-        """Extension initialization."""
-        if app:
-            self.init_app(app)
-
-    def init_app(self, app: Flask) -> None:
-        """Flask application initialization.
-
-        :param app: An instance of :class:`~flask.app.Flask`.
-        """
-        self.init_config(app)
-        state = _OARepoRequestsState(app)
-        self._state = app.extensions["oarepo-requests"] = state
-
-    def __getattr__(self, name: str):
-        """Proxy to state object."""
-        return getattr(self._state, name, None)
+    def action_components(self) -> list[type[RequestActionComponent]]:
+        """Return components for the given action."""
+        return cast(
+            "list[type[RequestActionComponent]]",
+            self.app.config["REQUESTS_ACTION_COMPONENTS"],
+        )
 
     def init_config(self, app: Flask) -> None:
         """Initialize configuration."""
