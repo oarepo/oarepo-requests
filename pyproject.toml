@@ -82,6 +82,10 @@ oarepo_requests = "oarepo_requests:alembic"
 
 [project.entry-points."invenio_config.module"]
 oarepo_requests = "oarepo_requests.initial_config"
+[project.entry-points."invenio_notifications.entity_resolvers"]
+request = "oarepo_requests.notifications.resolvers:requests_resolver"
+request_event = "oarepo_requests.notifications.resolvers:request_events_resolver"
+user = "oarepo_requests.notifications.resolvers:user_resolver"
 
 
 [[tool.mypy.overrides]]

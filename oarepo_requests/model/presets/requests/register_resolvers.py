@@ -22,6 +22,7 @@ from oarepo_model.customizations import (
     AddToModule,
     Customization,
 )
+from invenio_records_resources.references.entity_resolvers.results import ServiceResultResolver as InvenioServiceResultResolver
 from oarepo_model.presets import Preset
 from oarepo_runtime.typing import record_from_result
 from sqlalchemy.exc import NoResultFound
@@ -86,7 +87,7 @@ class ServiceResultResolver(RDMRecordServiceResultResolver):
         if self.draft_cls and isinstance(entity, self.draft_cls):
             return True
 
-        return ServiceResultResolver.matches_entity(self, entity=entity)
+        return InvenioServiceResultResolver.matches_entity(self, entity=entity)
 
 
 class RegisterResolversPreset(Preset):

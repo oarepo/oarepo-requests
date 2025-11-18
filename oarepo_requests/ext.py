@@ -13,7 +13,6 @@ from functools import cached_property
 from typing import TYPE_CHECKING, cast
 
 import importlib_metadata
-import invenio_notifications
 from deepmerge import conservative_merger
 from invenio_base.utils import obj_or_import_string
 from invenio_requests.customizations import EventType
@@ -145,22 +144,13 @@ class OARepoRequests:
         app.config.setdefault("REQUESTS_ACTION_COMPONENTS", []).extend(config.REQUESTS_ACTION_COMPONENTS)
 
 
-        app_registered_event_types = app.config.setdefault(
-            "NOTIFICATION_RECIPIENTS_RESOLVERS", {}
-        )
+        app_notification_recipient_resolvers = app.config.setdefault("NOTIFICATION_RECIPIENTS_RESOLVERS", {})
         app.config["NOTIFICATION_RECIPIENTS_RESOLVERS"] = conservative_merger.merge(
-            app_registered_event_types, config.NOTIFICATION_RECIPIENTS_RESOLVERS
+            app_notification_recipient_resolvers, config.NOTIFICATION_RECIPIENTS_RESOLVERS
         )
 
-        app.config.setdefault("NOTIFICATIONS_ENTITY_RESOLVERS", [])
-        app.config["NOTIFICATIONS_ENTITY_RESOLVERS"] += config.NOTIFICATIONS_ENTITY_RESOLVERS
-
-        app_notification_builders = app.config.setdefault( # can't set default config directly because it might be initialized to {} in invenio-notifications
-            "NOTIFICATIONS_BUILDERS", {}
-        )
-        app_notification_backends = app.config.setdefault(
-            "NOTIFICATIONS_BACKENDS", {}
-        )
+        app_notification_builders = app.config.setdefault("NOTIFICATIONS_BUILDERS", {})
+        app_notification_backends = app.config.setdefault("NOTIFICATIONS_BACKENDS", {})
 
         app.config["NOTIFICATIONS_BUILDERS"] = conservative_merger.merge(
             app_notification_builders, config.NOTIFICATIONS_BUILDERS
