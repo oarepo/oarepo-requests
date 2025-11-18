@@ -9,7 +9,6 @@
 
 from __future__ import annotations
 
-import invenio_requests.config
 from invenio_notifications.backends.email import EmailNotificationBackend
 from invenio_requests.customizations import CommentEventType, LogEventType
 from invenio_requests.services.permissions import (
