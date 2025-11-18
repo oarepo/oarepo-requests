@@ -6,7 +6,7 @@
 # details.
 #
 from __future__ import annotations
-from invenio_requests.config import REQUESTS_REGISTERED_EVENT_TYPES
+
 import os
 import time
 from datetime import timedelta
@@ -23,6 +23,7 @@ from invenio_records_permissions.generators import (
     SystemProcess,
 )
 from invenio_records_resources.services.uow import RecordCommitOp
+from invenio_requests.config import REQUESTS_REGISTERED_EVENT_TYPES
 from invenio_requests.customizations import CommentEventType, LogEventType
 from invenio_requests.proxies import current_requests_service
 from invenio_requests.services.generators import Receiver
