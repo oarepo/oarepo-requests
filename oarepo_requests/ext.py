@@ -9,15 +9,11 @@
 
 from __future__ import annotations
 
-from functools import cached_property
 from typing import TYPE_CHECKING, cast
 
-import importlib_metadata
 from invenio_base.utils import obj_or_import_string
 
 if TYPE_CHECKING:
-    from collections.abc import Callable
-
     from flask import Flask
     from flask_principal import Identity
     from invenio_records_resources.records.api import Record
@@ -85,32 +81,6 @@ class OARepoRequests:
         This value is taken from the configuration key REQUESTS_ALLOWED_RECEIVERS.
         """
         return cast("list[str]", self.app.config.get("REQUESTS_ALLOWED_RECEIVERS", []))
-
-    # TODO: possible not used
-    @cached_property
-    def identity_to_entity_references_functions(self) -> list[Callable]:
-        """Return a list of functions that map identity to entity references.
-
-        These functions are used to map the identity of the user to entity references
-        that represent the needs of the identity. The functions are taken from the entrypoints
-        registered under the group oarepo_requests.identity_to_entity_references.
-        """
-        group_name = "oarepo_requests.identity_to_entity_references"
-        return [x.load() for x in importlib_metadata.entry_points().select(group=group_name)]
-
-    # TODO: possible not used
-    def identity_to_entity_references(self, identity: Identity) -> list[dict[str, str]]:
-        """Map the identity to entity references."""
-        ret = [
-            mapping_fnc(identity)
-            for mapping_fnc in (self.identity_to_entity_references_functions)
-            if mapping_fnc(identity)
-        ]
-        flattened_ret = []
-        for mapping_result in ret:
-            if mapping_result:
-                flattened_ret += mapping_result
-        return flattened_ret
 
     def action_components(self) -> list[type[RequestActionComponent]]:
         """Return components for the given action."""
