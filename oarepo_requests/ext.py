@@ -14,6 +14,8 @@ from typing import TYPE_CHECKING, cast
 
 import importlib_metadata
 from invenio_base.utils import obj_or_import_string
+from invenio_requests.customizations import EventType
+from invenio_requests.proxies import current_event_type_registry, current_request_type_registry
 
 if TYPE_CHECKING:
     from collections.abc import Callable
@@ -136,3 +138,17 @@ class OARepoRequests:
 
         # let the user override the action components
         app.config.setdefault("REQUESTS_ACTION_COMPONENTS", []).extend(config.REQUESTS_ACTION_COMPONENTS)
+
+
+def api_finalize_app(app: Flask) -> None:
+    """Finalize app."""
+    finalize_app(app)
+
+
+def finalize_app(app: Flask) -> None:  # noqa ARG001
+    """Finalize app."""
+    # TODO: temporary before invenio fix
+    to_remove = [t for t in current_request_type_registry if isinstance(t, EventType)]
+    for type_ in to_remove:
+        current_request_type_registry._registered_types.pop(type_.type_id)  # noqa SLF001 # type: ignore[reportAttributeAccessIssue]
+        current_event_type_registry.register_type(type_)
