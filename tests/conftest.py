@@ -23,7 +23,6 @@ from invenio_records_permissions.generators import (
     SystemProcess,
 )
 from invenio_records_resources.services.uow import RecordCommitOp
-from invenio_requests.config import REQUESTS_REGISTERED_EVENT_TYPES
 from invenio_requests.customizations import CommentEventType, LogEventType
 from invenio_requests.proxies import current_requests_service
 from invenio_requests.services.generators import Receiver
@@ -709,6 +708,7 @@ def ui_serialization_result():
 
     return _result
 
+
 # TODO: invenio bug - eventtype entrypoint registration registers into requesttypes
 @pytest.fixture(scope="module")
 def extra_entry_points():
@@ -717,6 +717,7 @@ def extra_entry_points():
             "T = pytest_oarepo.requests.classes:TestEventType",
         ],
     }
+
 
 @pytest.fixture(scope="module")
 def app_config(app_config, requests_model):
