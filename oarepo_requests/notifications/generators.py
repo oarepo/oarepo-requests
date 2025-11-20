@@ -28,38 +28,18 @@ from oarepo_requests.proxies import current_notification_recipients_resolvers_re
 log = logging.getLogger("oarepo_requests.notifications.generators")
 
 if TYPE_CHECKING:
-    from collections.abc import Callable
     from typing import Any
 
+    from invenio_accounts.models import User
     from invenio_notifications.models import Notification
 
 
-def _extract_entity_email_data(entity: Any) -> dict[str, Any]:
-    def _get(entity: Any, key: Any) -> Any:
-        if isinstance(entity, dict) and key in entity:
-            return entity.get(key, None)
-        return getattr(entity, key, None)
-
-    def _add(entity: Any, key: Any, res: dict, transform: Callable = lambda x: x) -> Any:
-        v = _get(entity, key)
-        if v:
-            res[key] = transform(v)
-            return v
-        return None
-
-    ret: dict[str, Any] = {}
-    email = _add(entity, "email", ret)
-    if not email:
-        log.error(
-            "Entity %s %s does not have email/emails attribute, skipping.",
-            type(entity),
-            entity,
-        )
-        return {}
-    _add(entity, "preferences", ret, transform=lambda x: dict(x))
-    _add(entity, "id", ret)
-
-    return ret
+def _extract_user_email_data(user: User) -> dict[str, Any]:
+    return {
+        "id": user.id,
+        "preferences": dict(user.preferences),  # type: ignore[reportArgumentType]
+        "email": user.email,
+    }
 
 
 class EntityRecipient(RecipientGenerator):
@@ -138,7 +118,7 @@ class UserEmailRecipient(SpecificEntityRecipient):
         # might be a system identity or a ghost user
         email = getattr(entity, "email", None)
         if email:
-            return {email: Recipient(data=_extract_entity_email_data(entity))}
+            return {email: Recipient(data=_extract_user_email_data(entity))}
         return {}
 
 
@@ -147,7 +127,7 @@ class GroupEmailRecipient(SpecificEntityRecipient):
 
     def _get_recipients(self, entity: Any) -> dict[str, Recipient]:
         return {
-            user.email: Recipient(data=_extract_entity_email_data(user))
+            user.email: Recipient(data=_extract_user_email_data(user))
             for user in entity.users.all()
             if getattr(user, "email", None)
         }
