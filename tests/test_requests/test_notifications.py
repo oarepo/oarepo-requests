@@ -11,6 +11,11 @@ from typing import Any
 
 from invenio_requests.customizations.event_types import CommentEventType
 from invenio_requests.proxies import current_events_service
+from oarepo_workflows.resolvers.multiple_entities import (
+    MultipleEntitiesEntity,
+    MultipleEntitiesProxy,
+    MultipleEntitiesResolver,
+)
 
 
 def test_publish_notifications(
@@ -175,6 +180,47 @@ def test_group(
             assert len(outbox) == 2
             receivers = {m.recipients[0] for m in outbox}
             assert receivers == {"user1@example.org", "user2@example.org"}
+
+    finally:
+        app.config["OAREPO_REQUESTS_DEFAULT_RECEIVER"] = config_restore
+
+
+def test_group_multiple_recipients(
+    app,
+    users,
+    logged_client,
+    draft_factory,
+    submit_request_on_draft,
+    add_user_in_role,
+    role,
+    link2testclient,
+    urls,
+):
+    """Test notification being built on review submit."""
+    mail = app.extensions.get("mail")
+    config_restore = app.config["OAREPO_REQUESTS_DEFAULT_RECEIVER"]
+    add_user_in_role(users[0], role)
+    add_user_in_role(users[1], role)
+
+    def current_receiver(record=None, request_type=None, **kwargs: Any) -> Any:
+        if request_type.type_id == "publish_draft":
+            return MultipleEntitiesProxy(
+                MultipleEntitiesResolver(),
+                {"multiple": MultipleEntitiesEntity.create_id([{"user": users[2].id}, {"group": "it-dep"}])},
+            ).resolve()
+        return config_restore(record, request_type, **kwargs)
+
+    try:
+        app.config["OAREPO_REQUESTS_DEFAULT_RECEIVER"] = current_receiver
+
+        creator = users[0]
+        draft1 = draft_factory(creator.identity)
+
+        with mail.record_messages() as outbox:
+            submit_request_on_draft(creator.identity, draft1["id"], "publish_draft")
+            assert len(outbox) == 3
+            receivers = {m.recipients[0] for m in outbox}
+            assert receivers == {"user1@example.org", "user2@example.org", "user3@example.org"}
 
     finally:
         app.config["OAREPO_REQUESTS_DEFAULT_RECEIVER"] = config_restore

@@ -158,29 +158,16 @@ class MultipleRecipientsEmailRecipients(SpecificEntityRecipient):
 
     def _get_recipients(self, entity: Any) -> dict[str, Recipient]:
         """Get recipient emails of entity with multiple recipients.."""
-        final_recipients = {}
-        for current_entity in entity.entities:
-            recipient_entity = current_entity.resolve()
-            if hasattr(recipient_entity, "email"):
-                final_recipients[recipient_entity.email] = Recipient(data=_extract_entity_email_data(recipient_entity))
-            elif hasattr(recipient_entity, "emails"):
-                for email_data in recipient_entity.emails:
-                    final_recipients[email_data["email"]] = Recipient(_extract_entity_email_data(email_data))
-            else:
-                log.error(
-                    "Entity %s %s does not have email/emails attribute, skipping.",
-                    type(recipient_entity),
-                    recipient_entity,
-                )
-                continue
+        final_recipients: dict[str, Recipient] = {}
+        for current_entity_proxy in entity.entities:
+            reference = current_entity_proxy.reference_dict
+            recipient_entity = current_entity_proxy.resolve()
+            generator_cls = current_notification_recipients_resolvers_registry.get(
+                next(iter(reference.keys())), {}
+            ).get("email")
+            recipients = generator_cls(reference)._get_recipients(recipient_entity)  # noqa SLF001
+            final_recipients |= recipients
         return final_recipients
-
-
-def __call__(self, notification: Notification, recipients: dict[str, Recipient]):  # noqa ARG002
-    """Get the emails from the multiple recipients entity."""
-    entity = self._resolve_entity()
-    recipients.update(self._get_recipients(entity))
-    return recipients
 
 
 class RequestEntityResolve(EntityResolve):
