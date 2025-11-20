@@ -35,11 +35,13 @@ if TYPE_CHECKING:
 
 
 def _extract_user_email_data(user: User) -> dict[str, Any]:
-    return {
+    ret = {
         "id": user.id,
-        "preferences": dict(user.preferences),  # type: ignore[reportArgumentType]
         "email": user.email,
     }
+    if user.preferences is not None:
+        ret["preferences"] = dict(user.preferences)
+    return ret
 
 
 class EntityRecipient(RecipientGenerator):
