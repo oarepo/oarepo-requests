@@ -57,6 +57,8 @@ class EntityRecipient(RecipientGenerator):
         entity_ref_or_entity = dict_lookup(notification.context, self.key)
 
         if len(entity_ref_or_entity) != 1:
+            if len(entity_ref_or_entity) > 1:
+                raise ValueError(f"Entity recipient generator at {self.key} should point at one reference dictionary.")
             # a hack - we need to have the original entity reference, not the resolved one
             entity_ref_or_entity = self._get_unresolved_entity_from_resolved(notification.context, self.key)
         if not entity_ref_or_entity:
