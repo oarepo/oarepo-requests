@@ -709,7 +709,6 @@ def ui_serialization_result():
     return _result
 
 
-# TODO: invenio bug - eventtype entrypoint registration registers into requesttypes
 @pytest.fixture(scope="module")
 def extra_entry_points():
     return {
