@@ -10,18 +10,24 @@
 
 from __future__ import annotations
 
+from typing import TYPE_CHECKING
+
 from invenio_notifications.services.generators import ContextGenerator, EntityResolve, RecipientGenerator
 from invenio_requests.notifications.builders import (
     CommentRequestEventCreateNotificationBuilder as InvenioCommentRequestEventCreateNotificationBuilder,
 )
 from invenio_requests.notifications.generators import RequestParticipantsRecipient
 
+from oarepo_requests.notifications.filters import SystemUserRecipientFilter
 from oarepo_requests.notifications.generators import (
     GeneralRequestParticipantsRecipient,
     ReferenceSavingEntityResolve,
     RequestEntityResolve,
 )
 from oarepo_requests.utils import classproperty
+
+if TYPE_CHECKING:
+    from invenio_notifications.services.filters import RecipientFilter
 
 
 class CommentRequestEventCreateNotificationBuilder(InvenioCommentRequestEventCreateNotificationBuilder):
@@ -32,15 +38,9 @@ class CommentRequestEventCreateNotificationBuilder(InvenioCommentRequestEventCre
         """Get context for the notification builder."""
         invenio = super().context
         for idx, r in enumerate(list(invenio)):
-            if isinstance(r, EntityResolve) and r.key == "request":
-                invenio[idx] = (
-                    # entity resolver that adds the correct title if it is missing
-                    RequestEntityResolve(
-                        key="request",
-                    )
-                )
-            elif isinstance(r, EntityResolve):
-                invenio[idx] = ReferenceSavingEntityResolve(key=r.key)
+            if isinstance(r, EntityResolve):
+                replacement_cls = RequestEntityResolve if r.key == "request" else ReferenceSavingEntityResolve
+                invenio[idx] = replacement_cls(key="request")
         return *invenio, ReferenceSavingEntityResolve(key="request.topic")
 
     @classproperty
@@ -52,3 +52,8 @@ class CommentRequestEventCreateNotificationBuilder(InvenioCommentRequestEventCre
                 invenio[idx] = GeneralRequestParticipantsRecipient(key="request")
                 break
         return tuple(invenio)
+
+    @classproperty
+    def recipient_filters(self) -> tuple[RecipientFilter, ...]:  # type: ignore[reportIncompatibleVariableOverride]
+        """Get recipient filters for the notification builder."""
+        return *super().recipient_filters, SystemUserRecipientFilter()

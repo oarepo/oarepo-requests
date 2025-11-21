@@ -90,6 +90,7 @@ class GeneralRequestParticipantsRecipient(RecipientGenerator):
 
         return recipients
 
+
 # Do we need groups? Invenio doesn't seem to have GroupRecipient
 """
 class GroupEmailRecipient(SpecificEntityRecipient):
