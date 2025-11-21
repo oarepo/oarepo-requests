@@ -37,7 +37,6 @@ oarepo14 = [
     "oarepo[rdm,tests]>=14.0.0,<15.0.0",
 ]
 
-# TODO missing entrypoints
 [project.entry-points."invenio_base.apps"]
 oarepo_requests = "oarepo_requests.ext:OARepoRequests"
 
