@@ -40,7 +40,7 @@ class CommentRequestEventCreateNotificationBuilder(InvenioCommentRequestEventCre
         for idx, r in enumerate(list(invenio)):
             if isinstance(r, EntityResolve):
                 replacement_cls = RequestEntityResolve if r.key == "request" else ReferenceSavingEntityResolve
-                invenio[idx] = replacement_cls(key="request")
+                invenio[idx] = replacement_cls(key=r.key)
         return *invenio, ReferenceSavingEntityResolve(key="request.topic")
 
     @classproperty

@@ -29,6 +29,7 @@ class DeletePublishedRecordRequestAcceptNotificationBuilder(RequestActionNotific
 
     recipients = (EntityRecipientGenerator(key="request.created_by"),)
 
+    # topic resolution crashes on RecordDeletedException
     context = (
         ReferenceSavingEntityResolve(key="request"),
         ReferenceSavingEntityResolve(key="request.created_by"),
