@@ -10,7 +10,7 @@
 
 from __future__ import annotations
 
-from ..generators import EntityRecipient
+from ..generators import EntityRecipientGenerator
 from .base import RequestActionNotificationBuilder
 
 
@@ -19,7 +19,7 @@ class PublishDraftRequestSubmitNotificationBuilder(RequestActionNotificationBuil
 
     type = "publish-draft-request-event.submit"
 
-    recipients = (EntityRecipient(key="request.receiver"),)  # email only
+    recipients = (EntityRecipientGenerator(key="request.receiver"),)  # email only
 
 
 class PublishDraftRequestAcceptNotificationBuilder(RequestActionNotificationBuilder):
@@ -27,7 +27,7 @@ class PublishDraftRequestAcceptNotificationBuilder(RequestActionNotificationBuil
 
     type = "publish-draft-request-event.accept"
 
-    recipients = (EntityRecipient(key="request.created_by"),)
+    recipients = (EntityRecipientGenerator(key="request.created_by"),)
 
 
 class PublishDraftRequestDeclineNotificationBuilder(RequestActionNotificationBuilder):
@@ -35,4 +35,4 @@ class PublishDraftRequestDeclineNotificationBuilder(RequestActionNotificationBui
 
     type = "publish-draft-request-event.decline"
 
-    recipients = (EntityRecipient(key="request.created_by"),)
+    recipients = (EntityRecipientGenerator(key="request.created_by"),)

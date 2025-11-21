@@ -9,13 +9,13 @@
 
 from __future__ import annotations
 
-import invenio_requests.config
 from invenio_app_rdm.config import NOTIFICATIONS_BUILDERS as RDM_NOTIFICATIONS_BUILDERS
 from invenio_notifications.backends.email import EmailNotificationBackend
 from invenio_requests.customizations import CommentEventType, LogEventType
 from invenio_requests.services.permissions import (
     PermissionPolicy as InvenioRequestsPermissionPolicy,
 )
+from invenio_users_resources.notifications.generators import UserRecipient
 from oarepo_workflows.requests.events import WorkflowEvent
 
 from oarepo_requests.actions.components import (
@@ -34,11 +34,7 @@ from oarepo_requests.notifications.builders.publish import (
     PublishDraftRequestDeclineNotificationBuilder,
     PublishDraftRequestSubmitNotificationBuilder,
 )
-from oarepo_requests.notifications.generators import (
-    GroupEmailRecipient,
-    MultipleRecipientsEmailRecipients,
-    UserEmailRecipient,
-)
+from oarepo_requests.notifications.generators import MultipleRecipients
 
 REQUESTS_ALLOWED_RECEIVERS = ["user", "group", "auto_approve"]
 
@@ -55,10 +51,10 @@ REQUESTS_ACTION_COMPONENTS: tuple[type[RequestActionComponent], ...] = (
 # TODO: possibly not used outside ui
 PUBLISH_REQUEST_TYPES = ["publish_draft", "publish_new_version"]
 
+
 NOTIFICATION_RECIPIENTS_RESOLVERS = {
-    "user": {"email": UserEmailRecipient},
-    "group": {"email": GroupEmailRecipient},
-    "multiple": {"email": MultipleRecipientsEmailRecipients},
+    "user": lambda key, notification: UserRecipient(key),  # noqa ARG005
+    "multiple": lambda key, notification: MultipleRecipients(key),  # noqa ARG005
 }
 
 NOTIFICATIONS_BACKENDS = {

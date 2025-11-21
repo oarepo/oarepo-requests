@@ -10,9 +10,7 @@
 
 from __future__ import annotations
 
-from invenio_notifications.services.generators import EntityResolve
-
-from ..generators import EntityRecipient
+from ..generators import EntityRecipientGenerator, ReferenceSavingEntityResolve
 from .base import RequestActionNotificationBuilder
 
 
@@ -21,7 +19,7 @@ class DeletePublishedRecordRequestSubmitNotificationBuilder(RequestActionNotific
 
     type = "delete-published-record-request-event.submit"
 
-    recipients = (EntityRecipient(key="request.receiver"),)  # email only
+    recipients = (EntityRecipientGenerator(key="request.receiver"),)  # email only
 
 
 class DeletePublishedRecordRequestAcceptNotificationBuilder(RequestActionNotificationBuilder):
@@ -29,9 +27,12 @@ class DeletePublishedRecordRequestAcceptNotificationBuilder(RequestActionNotific
 
     type = "delete-published-record-request-event.accept"
 
-    recipients = (EntityRecipient(key="request.created_by"),)
+    recipients = (EntityRecipientGenerator(key="request.created_by"),)
 
-    context = (EntityResolve(key="request"),)
+    context = (
+        ReferenceSavingEntityResolve(key="request"),
+        ReferenceSavingEntityResolve(key="request.created_by"),
+    )
 
 
 class DeletePublishedRecordRequestDeclineNotificationBuilder(RequestActionNotificationBuilder):
@@ -39,4 +40,4 @@ class DeletePublishedRecordRequestDeclineNotificationBuilder(RequestActionNotifi
 
     type = "delete-published-record-request-event.decline"
 
-    recipients = (EntityRecipient(key="request.created_by"),)
+    recipients = (EntityRecipientGenerator(key="request.created_by"),)

@@ -16,9 +16,11 @@ from invenio_notifications.backends import EmailNotificationBackend
 from invenio_notifications.models import Notification
 from invenio_notifications.registry import EntityResolverRegistry
 from invenio_notifications.services.builders import NotificationBuilder
-from invenio_notifications.services.generators import ContextGenerator, EntityResolve
+from invenio_notifications.services.generators import ContextGenerator
 from invenio_notifications.services.generators import UserEmailBackend as InvenioUserEmailBackend
 from oarepo_runtime.typing import require_kwargs
+
+from oarepo_requests.notifications.generators import ReferenceSavingEntityResolve
 
 if TYPE_CHECKING:
     from invenio_requests.records.api import Request
@@ -30,7 +32,6 @@ class NotificationBackendWithClassId(Protocol):
     backend_id: str
 
 
-# TODO: is there any plan to support other backends?
 class UserEmailBackend(NotificationBackendWithClassId, InvenioUserEmailBackend):
     """Email backend for user emails."""
 
@@ -54,9 +55,10 @@ class RequestActionNotificationBuilder(NotificationBuilder):
         )
 
     context: tuple[ContextGenerator, ...] = (
-        EntityResolve(key="request"),
-        EntityResolve(key="request.topic"),
-        EntityResolve(key="request.created_by"),
+        ReferenceSavingEntityResolve(key="request"),
+        ReferenceSavingEntityResolve(key="request.topic"),
+        ReferenceSavingEntityResolve(key="request.created_by"),
+        ReferenceSavingEntityResolve(key="request.receiver"),
     )
 
     recipient_backends: tuple[NotificationBackendWithClassId, ...] = (UserEmailBackend(),)

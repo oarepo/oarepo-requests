@@ -16,14 +16,16 @@ from invenio_requests.notifications.builders import (
 )
 from invenio_requests.notifications.generators import RequestParticipantsRecipient
 
-from oarepo_requests.notifications.generators import GeneralRequestParticipantsRecipient, RequestEntityResolve
+from oarepo_requests.notifications.generators import (
+    GeneralRequestParticipantsRecipient,
+    ReferenceSavingEntityResolve,
+    RequestEntityResolve,
+)
 from oarepo_requests.utils import classproperty
 
 
 class CommentRequestEventCreateNotificationBuilder(InvenioCommentRequestEventCreateNotificationBuilder):
     """Notification builder for comment event."""
-
-    # "classproperty[tuple[ContextGenerator, ...]]" is not assignable to "List[ContextGenerator]"
 
     @classproperty
     def context(self) -> tuple[ContextGenerator, ...]:  # type: ignore[reportIncompatibleVariableOverride]
@@ -37,8 +39,9 @@ class CommentRequestEventCreateNotificationBuilder(InvenioCommentRequestEventCre
                         key="request",
                     )
                 )
-                break
-        return *invenio, EntityResolve(key="request.topic")
+            elif isinstance(r, EntityResolve):
+                invenio[idx] = ReferenceSavingEntityResolve(key=r.key)
+        return *invenio, ReferenceSavingEntityResolve(key="request.topic")
 
     @classproperty
     def recipients(self) -> tuple[RecipientGenerator, ...]:  # type: ignore[reportIncompatibleVariableOverride]

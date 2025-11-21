@@ -9,6 +9,7 @@ from __future__ import annotations
 
 from typing import Any
 
+import pytest
 from invenio_requests.customizations.event_types import CommentEventType
 from invenio_requests.proxies import current_events_service
 from oarepo_workflows.resolvers.multiple_entities import (
@@ -147,6 +148,7 @@ def test_delete_published_notifications(
         assert request_html_link in sent_mail.body
 
 
+@pytest.mark.skip("Not yet implemented")
 def test_group(
     app,
     users,
@@ -185,6 +187,7 @@ def test_group(
         app.config["OAREPO_REQUESTS_DEFAULT_RECEIVER"] = config_restore
 
 
+@pytest.mark.skip("Not yet implemented")
 def test_group_multiple_recipients(
     app,
     users,

@@ -143,7 +143,6 @@ class OARepoRequests:
         # let the user override the action components
         app.config.setdefault("REQUESTS_ACTION_COMPONENTS", []).extend(config.REQUESTS_ACTION_COMPONENTS)
 
-
         app_notification_recipient_resolvers = app.config.setdefault("NOTIFICATION_RECIPIENTS_RESOLVERS", {})
         app.config["NOTIFICATION_RECIPIENTS_RESOLVERS"] = conservative_merger.merge(
             app_notification_recipient_resolvers, config.NOTIFICATION_RECIPIENTS_RESOLVERS
@@ -165,14 +164,13 @@ def api_finalize_app(app: Flask) -> None:
     finalize_app(app)
 
 
-def finalize_app(app: Flask) -> None:  # noqa ARG001
+def finalize_app(app: Flask) -> None:
     """Finalize app."""
     # TODO: temporary before invenio fix
     to_remove = [t for t in current_request_type_registry if isinstance(t, EventType)]
     for type_ in to_remove:
         current_request_type_registry._registered_types.pop(type_.type_id)  # noqa SLF001 # type: ignore[reportAttributeAccessIssue]
         current_event_type_registry.register_type(type_)
-
 
     ext = app.extensions["oarepo-requests"]
     ext.notification_recipients_resolvers_registry = app.config["NOTIFICATION_RECIPIENTS_RESOLVERS"]

@@ -86,6 +86,7 @@ oarepo_requests = "oarepo_requests.initial_config"
 request = "oarepo_requests.notifications.resolvers:requests_resolver"
 request_event = "oarepo_requests.notifications.resolvers:request_events_resolver"
 user = "oarepo_requests.notifications.resolvers:user_resolver"
+multiple = "oarepo_requests.notifications.resolvers:multiple_entities_resolver"
 
 
 [[tool.mypy.overrides]]
