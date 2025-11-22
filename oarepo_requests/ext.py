@@ -15,7 +15,10 @@ from typing import TYPE_CHECKING, cast
 import importlib_metadata
 from invenio_base.utils import obj_or_import_string
 from invenio_requests.customizations import EventType
-from invenio_requests.proxies import current_event_type_registry, current_request_type_registry
+from invenio_requests.proxies import (
+    current_event_type_registry,
+    current_request_type_registry,
+)
 
 if TYPE_CHECKING:
     from collections.abc import Callable
