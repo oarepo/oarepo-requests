@@ -50,7 +50,11 @@ class RegisterResolversPreset(Preset):
             )
 
         yield AddModule("resolvers", exists_ok=True)
-        yield AddToModule("resolvers", "register_entity_resolver", staticmethod(register_entity_resolver))
+        yield AddToModule(
+            "resolvers",
+            "register_entity_resolver",
+            staticmethod(register_entity_resolver),
+        )
         yield AddEntryPoint(
             group="invenio_requests.entity_resolvers",
             name=f"{model.base_name}_requests",
