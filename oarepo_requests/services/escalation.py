@@ -99,21 +99,16 @@ def stale_requests() -> Generator[tuple[Request, WorkflowRequestEscalation]]:
                 .filter(RequestEventModel.type == "E", RequestEventModel.request_id == r.id)  # type: ignore[reportArgumentType]
                 .all()
             )
-
             event_escalation_ids = {cast("dict[str, Any]", e.json)["payload"]["escalation"] for e in escalation_events}
-            sorted_escalations = [
-                e
-                for e in sorted(workflow_request.escalations, key=lambda escalation: escalation.after)
-                if e.escalation_id not in event_escalation_ids
-            ]
+            escalations = [e for e in workflow_request.escalations if e.escalation_id not in event_escalation_ids]
+            sorted_escalations = sorted(escalations, key=lambda escalation: escalation.after)
 
             most_recent_escalation = None
-
+            utc_now_naive = datetime.now(UTC).replace(tzinfo=None)
             for escalation in sorted_escalations:
                 # take the most recent one
-                utc_now_naive = datetime.now(UTC).replace(tzinfo=None)
                 if (
-                    cast("datetime", r.updated) + escalation.after <= utc_now_naive
+                    utc_now_naive >= cast("datetime", r.updated) + escalation.after # after escalation deadline
                 ):  # for some reason request is not timezone aware
                     most_recent_escalation = escalation
                 else:
