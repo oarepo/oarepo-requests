@@ -60,6 +60,9 @@ new_version = "oarepo_requests.types.new_version:NewVersionRequestType"
 publish_new_version = "oarepo_requests.types.publish_new_version:PublishNewVersionRequestType"
 publish_changed_metadata = "oarepo_requests.types.publish_changed_metadata:PublishChangedMetadataRequestType"
 
+[project.entry-points."invenio_requests.event_types"]
+escalation = "oarepo_requests.types.events.escalation:EscalationEventType"
+
 [project.entry-points."invenio_base.finalize_app"]
 oarepo_requests = "oarepo_requests.ext:finalize_app"
 
