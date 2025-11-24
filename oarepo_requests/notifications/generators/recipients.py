@@ -9,6 +9,8 @@
 
 from __future__ import annotations
 
+from typing import TYPE_CHECKING, Any
+
 from invenio_access.permissions import system_identity
 from invenio_notifications.models import Notification, Recipient
 from invenio_notifications.services.generators import RecipientGenerator
@@ -19,6 +21,17 @@ from invenio_users_resources.proxies import current_users_service
 
 from oarepo_requests.notifications.generators.context import NotificationCtxWithReference
 from oarepo_requests.proxies import current_notification_recipient_generators_registry
+
+if TYPE_CHECKING:
+    from invenio_accounts.models import User
+
+
+def _extract_user_email_data(user: User) -> dict[str, Any]:
+    return {
+        "id": user.id,
+        "preferences": dict(user.preferences) if user.preferences else user.preferences,
+        "email": user.email,
+    }
 
 
 class EntityRecipientGenerator(RecipientGenerator):

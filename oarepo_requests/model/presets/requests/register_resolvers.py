@@ -40,7 +40,7 @@ if TYPE_CHECKING:
     from oarepo_model.model import InvenioModel
 
 
-class ServiceResultProxy(RDMRecordServiceResultProxy):
+class RecordServiceResultProxy(RDMRecordServiceResultProxy):
     """Proxy to resolve a record service result."""
 
     @override
@@ -62,14 +62,14 @@ class ServiceResultProxy(RDMRecordServiceResultProxy):
         return record.to_dict()  # type: ignore[no-any-return]
 
 
-class ServiceResultResolver(RDMRecordServiceResultResolver):
+class RecordServiceResultResolver(RDMRecordServiceResultResolver):
     """Service result resolver for draft records."""
 
     def __init__(
         self,
         service_id: str,
         type_key: str,
-        proxy_cls: type[ServiceResultProxy] = ServiceResultProxy,
+        proxy_cls: type[RecordServiceResultProxy] = RecordServiceResultProxy,
         item_cls: type[RecordItem] | None = None,
         record_cls: type[Record] | None = None,
     ):
@@ -113,12 +113,12 @@ class RegisterResolversPreset(Preset):
                 proxy_cls=runtime_dependencies.get("RecordProxy"),
             )
 
-        def register_notification_resolver() -> ServiceResultResolver:
+        def register_notification_resolver() -> RecordServiceResultResolver:
             service_id = builder.model.base_name
-            return ServiceResultResolver(
+            return RecordServiceResultResolver(
                 service_id=service_id,
                 type_key=service_id,
-                proxy_cls=ServiceResultProxy,
+                proxy_cls=RecordServiceResultProxy,
             )
 
         # just invenio things
