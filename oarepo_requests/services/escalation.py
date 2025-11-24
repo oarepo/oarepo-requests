@@ -44,7 +44,9 @@ def escalate_request(request: Request, escalation: WorkflowRequestEscalation, uo
     resolved_topic = request.topic.resolve()
     receiver = escalation.recipient_entity_reference(record=resolved_topic)
 
-    old_receiver_str = json.dumps(request["receiver"], sort_keys=True)
+    old_receiver_str = json.dumps(
+        request["receiver"], sort_keys=True
+    )  # why sort keys? should be only one even in multiple recipients
     new_receiver_str = json.dumps(receiver, sort_keys=True)
     if new_receiver_str != old_receiver_str:
         logger.info("Request %s receiver changed from %s to %s", request.id, old_receiver_str, new_receiver_str)
@@ -66,7 +68,7 @@ def escalate_request(request: Request, escalation: WorkflowRequestEscalation, uo
         )
 
         request.receiver = receiver
-        request.commit()
+        # done in RecordCommitOp? request.commit()
         uow.register(NotificationOp(EscalateRequestSubmitNotificationBuilder.build(request=request)))  # type: ignore[reportArgumentType]
         logger.info("Notification mail sent to %s", new_receiver_str)
         uow.register(RecordCommitOp(request))  # type: ignore[reportArgumentType]
@@ -89,8 +91,8 @@ def stale_requests() -> Generator[tuple[Request, WorkflowRequestEscalation]]:
         workflow = current_oarepo_workflows.get_workflow(topic)
         workflow_request = workflow.requests()[request_type]
 
-        if hasattr(workflow_request, "escalations") and workflow_request.escalations:
-            results = (
+        if workflow_request.escalations:
+            escalation_events = (
                 db.session.query(RequestEventModel)
                 # typing bool issue with SQLAlchemy; idk how to fix this
                 # relevant probably https://stackoverflow.com/questions/76387837/sqlalchemy-typing-support-on-filter-for-imperatively-mapped-attrs-classes
@@ -98,17 +100,16 @@ def stale_requests() -> Generator[tuple[Request, WorkflowRequestEscalation]]:
                 .all()
             )
 
-            sorted_escalations = sorted(workflow_request.escalations, key=lambda escalation: escalation.after)
+            event_escalation_ids = {cast("dict[str, Any]", e.json)["payload"]["escalation"] for e in escalation_events}
+            sorted_escalations = [
+                e
+                for e in sorted(workflow_request.escalations, key=lambda escalation: escalation.after)
+                if e.escalation_id not in event_escalation_ids
+            ]
+
             most_recent_escalation = None
 
             for escalation in sorted_escalations:
-                # cast - assume db query can't return none at this point
-                if any(
-                    cast("dict[str, Any]", result.json)["payload"]["escalation"] == escalation.escalation_id
-                    for result in results
-                ):
-                    continue  # already processed
-
                 # take the most recent one
                 utc_now_naive = datetime.now(UTC).replace(tzinfo=None)
                 if (
