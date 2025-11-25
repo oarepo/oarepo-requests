@@ -18,10 +18,9 @@ if TYPE_CHECKING:
     from invenio_notifications.models import Notification, Recipient
 
 
-class SystemUserRecipientFilter(RecipientFilter):
+class UsersWithNoMailRecipientFilter(RecipientFilter):
     """Recipient filter for filtering system user."""
 
     def __call__(self, notification: Notification, recipients: dict[str, Recipient]):  # noqa ARG002
         """Filter system recipient."""
-        recipients.pop("system", None)
-        return recipients
+        return {id_: recipient for id_, recipient in recipients.items() if "email" in recipient.data}

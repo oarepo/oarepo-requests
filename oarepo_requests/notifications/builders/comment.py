@@ -18,7 +18,7 @@ from invenio_requests.notifications.builders import (
 )
 from invenio_requests.notifications.generators import RequestParticipantsRecipient
 
-from oarepo_requests.notifications.filters import SystemUserRecipientFilter
+from oarepo_requests.notifications.filters import UsersWithNoMailRecipientFilter
 from oarepo_requests.notifications.generators import (
     GeneralRequestParticipantsRecipient,
     ReferenceSavingEntityResolve,
@@ -56,4 +56,4 @@ class CommentRequestEventCreateNotificationBuilder(InvenioCommentRequestEventCre
     @classproperty
     def recipient_filters(self) -> tuple[RecipientFilter, ...]:  # type: ignore[reportIncompatibleVariableOverride]
         """Get recipient filters for the notification builder."""
-        return *super().recipient_filters, SystemUserRecipientFilter()
+        return *super().recipient_filters, UsersWithNoMailRecipientFilter()

@@ -13,7 +13,7 @@ from typing import TYPE_CHECKING, Any, override
 
 from invenio_access.permissions import system_identity
 from invenio_notifications.services.generators import EntityResolve
-from invenio_records.dictutils import dict_lookup, dict_set
+from invenio_records.dictutils import dict_lookup
 from invenio_requests.records import Request
 
 if TYPE_CHECKING:
@@ -29,7 +29,11 @@ class NotificationCtxWithReference(dict):
         """Initialize the context."""
         super().__init__(ctx)
         self.references: dict[str, Any] = ctx.references if isinstance(ctx, NotificationCtxWithReference) else {}
-        dict_set(self.references, reference_key, reference_dict)
+        self.references[reference_key] = reference_dict
+
+    def get_reference_type(self, key: str) -> str:
+        """Get the type of the reference stored under the given key."""
+        return next(iter(self.references[key].keys()))
 
 
 class ReferenceSavingEntityResolve(EntityResolve):

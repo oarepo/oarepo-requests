@@ -47,7 +47,7 @@ class EntityRecipientGenerator(RecipientGenerator):
             raise TypeError(
                 "Using EntityRecipientGenerator on notification without saved reference dictionary to the entity."
             )
-        entity_type = next(iter(dict_lookup(notification.context.references, self.key).keys()))
+        entity_type = notification.context.get_reference_type(self.key)
         generator = current_notification_recipient_generators_registry[entity_type](self.key, notification)
         generator(notification, recipients)
 
@@ -63,11 +63,11 @@ class MultipleRecipients(RecipientGenerator):
         """Generate recipients for the given entity."""
         fields = dict_lookup(notification.context, self.key)
 
-        for type_, value_dict in fields.items():
-            for id_ in value_dict:
-                key = f"{self.key}.{type_}.{id_}"
-                generator = current_notification_recipient_generators_registry[type_](key, notification)
-                generator(notification, recipients)
+        for idx, entity_dict in enumerate(fields):
+            type_ = next(iter(entity_dict.keys()))
+            key = f"{self.key}.{idx}.{type_}"
+            generator = current_notification_recipient_generators_registry[type_](key, notification)
+            generator(notification, recipients)
 
 
 class GeneralRequestParticipantsRecipient(RecipientGenerator):

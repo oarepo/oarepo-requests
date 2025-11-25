@@ -11,67 +11,90 @@
 from __future__ import annotations
 
 import json
-from collections import defaultdict
-from typing import Any
+from typing import TYPE_CHECKING, Any, cast, override
 
-from invenio_access.permissions import system_identity, system_user_id
+from flask_principal import Identity
 from invenio_notifications.registry import EntityResolverRegistry
-from invenio_records_resources.references.entity_resolvers import ServiceResultResolver
-from invenio_users_resources.entity_resolvers import UserProxy, UserResolver
-from invenio_users_resources.proxies import current_users_service
-from oarepo_workflows.resolvers.multiple_entities import MultipleEntitiesProxy, MultipleEntitiesResolver
+from invenio_records_resources.references import EntityResolver
+from invenio_records_resources.references.entity_resolvers import EntityProxy, ServiceResultProxy, ServiceResultResolver
+from invenio_records_resources.services.errors import PermissionDeniedError
+from oarepo_workflows.resolvers.multiple_entities import (
+    MultipleEntitiesEntity,
+)
+
+if TYPE_CHECKING:
+    from flask_principal import ItemNeed, Need
+    from sqlalchemy import Identity
 
 
-class UserNotificationResolver(UserResolver):
-    """Resolver for user notifications."""
+class UserNotificationProxy(ServiceResultProxy):
+    """Proxy for a user entity."""
 
-    def _get_entity_proxy(self, ref_dict: dict[str, str]) -> UserNotificationProxy:
-        """Return a UserProxy for the given reference dict."""
-        return UserNotificationProxy(self, ref_dict)
-
-
-class UserNotificationProxy(UserProxy):
-    """Proxy for a user entity.
-
-    Supports both system_identity and user_id and returns the user data in dict format required in notifications.
-    """
-
+    # possibly an invenio bug
     def _resolve(self) -> dict[str, Any]:
         """Resolve the User from the proxy's reference dict, or system_identity."""
-        user_id = self._parse_ref_dict_id()
-        if user_id == system_user_id:  # system_user_id is a string: "system"
-            return self.system_record()  # type: ignore[no-any-return]
         try:
-            return current_users_service.read(system_identity, user_id).to_dict()  # type: ignore[no-any-return]
-        except:  # noqa E722
-            return self.ghost_record({"id": user_id})  # type: ignore[no-any-return]
+            return super()._resolve()  # type: ignore[no-any-return]
+        except (
+            PermissionDeniedError
+        ):  # users service raises PermissionDeniedError on missing resource due to security implications
+            return {"id": self._parse_ref_dict_id()}
 
 
-class MultipleEntitiesNotificationResolver(MultipleEntitiesResolver):
-    """Resolver for user notifications."""
+class MultipleEntitiesNotificationProxy(EntityProxy):
+    """Entity proxy for email addresses."""
 
-    def _get_entity_proxy(self, ref_dict: dict[str, str]) -> MultipleEntitiesNotificationProxy:
-        """Return a UserProxy for the given reference dict."""
-        return MultipleEntitiesNotificationProxy(self, ref_dict)
-
-
-class MultipleEntitiesNotificationProxy(MultipleEntitiesProxy):
-    """Proxy for a user entity.
-
-    Supports both system_identity and user_id and returns the user data in dict format required in notifications.
-    """
-
-    # Consider whether to reconceptualize inheritance to resolve typing issue
-    def _resolve(self) -> dict[str, Any]:  # type: ignore[reportIncompatibleMethodOverride]
+    @override
+    def _resolve(self) -> list[dict[str, dict[str, Any]]]:  # type: ignore[reportIncompatibleMethodOverride]
         """Resolve the User from the proxy's reference dict, or system_identity."""
         entity_refs = json.loads(self._parse_ref_dict_id())
 
-        fields: dict[str, dict[str, dict[str, Any]]] = defaultdict(dict)
+        fields: list[dict[str, dict[str, Any]]] = []
         for entity_ref in entity_refs:
             type_ = next(iter(entity_ref.keys()))
-            id_ = next(iter(entity_ref.values()))
-            fields[type_] |= {id_: EntityResolverRegistry.resolve_entity(entity_ref)}
+            fields.append({type_: EntityResolverRegistry.resolve_entity(entity_ref)})
+
         return fields
+
+    # not used in notifications but required for inheritance
+    @override
+    def get_needs(self, ctx: dict | None = None) -> list[Need | ItemNeed]:
+        """Get the needs provided by the entity."""
+        return []
+
+    @override
+    def pick_resolved_fields(self, identity: Identity, resolved_dict: dict[str, Any]) -> dict[str, Any]:
+        """Select which fields to return when resolving the reference."""
+        return resolved_dict
+
+
+class MultipleEntitiesNotificationResolver(EntityResolver):
+    """Resolver for user notifications."""
+
+    type_id = "multiple"
+
+    def __init__(self) -> None:
+        """Initialize the resolver."""
+        super().__init__("multiple")
+
+    def _get_entity_proxy(self, ref_dict: dict[str, str]) -> EntityProxy:
+        """Return a UserProxy for the given reference dict."""
+        return MultipleEntitiesNotificationProxy(self, ref_dict)
+
+    @override
+    def matches_reference_dict(self, ref_dict: dict) -> bool:
+        """Check if the reference dictionary can be resolved by this resolver."""
+        return cast("bool", self._parse_ref_dict_type(ref_dict) == self.type_id)
+
+    @override
+    def matches_entity(self, entity: Any) -> bool:
+        """Check if the entity can be serialized to a reference by this resolver."""
+        return isinstance(entity, MultipleEntitiesEntity)
+
+    @override
+    def _reference_entity(self, entity: MultipleEntitiesEntity) -> dict[str, str]:
+        """Return a reference dictionary for the entity."""
+        return {self.type_id: entity.id}
 
 
 def requests_resolver() -> ServiceResultResolver:
@@ -84,17 +107,17 @@ def request_events_resolver() -> ServiceResultResolver:
     return ServiceResultResolver(service_id="request_events", type_key="request_event")
 
 
+def user_resolver() -> ServiceResultResolver:
+    """Return community role notification resolver."""
+    return ServiceResultResolver(service_id="users", type_key="user", proxy_cls=UserNotificationProxy)
+
+
 def multiple_entities_resolver() -> MultipleEntitiesNotificationResolver:
     """Return community role notification resolver."""
     return MultipleEntitiesNotificationResolver()
 
 
-def user_resolver() -> UserNotificationResolver:
-    """Return community role notification resolver."""
-    return UserNotificationResolver()
-
-
 requests_resolver.type_key = "request"  # type: ignore[attr-defined]
 request_events_resolver.type_key = "request_event"  # type: ignore[attr-defined]
-user_resolver.type_key = UserNotificationResolver.type_id  # type: ignore[attr-defined]
+user_resolver.type_key = "user"  # type: ignore[attr-defined]
 multiple_entities_resolver.type_key = MultipleEntitiesNotificationResolver.type_id  # type: ignore[attr-defined]
