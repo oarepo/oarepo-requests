@@ -14,10 +14,12 @@ import json
 from typing import TYPE_CHECKING, Any, cast, override
 
 from flask_principal import Identity
+from invenio_access.permissions import system_user_id
 from invenio_notifications.registry import EntityResolverRegistry
 from invenio_records_resources.references import EntityResolver
 from invenio_records_resources.references.entity_resolvers import EntityProxy, ServiceResultProxy, ServiceResultResolver
 from invenio_records_resources.services.errors import PermissionDeniedError
+from invenio_users_resources.entity_resolvers import UserProxy
 from oarepo_workflows.resolvers.multiple_entities import (
     MultipleEntitiesEntity,
 )
@@ -28,17 +30,20 @@ if TYPE_CHECKING:
 
 
 class UserNotificationProxy(ServiceResultProxy):
-    """Proxy for a user entity."""
+    """Entity proxy for user notifications."""
 
-    # possibly an invenio bug
+    system_record = UserProxy.system_record
+    ghost_record = UserProxy.ghost_record
+
     def _resolve(self) -> dict[str, Any]:
         """Resolve the User from the proxy's reference dict, or system_identity."""
+        user_id = self._parse_ref_dict_id()
+        if user_id == system_user_id:  # system_user_id is a string: "system"
+            return self.system_record()  # type: ignore[no-any-return]
         try:
             return super()._resolve()  # type: ignore[no-any-return]
-        except (
-            PermissionDeniedError
-        ):  # users service raises PermissionDeniedError on missing resource due to security implications
-            return {"id": self._parse_ref_dict_id()}
+        except PermissionDeniedError:
+            return self.ghost_record({"id": user_id})  # type: ignore[no-any-return]
 
 
 class MultipleEntitiesNotificationProxy(EntityProxy):
@@ -52,7 +57,7 @@ class MultipleEntitiesNotificationProxy(EntityProxy):
         fields: list[dict[str, dict[str, Any]]] = []
         for entity_ref in entity_refs:
             type_ = next(iter(entity_ref.keys()))
-            fields.append({type_: EntityResolverRegistry.resolve_entity(entity_ref)})
+            fields.append({type_: cast("dict[str, Any]", EntityResolverRegistry.resolve_entity(entity_ref))})
 
         return fields
 
