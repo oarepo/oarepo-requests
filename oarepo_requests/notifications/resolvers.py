@@ -11,9 +11,8 @@
 from __future__ import annotations
 
 import json
-from typing import TYPE_CHECKING, Any, cast, override
+from typing import Any, cast, override
 
-from flask_principal import Identity
 from invenio_access.permissions import system_user_id
 from invenio_notifications.registry import EntityResolverRegistry
 from invenio_records_resources.references import EntityResolver
@@ -21,12 +20,9 @@ from invenio_records_resources.references.entity_resolvers import EntityProxy, S
 from invenio_records_resources.services.errors import PermissionDeniedError
 from invenio_users_resources.entity_resolvers import UserProxy
 from oarepo_workflows.resolvers.multiple_entities import (
-    MultipleEntitiesEntity,
+    MultipleEntitiesProxy,
+    MultipleEntitiesResolver,
 )
-
-if TYPE_CHECKING:
-    from flask_principal import ItemNeed, Need
-    from sqlalchemy import Identity
 
 
 class UserNotificationProxy(ServiceResultProxy):
@@ -49,6 +45,10 @@ class UserNotificationProxy(ServiceResultProxy):
 class MultipleEntitiesNotificationProxy(EntityProxy):
     """Entity proxy for email addresses."""
 
+    # not used in notifications but required for inheritance
+    get_needs = MultipleEntitiesProxy.get_needs
+    pick_resolved_fields = MultipleEntitiesProxy.pick_resolved_fields
+
     @override
     def _resolve(self) -> list[dict[str, dict[str, Any]]]:  # type: ignore[reportIncompatibleMethodOverride]
         """Resolve the User from the proxy's reference dict, or system_identity."""
@@ -61,22 +61,14 @@ class MultipleEntitiesNotificationProxy(EntityProxy):
 
         return fields
 
-    # not used in notifications but required for inheritance
-    @override
-    def get_needs(self, ctx: dict | None = None) -> list[Need | ItemNeed]:
-        """Get the needs provided by the entity."""
-        return []
-
-    @override
-    def pick_resolved_fields(self, identity: Identity, resolved_dict: dict[str, Any]) -> dict[str, Any]:
-        """Select which fields to return when resolving the reference."""
-        return resolved_dict
-
 
 class MultipleEntitiesNotificationResolver(EntityResolver):
     """Resolver for user notifications."""
 
-    type_id = "multiple"
+    type_id = MultipleEntitiesResolver.type_id
+    matches_reference_dict = MultipleEntitiesResolver.matches_reference_dict
+    matches_entity = MultipleEntitiesResolver.matches_entity
+    _reference_entity = MultipleEntitiesResolver._reference_entity  # noqa SLF001
 
     def __init__(self) -> None:
         """Initialize the resolver."""
@@ -85,21 +77,6 @@ class MultipleEntitiesNotificationResolver(EntityResolver):
     def _get_entity_proxy(self, ref_dict: dict[str, str]) -> EntityProxy:
         """Return a UserProxy for the given reference dict."""
         return MultipleEntitiesNotificationProxy(self, ref_dict)
-
-    @override
-    def matches_reference_dict(self, ref_dict: dict) -> bool:
-        """Check if the reference dictionary can be resolved by this resolver."""
-        return cast("bool", self._parse_ref_dict_type(ref_dict) == self.type_id)
-
-    @override
-    def matches_entity(self, entity: Any) -> bool:
-        """Check if the entity can be serialized to a reference by this resolver."""
-        return isinstance(entity, MultipleEntitiesEntity)
-
-    @override
-    def _reference_entity(self, entity: MultipleEntitiesEntity) -> dict[str, str]:
-        """Return a reference dictionary for the entity."""
-        return {self.type_id: entity.id}
 
 
 def requests_resolver() -> ServiceResultResolver:
