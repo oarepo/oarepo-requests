@@ -28,7 +28,9 @@ class NotificationCtxWithReference(dict):
     ):
         """Initialize the context."""
         super().__init__(ctx)
-        self.references: dict[str, Any] = ctx.references if isinstance(ctx, NotificationCtxWithReference) else {}
+        self.references: dict[str, dict[str, str]] = (
+            ctx.references if isinstance(ctx, NotificationCtxWithReference) else {}
+        )
         self.references[reference_key] = reference_dict
 
     def get_reference_type(self, key: str) -> str:
