@@ -1384,5 +1384,17 @@ msgstr ""
 msgid "Not submitted"
 msgstr ""
 
+#: /Users/miroslavbauer/Code/github.com/oarepo/oarepo-requests/oarepo_requests/types/edit_record.py:75
+#: /Users/miroslavbauer/Code/github.com/oarepo/oarepo-requests/oarepo_requests/types/new_version.py:71
+#: /Users/miroslavbauer/Code/github.com/oarepo/oarepo-requests/oarepo_requests/types/new_version.py:80
+msgid "Trying to create edit request on record without draft support"
+msgstr ""
+
+msgid "This record has no user requests applicable."
+msgstr ""
+
+msgid "An error occurred while fetching the applicable requests."
+msgstr ""
+
 #~ msgid "No status"
 #~ msgstr ""

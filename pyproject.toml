@@ -3,9 +3,7 @@ name = "oarepo-requests"
 dynamic = ["version"]
 description = "Add your description here"
 readme = "README.md"
-authors = [
-    { name = "Ronald Krist", email = "krist@cesnet.cz" }
-]
+authors = [{ name = "Ronald Krist", email = "krist@cesnet.cz" }]
 requires-python = ">=3.13,<3.15"
 
 dependencies = [
@@ -20,22 +18,16 @@ dependencies = [
 Homepage = "https://github.com/oarepo/oarepo-requests"
 
 [project.optional-dependencies]
-dev = [
-    "ruff>=0.11.13",
-    "types-PyYAML",
-    "oarepo-invenio-typing-stubs"
-]
+dev = ["ruff>=0.11.13", "types-PyYAML", "oarepo-invenio-typing-stubs"]
 
 tests = [
     "pytest-invenio",
     "pytest-oarepo",
     "oarepo-rdm>=1.0.0.dev4",
-    "oarepo-ui>=6.0.0dev1", # remove once dev versions aren't used
+    "oarepo-ui>=6.0.0dev1",   # remove once dev versions aren't used
     "deepdiff",
 ]
-oarepo14 = [
-    "oarepo[rdm,tests]>=14.0.0,<15.0.0",
-]
+oarepo14 = ["oarepo[rdm,tests]>=14.0.0,<15.0.0"]
 
 # TODO missing entrypoints
 [project.entry-points."invenio_base.apps"]
@@ -45,7 +37,10 @@ oarepo_requests = "oarepo_requests.ext:OARepoRequests"
 oarepo_requests = "oarepo_requests.ext:OARepoRequests"
 
 [project.entry-points."invenio_assets.webpack"]
-# oarepo_requests_ui_theme = "oarepo_requests.ui.theme.webpack:theme"
+oarepo_requests_ui_theme = "oarepo_requests.ui.theme.webpack:theme"
+
+[project.entry-points."invenio_base.blueprints"]
+oarepo_requests = "oarepo_requests.ui.views:create_blueprint"
 
 [project.entry-points."invenio_i18n.translations"]
 oarepo_requests_ui = "oarepo_requests"
@@ -94,6 +89,4 @@ build-backend = "hatchling.build"
 path = "oarepo_requests/__init__.py"
 
 [tool.hatch.build.targets.sdist]
-include = [
-    "/oarepo_requests",
-]
+include = ["/oarepo_requests"]

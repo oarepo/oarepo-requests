@@ -1,0 +1,18 @@
+ <div class="sidebar-container">
+    <h2 class="ui medium top attached header mt-0">{{ _('Requests') }}</h2>
+    <div id="record-requests" class="ui segment bottom attached requests rdm-sidebar"
+        data-record='{{ record_ui | tojson }}'
+        data-permissions='{{ permissions | tojson }}'
+        data-is-draft="{{ is_draft | tojson }}"
+        data-is-preview-submission-request="{{ is_preview_submission_request | tojson }}"
+        data-current-user-id="{{ current_user.id }}"
+        data-groups-enabled='{{ config.USERS_RESOURCES_GROUPS_ENABLED | tojson }}'
+{% if record_deletion %}
+        data-record-deletion='{{ record_deletion | tojson }}'
+        data-record-deletion-options='{{ record_deletion_options | tojson }}'
+{% else %}
+        data-record-deletion='{{ {} | tojson }}'
+        data-record-deletion-options='{{ [] | tojson }}'
+{% endif %}>
+    </div>
+</div>
