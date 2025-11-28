@@ -83,7 +83,6 @@ def allowed_request_types_for_record(identity: Identity, record: Record) -> dict
         pass
 
     record_ref = next(iter(reference_entity(record).keys()))
-
     ret = {}
     for rt in current_request_type_registry:
         if record_ref in rt.allowed_topic_ref_types:

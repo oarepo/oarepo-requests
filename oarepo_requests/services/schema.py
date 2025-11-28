@@ -38,6 +38,12 @@ class RequestTypeSchema(ma.Schema):
     type_id = ma.fields.String()
     """Type ID of the request type."""
 
+    name = ma.fields.String()
+    """Name of the request type."""
+
+    description = ma.fields.String()
+    """Description of the request type."""
+
     links = get_links_schema()
     """Links to the request type."""
 
