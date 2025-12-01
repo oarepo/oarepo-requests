@@ -36,7 +36,9 @@ from oarepo_requests.notifications.builders.publish import (
 )
 from oarepo_requests.notifications.generators import MultipleRecipients
 
-REQUESTS_ALLOWED_RECEIVERS = ["user", "group", "auto_approve"]
+# TODO: test
+# check individual receivers in multiple?
+REQUESTS_ALLOWED_RECEIVERS = ["user", "group", "auto_approve", "multiple"]
 
 DEFAULT_WORKFLOW_EVENTS = {
     CommentEventType.type_id: WorkflowEvent(submitters=InvenioRequestsPermissionPolicy.can_create_comment),

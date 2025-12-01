@@ -9,10 +9,8 @@
 
 from __future__ import annotations
 
-from functools import cached_property
 from typing import TYPE_CHECKING, cast
 
-import importlib_metadata
 from deepmerge import conservative_merger
 from invenio_base.utils import obj_or_import_string
 from invenio_requests.customizations import EventType
@@ -22,8 +20,6 @@ from invenio_requests.proxies import (
 )
 
 if TYPE_CHECKING:
-    from collections.abc import Callable
-
     from flask import Flask
     from flask_principal import Identity
     from invenio_records_resources.records.api import Record
@@ -32,28 +28,37 @@ if TYPE_CHECKING:
     from oarepo_requests.actions.components import RequestActionComponent
 
 
-class OARepoRequests:
-    """OARepo-Requests extension."""
+class _OARepoRequestsState:
+    def __init__(self, app: Flask):
+        """Initialize state.
 
-    def __init__(self, app: Flask | None = None) -> None:
-        """Extension initialization."""
-        if app:
-            self.init_app(app)
+        :param app: An instance of :class:`~flask.app.Flask`.
+        :param entry_point_group_mappings:
+            The entrypoint group name to load mappings.
+        :param entry_point_group_templates:
+            The entrypoint group name to load templates.
+        """
+        self.app = app
 
     def init_app(self, app: Flask) -> None:
         """Flask application initialization."""
         self.app = app
-        self.init_config(app)
         app.extensions["oarepo-requests"] = self
 
     @property
-    def ui_serialization_referenced_fields(self) -> list[str]:
-        """Request fields containing  that should be serialized in the UI.
+    def allowed_receiver_ref_types(self) -> list[str]:
+        """Return a list of allowed receiver entity reference types.
 
-        These fields will be dereferenced, serialized to UI using one of the entity_reference_ui_resolvers
-        and included in the serialized request.
+        This value is taken from the configuration key REQUESTS_ALLOWED_RECEIVERS.
         """
-        return cast("list[str]", self.app.config["REQUESTS_UI_SERIALIZATION_REFERENCED_FIELDS"])
+        return cast("list[str]", self.app.config.get("REQUESTS_ALLOWED_RECEIVERS", []))
+
+    def action_components(self) -> list[type[RequestActionComponent]]:
+        """Return components for the given action."""
+        return cast(
+            "list[type[RequestActionComponent]]",
+            self.app.config["REQUESTS_ACTION_COMPONENTS"],
+        )
 
     def default_request_receiver(
         self,
@@ -84,46 +89,27 @@ class OARepoRequests:
             data=data,
         )
 
-    @property
-    def allowed_receiver_ref_types(self) -> list[str]:
-        """Return a list of allowed receiver entity reference types.
 
-        This value is taken from the configuration key REQUESTS_ALLOWED_RECEIVERS.
+class OARepoRequests:
+    """OARepo-Requests extension."""
+
+    def __init__(self, app: Flask | None = None) -> None:
+        """Extension initialization."""
+        if app:
+            self.init_app(app)
+
+    def init_app(self, app: Flask) -> None:
+        """Flask application initialization.
+
+        :param app: An instance of :class:`~flask.app.Flask`.
         """
-        return cast("list[str]", self.app.config.get("REQUESTS_ALLOWED_RECEIVERS", []))
+        self.init_config(app)
+        state = _OARepoRequestsState(app)
+        self._state = app.extensions["oarepo-requests"] = state
 
-    # TODO: possible not used
-    @cached_property
-    def identity_to_entity_references_functions(self) -> list[Callable]:
-        """Return a list of functions that map identity to entity references.
-
-        These functions are used to map the identity of the user to entity references
-        that represent the needs of the identity. The functions are taken from the entrypoints
-        registered under the group oarepo_requests.identity_to_entity_references.
-        """
-        group_name = "oarepo_requests.identity_to_entity_references"
-        return [x.load() for x in importlib_metadata.entry_points().select(group=group_name)]
-
-    # TODO: possible not used
-    def identity_to_entity_references(self, identity: Identity) -> list[dict[str, str]]:
-        """Map the identity to entity references."""
-        ret = [
-            mapping_fnc(identity)
-            for mapping_fnc in (self.identity_to_entity_references_functions)
-            if mapping_fnc(identity)
-        ]
-        flattened_ret = []
-        for mapping_result in ret:
-            if mapping_result:
-                flattened_ret += mapping_result
-        return flattened_ret
-
-    def action_components(self) -> list[type[RequestActionComponent]]:
-        """Return components for the given action."""
-        return cast(
-            "list[type[RequestActionComponent]]",
-            self.app.config["REQUESTS_ACTION_COMPONENTS"],
-        )
+    def __getattr__(self, name: str):
+        """Proxy to state object."""
+        return getattr(self._state, name, None)
 
     def init_config(self, app: Flask) -> None:
         """Initialize configuration."""

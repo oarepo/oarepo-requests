@@ -10,13 +10,22 @@ from __future__ import annotations
 from typing import Any
 
 import pytest
+from invenio_i18n import lazy_gettext as _
+from invenio_notifications.backends import EmailNotificationBackend
+from invenio_notifications.manager import NotificationManager
+from invenio_notifications.models import Recipient
+from invenio_notifications.services.generators import EntityResolve
+from invenio_records.dictutils import dict_lookup, dict_set
 from invenio_requests.customizations.event_types import CommentEventType
 from invenio_requests.proxies import current_events_service
+from invenio_users_resources.notifications.generators import UserRecipient
 from oarepo_workflows.resolvers.multiple_entities import (
     MultipleEntitiesEntity,
     MultipleEntitiesProxy,
     MultipleEntitiesResolver,
 )
+
+from oarepo_requests.notifications.builders.publish import PublishDraftRequestSubmitNotificationBuilder
 
 
 def test_publish_notifications(
@@ -335,3 +344,62 @@ def test_comment_notifications(
         receivers = outbox[0].recipients
         assert set(receivers) == {"user2@example.org"}
         assert content in outbox[0].body
+
+
+def make_lazy(data):
+    if isinstance(data, dict):
+        return {key: make_lazy(value) for key, value in data.items()}
+    if isinstance(data, list):
+        return [make_lazy(item) for item in data]
+    if isinstance(data, str):
+        return _(data)
+    return data
+
+
+class LazyUserRecipient(UserRecipient):
+    """User email recipient generator for a notification."""
+
+    def __call__(self, notification, recipients):
+        """Update required recipient information and add backend id."""
+        user = dict_lookup(notification.context, self.key)
+        recipients[user["id"]] = Recipient(data=make_lazy(user))
+        return recipients
+
+
+class LazyEntityResolve(EntityResolve):
+    """Payload generator for a notification using the entity resolvers."""
+
+    def __call__(self, notification):
+        """Update required recipient information and add backend id."""
+        notification = super().__call__(notification)
+        dict_set(notification.context, self.key, make_lazy(dict_lookup(notification.context, self.key)))
+        return notification
+
+
+class LazyPublishDraftRequestSubmitNotificationBuilder(PublishDraftRequestSubmitNotificationBuilder):
+    """Publish draft request submit notification builder."""
+
+    context = (
+        EntityResolve(key="request"),
+        LazyEntityResolve(key="request.topic"),
+        LazyEntityResolve(key="request.created_by"),
+        LazyEntityResolve(key="request.receiver"),
+    )
+
+    recipients = (LazyUserRecipient(key="request.receiver"),)
+
+
+def test_lazy_string_parsing(app, users, logged_client, draft_factory, create_request_on_draft):
+    draft = draft_factory(users[0].identity)
+    request = create_request_on_draft(users[0].identity, draft["id"], "publish_draft")
+
+    manager = NotificationManager(
+        {EmailNotificationBackend.id: EmailNotificationBackend()},
+        {LazyPublishDraftRequestSubmitNotificationBuilder.type: LazyPublishDraftRequestSubmitNotificationBuilder},
+    )
+
+    notification = LazyPublishDraftRequestSubmitNotificationBuilder.build(request=request._obj)  # noqa SLF001
+    mail = app.extensions.get("mail")
+    with mail.record_messages() as outbox:
+        manager.handle_broadcast(notification)
+        assert len(outbox) == 1
