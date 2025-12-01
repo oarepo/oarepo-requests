@@ -18,11 +18,11 @@ from invenio_requests.proxies import (
 from werkzeug.local import LocalProxy
 
 if TYPE_CHECKING:
-    from oarepo_requests.ext import OARepoRequests
+    from oarepo_requests.ext import _OARepoRequestsState
     from oarepo_requests.resources.oarepo.resource import OARepoRequestsResource
     from oarepo_requests.services.oarepo.service import OARepoRequestsService
 
-current_oarepo_requests: OARepoRequests = LocalProxy(  # type: ignore[assignment]
+current_oarepo_requests: _OARepoRequestsState = LocalProxy(  # type: ignore[assignment]
     lambda: current_app.extensions["oarepo-requests"]
 )
 current_requests_service: OARepoRequestsService = current_invenio_requests_service  # type: ignore[assignment]
