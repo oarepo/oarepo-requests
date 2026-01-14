@@ -1,0 +1,293 @@
+from __future__ import annotations
+from typing import TYPE_CHECKING
+
+from flask import Blueprint
+from flask import current_app, render_template, g
+from flask_login import current_user, login_required
+from invenio_requests.views.decorators import pass_request
+from invenio_requests.customizations import AcceptAction
+from invenio_users_resources.proxies import current_user_resources
+from invenio_rdm_records.requests import CommunityInclusion, CommunitySubmission
+from invenio_checks.api import ChecksAPI
+from invenio_app_rdm.requests_ui.views.requests import (
+    _resolve_record_or_draft_files,
+    _resolve_record_or_draft_media_files,
+)
+from marshmallow_utils.fields.babel import gettext_from_dict
+from invenio_vocabularies.proxies import current_service as vocabulary_service
+from invenio_app_rdm.records_ui.views.deposits import (
+    get_user_communities_memberships,
+    load_custom_fields,
+)
+from oarepo_ui.proxies import current_oarepo_ui
+
+from invenio_i18n.ext import current_i18n
+from invenio_records_resources.services import RecordService
+
+from oarepo_requests.utils import (
+    get_matching_service_for_refdict,
+    resolve_reference_dict,
+)
+from invenio_rdm_records.resources.serializers import UIJSONSerializer
+from invenio_pidstore.errors import PIDDoesNotExistError
+from invenio_rdm_records.services.errors import RecordDeletedException
+from invenio_drafts_resources.services import RecordService as DraftRecordService
+from sqlalchemy.orm.exc import NoResultFound
+from oarepo_ui.templating.data import FieldData
+from oarepo_runtime import current_runtime
+
+
+def _has_record_topic(request) -> bool:
+    """Check if request topic is a record (not user, community, etc.) using oarepo resolver."""
+    topic = request["topic"]
+    if not topic:
+        return False
+    try:
+        service = get_matching_service_for_refdict(topic)
+        return service is not None and isinstance(service, RecordService)
+    except Exception:
+        return False
+
+
+def _resolve_topic_record_oarepo(request):
+    """Resolve topic record using oarepo utilities (model-agnostic version)."""
+    creator_id = request["expanded"].get("created_by", {}).get("id", None)
+    user_owns_request = str(creator_id) == str(current_user.id)
+
+    if request["is_closed"] and not user_owns_request:
+        return dict(
+            permissions={},
+            record_ui=None,
+            record=None,
+            model=None,
+            d=None,
+            record_detail_template=None,
+        )
+
+    topic_ref = request["topic"]
+    if not topic_ref:
+        return dict(
+            permissions={},
+            record_ui=None,
+            record=None,
+            model=None,
+            d=None,
+            record_detail_template=None,
+        )
+
+    try:
+        service = get_matching_service_for_refdict(topic_ref)
+        if not service:
+            return dict(
+                permissions={},
+                record_ui=None,
+                record=None,
+                model=None,
+                d=None,
+                record_detail_template=None,
+            )
+
+        # Get record ID from reference dict
+        pid = next(iter(topic_ref.values()))
+        # Get entity type (e.g., "datasets")
+        entity_type = next(iter(topic_ref.keys()))
+
+        record = None
+
+        # Try to read draft first if service supports drafts
+        if isinstance(service, DraftRecordService):
+            try:
+                record = service.read_draft(g.identity, pid, expand=True)
+            except (NoResultFound, PIDDoesNotExistError, RecordDeletedException):
+                pass
+
+        # If no draft or not a draft service, try published record
+        if not record:
+            try:
+                record = service.read(g.identity, pid, expand=True)
+            except (NoResultFound, RecordDeletedException):
+                return dict(
+                    permissions={},
+                    record_ui=None,
+                    record=None,
+                    model=None,
+                    d=None,
+                    record_detail_template=None,
+                )
+
+        if record:
+            record_ui = UIJSONSerializer().dump_obj(record.to_dict())
+            permissions = record.has_permissions_to(
+                [
+                    "edit",
+                    "new_version",
+                    "manage",
+                    "update_draft",
+                    "read_files",
+                    "review",
+                    "read",
+                ]
+            )
+
+            # Get model and ui_model from service config
+            model = None
+            ui_model = {}
+            if hasattr(service.config, "model") and service.config.model:
+                model = service.config.model
+                ui_model = getattr(model, "ui_model", {})
+
+            # Create FieldData for template
+            d = FieldData.create(
+                api_data=record.to_dict() if record else {},
+                ui_data=record_ui,
+                ui_definitions=ui_model,
+            )
+
+            # Determine template name: entity_type/RecordDetail.jinja (e.g., "datasets/RecordDetail.jinja")
+            record_detail_template = f"{entity_type}/RecordDetail.jinja"
+
+            return dict(
+                permissions=permissions,
+                record_ui=record_ui,
+                record=record,
+                model=ui_model,
+                d=d,
+                record_detail_template=record_detail_template,
+            )
+
+    except Exception:
+        pass
+
+    return dict(
+        permissions={},
+        record_ui=None,
+        record=None,
+        model=None,
+        d=None,
+        record_detail_template=None,
+    )
+
+
+@login_required
+@pass_request(expand=True)
+def user_dashboard_request_view(request, **kwargs):
+    """User dashboard request details view."""
+    avatar = current_user_resources.users_service.links_item_tpl.expand(
+        g.identity, current_user
+    )["avatar"]
+
+    request_type = request["type"]
+    request_is_accepted = request["status"] == AcceptAction.status_to
+
+    has_topic = request["topic"] is not None
+    has_record_topic = _has_record_topic(request)
+    has_community_topic = has_topic and "community" in request["topic"]
+    is_record_inclusion = request_type == CommunityInclusion.type_id
+    request_permissions = request.has_permissions_to(
+        ["action_accept", "lock_request", "create_comment"]
+    )
+
+    if has_record_topic:
+        topic = _resolve_topic_record_oarepo(request)
+        record_ui = topic["record_ui"]
+        record = topic["record"]
+        is_draft = record_ui["is_draft"] if record_ui else False
+        is_published = record_ui["is_published"] if record_ui else False
+        has_draft = record._record.has_draft if record else False
+
+        files = _resolve_record_or_draft_files(record_ui, request)
+        media_files = _resolve_record_or_draft_media_files(record_ui, request)
+
+        checks = None
+        if current_app.config.get("CHECKS_ENABLED", False) and record:
+            if is_record_inclusion and has_draft:
+                checks = ChecksAPI.get_runs(record._record, is_draft=True)
+            else:
+                checks = ChecksAPI.get_runs(record._record)
+
+        if request_type == "record-deletion":
+            reason_title = vocabulary_service.read(
+                g.identity,
+                ("removalreasons", request["payload"]["reason"]),
+            ).to_dict()
+            request["payload"]["reason_label"] = gettext_from_dict(
+                reason_title["title"],
+                current_i18n.locale,
+                current_app.config.get("BABEL_DEFAULT_LOCALE", "en"),
+            )
+
+        return current_oarepo_ui.catalog.render_first_existing(
+            [
+                f"invenio_requests.{request_type}.index",
+                "invenio_requests.details.index",
+            ],
+            # base_template="invenio_app_rdm/users/base.html",
+            user_avatar=avatar,
+            invenio_request=request.to_dict(),
+            record_ui=record_ui,
+            record=record,
+            checks=checks,
+            permissions={**topic["permissions"], **request_permissions},
+            is_preview=is_draft,  # preview only when draft
+            is_draft=is_draft,
+            is_published=is_published,
+            has_draft=has_draft,
+            request_is_accepted=request_is_accepted,
+            files=files,
+            media_files=media_files,
+            is_user_dashboard=True,
+            custom_fields_ui=load_custom_fields()["ui"],
+            user_communities_memberships=get_user_communities_memberships(),
+            include_deleted=False,
+            # OARepo specific for dynamic record templates
+            d=topic.get("d"),
+            model=topic.get("model"),
+            record_detail_template=topic.get("record_detail_template"),
+        )
+
+    elif has_community_topic or not has_topic:
+        return render_template(
+            f"invenio_requests/{request_type}/user_dashboard.html",
+            base_template="invenio_app_rdm/users/base.html",
+            user_avatar=avatar,
+            invenio_request=request.to_dict(),
+            request_is_accepted=request_is_accepted,
+            permissions={**request_permissions},
+            include_deleted=False,
+        )
+
+    topic = _resolve_topic_record_oarepo(request)
+    record_ui = topic["record_ui"]
+
+    return render_template(
+        [
+            f"invenio_requests/{request_type}/index.html",
+            "invenio_requests/details/index.html",
+        ],
+        base_template="invenio_app_rdm/users/base.html",
+        user_avatar=avatar,
+        record=None,
+        record_ui=None,
+        permissions={**topic["permissions"], **request_permissions},
+        invenio_request=request.to_dict(),
+        request_is_accepted=request_is_accepted,
+        include_deleted=False,
+    )
+
+
+def create_requests_ui_blueprint(app) -> Blueprint:
+    """Create the requests UI blueprint."""
+
+    routes = app.config["RDM_REQUESTS_ROUTES"]
+    blueprint = Blueprint(
+        "invenio_app_rdm_requests",
+        __name__,
+        template_folder="../templates",
+        static_folder="../static",
+    )
+
+    blueprint.add_url_rule(
+        routes["user-dashboard-request-details"],
+        view_func=user_dashboard_request_view,
+    )
+    return blueprint
