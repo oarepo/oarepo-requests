@@ -1,5 +1,5 @@
 from __future__ import annotations
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Any, Mapping
 
 from flask import Blueprint
 from flask import current_app, render_template, g
@@ -35,6 +35,11 @@ from invenio_drafts_resources.services import RecordService as DraftRecordServic
 from sqlalchemy.orm.exc import NoResultFound
 from oarepo_ui.templating.data import FieldData
 from oarepo_runtime import current_runtime
+from invenio_requests import current_request_type_registry
+
+if TYPE_CHECKING:
+    from flask import Blueprint, Flask
+    from invenio_requests.customizations.request_types import RequestType
 
 
 def _has_record_topic(request) -> bool:
@@ -291,3 +296,89 @@ def create_requests_ui_blueprint(app) -> Blueprint:
         view_func=user_dashboard_request_view,
     )
     return blueprint
+
+
+from oarepo_ui.resources.form_config import FormConfigResourceConfig
+from oarepo_requests.ui.components import (
+    ActionLabelsComponent,
+    FormConfigCustomFieldsComponent,
+    FormConfigRequestTypePropertiesComponent,
+)
+from oarepo_ui.resources import AllowedHtmlTagsComponent
+
+import marshmallow as ma
+from oarepo_ui.resources.base import UIComponentsResource
+
+from oarepo_ui.resources.decorators import pass_route_args
+from flask_resources import route
+
+
+class FormConfigResource(UIComponentsResource[FormConfigResourceConfig]):
+    """A resource for form configuration."""
+
+    def create_url_rules(self):
+        """Create the URL rules for the record resource."""
+        routes = []
+        route_config = self.config.routes
+        for route_name, route_url in route_config.items():
+            routes.append(route("GET", route_url, getattr(self, route_name)))
+        return routes
+
+    def _get_form_config(self, **kwargs: Any) -> dict[str, Any]:
+        """Get the form configuration for React forms.
+
+        :param kwargs: Additional configuration options.
+        :return: Dictionary with form configuration.
+        """
+        return self.config.form_config(**kwargs)
+
+    @pass_route_args("view")
+    def form_config(self, **kwargs: Any) -> dict[str, Any]:
+        """Return form configuration.
+
+        This is a view method that retrieves the form configuration by running
+        the necessary components.
+        """
+        print("FormConfigResource.form_config called with kwargs:", kwargs, flush=True)
+        form_config = self._get_form_config()
+        self.run_components(
+            "form_config", form_config=form_config, identity=g.identity, **kwargs
+        )
+        return form_config
+
+
+class RequestTypeSchema(ma.fields.Str):
+    """Schema that makes sure that the request type is a valid request type."""
+
+    def _deserialize(
+        self,
+        value: Any,
+        attr: str | None,
+        data: Mapping[str, Any] | None,
+        **kwargs: Any,
+    ) -> RequestType:
+        """Deserialize the value and check if it is a valid request type."""
+        ret = super()._deserialize(value, attr, data, **kwargs)
+        return current_request_type_registry.lookup(ret, quiet=True)
+
+
+class RequestsFormConfigResourceConfig(FormConfigResourceConfig):
+    """Config for the requests form config resource."""
+
+    url_prefix = "/requests"
+    blueprint_name = "oarepo_requests_form_config"
+    components = [
+        AllowedHtmlTagsComponent,
+        FormConfigCustomFieldsComponent,
+        FormConfigRequestTypePropertiesComponent,
+        ActionLabelsComponent,
+    ]
+    request_view_args = {"request_type": RequestTypeSchema()}
+    routes = {
+        "form_config": "/configs/<request_type>",
+    }
+
+
+def create_requests_form_config_blueprint(app: Flask) -> Blueprint:
+    """Register blueprint for form config resource."""
+    return FormConfigResource(RequestsFormConfigResourceConfig()).as_blueprint()

@@ -22,14 +22,21 @@ from invenio_requests.services.schemas import GenericRequestSchema
 from marshmallow import fields
 
 from oarepo_requests.utils import ref_to_str, reference_entity
+from oarepo_requests.ext import current_request_type_registry
 
-request_type_identity_ctx: ContextVar[Any] = ContextVar("oarepo_requests.request_type_identity", default=None)
-request_type_record_ctx: ContextVar[Any] = ContextVar("oarepo_requests.request_type_record", default=None)
+request_type_identity_ctx: ContextVar[Any] = ContextVar(
+    "oarepo_requests.request_type_identity", default=None
+)
+request_type_record_ctx: ContextVar[Any] = ContextVar(
+    "oarepo_requests.request_type_record", default=None
+)
 
 
 def get_links_schema() -> ma.fields.Dict:
     """Get links schema."""
-    return ma.fields.Dict(keys=ma.fields.String())  # value is either string or dict of strings (for actions)
+    return ma.fields.Dict(
+        keys=ma.fields.String()
+    )  # value is either string or dict of strings (for actions)
 
 
 class RequestTypeSchema(ma.Schema):
@@ -48,10 +55,40 @@ class RequestTypeSchema(ma.Schema):
         type_id = data["type_id"]
         identity = request_type_identity_ctx.get()
         record = request_type_record_ctx.get()
-        topic_ref = ref_to_str(reference_entity(record) if isinstance(record, Record) else record)
+        topic_ref = ref_to_str(
+            reference_entity(record) if isinstance(record, Record) else record
+        )
         link = EndpointLink("requests.create_via_url", params=["topic", "request_type"])
-        template = LinksTemplate({"create": link}, context={"topic": topic_ref, "request_type": type_id})
+        template = LinksTemplate(
+            {"create": link}, context={"topic": topic_ref, "request_type": type_id}
+        )
         data["links"] = {"actions": template.expand(identity, record)}
+        return data
+
+    @ma.post_dump
+    def _add_type_details(self, data: dict, **kwargs: Any) -> dict:
+        """Serialize details from request type."""
+        type = data["type_id"]
+        type_obj = current_request_type_registry.lookup(type, quiet=True)
+        if hasattr(type_obj, "description"):
+            data["description"] = type_obj.description
+        if hasattr(type_obj, "name"):
+            data["name"] = type_obj.name
+        if hasattr(type_obj, "dangerous"):
+            data["dangerous"] = type_obj.dangerous
+        if hasattr(type_obj, "is_editable"):
+            data["editable"] = type_obj.is_editable
+        if hasattr(type_obj, "has_form"):
+            data["has_form"] = type_obj.has_form
+
+        # if hasattr(type_obj, "stateful_name"):
+        #     data["stateful_name"] = type_obj.stateful_name(
+        #         identity=self.context["identity"], topic=self.context["topic"]
+        #     )
+        # if hasattr(type_obj, "stateful_description"):
+        #     data["stateful_description"] = type_obj.stateful_description(
+        #         identity=self.context["identity"], topic=self.context["topic"]
+        #     )
         return data
 
 

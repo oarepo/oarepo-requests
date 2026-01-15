@@ -8,6 +8,9 @@ import {
 } from "@js/oarepo_requests_common";
 import { i18next } from "@translations/oarepo_requests_ui/i18next";
 import sanitizeHtml from "sanitize-html";
+import { InvenioRequestsApp } from "@js/invenio_requests/InvenioRequestsApp";
+import defaultOverrides from "@js/oarepo_requests_common/defaultOverrides";
+import { overrideStore } from "react-overridable";
 
 /**
  * @typedef {import("../../record-requests/types").Request} Request
@@ -23,44 +26,28 @@ export const RequestModalContent = ({
   allowedHtmlTags,
 }) => {
   /** @type {{requests: Request[], setRequests: (requests: Request[]) => void}} */
-
+  console.log("RequestModalContent render", request);
   const description = request?.stateful_description || request?.description;
 
   const sanitizedDescription = sanitizeHtml(description, {
     allowedTags: allowedHtmlTags,
     allowedAttributes: allowedHtmlAttrs,
   });
-
+  const defaultComponents = {
+    "InvenioRequests.RequestActionsPortal": () => null,
+    ...defaultOverrides,
+    ...overrideStore.getAll(),
+  };
   return (
-    <Grid doubling stackable>
-      <Grid.Row>
-        {description && (
-          <Grid.Column as="p" id="request-modal-desc">
-            <span dangerouslySetInnerHTML={{ __html: sanitizedDescription }} />{" "}
-            {request?.links?.self_html && (
-              <a
-                href={request.links.self_html}
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                ({i18next.t("Request details")})
-              </a>
-            )}
-          </Grid.Column>
-        )}
-      </Grid.Row>
-      <Grid.Row>
-        <Grid.Column>
-          <SideRequestInfo request={request} />
-        </Grid.Column>
-      </Grid.Row>
-      <RequestCustomFields request={request} customFields={customFields} />
-      <Grid.Row>
-        <Grid.Column>
-          <Timeline request={request} />
-        </Grid.Column>
-      </Grid.Row>
-    </Grid>
+    <InvenioRequestsApp
+      request={request}
+      defaultQueryParams={10}
+      defaultReplyQueryParams={5}
+      overriddenCmps={defaultComponents}
+      // userAvatar={userAvatar}
+      permissions={{}}
+      // config={config}
+    />
   );
 };
 

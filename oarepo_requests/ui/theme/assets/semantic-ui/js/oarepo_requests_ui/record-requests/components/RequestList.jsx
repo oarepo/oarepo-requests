@@ -21,7 +21,7 @@ export const RequestList = ({ requests }) => {
     const buttonIconProps =
       requestButtonsIconsConfig[request.status_code] ||
       requestButtonsIconsConfig?.default;
-    const header = request?.stateful_name || request?.name;
+    const header = request?.stateful_name || request?.name || request.type;
     return (
       <RequestModal
         key={request.id}

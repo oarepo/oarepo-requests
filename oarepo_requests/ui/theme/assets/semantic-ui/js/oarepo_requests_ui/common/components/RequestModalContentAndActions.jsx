@@ -13,6 +13,8 @@ import { mapLinksToActions } from "@js/oarepo_requests_common";
 import PropTypes from "prop-types";
 import { useQuery, useIsMutating } from "@tanstack/react-query";
 import { httpApplicationJson } from "@js/oarepo_ui";
+import { RequestActionController } from "@js/invenio_requests/request/actions/RequestActionController";
+import { useCallbackContext } from "../contexts";
 
 export const RequestModalContentAndActions = ({
   request,
@@ -24,7 +26,18 @@ export const RequestModalContentAndActions = ({
 }) => {
   const { errors } = useFormikContext();
   const error = errors?.api;
+  const { fetchNewRequests } = useCallbackContext();
+  const actionSuccessCallback = (response) => {
+    const redirectionURL =
+      response?.data?.links?.ui_redirect_url ||
+      response?.data?.links?.topic?.self_html;
+    onClose();
+    fetchNewRequests();
 
+    if (redirectionURL) {
+      window.location.href = redirectionURL;
+    }
+  };
   const {
     data,
     error: customFieldsLoadingError,
@@ -82,7 +95,15 @@ export const RequestModalContentAndActions = ({
         />
       </Modal.Content>
       <Modal.Actions>
-        {modalActions.map(({ name, component: ActionComponent }) => (
+        <Button onClick={onClose} icon labelPosition="left">
+          <Icon name="cancel" />
+          {i18next.t("Close")}
+        </Button>
+        <RequestActionController
+          request={requestCreationModal ? requestType : request}
+          actionSuccessCallback={actionSuccessCallback}
+        />
+        {/* {modalActions.map(({ name, component: ActionComponent }) => (
           <ActionComponent
             key={name}
             request={request}
@@ -90,11 +111,7 @@ export const RequestModalContentAndActions = ({
             extraData={requestTypeProperties}
             isMutating={isMutating}
           />
-        ))}
-        <Button onClick={onClose} icon labelPosition="left">
-          <Icon name="cancel" />
-          {i18next.t("Close")}
-        </Button>
+        ))} */}
       </Modal.Actions>
     </React.Fragment>
   );

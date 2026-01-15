@@ -14,9 +14,11 @@ import {
 import { httpVnd } from "@js/oarepo_ui";
 import { OverridableContext, overrideStore } from "react-overridable";
 import overrides from "@js/oarepo_requests_common/overrides";
+import defaultOverrides from "@js/oarepo_requests_common/defaultOverrides";
 
 const overriddenComponents = {
   ...overrides,
+  ...defaultOverrides,
   ...overrideStore.getAll(),
 };
 

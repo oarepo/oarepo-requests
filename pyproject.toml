@@ -43,6 +43,7 @@ oarepo_requests = "oarepo_requests.ext:OARepoRequests"
 
 [project.entry-points."invenio_base.blueprints"]
 requests = "oarepo_requests.ui.views:create_requests_ui_blueprint"
+requests_form_config = "oarepo_requests.ui.views:create_requests_form_config_blueprint"
 
 [project.entry-points."invenio_base.api_apps"]
 oarepo_requests = "oarepo_requests.ext:OARepoRequests"
