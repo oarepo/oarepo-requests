@@ -59,8 +59,27 @@ class RequestTypeSchema(ma.Schema):
             reference_entity(record) if isinstance(record, Record) else record
         )
         link = EndpointLink("requests.create_via_url", params=["topic", "request_type"])
+
+        # Get request type object to check conditions
+        type_obj = current_request_type_registry.lookup(type_id, quiet=True)
+
+        # Build links dictionary starting with create
+        links_dict = {"create": link}
+
+        # Add "save" link when request has custom fields UI and is editable
+        has_custom_fields_ui = (
+            type_obj and hasattr(type_obj, "form") and type_obj.form is not None
+        )
+        is_editable = (
+            type_obj and hasattr(type_obj, "is_editable") and type_obj.is_editable
+        )
+
+        if has_custom_fields_ui and is_editable:
+            links_dict["save"] = link  # Same endpoint, different action
+
+        links_dict["submit"] = link  # Always add submit link
         template = LinksTemplate(
-            {"create": link}, context={"topic": topic_ref, "request_type": type_id}
+            links_dict, context={"topic": topic_ref, "request_type": type_id}
         )
         data["links"] = {"actions": template.expand(identity, record)}
         return data

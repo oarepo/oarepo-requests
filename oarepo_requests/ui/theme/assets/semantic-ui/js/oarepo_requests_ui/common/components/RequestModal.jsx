@@ -1,7 +1,7 @@
 import React from "react";
 import { useConfirmationModal } from "@js/oarepo_ui";
 import { Dimmer, Loader, Modal, Button } from "semantic-ui-react";
-import { useFormik, FormikProvider } from "formik";
+import { useFormik, FormikProvider, Formik } from "formik";
 import _isEmpty from "lodash/isEmpty";
 import {
   ModalControlContextProvider,
@@ -9,7 +9,7 @@ import {
 } from "@js/oarepo_requests_common";
 import PropTypes from "prop-types";
 import { useIsMutating } from "@tanstack/react-query";
-import { useCallbackContext } from "../contexts";
+import { useCallbackContext, useFormikRefContext } from "../contexts";
 
 /**
  * @typedef {import("../../record-requests/types").Request} Request
@@ -29,24 +29,27 @@ export const RequestModal = ({
 }) => {
   const { isOpen, close: closeModal, open: openModal } = useConfirmationModal();
   const { setActionsLocked } = useCallbackContext();
+  const formikRef = useFormikRefContext();
 
-  const formik = useFormik({
-    initialValues: !_isEmpty(request?.payload)
-      ? { payload: request.payload }
-      : { payload: {} },
-  });
-  const { resetForm, setErrors } = formik;
+  const { resetForm, setErrors } = formikRef?.current || {};
 
   const isMutating = useIsMutating();
 
   const onClose = () => {
-    setErrors({});
-    resetForm();
+    setErrors?.({});
+    resetForm?.();
     closeModal();
     setActionsLocked(false);
   };
   return (
-    <FormikProvider value={formik}>
+    <Formik
+      initialValues={
+        !_isEmpty(request?.payload)
+          ? { payload: request.payload }
+          : { payload: {} }
+      }
+      innerRef={formikRef}
+    >
       <ModalControlContextProvider
         value={{
           isOpen,
@@ -81,10 +84,11 @@ export const RequestModal = ({
             requestCreationModal={requestCreationModal}
             isMutating={isMutating}
             onClose={onClose}
+            formikRef={formikRef}
           />
         </Modal>
       </ModalControlContextProvider>
-    </FormikProvider>
+    </Formik>
   );
 };
 

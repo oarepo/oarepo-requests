@@ -96,7 +96,6 @@
       >
         {{ _("Conversation") }}
       </a>
-
       {% if record_ui %}
         <a
           role="tab"
@@ -172,3 +171,9 @@
 
   </div>
 {% endblock request_timeline %}
+
+
+{% block javascript %}
+  {% include config.THEME_JAVASCRIPT_TEMPLATE %}
+  {{ webpack['oarepo_requests_ui_request_detail.js'] }}
+{% endblock %}

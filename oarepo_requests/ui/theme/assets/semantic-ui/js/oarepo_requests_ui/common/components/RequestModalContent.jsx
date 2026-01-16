@@ -11,6 +11,7 @@ import sanitizeHtml from "sanitize-html";
 import { InvenioRequestsApp } from "@js/invenio_requests/InvenioRequestsApp";
 import defaultOverrides from "@js/oarepo_requests_common/defaultOverrides";
 import { overrideStore } from "react-overridable";
+import { RequestDetails } from "../RequestDetail";
 
 /**
  * @typedef {import("../../record-requests/types").Request} Request
@@ -35,6 +36,7 @@ export const RequestModalContent = ({
   });
   const defaultComponents = {
     "InvenioRequests.RequestActionsPortal": () => null,
+    "InvenioRequests.RequestDetails.layout": RequestDetails,
     ...defaultOverrides,
     ...overrideStore.getAll(),
   };

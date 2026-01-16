@@ -13,8 +13,9 @@ import { mapLinksToActions } from "@js/oarepo_requests_common";
 import PropTypes from "prop-types";
 import { useQuery, useIsMutating } from "@tanstack/react-query";
 import { httpApplicationJson } from "@js/oarepo_ui";
-import { RequestActionController } from "@js/invenio_requests/request/actions/RequestActionController";
+import { RequestActionController } from "../RequestActionController";
 import { useCallbackContext } from "../contexts";
+import { RequestActionController as InvenioRequestsActionController } from "@js/invenio_requests/request/actions/RequestActionController";
 
 export const RequestModalContentAndActions = ({
   request,
@@ -23,6 +24,7 @@ export const RequestModalContentAndActions = ({
   ContentComponent,
   requestCreationModal,
   onClose,
+  formikRef,
 }) => {
   const { errors } = useFormikContext();
   const error = errors?.api;
@@ -102,6 +104,7 @@ export const RequestModalContentAndActions = ({
         <RequestActionController
           request={requestCreationModal ? requestType : request}
           actionSuccessCallback={actionSuccessCallback}
+          formikRef={formikRef}
         />
         {/* {modalActions.map(({ name, component: ActionComponent }) => (
           <ActionComponent
@@ -124,4 +127,5 @@ RequestModalContentAndActions.propTypes = {
   requestCreationModal: PropTypes.bool,
   onSubmit: PropTypes.func,
   onClose: PropTypes.func,
+  formikRef: PropTypes.object,
 };
