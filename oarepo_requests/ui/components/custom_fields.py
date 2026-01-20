@@ -32,9 +32,11 @@ class FormConfigCustomFieldsComponent(UIResourceComponent):
 
         if isinstance(form, dict):
             # it is just a single field
-            form = [{"section": "", "fields": [form]}]
+            # displaySection False to prevent rendering accordions
+            form = [{"displaySection": False, "section": "", "fields": [form]}]
         elif isinstance(form, list):
             for it in form:
+                it["displaySection"] = it.get("displaySection", False)
                 if not isinstance(it, dict):
                     raise ValueError(f"Form section must be a dictionary: {it}")
                 assert "section" in it, f"Form section must contain 'section' key: {it}"

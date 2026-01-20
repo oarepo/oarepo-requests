@@ -2,63 +2,53 @@ import React, { useEffect } from "react";
 import { Button, Message } from "semantic-ui-react";
 import PropTypes from "prop-types";
 import {
-  useAction,
   useRequestContext,
-  saveAndSubmit,
   ConfirmationModal,
   REQUEST_TYPE,
 } from "@js/oarepo_requests_common";
 import { useConfirmationModal } from "@js/oarepo_ui";
 import { i18next } from "@translations/oarepo_requests_ui/i18next";
-import { useCallbackContext } from "../contexts";
+import { useCallbackContext, useRequestActionContext } from "../contexts";
 
 // Directly create and submit request without modal
-const DirectCreateAndSubmit = ({
-  requestType,
-  requireConfirmation,
-  isMutating,
-}) => {
+const DirectCreateAndSubmit = ({ requestType, requireConfirmation }) => {
   const { isOpen, close, open } = useConfirmationModal();
   const { actionsLocked, setActionsLocked } = useCallbackContext();
-
-  const {
-    isLoading,
-    mutate: createAndSubmit,
-    isError,
-    error,
-    reset,
-  } = useAction({
-    action: saveAndSubmit,
-    requestOrRequestType: requestType,
-  });
+  const { performAction, cleanError, error, loading } =
+    useRequestActionContext();
   const { requestButtonsIconsConfig } = useRequestContext();
   const buttonIconProps =
     requestButtonsIconsConfig[requestType.type_id] ||
     requestButtonsIconsConfig?.default;
   const buttonContent =
     requestType?.stateful_name || requestType?.name || requestType?.type_id;
+  const handleSubmit = async () => {
+    setActionsLocked(true);
+    try {
+      await performAction("submit");
+    } finally {
+      setActionsLocked(false);
+    }
+  };
 
   const handleClick = () => {
-    setActionsLocked(true);
     if (requireConfirmation) {
       open();
     } else {
-      createAndSubmit();
+      handleSubmit();
     }
   };
   useEffect(() => {
     let timeoutId;
-    if (isError) {
+    if (error) {
       timeoutId = setTimeout(() => {
-        reset();
+        cleanError();
       }, 2500);
-      setActionsLocked(false);
     }
     return () => {
       clearTimeout(timeoutId);
     };
-  }, [isError, reset]);
-
+  }, [error, cleanError, setActionsLocked]);
   return (
     <React.Fragment>
       <Button
@@ -67,18 +57,16 @@ const DirectCreateAndSubmit = ({
         fluid
         title={buttonContent}
         content={buttonContent}
-        loading={isLoading}
-        disabled={actionsLocked || isMutating > 0}
+        loading={loading}
+        disabled={actionsLocked}
         onClick={() => handleClick()}
         labelPosition="left"
         {...buttonIconProps}
       />
-      {isError && (
+      {error && (
         <Message negative className="rel-mb-1">
           <Message.Header>
-            {(error?.response?.data?.errors?.length > 0 &&
-              error.directSubmitMessage) ||
-              i18next.t("Request could not be executed.")}
+            {error.message || i18next.t("Request could not be executed.")}
           </Message.Header>
         </Message>
       )}
@@ -87,7 +75,7 @@ const DirectCreateAndSubmit = ({
         requestOrRequestType={requestType}
         requestExtraData={requestType}
         onConfirmAction={() => {
-          createAndSubmit();
+          handleSubmit();
         }}
         isOpen={isOpen}
         close={close}
@@ -102,4 +90,4 @@ DirectCreateAndSubmit.propTypes = {
   isMutating: PropTypes.number,
 };
 
-export default DirectCreateAndSubmit;
+export { DirectCreateAndSubmit };

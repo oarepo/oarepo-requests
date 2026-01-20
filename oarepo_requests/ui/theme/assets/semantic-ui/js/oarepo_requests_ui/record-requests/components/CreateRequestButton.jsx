@@ -1,18 +1,17 @@
-import React, { useRef } from "react";
+import React, { useRef, useState } from "react";
 import { Button } from "semantic-ui-react";
 import { RequestModal, CreateRequestModalContent } from ".";
-import { DirectCreateAndSubmit } from "@js/oarepo_requests_common";
+import { DirectCreateAndSubmit } from "@js/oarepo_requests_common/actions";
 import PropTypes from "prop-types";
 import { useCallbackContext } from "../../common";
 import { FormikRefContextProvider } from "../../common/contexts/FormikRefContext";
 
 export const CreateRequestButton = ({
   requestType,
-  isMutating,
   buttonIconProps,
   header,
 }) => {
-  const { actionsLocked, setActionsLocked } = useCallbackContext();
+  const { actionsLocked } = useCallbackContext();
   const { dangerous, has_form: hasForm } = requestType;
   const needsDialog = dangerous || hasForm;
   if (!hasForm) {
@@ -20,7 +19,6 @@ export const CreateRequestButton = ({
       <DirectCreateAndSubmit
         requestType={requestType}
         requireConfirmation={dangerous}
-        isMutating={isMutating}
       />
     );
   }
@@ -38,8 +36,7 @@ export const CreateRequestButton = ({
               fluid
               title={header}
               content={header}
-              onClick={() => setActionsLocked(true)}
-              disabled={actionsLocked || isMutating > 0}
+              disabled={actionsLocked}
               labelPosition="left"
               {...buttonIconProps}
             />

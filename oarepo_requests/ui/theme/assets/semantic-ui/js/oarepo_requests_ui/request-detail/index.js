@@ -11,7 +11,7 @@ import ReactDOM from "react-dom";
 import { overrideStore } from "react-overridable";
 import { InvenioRequestsApp } from "@js/invenio_requests/InvenioRequestsApp";
 import defaultOverrides from "@js/oarepo_requests_common/defaultOverrides";
-import { FormikRefContextProvider } from "../common";
+import { FormikRefContextProvider, CallbackContextProvider } from "../common";
 import { RequestActionsPortal } from "./RequestActionsPortal";
 import { RequestDetails } from "../common/RequestDetail";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";

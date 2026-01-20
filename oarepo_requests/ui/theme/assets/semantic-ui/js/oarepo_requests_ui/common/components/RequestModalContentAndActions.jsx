@@ -9,7 +9,6 @@ import {
   Message,
 } from "semantic-ui-react";
 import { useFormikContext } from "formik";
-import { mapLinksToActions } from "@js/oarepo_requests_common";
 import PropTypes from "prop-types";
 import { useQuery, useIsMutating } from "@tanstack/react-query";
 import { httpApplicationJson } from "@js/oarepo_ui";
@@ -28,12 +27,11 @@ export const RequestModalContentAndActions = ({
 }) => {
   const { errors } = useFormikContext();
   const error = errors?.api;
-  const { fetchNewRequests } = useCallbackContext();
+  const { fetchNewRequests, onAfterAction } = useCallbackContext();
   const actionSuccessCallback = (response) => {
     const redirectionURL =
       response?.data?.links?.ui_redirect_url ||
       response?.data?.links?.topic?.self_html;
-    onClose();
     fetchNewRequests();
 
     if (redirectionURL) {
@@ -62,11 +60,6 @@ export const RequestModalContentAndActions = ({
 
   const requestTypeProperties = data?.data?.request_type_properties;
   const isMutating = useIsMutating();
-  const modalActions = mapLinksToActions(
-    requestCreationModal ? requestType : request,
-    customFields,
-    requestTypeProperties
-  );
 
   return (
     <React.Fragment>
@@ -91,20 +84,20 @@ export const RequestModalContentAndActions = ({
           requestType={requestType}
           onCompletedAction={onSubmit}
           customFields={customFields}
-          modalActions={modalActions}
           allowedHtmlAttrs={allowedHtmlAttrs}
           allowedHtmlTags={allowedHtmlTags}
         />
       </Modal.Content>
-      <Modal.Actions>
+      <Modal.Actions className="flex justify-space-between align-items-center">
         <Button onClick={onClose} icon labelPosition="left">
           <Icon name="cancel" />
           {i18next.t("Close")}
         </Button>
         <RequestActionController
           request={requestCreationModal ? requestType : request}
-          actionSuccessCallback={actionSuccessCallback}
+          actionSuccessCallback={onAfterAction ?? actionSuccessCallback}
           formikRef={formikRef}
+          size="medium"
         />
         {/* {modalActions.map(({ name, component: ActionComponent }) => (
           <ActionComponent

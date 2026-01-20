@@ -14,7 +14,7 @@ import { useCallbackContext, FormikRefContextProvider } from "../../common";
  * @param {{ requests: Request[] }} props
  */
 export const RequestList = ({ requests }) => {
-  const { actionsLocked, setActionsLocked } = useCallbackContext();
+  const { actionsLocked } = useCallbackContext();
   const { requestButtonsIconsConfig } = useRequestContext();
   const isMutating = useIsMutating();
   return requests.map((request) => {
@@ -36,7 +36,6 @@ export const RequestList = ({ requests }) => {
               fluid
               title={header}
               content={header}
-              onClick={() => setActionsLocked(true)}
               disabled={actionsLocked || isMutating > 0}
               labelPosition="left"
               {...buttonIconProps}

@@ -19,6 +19,9 @@ import {
   TimelineReviewersUpdatedEvent,
 } from "@js/invenio_requests/timelineEvents";
 import { i18next } from "@translations/oarepo_requests_ui/i18next";
+import { RequestSubmitButton, RequestSubmitModalTrigger } from "./actions";
+import { RequestAction } from "./RequestAction";
+import { SubmitRequestAction } from "./components/SubmitRequestAction";
 
 const defaultComponents = {
   ...defaultContribComponents,
@@ -37,9 +40,15 @@ const defaultComponents = {
   "RequestStatus.layout.declined": DeclineStatus,
   "RequestStatus.layout.cancelled": CancelStatus,
   "RequestStatus.layout.expired": ExpireStatus,
+  // "RequestActionModalTrigger.create": () => null,
   "RequestActionModal.title.cancel": () => i18next.t("Cancel request"),
   "RequestActionModal.title.accept": () => i18next.t("Accept request"),
   "RequestActionModal.title.decline": () => i18next.t("Decline request"),
+  "RequestActionButton.submit": RequestSubmitButton,
+  "RequestActionModalTrigger.submit": RequestSubmitModalTrigger,
+  "InvenioRequests.RequestAction": () => null,
+  "InvenioRequests.RequestAction.layout.submit": SubmitRequestAction,
 };
+console.log("oarepo_requests_ui defaultComponents", defaultComponents);
 
 export default defaultComponents;

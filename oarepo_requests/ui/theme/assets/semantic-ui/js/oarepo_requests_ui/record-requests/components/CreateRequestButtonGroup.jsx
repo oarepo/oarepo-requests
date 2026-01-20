@@ -1,11 +1,14 @@
-import React from "react";
+import React, { useState, useRef } from "react";
 import { i18next } from "@translations/oarepo_requests_ui/i18next";
 import { Placeholder, Message } from "semantic-ui-react";
 import _isEmpty from "lodash/isEmpty";
-import { useRequestContext } from "@js/oarepo_requests_common";
+import {
+  useRequestContext,
+  useCallbackContext,
+} from "@js/oarepo_requests_common";
 import PropTypes from "prop-types";
-import { useIsMutating } from "@tanstack/react-query";
 import { CreateRequestButton } from "./CreateRequestButton";
+import { RequestActionController } from "../../common";
 
 /**
  * @param {{  applicableRequestsLoading: boolean, applicableRequestsLoadingError: Error }} props
@@ -15,13 +18,21 @@ export const CreateRequestButtonGroup = ({
   applicableRequestsLoadingError,
 }) => {
   const { requestTypes, requestButtonsIconsConfig } = useRequestContext();
+  const { onAfterAction, fetchNewRequests } = useCallbackContext();
   const createRequests = requestTypes?.filter(
     (requestType) => requestType.links.actions?.create
   );
-  const isMutating = useIsMutating();
-
   let content;
+  const actionSuccessCallback = (response) => {
+    const redirectionURL =
+      response?.data?.links?.ui_redirect_url ||
+      response?.data?.links?.topic?.self_html;
+    fetchNewRequests();
 
+    if (redirectionURL) {
+      window.location.href = redirectionURL;
+    }
+  };
   if (applicableRequestsLoading) {
     content = (
       <Placeholder>
@@ -52,13 +63,19 @@ export const CreateRequestButtonGroup = ({
         requestButtonsIconsConfig?.default;
 
       return (
-        <CreateRequestButton
+        <RequestActionController
           key={requestType.type_id}
-          requestType={requestType}
-          isMutating={isMutating}
-          buttonIconProps={buttonIconProps}
-          header={header}
-        />
+          renderAllActions={false}
+          request={requestType}
+          actionSuccessCallback={onAfterAction ?? actionSuccessCallback}
+        >
+          <CreateRequestButton
+            key={requestType.type_id}
+            requestType={requestType}
+            buttonIconProps={buttonIconProps}
+            header={header}
+          />
+        </RequestActionController>
       );
     });
   }

@@ -40,6 +40,7 @@ export const RequestModalContent = ({
     ...defaultOverrides,
     ...overrideStore.getAll(),
   };
+
   return (
     <InvenioRequestsApp
       request={request}

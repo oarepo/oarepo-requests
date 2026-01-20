@@ -92,6 +92,13 @@ const RecordRequests = ({
       window.removeEventListener("unload", handleBeforeUnload);
     };
   }, [setActionsLocked]);
+
+  const onSuccessAction = () => {
+    fetchNewRequests();
+    if (onAfterAction) {
+      onAfterAction();
+    }
+  };
   return (
     <RequestContextProvider
       value={{
@@ -107,7 +114,7 @@ const RecordRequests = ({
       <CallbackContextProvider
         value={{
           onBeforeAction,
-          onAfterAction,
+          onAfterAction: onSuccessAction,
           onErrorPlugins,
           fetchNewRequests,
           actionExtraContext,

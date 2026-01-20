@@ -12,106 +12,172 @@ import { errorSerializer } from "@js/invenio_requests/api/serializers";
 import { RequestActions } from "@js/invenio_requests/request/actions/RequestActions";
 import PropTypes from "prop-types";
 import { RequestActionContext } from "@js/invenio_requests/request/actions/context";
-import React, { Component } from "react";
+import React, {
+  useState,
+  useMemo,
+  useCallback,
+  forwardRef,
+  useImperativeHandle,
+  useContext,
+} from "react";
 import { OarepoRequestsAPI } from "./OarepoRequestsApi";
+import { OverridableContext } from "react-overridable";
 
-export class RequestActionController extends Component {
-  constructor(props) {
-    super(props);
-    const { request, requestApi } = props;
-    this.linkExtractor = new RequestLinksExtractor(request);
-    this.requestApi = requestApi || new OarepoRequestsAPI(this.linkExtractor);
-    this.state = { modalOpen: {}, loading: false, error: undefined };
-  }
+export const RequestActionController = forwardRef(
+  (
+    {
+      request,
+      requestApi: requestApiProp,
+      actionSuccessCallback,
+      onBeforeAction,
+      onError,
+      formikRef,
+      size,
+      children,
+      renderAllActions,
+    },
+    ref
+  ) => {
+    const [modalOpen, setModalOpen] = useState({});
+    const [loading, setLoading] = useState(false);
+    const [error, setError] = useState(undefined);
 
-  toggleActionModal = (actionId, val) => {
-    const { modalOpen } = this.state;
-    if (val) {
-      modalOpen[actionId] = val;
-    } else {
-      modalOpen[actionId] = !modalOpen[actionId];
-    }
-    this.setState({ modalOpen: { ...modalOpen } });
-  };
+    const linkExtractor = useMemo(
+      () => new RequestLinksExtractor(request),
+      [request]
+    );
 
-  performAction = async (action, commentContent) => {
-    const { actionSuccessCallback, onBeforeAction, onError, formikRef } =
-      this.props;
+    const requestApi = useMemo(
+      () => requestApiProp || new OarepoRequestsAPI(linkExtractor),
+      [requestApiProp, linkExtractor]
+    );
 
-    // Extract form data from formik if available
-    let formData = null;
-    if (formikRef && formikRef.current) {
-      const values = formikRef.current.values;
-      if (values && Object.keys(values.payload).length > 0) {
-        formData = { payload: values.payload };
-      }
-    }
-
-    if (onBeforeAction) {
-      try {
-        const canProceed = await onBeforeAction(action, commentContent);
-
-        if (!canProceed) {
-          return;
+    const toggleActionModal = useCallback((actionId, val) => {
+      setModalOpen((prevModalOpen) => {
+        const newModalOpen = { ...prevModalOpen };
+        if (val !== undefined) {
+          newModalOpen[actionId] = val;
+        } else {
+          newModalOpen[actionId] = !prevModalOpen[actionId];
         }
-      } catch (error) {
-        this.setState({ error: errorSerializer(error) });
+        return newModalOpen;
+      });
+    }, []);
 
-        if (onError) {
-          onError(errorSerializer(error));
+    const performAction = useCallback(
+      async (action, commentContent) => {
+        // Extract form data from formik if available
+        let formData = null;
+        if (formikRef && formikRef.current) {
+          const values = formikRef.current.values;
+          if (values && Object.keys(values.payload).length > 0) {
+            formData = { payload: values.payload };
+          }
         }
-        return;
-      }
-    }
 
-    this.setState({ loading: true });
-    try {
-      const specificAction = this.requestApi[action];
-      const response =
-        (await specificAction?.(formData)) ||
-        (await this.requestApi.performAction(action, commentContent, formData));
+        if (onBeforeAction) {
+          try {
+            const canProceed = await onBeforeAction(action, request);
 
-      this.setState({ loading: false });
-      this.toggleActionModal(action, false);
-      actionSuccessCallback(response?.data);
-    } catch (error) {
-      console.error(error);
-      const serializedError = errorSerializer(error);
-      this.setState({ loading: false, error: serializedError });
+            if (!canProceed) {
+              return;
+            }
+          } catch (error) {
+            const serializedError = errorSerializer(error);
+            setError(serializedError);
 
-      if (onError) {
-        onError(serializedError);
-      }
-    }
-  };
+            if (onError) {
+              onError(serializedError);
+            }
+            return;
+          }
+        }
 
-  cleanError = () => {
-    this.setState({ error: undefined });
-  };
+        setLoading(true);
+        try {
+          const specificAction = requestApi[action];
+          const response =
+            (await specificAction?.(formData)) ||
+            (await requestApi.performAction(action, commentContent, formData));
 
-  render() {
-    const { modalOpen, error, loading } = this.state;
-    const { request, children, size } = this.props;
+          setLoading(false);
+          toggleActionModal(action, false);
+          actionSuccessCallback(response?.data);
+        } catch (error) {
+          console.error(error);
+          setLoading(false);
+          setError(error);
 
+          if (onError) {
+            onError(error);
+          }
+        }
+      },
+      [
+        formikRef,
+        onBeforeAction,
+        request,
+        onError,
+        requestApi,
+        toggleActionModal,
+        actionSuccessCallback,
+      ]
+    );
+
+    const cleanError = useCallback(() => {
+      setError(undefined);
+    }, []);
+
+    // Expose state and methods to parent via ref
+    useImperativeHandle(
+      ref,
+      () => ({
+        loading,
+        error,
+        modalOpen,
+        performAction,
+        cleanError,
+        toggleActionModal,
+      }),
+      [loading, error, modalOpen, performAction, cleanError, toggleActionModal]
+    );
+
+    const contextValue = useMemo(
+      () => ({
+        modalOpen,
+        toggleModal: toggleActionModal,
+        linkExtractor,
+        requestApi,
+        performAction,
+        cleanError,
+        error,
+        loading,
+        request: request,
+      }),
+      [
+        modalOpen,
+        toggleActionModal,
+        linkExtractor,
+        requestApi,
+        performAction,
+        cleanError,
+        error,
+        loading,
+        request,
+      ]
+    );
+    const overridableContext = useContext(OverridableContext);
+    console.log(overridableContext, "dwadawdwadwadwadwadwadwadwaddwadwadwawa");
     return (
-      <RequestActionContext.Provider
-        value={{
-          modalOpen: modalOpen,
-          toggleModal: this.toggleActionModal,
-          linkExtractor: this.linkExtractor,
-          requestApi: this.requestApi,
-          performAction: this.performAction,
-          cleanError: this.cleanError,
-          error: error,
-          loading: loading,
-        }}
-      >
-        <RequestActions request={request} size={size} />
+      <RequestActionContext.Provider value={contextValue}>
+        {renderAllActions && <RequestActions request={request} size={size} />}
         {children}
       </RequestActionContext.Provider>
     );
   }
-}
+);
+
+RequestActionController.displayName = "RequestActionController";
 
 RequestActionController.propTypes = {
   request: PropTypes.object.isRequired,
@@ -125,6 +191,7 @@ RequestActionController.propTypes = {
   formikRef: PropTypes.object,
   size: PropTypes.string,
   children: PropTypes.node,
+  renderAllActions: PropTypes.bool,
 };
 
 RequestActionController.defaultProps = {
@@ -135,4 +202,5 @@ RequestActionController.defaultProps = {
   formikRef: null,
   size: "medium",
   children: null,
+  renderAllActions: true,
 };

@@ -64,17 +64,17 @@ export const RequestCustomFields = ({ request, columnWidth }) => {
   console.log(renderSubmitForm, renderReadOnlyData, "render flags");
   console.log(request.is_closed, "request.is_closed");
   return renderSubmitForm || renderReadOnlyData ? (
-    <Grid.Row>
-      <Grid.Column width={columnWidth}>
-        {renderSubmitForm && !request.is_closed && (
-          <Formik
-            initialValues={
-              !_isEmpty(request?.payload)
-                ? { payload: request.payload }
-                : { payload: {} }
-            }
-            innerRef={formikRef}
-          >
+    <Formik
+      initialValues={
+        !_isEmpty(request?.payload)
+          ? { payload: request.payload }
+          : { payload: {} }
+      }
+      innerRef={formikRef}
+    >
+      <Grid.Row>
+        <Grid.Column width={columnWidth}>
+          {renderSubmitForm && !request.is_closed && (
             <Form>
               <div className="requests-form-cf">
                 <CustomFields
@@ -88,26 +88,26 @@ export const RequestCustomFields = ({ request, columnWidth }) => {
                 <Divider hidden />
               </div>
             </Form>
-          </Formik>
-        )}
+          )}
 
-        {renderReadOnlyData && (
-          <div className="requests-form-cf">
-            <CustomFields
-              config={readOnlyCustomFieldsConfig}
-              templateLoaders={[
-                (widget) => import(`@templates/custom_fields/${widget}.js`),
-                (widget) =>
-                  import(
-                    `@js/oarepo_requests_common/components/DefaultView.jsx`
-                  ),
-              ]}
-              fieldPathPrefix="payload"
-            />
-          </div>
-        )}
-      </Grid.Column>
-    </Grid.Row>
+          {renderReadOnlyData && (
+            <div className="requests-form-cf">
+              <CustomFields
+                config={readOnlyCustomFieldsConfig}
+                templateLoaders={[
+                  (widget) => import(`@templates/custom_fields/${widget}.js`),
+                  (widget) =>
+                    import(
+                      `@js/oarepo_requests_common/components/DefaultView.jsx`
+                    ),
+                ]}
+                fieldPathPrefix="payload"
+              />
+            </div>
+          )}
+        </Grid.Column>
+      </Grid.Row>
+    </Formik>
   ) : null;
 };
 

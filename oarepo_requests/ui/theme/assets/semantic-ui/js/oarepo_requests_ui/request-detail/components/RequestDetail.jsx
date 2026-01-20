@@ -129,7 +129,7 @@ export const RequestDetail = ({
                     dangerouslySetInnerHTML={{
                       __html: sanitizedDescription,
                     }}
-                  ></p>
+                  />
                 )}
                 <SideRequestInfo request={request} />
               </Grid.Column>
