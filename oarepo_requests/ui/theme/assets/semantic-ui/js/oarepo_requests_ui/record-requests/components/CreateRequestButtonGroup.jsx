@@ -18,21 +18,11 @@ export const CreateRequestButtonGroup = ({
   applicableRequestsLoadingError,
 }) => {
   const { requestTypes, requestButtonsIconsConfig } = useRequestContext();
-  const { onAfterAction, fetchNewRequests } = useCallbackContext();
   const createRequests = requestTypes?.filter(
     (requestType) => requestType.links.actions?.create
   );
   let content;
-  const actionSuccessCallback = (response) => {
-    const redirectionURL =
-      response?.data?.links?.ui_redirect_url ||
-      response?.data?.links?.topic?.self_html;
-    fetchNewRequests();
 
-    if (redirectionURL) {
-      window.location.href = redirectionURL;
-    }
-  };
   if (applicableRequestsLoading) {
     content = (
       <Placeholder>
@@ -63,19 +53,12 @@ export const CreateRequestButtonGroup = ({
         requestButtonsIconsConfig?.default;
 
       return (
-        <RequestActionController
+        <CreateRequestButton
           key={requestType.type_id}
-          renderAllActions={false}
-          request={requestType}
-          actionSuccessCallback={onAfterAction ?? actionSuccessCallback}
-        >
-          <CreateRequestButton
-            key={requestType.type_id}
-            requestType={requestType}
-            buttonIconProps={buttonIconProps}
-            header={header}
-          />
-        </RequestActionController>
+          requestType={requestType}
+          buttonIconProps={buttonIconProps}
+          header={header}
+        />
       );
     });
   }

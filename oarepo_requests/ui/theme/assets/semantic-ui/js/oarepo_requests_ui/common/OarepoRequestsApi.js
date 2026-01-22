@@ -19,7 +19,7 @@ export class OarepoRequestsAPI extends InvenioRequestsAPI {
    * @param {Object} formData - Form data in format {payload: {key: value}}
    * @returns {Promise} Response with created request
    */
-  create = async (formData) => {
+  create = async (action, comment, formData) => {
     const createLink = this.linksExtractor.actions.create;
     if (!createLink) {
       throw new Error("Create action link is missing");
@@ -35,7 +35,7 @@ export class OarepoRequestsAPI extends InvenioRequestsAPI {
    * @param {Object} formData - Form data in format {payload: {key: value}}
    * @returns {Promise} Response with updated request
    */
-  save = async (formData) => {
+  save = async (action, comment, formData) => {
     const selfLink = this.linksExtractor.self;
     if (!selfLink) {
       throw new Error("Self link is missing");
@@ -51,11 +51,11 @@ export class OarepoRequestsAPI extends InvenioRequestsAPI {
    * @param {Object} formData - Form data in format {payload: {key: value}}
    * @returns {Promise} Response after submission
    */
-  submit = async (formData) => {
+  submit = async (action, comment, formData) => {
     // First create the request
     const createLink = this.linksExtractor.actions.create;
     if (createLink) {
-      const createResponse = await this.create(formData);
+      const createResponse = await this.create("create", undefined, formData);
       const submitLink = createResponse?.data?.links?.actions?.submit;
       if (!submitLink) {
         throw new Error("Submit link not found in create response");
@@ -70,7 +70,7 @@ export class OarepoRequestsAPI extends InvenioRequestsAPI {
     } else {
       const saveLink = this.linksExtractor.self;
       if (formData && !_isEmpty(formData)) {
-        await this.save(formData);
+        await this.save("save", undefined, formData);
       }
       const submitLink = this.linksExtractor.actions.submit;
       return await http.post(

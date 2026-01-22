@@ -1,4 +1,19 @@
 .ui.button {
+  &.requests.request-action-button {
+    &.create,
+    &.submit {
+      background-color: @blue;
+      color: @white;
+    }
+    &.accept {
+      background-color: @green;
+      color: @white;
+    }
+    &.decline {
+      background-color: @red;
+      color: @white;
+    }
+  }
   &.request-create-button {
     display: block;
     margin-bottom: 10px;

@@ -3,13 +3,13 @@
 //
 // OARepo-Requests is free software; you can redistribute it and/or modify it
 // under the terms of the MIT License; see LICENSE file for more details.
-
+import _set from "lodash/set";
 import {
   RequestLinksExtractor,
   InvenioRequestsAPI,
 } from "@js/invenio_requests/api";
 import { errorSerializer } from "@js/invenio_requests/api/serializers";
-import { RequestActions } from "@js/invenio_requests/request/actions/RequestActions";
+import { RequestActions } from "./RequestActions";
 import PropTypes from "prop-types";
 import { RequestActionContext } from "@js/invenio_requests/request/actions/context";
 import React, {
@@ -22,7 +22,16 @@ import React, {
 } from "react";
 import { OarepoRequestsAPI } from "./OarepoRequestsApi";
 import { OverridableContext } from "react-overridable";
+export const createFormikErrors = (requestPayloadErrors) => {
+  if (!requestPayloadErrors || !Array.isArray(requestPayloadErrors)) {
+    return {};
+  }
 
+  return requestPayloadErrors.reduce((errors, e) => {
+    _set(errors, e.field, e.messages.join(" "));
+    return errors;
+  }, {});
+};
 export const RequestActionController = forwardRef(
   (
     {
@@ -41,7 +50,6 @@ export const RequestActionController = forwardRef(
     const [modalOpen, setModalOpen] = useState({});
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(undefined);
-
     const linkExtractor = useMemo(
       () => new RequestLinksExtractor(request),
       [request]
@@ -74,11 +82,11 @@ export const RequestActionController = forwardRef(
             formData = { payload: values.payload };
           }
         }
+        setLoading(true);
 
         if (onBeforeAction) {
           try {
             const canProceed = await onBeforeAction(action, request);
-
             if (!canProceed) {
               return;
             }
@@ -89,22 +97,34 @@ export const RequestActionController = forwardRef(
             if (onError) {
               onError(serializedError);
             }
+            setLoading(false);
             return;
           }
         }
 
-        setLoading(true);
         try {
           const specificAction = requestApi[action];
+          console.log(specificAction, "specificActionspecificAction");
           const response =
-            (await specificAction?.(formData)) ||
+            (await specificAction?.(action, undefined, formData)) ||
             (await requestApi.performAction(action, commentContent, formData));
 
           setLoading(false);
           toggleActionModal(action, false);
           actionSuccessCallback(response?.data);
         } catch (error) {
-          console.error(error);
+          console.error(error, "dwadwadawdwadadadwad");
+          const formikErrors =
+            (error?.response?.data?.request_payload_errors?.length > 0 &&
+              createFormikErrors(
+                error?.response?.data?.request_payload_errors
+              )) ||
+            {};
+          formikRef?.current?.setErrors({
+            api: error?.response?.data?.message || error.message,
+            ...formikErrors,
+          });
+          toggleActionModal(action, false);
           setLoading(false);
           setError(error);
 
@@ -166,8 +186,6 @@ export const RequestActionController = forwardRef(
         request,
       ]
     );
-    const overridableContext = useContext(OverridableContext);
-    console.log(overridableContext, "dwadawdwadwadwadwadwadwadwaddwadwadwawa");
     return (
       <RequestActionContext.Provider value={contextValue}>
         {renderAllActions && <RequestActions request={request} size={size} />}

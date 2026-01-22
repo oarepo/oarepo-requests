@@ -5,21 +5,47 @@ import { DirectCreateAndSubmit } from "@js/oarepo_requests_common/actions";
 import PropTypes from "prop-types";
 import { useCallbackContext } from "../../common";
 import { FormikRefContextProvider } from "../../common/contexts/FormikRefContext";
+import { RequestActionController } from "../../common";
 
 export const CreateRequestButton = ({
   requestType,
   buttonIconProps,
   header,
 }) => {
-  const { actionsLocked } = useCallbackContext();
+  const {
+    actionsLocked,
+    fetchNewRequests,
+    onAfterAction,
+    onBeforeAction,
+    onErrorPlugins,
+  } = useCallbackContext();
   const { dangerous, has_form: hasForm } = requestType;
   const needsDialog = dangerous || hasForm;
+  const actionSuccessCallback = (response) => {
+    const redirectionURL =
+      response?.data?.links?.ui_redirect_url ||
+      response?.data?.links?.topic?.self_html;
+    fetchNewRequests();
+
+    if (redirectionURL) {
+      window.location.href = redirectionURL;
+    }
+  };
   if (!hasForm) {
     return (
-      <DirectCreateAndSubmit
-        requestType={requestType}
-        requireConfirmation={dangerous}
-      />
+      <RequestActionController
+        key={requestType.type_id}
+        renderAllActions={false}
+        request={requestType}
+        actionSuccessCallback={onAfterAction ?? actionSuccessCallback}
+        onBeforeAction={onBeforeAction}
+        onErrorPlugins={onErrorPlugins}
+      >
+        <DirectCreateAndSubmit
+          requestType={requestType}
+          requireConfirmation={dangerous}
+        />
+      </RequestActionController>
     );
   }
 

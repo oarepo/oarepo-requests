@@ -3,27 +3,15 @@ import { Grid, Form, Divider } from "semantic-ui-react";
 import { CustomFields } from "react-invenio-forms";
 import { REQUEST_MODAL_TYPE } from "@js/oarepo_requests_common";
 import PropTypes from "prop-types";
-import { useQuery } from "@tanstack/react-query";
 import { Formik } from "formik";
-import { useFormikRefContext } from "../contexts";
+import { useFormikRefContext, useRequestConfigContext } from "../contexts";
 import _isEmpty from "lodash/isEmpty";
-import { httpApplicationJson } from "@js/oarepo_ui";
 
 export const RequestCustomFields = ({ request, columnWidth }) => {
   const formikRef = useFormikRefContext();
-  console.log("dwadwadwadawdwadawda");
-  const { data, isLoading } = useQuery(
-    ["applicableCustomFieldssss", request?.type],
-    () => httpApplicationJson.get(`/requests/configs/${request?.type}`),
-    {
-      enabled: !!request?.type,
-      refetchOnWindowFocus: false,
-      staleTime: Infinity,
-    }
-  );
-  console.log("RequestCustomFields data:", data);
-  const customFields = data?.data?.custom_fields;
-  console.log(customFields, "customFields");
+  const { requestTypeConfig } = useRequestConfigContext();
+
+  const customFields = requestTypeConfig?.custom_fields;
   const customFieldsType =
     request.status === "created"
       ? REQUEST_MODAL_TYPE.SUBMIT_FORM
@@ -44,10 +32,10 @@ export const RequestCustomFields = ({ request, columnWidth }) => {
   const readOnlyCustomFieldsConfig = customFields?.ui.map((section) => {
     const { fields } = section;
     const fieldsWithReadOnlyWidget = fields.map((field) => {
-      const { read_only_ui_widget } = field;
+      const { read_only_ui_widget: readOnlyUiWidget } = field;
       return {
         ...field,
-        ui_widget: read_only_ui_widget,
+        ui_widget: readOnlyUiWidget,
       };
     });
     return {
@@ -61,8 +49,6 @@ export const RequestCustomFields = ({ request, columnWidth }) => {
     Object.keys(request?.payload || {}).some((key) =>
       customFieldsPaths?.includes(key)
     );
-  console.log(renderSubmitForm, renderReadOnlyData, "render flags");
-  console.log(request.is_closed, "request.is_closed");
   return renderSubmitForm || renderReadOnlyData ? (
     <Formik
       initialValues={
@@ -113,7 +99,6 @@ export const RequestCustomFields = ({ request, columnWidth }) => {
 
 RequestCustomFields.propTypes = {
   request: PropTypes.object.isRequired,
-  customFields: PropTypes.object,
   columnWidth: PropTypes.number,
 };
 

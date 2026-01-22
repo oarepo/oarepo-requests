@@ -3,10 +3,11 @@ import PropTypes from "prop-types";
 import Overridable from "react-overridable";
 import { Modal } from "semantic-ui-react";
 import { useRequestActionContext } from "../contexts";
-import { RequestActionModal } from "@js/invenio_requests/request/actions/RequestActionModal";
 import { RequestActionModalTrigger } from "@js/invenio_requests/request/actions/RequestActionModalTrigger";
 import { RequestActionButton } from "@js/invenio_requests/request/actions/RequestActionButton";
 import { i18next } from "@translations/oarepo_requests_ui/i18next";
+import { RequestActionModal } from "../RequestActionModal";
+
 export const SubmitRequestAction = ({
   action,
   loading,
@@ -18,9 +19,9 @@ export const SubmitRequestAction = ({
   handleActionClick,
   modalId,
 }) => {
-  console.log("dwadwadwadwadwada");
   const { request } = useRequestActionContext();
   if (!request?.dangerous) {
+    console.log("rendering button");
     return (
       <RequestActionButton
         action={action}
@@ -49,21 +50,7 @@ export const SubmitRequestAction = ({
         modalId={modalId}
         requestType={requestType}
       >
-        <Modal.Content>
-          {error && (
-            <Message negative>
-              <p>{error}</p>
-            </Message>
-          )}
-          <Modal.Description>
-            {i18next.t("Add comment (optional)")}
-            <Divider hidden />
-            <RichEditor
-              inputValue={() => actionComment}
-              onChange={this.onCommentChange}
-            />
-          </Modal.Description>
-        </Modal.Content>
+        <Modal.Content></Modal.Content>
       </RequestActionModal>
     </React.Fragment>
   );

@@ -9,8 +9,12 @@ import {
 } from "@js/oarepo_requests_common";
 import PropTypes from "prop-types";
 import { useIsMutating } from "@tanstack/react-query";
-import { useCallbackContext, useFormikRefContext } from "../contexts";
-
+import {
+  useCallbackContext,
+  useFormikRefContext,
+  RequestConfigContextProvider,
+} from "../contexts";
+import { i18next } from "@translations/oarepo_requests_ui/i18next";
 /**
  * @typedef {import("../../record-requests/types").Request} Request
  * @typedef {import("../../record-requests/types").RequestType} RequestType
@@ -33,8 +37,7 @@ export const RequestModal = ({
 
   const { resetForm, setErrors } = formikRef?.current || {};
 
-  const isMutating = useIsMutating();
-
+  const requestTypeId = requestType?.type_id || request?.type;
   const onClose = () => {
     setErrors?.({});
     resetForm?.();
@@ -61,6 +64,7 @@ export const RequestModal = ({
           className="requests-request-modal form-modal"
           as={Dimmer.Dimmable}
           blurring
+          size="large"
           onClose={onClose}
           onOpen={openModal}
           open={isOpen}
@@ -71,21 +75,29 @@ export const RequestModal = ({
           aria-labelledby="request-modal-header"
           aria-describedby="request-modal-desc"
         >
-          <Dimmer active={isMutating > 0}>
-            <Loader inverted size="large" />
-          </Dimmer>
           <Modal.Header as="h1" id="request-modal-header">
-            {header}
+            {header}{" "}
+            {request?.id && (
+              <a
+                target="_blank"
+                rel="noopener noreferrer"
+                href={request?.links?.self_html}
+                className="text size small"
+              >
+                ({i18next.t("request details")})
+              </a>
+            )}
           </Modal.Header>
-          <RequestModalContentAndActions
-            request={request}
-            requestType={requestType}
-            ContentComponent={ContentComponent}
-            requestCreationModal={requestCreationModal}
-            isMutating={isMutating}
-            onClose={onClose}
-            formikRef={formikRef}
-          />
+          <RequestConfigContextProvider requestTypeId={requestTypeId}>
+            <RequestModalContentAndActions
+              request={request}
+              requestType={requestType}
+              ContentComponent={ContentComponent}
+              requestCreationModal={requestCreationModal}
+              onClose={onClose}
+              formikRef={formikRef}
+            />
+          </RequestConfigContextProvider>
         </Modal>
       </ModalControlContextProvider>
     </Formik>

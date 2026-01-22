@@ -11,7 +11,11 @@ import ReactDOM from "react-dom";
 import { overrideStore } from "react-overridable";
 import { InvenioRequestsApp } from "@js/invenio_requests/InvenioRequestsApp";
 import defaultOverrides from "@js/oarepo_requests_common/defaultOverrides";
-import { FormikRefContextProvider, CallbackContextProvider } from "../common";
+import {
+  FormikRefContextProvider,
+  CallbackContextProvider,
+  RequestConfigContextProvider,
+} from "../common";
 import { RequestActionsPortal } from "./RequestActionsPortal";
 import { RequestDetails } from "../common/RequestDetail";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
@@ -41,18 +45,22 @@ const defaultComponents = {
 };
 
 ReactDOM.render(
-  <FormikRefContextProvider>
-    <QueryClientProvider client={queryClient}>
-      <InvenioRequestsApp
-        request={request}
-        defaultQueryParams={defaultQueryParams}
-        // defaultReplyQueryParams={defaultReplyQueryParams}
-        overriddenCmps={defaultComponents}
-        userAvatar={userAvatar}
-        permissions={permissions}
-        config={config}
-      />
-    </QueryClientProvider>
-  </FormikRefContextProvider>,
+  <CallbackContextProvider>
+    <FormikRefContextProvider>
+      <QueryClientProvider client={queryClient}>
+        <RequestConfigContextProvider requestTypeId={request.type}>
+          <InvenioRequestsApp
+            request={request}
+            defaultQueryParams={defaultQueryParams}
+            // defaultReplyQueryParams={defaultReplyQueryParams}
+            overriddenCmps={defaultComponents}
+            userAvatar={userAvatar}
+            permissions={permissions}
+            config={config}
+          />
+        </RequestConfigContextProvider>
+      </QueryClientProvider>
+    </FormikRefContextProvider>
+  </CallbackContextProvider>,
   requestDetailsDiv
 );

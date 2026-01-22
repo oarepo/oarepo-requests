@@ -49,6 +49,7 @@ const DirectCreateAndSubmit = ({ requestType, requireConfirmation }) => {
       clearTimeout(timeoutId);
     };
   }, [error, cleanError, setActionsLocked]);
+
   return (
     <React.Fragment>
       <Button

@@ -48,6 +48,7 @@ const defaultComponents = {
   "RequestActionModalTrigger.submit": RequestSubmitModalTrigger,
   "InvenioRequests.RequestAction": () => null,
   "InvenioRequests.RequestAction.layout.submit": SubmitRequestAction,
+  "InvenioRequests.RequestAction.layout.create": SubmitRequestAction,
 };
 console.log("oarepo_requests_ui defaultComponents", defaultComponents);
 

@@ -8,7 +8,6 @@
 import RequestMetadata from "@js/invenio_requests/request/RequestMetadata";
 import React, { Component } from "react";
 import PropTypes from "prop-types";
-import Overridable from "react-overridable";
 import { Grid, Container, Header } from "semantic-ui-react";
 import { Timeline } from "@js/invenio_requests/timeline";
 import { RequestCustomFields } from "./components";
@@ -18,13 +17,10 @@ export class RequestDetails extends Component {
     const { request, userAvatar, permissions, config } = this.props;
     return (
       <React.Fragment>
-        <Container>
-          <Header as="h2" dividing>
-            {request?.stateful_name || request?.name || request?.type}
-          </Header>
-          <p>{request?.stateful_description || request?.description}</p>
+        <p>{request?.stateful_description || request?.description}</p>
+        <div className="rel-mb-2">
           <RequestCustomFields request={request} />
-        </Container>
+        </div>
         <Grid stackable reversed="mobile">
           <Grid.Column mobile={16} tablet={12} computer={13}>
             <Timeline

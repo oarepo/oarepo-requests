@@ -11,7 +11,7 @@ import React, { Component } from "react";
 import PropTypes from "prop-types";
 import Overridable from "react-overridable";
 import { Divider, Modal, Message } from "semantic-ui-react";
-import { RequestActionModal } from "@js/invenio_requests/request/actions/RequestActionModal";
+import { RequestActionModal } from "./RequestActionModal";
 import { RequestActionModalTrigger } from "@js/invenio_requests/request/actions/RequestActionModalTrigger";
 import { i18next } from "@translations/oarepo_requests_ui/i18next";
 
@@ -40,7 +40,6 @@ export class RequestAction extends Component {
     const { action, requestType, size } = this.props;
     const { actionComment } = this.state;
     const modalId = action;
-    console.log(action, "dwadawdwadwadwadwadwadwadwadwa");
     return (
       <Overridable
         id={`InvenioRequests.RequestAction.layout.${action}`}
@@ -71,11 +70,6 @@ export class RequestAction extends Component {
             requestType={requestType}
           >
             <Modal.Content>
-              {error && (
-                <Message negative>
-                  <p>{error}</p>
-                </Message>
-              )}
               <Modal.Description>
                 {i18next.t("Add comment (optional)")}
                 <Divider hidden />

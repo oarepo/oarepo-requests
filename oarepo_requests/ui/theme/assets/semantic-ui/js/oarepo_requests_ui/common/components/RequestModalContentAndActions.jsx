@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useRef } from "react";
 import { i18next } from "@translations/oarepo_requests_ui/i18next";
 import {
   Dimmer,
@@ -10,11 +10,8 @@ import {
 } from "semantic-ui-react";
 import { useFormikContext } from "formik";
 import PropTypes from "prop-types";
-import { useQuery, useIsMutating } from "@tanstack/react-query";
-import { httpApplicationJson } from "@js/oarepo_ui";
 import { RequestActionController } from "../RequestActionController";
-import { useCallbackContext } from "../contexts";
-import { RequestActionController as InvenioRequestsActionController } from "@js/invenio_requests/request/actions/RequestActionController";
+import { useCallbackContext, useRequestConfigContext } from "../contexts";
 
 export const RequestModalContentAndActions = ({
   request,
@@ -27,7 +24,8 @@ export const RequestModalContentAndActions = ({
 }) => {
   const { errors } = useFormikContext();
   const error = errors?.api;
-  const { fetchNewRequests, onAfterAction } = useCallbackContext();
+  const { fetchNewRequests, onAfterAction, onBeforeAction } =
+    useCallbackContext();
   const actionSuccessCallback = (response) => {
     const redirectionURL =
       response?.data?.links?.ui_redirect_url ||
@@ -39,27 +37,14 @@ export const RequestModalContentAndActions = ({
     }
   };
   const {
-    data,
-    error: customFieldsLoadingError,
+    requestTypeConfig,
     isLoading,
-  } = useQuery(
-    ["applicableCustomFields", requestType?.type_id || request?.type],
-    () =>
-      httpApplicationJson.get(
-        `/requests/configs/${requestType?.type_id || request?.type}`
-      ),
-    {
-      enabled: !!(requestType?.type_id || request?.type),
-      refetchOnWindowFocus: false,
-      staleTime: Infinity,
-    }
-  );
-  const customFields = data?.data?.custom_fields;
-  const allowedHtmlAttrs = data?.data?.allowedHtmlAttrs;
-  const allowedHtmlTags = data?.data?.allowedHtmlTags;
+    error: customFieldsLoadingError,
+  } = useRequestConfigContext();
 
-  const requestTypeProperties = data?.data?.request_type_properties;
-  const isMutating = useIsMutating();
+  const customFields = requestTypeConfig?.custom_fields;
+  const allowedHtmlAttrs = requestTypeConfig?.allowedHtmlAttrs;
+  const allowedHtmlTags = requestTypeConfig?.allowedHtmlTags;
 
   return (
     <React.Fragment>
@@ -97,17 +82,9 @@ export const RequestModalContentAndActions = ({
           request={requestCreationModal ? requestType : request}
           actionSuccessCallback={onAfterAction ?? actionSuccessCallback}
           formikRef={formikRef}
+          onBeforeAction={onBeforeAction}
           size="medium"
         />
-        {/* {modalActions.map(({ name, component: ActionComponent }) => (
-          <ActionComponent
-            key={name}
-            request={request}
-            requestType={requestType}
-            extraData={requestTypeProperties}
-            isMutating={isMutating}
-          />
-        ))} */}
       </Modal.Actions>
     </React.Fragment>
   );

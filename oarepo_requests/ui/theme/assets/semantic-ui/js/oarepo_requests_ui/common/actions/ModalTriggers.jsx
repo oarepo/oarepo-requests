@@ -21,7 +21,7 @@ export const RequestSubmitModalTrigger = ({
   size,
   className,
 }) => {
-  const text = i18next.t("Request access");
+  const text = i18next.t("Submit");
   return (
     <MediaContextProvider>
       <Media greaterThanOrEqual="tablet">
@@ -38,13 +38,23 @@ export const RequestSubmitModalTrigger = ({
       <Media at="mobile">
         <Dropdown.Item
           icon={{
-            name: "unlock alternate",
+            name: "send",
             color: "positive",
             className: "mr-5",
           }}
           onClick={onClick}
           content={text}
-        />
+        >
+          <RequestSubmitButton
+            onClick={onClick}
+            loading={loading}
+            disabled={loading}
+            requestType={requestType}
+            size={size}
+            className={className}
+            {...ariaAttributes}
+          />
+        </Dropdown.Item>
       </Media>
     </MediaContextProvider>
   );

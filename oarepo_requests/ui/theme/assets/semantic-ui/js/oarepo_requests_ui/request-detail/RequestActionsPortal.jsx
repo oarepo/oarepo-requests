@@ -1,4 +1,3 @@
-import { RequestActionController } from "@js/invenio_requests/request/actions/RequestActionController";
 import PropTypes from "prop-types";
 import ReactDOM from "react-dom";
 import React from "react";
@@ -15,7 +14,6 @@ const element = document.getElementById("request-actions");
 
 export const RequestActionsPortal = ({ request, actionSuccessCallback }) => {
   const formikRef = useFormikRefContext();
-  console.log("dwadwadwadawdwa");
   return ReactDOM.createPortal(
     <RequestActionController
       request={request}

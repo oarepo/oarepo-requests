@@ -107,7 +107,7 @@ class OARepoRequestsService(RequestsService):
         )
         if errors:
             raise CustomHTTPJSONException(
-                description=_("Action could not be performed due to validation request fields validation errors."),
+                description=_("Action could not be performed due to request fields validation errors."),
                 request_payload_errors=errors,
                 code=400,
             )
