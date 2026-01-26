@@ -1,7 +1,16 @@
+#
+# Copyright (c) 2026 CESNET z.s.p.o.
+#
+# This file is a part of oarepo-requests (see https://github.com/oarepo/oarepo-requests).
+#
+# oarepo-requests is free software; you can redistribute it and/or modify it
+# under the terms of the MIT License; see LICENSE file for more details.
+#
 """UI views for requests module."""
 
 from __future__ import annotations
 
+import contextlib
 from typing import TYPE_CHECKING, Any, ClassVar
 
 import marshmallow as ma
@@ -52,10 +61,11 @@ if TYPE_CHECKING:
     from collections.abc import Mapping
 
     from flask import Flask
+    from flask.typing import ResponseReturnValue
     from invenio_requests.customizations.request_types import RequestType
 
 
-def _has_record_topic(request) -> bool:
+def _has_record_topic(request: Mapping[str, Any]) -> bool:
     """Check if request topic is a record (not user, community, etc.) using oarepo resolver."""
     topic = request["topic"]
     if not topic:
@@ -63,11 +73,11 @@ def _has_record_topic(request) -> bool:
     try:
         service = get_matching_service_for_refdict(topic)
         return service is not None and isinstance(service, RecordService)
-    except Exception:
+    except Exception:  # noqa: BLE001
         return False
 
 
-def _resolve_topic_record_oarepo(request):
+def _resolve_topic_record_oarepo(request: Mapping[str, Any]) -> dict[str, Any]:
     """Resolve topic record using oarepo utilities (model-agnostic version)."""
     creator_id = request["expanded"].get("created_by", {}).get("id", None)
     user_owns_request = str(creator_id) == str(current_user.id)
@@ -114,10 +124,8 @@ def _resolve_topic_record_oarepo(request):
 
         # Try to read draft first if service supports drafts
         if isinstance(service, DraftRecordService):
-            try:
+            with contextlib.suppress(NoResultFound, PIDDoesNotExistError, RecordDeletedException):
                 record = service.read_draft(g.identity, pid, expand=True)
-            except (NoResultFound, PIDDoesNotExistError, RecordDeletedException):
-                pass
 
         # If no draft or not a draft service, try published record
         if not record:
@@ -149,7 +157,7 @@ def _resolve_topic_record_oarepo(request):
 
             # Get model and ui_model from service config
             model = None
-            ui_model = {}
+            ui_model: Mapping[str, Any] = {}
             if hasattr(service.config, "model") and service.config.model:
                 model = service.config.model
                 ui_model = getattr(model, "ui_model", {})
@@ -173,7 +181,7 @@ def _resolve_topic_record_oarepo(request):
                 "record_detail_template": record_detail_template,
             }
 
-    except Exception:
+    except Exception:  # noqa: BLE001, S110
         pass
 
     return {
@@ -188,7 +196,7 @@ def _resolve_topic_record_oarepo(request):
 
 @login_required
 @pass_request(expand=True)
-def user_dashboard_request_view(request, **kwargs):
+def user_dashboard_request_view(request: Any, **kwargs: Any) -> ResponseReturnValue:  # noqa: ARG001
     """User dashboard request details view."""
     avatar = current_user_resources.users_service.links_item_tpl.expand(g.identity, current_user)["avatar"]
 
@@ -216,7 +224,7 @@ def user_dashboard_request_view(request, **kwargs):
         if current_app.config.get("CHECKS_ENABLED", False) and record:
             if is_record_inclusion and has_draft:
                 checks = ChecksAPI.get_runs(
-                    record._record,
+                    record._record,  # noqa: SLF001
                     is_draft=True,
                 )
             else:
@@ -325,7 +333,7 @@ class FormConfigResource(UIComponentsResource[FormConfigResourceConfig]):
         :param kwargs: Additional configuration options.
         :return: Dictionary with form configuration.
         """
-        return self.config.form_config(**kwargs)
+        return self.config.form_config(**kwargs)  # type: ignore[no-any-return]
 
     @pass_route_args("view")
     def form_config(self, **kwargs: Any) -> dict[str, Any]:

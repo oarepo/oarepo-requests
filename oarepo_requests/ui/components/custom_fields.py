@@ -22,11 +22,17 @@ if TYPE_CHECKING:
 class FormConfigCustomFieldsComponent(UIResourceComponent):
     """Component for adding custom fields to request's form config."""
 
-    def form_config(self, *, request_type, form_config: dict, **kwargs: Any) -> None:
+    def form_config(
+        self,
+        *,
+        request_type: RequestType,
+        form_config: dict,
+        **kwargs: Any,  # noqa: ARG002
+    ) -> None:
         """Add custom fields to the form config."""
         type_ = request_type
         # ignore the type as we are checking for alternatives below
-        form: dict | list = getattr(type_, "form", None)  # type: ignore
+        form: dict | list = getattr(type_, "form", None)  # type: ignore[assignment]
         if not form:
             return
 
@@ -38,12 +44,15 @@ class FormConfigCustomFieldsComponent(UIResourceComponent):
             for it in form:
                 it["displaySection"] = it.get("displaySection", False)
                 if not isinstance(it, dict):
-                    raise ValueError(f"Form section must be a dictionary: {it}")
-                assert "section" in it, f"Form section must contain 'section' key: {it}"
-                assert "fields" in it, f"Form section must contain 'fields' key: {it}"
-                assert isinstance(it["fields"], list), f"Form section fields must be a list: {it}"
+                    raise TypeError(f"Form section must be a dictionary: {it}")
+                if "section" not in it:
+                    raise KeyError(f"Form section must contain 'section' key: {it}")
+                if "fields" not in it:
+                    raise KeyError(f"Form section must contain 'fields' key: {it}")
+                if not isinstance(it["fields"], list):
+                    raise TypeError(f"Form section fields must be a list: {it}")
         else:
-            raise ValueError(
+            raise TypeError(
                 f"form must be either dict containing a definition of a single field or a list of sections: '{form}'. "
                 f"See https://inveniordm.docs.cern.ch/customize/metadata/custom_fields/records/#upload-deposit-form "
                 f"for details on the format."
@@ -55,7 +64,13 @@ class FormConfigCustomFieldsComponent(UIResourceComponent):
 class FormConfigRequestTypePropertiesComponent(UIResourceComponent):
     """Component for adding request type properties to request's form config."""
 
-    def form_config(self, *, request_type: RequestType, form_config: dict, **kwargs: Any) -> None:
+    def form_config(
+        self,
+        *,
+        request_type: RequestType,
+        form_config: dict,
+        **kwargs: Any,  # noqa: ARG002
+    ) -> None:
         """Add request type properties to the form config (dangerous, editable, has_form)."""
         type_: RequestType = request_type
 

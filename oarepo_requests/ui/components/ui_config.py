@@ -22,7 +22,7 @@ class RequestsUIConfigComponent(UIResourceComponent):
         self,
         *,
         form_config: dict,
-        **kwargs: Any,
+        **kwargs: Any,  # noqa: ARG002
     ) -> None:
         """Add requests UI configuration to the form config."""
         form_config["requests_ui_config"] = {

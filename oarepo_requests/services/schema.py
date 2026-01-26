@@ -56,9 +56,9 @@ class RequestTypeSchema(ma.Schema):
         return data
 
     @ma.post_dump
-    def _add_type_details(self, data: dict, **kwargs: Any) -> dict:
+    def _add_type_details(self, data: dict, **kwargs: Any) -> dict:  # noqa ARG001
         """Serialize details from request type."""
-        type = data["type_id"]
+        type = data["type_id"]  # noqa: A001
         type_obj = current_request_type_registry.lookup(type, quiet=True)
         if hasattr(type_obj, "description"):
             data["description"] = type_obj.description
@@ -70,15 +70,8 @@ class RequestTypeSchema(ma.Schema):
             data["editable"] = type_obj.is_editable
         if hasattr(type_obj, "has_form"):
             data["has_form"] = type_obj.has_form
+        # TODO: implement stateful name and description context seems to no longer work in marshmallow
 
-        # if hasattr(type_obj, "stateful_name"):
-        #     data["stateful_name"] = type_obj.stateful_name(
-        #         identity=self.context["identity"], topic=self.context["topic"]
-        #     )
-        # if hasattr(type_obj, "stateful_description"):
-        #     data["stateful_description"] = type_obj.stateful_description(
-        #         identity=self.context["identity"], topic=self.context["topic"]
-        #     )
         return data
 
 
