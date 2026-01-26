@@ -29,9 +29,9 @@ from invenio_checks.api import ChecksAPI
 from invenio_drafts_resources.services import RecordService as DraftRecordService
 from invenio_i18n.ext import current_i18n
 from invenio_pidstore.errors import PIDDoesNotExistError
-from invenio_rdm_records.requests import CommunityInclusion
-from invenio_rdm_records.resources.serializers import UIJSONSerializer
-from invenio_rdm_records.services.errors import RecordDeletedException
+from invenio_rdm_records.requests import CommunityInclusion  # type: ignore[attr-defined]
+from invenio_rdm_records.resources.serializers import UIJSONSerializer  # type: ignore[attr-defined]
+from invenio_rdm_records.services.errors import RecordDeletedException  # type: ignore[attr-defined]
 from invenio_records_resources.services import RecordService
 from invenio_requests import current_request_type_registry
 from invenio_requests.customizations import AcceptAction
@@ -45,7 +45,7 @@ from oarepo_ui.resources.base import UIComponentsResource
 from oarepo_ui.resources.decorators import pass_route_args
 from oarepo_ui.resources.form_config import FormConfigResourceConfig
 from oarepo_ui.templating.data import FieldData
-from sqlalchemy.orm.exc import NoResultFound
+from sqlalchemy.orm.exc import NoResultFound  # type: ignore[attr-defined]
 
 from oarepo_requests.ui.components import (
     ActionLabelsComponent,
@@ -196,7 +196,10 @@ def _resolve_topic_record_oarepo(request: Mapping[str, Any]) -> dict[str, Any]:
 
 @login_required
 @pass_request(expand=True)
-def user_dashboard_request_view(request: Any, **kwargs: Any) -> ResponseReturnValue:  # noqa: ARG001
+def user_dashboard_request_view(
+    request: Any,
+    **kwargs: Any,  # noqa: ARG001
+) -> ResponseReturnValue:
     """User dashboard request details view."""
     avatar = current_user_resources.users_service.links_item_tpl.expand(g.identity, current_user)["avatar"]
 
@@ -233,7 +236,7 @@ def user_dashboard_request_view(request: Any, **kwargs: Any) -> ResponseReturnVa
         if request_type == "record-deletion":
             reason_title = vocabulary_service.read(
                 g.identity,
-                ("removalreasons", request["payload"]["reason"]),
+                ("removalreasons", request["payload"]["reason"]),  # type: ignore[arg-type]
             ).to_dict()
             request["payload"]["reason_label"] = gettext_from_dict(
                 reason_title["title"],
@@ -335,7 +338,7 @@ class FormConfigResource(UIComponentsResource[FormConfigResourceConfig]):
         """
         return self.config.form_config(**kwargs)  # type: ignore[no-any-return]
 
-    @pass_route_args("view")
+    @pass_route_args("request_type")
     def form_config(self, **kwargs: Any) -> dict[str, Any]:
         """Return form configuration.
 
@@ -374,12 +377,12 @@ class RequestsFormConfigResourceConfig(FormConfigResourceConfig):
         ActionLabelsComponent,
         RequestsUIConfigComponent,
     ]
-    request_view_args: ClassVar[dict] = {"request_type": RequestTypeSchema()}
-    routes: ClassVar[dict] = {
+    request_request_type_args: ClassVar[dict] = {"request_type": RequestTypeSchema()}
+    routes: Mapping[str, str] = {
         "form_config": "/configs/<request_type>",
     }
 
 
 def create_requests_form_config_blueprint(app: Flask) -> Blueprint:  # NOQA: ARG001
     """Register blueprint for form config resource."""
-    return FormConfigResource(RequestsFormConfigResourceConfig()).as_blueprint()
+    return FormConfigResource(RequestsFormConfigResourceConfig()).as_blueprint()  # type: ignore[arg-type]

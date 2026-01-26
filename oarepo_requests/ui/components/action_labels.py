@@ -35,7 +35,7 @@ class ActionLabelsComponent(UIResourceComponent):
         if type_:
             for action_type, action in type_.available_actions.items():
                 if hasattr(action, "stateful_name"):
-                    name = action.stateful_name(identity, **kwargs)
+                    name = action.stateful_name(identity, **kwargs)  # type: ignore[attr-defined]
                 else:
                     name = action_type.capitalize()
                 action_labels[action_type] = name
