@@ -41,9 +41,3 @@ PUBLISH_REQUEST_TYPES = ["publish_draft", "publish_new_version"]
 NOTIFICATIONS_BACKENDS = {
     EmailNotificationBackend.id: EmailNotificationBackend(),
 }
-
-USERS_RESOURCES_GROUPS_ENABLED = False
-
-REQUESTS_REVIEWERS_ENABLED = False
-
-REQUESTS_REVIEWERS_MAX_NUMBER = 5
