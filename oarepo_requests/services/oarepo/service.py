@@ -107,9 +107,7 @@ class OARepoRequestsService(RequestsService):
         )
         if errors:
             raise CustomHTTPJSONException(
-                description=_(
-                    "Action could not be performed due to request fields validation errors."
-                ),
+                description=_("Action could not be performed due to request fields validation errors."),
                 request_payload_errors=errors,
                 code=400,
             )
@@ -130,25 +128,17 @@ class OARepoRequestsService(RequestsService):
         uow.register(IndexRefreshOp(indexer=self.indexer, index=self.record_cls.index))  # type: ignore[reportArgumentType]
         return result
 
-    def applicable_request_types(
-        self, identity: Identity, topic: Record | dict[str, str]
-    ) -> RequestTypesList:
+    def applicable_request_types(self, identity: Identity, topic: Record | dict[str, str]) -> RequestTypesList:
         """Get applicable request types for a record."""
-        topic = (
-            resolve_reference_dict(topic) if not isinstance(topic, Record) else topic
-        )
+        topic = resolve_reference_dict(topic) if not isinstance(topic, Record) else topic
         if not isinstance(topic, Record):
-            raise TypeError(
-                "Trying to find applicable request types on non-record entity"
-            )
+            raise TypeError("Trying to find applicable request types on non-record entity")
 
         allowed_request_types = allowed_request_types_for_record(identity, topic)
         return RequestTypesList(
             service=self,
             identity=identity,
             results=list(allowed_request_types.values()),
-            links_tpl=LinksTemplate(
-                {"self": EndpointLink("requests.applicable_request_types")}
-            ),
+            links_tpl=LinksTemplate({"self": EndpointLink("requests.applicable_request_types")}),
             record=topic,
         )

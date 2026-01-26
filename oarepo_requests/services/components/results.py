@@ -37,25 +37,19 @@ if TYPE_CHECKING:
 class RequestTypesComponent(ResultComponent):
     """Component for expanding request types."""
 
-    def update_data(
-        self, identity: Identity, record: Record, projection: dict, expand: bool
-    ) -> None:
+    def update_data(self, identity: Identity, record: Record, projection: dict, expand: bool) -> None:
         """Expand request types if requested."""
         if not expand:
             return
         allowed_request_types = allowed_request_types_for_record(identity, record)
-        request_types_list = serialize_request_types(
-            allowed_request_types, identity, record
-        )
+        request_types_list = serialize_request_types(allowed_request_types, identity, record)
         projection["expanded"]["request_types"] = request_types_list
 
 
 class RequestsComponent(ResultComponent):
     """Component for expanding requests on a record."""
 
-    def update_data(
-        self, identity: Identity, record: Record, projection: dict, expand: bool
-    ) -> None:
+    def update_data(self, identity: Identity, record: Record, projection: dict, expand: bool) -> None:
         """Expand requests if requested."""
         if not expand:
             return

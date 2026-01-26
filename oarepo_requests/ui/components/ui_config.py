@@ -26,11 +26,7 @@ class RequestsUIConfigComponent(UIResourceComponent):
     ) -> None:
         """Add requests UI configuration to the form config."""
         form_config["requests_ui_config"] = {
-            "allowGroupReviewers": current_app.config.get(
-                "USERS_RESOURCES_GROUPS_ENABLED", False
-            ),
-            "enableReviewers": current_app.config.get(
-                "REQUESTS_REVIEWERS_ENABLED", False
-            ),
+            "allowGroupReviewers": current_app.config.get("USERS_RESOURCES_GROUPS_ENABLED", False),
+            "enableReviewers": current_app.config.get("REQUESTS_REVIEWERS_ENABLED", False),
             "maxReviewers": current_app.config.get("REQUESTS_REVIEWERS_MAX_NUMBER", 10),
         }

@@ -72,19 +72,13 @@ class EditPublishedRecordRequestType(NonDuplicableOARepoRecordRequestType):
         :param kwargs:          additional keyword arguments
         """
         if not isinstance(topic, RecordWithDraft):
-            raise TypeError(
-                gettext("Trying to create edit request on record without draft support")
-            )
+            raise TypeError(gettext("Trying to create edit request on record without draft support"))
         if has_draft(topic):
-            raise ValueError(
-                gettext("Trying to create edit request on record with draft")
-            )
+            raise ValueError(gettext("Trying to create edit request on record with draft"))
         super().can_create(identity, data, receiver, topic, creator, *args, **kwargs)
 
     @classmethod
-    def is_applicable_to(
-        cls, identity: Identity, topic: Record, *args: Any, **kwargs: Any
-    ) -> bool:
+    def is_applicable_to(cls, identity: Identity, topic: Record, *args: Any, **kwargs: Any) -> bool:
         """Check if the request type is applicable to the topic."""
         if not isinstance(topic, RecordWithDraft):
             return False
@@ -128,21 +122,13 @@ class EditPublishedRecordRequestType(NonDuplicableOARepoRecordRequestType):
             return gettext("Click to start editing the metadata of the record.")
 
         if not request:
-            return gettext(
-                "Request edit access to the record. You will be notified about the decision by email."
-            )
+            return gettext("Request edit access to the record. You will be notified about the decision by email.")
         match request.status:
             case "submitted":
                 if request_identity_matches(request.created_by, identity):
-                    return gettext(
-                        "Edit access requested. You will be notified about the decision by email."
-                    )
+                    return gettext("Edit access requested. You will be notified about the decision by email.")
                 if request_identity_matches(request.receiver, identity):
-                    return gettext(
-                        "You have been requested to grant edit access to the record."
-                    )
+                    return gettext("You have been requested to grant edit access to the record.")
                 return gettext("Edit access requested.")
             case _:
-                return gettext(
-                    "Request edit access to the record. You will be notified about the decision by email."
-                )
+                return gettext("Request edit access to the record. You will be notified about the decision by email.")

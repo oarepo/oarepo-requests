@@ -92,9 +92,7 @@ class RequestTypesList(RecordList):
             try:
                 # identity in context is hardcoded in ServiceSchemaWrapper
                 # which we have to use if we want to subclass RecordList
-                projection = self._schema.dump(
-                    hit, context={"identity": self._identity}
-                )
+                projection = self._schema.dump(hit, context={"identity": self._identity})
             finally:
                 # Reset contextvars to previous values to avoid leaking state
                 request_type_identity_ctx.reset(tok_identity)
@@ -125,8 +123,7 @@ def serialize_request_types(
     tok_record = request_type_record_ctx.set(record)
     try:
         return [
-            cast("dict[str, Any]", RequestTypeSchema().dump(request_type))
-            for request_type in request_types.values()
+            cast("dict[str, Any]", RequestTypeSchema().dump(request_type)) for request_type in request_types.values()
         ]
     finally:
         # Reset contextvars to previous values to avoid leaking state

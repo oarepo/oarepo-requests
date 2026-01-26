@@ -52,9 +52,7 @@ class OARepoRequests:
         These fields will be dereferenced, serialized to UI using one of the entity_reference_ui_resolvers
         and included in the serialized request.
         """
-        return cast(
-            "list[str]", self.app.config["REQUESTS_UI_SERIALIZATION_REFERENCED_FIELDS"]
-        )
+        return cast("list[str]", self.app.config["REQUESTS_UI_SERIALIZATION_REFERENCED_FIELDS"])
 
     def default_request_receiver(
         self,
@@ -77,9 +75,7 @@ class OARepoRequests:
         :param creator: Creator of the request.
         :param data: Payload of the request.
         """
-        return obj_or_import_string(
-            self.app.config["OAREPO_REQUESTS_DEFAULT_RECEIVER"]
-        )(  # type: ignore[no-any-return]
+        return obj_or_import_string(self.app.config["OAREPO_REQUESTS_DEFAULT_RECEIVER"])(  # type: ignore[no-any-return]
             identity=identity,
             request_type=request_type,
             record=record,
@@ -105,9 +101,7 @@ class OARepoRequests:
         registered under the group oarepo_requests.identity_to_entity_references.
         """
         group_name = "oarepo_requests.identity_to_entity_references"
-        return [
-            x.load() for x in importlib_metadata.entry_points().select(group=group_name)
-        ]
+        return [x.load() for x in importlib_metadata.entry_points().select(group=group_name)]
 
     # TODO: possible not used
     def identity_to_entity_references(self, identity: Identity) -> list[dict[str, str]]:
@@ -135,32 +129,20 @@ class OARepoRequests:
         from . import config
 
         app.config.setdefault("OAREPO_REQUESTS_DEFAULT_RECEIVER", None)
-        app.config.setdefault("REQUESTS_ALLOWED_RECEIVERS", []).extend(
-            config.REQUESTS_ALLOWED_RECEIVERS
-        )
+        app.config.setdefault("REQUESTS_ALLOWED_RECEIVERS", []).extend(config.REQUESTS_ALLOWED_RECEIVERS)
 
         app.config.setdefault("PUBLISH_REQUEST_TYPES", config.PUBLISH_REQUEST_TYPES)
-        app.config.setdefault(
-            "USERS_RESOURCES_GROUPS_ENABLED", config.USERS_RESOURCES_GROUPS_ENABLED
-        )
-        app.config.setdefault(
-            "REQUESTS_REVIEWERS_ENABLED", config.REQUESTS_REVIEWERS_ENABLED
-        )
-        app.config.setdefault(
-            "REQUESTS_REVIEWERS_MAX_NUMBER", config.REQUESTS_REVIEWERS_MAX_NUMBER
-        )
+        app.config.setdefault("USERS_RESOURCES_GROUPS_ENABLED", config.USERS_RESOURCES_GROUPS_ENABLED)
+        app.config.setdefault("REQUESTS_REVIEWERS_ENABLED", config.REQUESTS_REVIEWERS_ENABLED)
+        app.config.setdefault("REQUESTS_REVIEWERS_MAX_NUMBER", config.REQUESTS_REVIEWERS_MAX_NUMBER)
         # do not overwrite user's stuff
-        app_default_workflow_events = app.config.setdefault(
-            "DEFAULT_WORKFLOW_EVENTS", {}
-        )
+        app_default_workflow_events = app.config.setdefault("DEFAULT_WORKFLOW_EVENTS", {})
         for k, v in config.DEFAULT_WORKFLOW_EVENTS.items():
             if k not in app_default_workflow_events:
                 app_default_workflow_events[k] = v
 
         # let the user override the action components
-        app.config.setdefault("REQUESTS_ACTION_COMPONENTS", []).extend(
-            config.REQUESTS_ACTION_COMPONENTS
-        )
+        app.config.setdefault("REQUESTS_ACTION_COMPONENTS", []).extend(config.REQUESTS_ACTION_COMPONENTS)
 
 
 def api_finalize_app(app: Flask) -> None:

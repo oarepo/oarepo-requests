@@ -41,9 +41,7 @@ class FormConfigCustomFieldsComponent(UIResourceComponent):
                     raise ValueError(f"Form section must be a dictionary: {it}")
                 assert "section" in it, f"Form section must contain 'section' key: {it}"
                 assert "fields" in it, f"Form section must contain 'fields' key: {it}"
-                assert isinstance(it["fields"], list), (
-                    f"Form section fields must be a list: {it}"
-                )
+                assert isinstance(it["fields"], list), f"Form section fields must be a list: {it}"
         else:
             raise ValueError(
                 f"form must be either dict containing a definition of a single field or a list of sections: '{form}'. "
@@ -57,9 +55,7 @@ class FormConfigCustomFieldsComponent(UIResourceComponent):
 class FormConfigRequestTypePropertiesComponent(UIResourceComponent):
     """Component for adding request type properties to request's form config."""
 
-    def form_config(
-        self, *, request_type: RequestType, form_config: dict, **kwargs: Any
-    ) -> None:
+    def form_config(self, *, request_type: RequestType, form_config: dict, **kwargs: Any) -> None:
         """Add request type properties to the form config (dangerous, editable, has_form)."""
         type_: RequestType = request_type
 

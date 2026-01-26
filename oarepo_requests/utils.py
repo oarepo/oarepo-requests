@@ -45,16 +45,7 @@ if TYPE_CHECKING:
 
     from oarepo_requests.services.results import RequestTypesList
 
-type JsonValue = (
-    str
-    | LazyString
-    | int
-    | float
-    | bool
-    | None
-    | dict[str, JsonValue]
-    | list[JsonValue]
-)
+type JsonValue = str | LazyString | int | float | bool | None | dict[str, JsonValue] | list[JsonValue]
 
 
 # TODO: move to runtime; typing issues
@@ -70,9 +61,7 @@ class classproperty[T]:  # noqa N801
         return self.fget(owner)
 
 
-def allowed_request_types_for_record(
-    identity: Identity, record: Record
-) -> dict[str, RequestType]:
+def allowed_request_types_for_record(identity: Identity, record: Record) -> dict[str, RequestType]:
     """Return allowed request types for the record.
 
     If there is a workflow defined on the record, only request types allowed by the workflow are returned.
@@ -86,9 +75,7 @@ def allowed_request_types_for_record(
         workflow_requests = current_oarepo_workflows.get_workflow(record).requests()
         return {
             type_id: wr.request_type
-            for (type_id, wr) in workflow_requests.applicable_workflow_requests(
-                identity, record=record
-            )
+            for (type_id, wr) in workflow_requests.applicable_workflow_requests(identity, record=record)
         }
     except MissingWorkflowError:
         # workflow not defined on the record, probably not a workflow-enabled record
@@ -105,9 +92,7 @@ def allowed_request_types_for_record(
     return ret
 
 
-def create_query_term_for_reference(
-    field_name: str, reference: dict[str, str]
-) -> Query:
+def create_query_term_for_reference(field_name: str, reference: dict[str, str]) -> Query:
     """Create an opensearch query term for the reference.
 
     :param field_name: Field name to search in (can be "topic", "receiver", ...).
@@ -116,11 +101,7 @@ def create_query_term_for_reference(
     """
     return dsl.Q(
         "term",
-        **{
-            f"{field_name}.{next(iter(reference.keys()))}": next(
-                iter(reference.values())
-            )
-        },
+        **{f"{field_name}.{next(iter(reference.keys()))}": next(iter(reference.values()))},
     )
 
 
@@ -156,21 +137,15 @@ def search_requests_filter(
     )
 
 
-def open_request_exists(
-    topic_or_reference: Record | dict[str, str], type_id: str
-) -> bool:
+def open_request_exists(topic_or_reference: Record | dict[str, str], type_id: str) -> bool:
     """Check if there is an open request of a given type for the topic.
 
     :param topic_or_reference: Topic record or reference to the record in the form {"datasets": "id"}.
     :param type_id: Request type id.
     """
     topic_reference = ResolverRegistry.reference_entity(topic_or_reference, raise_=True)
-    base_filter = search_requests_filter(
-        type_id=type_id, topic_reference=topic_reference, is_open=True
-    )
-    results = current_requests_service.search(
-        system_identity, extra_filter=base_filter
-    ).hits
+    base_filter = search_requests_filter(type_id=type_id, topic_reference=topic_reference, is_open=True)
+    results = current_requests_service.search(system_identity, extra_filter=base_filter).hits
     return bool(list(results))
 
 
@@ -187,9 +162,7 @@ def reference_entity(entity: Any) -> dict[str, str]:
 
     Raises ValueError if the reference cannot be resolved.
     """
-    return cast(
-        "dict[str, str]", ResolverRegistry.reference_entity(entity, raise_=True)
-    )
+    return cast("dict[str, str]", ResolverRegistry.reference_entity(entity, raise_=True))
 
 
 # TODO: possibly not used
@@ -219,13 +192,9 @@ def get_entity_key_for_record_cls(record_cls: type[Record]) -> str:
         if hasattr(resolver, "record_cls") and resolver.record_cls == record_cls:  # type: ignore[reportAttributeAccessIssue]
             type_id: str | None = getattr(resolver, "type_id", None)
             if type_id is None:
-                raise ValueError(
-                    f"Entity resolver {type(resolver)} does not have an associated type_id"
-                )
+                raise ValueError(f"Entity resolver {type(resolver)} does not have an associated type_id")
             return type_id
-    raise AttributeError(
-        f"Record class {record_cls} does not have a registered entity resolver."
-    )
+    raise AttributeError(f"Record class {record_cls} does not have a registered entity resolver.")
 
 
 def reference_to_tuple(reference: dict[str, str]) -> tuple[str, str]:
@@ -295,22 +264,15 @@ def is_auto_approved(
     if not current_oarepo_workflows:
         return False
 
-    receiver = get_receiver_for_request_type(
-        request_type=request_type, identity=identity, topic=topic
-    )
+    receiver = get_receiver_for_request_type(request_type=request_type, identity=identity, topic=topic)
 
     return bool(
         receiver
-        and (
-            isinstance(receiver, AutoApprove)
-            or (isinstance(receiver, dict) and receiver.get("auto_approve"))
-        )
+        and (isinstance(receiver, AutoApprove) or (isinstance(receiver, dict) and receiver.get("auto_approve")))
     )
 
 
-def request_identity_matches(
-    entity_reference: dict[str, str], identity: Identity
-) -> bool:
+def request_identity_matches(entity_reference: dict[str, str], identity: Identity) -> bool:
     """Check if the identity matches the entity reference.
 
     Identity matches the entity reference if the needs provided by the entity reference
@@ -386,26 +348,18 @@ def has_rights_to_submit_request(request: Request, identity: Identity) -> bool:
     )
 
 
-def search_requests(
-    identity: Identity, record: RecordWithDraft | dict[str, str], expand: bool = False
-) -> RequestList:
+def search_requests(identity: Identity, record: RecordWithDraft | dict[str, str], expand: bool = False) -> RequestList:
     """Search requests for a given record."""
-    topic_ref = (
-        reference_entity(record) if isinstance(record, RecordWithDraft) else record
-    )
+    topic_ref = reference_entity(record) if isinstance(record, RecordWithDraft) else record
     return cast(
         "RequestList",
         current_requests_service.search(identity, topic=topic_ref, expand=expand),
     )
 
 
-def applicable_requests(
-    identity: Identity, record: RecordWithDraft | dict[str, str]
-) -> RequestTypesList:
+def applicable_requests(identity: Identity, record: RecordWithDraft | dict[str, str]) -> RequestTypesList:
     """Get applicable request types for a record."""
-    topic_ref = (
-        reference_entity(record) if isinstance(record, RecordWithDraft) else record
-    )
+    topic_ref = reference_entity(record) if isinstance(record, RecordWithDraft) else record
     return current_requests_service.applicable_request_types(identity, topic=topic_ref)
 
 

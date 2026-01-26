@@ -27,16 +27,12 @@ def test_requests_field(
     draft1 = draft_factory(creator.identity)
     draft1_id = draft1["id"]
 
-    resp_request_create = create_request_on_draft(
-        creator.identity, draft1_id, "publish_draft"
-    )
+    resp_request_create = create_request_on_draft(creator.identity, draft1_id, "publish_draft")
     creator_client.post(
         link2testclient(resp_request_create["links"]["actions"]["submit"]),
     )
     record = receiver_client.get(f"{urls['BASE_URL']}/{draft1_id}/draft")
-    expanded_record = receiver_client.get(
-        f"{urls['BASE_URL']}/{draft1_id}/draft?expand=true"
-    )
+    expanded_record = receiver_client.get(f"{urls['BASE_URL']}/{draft1_id}/draft?expand=true")
 
     assert "requests" not in record.json.get("expanded", {})
     assert "requests" in expanded_record.json["expanded"]
@@ -54,12 +50,8 @@ def test_autoaccept_receiver(
     creator_client = logged_client(creator)
 
     record1 = record_factory(creator.identity)
-    resp_request_submit = create_request_on_record(
-        creator.identity, record1["id"], "edit_published_record"
-    )
-    request = creator_client.get(
-        f"{urls['BASE_URL_REQUESTS']}{resp_request_submit['id']}?expand=true"
-    ).json
+    resp_request_submit = create_request_on_record(creator.identity, record1["id"], "edit_published_record")
+    request = creator_client.get(f"{urls['BASE_URL_REQUESTS']}{resp_request_submit['id']}?expand=true").json
     assert request["expanded"]["receiver"] == {"auto_approve": "true"}
 
 
@@ -78,12 +70,8 @@ def test_multiple_recipients(
     recipient2_id = str(users[1].id)
 
     record1 = draft_factory(creator.identity, custom_workflow="multiple_recipients")
-    resp_request_submit = create_request_on_draft(
-        creator.identity, record1["id"], "publish_draft"
-    )
-    request = creator_client.get(
-        f"{urls['BASE_URL_REQUESTS']}{resp_request_submit['id']}?expand=true"
-    ).json
+    resp_request_submit = create_request_on_draft(creator.identity, record1["id"], "publish_draft")
+    request = creator_client.get(f"{urls['BASE_URL_REQUESTS']}{resp_request_submit['id']}?expand=true").json
     assert request["expanded"]["receiver"] == {
         "user": {
             recipient1_id: {
@@ -135,7 +123,5 @@ def test_draft_topic(
     creator_client = logged_client(creator)
     draft1 = draft_factory(creator.identity)
     request = submit_request_on_draft(creator.identity, draft1["id"], "publish_draft")
-    expanded_record = creator_client.get(
-        f"{urls['BASE_URL_REQUESTS']}{request['id']}?expand=true"
-    ).json
+    expanded_record = creator_client.get(f"{urls['BASE_URL_REQUESTS']}{request['id']}?expand=true").json
     assert "topic" in expanded_record["expanded"]

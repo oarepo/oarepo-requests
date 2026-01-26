@@ -57,9 +57,7 @@ class DeletePublishedRecordRequestType(NonDuplicableOARepoRecordRequestType):
     }
 
     @classmethod
-    def is_applicable_to(
-        cls, identity: Identity, topic: Record, *args: Any, **kwargs: Any
-    ) -> bool:
+    def is_applicable_to(cls, identity: Identity, topic: Record, *args: Any, **kwargs: Any) -> bool:
         """Check if the request type is applicable to the topic."""
         if open_request_exists(topic, cls.type_id):
             return False
@@ -148,12 +146,8 @@ class DeletePublishedRecordRequestType(NonDuplicableOARepoRecordRequestType):
                         "You have been asked to approve the request to permanently delete the record. "
                         "You can approve or reject the request."
                     )
-                return gettext(
-                    "Permission to delete record (including files) requested. "
-                )
+                return gettext("Permission to delete record (including files) requested. ")
             case _:
                 if request_identity_matches(request.created_by, identity):
-                    return gettext(
-                        "Submit request to get permission to delete the record."
-                    )
+                    return gettext("Submit request to get permission to delete the record.")
                 return gettext("You do not have permission to delete the record.")

@@ -30,9 +30,7 @@ class RequestOwnerFilterParam(FilterParam):
 
     # params have to be dict; support for pop operation required
     @override
-    def apply(
-        self, identity: Identity, search: RecordsSearchV2, params: dict[str, str]
-    ) -> RecordsSearchV2:  # type: ignore[reportIncompatibleMethodOverride]
+    def apply(self, identity: Identity, search: RecordsSearchV2, params: dict[str, str]) -> RecordsSearchV2:  # type: ignore[reportIncompatibleMethodOverride]
         """Apply the filter to the search."""
         value = params.pop(self.param_name, None)
         if value is not None:
@@ -54,9 +52,7 @@ class RequestAllAvailableFilterParam(ParamInterpreter):
         return partial(cls, param)
 
     @override
-    def apply(
-        self, identity: Identity, search: RecordsSearchV2, params: dict[str, str]
-    ) -> RecordsSearchV2:  # type: ignore[reportIncompatibleMethodOverride]
+    def apply(self, identity: Identity, search: RecordsSearchV2, params: dict[str, str]) -> RecordsSearchV2:  # type: ignore[reportIncompatibleMethodOverride]
         """Apply the filter to the search - does nothing."""
         params.pop(self.param_name, None)
         return search
@@ -71,17 +67,11 @@ class RequestNotOwnerFilterParam(FilterParam):
     """
 
     @override
-    def apply(
-        self, identity: Identity, search: RecordsSearchV2, params: dict[str, str]
-    ) -> RecordsSearchV2:  # type: ignore[reportIncompatibleMethodOverride]
+    def apply(self, identity: Identity, search: RecordsSearchV2, params: dict[str, str]) -> RecordsSearchV2:  # type: ignore[reportIncompatibleMethodOverride]
         """Apply the filter to the search."""
         value = params.pop(self.param_name, None)
         if value is not None:
-            search = search.filter(
-                dsl.query.Bool(
-                    must_not=[dsl.Q("term", **{self.field_name: identity.id})]
-                )
-            )
+            search = search.filter(dsl.query.Bool(must_not=[dsl.Q("term", **{self.field_name: identity.id})]))
         return search
 
 
@@ -89,9 +79,7 @@ class IsClosedParam(IsOpenParam):
     """Get just the closed requests."""
 
     @override
-    def apply(
-        self, identity: Identity, search: RecordsSearchV2, params: dict[str, str]
-    ) -> RecordsSearchV2:  # type: ignore[reportIncompatibleMethodOverride]
+    def apply(self, identity: Identity, search: RecordsSearchV2, params: dict[str, str]) -> RecordsSearchV2:  # type: ignore[reportIncompatibleMethodOverride]
         """Evaluate the is_closed parameter on the search."""
         if params.get("is_closed") is True:
             search = search.filter("term", **{self.field_name: True})

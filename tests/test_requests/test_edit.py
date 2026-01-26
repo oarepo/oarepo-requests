@@ -31,9 +31,7 @@ def test_edit_autoaccept(
     )
     assert direct_edit.status_code == 403
 
-    resp_request_submit = submit_request_on_record(
-        creator.identity, id_, "edit_published_record"
-    )
+    resp_request_submit = submit_request_on_record(creator.identity, id_, "edit_published_record")
     # is request accepted and closed?
     request = creator_client.get(
         f"{urls['BASE_URL_REQUESTS']}{resp_request_submit['id']}",
@@ -76,18 +74,10 @@ def test_publish(
 
     submit_request_on_record(creator.identity, id_, "edit_published_record")
 
-    creator_client.put(
-        f"{urls['BASE_URL']}/{id_}/draft", json={"metadata": {"title": "edited"}}
-    )
-    publish_request = submit_request_on_draft(
-        creator.identity, id_, "publish_changed_metadata"
-    )
-    receiver_request = receiver_client.get(
-        f"{urls['BASE_URL_REQUESTS']}{publish_request['id']}"
-    )
-    receiver_client.post(
-        link2testclient(receiver_request.json["links"]["actions"]["accept"])
-    )
+    creator_client.put(f"{urls['BASE_URL']}/{id_}/draft", json={"metadata": {"title": "edited"}})
+    publish_request = submit_request_on_draft(creator.identity, id_, "publish_changed_metadata")
+    receiver_request = receiver_client.get(f"{urls['BASE_URL_REQUESTS']}{publish_request['id']}")
+    receiver_client.post(link2testclient(receiver_request.json["links"]["actions"]["accept"]))
 
     # check it's published
     new_record = creator_client.get(f"{urls['BASE_URL']}/{id_}")
