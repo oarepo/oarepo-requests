@@ -33,8 +33,8 @@ export const ConfirmationModal = ({
   // TODO: this is primitive and probably the best way would be to have a config in the request type on BE
   // that would say which actions should offer you the comment input
   const isDecline = requestActionName === REQUEST_TYPE.DECLINE;
-  const handleConfirmAction = (comment) => {
-    onConfirmAction(comment);
+  const handleConfirmAction = (requestActionName, comment) => {
+    onConfirmAction(requestActionName, comment);
     setComment("");
     close();
   };
@@ -53,7 +53,7 @@ export const ConfirmationModal = ({
           <Message negative>
             <Message.Header>
               {i18next.t(
-                "Are you sure you wish to proceed? After this request is accepted, it will not be possible to reverse the action."
+                "Are you sure you wish to proceed? After this request is accepted, it will not be possible to reverse the action.",
               )}
             </Message.Header>
           </Message>
@@ -77,7 +77,7 @@ export const ConfirmationModal = ({
             <Icon name="info circle" className="text size large" />
             <span>
               {i18next.t(
-                "It is highly recommended to provide an explanation for the rejection of the request. Note that it is always possible to provide explanation later on the request timeline."
+                "It is highly recommended to provide an explanation for the rejection of the request. Note that it is always possible to provide explanation later on the request timeline.",
               )}
             </span>
           </Message>

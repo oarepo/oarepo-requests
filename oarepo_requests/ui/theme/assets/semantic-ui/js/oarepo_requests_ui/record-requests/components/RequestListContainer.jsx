@@ -17,11 +17,7 @@ export const RequestListContainer = ({
     (request) =>
       request.is_open || request?.status_code?.toLowerCase() === "created",
   );
-  if (
-    !requestsLoading &&
-    !requestsLoadingError &&
-    !openRequests?.length === 0
-  ) {
+  if (!requestsLoading && !requestsLoadingError && openRequests?.length === 0) {
     return null;
   }
 

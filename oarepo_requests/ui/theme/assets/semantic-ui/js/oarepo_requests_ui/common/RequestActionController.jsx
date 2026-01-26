@@ -41,12 +41,12 @@ export const RequestActionController = ({
   const [error, setError] = useState(undefined);
   const linkExtractor = useMemo(
     () => new RequestLinksExtractor(request),
-    [request]
+    [request],
   );
   const modalControlContext = useModalControlContext();
   const requestApi = useMemo(
     () => requestApiProp || new OarepoRequestsAPI(linkExtractor),
-    [requestApiProp, linkExtractor]
+    [requestApiProp, linkExtractor],
   );
 
   const performAction = useCallback(
@@ -54,10 +54,17 @@ export const RequestActionController = ({
       let formData = null;
       if (formikRef && formikRef.current) {
         const values = formikRef.current.values;
+        // Remove empty payload values
+        for (const key of Object.keys(values.payload || {})) {
+          if (!values.payload[key]) {
+            delete values.payload[key];
+          }
+        }
         if (values && Object.keys(values.payload).length > 0) {
           formData = { payload: values.payload };
         }
       }
+
       setLoading(true);
       const context = {
         action,
@@ -90,7 +97,7 @@ export const RequestActionController = ({
         const formikErrors =
           (error?.response?.data?.request_payload_errors?.length > 0 &&
             createFormikErrors(
-              error?.response?.data?.request_payload_errors
+              error?.response?.data?.request_payload_errors,
             )) ||
           {};
         formikRef?.current?.setErrors({
@@ -118,7 +125,7 @@ export const RequestActionController = ({
       actionSuccessCallback,
       onErrorPlugins,
       modalControlContext,
-    ]
+    ],
   );
 
   const cleanError = useCallback(() => {
@@ -143,7 +150,7 @@ export const RequestActionController = ({
       error,
       loading,
       request,
-    ]
+    ],
   );
   return (
     <RequestActionContext.Provider value={contextValue}>
