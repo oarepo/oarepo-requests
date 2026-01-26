@@ -8,17 +8,11 @@
 import { RequestLinksExtractor } from "@js/invenio_requests/api";
 import React from "react";
 import Overridable from "react-overridable";
-import { RequestAction } from "./RequestAction";
 import { Dropdown } from "semantic-ui-react";
 import PropTypes from "prop-types";
 import { RequestActionButton } from "./actions";
 import { useRequestConfigContext } from "./contexts";
-import {
-  WarningMessage,
-  ConfirmationModalConfirmButton,
-  ConfirmationModalCancelButton,
-  REQUEST_TYPE,
-} from "@js/oarepo_requests_common";
+import { REQUEST_TYPE } from "@js/oarepo_requests_common";
 
 const iconConfig = {
   create: "plus",
@@ -27,14 +21,6 @@ const iconConfig = {
   cancel: "cancel",
   accept: "checkmark",
   decline: "cancel",
-};
-
-const colorConfig = {
-  create: "blue",
-  submit: "blue",
-  save: "green",
-  accept: "green",
-  decline: "red",
 };
 
 const requireConfirmation = (actionName, requestTypesConfig) => {
@@ -70,14 +56,13 @@ const getAvailableActions = (initialActions, requestTypesConfig) => {
   return [...actions];
 };
 export const RequestActions = ({ request, size }) => {
-  const { requestTypeConfig, isLoading } = useRequestConfigContext();
+  const { requestTypeConfig } = useRequestConfigContext();
 
   const actions = Object.keys(new RequestLinksExtractor(request).actions);
   const actionNames = getAvailableActions(
     actions,
     requestTypeConfig?.request_type_properties
   );
-  console.log(requestTypeConfig, "requestTypeConfig");
   return (
     <Overridable
       id="InvenioRequests.RequestActions.layout"
@@ -111,15 +96,26 @@ export const RequestActions = ({ request, size }) => {
           floating
           labeled
           button
-          className="icon mobile only"
+          className="icon mobile only requests request-actions-dropdown"
         >
           <Dropdown.Menu>
-            {actions.map((action) => {
+            {actionNames.map((actionName) => {
               return (
                 <RequestActionButton
-                  key={action}
-                  action={action}
-                  requestType={request.type}
+                  requestActionName={actionName}
+                  key={actionName}
+                  requestOrRequestType={request}
+                  extraData={requestTypeConfig?.request_type_properties}
+                  buttonLabel={requestTypeConfig?.action_labels?.[actionName]}
+                  iconName={iconConfig[actionName]}
+                  requireConfirmation={requireConfirmation(
+                    actionName,
+                    requestTypeConfig?.request_type_properties
+                  )}
+                  className={`requests request-action-button ${actionName} ${
+                    requestTypeConfig?.request_type_properties?.dangerous &&
+                    "dangerous"
+                  }`}
                 />
               );
             })}

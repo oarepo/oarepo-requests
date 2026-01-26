@@ -8,20 +8,13 @@ import {
   RequestLinksExtractor,
   InvenioRequestsAPI,
 } from "@js/invenio_requests/api";
-import { errorSerializer } from "@js/invenio_requests/api/serializers";
 import { RequestActions } from "./RequestActions";
 import PropTypes from "prop-types";
 import { RequestActionContext } from "@js/invenio_requests/request/actions/context";
-import React, {
-  useState,
-  useMemo,
-  useCallback,
-  forwardRef,
-  useImperativeHandle,
-  useContext,
-} from "react";
+import { useModalControlContext } from "./contexts";
+import React, { useState, useMemo, useCallback, forwardRef } from "react";
 import { OarepoRequestsAPI } from "./OarepoRequestsApi";
-import { OverridableContext } from "react-overridable";
+
 export const createFormikErrors = (requestPayloadErrors) => {
   if (!requestPayloadErrors || !Array.isArray(requestPayloadErrors)) {
     return {};
@@ -32,49 +25,33 @@ export const createFormikErrors = (requestPayloadErrors) => {
     return errors;
   }, {});
 };
+
 export const RequestActionController = forwardRef(
-  (
-    {
-      request,
-      requestApi: requestApiProp,
-      actionSuccessCallback,
-      onBeforeAction,
-      onError,
-      formikRef,
-      size,
-      children,
-      renderAllActions,
-    },
-    ref
-  ) => {
-    const [modalOpen, setModalOpen] = useState({});
+  ({
+    request,
+    requestApi: requestApiProp,
+    actionSuccessCallback,
+    onBeforeAction,
+    onErrorPlugins,
+    formikRef,
+    size,
+    children,
+    renderAllActions,
+  }) => {
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(undefined);
     const linkExtractor = useMemo(
       () => new RequestLinksExtractor(request),
       [request]
     );
-
+    const modalControlContext = useModalControlContext();
     const requestApi = useMemo(
       () => requestApiProp || new OarepoRequestsAPI(linkExtractor),
       [requestApiProp, linkExtractor]
     );
 
-    const toggleActionModal = useCallback((actionId, val) => {
-      setModalOpen((prevModalOpen) => {
-        const newModalOpen = { ...prevModalOpen };
-        if (val !== undefined) {
-          newModalOpen[actionId] = val;
-        } else {
-          newModalOpen[actionId] = !prevModalOpen[actionId];
-        }
-        return newModalOpen;
-      });
-    }, []);
-
     const performAction = useCallback(
       async (action, commentContent) => {
-        // Extract form data from formik if available
         let formData = null;
         if (formikRef && formikRef.current) {
           const values = formikRef.current.values;
@@ -83,20 +60,20 @@ export const RequestActionController = forwardRef(
           }
         }
         setLoading(true);
+        const context = {
+          action,
+          request,
+          modalControlContext,
+          formikRef,
+        };
 
         if (onBeforeAction) {
           try {
-            const canProceed = await onBeforeAction(action, request);
+            const canProceed = await onBeforeAction(context);
             if (!canProceed) {
               return;
             }
           } catch (error) {
-            const serializedError = errorSerializer(error);
-            setError(serializedError);
-
-            if (onError) {
-              onError(serializedError);
-            }
             setLoading(false);
             return;
           }
@@ -104,16 +81,13 @@ export const RequestActionController = forwardRef(
 
         try {
           const specificAction = requestApi[action];
-          console.log(specificAction, "specificActionspecificAction");
           const response =
             (await specificAction?.(action, undefined, formData)) ||
             (await requestApi.performAction(action, commentContent, formData));
 
           setLoading(false);
-          toggleActionModal(action, false);
-          actionSuccessCallback(response?.data);
+          actionSuccessCallback(response?.data, context);
         } catch (error) {
-          console.error(error, "dwadwadawdwadadadwad");
           const formikErrors =
             (error?.response?.data?.request_payload_errors?.length > 0 &&
               createFormikErrors(
@@ -124,12 +98,16 @@ export const RequestActionController = forwardRef(
             api: error?.response?.data?.message || error.message,
             ...formikErrors,
           });
-          toggleActionModal(action, false);
           setLoading(false);
           setError(error);
 
-          if (onError) {
-            onError(error);
+          if (onErrorPlugins?.length > 0) {
+            for (const plugin of onErrorPlugins) {
+              const handled = plugin(error, context);
+              if (handled) {
+                return;
+              }
+            }
           }
         }
       },
@@ -137,10 +115,10 @@ export const RequestActionController = forwardRef(
         formikRef,
         onBeforeAction,
         request,
-        onError,
         requestApi,
-        toggleActionModal,
         actionSuccessCallback,
+        onErrorPlugins,
+        modalControlContext,
       ]
     );
 
@@ -148,24 +126,8 @@ export const RequestActionController = forwardRef(
       setError(undefined);
     }, []);
 
-    // Expose state and methods to parent via ref
-    useImperativeHandle(
-      ref,
-      () => ({
-        loading,
-        error,
-        modalOpen,
-        performAction,
-        cleanError,
-        toggleActionModal,
-      }),
-      [loading, error, modalOpen, performAction, cleanError, toggleActionModal]
-    );
-
     const contextValue = useMemo(
       () => ({
-        modalOpen,
-        toggleModal: toggleActionModal,
         linkExtractor,
         requestApi,
         performAction,
@@ -175,8 +137,6 @@ export const RequestActionController = forwardRef(
         request: request,
       }),
       [
-        modalOpen,
-        toggleActionModal,
         linkExtractor,
         requestApi,
         performAction,
@@ -205,7 +165,7 @@ RequestActionController.propTypes = {
   ]),
   actionSuccessCallback: PropTypes.func,
   onBeforeAction: PropTypes.func,
-  onError: PropTypes.func,
+  onErrorPlugins: PropTypes.arrayOf(PropTypes.func),
   formikRef: PropTypes.object,
   size: PropTypes.string,
   children: PropTypes.node,
@@ -216,7 +176,6 @@ RequestActionController.defaultProps = {
   requestApi: null,
   actionSuccessCallback: () => {},
   onBeforeAction: null,
-  onError: null,
   formikRef: null,
   size: "medium",
   children: null,

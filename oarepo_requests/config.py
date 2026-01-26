@@ -25,8 +25,12 @@ from oarepo_requests.actions.components import (
 REQUESTS_ALLOWED_RECEIVERS = ["user", "group", "auto_approve"]
 
 DEFAULT_WORKFLOW_EVENTS = {
-    CommentEventType.type_id: WorkflowEvent(submitters=InvenioRequestsPermissionPolicy.can_create_comment),
-    LogEventType.type_id: WorkflowEvent(submitters=InvenioRequestsPermissionPolicy.can_create_comment),
+    CommentEventType.type_id: WorkflowEvent(
+        submitters=InvenioRequestsPermissionPolicy.can_create_comment
+    ),
+    LogEventType.type_id: WorkflowEvent(
+        submitters=InvenioRequestsPermissionPolicy.can_create_comment
+    ),
 }
 
 REQUESTS_ACTION_COMPONENTS: tuple[type[RequestActionComponent], ...] = (
@@ -41,3 +45,9 @@ PUBLISH_REQUEST_TYPES = ["publish_draft", "publish_new_version"]
 NOTIFICATIONS_BACKENDS = {
     EmailNotificationBackend.id: EmailNotificationBackend(),
 }
+
+USERS_RESOURCES_GROUPS_ENABLED = False
+
+REQUESTS_REVIEWERS_ENABLED = False
+
+REQUESTS_REVIEWERS_MAX_NUMBER = 5

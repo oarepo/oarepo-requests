@@ -50,7 +50,7 @@ export const SubmitRequestAction = ({
         modalId={modalId}
         requestType={requestType}
       >
-        <Modal.Content></Modal.Content>
+        <Modal.Content />
       </RequestActionModal>
     </React.Fragment>
   );

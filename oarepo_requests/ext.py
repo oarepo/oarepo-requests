@@ -19,6 +19,7 @@ from invenio_requests.proxies import (
     current_event_type_registry,
     current_request_type_registry,
 )
+from oarepo_requests.config import USERS_RESOURCES_GROUPS_ENABLED
 
 if TYPE_CHECKING:
     from collections.abc import Callable
@@ -132,7 +133,9 @@ class OARepoRequests:
         app.config.setdefault("REQUESTS_ALLOWED_RECEIVERS", []).extend(config.REQUESTS_ALLOWED_RECEIVERS)
 
         app.config.setdefault("PUBLISH_REQUEST_TYPES", config.PUBLISH_REQUEST_TYPES)
-
+        app.config.setdefault("USERS_RESOURCES_GROUPS_ENABLED", config.USERS_RESOURCES_GROUPS_ENABLED)
+        app.config.setdefault("REQUESTS_REVIEWERS_ENABLED", config.REQUESTS_REVIEWERS_ENABLED)
+        app.config.setdefault("REQUESTS_REVIEWERS_MAX_NUMBER", config.REQUESTS_REVIEWERS_MAX_NUMBER)
         # do not overwrite user's stuff
         app_default_workflow_events = app.config.setdefault("DEFAULT_WORKFLOW_EVENTS", {})
         for k, v in config.DEFAULT_WORKFLOW_EVENTS.items():

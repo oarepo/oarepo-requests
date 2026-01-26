@@ -3,7 +3,6 @@ import PropTypes from "prop-types";
 import { Button } from "semantic-ui-react";
 import { RequestModal, RequestModalContent } from ".";
 import { useRequestContext } from "@js/oarepo_requests_common";
-import { useIsMutating } from "@tanstack/react-query";
 import { useCallbackContext, FormikRefContextProvider } from "../../common";
 
 /**
@@ -16,7 +15,6 @@ import { useCallbackContext, FormikRefContextProvider } from "../../common";
 export const RequestList = ({ requests }) => {
   const { actionsLocked } = useCallbackContext();
   const { requestButtonsIconsConfig } = useRequestContext();
-  const isMutating = useIsMutating();
   return requests.map((request) => {
     const buttonIconProps =
       requestButtonsIconsConfig[request.status_code] ||
@@ -36,7 +34,7 @@ export const RequestList = ({ requests }) => {
               fluid
               title={header}
               content={header}
-              disabled={actionsLocked || isMutating > 0}
+              disabled={actionsLocked}
               labelPosition="left"
               {...buttonIconProps}
             />

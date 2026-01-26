@@ -303,6 +303,7 @@ from oarepo_requests.ui.components import (
     ActionLabelsComponent,
     FormConfigCustomFieldsComponent,
     FormConfigRequestTypePropertiesComponent,
+    RequestsUIConfigComponent,
 )
 from oarepo_ui.resources import AllowedHtmlTagsComponent
 
@@ -372,6 +373,7 @@ class RequestsFormConfigResourceConfig(FormConfigResourceConfig):
         FormConfigCustomFieldsComponent,
         FormConfigRequestTypePropertiesComponent,
         ActionLabelsComponent,
+        RequestsUIConfigComponent,
     ]
     request_view_args = {"request_type": RequestTypeSchema()}
     routes = {
