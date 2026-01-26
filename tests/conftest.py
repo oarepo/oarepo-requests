@@ -14,7 +14,6 @@ from typing import TYPE_CHECKING, Any, ClassVar
 
 import pytest
 from flask import Blueprint
-from invenio_app.factory import create_app as _create_app
 from invenio_i18n import _
 from invenio_rdm_records.services.generators import RecordOwners
 from invenio_rdm_records.services.pids import providers
@@ -80,12 +79,6 @@ pytest_plugins = [
     "pytest_oarepo.users",
     "pytest_oarepo.files",
 ]
-
-
-@pytest.fixture(scope="module")
-def create_app(instance_path, entry_points):
-    """Application factory fixture."""
-    return _create_app
 
 
 @pytest.fixture

@@ -38,7 +38,6 @@ def app_config(app_config):
     # for ui tests
     app_config["APP_THEME"] = ["semantic-ui"]
     app_config["THEME_SEARCHBAR"] = False
-    app_config["THEME_HEADER_TEMPLATE"] = "oarepo_ui/header.html"
 
     return app_config
 

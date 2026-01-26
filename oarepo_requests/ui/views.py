@@ -93,7 +93,6 @@ def _resolve_topic_record_oarepo(request: Mapping[str, Any]) -> dict[str, Any]:
         service = get_matching_service_for_refdict(topic_ref)
         if not service:
             return {
-                "permissions": {},
                 "record_ui": None,
                 "record": None,
                 "model": None,
@@ -119,7 +118,6 @@ def _resolve_topic_record_oarepo(request: Mapping[str, Any]) -> dict[str, Any]:
                 record = service.read(g.identity, pid, expand=True)
             except (NoResultFound, RecordDeletedException):
                 return {
-                    "permissions": {},
                     "record_ui": None,
                     "record": None,
                     "model": None,
@@ -129,17 +127,6 @@ def _resolve_topic_record_oarepo(request: Mapping[str, Any]) -> dict[str, Any]:
 
         if record:
             record_ui = UIJSONSerializer().dump_obj(record.to_dict())
-            permissions = record.has_permissions_to(
-                [
-                    "edit",
-                    "new_version",
-                    "manage",
-                    "update_draft",
-                    "read_files",
-                    "review",
-                    "read",
-                ]
-            )
 
             # Get model and ui_model from service config
             model = None
@@ -159,7 +146,6 @@ def _resolve_topic_record_oarepo(request: Mapping[str, Any]) -> dict[str, Any]:
             record_detail_template = f"{entity_type}/RecordDetail.jinja"
 
             return {
-                "permissions": permissions,
                 "record_ui": record_ui,
                 "record": record,
                 "model": ui_model,
@@ -171,7 +157,6 @@ def _resolve_topic_record_oarepo(request: Mapping[str, Any]) -> dict[str, Any]:
         pass
 
     return {
-        "permissions": {},
         "record_ui": None,
         "record": None,
         "model": None,
@@ -196,7 +181,14 @@ def user_dashboard_request_view(
     has_record_topic = _has_record_topic(request)
     has_community_topic = has_topic and "community" in request["topic"]
     is_record_inclusion = request_type == CommunityInclusion.type_id
-    request_permissions = request.has_permissions_to(["action_accept", "lock_request", "create_comment"])
+    # TODO: not possible to statically check permissions (create_comment) on our permissions policy i.e. it requires
+    # event_type
+    request_permissions = request.has_permissions_to(
+        [
+            "action_accept",
+            "lock_request",
+        ]
+    )
 
     if has_record_topic:
         topic = _resolve_topic_record_oarepo(request)
@@ -240,7 +232,7 @@ def user_dashboard_request_view(
             record_ui=record_ui,
             record=record,
             checks=checks,
-            permissions={**topic["permissions"], **request_permissions},
+            permissions={**request_permissions},
             is_preview=is_draft,  # preview only when draft
             is_draft=is_draft,
             is_published=is_published,

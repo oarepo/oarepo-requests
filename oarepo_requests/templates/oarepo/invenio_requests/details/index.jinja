@@ -41,7 +41,7 @@
 
 {%- block request_header %}
   {% if is_user_dashboard %}
-    {% set back_button_url = url_for("invenio_app_rdm_users.requests") %}
+    {% set back_button_url = "/me/requests" %}
   {% elif community %}
     {% set back_button_url = url_for("invenio_communities.communities_requests", pid_value=community.id) %}
   {% else %}
@@ -155,7 +155,7 @@
         {% set use_theme_basic_template = false %}
         {% set preview_submission_request = true %}
         {% if record_detail_template %}
-          {% include record_detail_template %}
+          {% include record_detail_template ignore missing %}
         {% else %}
           <div class="ui message warning">
             {{ _("Record preview not available for this record type.") }}

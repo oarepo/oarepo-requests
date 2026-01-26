@@ -88,7 +88,6 @@ def test_record_delete_unauthorized(
         assert "delete_record" not in data["creatable_request_types"]
 
 
-@pytest.mark.skip
 def test_request_detail_page(
     app,
     logged_client,
@@ -120,7 +119,6 @@ def test_request_detail_page(
         assert c.status_code == 200
 
 
-@pytest.mark.skip
 def test_form_config(app, client, record_ui_resource, fake_manifest):
     with client.get("/requests/configs/publish_new_version") as c:
         assert c.json == {
@@ -166,6 +164,7 @@ def test_form_config(app, client, record_ui_resource, fake_manifest):
             "custom_fields": {
                 "ui": [
                     {
+                        "displaySection": False,
                         "section": "",
                         "fields": [
                             {
@@ -194,5 +193,10 @@ def test_form_config(app, client, record_ui_resource, fake_manifest):
                 "delete": "Delete",
                 "expire": "Expire",
                 "submit": "Submit",
+            },
+            "requests_ui_config": {
+                "allowGroupReviewers": True,
+                "enableReviewers": False,
+                "maxReviewers": 15,
             },
         }
