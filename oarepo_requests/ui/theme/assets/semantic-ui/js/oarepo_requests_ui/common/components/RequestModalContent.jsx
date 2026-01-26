@@ -1,8 +1,8 @@
 import React from "react";
 import PropTypes from "prop-types";
 import { InvenioRequestsApp } from "@js/invenio_requests/InvenioRequestsApp";
-import defaultOverrides from "@js/oarepo_requests_common/defaultOverrides";
 import { overrideStore } from "react-overridable";
+import defaultOverrides from "../defaultOverrides";
 import { RequestDetails } from "../RequestDetail";
 import { useRequestConfigContext } from "../contexts";
 

@@ -1,9 +1,9 @@
 import React from "react";
 import { Button, Icon } from "semantic-ui-react";
 import PropTypes from "prop-types";
-import { ConfirmationModal } from "@js/oarepo_requests_common";
 import { useConfirmationModal } from "@js/oarepo_ui";
 import { useRequestActionContext } from "../contexts";
+import { ConfirmationModal } from "../components";
 
 export const RequestActionButton = ({
   requestOrRequestType,
@@ -15,8 +15,7 @@ export const RequestActionButton = ({
   ...uiProps
 }) => {
   const { isOpen, close, open } = useConfirmationModal();
-  const { performAction, cleanError, error, loading } =
-    useRequestActionContext();
+  const { performAction, loading } = useRequestActionContext();
 
   const handleClick = () => {
     if (requireConfirmation) {

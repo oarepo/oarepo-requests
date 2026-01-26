@@ -5,7 +5,7 @@ import { i18next } from "@translations/oarepo_requests_ui/i18next";
 import {
   formatValueToStringLikeFormat,
   formatNestedRecordFieldPath,
-} from "@js/oarepo_requests_common";
+} from "../utils/utils";
 
 export const DiffOperationAccordionTable = ({ operations, operationType }) => {
   const [isAccordionVisible, setIsAccordionVisible] = useState(false);

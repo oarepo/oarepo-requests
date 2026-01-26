@@ -1,15 +1,12 @@
 import React, { useState } from "react";
 import { Modal, Message, Icon, Divider } from "semantic-ui-react";
-import {
-  WarningMessage,
-  ConfirmationModalConfirmButton,
-  ConfirmationModalCancelButton,
-  REQUEST_TYPE,
-} from "@js/oarepo_requests_common";
 import { i18next } from "@translations/oarepo_requests_ui/i18next";
 import PropTypes from "prop-types";
 import { RichEditor } from "react-invenio-forms";
-import { useCallbackContext, useRequestActionContext } from "../contexts";
+import { useRequestActionContext } from "../contexts";
+import { ConfirmationModalConfirmButton } from "./ConfirmationModalConfirmButton";
+import { ConfirmationModalCancelButton } from "./ConfirmationModalCancelButton";
+import { REQUEST_TYPE } from "../utils/objects";
 
 const ACTION_HEADERS = {
   [REQUEST_TYPE.CREATE]: i18next.t("Create request"),
@@ -53,11 +50,13 @@ export const ConfirmationModal = ({
       <Modal.Header>{`${ACTION_HEADERS[requestActionName]} (${requestOrRequestType.name})`}</Modal.Header>
       <Modal.Content>
         {isCreateOrSubmit && (
-          <WarningMessage
-            message={i18next.t(
-              "Are you sure you wish to proceed? After this request is accepted, it will not be possible to reverse the action."
-            )}
-          />
+          <Message negative>
+            <Message.Header>
+              {i18next.t(
+                "Are you sure you wish to proceed? After this request is accepted, it will not be possible to reverse the action."
+              )}
+            </Message.Header>
+          </Message>
         )}
         {isDecline && (
           <>

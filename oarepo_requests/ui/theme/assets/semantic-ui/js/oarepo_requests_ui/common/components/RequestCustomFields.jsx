@@ -1,11 +1,11 @@
 import React from "react";
 import { Grid, Form, Divider } from "semantic-ui-react";
 import { CustomFields } from "react-invenio-forms";
-import { REQUEST_MODAL_TYPE } from "@js/oarepo_requests_common";
 import PropTypes from "prop-types";
 import { Formik } from "formik";
 import { useFormikRefContext, useRequestConfigContext } from "../contexts";
 import _isEmpty from "lodash/isEmpty";
+import { REQUEST_MODAL_TYPE } from "../utils/objects";
 
 export const RequestCustomFields = ({ request, columnWidth }) => {
   const formikRef = useFormikRefContext();
@@ -82,10 +82,7 @@ export const RequestCustomFields = ({ request, columnWidth }) => {
                 config={readOnlyCustomFieldsConfig}
                 templateLoaders={[
                   (widget) => import(`@templates/custom_fields/${widget}.js`),
-                  (widget) =>
-                    import(
-                      `@js/oarepo_requests_common/components/DefaultView.jsx`
-                    ),
+                  (widget) => import(`./DefaultView.jsx`),
                 ]}
                 fieldPathPrefix="payload"
               />

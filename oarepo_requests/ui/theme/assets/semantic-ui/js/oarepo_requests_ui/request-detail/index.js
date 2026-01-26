@@ -25,7 +25,7 @@ const queryClient = new QueryClient();
 const requestDetailsDiv = document.getElementById("request-detail");
 const request = JSON.parse(requestDetailsDiv.dataset.record);
 const defaultQueryParams = JSON.parse(
-  requestDetailsDiv.dataset.defaultQueryConfig
+  requestDetailsDiv.dataset.defaultQueryConfig,
 );
 // const defaultReplyQueryParams = JSON.parse(
 //   requestDetailsDiv.dataset.defaultReplyQueryConfig
@@ -62,5 +62,5 @@ ReactDOM.render(
       </QueryClientProvider>
     </FormikRefContextProvider>
   </CallbackContextProvider>,
-  requestDetailsDiv
+  requestDetailsDiv,
 );

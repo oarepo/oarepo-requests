@@ -68,7 +68,6 @@ export class OarepoRequestsAPI extends InvenioRequestsAPI {
         }
       );
     } else {
-      const saveLink = this.linksExtractor.self;
       if (formData && !_isEmpty(formData)) {
         await this.save("save", undefined, formData);
       }

@@ -4,12 +4,9 @@ import { Icon, Message } from "semantic-ui-react";
 import { i18next } from "@translations/oarepo_requests_ui/i18next";
 import { ErrorBoundary } from "react-error-boundary";
 import _isArray from "lodash/isArray";
-import {
-  getRequestStatusIcon,
-  getFeedMessage,
-  GenericActionEvent,
-  DiffOperationAccordionTable,
-} from "@js/oarepo_requests_common";
+import { getRequestStatusIcon, getFeedMessage } from "../utils/utils";
+import { GenericActionEvent } from "./GenericActionEvent";
+import { DiffOperationAccordionTable } from "./DiffOperationAccordionTable";
 
 const DiffFallbackMessage = ({ error }) => (
   <Message negative>

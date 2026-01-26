@@ -1,5 +1,5 @@
 import { RequestActionContext } from "@js/invenio_requests/request/actions/context";
-import React, { useContext } from "react";
+import { useContext } from "react";
 
 export const useRequestActionContext = () => {
   const context = useContext(RequestActionContext);

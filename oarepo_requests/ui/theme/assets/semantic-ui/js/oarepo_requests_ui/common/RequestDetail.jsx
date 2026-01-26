@@ -8,7 +8,7 @@
 import RequestMetadata from "@js/invenio_requests/request/RequestMetadata";
 import React, { Component } from "react";
 import PropTypes from "prop-types";
-import { Grid, Container, Header } from "semantic-ui-react";
+import { Grid } from "semantic-ui-react";
 import { Timeline } from "@js/invenio_requests/timeline";
 import { RequestCustomFields } from "./components";
 

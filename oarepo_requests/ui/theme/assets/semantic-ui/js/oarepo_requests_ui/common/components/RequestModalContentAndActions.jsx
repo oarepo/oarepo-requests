@@ -1,4 +1,4 @@
-import React, { useRef } from "react";
+import React from "react";
 import { i18next } from "@translations/oarepo_requests_ui/i18next";
 import {
   Dimmer,

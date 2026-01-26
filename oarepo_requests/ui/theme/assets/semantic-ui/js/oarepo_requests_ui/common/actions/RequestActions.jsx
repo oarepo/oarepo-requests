@@ -10,8 +10,8 @@ import React from "react";
 import Overridable from "react-overridable";
 import { Dropdown } from "semantic-ui-react";
 import PropTypes from "prop-types";
-import { RequestActionButton } from "./actions";
-import { useRequestConfigContext } from "./contexts";
+import { RequestActionButton } from ".";
+import { useRequestConfigContext } from "../contexts";
 import { REQUEST_TYPE } from "@js/oarepo_requests_common";
 
 const iconConfig = {

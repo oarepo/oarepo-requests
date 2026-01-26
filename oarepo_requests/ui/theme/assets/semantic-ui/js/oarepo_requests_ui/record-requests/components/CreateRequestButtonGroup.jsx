@@ -1,14 +1,10 @@
-import React, { useState, useRef } from "react";
+import React from "react";
 import { i18next } from "@translations/oarepo_requests_ui/i18next";
 import { Placeholder, Message } from "semantic-ui-react";
 import _isEmpty from "lodash/isEmpty";
-import {
-  useRequestContext,
-  useCallbackContext,
-} from "@js/oarepo_requests_common";
+import { useRequestContext } from "@js/oarepo_requests_common";
 import PropTypes from "prop-types";
 import { CreateRequestButton } from "./CreateRequestButton";
-import { RequestActionController } from "../../common";
 
 /**
  * @param {{  applicableRequestsLoading: boolean, applicableRequestsLoadingError: Error }} props

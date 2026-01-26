@@ -1,14 +1,15 @@
 import React, { useEffect } from "react";
 import { Button, Message } from "semantic-ui-react";
 import PropTypes from "prop-types";
-import {
-  useRequestContext,
-  ConfirmationModal,
-  REQUEST_TYPE,
-} from "@js/oarepo_requests_common";
 import { useConfirmationModal } from "@js/oarepo_ui";
 import { i18next } from "@translations/oarepo_requests_ui/i18next";
-import { useCallbackContext, useRequestActionContext } from "../contexts";
+import {
+  useCallbackContext,
+  useRequestActionContext,
+  useRequestContext,
+} from "../contexts";
+import { ConfirmationModal } from "../components";
+import { REQUEST_TYPE } from "../utils/objects";
 
 // Directly create and submit request without modal
 const DirectCreateAndSubmit = ({ requestType, requireConfirmation }) => {

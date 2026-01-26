@@ -1,19 +1,16 @@
 import React from "react";
 import { useConfirmationModal } from "@js/oarepo_ui";
-import { Dimmer, Loader, Modal, Button } from "semantic-ui-react";
-import { useFormik, FormikProvider, Formik } from "formik";
+import { Dimmer, Modal, Button } from "semantic-ui-react";
+import { Formik } from "formik";
 import _isEmpty from "lodash/isEmpty";
-import {
-  ModalControlContextProvider,
-  RequestModalContentAndActions,
-} from "@js/oarepo_requests_common";
 import PropTypes from "prop-types";
-import { useIsMutating } from "@tanstack/react-query";
 import {
   useCallbackContext,
   useFormikRefContext,
   RequestConfigContextProvider,
+  ModalControlContextProvider,
 } from "../contexts";
+import { RequestModalContentAndActions } from "./RequestModalContentAndActions";
 import { i18next } from "@translations/oarepo_requests_ui/i18next";
 /**
  * @typedef {import("../../record-requests/types").Request} Request

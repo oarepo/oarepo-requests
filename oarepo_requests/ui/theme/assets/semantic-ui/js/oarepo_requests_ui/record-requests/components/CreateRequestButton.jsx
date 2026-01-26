@@ -1,4 +1,4 @@
-import React, { useRef, useState } from "react";
+import React from "react";
 import { Button } from "semantic-ui-react";
 import { RequestModal, CreateRequestModalContent } from ".";
 import { DirectCreateAndSubmit } from "@js/oarepo_requests_common/actions";
