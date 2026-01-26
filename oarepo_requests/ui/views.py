@@ -79,19 +79,6 @@ def _has_record_topic(request: Mapping[str, Any]) -> bool:
 
 def _resolve_topic_record_oarepo(request: Mapping[str, Any]) -> dict[str, Any]:
     """Resolve topic record using oarepo utilities (model-agnostic version)."""
-    creator_id = request["expanded"].get("created_by", {}).get("id", None)
-    user_owns_request = str(creator_id) == str(current_user.id)
-
-    if request["is_closed"] and not user_owns_request:
-        return {
-            "permissions": {},
-            "record_ui": None,
-            "record": None,
-            "model": None,
-            "d": None,
-            "record_detail_template": None,
-        }
-
     topic_ref = request["topic"]
     if not topic_ref:
         return {
@@ -102,7 +89,6 @@ def _resolve_topic_record_oarepo(request: Mapping[str, Any]) -> dict[str, Any]:
             "d": None,
             "record_detail_template": None,
         }
-
     try:
         service = get_matching_service_for_refdict(topic_ref)
         if not service:
