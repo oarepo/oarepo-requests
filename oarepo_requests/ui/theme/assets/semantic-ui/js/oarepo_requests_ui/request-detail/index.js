@@ -10,7 +10,7 @@ import React from "react";
 import ReactDOM from "react-dom";
 import { overrideStore } from "react-overridable";
 import { InvenioRequestsApp } from "@js/invenio_requests/InvenioRequestsApp";
-import defaultOverrides from "@js/oarepo_requests_common/defaultOverrides";
+import defaultOverrides from "../common/defaultOverrides";
 import {
   FormikRefContextProvider,
   CallbackContextProvider,

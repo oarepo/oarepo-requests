@@ -20,7 +20,7 @@ export const RequestModalContent = ({ request }) => {
     ...defaultOverrides,
     ...overrideStore.getAll(),
   };
-
+  // TODO: how to get avatar and permissions for when Request is inside of a modal?
   return (
     <InvenioRequestsApp
       request={request}

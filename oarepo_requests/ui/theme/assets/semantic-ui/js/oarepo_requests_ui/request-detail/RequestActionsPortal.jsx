@@ -2,7 +2,7 @@ import PropTypes from "prop-types";
 import ReactDOM from "react-dom";
 import React from "react";
 import { useFormikRefContext } from "../common";
-import { RequestActionController } from "@js/oarepo_requests_common";
+import { RequestActionController } from "../common/RequestActionController";
 
 const element = document.getElementById("request-actions");
 

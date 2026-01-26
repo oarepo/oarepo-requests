@@ -43,6 +43,5 @@ const defaultComponents = {
   "RequestActionModal.title.decline": () => i18next.t("Decline request"),
   "InvenioRequests.RequestAction": () => null,
 };
-console.log("oarepo_requests_ui defaultComponents", defaultComponents);
 
 export default defaultComponents;

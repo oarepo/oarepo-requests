@@ -15,9 +15,8 @@ export const RequestListContainer = ({
   const { requests } = useRequestContext();
   let openRequests = requests?.filter(
     (request) =>
-      request.is_open || request?.status_code?.toLowerCase() === "created"
+      request.is_open || request?.status_code?.toLowerCase() === "created",
   );
-  console.log(openRequests, "dwadwadwada");
   if (
     !requestsLoading &&
     !requestsLoadingError &&
