@@ -55,9 +55,13 @@ class RequestTypeSchema(ma.Schema):
         type_id = data["type_id"]
         identity = request_type_identity_ctx.get()
         record = request_type_record_ctx.get()
-        topic_ref = ref_to_str(reference_entity(record) if isinstance(record, Record) else record)
+        topic_ref = ref_to_str(
+            reference_entity(record) if isinstance(record, Record) else record
+        )
         link = EndpointLink("requests.create_via_url", params=["topic", "request_type"])
-        template = LinksTemplate({"create": link}, context={"topic": topic_ref, "request_type": type_id})
+        template = LinksTemplate(
+            {"create": link}, context={"topic": topic_ref, "request_type": type_id}
+        )
         data["links"] = {"actions": template.expand(identity, record)}
         return data
 

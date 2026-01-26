@@ -34,7 +34,9 @@ def test_revert_on_accept_crash(
     id_ = record1["id"]
     request = create_request_on_record(creator.identity, id_, "edit_published_record")
     with pytest.raises(PermissionDeniedError, match="edit"):
-        current_requests_service.execute_action(creator.identity, request["id"], "submit")
+        current_requests_service.execute_action(
+            creator.identity, request["id"], "submit"
+        )
 
     request = current_requests_service.read(system_identity, request["id"])
     assert request.data["status"] == "created"

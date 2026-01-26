@@ -68,16 +68,24 @@ class NewVersionRequestType(NonDuplicableOARepoRecordRequestType):
     ) -> None:
         """Check if the request can be created."""
         if not isinstance(topic, RecordWithDraft):
-            raise TypeError(gettext("Trying to create edit request on record without draft support"))
+            raise TypeError(
+                gettext("Trying to create edit request on record without draft support")
+            )
         if has_draft(topic):
-            raise ValueError(gettext("Trying to create edit request on record with draft"))
+            raise ValueError(
+                gettext("Trying to create edit request on record with draft")
+            )
         super().can_create(identity, data, receiver, topic, creator, *args, **kwargs)
 
     @classmethod
-    def is_applicable_to(cls, identity: Identity, topic: Record, *args: Any, **kwargs: Any) -> bool:
+    def is_applicable_to(
+        cls, identity: Identity, topic: Record, *args: Any, **kwargs: Any
+    ) -> bool:
         """Check if the request type is applicable to the topic."""
         if not isinstance(topic, RecordWithDraft):
-            raise TypeError(gettext("Trying to create edit request on record without draft support"))
+            raise TypeError(
+                gettext("Trying to create edit request on record without draft support")
+            )
         # if already editing metadata or a new version, we don't want to create a new request
         if has_draft(topic):
             return False
@@ -151,7 +159,9 @@ class NewVersionRequestType(NonDuplicableOARepoRecordRequestType):
                         "You have been asked to approve the request to update the record. "
                         "You can approve or reject the request."
                     )
-                return gettext("Permission to update record (including files) requested. ")
+                return gettext(
+                    "Permission to update record (including files) requested. "
+                )
             case _:
                 if request_identity_matches(request.created_by, identity):
                     return gettext("Submit request to get edit access to the record.")

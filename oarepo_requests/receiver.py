@@ -41,13 +41,21 @@ def default_workflow_receiver_function(
         return None  # exception?
 
     try:
-        request: WorkflowRequest = workflow.requests().requests_by_id[request_type.type_id]
+        request: WorkflowRequest = workflow.requests().requests_by_id[
+            request_type.type_id
+        ]
     except KeyError as e:
         raise RequestTypeNotInWorkflowError(
             request_type.type_id, current_oarepo_workflows.get_workflow(record).code
         ) from e
 
-    receiver = request.recipient_entity_reference(record=record, request_type=request_type, **kwargs)
+    receiver = request.recipient_entity_reference(
+        record=record, request_type=request_type, **kwargs
+    )
     if not request_type.receiver_can_be_none and not receiver:
-        raise ReceiverNonReferencableError(request_type=request_type, record=record, **kwargs)
-    return cast("Mapping[str, str]", receiver)  # TODO: unknown linter issue, possibly a bug
+        raise ReceiverNonReferencableError(
+            request_type=request_type, record=record, **kwargs
+        )
+    return cast(
+        "Mapping[str, str]", receiver
+    )  # TODO: unknown linter issue, possibly a bug

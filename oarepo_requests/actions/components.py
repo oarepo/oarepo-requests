@@ -155,12 +155,18 @@ class WorkflowTransitionComponent(RequestActionComponent):
     to the target state.
     """
 
-    def _workflow_transition(self, identity: Identity, action: OARepoGenericActionMixin, uow: UnitOfWork) -> None:
+    def _workflow_transition(
+        self, identity: Identity, action: OARepoGenericActionMixin, uow: UnitOfWork
+    ) -> None:
         from oarepo_workflows.proxies import current_oarepo_workflows
 
         topic = action.topic
         request = action.request
-        transitions = current_oarepo_workflows.get_workflow(topic).requests()[request.type.type_id].transitions
+        transitions = (
+            current_oarepo_workflows.get_workflow(topic)
+            .requests()[request.type.type_id]
+            .transitions
+        )
         target_state = transitions[action.status_to]
         if target_state and not topic.is_deleted:
             current_oarepo_workflows.set_state(

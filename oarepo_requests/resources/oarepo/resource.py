@@ -89,7 +89,9 @@ class OARepoRequestsResource(RequestsResource, ErrorHandlersMixin):
     def create_via_url(self) -> tuple[dict, int]:
         """Create a new request based on a request type and topic from view_args arguments."""
         request_type_id = resource_requestctx.view_args["request_type"]
-        topic = resolve_reference_dict(string_to_reference(resource_requestctx.view_args["topic"]))
+        topic = resolve_reference_dict(
+            string_to_reference(resource_requestctx.view_args["topic"])
+        )
 
         items = self.service.create(
             identity=g.identity,

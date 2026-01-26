@@ -7,7 +7,7 @@ from flask_login import current_user, login_required
 from invenio_requests.views.decorators import pass_request
 from invenio_requests.customizations import AcceptAction
 from invenio_users_resources.proxies import current_user_resources
-from invenio_rdm_records.requests import CommunityInclusion, CommunitySubmission
+from invenio_rdm_records.requests import CommunityInclusion
 from invenio_checks.api import ChecksAPI
 from invenio_app_rdm.requests_ui.views.requests import (
     _resolve_record_or_draft_files,
@@ -26,7 +26,6 @@ from invenio_records_resources.services import RecordService
 
 from oarepo_requests.utils import (
     get_matching_service_for_refdict,
-    resolve_reference_dict,
 )
 from invenio_rdm_records.resources.serializers import UIJSONSerializer
 from invenio_pidstore.errors import PIDDoesNotExistError
@@ -34,8 +33,21 @@ from invenio_rdm_records.services.errors import RecordDeletedException
 from invenio_drafts_resources.services import RecordService as DraftRecordService
 from sqlalchemy.orm.exc import NoResultFound
 from oarepo_ui.templating.data import FieldData
-from oarepo_runtime import current_runtime
 from invenio_requests import current_request_type_registry
+from oarepo_ui.resources.form_config import FormConfigResourceConfig
+from oarepo_requests.ui.components import (
+    ActionLabelsComponent,
+    FormConfigCustomFieldsComponent,
+    FormConfigRequestTypePropertiesComponent,
+    RequestsUIConfigComponent,
+)
+from oarepo_ui.resources import AllowedHtmlTagsComponent
+
+import marshmallow as ma
+from oarepo_ui.resources.base import UIComponentsResource
+
+from oarepo_ui.resources.decorators import pass_route_args
+from flask_resources import route
 
 if TYPE_CHECKING:
     from flask import Blueprint, Flask
@@ -296,22 +308,6 @@ def create_requests_ui_blueprint(app) -> Blueprint:
         view_func=user_dashboard_request_view,
     )
     return blueprint
-
-
-from oarepo_ui.resources.form_config import FormConfigResourceConfig
-from oarepo_requests.ui.components import (
-    ActionLabelsComponent,
-    FormConfigCustomFieldsComponent,
-    FormConfigRequestTypePropertiesComponent,
-    RequestsUIConfigComponent,
-)
-from oarepo_ui.resources import AllowedHtmlTagsComponent
-
-import marshmallow as ma
-from oarepo_ui.resources.base import UIComponentsResource
-
-from oarepo_ui.resources.decorators import pass_route_args
-from flask_resources import route
 
 
 class FormConfigResource(UIComponentsResource[FormConfigResourceConfig]):

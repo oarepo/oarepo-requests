@@ -128,7 +128,9 @@ def app(app):
     def record_latest(pid_value: str) -> str:
         return "latest ok"
 
-    @bp.route("/test-requests/records/<pid_value>/export/<export_format>", methods=["GET"])
+    @bp.route(
+        "/test-requests/records/<pid_value>/export/<export_format>", methods=["GET"]
+    )
     def export(pid_value, export_format: str) -> str:
         return "export ok"
 
@@ -143,7 +145,9 @@ can_comment_only_receiver = [
 
 events_only_receiver_can_comment = {
     CommentEventType.type_id: WorkflowEvent(submitters=can_comment_only_receiver),
-    LogEventType.type_id: WorkflowEvent(submitters=InvenioRequestsPermissionPolicy.can_create_comment),
+    LogEventType.type_id: WorkflowEvent(
+        submitters=InvenioRequestsPermissionPolicy.can_create_comment
+    ),
     TestEventType.type_id: WorkflowEvent(submitters=can_comment_only_receiver),
 }
 
@@ -539,7 +543,9 @@ class TestWorkflowPermissions(RequestBasedWorkflowPermissions):
         IfInState("publishing", [RecordOwners(), UserGenerator("user2@example.org")]),
         IfInState("published", [AnyUser()]),
         IfInState("deleting", [AnyUser()]),
-        IfInState("deleted", [AnyUser()]),  # invenio doesn't seem to control this on can_read level
+        IfInState(
+            "deleted", [AnyUser()]
+        ),  # invenio doesn't seem to control this on can_read level
     )
     can_manage_files = (RecordOwners(),)
 
@@ -602,7 +608,9 @@ WORKFLOWS = [
     ),
     Workflow(
         code="different_recipients",
-        label=_("Workflow with draft requests with different recipients to test param interpreters"),
+        label=_(
+            "Workflow with draft requests with different recipients to test param interpreters"
+        ),
         permission_policy_cls=TestWorkflowPermissions,
         request_policy_cls=RequestsWithDifferentRecipients,
     ),
@@ -627,7 +635,9 @@ WORKFLOWS = [
     Workflow(
         code="edit_accept_crash",
         label=_(""),
-        permission_policy_cls=type("EditAcceptCrashPermissions", (TestWorkflowPermissions,), {"can_edit": []}),
+        permission_policy_cls=type(
+            "EditAcceptCrashPermissions", (TestWorkflowPermissions,), {"can_edit": []}
+        ),
         request_policy_cls=PublishAutoAcceptRequests,
     ),
 ]
@@ -644,7 +654,9 @@ def serialization_result():
         return {
             "id": request_id,
             "links": {
-                "actions": {"cancel": f"https://127.0.0.1:5000/api/requests/{request_id}/actions/cancel"},
+                "actions": {
+                    "cancel": f"https://127.0.0.1:5000/api/requests/{request_id}/actions/cancel"
+                },
                 "self": f"https://127.0.0.1:5000/api/requests/extended/{request_id}",
                 "comments": f"https://127.0.0.1:5000/api/requests/extended/{request_id}/comments",
                 "timeline": f"https://127.0.0.1:5000/api/requests/extended/{request_id}/timeline",
@@ -684,7 +696,9 @@ def ui_serialization_result():
             "is_expired": False,
             "is_open": True,
             "links": {
-                "actions": {"cancel": f"https://127.0.0.1:5000/api/requests/{request_id}/actions/cancel"},
+                "actions": {
+                    "cancel": f"https://127.0.0.1:5000/api/requests/{request_id}/actions/cancel"
+                },
                 "self": f"https://127.0.0.1:5000/api/requests/extended/{request_id}",
                 "comments": f"https://127.0.0.1:5000/api/requests/extended/{request_id}/comments",
                 "timeline": f"https://127.0.0.1:5000/api/requests/extended/{request_id}/timeline",
@@ -727,8 +741,12 @@ def app_config(app_config, requests_model):
         }
     ]
     app_config["JSONSCHEMAS_HOST"] = "localhost"
-    app_config["RECORDS_REFRESOLVER_CLS"] = "invenio_records.resolver.InvenioRefResolver"
-    app_config["RECORDS_REFRESOLVER_STORE"] = "invenio_jsonschemas.proxies.current_refresolver_store"
+    app_config["RECORDS_REFRESOLVER_CLS"] = (
+        "invenio_records.resolver.InvenioRefResolver"
+    )
+    app_config["RECORDS_REFRESOLVER_STORE"] = (
+        "invenio_jsonschemas.proxies.current_refresolver_store"
+    )
     app_config["CACHE_TYPE"] = "SimpleCache"
 
     app_config["OAREPO_REQUESTS_DEFAULT_RECEIVER"] = default_workflow_receiver_function
@@ -754,7 +772,9 @@ def app_config(app_config, requests_model):
     app_config["APP_THEME"] = ["oarepo", "semantic-ui"]
 
     app_config["REST_CSRF_ENABLED"] = False
-    app_config["RDM_OPTIONAL_DOI_VALIDATOR"] = lambda _draft, _previous_published, **_kwargs: True
+    app_config["RDM_OPTIONAL_DOI_VALIDATOR"] = (
+        lambda _draft, _previous_published, **_kwargs: True
+    )
     app_config["RDM_RECORDS_ALLOW_RESTRICTION_AFTER_GRACE_PERIOD"] = True
 
     app_config["RDM_PERSISTENT_IDENTIFIER_PROVIDERS"] = [

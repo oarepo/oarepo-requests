@@ -24,7 +24,9 @@ def test_conditional_receiver_creator_matches(
 
     draft1 = draft_factory(creator.identity, custom_workflow="with_ct")
 
-    resp_request_create = create_request_on_draft(creator.identity, draft1["id"], "conditional_recipient_rt")
+    resp_request_create = create_request_on_draft(
+        creator.identity, draft1["id"], "conditional_recipient_rt"
+    )
 
     assert resp_request_create["receiver"] == {"user": str(users[1].id)}
 
@@ -42,6 +44,8 @@ def test_conditional_receiver_creator_does_not_match(
 
     draft1 = draft_factory(creator.identity, custom_workflow="with_ct")
 
-    resp_request_create = create_request_on_draft(creator.identity, draft1["id"], "conditional_recipient_rt")
+    resp_request_create = create_request_on_draft(
+        creator.identity, draft1["id"], "conditional_recipient_rt"
+    )
 
     assert resp_request_create["receiver"] == {"user": str(users[2].id)}

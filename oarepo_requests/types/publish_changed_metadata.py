@@ -30,7 +30,9 @@ class PublishChangedMetadataRequestType(PublishRequestType):
     name = _("Publish changed metadata")
 
     @classmethod
-    def is_applicable_to(cls, identity: Identity, topic: Record, *args: Any, **kwargs: Any) -> bool:
+    def is_applicable_to(
+        cls, identity: Identity, topic: Record, *args: Any, **kwargs: Any
+    ) -> bool:
         """Check if the request type is applicable to the topic."""
         if cls.topic_type(topic) != "metadata":
             return False
@@ -102,9 +104,13 @@ class PublishChangedMetadataRequestType(PublishRequestType):
                 "It is now locked and no further changes are possible. "
                 "You will be notified about the decision by email."
             ),
-            submitted_others=gettext("The record with changed metadata has been submitted for review. "),
+            submitted_others=gettext(
+                "The record with changed metadata has been submitted for review. "
+            ),
             accepted=gettext("Accepted changed metadata publication"),
             declined=gettext("Declined changed metadata publication"),
             cancelled=gettext("Cancelled changed metadata publication"),
-            created=gettext("Waiting for finishing the changed metadata publication request."),
+            created=gettext(
+                "Waiting for finishing the changed metadata publication request."
+            ),
         )

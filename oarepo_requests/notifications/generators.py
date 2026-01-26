@@ -26,7 +26,9 @@ def _extract_entity_email_data(entity: Any) -> dict[str, Any]:
             return entity.get(key, None)
         return getattr(entity, key, None)
 
-    def _add(entity: Any, key: str, res: dict[str, Any], transform: Callable = lambda x: x) -> Any:
+    def _add(
+        entity: Any, key: str, res: dict[str, Any], transform: Callable = lambda x: x
+    ) -> Any:
         v = _get(entity, key)
         if v:
             res[key] = transform(v)

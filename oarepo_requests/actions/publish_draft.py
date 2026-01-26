@@ -110,7 +110,9 @@ class PublishDraftAcceptAction(PublishMixin, OARepoAcceptAction):
                 # to opensearch index. That's why we need to get the record from DB and re-check.
                 raise UnresolvedRequestsError(action=str(self.name))
         id_ = self.topic["id"]
-        self.topic = record_from_result(topic_service.publish(identity, id_, *args, uow=uow, expand=False, **kwargs))
+        self.topic = record_from_result(
+            topic_service.publish(identity, id_, *args, uow=uow, expand=False, **kwargs)
+        )
 
 
 class PublishDraftDeclineAction(OARepoDeclineAction):

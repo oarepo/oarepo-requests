@@ -45,11 +45,6 @@
   {% elif community %}
     {% set back_button_url = url_for("invenio_communities.communities_requests", pid_value=community.id) %}
   {% else %}
-    {#
-        if you access from a secret link there is no dashboard or community
-            /access/requests/<id>?token=<token>
-        back button is not rendered if there is no URL
-    #}
     {% set back_button_url = "" %}
   {% endif %}
   <div class="computer-flex-header rel-mt-2">

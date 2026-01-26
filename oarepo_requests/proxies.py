@@ -31,5 +31,7 @@ current_oarepo_requests_resource: OARepoRequestsResource = LocalProxy(  # type: 
 )
 
 current_notification_recipients_resolvers_registry = LocalProxy(  # type: ignore[assignment]
-    lambda: current_app.extensions["oarepo-requests"].notification_recipients_resolvers_registry
+    lambda: current_app.extensions[
+        "oarepo-requests"
+    ].notification_recipients_resolvers_registry
 )
