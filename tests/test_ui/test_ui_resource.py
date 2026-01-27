@@ -119,7 +119,100 @@ def test_request_detail_page(
         assert c.status_code == 200
 
 
-def test_form_config(app, client, record_ui_resource, fake_manifest):
+def test_form_config_delete_published_record(app, client, record_ui_resource, fake_manifest):
+    with client.get("/requests/configs/delete_published_record") as c:
+        assert c.json == {
+            "allowedHtmlAttrs": {
+                "*": ["class"],
+                "a": ["href", "title", "name", "class", "rel"],
+                "abbr": ["title"],
+                "acronym": ["title"],
+            },
+            "allowedHtmlTags": [
+                "a",
+                "abbr",
+                "acronym",
+                "b",
+                "blockquote",
+                "br",
+                "code",
+                "div",
+                "table",
+                "tbody",
+                "td",
+                "th",
+                "tr",
+                "em",
+                "h1",
+                "h2",
+                "h3",
+                "h4",
+                "h5",
+                "i",
+                "li",
+                "ol",
+                "p",
+                "pre",
+                "span",
+                "strike",
+                "strong",
+                "sub",
+                "sup",
+                "u",
+                "ul",
+            ],
+            "custom_fields": {
+                "ui": [
+                    {
+                        "displaySection": False,
+                        "section": "",
+                        "fields": [
+                            {
+                                "field": "removal_reason",
+                                "ui_widget": "Input",
+                                "props": {
+                                    "label": "Removal Reason",
+                                    "placeholder": "Write down the removal reason.",
+                                    "required": True,
+                                },
+                            },
+                            {
+                                "section": "",
+                                "field": "note",
+                                "ui_widget": "Input",
+                                "props": {
+                                    "label": "Note",
+                                    "placeholder": "Write down the additional note.",
+                                    "required": False,
+                                },
+                            },
+                        ],
+                    }
+                ]
+            },
+            "request_type_properties": {
+                "dangerous": True,
+                "editable": False,
+                "has_form": True,
+            },
+            "action_labels": {
+                "accept": "Permanently delete",
+                "cancel": "Cancel",
+                "create": "Create",
+                "decline": "Keep the record",
+                "delete": "Delete",
+                "expire": "Expire",
+                "submit": "Submit",
+            },
+            "requests_ui_config": {
+                "allowGroupReviewers": True,
+                "enableReviewers": False,
+                "maxReviewers": 15,
+            },
+        }
+
+
+def test_form_config_publish_new_version(app, client, record_ui_resource, fake_manifest):
     with client.get("/requests/configs/publish_new_version") as c:
         assert c.json == {
             "allowedHtmlAttrs": {

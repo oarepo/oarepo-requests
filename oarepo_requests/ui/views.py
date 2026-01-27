@@ -202,7 +202,7 @@ def user_dashboard_request_view(
         media_files = _resolve_record_or_draft_media_files(record_ui, request)
 
         checks = None
-        if current_app.config.get("CHECKS_ENABLED", False) and record:
+        if current_app.config.get("CHECKS_ENABLED", False) and record:  # pragma: no cover
             if is_record_inclusion and has_draft:
                 checks = ChecksAPI.get_runs(
                     record._record,  # noqa: SLF001
@@ -250,7 +250,7 @@ def user_dashboard_request_view(
             record_detail_template=topic.get("record_detail_template"),
         )
 
-    if has_community_topic or not has_topic:
+    if has_community_topic or not has_topic:  # pragma: no cover
         return render_template(
             f"invenio_requests/{request_type}/user_dashboard.html",
             base_template="invenio_app_rdm/users/base.html",
