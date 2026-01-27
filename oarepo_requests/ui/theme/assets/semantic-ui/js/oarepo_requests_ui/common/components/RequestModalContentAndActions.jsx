@@ -16,7 +16,6 @@ import { useCallbackContext, useRequestConfigContext } from "../contexts";
 export const RequestModalContentAndActions = ({
   request,
   requestType,
-  onSubmit,
   ContentComponent,
   requestCreationModal,
   onClose,
@@ -24,7 +23,7 @@ export const RequestModalContentAndActions = ({
 }) => {
   const { errors } = useFormikContext();
   const error = errors?.api;
-  const { fetchNewRequests, onAfterAction, onBeforeAction } =
+  const { fetchNewRequests, onAfterAction, onBeforeAction, onErrorPlugins } =
     useCallbackContext();
   const actionSuccessCallback = (response) => {
     const redirectionURL =
@@ -67,7 +66,6 @@ export const RequestModalContentAndActions = ({
         <ContentComponent
           request={request}
           requestType={requestType}
-          onCompletedAction={onSubmit}
           customFields={customFields}
           allowedHtmlAttrs={allowedHtmlAttrs}
           allowedHtmlTags={allowedHtmlTags}
@@ -83,6 +81,7 @@ export const RequestModalContentAndActions = ({
           actionSuccessCallback={onAfterAction ?? actionSuccessCallback}
           formikRef={formikRef}
           onBeforeAction={onBeforeAction}
+          onErrorPlugins={onErrorPlugins}
           size="medium"
         />
       </Modal.Actions>
@@ -95,7 +94,6 @@ RequestModalContentAndActions.propTypes = {
   requestType: PropTypes.object,
   ContentComponent: PropTypes.func,
   requestCreationModal: PropTypes.bool,
-  onSubmit: PropTypes.func,
   onClose: PropTypes.func,
   formikRef: PropTypes.object,
 };

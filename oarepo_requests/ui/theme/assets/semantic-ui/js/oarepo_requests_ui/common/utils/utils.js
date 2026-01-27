@@ -74,10 +74,10 @@ export const formatNestedRecordFieldPath = (path) => {
   return path
     .replace(/^\//, "")
     .replace(/\/(\d+)\//g, (match, arrayIndex) => {
-      return ` › ${parseInt(arrayIndex) + 1} › `;
+      return ` › ${Number.parseInt(arrayIndex) + 1} › `;
     })
     .replace(/\/(\d+)$/, (match, arrayIndex) => {
-      return ` › ${parseInt(arrayIndex) + 1}`;
+      return ` › ${Number.parseInt(arrayIndex) + 1}`;
     })
     .replace(/\//g, " › ");
 };

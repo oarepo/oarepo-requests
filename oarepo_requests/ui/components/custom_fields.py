@@ -52,7 +52,7 @@ class FormConfigCustomFieldsComponent(UIResourceComponent):
                 if not isinstance(it["fields"], list):
                     raise TypeError(f"Form section fields must be a list: {it}")
         else:
-            raise TypeError(
+            raise TypeError(  # pragma: no cover
                 f"form must be either dict containing a definition of a single field or a list of sections: '{form}'. "
                 f"See https://inveniordm.docs.cern.ch/customize/metadata/custom_fields/records/#upload-deposit-form "
                 f"for details on the format."

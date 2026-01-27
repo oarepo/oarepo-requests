@@ -47,14 +47,14 @@ export const RequestCustomFields = ({ request, columnWidth }) => {
   const renderReadOnlyData =
     customFieldsType === REQUEST_MODAL_TYPE.READ_ONLY &&
     Object.keys(request?.payload || {}).some((key) =>
-      customFieldsPaths?.includes(key)
+      customFieldsPaths?.includes(key),
     );
   return renderSubmitForm || renderReadOnlyData ? (
     <Formik
       initialValues={
-        !_isEmpty(request?.payload)
-          ? { payload: request.payload }
-          : { payload: {} }
+        _isEmpty(request?.payload)
+          ? { payload: {} }
+          : { payload: request.payload }
       }
       innerRef={formikRef}
     >

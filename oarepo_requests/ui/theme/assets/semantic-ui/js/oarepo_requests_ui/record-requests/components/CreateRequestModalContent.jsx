@@ -23,6 +23,7 @@ export const CreateRequestModalContent = ({
     allowedTags: allowedHtmlTags,
     allowedAttributes: allowedHtmlAttrs,
   });
+  console.log("dwadwadwa");
 
   return (
     <>

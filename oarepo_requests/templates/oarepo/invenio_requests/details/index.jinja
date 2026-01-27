@@ -38,6 +38,7 @@
 
 {% set active_dashboard_menu_item = 'requests' %}
 {% set active_community_header_menu_item = 'requests' %}
+{% set metadata = record["metadata"] %}
 
 {%- block request_header %}
   {% if is_user_dashboard %}
@@ -137,7 +138,7 @@
         id="checks-tab-panel"
         hidden="hidden"
       >
-        {% include "invenio_checks/requests/details.html" %}
+        {% include "invenio_checks/requests/details.html" with context %}
       </div>
     {% endif %}
 

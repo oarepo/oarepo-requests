@@ -52,7 +52,7 @@ export const RequestActionController = ({
   const performAction = useCallback(
     async (action, commentContent) => {
       let formData = null;
-      if (formikRef && formikRef.current) {
+      if (formikRef?.current) {
         const values = formikRef.current.values;
         // Remove empty payload values
         for (const key of Object.keys(values.payload || {})) {
@@ -81,6 +81,9 @@ export const RequestActionController = ({
           }
         } catch (error) {
           setLoading(false);
+          formikRef?.current?.setErrors({
+            api: error?.response?.data?.message || error.message,
+          });
           return;
         }
       }

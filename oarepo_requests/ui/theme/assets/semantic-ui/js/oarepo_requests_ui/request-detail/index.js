@@ -27,6 +27,7 @@ const request = JSON.parse(requestDetailsDiv.dataset.record);
 const defaultQueryParams = JSON.parse(
   requestDetailsDiv.dataset.defaultQueryConfig,
 );
+// this is currently not used in version we have, but it is in their main
 // const defaultReplyQueryParams = JSON.parse(
 //   requestDetailsDiv.dataset.defaultReplyQueryConfig
 // );
@@ -37,10 +38,8 @@ const overriddenComponents = overrideStore.getAll();
 
 const defaultComponents = {
   ...defaultOverrides,
-  ...{
-    "InvenioRequests.RequestActionsPortal": RequestActionsPortal,
-    "InvenioRequests.RequestDetails.layout": RequestDetails,
-  },
+  "InvenioRequests.RequestActionsPortal": RequestActionsPortal,
+  "InvenioRequests.RequestDetails.layout": RequestDetails,
   ...overriddenComponents,
 };
 

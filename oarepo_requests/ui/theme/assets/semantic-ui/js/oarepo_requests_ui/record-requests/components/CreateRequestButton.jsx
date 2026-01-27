@@ -3,9 +3,8 @@ import { Button } from "semantic-ui-react";
 import { RequestModal, CreateRequestModalContent } from ".";
 import { DirectCreateAndSubmit } from "@js/oarepo_requests_common/actions";
 import PropTypes from "prop-types";
-import { useCallbackContext } from "../../common";
+import { useCallbackContext, RequestActionController } from "../../common";
 import { FormikRefContextProvider } from "../../common/contexts/FormikRefContext";
-import { RequestActionController } from "../../common";
 
 export const CreateRequestButton = ({
   requestType,
@@ -78,7 +77,6 @@ export const CreateRequestButton = ({
 
 CreateRequestButton.propTypes = {
   requestType: PropTypes.object,
-  isMutating: PropTypes.number.isRequired,
   buttonIconProps: PropTypes.object,
   header: PropTypes.string.isRequired,
 };

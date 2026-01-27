@@ -58,8 +58,8 @@ class RequestTypeSchema(ma.Schema):
     @ma.post_dump
     def _add_type_details(self, data: dict, **kwargs: Any) -> dict:  # noqa ARG001
         """Serialize details from request type."""
-        type = data["type_id"]  # noqa: A001
-        type_obj = current_request_type_registry.lookup(type, quiet=True)
+        type_ = data["type_id"]
+        type_obj = current_request_type_registry.lookup(type_, quiet=True)
         if hasattr(type_obj, "description"):
             data["description"] = type_obj.description
         if hasattr(type_obj, "name"):

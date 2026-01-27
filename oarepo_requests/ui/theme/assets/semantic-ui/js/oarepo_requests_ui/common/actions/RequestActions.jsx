@@ -61,7 +61,7 @@ export const RequestActions = ({ request, size }) => {
   const actions = Object.keys(new RequestLinksExtractor(request).actions);
   const actionNames = getAvailableActions(
     actions,
-    requestTypeConfig?.request_type_properties
+    requestTypeConfig?.request_type_properties,
   );
   return (
     <Overridable
@@ -81,7 +81,7 @@ export const RequestActions = ({ request, size }) => {
               iconName={iconConfig[actionName]}
               requireConfirmation={requireConfirmation(
                 actionName,
-                requestTypeConfig?.request_type_properties
+                requestTypeConfig?.request_type_properties,
               )}
               className={`requests request-action-button ${actionName} ${
                 requestTypeConfig?.request_type_properties?.dangerous &&
@@ -110,7 +110,7 @@ export const RequestActions = ({ request, size }) => {
                   iconName={iconConfig[actionName]}
                   requireConfirmation={requireConfirmation(
                     actionName,
-                    requestTypeConfig?.request_type_properties
+                    requestTypeConfig?.request_type_properties,
                   )}
                   className={`requests request-action-button ${actionName} ${
                     requestTypeConfig?.request_type_properties?.dangerous &&
@@ -127,13 +127,11 @@ export const RequestActions = ({ request, size }) => {
 };
 
 RequestActions.propTypes = {
-  request: PropTypes.shape({
-    type: PropTypes.string.isRequired,
-  }).isRequired,
+  request: PropTypes.object.isRequired,
   size: PropTypes.string.isRequired,
 };
 
 export default Overridable.component(
   "InvenioRequests.RequestActions",
-  RequestActions
+  RequestActions,
 );

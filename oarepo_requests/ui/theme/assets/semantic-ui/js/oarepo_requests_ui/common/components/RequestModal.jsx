@@ -44,9 +44,9 @@ export const RequestModal = ({
   return (
     <Formik
       initialValues={
-        !_isEmpty(request?.payload)
-          ? { payload: request.payload }
-          : { payload: {} }
+        _isEmpty(request?.payload)
+          ? { payload: {} }
+          : { payload: request.payload }
       }
       innerRef={formikRef}
     >
