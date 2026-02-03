@@ -16,6 +16,5 @@ from oarepo_requests.services.oarepo.service import OARepoRequestsService
 
 REQUESTS_SERVICE_CLASS = OARepoRequestsService
 REQUESTS_SERVICE_CONFIG_CLASS = OARepoRequestsServiceConfig
-
 REQUESTS_RESOURCE_CLASS = OARepoRequestsResource
 REQUESTS_RESOURCE_CONFIG_CLASS = OARepoRequestsResourceConfig

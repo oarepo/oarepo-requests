@@ -37,13 +37,15 @@ oarepo14 = [
     "oarepo[rdm,tests]>=14.0.0,<15.0.0",
 ]
 
-# TODO missing entrypoints
 [project.entry-points."invenio_base.apps"]
 oarepo_requests = "oarepo_requests.ext:OARepoRequests"
 
 [project.entry-points."invenio_base.api_apps"]
 oarepo_requests = "oarepo_requests.ext:OARepoRequests"
-
+[project.entry-points."invenio_base.api_blueprints"]
+oarepo_notifications = "oarepo_requests.views.api:create_notifications"
+[project.entry-points."invenio_base.blueprints"]
+oarepo_notifications = "oarepo_requests.views.app:create_notifications"
 [project.entry-points."invenio_assets.webpack"]
 # oarepo_requests_ui_theme = "oarepo_requests.ui.theme.webpack:theme"
 
@@ -79,6 +81,11 @@ oarepo_requests = "oarepo_requests:alembic"
 
 [project.entry-points."invenio_config.module"]
 oarepo_requests = "oarepo_requests.initial_config"
+[project.entry-points."invenio_notifications.entity_resolvers"]
+request = "oarepo_requests.notifications.resolvers:requests_resolver"
+request_event = "oarepo_requests.notifications.resolvers:request_events_resolver"
+user = "oarepo_requests.notifications.resolvers:user_resolver"
+multiple = "oarepo_requests.notifications.resolvers:multiple_entities_resolver"
 
 
 [[tool.mypy.overrides]]

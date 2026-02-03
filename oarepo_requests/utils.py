@@ -180,23 +180,6 @@ def get_matching_service_for_refdict(
     return None
 
 
-def get_entity_key_for_record_cls(record_cls: type[Record]) -> str:
-    """Get the entity type id for the record_cls.
-
-    :param record_cls: Record class.
-    :return: Entity type id
-    """
-    for resolver in ResolverRegistry.get_registered_resolvers():
-        if not hasattr(resolver, "record_cls"):
-            continue
-        if hasattr(resolver, "record_cls") and resolver.record_cls == record_cls:  # type: ignore[reportAttributeAccessIssue]
-            type_id: str | None = getattr(resolver, "type_id", None)
-            if type_id is None:
-                raise ValueError(f"Entity resolver {type(resolver)} does not have an associated type_id")
-            return type_id
-    raise AttributeError(f"Record class {record_cls} does not have a registered entity resolver.")
-
-
 def reference_to_tuple(reference: dict[str, str]) -> tuple[str, str]:
     """Convert the reference dict to a tuple.
 
