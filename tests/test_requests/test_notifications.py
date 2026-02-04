@@ -25,7 +25,9 @@ from oarepo_workflows.resolvers.multiple_entities import (
     MultipleEntitiesResolver,
 )
 
-from oarepo_requests.notifications.builders.publish import PublishDraftRequestSubmitNotificationBuilder
+from oarepo_requests.notifications.builders.publish import (
+    PublishDraftRequestSubmitNotificationBuilder,
+)
 
 
 def test_publish_notifications(
@@ -232,7 +234,11 @@ def test_group_multiple_recipients(
             submit_request_on_draft(creator.identity, draft1["id"], "publish_draft")
             assert len(outbox) == 3
             receivers = {m.recipients[0] for m in outbox}
-            assert receivers == {"user1@example.org", "user2@example.org", "user3@example.org"}
+            assert receivers == {
+                "user1@example.org",
+                "user2@example.org",
+                "user3@example.org",
+            }
 
     finally:
         app.config["OAREPO_REQUESTS_DEFAULT_RECEIVER"] = config_restore
@@ -372,7 +378,11 @@ class LazyEntityResolve(EntityResolve):
     def __call__(self, notification):
         """Update required recipient information and add backend id."""
         notification = super().__call__(notification)
-        dict_set(notification.context, self.key, make_lazy(dict_lookup(notification.context, self.key)))
+        dict_set(
+            notification.context,
+            self.key,
+            make_lazy(dict_lookup(notification.context, self.key)),
+        )
         return notification
 
 

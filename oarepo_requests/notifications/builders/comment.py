@@ -12,7 +12,11 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
-from invenio_notifications.services.generators import ContextGenerator, EntityResolve, RecipientGenerator
+from invenio_notifications.services.generators import (
+    ContextGenerator,
+    EntityResolve,
+    RecipientGenerator,
+)
 from invenio_requests.notifications.builders import (
     CommentRequestEventCreateNotificationBuilder as InvenioCommentRequestEventCreateNotificationBuilder,
 )

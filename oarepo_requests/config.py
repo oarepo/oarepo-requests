@@ -23,7 +23,9 @@ from oarepo_requests.actions.components import (
     RequestActionComponent,
     WorkflowTransitionComponent,
 )
-from oarepo_requests.notifications.builders.comment import CommentRequestEventCreateNotificationBuilder
+from oarepo_requests.notifications.builders.comment import (
+    CommentRequestEventCreateNotificationBuilder,
+)
 from oarepo_requests.notifications.builders.delete_published_record import (
     DeletePublishedRecordRequestAcceptNotificationBuilder,
     DeletePublishedRecordRequestDeclineNotificationBuilder,

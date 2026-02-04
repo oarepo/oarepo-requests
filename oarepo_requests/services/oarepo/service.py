@@ -91,7 +91,7 @@ class OARepoRequestsService(RequestsService):
         type_ = current_request_type_registry.lookup(request_type, quiet=True)
         if not type_:
             raise UnknownRequestTypeError(request_type)
-        data = data if data else {}
+        data = data or {}
         if receiver is None:
             # if explicit creator is not passed, use current identity - this is in sync with invenio_requests
             receiver = current_oarepo_requests.default_request_receiver(

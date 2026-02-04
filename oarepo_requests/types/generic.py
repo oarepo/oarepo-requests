@@ -17,7 +17,9 @@ from invenio_requests.customizations.states import RequestState
 from invenio_requests.proxies import current_requests_service
 
 from oarepo_requests.errors import OpenRequestAlreadyExistsError
-from oarepo_requests.notifications.builders.comment import CommentRequestEventCreateNotificationBuilder
+from oarepo_requests.notifications.builders.comment import (
+    CommentRequestEventCreateNotificationBuilder,
+)
 from oarepo_requests.utils import classproperty, open_request_exists
 
 from ..actions.generic import (

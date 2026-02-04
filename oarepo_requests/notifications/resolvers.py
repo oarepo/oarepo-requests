@@ -16,7 +16,11 @@ from typing import Any, cast, override
 from invenio_access.permissions import system_user_id
 from invenio_notifications.registry import EntityResolverRegistry
 from invenio_records_resources.references import EntityResolver
-from invenio_records_resources.references.entity_resolvers import EntityProxy, ServiceResultProxy, ServiceResultResolver
+from invenio_records_resources.references.entity_resolvers import (
+    EntityProxy,
+    ServiceResultProxy,
+    ServiceResultResolver,
+)
 from invenio_records_resources.services.errors import PermissionDeniedError
 from invenio_users_resources.entity_resolvers import UserProxy
 from oarepo_workflows.resolvers.multiple_entities import (
@@ -57,7 +61,14 @@ class MultipleEntitiesNotificationProxy(EntityProxy):
         fields: list[dict[str, dict[str, Any]]] = []
         for entity_ref in entity_refs:
             type_ = next(iter(entity_ref.keys()))
-            fields.append({type_: cast("dict[str, Any]", EntityResolverRegistry.resolve_entity(entity_ref))})
+            fields.append(
+                {
+                    type_: cast(
+                        "dict[str, Any]",
+                        EntityResolverRegistry.resolve_entity(entity_ref),
+                    )
+                }
+            )
 
         return fields
 

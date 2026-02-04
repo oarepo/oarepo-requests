@@ -19,7 +19,9 @@ from invenio_requests import current_events_service
 from invenio_search.engine import dsl
 from invenio_users_resources.proxies import current_users_service
 
-from oarepo_requests.notifications.generators.context import NotificationCtxWithReference
+from oarepo_requests.notifications.generators.context import (
+    NotificationCtxWithReference,
+)
 from oarepo_requests.proxies import current_notification_recipient_generators_registry
 
 if TYPE_CHECKING:
@@ -91,6 +93,7 @@ class GeneralRequestParticipantsRecipient(RecipientGenerator):
         # fetching all request events to get involved users
         request_events = current_events_service.scan(
             identity=system_identity,
+            request_id=request["id"],
             extra_filter=dsl.Q("term", request_id=request["id"]),
         )
         # assume commenters can only be users

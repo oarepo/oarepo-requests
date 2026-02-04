@@ -131,7 +131,8 @@ class OARepoRequests:
 
         app_notification_recipient_resolvers = app.config.setdefault("NOTIFICATION_RECIPIENTS_RESOLVERS", {})
         app.config["NOTIFICATION_RECIPIENTS_RESOLVERS"] = conservative_merger.merge(
-            app_notification_recipient_resolvers, config.NOTIFICATION_RECIPIENTS_RESOLVERS
+            app_notification_recipient_resolvers,
+            config.NOTIFICATION_RECIPIENTS_RESOLVERS,
         )
 
         app_notification_builders = app.config.setdefault("NOTIFICATIONS_BUILDERS", {})

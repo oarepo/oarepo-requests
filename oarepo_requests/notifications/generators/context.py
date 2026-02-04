@@ -24,7 +24,10 @@ class NotificationCtxWithReference(dict):
     """Context dict that keeps up separate dict with unresolved references."""
 
     def __init__(
-        self, reference_dict: dict[str, str], reference_key: str, ctx: dict[str, Any] | NotificationCtxWithReference
+        self,
+        reference_dict: dict[str, str],
+        reference_key: str,
+        ctx: dict[str, Any] | NotificationCtxWithReference,
     ):
         """Initialize the context."""
         super().__init__(ctx)

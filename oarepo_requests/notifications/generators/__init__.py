@@ -9,7 +9,10 @@
 
 from __future__ import annotations
 
-from oarepo_requests.notifications.generators.context import ReferenceSavingEntityResolve, RequestEntityResolve
+from oarepo_requests.notifications.generators.context import (
+    ReferenceSavingEntityResolve,
+    RequestEntityResolve,
+)
 from oarepo_requests.notifications.generators.recipients import (
     EntityRecipientGenerator,
     GeneralRequestParticipantsRecipient,

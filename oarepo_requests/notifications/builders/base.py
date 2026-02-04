@@ -17,10 +17,15 @@ from invenio_notifications.models import Notification
 from invenio_notifications.registry import EntityResolverRegistry
 from invenio_notifications.services.builders import NotificationBuilder
 from invenio_notifications.services.generators import ContextGenerator
-from invenio_notifications.services.generators import UserEmailBackend as InvenioUserEmailBackend
+from invenio_notifications.services.generators import (
+    UserEmailBackend as InvenioUserEmailBackend,
+)
 from oarepo_runtime.typing import require_kwargs
 
-from oarepo_requests.notifications.filters import SystemUserRecipientFilter, UsersWithNoMailRecipientFilter
+from oarepo_requests.notifications.filters import (
+    SystemUserRecipientFilter,
+    UsersWithNoMailRecipientFilter,
+)
 from oarepo_requests.notifications.generators import ReferenceSavingEntityResolve
 
 if TYPE_CHECKING:
@@ -65,4 +70,7 @@ class RequestActionNotificationBuilder(NotificationBuilder):
 
     recipient_backends: tuple[NotificationBackendWithClassId, ...] = (UserEmailBackend(),)
 
-    recipient_filters: tuple[RecipientFilter, ...] = (UsersWithNoMailRecipientFilter(), SystemUserRecipientFilter())
+    recipient_filters: tuple[RecipientFilter, ...] = (
+        UsersWithNoMailRecipientFilter(),
+        SystemUserRecipientFilter(),
+    )

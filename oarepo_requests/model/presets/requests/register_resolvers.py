@@ -15,7 +15,10 @@ from typing import TYPE_CHECKING, Any, override
 from invenio_access.permissions import system_identity
 from invenio_drafts_resources.services import RecordService as RecordServiceWithDrafts
 from invenio_pidstore.errors import PIDDoesNotExistError
-from invenio_rdm_records.requests.entity_resolvers import RDMRecordServiceResultProxy, RDMRecordServiceResultResolver
+from invenio_rdm_records.requests.entity_resolvers import (
+    RDMRecordServiceResultProxy,
+    RDMRecordServiceResultResolver,
+)
 from invenio_records_resources.references.entity_resolvers.results import (
     ServiceResultResolver as InvenioServiceResultResolver,
 )
@@ -125,8 +128,16 @@ class RegisterResolversPreset(Preset):
         register_notification_resolver.type_key = builder.model.base_name  # type: ignore[attr-defined]
 
         yield AddModule("resolvers", exists_ok=True)
-        yield AddToModule("resolvers", "register_entity_resolver", staticmethod(register_entity_resolver))
-        yield AddToModule("resolvers", "register_notification_resolver", staticmethod(register_notification_resolver))
+        yield AddToModule(
+            "resolvers",
+            "register_entity_resolver",
+            staticmethod(register_entity_resolver),
+        )
+        yield AddToModule(
+            "resolvers",
+            "register_notification_resolver",
+            staticmethod(register_notification_resolver),
+        )
         yield AddEntryPoint(
             group="invenio_requests.entity_resolvers",
             name=f"{model.base_name}_requests",
