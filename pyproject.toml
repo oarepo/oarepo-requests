@@ -40,6 +40,10 @@ oarepo14 = [
 [project.entry-points."invenio_base.apps"]
 oarepo_requests = "oarepo_requests.ext:OARepoRequests"
 
+[project.entry-points."invenio_base.blueprints"]
+requests = "oarepo_requests.ui.views:create_requests_ui_blueprint"
+requests_form_config = "oarepo_requests.ui.views:create_requests_form_config_blueprint"
+
 [project.entry-points."invenio_base.api_apps"]
 oarepo_requests = "oarepo_requests.ext:OARepoRequests"
 [project.entry-points."invenio_base.api_blueprints"]
@@ -47,7 +51,7 @@ oarepo_notifications = "oarepo_requests.views.api:create_notifications"
 [project.entry-points."invenio_base.blueprints"]
 oarepo_notifications = "oarepo_requests.views.app:create_notifications"
 [project.entry-points."invenio_assets.webpack"]
-# oarepo_requests_ui_theme = "oarepo_requests.ui.theme.webpack:theme"
+oarepo_requests_ui_theme = "oarepo_requests.ui.theme.webpack:theme"
 
 [project.entry-points."invenio_i18n.translations"]
 oarepo_requests_ui = "oarepo_requests"

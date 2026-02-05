@@ -119,7 +119,6 @@ class OARepoRequests:
         app.config.setdefault("REQUESTS_ALLOWED_RECEIVERS", []).extend(config.REQUESTS_ALLOWED_RECEIVERS)
 
         app.config.setdefault("PUBLISH_REQUEST_TYPES", config.PUBLISH_REQUEST_TYPES)
-
         # do not overwrite user's stuff
         app_default_workflow_events = app.config.setdefault("DEFAULT_WORKFLOW_EVENTS", {})
         for k, v in config.DEFAULT_WORKFLOW_EVENTS.items():
