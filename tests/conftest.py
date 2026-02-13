@@ -41,7 +41,7 @@ from oarepo_workflows import (
 )
 from oarepo_workflows.base import Workflow
 from oarepo_workflows.model.presets import workflows_preset
-from oarepo_workflows.requests.events import WorkflowEvent
+from oarepo_workflows.requests.events import WorkflowEvent, WorkflowEvents
 from pytest_oarepo.requests.classes import (
     CSLocaleUserGenerator,
     SystemUserGenerator,
@@ -141,11 +141,14 @@ can_comment_only_receiver = [
     SystemProcess(),
 ]
 
-events_only_receiver_can_comment = {
-    CommentEventType.type_id: WorkflowEvent(submitters=can_comment_only_receiver),
-    LogEventType.type_id: WorkflowEvent(submitters=InvenioRequestsPermissionPolicy.can_create_comment),
-    TestEventType.type_id: WorkflowEvent(submitters=can_comment_only_receiver),
-}
+
+events_only_receiver_can_comment = WorkflowEvents(
+    {
+        CommentEventType.type_id: WorkflowEvent(submitters=can_comment_only_receiver),
+        LogEventType.type_id: WorkflowEvent(submitters=InvenioRequestsPermissionPolicy.can_create_comment),
+        TestEventType.type_id: WorkflowEvent(submitters=can_comment_only_receiver),
+    }
+)
 
 
 class GenericTestableRecordRequestType(NonDuplicableOARepoRecordRequestType):
