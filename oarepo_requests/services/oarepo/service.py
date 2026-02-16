@@ -62,8 +62,8 @@ class OARepoRequestsService(RequestsService):
         identity: Identity,
         data: dict[str, Any] | None,
         request_type: str,
-        *args: Any,
         receiver: dict[str, str] | Any | None = None,
+        *args: Any,
         creator: dict[str, str] | Any | None = None,
         topic: Record | None = None,
         expires_at: datetime | None = None,
@@ -88,7 +88,11 @@ class OARepoRequestsService(RequestsService):
         # TODO: invenio suggest None topic can be here but we do not expect it
         if topic is None:
             raise ValueError("")
-        type_ = current_request_type_registry.lookup(request_type, quiet=True)
+        type_ = (
+            current_request_type_registry.lookup(request_type, quiet=True)
+            if isinstance(request_type, str)
+            else request_type
+        )
         if not type_:
             raise UnknownRequestTypeError(request_type)
         data = data or {}
