@@ -23,7 +23,11 @@ class UsersWithNoMailRecipientFilter(RecipientFilter):
 
     def __call__(self, notification: Notification, recipients: dict[str, Recipient]):  # noqa ARG002
         """Filter system recipient."""
-        return {id_: recipient for id_, recipient in recipients.items() if "email" in recipient.data}
+        return {
+            id_: recipient
+            for id_, recipient in recipients.items()
+            if "email" in recipient.data
+        }
 
 
 class SystemUserRecipientFilter(RecipientFilter):

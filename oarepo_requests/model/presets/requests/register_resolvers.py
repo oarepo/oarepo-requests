@@ -57,7 +57,9 @@ class RecordServiceResultProxy(RDMRecordServiceResultProxy):
                 record = self._get_record(pid_value)
             else:
                 record = (
-                    draft if not record_from_result(draft).is_published else self._get_record(pid_value)  # type: ignore[reportAttributeAccessIssue]
+                    draft
+                    if not record_from_result(draft).is_published
+                    else self._get_record(pid_value)  # type: ignore[reportAttributeAccessIssue]
                 )
         else:
             record = self._get_record(pid_value)
@@ -77,14 +79,18 @@ class RecordServiceResultResolver(RDMRecordServiceResultResolver):
         record_cls: type[Record] | None = None,
     ):
         """Initialize the resolver."""
-        super(RDMRecordServiceResultResolver, self).__init__(service_id, type_key, proxy_cls, item_cls, record_cls)
+        super(RDMRecordServiceResultResolver, self).__init__(
+            service_id, type_key, proxy_cls, item_cls, record_cls
+        )
 
     @property
     @override
     def draft_cls(self) -> type[Draft] | None:
         """Get specified draft class or from service."""
         service = self.get_service()
-        return service.draft_cls if isinstance(service, RecordServiceWithDrafts) else None
+        return (
+            service.draft_cls if isinstance(service, RecordServiceWithDrafts) else None
+        )
 
     @override
     def matches_entity(self, entity: Any) -> bool:

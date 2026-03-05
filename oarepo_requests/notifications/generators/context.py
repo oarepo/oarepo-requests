@@ -50,7 +50,9 @@ class ReferenceSavingEntityResolve(EntityResolve):
         if entity_ref is None:
             return notification
         notification = super().__call__(notification)
-        notification.context = NotificationCtxWithReference(entity_ref, self.key, notification.context)
+        notification.context = NotificationCtxWithReference(
+            entity_ref, self.key, notification.context
+        )
         return notification
 
 
@@ -69,5 +71,7 @@ class RequestEntityResolve(ReferenceSavingEntityResolve):
             # If the request type has a stateful name, use it
             # note: do not have better identity here, so using system_identity
             # as a fallback
-            request_dict["title"] = request.type.stateful_name(system_identity, topic=None)  # type: ignore[reportAttributeAccessIssue]
+            request_dict["title"] = request.type.stateful_name(
+                system_identity, topic=None
+            )  # type: ignore[reportAttributeAccessIssue]
         return notification

@@ -30,7 +30,9 @@ def test_new_version_autoaccept(
     )
     assert new_version_direct.status_code == 403
 
-    resp_request_submit = submit_request_on_record(creator.identity, record1_id, "new_version", expand=True)
+    resp_request_submit = submit_request_on_record(
+        creator.identity, record1_id, "new_version", expand=True
+    )
     # is request accepted and closed?
     request = creator_client.get(
         f"{urls['BASE_URL_REQUESTS']}{resp_request_submit['id']}",
@@ -80,8 +82,16 @@ def test_new_version_files(
     draft_search = creator_client.get("/user/requests-test").json["hits"][
         "hits"
     ]  # a link is in another pull request for now
-    new_version_1 = [x for x in draft_search if x["parent"]["id"] == record1["parent"]["id"] and x["state"] == "draft"]
-    new_version_2 = [x for x in draft_search if x["parent"]["id"] == record2["parent"]["id"] and x["state"] == "draft"]
+    new_version_1 = [
+        x
+        for x in draft_search
+        if x["parent"]["id"] == record1["parent"]["id"] and x["state"] == "draft"
+    ]
+    new_version_2 = [
+        x
+        for x in draft_search
+        if x["parent"]["id"] == record2["parent"]["id"] and x["state"] == "draft"
+    ]
 
     assert len(new_version_1) == 1
     assert len(new_version_2) == 1
@@ -114,7 +124,9 @@ def test_redirect_url(
     record1 = record_factory(creator.identity)
     record1_id = record1["id"]
 
-    resp_request_submit = submit_request_on_record(creator.identity, record1_id, "new_version")
+    resp_request_submit = submit_request_on_record(
+        creator.identity, record1_id, "new_version"
+    )
     original_request_id = resp_request_submit["id"]
     # is request accepted and closed?
 
@@ -136,9 +148,15 @@ def test_redirect_url(
     )
 
     creator_client.get(f"{urls['BASE_URL']}/{new_id}/draft")
-    publish_request = submit_request_on_draft(creator.identity, new_id, "publish_new_version")
-    receiver_request = receiver_client.get(f"{urls['BASE_URL_REQUESTS']}{publish_request['id']}")
-    receiver_client.post(link2testclient(receiver_request.json["links"]["actions"]["accept"]))
+    publish_request = submit_request_on_draft(
+        creator.identity, new_id, "publish_new_version"
+    )
+    receiver_request = receiver_client.get(
+        f"{urls['BASE_URL_REQUESTS']}{publish_request['id']}"
+    )
+    receiver_client.post(
+        link2testclient(receiver_request.json["links"]["actions"]["accept"])
+    )
 
     original_request = creator_client.get(
         f"{urls['BASE_URL_REQUESTS']}{original_request_id}",
@@ -172,10 +190,18 @@ def test_publish(
     )
     # publish the new draft
     new_id = resp_request.data["expanded"]["payload"]["created_topic"]["id"]
-    creator_client.put(f"{urls['BASE_URL']}/{new_id}/draft", json={"metadata": {"title": "edited"}})
-    publish_request = submit_request_on_draft(creator.identity, new_id, "publish_new_version")
-    receiver_request = receiver_client.get(f"{urls['BASE_URL_REQUESTS']}{publish_request['id']}")
-    receiver_client.post(link2testclient(receiver_request.json["links"]["actions"]["accept"]))
+    creator_client.put(
+        f"{urls['BASE_URL']}/{new_id}/draft", json={"metadata": {"title": "edited"}}
+    )
+    publish_request = submit_request_on_draft(
+        creator.identity, new_id, "publish_new_version"
+    )
+    receiver_request = receiver_client.get(
+        f"{urls['BASE_URL_REQUESTS']}{publish_request['id']}"
+    )
+    receiver_client.post(
+        link2testclient(receiver_request.json["links"]["actions"]["accept"])
+    )
 
     # check it's published
     new_record = creator_client.get(f"{urls['BASE_URL']}/{new_id}")

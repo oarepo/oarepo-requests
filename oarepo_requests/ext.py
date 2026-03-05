@@ -81,7 +81,9 @@ class _OARepoRequestsState:
         :param creator: Creator of the request.
         :param data: Payload of the request.
         """
-        return obj_or_import_string(self.app.config["OAREPO_REQUESTS_DEFAULT_RECEIVER"])(  # type: ignore[no-any-return]
+        return obj_or_import_string(
+            self.app.config["OAREPO_REQUESTS_DEFAULT_RECEIVER"]
+        )(  # type: ignore[no-any-return]
             identity=identity,
             request_type=request_type,
             record=record,
@@ -116,20 +118,28 @@ class OARepoRequests:
         from . import config
 
         app.config.setdefault("OAREPO_REQUESTS_DEFAULT_RECEIVER", None)
-        app.config.setdefault("REQUESTS_ALLOWED_RECEIVERS", []).extend(config.REQUESTS_ALLOWED_RECEIVERS)
+        app.config.setdefault("REQUESTS_ALLOWED_RECEIVERS", []).extend(
+            config.REQUESTS_ALLOWED_RECEIVERS
+        )
 
         app.config.setdefault("PUBLISH_REQUEST_TYPES", config.PUBLISH_REQUEST_TYPES)
 
         # do not overwrite user's stuff
-        app_default_workflow_events = app.config.setdefault("DEFAULT_WORKFLOW_EVENTS", {})
+        app_default_workflow_events = app.config.setdefault(
+            "DEFAULT_WORKFLOW_EVENTS", {}
+        )
         for k, v in config.DEFAULT_WORKFLOW_EVENTS.items():
             if k not in app_default_workflow_events:
                 app_default_workflow_events[k] = v
 
         # let the user override the action components
-        app.config.setdefault("REQUESTS_ACTION_COMPONENTS", []).extend(config.REQUESTS_ACTION_COMPONENTS)
+        app.config.setdefault("REQUESTS_ACTION_COMPONENTS", []).extend(
+            config.REQUESTS_ACTION_COMPONENTS
+        )
 
-        app_notification_recipient_resolvers = app.config.setdefault("NOTIFICATION_RECIPIENTS_RESOLVERS", {})
+        app_notification_recipient_resolvers = app.config.setdefault(
+            "NOTIFICATION_RECIPIENTS_RESOLVERS", {}
+        )
         app.config["NOTIFICATION_RECIPIENTS_RESOLVERS"] = conservative_merger.merge(
             app_notification_recipient_resolvers,
             config.NOTIFICATION_RECIPIENTS_RESOLVERS,
@@ -160,7 +170,9 @@ def finalize_app(app: Flask) -> None:
         current_event_type_registry.register_type(type_)
 
     ext = app.extensions["oarepo-requests"]
-    ext.notification_recipients_resolvers_registry = app.config["NOTIFICATION_RECIPIENTS_RESOLVERS"]
+    ext.notification_recipients_resolvers_registry = app.config[
+        "NOTIFICATION_RECIPIENTS_RESOLVERS"
+    ]
 
     invenio_notifications = app.extensions["invenio-notifications"]
     invenio_notifications.init_manager(app)

@@ -35,7 +35,9 @@ class NewVersionAcceptAction(OARepoAcceptAction):
     ) -> None:
         """Apply the action, creating a new version of the record."""
         topic_service = get_draft_record_service(self.topic)
-        new_version_topic = topic_service.new_version(identity, self.topic["id"], uow=uow)
+        new_version_topic = topic_service.new_version(
+            identity, self.topic["id"], uow=uow
+        )
         created_topic = record_from_result(new_version_topic)
         if (
             "payload" in self.request
@@ -46,4 +48,6 @@ class NewVersionAcceptAction(OARepoAcceptAction):
         if "payload" not in self.request:
             self.request["payload"] = {}
         # payload only allows strings
-        self.request["payload"]["created_topic"] = ref_to_str(reference_entity(created_topic))
+        self.request["payload"]["created_topic"] = ref_to_str(
+            reference_entity(created_topic)
+        )
