@@ -21,6 +21,7 @@ from invenio_records_resources.services.base.links import (
 from invenio_requests.services.schemas import GenericRequestSchema
 from marshmallow import fields
 
+from oarepo_requests.ext import current_request_type_registry
 from oarepo_requests.utils import ref_to_str, reference_entity
 
 request_type_identity_ctx: ContextVar[Any] = ContextVar("oarepo_requests.request_type_identity", default=None)
@@ -52,6 +53,25 @@ class RequestTypeSchema(ma.Schema):
         link = EndpointLink("requests.create_via_url", params=["topic", "request_type"])
         template = LinksTemplate({"create": link}, context={"topic": topic_ref, "request_type": type_id})
         data["links"] = {"actions": template.expand(identity, record)}
+        return data
+
+    @ma.post_dump
+    def _add_type_details(self, data: dict, **kwargs: Any) -> dict:  # noqa ARG001
+        """Serialize details from request type."""
+        type_ = data["type_id"]
+        type_obj = current_request_type_registry.lookup(type_, quiet=True)
+        if hasattr(type_obj, "description"):
+            data["description"] = type_obj.description
+        if hasattr(type_obj, "name"):
+            data["name"] = type_obj.name
+        if hasattr(type_obj, "dangerous"):
+            data["dangerous"] = type_obj.dangerous
+        if hasattr(type_obj, "is_editable"):
+            data["editable"] = type_obj.is_editable
+        if hasattr(type_obj, "has_form"):
+            data["has_form"] = type_obj.has_form
+        # TODO: implement stateful name and description context seems to no longer work in marshmallow
+
         return data
 
 

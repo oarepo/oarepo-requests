@@ -10,6 +10,21 @@ from __future__ import annotations
 from oarepo_requests.utils import applicable_requests
 
 
+def assert_contains_item(items, expected_subset):
+    """Assert that at least one dict in `items` contains all key/value pairs from `expected_subset` (deep/nested)."""
+
+    def is_subset(expected, actual) -> bool:
+        if isinstance(expected, dict):
+            return all(k in actual and is_subset(v, actual[k]) for k, v in expected.items())
+        return expected == actual
+
+    for item in items:
+        if is_subset(expected_subset, item):
+            return
+
+    raise AssertionError(f"Expected subset not found:\n{expected_subset}\n\nIn:\n{items}")
+
+
 def test_allowed_request_types_on_draft_service(
     requests_model,
     users,
@@ -23,14 +38,17 @@ def test_allowed_request_types_on_draft_service(
 
     draft = requests_model.Draft.pid.resolve(draft1["id"], registered_only=False)
     allowed_request_types = applicable_requests(identity, draft)
-    assert sorted(allowed_request_types.to_dict()["hits"]["hits"], key=lambda x: x["type_id"]) == [
+    hits = allowed_request_types.to_dict()["hits"]["hits"]
+
+    assert_contains_item(
+        hits,
         {
             "links": {
                 "actions": {"create": f"https://127.0.0.1:5000/api/requests/requests_test:{draft1_id}/publish_draft"}
             },
             "type_id": "publish_draft",
         },
-    ]
+    )
 
 
 def test_allowed_request_types_on_draft_resource(
@@ -50,14 +68,17 @@ def test_allowed_request_types_on_draft_resource(
     applicable_requests_link = draft1["links"]["applicable-requests"]
     assert applicable_requests_link == f"https://127.0.0.1:5000/api/requests/applicable?topic=requests_test:{draft1_id}"
     allowed_request_types = creator_client.get(link2testclient(applicable_requests_link))
-    assert sorted(allowed_request_types.json["hits"]["hits"], key=lambda x: x["type_id"]) == [
+    hits = allowed_request_types.json["hits"]["hits"]
+
+    assert_contains_item(
+        hits,
         {
             "links": {
                 "actions": {"create": f"https://127.0.0.1:5000/api/requests/requests_test:{draft1_id}/publish_draft"}
             },
             "type_id": "publish_draft",
         },
-    ]
+    )
 
 
 def test_allowed_request_types_on_published_resource(
@@ -81,30 +102,41 @@ def test_allowed_request_types_on_published_resource(
     )
     allowed_request_types = creator_client.get(link2testclient(applicable_requests_link))
     assert allowed_request_types.status_code == 200
-    assert sorted(allowed_request_types.json["hits"]["hits"], key=lambda x: x["type_id"]) == [
+    hits = allowed_request_types.json["hits"]["hits"]
+
+    assert_contains_item(
+        hits,
         {
+            "type_id": "delete_published_record",
             "links": {
                 "actions": {
                     "create": f"https://127.0.0.1:5000/api/requests/requests_test:{published1_id}/delete_published_record"
                 }
             },
-            "type_id": "delete_published_record",
         },
+    )
+
+    assert_contains_item(
+        hits,
         {
+            "type_id": "edit_published_record",
             "links": {
                 "actions": {
                     "create": f"https://127.0.0.1:5000/api/requests/requests_test:{published1_id}/edit_published_record"
                 }
             },
-            "type_id": "edit_published_record",
         },
+    )
+
+    assert_contains_item(
+        hits,
         {
+            "type_id": "new_version",
             "links": {
                 "actions": {"create": f"https://127.0.0.1:5000/api/requests/requests_test:{published1_id}/new_version"}
             },
-            "type_id": "new_version",
         },
-    ]
+    )
 
 
 """

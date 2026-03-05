@@ -8,11 +8,72 @@
 from __future__ import annotations
 
 import json
+from unittest.mock import MagicMock
 
 import pytest
+from invenio_requests.customizations import RequestType
 from invenio_requests.proxies import current_requests_service
 
+from oarepo_requests.ui.components.custom_fields import FormConfigCustomFieldsComponent
+
 allowed_actions = ["submit", "delete"]
+
+
+def _make_request_type_with_form(form: dict | list | None) -> RequestType:
+    """Create a mock RequestType with the given form attribute."""
+    request_type = MagicMock(spec=RequestType)
+    request_type.form = form
+    return request_type
+
+
+def _run_custom_fields_component(form: dict | list | None) -> dict:
+    """Instantiate FormConfigCustomFieldsComponent and run form_config with the given form."""
+    component = FormConfigCustomFieldsComponent(resource=MagicMock())
+    request_type = _make_request_type_with_form(form)
+    form_config: dict = {}
+    component.form_config(request_type=request_type, form_config=form_config)
+    return form_config
+
+
+class TestFormConfigCustomFieldsValidation:
+    """Tests for FormConfigCustomFieldsComponent form validation."""
+
+    def test_missing_section_key(self) -> None:
+        """Form list item without 'section' key raises KeyError."""
+        with pytest.raises(KeyError, match="section"):
+            _run_custom_fields_component([{"fields": [{"field": "x"}]}])
+
+    def test_missing_fields_key(self) -> None:
+        """Form list item without 'fields' key raises KeyError."""
+        with pytest.raises(KeyError, match="fields"):
+            _run_custom_fields_component([{"section": ""}])
+
+    def test_fields_not_a_list(self) -> None:
+        """Form section with non-list 'fields' value raises TypeError."""
+        with pytest.raises(TypeError, match="Form section fields must be a list"):
+            _run_custom_fields_component([{"section": "", "fields": "not_a_list"}])
+
+    def test_valid_list_form(self) -> None:
+        """Valid list form populates custom_fields with displaySection defaulting to False."""
+        form_config = _run_custom_fields_component([{"section": "s", "fields": [{"field": "x"}]}])
+        assert "custom_fields" in form_config
+        assert form_config["custom_fields"]["ui"][0]["displaySection"] is False
+
+    def test_valid_dict_form(self) -> None:
+        """Dict form gets wrapped into the expected list structure."""
+        form_config = _run_custom_fields_component({"field": "x", "ui_widget": "Input"})
+        assert form_config["custom_fields"]["ui"] == [
+            {
+                "displaySection": False,
+                "section": "",
+                "fields": [{"field": "x", "ui_widget": "Input"}],
+            }
+        ]
+
+    def test_no_form(self) -> None:
+        """None form results in no custom_fields key."""
+        form_config = _run_custom_fields_component(None)
+        assert "custom_fields" not in form_config
 
 
 @pytest.mark.skip
@@ -88,7 +149,6 @@ def test_record_delete_unauthorized(
         assert "delete_record" not in data["creatable_request_types"]
 
 
-@pytest.mark.skip
 def test_request_detail_page(
     app,
     logged_client,
@@ -120,8 +180,100 @@ def test_request_detail_page(
         assert c.status_code == 200
 
 
-@pytest.mark.skip
-def test_form_config(app, client, record_ui_resource, fake_manifest):
+def test_form_config_delete_published_record(app, client, record_ui_resource, fake_manifest):
+    with client.get("/requests/configs/delete_published_record") as c:
+        assert c.json == {
+            "allowedHtmlAttrs": {
+                "*": ["class"],
+                "a": ["href", "title", "name", "class", "rel"],
+                "abbr": ["title"],
+                "acronym": ["title"],
+            },
+            "allowedHtmlTags": [
+                "a",
+                "abbr",
+                "acronym",
+                "b",
+                "blockquote",
+                "br",
+                "code",
+                "div",
+                "table",
+                "tbody",
+                "td",
+                "th",
+                "tr",
+                "em",
+                "h1",
+                "h2",
+                "h3",
+                "h4",
+                "h5",
+                "i",
+                "li",
+                "ol",
+                "p",
+                "pre",
+                "span",
+                "strike",
+                "strong",
+                "sub",
+                "sup",
+                "u",
+                "ul",
+            ],
+            "custom_fields": {
+                "ui": [
+                    {
+                        "displaySection": False,
+                        "section": "",
+                        "fields": [
+                            {
+                                "field": "removal_reason",
+                                "ui_widget": "Input",
+                                "props": {
+                                    "label": "Removal Reason",
+                                    "placeholder": "Write down the removal reason.",
+                                    "required": True,
+                                },
+                            },
+                            {
+                                "section": "",
+                                "field": "note",
+                                "ui_widget": "Input",
+                                "props": {
+                                    "label": "Note",
+                                    "placeholder": "Write down the additional note.",
+                                    "required": False,
+                                },
+                            },
+                        ],
+                    }
+                ]
+            },
+            "request_type_properties": {
+                "dangerous": True,
+                "editable": False,
+                "has_form": True,
+            },
+            "action_labels": {
+                "accept": "Permanently delete",
+                "cancel": "Cancel",
+                "create": "Create",
+                "decline": "Keep the record",
+                "delete": "Delete",
+                "expire": "Expire",
+                "submit": "Submit",
+            },
+            "requests_ui_config": {
+                "allowGroupReviewers": True,
+                "enableReviewers": False,
+                "maxReviewers": 15,
+            },
+        }
+
+
+def test_form_config_publish_new_version(app, client, record_ui_resource, fake_manifest):
     with client.get("/requests/configs/publish_new_version") as c:
         assert c.json == {
             "allowedHtmlAttrs": {
@@ -166,6 +318,7 @@ def test_form_config(app, client, record_ui_resource, fake_manifest):
             "custom_fields": {
                 "ui": [
                     {
+                        "displaySection": False,
                         "section": "",
                         "fields": [
                             {
@@ -194,5 +347,10 @@ def test_form_config(app, client, record_ui_resource, fake_manifest):
                 "delete": "Delete",
                 "expire": "Expire",
                 "submit": "Submit",
+            },
+            "requests_ui_config": {
+                "allowGroupReviewers": True,
+                "enableReviewers": False,
+                "maxReviewers": 15,
             },
         }
