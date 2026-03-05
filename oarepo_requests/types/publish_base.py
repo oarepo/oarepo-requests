@@ -76,9 +76,7 @@ class PublishRequestType(NonDuplicableOARepoRecordRequestType):
 
     @classmethod
     @override
-    def is_applicable_to(
-        cls, identity: Identity, topic: Record, *args: Any, **kwargs: Any
-    ) -> bool:
+    def is_applicable_to(cls, identity: Identity, topic: Record, *args: Any, **kwargs: Any) -> bool:
         """Check if the request type is applicable to the topic."""
         if not isinstance(topic, RecordWithDraft):
             raise TypeError(f"Topic type {type(topic)} does not support drafts")
@@ -119,9 +117,7 @@ class PublishRequestType(NonDuplicableOARepoRecordRequestType):
 
         # if files support is enabled for this topic, check if there are any files
         if hasattr(topic, "files"):
-            can_toggle_files = topic_service.check_permission(
-                identity, "manage_files", record=topic
-            )
+            can_toggle_files = topic_service.check_permission(identity, "manage_files", record=topic)
             draft_files = topic.files  # type: ignore[reportAttributeAccessIssue]
             if draft_files.enabled and not draft_files.items():
                 if can_toggle_files:
@@ -134,9 +130,7 @@ class PublishRequestType(NonDuplicableOARepoRecordRequestType):
                 raise ma.ValidationError({"files.enabled": [my_message]})
 
     @classmethod
-    def topic_type(
-        cls, topic: Record
-    ) -> Literal["initial", "new_version", "metadata", "published"]:
+    def topic_type(cls, topic: Record) -> Literal["initial", "new_version", "metadata", "published"]:
         """Return publish status type of the topic."""
         if not isinstance(topic, RecordWithDraft):
             raise TypeError(f"Topic type {type(topic)} does not support drafts")

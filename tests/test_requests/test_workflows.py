@@ -37,12 +37,8 @@ def test_publish_with_workflows(
     requests_model.Draft.index.refresh()
 
     # test record owner can create publish request
-    create_non_owner = receiver_client.post(
-        get_action_url(draft1["expanded"]["request_types"], "publish_draft")
-    )
-    resp_request_create = create_request_on_draft(
-        creator.identity, draft1_id, "publish_draft"
-    )
+    create_non_owner = receiver_client.post(get_action_url(draft1["expanded"]["request_types"], "publish_draft"))
+    resp_request_create = create_request_on_draft(creator.identity, draft1_id, "publish_draft")
     assert create_non_owner.status_code == 403
 
     resp_request_submit = creator_client.post(
@@ -51,27 +47,17 @@ def test_publish_with_workflows(
     assert resp_request_submit.status_code == 200
 
     # test state of the record is changed to published
-    draft_with_submitted_request = record_service.read_draft(
-        creator.identity, draft1_id
-    )._record  # noqa SLF001
+    draft_with_submitted_request = record_service.read_draft(creator.identity, draft1_id)._record  # noqa SLF001
     assert draft_with_submitted_request["state"] == "publishing"
 
-    record_creator = creator_client.get(
-        f"{urls['BASE_URL']}/{draft1_id}/draft?expand=true"
-    ).json
-    record_receiver = receiver_client.get(
-        f"{urls['BASE_URL']}/{draft1_id}/draft?expand=true"
-    ).json
+    record_creator = creator_client.get(f"{urls['BASE_URL']}/{draft1_id}/draft?expand=true").json
+    record_receiver = receiver_client.get(f"{urls['BASE_URL']}/{draft1_id}/draft?expand=true").json
 
     assert "accept" not in record_creator["expanded"]["requests"][0]["links"]["actions"]
-    assert {"accept", "decline"} == record_receiver["expanded"]["requests"][0]["links"][
-        "actions"
-    ].keys()
+    assert {"accept", "decline"} == record_receiver["expanded"]["requests"][0]["links"]["actions"].keys()
 
     accept = receiver_client.post(
-        link2testclient(
-            record_receiver["expanded"]["requests"][0]["links"]["actions"]["accept"]
-        ),
+        link2testclient(record_receiver["expanded"]["requests"][0]["links"]["actions"]["accept"]),
     )
     assert accept.status_code == 200
     record_cls = requests_model.Record
@@ -101,9 +87,7 @@ def test_if_no_new_version_draft(
     requests = record["expanded"]["request_types"]
     assert "new_version" in {r["type_id"] for r in requests}
 
-    resp_request_submit = submit_request_on_record(
-        creator.identity, record_id, "new_version"
-    )
+    resp_request_submit = submit_request_on_record(creator.identity, record_id, "new_version")
 
     request = creator_client.get(
         f"{urls['BASE_URL_REQUESTS']}{resp_request_submit['id']}",
@@ -117,9 +101,7 @@ def test_if_no_new_version_draft(
         r["type_id"] for r in requests
     }  # new version created, requests should not be available again
 
-    resp_request_submit = submit_request_on_record(
-        creator.identity, record2_id, "edit_published_record"
-    )
+    resp_request_submit = submit_request_on_record(creator.identity, record2_id, "edit_published_record")
     request = creator_client.get(
         f"{urls['BASE_URL_REQUESTS']}{resp_request_submit['id']}",
     ).json  # request is autoaccepted
@@ -157,9 +139,7 @@ def test_if_no_edit_draft(
     )
     requests = record.json["expanded"]["request_types"]
     assert "edit_published_record" in {r["type_id"] for r in requests}
-    resp_request_submit = submit_request_on_record(
-        creator.identity, id_, "edit_published_record"
-    )
+    resp_request_submit = submit_request_on_record(creator.identity, id_, "edit_published_record")
     request = creator_client.get(
         f"{urls['BASE_URL_REQUESTS']}{resp_request_submit['id']}",
     ).json  # request is autoaccepted
@@ -177,9 +157,7 @@ def test_if_no_edit_draft(
         f"{urls['BASE_URL']}/{id2_}?expand=true",
     )
     requests = record.json["expanded"]["request_types"]
-    resp_request_submit = submit_request_on_record(
-        creator.identity, id2_, "new_version"
-    )
+    resp_request_submit = submit_request_on_record(creator.identity, id2_, "new_version")
 
     request = creator_client.get(
         f"{urls['BASE_URL_REQUESTS']}{resp_request_submit['id']}",
@@ -213,9 +191,7 @@ def test_workflow_events(
     user1_client = logged_client(user1)
     user2_client = logged_client(user2)
 
-    draft1 = draft_factory(
-        user1.identity, custom_workflow="with_approve_without_generic"
-    )
+    draft1 = draft_factory(user1.identity, custom_workflow="with_approve_without_generic")
     record_id = draft1["id"]
 
     submit_request_on_draft(user1.identity, record_id, "approve_draft")
@@ -240,13 +216,9 @@ def test_workflow_events(
     )
     assert create_event_u2
 
-    record_receiver = user2_client.get(
-        f"{urls['BASE_URL']}/{record_id}/draft?expand=true"
-    ).json
+    record_receiver = user2_client.get(f"{urls['BASE_URL']}/{record_id}/draft?expand=true").json
     accept = user2_client.post(
-        link2testclient(
-            record_receiver["expanded"]["requests"][0]["links"]["actions"]["accept"]
-        ),
+        link2testclient(record_receiver["expanded"]["requests"][0]["links"]["actions"]["accept"]),
     )
     assert accept.status_code == 200
 
@@ -274,9 +246,7 @@ def test_cancel_transition(
     }
     assert record.json["state"] == "publishing"
     creator_client.post(
-        link2testclient(
-            record.json["expanded"]["requests"][0]["links"]["actions"]["cancel"]
-        ),
+        link2testclient(record.json["expanded"]["requests"][0]["links"]["actions"]["cancel"]),
     )
 
     record = creator_client.get(f"{urls['BASE_URL']}/{draft_id}/draft?expand=true")

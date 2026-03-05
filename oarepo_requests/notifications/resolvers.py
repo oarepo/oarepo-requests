@@ -102,9 +102,7 @@ def request_events_resolver() -> ServiceResultResolver:
 
 def user_resolver() -> ServiceResultResolver:
     """Return community role notification resolver."""
-    return ServiceResultResolver(
-        service_id="users", type_key="user", proxy_cls=UserNotificationProxy
-    )
+    return ServiceResultResolver(service_id="users", type_key="user", proxy_cls=UserNotificationProxy)
 
 
 def multiple_entities_resolver() -> MultipleEntitiesNotificationResolver:

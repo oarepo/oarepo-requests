@@ -47,9 +47,7 @@ def test_delete(
         "decline",
     }
     receiver_client.post(
-        link2testclient(
-            record.json["expanded"]["requests"][0]["links"]["actions"]["accept"]
-        ),
+        link2testclient(record.json["expanded"]["requests"][0]["links"]["actions"]["accept"]),
     )
 
     requests_model.Record.index.refresh()
@@ -67,14 +65,8 @@ def test_delete(
         create_additional_data={"payload": {"removal_reason": "test reason"}},
     )
     record = receiver_client.get(f"{urls['BASE_URL']}/{record2_id}?expand=true")
-    receiver_client.post(
-        link2testclient(
-            record.json["expanded"]["requests"][0]["links"]["actions"]["decline"]
-        )
-    )
-    declined_request = creator_client.get(
-        f"{urls['BASE_URL_REQUESTS']}{resp_request_submit['id']}"
-    )
+    receiver_client.post(link2testclient(record.json["expanded"]["requests"][0]["links"]["actions"]["decline"]))
+    declined_request = creator_client.get(f"{urls['BASE_URL_REQUESTS']}{resp_request_submit['id']}")
     assert declined_request.json["status"] == "declined"
 
     resp_request_submit = submit_request_on_record(
@@ -84,15 +76,9 @@ def test_delete(
         create_additional_data={"payload": {"removal_reason": "test reason"}},
     )
     record = creator_client.get(f"{urls['BASE_URL']}/{record3_id}?expand=true")
-    assert record.json["expanded"]["requests"][0]["links"]["actions"].keys() == {
-        "cancel"
-    }
+    assert record.json["expanded"]["requests"][0]["links"]["actions"].keys() == {"cancel"}
     creator_client.post(
-        link2testclient(
-            record.json["expanded"]["requests"][0]["links"]["actions"]["cancel"]
-        ),
+        link2testclient(record.json["expanded"]["requests"][0]["links"]["actions"]["cancel"]),
     )
-    canceled_request = creator_client.get(
-        f"{urls['BASE_URL_REQUESTS']}{resp_request_submit['id']}"
-    )
+    canceled_request = creator_client.get(f"{urls['BASE_URL_REQUESTS']}{resp_request_submit['id']}")
     assert canceled_request.json["status"] == "cancelled"

@@ -34,16 +34,12 @@ def upgrade() -> None:
     op.create_table(
         "record_snapshots",
         sa.Column("id", sa.Integer(), nullable=False),
-        sa.Column(
-            "record_uuid", sqlalchemy_utils.types.uuid.UUIDType(), nullable=False
-        ),
+        sa.Column("record_uuid", sqlalchemy_utils.types.uuid.UUIDType(), nullable=False),
         sa.Column(
             "json",
             sa.JSON()
             .with_variant(sqlalchemy_utils.types.json.JSONType(), "mysql")
-            .with_variant(
-                postgresql.JSONB(none_as_null=True, astext_type=sa.Text()), "postgresql"
-            )
+            .with_variant(postgresql.JSONB(none_as_null=True, astext_type=sa.Text()), "postgresql")
             .with_variant(sqlalchemy_utils.types.json.JSONType(), "sqlite"),
             nullable=False,
         ),

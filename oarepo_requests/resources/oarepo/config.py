@@ -65,8 +65,6 @@ class OARepoRequestsResourceConfig(RequestsResourceConfig, ConfiguratorMixin):
     ]:
         """Get error handlers."""
         error_handlers = dict(super().error_handlers)
-        for x in importlib_metadata.entry_points(
-            group="oarepo_requests.error_handlers"
-        ):
+        for x in importlib_metadata.entry_points(group="oarepo_requests.error_handlers"):
             error_handlers.update(x.load())
         return MappingProxyType(error_handlers)  # type: ignore[reportReturnType]

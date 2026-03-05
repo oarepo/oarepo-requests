@@ -57,9 +57,7 @@ class RequestActionNotificationBuilder(NotificationBuilder):
             type=cls.type,
             context={
                 "request": EntityResolverRegistry.reference_entity(request),
-                "backend_ids": [
-                    backend.backend_id for backend in cls.recipient_backends
-                ],
+                "backend_ids": [backend.backend_id for backend in cls.recipient_backends],
             },
         )
 
@@ -70,9 +68,7 @@ class RequestActionNotificationBuilder(NotificationBuilder):
         ReferenceSavingEntityResolve(key="request.receiver"),
     )
 
-    recipient_backends: tuple[NotificationBackendWithClassId, ...] = (
-        UserEmailBackend(),
-    )
+    recipient_backends: tuple[NotificationBackendWithClassId, ...] = (UserEmailBackend(),)
 
     recipient_filters: tuple[RecipientFilter, ...] = (
         UsersWithNoMailRecipientFilter(),

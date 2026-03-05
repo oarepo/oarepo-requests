@@ -51,13 +51,7 @@ class DeletePublishedRecordSubmitAction(OARepoSubmitAction):
         *args: Any,
         **kwargs: Any,
     ) -> None:
-        uow.register(
-            NotificationOp(
-                DeletePublishedRecordRequestSubmitNotificationBuilder.build(
-                    request=self.request
-                )
-            )
-        )
+        uow.register(NotificationOp(DeletePublishedRecordRequestSubmitNotificationBuilder.build(request=self.request)))
 
 
 class DeletePublishedRecordAcceptAction(OARepoAcceptAction):
@@ -82,18 +76,13 @@ class DeletePublishedRecordAcceptAction(OARepoAcceptAction):
             from flask import current_app
 
             oarepo = current_app.extensions["oarepo-runtime"]
-            resource_config = oarepo.models_by_record_class[
-                topic_service.record_cls
-            ].resource_config
+            resource_config = oarepo.models_by_record_class[topic_service.record_cls].resource_config
 
             citation_text = "Citation unavailable."
-            if (
-                resource_config
-                and "text/x-iso-690+plain" in resource_config.response_handlers
-            ):
-                citation_text = resource_config.response_handlers[
-                    "text/x-iso-690+plain"
-                ].serializer.serialize_object(topic)
+            if resource_config and "text/x-iso-690+plain" in resource_config.response_handlers:
+                citation_text = resource_config.response_handlers["text/x-iso-690+plain"].serializer.serialize_object(
+                    topic
+                )
 
             data = {
                 "removal_reason": {"id": self.request["payload"]["removal_reason"]},
@@ -101,20 +90,12 @@ class DeletePublishedRecordAcceptAction(OARepoAcceptAction):
                 "note": self.request["payload"].get("note", ""),
                 "is_visible": True,
             }
-            self.topic = record_from_result(
-                topic_service.delete_record(identity, topic["id"], data)
-            )
+            self.topic = record_from_result(topic_service.delete_record(identity, topic["id"], data))
             db.session.commit()
         else:
             topic_service.delete(identity, topic["id"], *args, uow=uow, **kwargs)
 
-        uow.register(
-            NotificationOp(
-                DeletePublishedRecordRequestAcceptNotificationBuilder.build(
-                    request=self.request
-                )
-            )
-        )
+        uow.register(NotificationOp(DeletePublishedRecordRequestAcceptNotificationBuilder.build(request=self.request)))
         # TODO: cascade cancel?
 
 
@@ -131,10 +112,4 @@ class DeletePublishedRecordDeclineAction(OARepoDeclineAction):
         *args: Any,
         **kwargs: Any,
     ) -> None:
-        uow.register(
-            NotificationOp(
-                DeletePublishedRecordRequestDeclineNotificationBuilder.build(
-                    request=self.request
-                )
-            )
-        )
+        uow.register(NotificationOp(DeletePublishedRecordRequestDeclineNotificationBuilder.build(request=self.request)))

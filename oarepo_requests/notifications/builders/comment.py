@@ -34,9 +34,7 @@ if TYPE_CHECKING:
     from invenio_notifications.services.filters import RecipientFilter
 
 
-class CommentRequestEventCreateNotificationBuilder(
-    InvenioCommentRequestEventCreateNotificationBuilder
-):
+class CommentRequestEventCreateNotificationBuilder(InvenioCommentRequestEventCreateNotificationBuilder):
     """Notification builder for comment event."""
 
     @classproperty
@@ -45,11 +43,7 @@ class CommentRequestEventCreateNotificationBuilder(
         invenio = super().context
         for idx, r in enumerate(list(invenio)):
             if isinstance(r, EntityResolve):
-                replacement_cls = (
-                    RequestEntityResolve
-                    if r.key == "request"
-                    else ReferenceSavingEntityResolve
-                )
+                replacement_cls = RequestEntityResolve if r.key == "request" else ReferenceSavingEntityResolve
                 invenio[idx] = replacement_cls(key=r.key)
         return *invenio, ReferenceSavingEntityResolve(key="request.topic")
 

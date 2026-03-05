@@ -34,6 +34,4 @@ class EditTopicAcceptAction(OARepoAcceptAction):
         **kwargs: Any,
     ) -> None:
         topic_service = get_draft_record_service(self.topic)
-        self.topic = record_from_result(
-            topic_service.edit(identity, self.topic["id"], uow=uow)
-        )
+        self.topic = record_from_result(topic_service.edit(identity, self.topic["id"], uow=uow))

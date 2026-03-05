@@ -14,9 +14,7 @@ from ..generators import EntityRecipientGenerator, ReferenceSavingEntityResolve
 from .base import RequestActionNotificationBuilder
 
 
-class DeletePublishedRecordRequestSubmitNotificationBuilder(
-    RequestActionNotificationBuilder
-):
+class DeletePublishedRecordRequestSubmitNotificationBuilder(RequestActionNotificationBuilder):
     """Notification builder for delete published record request submit event."""
 
     type = "delete-published-record-request-event.submit"
@@ -24,9 +22,7 @@ class DeletePublishedRecordRequestSubmitNotificationBuilder(
     recipients = (EntityRecipientGenerator(key="request.receiver"),)  # email only
 
 
-class DeletePublishedRecordRequestAcceptNotificationBuilder(
-    RequestActionNotificationBuilder
-):
+class DeletePublishedRecordRequestAcceptNotificationBuilder(RequestActionNotificationBuilder):
     """Notification builder for delete published record request accept event."""
 
     type = "delete-published-record-request-event.accept"
@@ -40,9 +36,7 @@ class DeletePublishedRecordRequestAcceptNotificationBuilder(
     )
 
 
-class DeletePublishedRecordRequestDeclineNotificationBuilder(
-    RequestActionNotificationBuilder
-):
+class DeletePublishedRecordRequestDeclineNotificationBuilder(RequestActionNotificationBuilder):
     """Notification builder for delete published record request decline event."""
 
     type = "delete-published-record-request-event.decline"

@@ -85,14 +85,9 @@ class OARepoGenericActionMixin(RequestAction):
     @cached_property
     def components(self) -> list[RequestActionComponent]:
         """Return a list of components for this action."""
-        return [
-            component_cls()
-            for component_cls in current_oarepo_requests.action_components()
-        ]
+        return [component_cls() for component_cls in current_oarepo_requests.action_components()]
 
-    def execute(
-        self, identity: Identity, uow: UnitOfWork, *args: Any, **kwargs: Any
-    ) -> None:
+    def execute(self, identity: Identity, uow: UnitOfWork, *args: Any, **kwargs: Any) -> None:
         """Execute the action."""
         was_request_active = request_active in identity.provides
         if not was_request_active:
@@ -102,9 +97,7 @@ class OARepoGenericActionMixin(RequestAction):
             super().execute(identity, uow, *args, **kwargs)
             for component in self.components:
                 if hasattr(component, self.type_id):
-                    getattr(component, self.type_id)(
-                        identity, self, uow, *args, **kwargs
-                    )
+                    getattr(component, self.type_id)(identity, self, uow, *args, **kwargs)
         finally:
             # in case we are not running the actions in isolated state
             if not was_request_active:

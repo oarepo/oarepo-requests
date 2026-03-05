@@ -62,22 +62,14 @@ def test_publish_notifications(
     with mail.record_messages() as outbox:
         # Validate that email was sent
         receiver_client.post(
-            link2testclient(
-                record.json["expanded"]["requests"][0]["links"]["actions"]["accept"]
-            ),
+            link2testclient(record.json["expanded"]["requests"][0]["links"]["actions"]["accept"]),
         )
         # check notification is build on submit
         assert len(outbox) == 1
         sent_mail = outbox[0]
         assert "Record 'blabla' has been published" in sent_mail.subject
-        assert (
-            'Your record "blabla" has been published. You can see the record at'
-            in sent_mail.body
-        )
-        assert (
-            'Your record "blabla" has been published. You can see the record at'
-            in sent_mail.html
-        )
+        assert 'Your record "blabla" has been published. You can see the record at' in sent_mail.body
+        assert 'Your record "blabla" has been published. You can see the record at' in sent_mail.html
 
     draft1 = draft_factory(creator.identity)
     submit_request_on_draft(creator.identity, draft1["id"], "publish_draft")
@@ -86,17 +78,12 @@ def test_publish_notifications(
         # Validate that email was sent
         request_html_link = record.json["expanded"]["requests"][0]["links"]["self_html"]
         receiver_client.post(
-            link2testclient(
-                record.json["expanded"]["requests"][0]["links"]["actions"]["decline"]
-            ),
+            link2testclient(record.json["expanded"]["requests"][0]["links"]["actions"]["decline"]),
         )
         # check notification is build on submit
         assert len(outbox) == 1
         sent_mail = outbox[0]
-        assert (
-            "Request for publishing of record 'blabla' was declined"
-            in sent_mail.subject
-        )
+        assert "Request for publishing of record 'blabla' was declined" in sent_mail.subject
         assert request_html_link in sent_mail.html
         assert request_html_link in sent_mail.body
 
@@ -139,9 +126,7 @@ def test_delete_published_notifications(
         # Validate that email was sent
         request_html_link = record.json["expanded"]["requests"][0]["links"]["self_html"]
         receiver_client.post(
-            link2testclient(
-                record.json["expanded"]["requests"][0]["links"]["actions"]["accept"]
-            ),
+            link2testclient(record.json["expanded"]["requests"][0]["links"]["actions"]["accept"]),
         )
         # check notification is build on submit
         assert len(outbox) == 1
@@ -163,17 +148,13 @@ def test_delete_published_notifications(
         # Validate that email was sent
         request_html_link = record.json["expanded"]["requests"][0]["links"]["self_html"]
         receiver_client.post(
-            link2testclient(
-                record.json["expanded"]["requests"][0]["links"]["actions"]["decline"]
-            ),
+            link2testclient(record.json["expanded"]["requests"][0]["links"]["actions"]["decline"]),
         )
         # check notification is build on submit
         assert len(outbox) == 1
         sent_mail = outbox[0]
 
-        assert (
-            "Request for deletion of record 'blabla' was declined" in sent_mail.subject
-        )
+        assert "Request for deletion of record 'blabla' was declined" in sent_mail.subject
         assert request_html_link in sent_mail.html
         assert request_html_link in sent_mail.body
 
@@ -239,11 +220,7 @@ def test_group_multiple_recipients(
         if request_type.type_id == "publish_draft":
             return MultipleEntitiesProxy(
                 MultipleEntitiesResolver(),
-                {
-                    "multiple": MultipleEntitiesEntity.create_id(
-                        [{"user": users[2].id}, {"group": "it-dep"}]
-                    )
-                },
+                {"multiple": MultipleEntitiesEntity.create_id([{"user": users[2].id}, {"group": "it-dep"}])},
             ).resolve()
         return config_restore(record, request_type, **kwargs)
 
@@ -300,22 +277,14 @@ def test_locale(
     with mail.record_messages() as outbox:
         # Validate that email was sent
         receiver_client.post(
-            link2testclient(
-                record.json["expanded"]["requests"][0]["links"]["actions"]["accept"]
-            ),
+            link2testclient(record.json["expanded"]["requests"][0]["links"]["actions"]["accept"]),
         )
         # check notification is build on submit
         assert len(outbox) == 1
         sent_mail = outbox[0]
         assert "Record 'blabla' has been published" in sent_mail.subject
-        assert (
-            'Your record "blabla" has been published. You can see the record at'
-            in sent_mail.body
-        )
-        assert (
-            'Your record "blabla" has been published. You can see the record at'
-            in sent_mail.html
-        )
+        assert 'Your record "blabla" has been published. You can see the record at' in sent_mail.body
+        assert 'Your record "blabla" has been published. You can see the record at' in sent_mail.html
 
 
 def test_locale_multiple_recipients(
@@ -345,17 +314,10 @@ def test_locale_multiple_recipients(
         )
         # check notification is build on submit
         assert len(outbox) == 2
-        sent_mail_cz = [
-            mail for mail in outbox if mail.recipients[0] == cs_receiver.user.email
-        ]
-        sent_mail_en = [
-            mail for mail in outbox if mail.recipients[0] == users[0].user.email
-        ]
+        sent_mail_cz = [mail for mail in outbox if mail.recipients[0] == cs_receiver.user.email]
+        sent_mail_en = [mail for mail in outbox if mail.recipients[0] == users[0].user.email]
         assert len(sent_mail_cz) == len(sent_mail_en) == 1
-        assert (
-            sent_mail_cz[0].subject
-            == "❗️ Žádost o smazání vypublikovaného záznamu blabla"
-        )
+        assert sent_mail_cz[0].subject == "❗️ Žádost o smazání vypublikovaného záznamu blabla"
         assert sent_mail_en[0].subject == "❗️ Request to delete published record blabla"
 
 
@@ -424,9 +386,7 @@ class LazyEntityResolve(EntityResolve):
         return notification
 
 
-class LazyPublishDraftRequestSubmitNotificationBuilder(
-    PublishDraftRequestSubmitNotificationBuilder
-):
+class LazyPublishDraftRequestSubmitNotificationBuilder(PublishDraftRequestSubmitNotificationBuilder):
     """Publish draft request submit notification builder."""
 
     context = (
@@ -439,22 +399,16 @@ class LazyPublishDraftRequestSubmitNotificationBuilder(
     recipients = (LazyUserRecipient(key="request.receiver"),)
 
 
-def test_lazy_string_parsing(
-    app, users, logged_client, draft_factory, create_request_on_draft
-):
+def test_lazy_string_parsing(app, users, logged_client, draft_factory, create_request_on_draft):
     draft = draft_factory(users[0].identity)
     request = create_request_on_draft(users[0].identity, draft["id"], "publish_draft")
 
     manager = NotificationManager(
         {EmailNotificationBackend.id: EmailNotificationBackend()},
-        {
-            LazyPublishDraftRequestSubmitNotificationBuilder.type: LazyPublishDraftRequestSubmitNotificationBuilder
-        },
+        {LazyPublishDraftRequestSubmitNotificationBuilder.type: LazyPublishDraftRequestSubmitNotificationBuilder},
     )
 
-    notification = LazyPublishDraftRequestSubmitNotificationBuilder.build(
-        request=request._obj
-    )  # noqa SLF001
+    notification = LazyPublishDraftRequestSubmitNotificationBuilder.build(request=request._obj)  # noqa SLF001
     mail = app.extensions.get("mail")
     with mail.record_messages() as outbox:
         manager.handle_broadcast(notification)

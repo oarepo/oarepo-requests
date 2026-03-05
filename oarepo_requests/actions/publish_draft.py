@@ -79,11 +79,7 @@ class PublishDraftSubmitAction(PublishMixin, OARepoSubmitAction):
                     if version == self.request["payload"]["version"]:
                         raise VersionAlreadyExists
             self.topic.metadata["version"] = self.request["payload"]["version"]
-        uow.register(
-            NotificationOp(
-                PublishDraftRequestSubmitNotificationBuilder.build(request=self.request)
-            )
-        )
+        uow.register(NotificationOp(PublishDraftRequestSubmitNotificationBuilder.build(request=self.request)))
 
 
 class PublishDraftAcceptAction(PublishMixin, OARepoAcceptAction):
@@ -121,14 +117,8 @@ class PublishDraftAcceptAction(PublishMixin, OARepoAcceptAction):
                 # to opensearch index. That's why we need to get the record from DB and re-check.
                 raise UnresolvedRequestsError(action=str(self.name))
         id_ = self.topic["id"]
-        self.topic = record_from_result(
-            topic_service.publish(identity, id_, *args, uow=uow, expand=False, **kwargs)
-        )
-        uow.register(
-            NotificationOp(
-                PublishDraftRequestAcceptNotificationBuilder.build(request=self.request)
-            )
-        )
+        self.topic = record_from_result(topic_service.publish(identity, id_, *args, uow=uow, expand=False, **kwargs))
+        uow.register(NotificationOp(PublishDraftRequestAcceptNotificationBuilder.build(request=self.request)))
 
 
 class PublishDraftDeclineAction(OARepoDeclineAction):
@@ -145,10 +135,4 @@ class PublishDraftDeclineAction(OARepoDeclineAction):
         **kwargs: Any,
     ) -> None:
         """Publish the draft."""
-        uow.register(
-            NotificationOp(
-                PublishDraftRequestDeclineNotificationBuilder.build(
-                    request=self.request
-                )
-            )
-        )
+        uow.register(NotificationOp(PublishDraftRequestDeclineNotificationBuilder.build(request=self.request)))
