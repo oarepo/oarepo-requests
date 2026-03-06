@@ -65,11 +65,6 @@ oarepo_requests = "oarepo_requests.ext:finalize_app"
 
 [project.entry-points."invenio_base.api_finalize_app"]
 oarepo_requests = "oarepo_requests.ext:api_finalize_app"
-
-[project.entry-points."oarepo_requests.identity_to_entity_references"]
-user = "oarepo_requests.identity_to_entity_references:user_mappings"
-group = "oarepo_requests.identity_to_entity_references:group_mappings"
-
 # [project.entry-points."invenio_db.models"]
 # record_snapshots = "oarepo_requests.models"
 
