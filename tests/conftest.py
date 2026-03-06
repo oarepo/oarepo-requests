@@ -630,6 +630,12 @@ WORKFLOWS = [
         permission_policy_cls=type("EditAcceptCrashPermissions", (TestWorkflowPermissions,), {"can_edit": []}),
         request_policy_cls=PublishAutoAcceptRequests,
     ),
+    Workflow(
+        code="individual",
+        label=_("Default workflow"),
+        permission_policy_cls=TestWorkflowPermissions,
+        request_policy_cls=DefaultRequests,
+    ),
 ]
 
 
