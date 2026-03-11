@@ -328,7 +328,6 @@ def test_comment_notifications(
     draft_factory,
     submit_request_on_draft,
     add_user_in_role,
-    role,
     link2testclient,
     urls,
 ):

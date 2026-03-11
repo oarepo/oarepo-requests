@@ -42,12 +42,12 @@ from oarepo_workflows import (
 from oarepo_workflows.base import Workflow
 from oarepo_workflows.model.presets import workflows_preset
 from oarepo_workflows.requests.events import WorkflowEvent
-from pytest_oarepo.requests.classes import (
+from pytest_oarepo.permission_generators import (
     CSLocaleUserGenerator,
     SystemUserGenerator,
-    TestEventType,
     UserGenerator,
 )
+from pytest_oarepo.requests.classes import TestEventType
 
 from oarepo_requests.actions.generic import (
     OARepoAcceptAction,
@@ -77,6 +77,7 @@ pytest_plugins = [
     "pytest_oarepo.records",
     "pytest_oarepo.fixtures",
     "pytest_oarepo.users",
+    "pytest_oarepo.roles",
     "pytest_oarepo.files",
 ]
 
