@@ -15,6 +15,7 @@ from typing import Any, cast, override
 
 from invenio_access.permissions import system_user_id
 from invenio_notifications.registry import EntityResolverRegistry
+from invenio_rdm_records.requests.entity_resolvers import RDMRecordServiceResultResolver
 from invenio_records_resources.references import EntityResolver
 from invenio_records_resources.references.entity_resolvers import (
     EntityProxy,
@@ -110,7 +111,13 @@ def multiple_entities_resolver() -> MultipleEntitiesNotificationResolver:
     return MultipleEntitiesNotificationResolver()
 
 
+def record_resolver() -> RDMRecordServiceResultResolver:
+    """Return community role notification resolver."""
+    return RDMRecordServiceResultResolver()
+
+
 requests_resolver.type_key = "request"  # type: ignore[attr-defined]
 request_events_resolver.type_key = "request_event"  # type: ignore[attr-defined]
 user_resolver.type_key = "user"  # type: ignore[attr-defined]
 multiple_entities_resolver.type_key = MultipleEntitiesNotificationResolver.type_id  # type: ignore[attr-defined]
+record_resolver.type_key = "record"  # type: ignore[attr-defined]

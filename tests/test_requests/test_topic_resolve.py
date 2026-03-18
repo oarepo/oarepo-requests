@@ -43,14 +43,15 @@ def test_resolve_topic(
         query_string={"expand": "true"},
     )
     assert resp.status_code == 200
-    assert resp.json["expanded"]["topic"] == {
-        "id": record1_id,
-        "links": {
+    assert resp.json["expanded"]["topic"]["id"] == record1_id
+    assert (
+        resp.json["expanded"]["topic"]["links"].items()
+        >= {
             "latest_html": f"https://127.0.0.1:5000/api/test-requests/records/{record1_id}/latest",
             "self": f"https://127.0.0.1:5000/api/requests-test/{record1_id}",
             "self_html": f"https://127.0.0.1:5000/api/test-requests/records/{record1_id}",
-        },
-    }
+        }.items()
+    )
 
     receiver_read = receiver_client.get(f"{urls['BASE_URL_REQUESTS']}{resp_request_submit['id']}")
     receiver_client.post(link2testclient(receiver_read.json["links"]["actions"]["accept"]))
@@ -60,19 +61,20 @@ def test_resolve_topic(
         link2testclient(resp_request_submit["links"]["self"]),
     )
     assert resp.status_code == 200
-    assert resp.json["topic"] == {"requests_test": record1_id}
+    assert resp.json["topic"] == {"record": record1_id}
 
     resp_expanded = creator_client.get(
         link2testclient(resp_request_submit["links"]["self"]),
         query_string={"expand": "true"},
     )
     assert resp_expanded.status_code == 200
-    assert resp_expanded.json["topic"] == {"requests_test": record1_id}
-    assert resp_expanded.json["expanded"]["topic"] == {
-        "id": record1_id,
-        "links": {
+    assert resp_expanded.json["topic"] == {"record": record1_id}
+    assert resp_expanded.json["expanded"]["topic"]["id"] == record1_id
+    assert (
+        resp_expanded.json["expanded"]["topic"]["links"].items()
+        >= {
             "latest_html": f"https://127.0.0.1:5000/api/test-requests/records/{record1_id}/latest",
             "self": f"https://127.0.0.1:5000/api/requests-test/{record1_id}",
             "self_html": f"https://127.0.0.1:5000/api/test-requests/records/{record1_id}",
-        },
-    }
+        }.items()
+    )

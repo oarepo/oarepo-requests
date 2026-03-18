@@ -143,7 +143,7 @@ def test_redirect_url(
     original_request = creator_client.get(
         f"{urls['BASE_URL_REQUESTS']}{original_request_id}",
     ).json
-    assert original_request["topic"] == {"requests_test": record1_id}
+    assert original_request["topic"] == {"record": record1_id}
 
 
 def test_publish(
@@ -171,6 +171,7 @@ def test_publish(
         expand=True,
     )
     # publish the new draft
+    # TODO: fix reference
     new_id = resp_request.data["expanded"]["payload"]["created_topic"]["id"]
     creator_client.put(f"{urls['BASE_URL']}/{new_id}/draft", json={"metadata": {"title": "edited"}})
     publish_request = submit_request_on_draft(creator.identity, new_id, "publish_new_version")
