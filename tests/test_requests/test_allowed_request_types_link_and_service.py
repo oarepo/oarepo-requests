@@ -25,9 +25,7 @@ def test_allowed_request_types_on_draft_service(
     allowed_request_types = applicable_requests(identity, draft)
     assert sorted(allowed_request_types.to_dict()["hits"]["hits"], key=lambda x: x["type_id"]) == [
         {
-            "links": {
-                "actions": {"create": f"https://127.0.0.1:5000/api/requests/requests_test:{draft1_id}/publish_draft"}
-            },
+            "links": {"actions": {"create": f"https://127.0.0.1:5000/api/requests/record:{draft1_id}/publish_draft"}},
             "type_id": "publish_draft",
         },
     ]
@@ -48,13 +46,11 @@ def test_allowed_request_types_on_draft_resource(
     draft1_id = draft1["id"]
 
     applicable_requests_link = draft1["links"]["applicable-requests"]
-    assert applicable_requests_link == f"https://127.0.0.1:5000/api/requests/applicable?topic=requests_test:{draft1_id}"
+    assert applicable_requests_link == f"https://127.0.0.1:5000/api/requests/applicable?topic=record:{draft1_id}"
     allowed_request_types = creator_client.get(link2testclient(applicable_requests_link))
     assert sorted(allowed_request_types.json["hits"]["hits"], key=lambda x: x["type_id"]) == [
         {
-            "links": {
-                "actions": {"create": f"https://127.0.0.1:5000/api/requests/requests_test:{draft1_id}/publish_draft"}
-            },
+            "links": {"actions": {"create": f"https://127.0.0.1:5000/api/requests/record:{draft1_id}/publish_draft"}},
             "type_id": "publish_draft",
         },
     ]
@@ -75,17 +71,14 @@ def test_allowed_request_types_on_published_resource(
     published1_id = published1["id"]
 
     applicable_requests_link = published1["links"]["applicable-requests"]
-    assert (
-        applicable_requests_link
-        == f"https://127.0.0.1:5000/api/requests/applicable?topic=requests_test:{published1_id}"
-    )
+    assert applicable_requests_link == f"https://127.0.0.1:5000/api/requests/applicable?topic=record:{published1_id}"
     allowed_request_types = creator_client.get(link2testclient(applicable_requests_link))
     assert allowed_request_types.status_code == 200
     assert sorted(allowed_request_types.json["hits"]["hits"], key=lambda x: x["type_id"]) == [
         {
             "links": {
                 "actions": {
-                    "create": f"https://127.0.0.1:5000/api/requests/requests_test:{published1_id}/delete_published_record"
+                    "create": f"https://127.0.0.1:5000/api/requests/record:{published1_id}/delete_published_record"
                 }
             },
             "type_id": "delete_published_record",
@@ -93,15 +86,13 @@ def test_allowed_request_types_on_published_resource(
         {
             "links": {
                 "actions": {
-                    "create": f"https://127.0.0.1:5000/api/requests/requests_test:{published1_id}/edit_published_record"
+                    "create": f"https://127.0.0.1:5000/api/requests/record:{published1_id}/edit_published_record"
                 }
             },
             "type_id": "edit_published_record",
         },
         {
-            "links": {
-                "actions": {"create": f"https://127.0.0.1:5000/api/requests/requests_test:{published1_id}/new_version"}
-            },
+            "links": {"actions": {"create": f"https://127.0.0.1:5000/api/requests/record:{published1_id}/new_version"}},
             "type_id": "new_version",
         },
     ]
