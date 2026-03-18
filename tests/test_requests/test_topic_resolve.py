@@ -61,3 +61,13 @@ def test_resolve_topic(
     assert resp_expanded.status_code == 200
     assert resp_expanded.json["topic"] == {"record": record1_id}
     assert resp_expanded.json["expanded"]["topic"]["id"] == record1_id
+    assert resp_expanded.json["topic"] == {"record": record1_id}
+    assert resp_expanded.json["expanded"]["topic"]["id"] == record1_id
+    assert (
+        resp_expanded.json["expanded"]["topic"]["links"].items()
+        >= {
+            "latest_html": f"https://127.0.0.1:5000/api/test-requests/records/{record1_id}/latest",
+            "self": f"https://127.0.0.1:5000/api/requests-test/{record1_id}",
+            "self_html": f"https://127.0.0.1:5000/api/test-requests/records/{record1_id}",
+        }.items()
+    )
