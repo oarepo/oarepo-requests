@@ -458,7 +458,7 @@ class RequestsWithApprove(WorkflowRequestPolicy):
     )
     generic = WorkflowRequest(
         requesters=[IfInState("draft", [AutoRequest()])],
-        recipients=[UserGenerator("user1@example.org")],
+        recipients=[],
     )
     approve_draft = WorkflowRequest(
         requesters=[IfInState("draft", [RecordOwners()])],

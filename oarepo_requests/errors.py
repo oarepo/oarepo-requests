@@ -14,12 +14,13 @@ from typing import TYPE_CHECKING, Any, cast, override
 
 from flask import g
 from flask_resources import (
-    HTTPJSONException,
+    HTTPJSONException, create_error_handler,
 )
 from flask_resources.serializers.json import JSONEncoder
 from invenio_i18n import gettext
 from invenio_i18n import lazy_gettext as _
 from invenio_requests.errors import CannotExecuteActionError
+from oarepo_workflows.errors import RequestTypeNotInWorkflowError
 
 if TYPE_CHECKING:
     from invenio_records_resources.records import Record
@@ -144,7 +145,6 @@ class ReceiverNonReferencableError(Exception):
             message += f"\n{', '.join(self.kwargs)}"
         return message  # type: ignore[no-any-return]
 
-
 class VersionAlreadyExists(CustomHTTPJSONException):
     """Exception raised when a version tag already exists."""
 
@@ -166,3 +166,25 @@ class VersionAlreadyExists(CustomHTTPJSONException):
             description=description,
             request_payload_errors=request_payload_errors,
         )
+
+# TODO: some errors redefine description, some __str__, some get_body.. consider uniting
+oarepo_requests_error_handlers = {
+    UnknownRequestTypeError: create_error_handler(
+        lambda e: HTTPJSONException(
+            code=400,
+            description=e.description,
+        )
+    ),
+    ReceiverNonReferencableError: create_error_handler(
+        lambda e: HTTPJSONException(
+            code=400,
+            description=e.description,
+        )
+    ),
+    RequestTypeNotInWorkflowError: create_error_handler(
+        lambda e: HTTPJSONException(
+            code=400,
+            description=e.description,
+        )
+    )
+}

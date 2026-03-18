@@ -97,6 +97,7 @@ class OARepoRequestsResource(RequestsResource, ErrorHandlersMixin):
             request_type=request_type_id,
             topic=topic,
             expand=resource_requestctx.args.get("expand", False),
+            receiver=resource_requestctx.data.get("receiver", None) if resource_requestctx.data is not None else None,
         )
 
         return items.to_dict(), 201
