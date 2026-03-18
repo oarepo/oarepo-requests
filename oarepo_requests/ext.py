@@ -18,6 +18,9 @@ from invenio_requests.proxies import (
     current_event_type_registry,
     current_request_type_registry,
 )
+from invenio_requests.records import Request
+
+from oarepo_requests.records.dumpers import RecordReferenceDumperExt
 
 if TYPE_CHECKING:
     from flask import Flask
@@ -164,3 +167,6 @@ def finalize_app(app: Flask) -> None:
 
     invenio_notifications = app.extensions["invenio-notifications"]
     invenio_notifications.init_manager(app)
+
+    if not any(e for e in Request.dumper._extensions if isinstance(e, RecordReferenceDumperExt)):  # noqa SLF001 # type: ignore[reportAttributeAccessIssue]
+        Request.dumper._extensions.append(RecordReferenceDumperExt())  # noqa SLF001 # type: ignore[reportAttributeAccessIssue]

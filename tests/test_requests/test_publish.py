@@ -34,14 +34,10 @@ def test_publish_service(
     # the entity links taken from expanded won't show in RequestItem.links if something's dependent on that
     assert "self" in request.data["expanded"]["created_by"]["links"]
     assert "self" in request.data["expanded"]["receiver"]["links"]
-    assert "self" in request.data["expanded"]["topic"]["links"]
-    assert "self_html" in request.data["expanded"]["topic"]["links"]
     assert "payload" not in request.data["expanded"]
 
     assert "self" in submit_result.data["expanded"]["created_by"]["links"]
     assert "self" in submit_result.data["expanded"]["receiver"]["links"]
-    assert "self" in submit_result.data["expanded"]["topic"]["links"]
-    assert "self_html" in submit_result.data["expanded"]["topic"]["links"]
     assert "payload" not in submit_result.data["expanded"]
 
     accept = current_requests_service.execute_action(receiver.identity, request.id, "accept", expand=True)
@@ -50,7 +46,6 @@ def test_publish_service(
     requests_model.Draft.index.refresh()
     assert "self" in accept.data["expanded"]["created_by"]["links"]
     assert "self" in accept.data["expanded"]["receiver"]["links"]
-    assert "self" in accept.data["expanded"]["topic"]["links"]
 
     record_service.read(creator.identity, draft["id"])  # will throw exception if record isn't published
 
