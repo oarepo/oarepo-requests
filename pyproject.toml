@@ -84,7 +84,7 @@ user = "oarepo_requests.notifications.resolvers:user_resolver"
 multiple = "oarepo_requests.notifications.resolvers:multiple_entities_resolver"
 
 [project.entry-points."invenio_requests.entity_resolvers"]
-records = "oarepo_requests.resolvers.resolver:RecordResolver"
+records = "invenio_rdm_records.requests.entity_resolvers:RDMRecordResolver"
 
 [[tool.mypy.overrides]]
 module = ["untyped_package.*"]
