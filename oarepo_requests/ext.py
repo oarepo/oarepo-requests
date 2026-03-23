@@ -168,5 +168,5 @@ def finalize_app(app: Flask) -> None:
     invenio_notifications = app.extensions["invenio-notifications"]
     invenio_notifications.init_manager(app)
 
-    if not [e for e in Request.dumper._extensions if isinstance(e, RecordReferenceDumperExt)]:  # noqa SLF001 # type: ignore[reportAttributeAccessIssue]
+    if not any(e for e in Request.dumper._extensions if isinstance(e, RecordReferenceDumperExt)):  # noqa SLF001 # type: ignore[reportAttributeAccessIssue]
         Request.dumper._extensions.append(RecordReferenceDumperExt())  # noqa SLF001 # type: ignore[reportAttributeAccessIssue]
