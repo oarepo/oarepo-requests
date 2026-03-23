@@ -83,7 +83,7 @@ def test_multiple_recipients(
                 "is_current_user": True,
                 "links": {
                     "avatar": f"https://127.0.0.1:5000/api/users/{recipient1_id}/avatar.svg",
-                    "records_html": f"https://127.0.0.1:5000/search/records?q=parent.access.owned_by.user:{recipient1_id}",
+                    "records_html": f"https://127.0.0.1:5000/search?q=parent.access.owned_by.user:{recipient1_id}",
                     "self": f"https://127.0.0.1:5000/api/users/{recipient1_id}",
                 },
                 "profile": {"affiliations": "CERN", "full_name": ""},
@@ -99,7 +99,7 @@ def test_multiple_recipients(
                 "is_current_user": False,
                 "links": {
                     "avatar": f"https://127.0.0.1:5000/api/users/{recipient2_id}/avatar.svg",
-                    "records_html": f"https://127.0.0.1:5000/search/records?q=parent.access.owned_by.user:{recipient2_id}",
+                    "records_html": f"https://127.0.0.1:5000/search?q=parent.access.owned_by.user:{recipient2_id}",
                     "self": f"https://127.0.0.1:5000/api/users/{recipient2_id}",
                 },
                 "profile": {"affiliations": "CERN", "full_name": ""},

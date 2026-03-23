@@ -26,7 +26,7 @@ def test_no_recipient(
         urls["BASE_URL_REQUESTS"],
         json={
             "request_type": "approve_draft",
-            "topic": {"requests_test": draft1["id"]},
+            "topic": {"record": draft1["id"]},
         },
     )
     assert resp_request_create.status_code == 201
