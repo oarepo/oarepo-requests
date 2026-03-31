@@ -42,12 +42,8 @@ from oarepo_workflows import (
 from oarepo_workflows.base import Workflow
 from oarepo_workflows.model.presets import workflows_preset
 from oarepo_workflows.requests.events import WorkflowEvent
-from pytest_oarepo.requests.classes import (
-    CSLocaleUserGenerator,
-    SystemUserGenerator,
-    TestEventType,
-    UserGenerator,
-)
+from pytest_oarepo.workflows.events import TestEventType
+from pytest_oarepo.workflows.permission_generators import CSLocaleUserGenerator, SystemUserGenerator, UserGenerator
 
 from oarepo_requests.actions.generic import (
     OARepoAcceptAction,
@@ -719,7 +715,7 @@ def ui_serialization_result():
 def extra_entry_points():
     return {
         "invenio_requests.event_types": [
-            "T = pytest_oarepo.requests.classes:TestEventType",
+            "T = pytest_oarepo.workflows.events:TestEventType",
         ],
     }
 
