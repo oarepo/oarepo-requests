@@ -30,6 +30,12 @@ from oarepo_requests.notifications.builders.publish import (
 )
 
 
+@pytest.fixture
+def role(roles):
+    """Get the first role from the fixture."""
+    return roles[0]
+
+
 def test_publish_notifications(
     app,
     users,
