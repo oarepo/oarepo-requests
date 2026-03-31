@@ -74,6 +74,7 @@ pytest_plugins = [
     "pytest_oarepo.fixtures",
     "pytest_oarepo.users",
     "pytest_oarepo.files",
+    "pytest_oarepo.roles",
 ]
 
 
