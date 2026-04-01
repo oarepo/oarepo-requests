@@ -13,13 +13,10 @@ from .delete_published_record import DeletePublishedRecordRequestType
 from .edit_record import EditPublishedRecordRequestType
 from .generic import NonDuplicableOARepoRecordRequestType
 from .publish_draft import PublishDraftRequestType
-from .ref_types import ModelRefTypes, ReceiverRefTypes
 
 __all__ = [
     "DeletePublishedRecordRequestType",
     "EditPublishedRecordRequestType",
-    "ModelRefTypes",
     "NonDuplicableOARepoRecordRequestType",
     "PublishDraftRequestType",
-    "ReceiverRefTypes",
 ]

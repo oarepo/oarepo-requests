@@ -20,6 +20,7 @@ from oarepo_requests.errors import OpenRequestAlreadyExistsError
 from oarepo_requests.notifications.builders.comment import (
     CommentRequestEventCreateNotificationBuilder,
 )
+from oarepo_requests.proxies import current_oarepo_requests
 from oarepo_requests.utils import classproperty, open_request_exists
 
 from ..actions.generic import (
@@ -34,7 +35,6 @@ from ..utils import (
     is_auto_approved,
     request_identity_matches,
 )
-from .ref_types import ModelRefTypes, ReceiverRefTypes
 
 if TYPE_CHECKING:
     from collections.abc import Callable
@@ -60,7 +60,7 @@ class OARepoRequestType(RequestType):
     editable: bool | None = None
     """Whether the request type can be edited multiple times before it is submitted."""
 
-    allowed_receiver_ref_types = ReceiverRefTypes()  # type: ignore[reportAssignmentType]
+    allowed_receiver_ref_types = current_oarepo_requests.allowed_receiver_ref_types
 
     comment_notification_builder = CommentRequestEventCreateNotificationBuilder
 
@@ -244,7 +244,7 @@ class OARepoRequestType(RequestType):
 class OARepoRecordRequestType(OARepoRequestType):
     """Base request type for OARepo requests that can be created on a record."""
 
-    allowed_topic_ref_types = ModelRefTypes()  # type: ignore[reportAssignmentType]
+    allowed_topic_ref_types = ("record",)  # type: ignore[reportAssignmentType]
 
     @classmethod
     def _allowed_by_publication_status(cls, record: Record) -> bool:
