@@ -9,8 +9,7 @@ from __future__ import annotations
 
 import pytest
 from invenio_records_resources.services.errors import PermissionDeniedError
-
-from tests.conftest import TestEventType
+from pytest_oarepo.workflows.events import TestEventType
 
 
 def test_publish_with_workflows(
