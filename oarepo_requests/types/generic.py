@@ -60,7 +60,9 @@ class OARepoRequestType(RequestType):
     editable: bool | None = None
     """Whether the request type can be edited multiple times before it is submitted."""
 
-    allowed_receiver_ref_types = current_oarepo_requests.allowed_receiver_ref_types
+    @classproperty
+    def allowed_receiver_ref_types(cls) -> list[str]:  # type: ignore[reportIncompatibleVariableOverride] # noqa N805
+        return current_oarepo_requests.allowed_receiver_ref_types
 
     comment_notification_builder = CommentRequestEventCreateNotificationBuilder
 
