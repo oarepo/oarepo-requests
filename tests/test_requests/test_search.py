@@ -32,12 +32,7 @@ def test_search_by_topic_model_type(
         expand=True,
     )
     assert (
-        len(
-            current_requests_service.search(
-                system_identity,
-                extra_filter=dsl.Q("exists", field="topic.requests_test"),
-            )
-        )
+        len(current_requests_service.search(system_identity, extra_filter=dsl.Q("exists", field="topic.requests_test")))
         == 1
     )
 

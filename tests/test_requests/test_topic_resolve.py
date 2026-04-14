@@ -61,5 +61,3 @@ def test_resolve_topic(
     assert resp_expanded.status_code == 200
     assert resp_expanded.json["topic"] == {"record": record1_id}
     assert resp_expanded.json["expanded"]["topic"]["id"] == record1_id
-    assert resp_expanded.json["topic"] == {"record": record1_id}
-    assert resp_expanded.json["expanded"]["topic"]["id"] == record1_id

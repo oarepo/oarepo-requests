@@ -98,7 +98,7 @@ def location(location):
 
 
 @pytest.fixture(scope="module")
-def app(app):  # noqa C901
+def app(app):
     bp = Blueprint("test_requests_ui", __name__)
 
     @bp.route("/test-requests/preview/<pid_value>", methods=["GET"])
@@ -130,22 +130,6 @@ def app(app):  # noqa C901
         return "export ok"
 
     app.register_blueprint(bp)
-
-    admin_bp = Blueprint("administration", __name__, url_prefix="/administration")
-
-    @admin_bp.route("/records")
-    def records() -> str:
-        return "admin records ok"
-
-    @admin_bp.route("/drafts")
-    def drafts() -> str:
-        return "admin drafts ok"
-
-    @admin_bp.route("/moderation")
-    def moderation() -> str:
-        return "admin moderation ok"
-
-    app.register_blueprint(admin_bp)
     return app
 
 
