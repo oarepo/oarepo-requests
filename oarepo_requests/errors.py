@@ -170,7 +170,6 @@ class VersionAlreadyExists(CustomHTTPJSONException):
         )
 
 
-# TODO: some errors define description, some __str__, some get_body.. consider uniting
 oarepo_requests_error_handlers = {
     UnknownRequestTypeError: create_error_handler(
         lambda e: HTTPJSONException(

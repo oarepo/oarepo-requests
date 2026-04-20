@@ -13,6 +13,7 @@ from oarepo_runtime.typing import record_from_result
 from oarepo_workflows.errors import RequestTypeNotInWorkflowError
 
 from oarepo_requests.errors import ReceiverNonReferencableError
+from oarepo_requests.proxies import current_requests_service
 
 
 def test_open_request_already_exists_error(
@@ -64,7 +65,7 @@ def test_request_type_not_in_workflow_error(
     draft_factory,
     search_clear,
 ):
-    """Creating a request with a non-existent type returns 400."""
+    """Creating a request type not defined in workflow returns 400."""
     creator = users[0]
     creator_client = logged_client(creator)
 
@@ -133,10 +134,6 @@ def test_version_already_exists_error_on_create(
     submit_request_on_record,
     search_clear,
 ):
-    """Creating publish_new_version with a duplicate version tag returns 400."""
-    from invenio_access.permissions import system_identity
-
-    from oarepo_requests.proxies import current_requests_service
 
     creator = users[0]
     creator_client = logged_client(creator)
