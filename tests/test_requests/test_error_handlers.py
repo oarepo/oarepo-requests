@@ -165,15 +165,13 @@ def test_version_already_exists_error_on_create(
     assert "version" in body.get("message", "").lower() or "request_payload_errors" in body
 
 
-# TODO: used when validation errors are thrown in main service create; out-of-pattern
-def test_custom_http_json_exception_body_format(
+def test_create_request_failed_on_validation(
     logged_client,
     users,
     urls,
     draft_factory,
     search_clear,
 ):
-    """CustomHTTPJSONException responses include status and message fields."""
     creator = users[0]
     creator_client = logged_client(creator)
 
@@ -187,7 +185,6 @@ def test_custom_http_json_exception_body_format(
     assert "status" in body
     assert body["status"] == 400
     assert "message" in body
-    assert "request_payload_errors" in body
 
 
 def test_receiver_not_referencable_error(

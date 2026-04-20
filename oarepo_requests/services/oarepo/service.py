@@ -12,14 +12,13 @@ from __future__ import annotations
 from typing import TYPE_CHECKING, Any, override
 
 from invenio_drafts_resources.records.api import Record
-from invenio_i18n import _
 from invenio_records_resources.services import LinksTemplate
 from invenio_records_resources.services.base.links import EndpointLink
 from invenio_records_resources.services.uow import IndexRefreshOp, unit_of_work
 from invenio_requests import current_request_type_registry
 from invenio_requests.services import RequestsService
 
-from oarepo_requests.errors import CustomHTTPJSONException, UnknownRequestTypeError
+from oarepo_requests.errors import UnknownRequestTypeError
 from oarepo_requests.proxies import current_oarepo_requests
 from oarepo_requests.services.results import (
     RequestTypesList,
@@ -104,17 +103,11 @@ class OARepoRequestsService(RequestsService):
         if "payload" not in data and type_.payload_schema:
             data["payload"] = {}
         schema = self._wrap_schema(type_.marshmallow_schema())
-        data, errors = schema.load(
+        data, _ = schema.load(
             data,
             context={"identity": identity},
-            raise_errors=False,
+            raise_errors=True,
         )
-        if errors:
-            raise CustomHTTPJSONException(
-                description=_("Action could not be performed due to validation request fields validation errors."),
-                request_payload_errors=errors,
-                code=400,
-            )
         if hasattr(type_, "can_create"):
             # raise exception if can't
             type_.can_create(identity, data, receiver, topic, creator)
