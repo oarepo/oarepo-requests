@@ -1,6 +1,6 @@
 [project]
 name = "oarepo-requests"
-version = "5.1.0"
+version = "5.2.0"
 description = "Extra requests for InvenioRDM ecosystem"
 readme = "README.md"
 authors = [
