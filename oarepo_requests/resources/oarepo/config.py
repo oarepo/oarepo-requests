@@ -17,6 +17,7 @@ import marshmallow as ma
 from invenio_records_resources.services.base.config import ConfiguratorMixin
 from invenio_requests.resources import RequestsResourceConfig
 
+from oarepo_requests.errors import oarepo_requests_error_handlers
 from oarepo_requests.services.search import ExtendedRequestSearchRequestArgsSchema
 
 if TYPE_CHECKING:
@@ -64,7 +65,7 @@ class OARepoRequestsResourceConfig(RequestsResourceConfig, ConfiguratorMixin):
         Callable[[Exception], Response],
     ]:
         """Get error handlers."""
-        error_handlers = dict(super().error_handlers)
+        error_handlers = dict(super().error_handlers) | oarepo_requests_error_handlers
         for x in importlib_metadata.entry_points(group="oarepo_requests.error_handlers"):
             error_handlers.update(x.load())
         return MappingProxyType(error_handlers)  # type: ignore[reportReturnType]
