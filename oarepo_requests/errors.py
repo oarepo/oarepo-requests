@@ -15,11 +15,13 @@ from typing import TYPE_CHECKING, Any, cast, override
 from flask import g
 from flask_resources import (
     HTTPJSONException,
+    create_error_handler,
 )
 from flask_resources.serializers.json import JSONEncoder
 from invenio_i18n import gettext
 from invenio_i18n import lazy_gettext as _
 from invenio_requests.errors import CannotExecuteActionError
+from oarepo_workflows.errors import RequestTypeNotInWorkflowError
 
 if TYPE_CHECKING:
     from invenio_records_resources.records import Record
@@ -166,3 +168,25 @@ class VersionAlreadyExists(CustomHTTPJSONException):
             description=description,
             request_payload_errors=request_payload_errors,
         )
+
+
+oarepo_requests_error_handlers = {
+    UnknownRequestTypeError: create_error_handler(
+        lambda e: HTTPJSONException(
+            code=400,
+            description=e.description,  # type: ignore[reportAttributeAccessIssue]
+        )
+    ),
+    ReceiverNonReferencableError: create_error_handler(
+        lambda e: HTTPJSONException(
+            code=400,
+            description=e.description,  # type: ignore[reportAttributeAccessIssue]
+        )
+    ),
+    RequestTypeNotInWorkflowError: create_error_handler(
+        lambda e: HTTPJSONException(
+            code=400,
+            description=e.description,  # type: ignore[reportAttributeAccessIssue]
+        )
+    ),
+}
