@@ -12,6 +12,7 @@ from __future__ import annotations
 from typing import TYPE_CHECKING, Any
 
 from invenio_access.permissions import system_identity
+from invenio_accounts.models import Role
 from invenio_notifications.models import Notification, Recipient
 from invenio_notifications.services.generators import RecipientGenerator
 from invenio_records.dictutils import dict_lookup
@@ -107,14 +108,21 @@ class GeneralRequestParticipantsRecipient(RecipientGenerator):
         return recipients
 
 
-# Do we need groups? Invenio doesn't seem to have GroupRecipient
-"""
-class GroupEmailRecipient(SpecificEntityRecipient):
+class GroupRecipient(RecipientGenerator):
+    """Role recipient generator for a notification."""
 
-    def _get_recipients(self, entity: Any) -> dict[str, Recipient]:
-        return {
-            user.email: Recipient(data=_extract_user_email_data(user))
-            for user in entity.users.all()
-            if getattr(user, "email", None)
-        }
-"""
+    def __init__(self, key: str):
+        """Ctor."""
+        self.key = key
+
+    def __call__(self, notification: Notification, recipients: dict[str, Recipient]):
+        """Update required recipient information and add backend id."""
+        group = dict_lookup(notification.context, self.key)
+        role = Role.query.filter_by(name=group["name"]).first()
+        if role is None:
+            return recipients
+
+        for user in role.users:
+            # TODO: should use service to get the representation
+            recipients[user.id] = Recipient(data=_extract_user_email_data(user))
+        return recipients

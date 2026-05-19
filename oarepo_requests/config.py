@@ -37,6 +37,7 @@ from oarepo_requests.notifications.builders.publish import (
     PublishDraftRequestSubmitNotificationBuilder,
 )
 from oarepo_requests.notifications.generators import MultipleRecipients
+from oarepo_requests.notifications.generators.recipients import GroupRecipient
 
 # check individual receivers in multiple?
 REQUESTS_ALLOWED_RECEIVERS = ["user", "group", "auto_approve"]
@@ -58,6 +59,7 @@ PUBLISH_REQUEST_TYPES = ["publish_draft", "publish_new_version"]
 NOTIFICATION_RECIPIENTS_RESOLVERS = {
     "user": lambda key, notification: UserRecipient(key),  # noqa ARG005
     "multiple": lambda key, notification: MultipleRecipients(key),  # noqa ARG005
+    "group": lambda key, notification: GroupRecipient(key),  # noqa ARG005
 }
 
 NOTIFICATIONS_BACKENDS = {

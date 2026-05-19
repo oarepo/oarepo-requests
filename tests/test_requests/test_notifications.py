@@ -168,7 +168,6 @@ def test_delete_published_notifications(
         # assert request_html_link in sent_mail.body
 
 
-@pytest.mark.skip("Not yet implemented")
 def test_group(
     app,
     users,
@@ -198,7 +197,8 @@ def test_group(
         draft1 = draft_factory(creator.identity)
 
         with mail.record_messages() as outbox:
-            submit_request_on_draft(creator.identity, draft1["id"], "publish_draft")
+            req = submit_request_on_draft(creator.identity, draft1["id"], "publish_draft")
+            assert req.data["receiver"] == {"group": "it-dep"}
             assert len(outbox) == 2
             receivers = {m.recipients[0] for m in outbox}
             assert receivers == {"user1@example.org", "user2@example.org"}
@@ -207,7 +207,6 @@ def test_group(
         app.config["OAREPO_REQUESTS_DEFAULT_RECEIVER"] = config_restore
 
 
-@pytest.mark.skip("Not yet implemented")
 def test_group_multiple_recipients(
     app,
     users,
@@ -417,7 +416,7 @@ def test_lazy_string_parsing(app, users, logged_client, draft_factory, create_re
         {LazyPublishDraftRequestSubmitNotificationBuilder.type: LazyPublishDraftRequestSubmitNotificationBuilder},
     )
 
-    notification = LazyPublishDraftRequestSubmitNotificationBuilder.build(request=request._obj)  # noqa SLF001
+    notification = LazyPublishDraftRequestSubmitNotificationBuilder.build(request=request._obj)  # noqa: SLF001
     mail = app.extensions.get("mail")
     with mail.record_messages() as outbox:
         manager.handle_broadcast(notification)

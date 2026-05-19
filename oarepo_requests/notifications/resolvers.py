@@ -116,8 +116,14 @@ def record_resolver() -> RDMRecordServiceResultResolver:
     return RDMRecordServiceResultResolver()
 
 
+def group_resolver() -> ServiceResultResolver:
+    """Return group notification resolver."""
+    return ServiceResultResolver(service_id="groups", type_key="group")
+
+
 requests_resolver.type_key = "request"  # type: ignore[attr-defined]
 request_events_resolver.type_key = "request_event"  # type: ignore[attr-defined]
 user_resolver.type_key = "user"  # type: ignore[attr-defined]
 multiple_entities_resolver.type_key = MultipleEntitiesNotificationResolver.type_id  # type: ignore[attr-defined]
 record_resolver.type_key = "record"  # type: ignore[attr-defined]
+group_resolver.type_key = "group"  # type: ignore[attr-defined]
