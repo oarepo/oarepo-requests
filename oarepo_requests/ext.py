@@ -9,7 +9,8 @@
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, cast
+from functools import cached_property
+from typing import TYPE_CHECKING, Protocol, cast
 
 from deepmerge import conservative_merger
 from invenio_base.utils import obj_or_import_string
@@ -29,6 +30,20 @@ if TYPE_CHECKING:
     from invenio_requests.customizations import RequestType
 
     from oarepo_requests.actions.components import RequestActionComponent
+
+
+class DefaultRequestReceiverFunction(Protocol):
+    """Protocol for the default request receiver function."""
+
+    def __call__(
+        self,
+        identity: Identity,
+        request_type: RequestType,
+        record: Record,
+        creator: dict[str, str] | Identity,
+        data: dict,
+    ) -> dict[str, str] | None:
+        """Return the default request receiver reference for the given request type and record, or ``None``."""
 
 
 class _OARepoRequestsState:
@@ -63,6 +78,17 @@ class _OARepoRequestsState:
             self.app.config["REQUESTS_ACTION_COMPONENTS"],
         )
 
+    @cached_property
+    def default_request_receiver_function(
+        self,
+    ) -> DefaultRequestReceiverFunction | None:
+        """Return the default request receiver function."""
+        return (
+            obj_or_import_string(self.app.config.get("OAREPO_REQUESTS_DEFAULT_RECEIVER"))
+            if "OAREPO_REQUESTS_DEFAULT_RECEIVER" in self.app.config
+            else None
+        )
+
     def default_request_receiver(
         self,
         identity: Identity,
@@ -84,7 +110,10 @@ class _OARepoRequestsState:
         :param creator: Creator of the request.
         :param data: Payload of the request.
         """
-        return obj_or_import_string(self.app.config["OAREPO_REQUESTS_DEFAULT_RECEIVER"])(  # type: ignore[no-any-return]
+        if self.default_request_receiver_function is None:
+            return None
+
+        return self.default_request_receiver_function(
             identity=identity,
             request_type=request_type,
             record=record,
@@ -118,7 +147,6 @@ class OARepoRequests:
         """Initialize configuration."""
         from . import config
 
-        app.config.setdefault("OAREPO_REQUESTS_DEFAULT_RECEIVER", None)
         app.config.setdefault("REQUESTS_ALLOWED_RECEIVERS", []).extend(config.REQUESTS_ALLOWED_RECEIVERS)
 
         app.config.setdefault("PUBLISH_REQUEST_TYPES", config.PUBLISH_REQUEST_TYPES)
@@ -168,5 +196,6 @@ def finalize_app(app: Flask) -> None:
     invenio_notifications = app.extensions["invenio-notifications"]
     invenio_notifications.init_manager(app)
 
-    if not any(e for e in Request.dumper._extensions if isinstance(e, RecordReferenceDumperExt)):  # noqa SLF001 # type: ignore[reportAttributeAccessIssue]
-        Request.dumper._extensions.append(RecordReferenceDumperExt())  # noqa SLF001 # type: ignore[reportAttributeAccessIssue]
+    dumper_extensions = Request.dumper._extensions  # noqa SLF001 # type: ignore[reportAttributeAccessIssue]
+    if not any(isinstance(e, RecordReferenceDumperExt) for e in dumper_extensions):
+        dumper_extensions.append(RecordReferenceDumperExt())
