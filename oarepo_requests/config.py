@@ -43,12 +43,8 @@ from oarepo_requests.notifications.generators.recipients import GroupRecipient
 REQUESTS_ALLOWED_RECEIVERS = ["user", "group", "auto_approve"]
 
 DEFAULT_WORKFLOW_EVENTS = {
-    CommentEventType.type_id: WorkflowEvent(
-        submitters=InvenioRequestsPermissionPolicy.can_create_comment
-    ),
-    LogEventType.type_id: WorkflowEvent(
-        submitters=InvenioRequestsPermissionPolicy.can_create_comment
-    ),
+    CommentEventType.type_id: WorkflowEvent(submitters=InvenioRequestsPermissionPolicy.can_create_comment),
+    LogEventType.type_id: WorkflowEvent(submitters=InvenioRequestsPermissionPolicy.can_create_comment),
 }
 
 REQUESTS_ACTION_COMPONENTS: tuple[type[RequestActionComponent], ...] = (

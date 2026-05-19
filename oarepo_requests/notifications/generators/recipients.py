@@ -51,9 +51,7 @@ class EntityRecipientGenerator(RecipientGenerator):
                 "Using EntityRecipientGenerator on notification without saved reference dictionary to the entity."
             )
         entity_type = notification.context.get_reference_type(self.key)
-        generator = current_notification_recipient_generators_registry[entity_type](
-            self.key, notification
-        )
+        generator = current_notification_recipient_generators_registry[entity_type](self.key, notification)
         generator(notification, recipients)
 
 
@@ -71,9 +69,7 @@ class MultipleRecipients(RecipientGenerator):
         for idx, entity_dict in enumerate(fields):
             type_ = next(iter(entity_dict.keys()))
             key = f"{self.key}.{idx}.{type_}"
-            generator = current_notification_recipient_generators_registry[type_](
-                key, notification
-            )
+            generator = current_notification_recipient_generators_registry[type_](key, notification)
             generator(notification, recipients)
 
 
@@ -102,11 +98,7 @@ class GeneralRequestParticipantsRecipient(RecipientGenerator):
             extra_filter=dsl.Q("term", request_id=request["id"]),
         )
         # assume commenters can only be users
-        user_ids = {
-            re["created_by"]["user"]
-            for re in request_events
-            if re["created_by"].get("user")
-        }
+        user_ids = {re["created_by"]["user"] for re in request_events if re["created_by"].get("user")}
 
         filter_ = dsl.Q("terms", id=list(user_ids))
         users = current_users_service.scan(system_identity, extra_filter=filter_)
@@ -119,16 +111,18 @@ class GeneralRequestParticipantsRecipient(RecipientGenerator):
 class GroupRecipient(RecipientGenerator):
     """Role recipient generator for a notification."""
 
-    def __init__(self, key):
+    def __init__(self, key: str):
         """Ctor."""
         self.key = key
 
-    def __call__(self, notification, recipients):
+    def __call__(self, notification: Notification, recipients: dict[str, Recipient]):
         """Update required recipient information and add backend id."""
-        # print("Group recipient called", notification.context, self.key)
         group = dict_lookup(notification.context, self.key)
         role = Role.query.filter_by(name=group["name"]).first()
+        if role is None:
+            return recipients
+
         for user in role.users:
             # TODO: should use service to get the representation
-            recipients[user.id] = Recipient(data={"email": user.email})
+            recipients[user.id] = Recipient(data=_extract_user_email_data(user))
         return recipients
