@@ -7,6 +7,7 @@
 #
 from __future__ import annotations
 
+import contextlib
 import os
 import time
 from datetime import timedelta
@@ -43,7 +44,11 @@ from oarepo_workflows.base import Workflow
 from oarepo_workflows.model.presets import workflows_preset
 from oarepo_workflows.requests.events import WorkflowEvent
 from pytest_oarepo.workflows.events import TestEventType
-from pytest_oarepo.workflows.permission_generators import CSLocaleUserGenerator, SystemUserGenerator, UserGenerator
+from pytest_oarepo.workflows.permission_generators import (
+    CSLocaleUserGenerator,
+    SystemUserGenerator,
+    UserGenerator,
+)
 
 from oarepo_requests.actions.generic import (
     OARepoAcceptAction,
@@ -868,3 +873,9 @@ def get_action_url(find_request_type, link2testclient):
         return link2testclient(request["links"]["actions"][action])
 
     return _action_url
+
+
+@pytest.fixture(autouse=True)
+def reset_default_request_receiver_function_cache(app):
+    with contextlib.suppress(AttributeError):
+        del app.extensions["oarepo-requests"].default_request_receiver_function
