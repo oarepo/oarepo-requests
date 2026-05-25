@@ -1,0 +1,1 @@
+/Users/dusanstojanovic/Projects/oarepo/tools/resolve_invenio.sh
