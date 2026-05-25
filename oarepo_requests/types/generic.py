@@ -9,6 +9,7 @@
 
 from __future__ import annotations
 
+from abc import abstractmethod
 from typing import TYPE_CHECKING, Any, cast
 
 from invenio_records_resources.services.errors import PermissionDeniedError
@@ -332,3 +333,18 @@ class NonDuplicableOARepoRecordRequestType(OARepoRecordRequestType):
         if open_request_exists(topic, cls.type_id):
             return False
         return super().is_applicable_to(identity, topic, *args, **kwargs)
+
+
+class DefaultReceiverMixin:
+    """Mixin for request types that have a default request receiver."""
+
+    @classmethod
+    @abstractmethod
+    def default_request_receiver(
+        cls,
+        identity: Identity,
+        topic: Record,
+        creator: dict[str, str] | Identity,
+        data: dict,
+    ) -> dict[str, str] | None:
+        """Return the default request receiver."""

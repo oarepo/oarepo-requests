@@ -24,6 +24,7 @@ from oarepo_requests.services.results import (
     RequestTypesList,
     StringEntityResolverExpandableField,
 )
+from oarepo_requests.types import DefaultReceiverMixin
 from oarepo_requests.utils import (
     allowed_request_types_for_record,
     resolve_reference_dict,
@@ -96,10 +97,13 @@ class OARepoRequestsService(RequestsService):
             raise UnknownRequestTypeError(request_type)
         data = data or {}
         if receiver is None:
-            # if explicit creator is not passed, use current identity - this is in sync with invenio_requests
-            receiver = current_oarepo_requests.default_request_receiver(
-                identity, type_, topic, creator or identity, data
-            )
+            if isinstance(request_type, DefaultReceiverMixin):
+                receiver = request_type.default_request_receiver(identity, topic, creator or identity, data)
+            else:
+                # if explicit creator is not passed, use current identity - this is in sync with invenio_requests
+                receiver = current_oarepo_requests.default_request_receiver(
+                    identity, type_, topic, creator or identity, data
+                )
         if "payload" not in data and type_.payload_schema:
             data["payload"] = {}
         schema = self._wrap_schema(type_.marshmallow_schema())
