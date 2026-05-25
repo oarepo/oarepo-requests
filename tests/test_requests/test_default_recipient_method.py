@@ -23,7 +23,7 @@ def test_default_recipient_method(
 ):
     creator = users[0]
 
-    draft1 = draft_factory(creator.identity)
+    draft1 = draft_factory(creator.identity, custom_workflow="no_receiver")
     draft1_id = draft1["id"]
     requests_model.Record.index.refresh()
     requests_model.Draft.index.refresh()

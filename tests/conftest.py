@@ -316,11 +316,6 @@ class DefaultRequests(WorkflowRequestPolicy):
         recipients=[AutoApprove()],
         transitions=WorkflowTransitions(),
     )
-    no_receiver_rt = WorkflowRequest(
-        requesters=[AuthenticatedUser()],
-        recipients=[],
-        transitions=WorkflowTransitions(),
-    )
 
 
 class PublishAutoAcceptRequests(DefaultRequests):
@@ -559,6 +554,16 @@ class RequestsWithSystemIdentity(WorkflowRequestPolicy):
     )
 
 
+class RequestsWithNoRecipients(WorkflowRequestPolicy):
+    """Test requests workflow with publish only by system identity."""
+
+    no_receiver_rt = WorkflowRequest(
+        requesters=[AuthenticatedUser()],
+        recipients=[],
+        transitions=WorkflowTransitions(),
+    )
+
+
 class TestWorkflowPermissions(RequestBasedWorkflowPermissions):
     """Default workflow permissions for testing."""
 
@@ -604,6 +609,12 @@ WORKFLOWS = [
         label=_("Default workflow"),
         permission_policy_cls=TestWorkflowPermissions,
         request_policy_cls=DefaultRequests,
+    ),
+    Workflow(
+        code="no_receiver",
+        label=_("Workflow with no receiver"),
+        permission_policy_cls=TestWorkflowPermissions,
+        request_policy_cls=RequestsWithNoRecipients,
     ),
     Workflow(
         code="with_approve",
