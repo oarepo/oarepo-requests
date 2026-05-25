@@ -97,8 +97,8 @@ class OARepoRequestsService(RequestsService):
             raise UnknownRequestTypeError(request_type)
         data = data or {}
         if receiver is None:
-            if isinstance(request_type, DefaultReceiverMixin):
-                receiver = request_type.default_request_receiver(identity, topic, creator or identity, data)
+            if isinstance(type_, DefaultReceiverMixin):
+                receiver = type_.default_request_receiver(identity, topic, creator or identity, data)
             else:
                 # if explicit creator is not passed, use current identity - this is in sync with invenio_requests
                 receiver = current_oarepo_requests.default_request_receiver(
