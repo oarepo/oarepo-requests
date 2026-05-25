@@ -9,6 +9,7 @@
 
 from __future__ import annotations
 
+from abc import abstractmethod
 from typing import TYPE_CHECKING, Any, cast
 
 from invenio_records_resources.services.errors import PermissionDeniedError
@@ -42,9 +43,12 @@ if TYPE_CHECKING:
     from flask_babel.speaklater import LazyString
     from flask_principal import Identity
     from invenio_records_resources.records import Record
+    from invenio_requests.customizations import RequestType as TypingMixinRequestType
     from invenio_requests.customizations.actions import RequestAction
     from invenio_requests.records.api import Request
     from marshmallow.schema import Schema
+else:
+    TypingMixinRequestType = object
 
 
 class OARepoRequestType(RequestType):
@@ -332,3 +336,18 @@ class NonDuplicableOARepoRecordRequestType(OARepoRecordRequestType):
         if open_request_exists(topic, cls.type_id):
             return False
         return super().is_applicable_to(identity, topic, *args, **kwargs)
+
+
+class DefaultReceiverMixin(TypingMixinRequestType):
+    """Mixin for request types that have a default request receiver."""
+
+    @classmethod
+    @abstractmethod
+    def default_request_receiver(
+        cls,
+        identity: Identity,
+        topic: Record,
+        creator: dict[str, str] | Identity,
+        data: dict,
+    ) -> dict[str, str] | None:
+        """Return the default request receiver."""

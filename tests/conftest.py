@@ -11,7 +11,7 @@ import contextlib
 import os
 import time
 from datetime import timedelta
-from typing import TYPE_CHECKING, Any, ClassVar
+from typing import TYPE_CHECKING, Any, ClassVar, override
 
 import pytest
 from flask import Blueprint
@@ -66,10 +66,13 @@ from oarepo_requests.services.permissions.workflow_policies import (
     RequestBasedWorkflowPermissions,
 )
 from oarepo_requests.types import (
+    DefaultReceiverMixin,
     NonDuplicableOARepoRecordRequestType,
 )
 
 if TYPE_CHECKING:
+    from flask_principal import Identity
+    from invenio_records.api import Record
     from invenio_requests.customizations.actions import RequestAction
     from invenio_requests.records.api import Request
 
@@ -219,6 +222,25 @@ class ConditionalRecipientRecordRequestType(NonDuplicableOARepoRecordRequestType
     description = _("A no-op request to check conditional recipients")
     receiver_can_be_none = False
     allowed_on_published = False
+
+
+class NoReceiverRequestType(DefaultReceiverMixin, NonDuplicableOARepoRecordRequestType):
+    """Request type with no receiver."""
+
+    type_id = "no_receiver_rt"
+    name = _("Request type to test no receiver")
+    receiver_can_be_none = True
+
+    @override
+    @classmethod
+    def default_request_receiver(
+        cls,
+        identity: Identity,
+        topic: Record,
+        creator: dict[str, str] | Identity,
+        data: dict,
+    ) -> None:
+        """Return None."""
 
 
 class DefaultRequests(WorkflowRequestPolicy):
@@ -532,6 +554,16 @@ class RequestsWithSystemIdentity(WorkflowRequestPolicy):
     )
 
 
+class RequestsWithNoRecipients(WorkflowRequestPolicy):
+    """Test requests workflow with no recipients."""
+
+    no_receiver_rt = WorkflowRequest(
+        requesters=[AuthenticatedUser()],
+        recipients=[],
+        transitions=WorkflowTransitions(),
+    )
+
+
 class TestWorkflowPermissions(RequestBasedWorkflowPermissions):
     """Default workflow permissions for testing."""
 
@@ -577,6 +609,12 @@ WORKFLOWS = [
         label=_("Default workflow"),
         permission_policy_cls=TestWorkflowPermissions,
         request_policy_cls=DefaultRequests,
+    ),
+    Workflow(
+        code="no_receiver",
+        label=_("Workflow with no receiver"),
+        permission_policy_cls=TestWorkflowPermissions,
+        request_policy_cls=RequestsWithNoRecipients,
     ),
     Workflow(
         code="with_approve",
@@ -747,6 +785,7 @@ def app_config(app_config, requests_model):
         ConditionalRecipientRecordRequestType(),
         AnotherTopicUpdatingRecordRequestType(),
         GenericTestableRecordRequestType(),
+        NoReceiverRequestType(),
     ]
     app_config["FILES_REST_STORAGE_CLASS_LIST"] = {
         "L": "Local",

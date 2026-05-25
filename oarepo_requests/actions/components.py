@@ -256,7 +256,7 @@ class AutoAcceptComponent(RequestActionComponent):
         if action.request.status != "submitted":
             return
         receiver_ref = action.request.receiver  # this is <x>proxy, not dict
-        if not receiver_ref.reference_dict.get("auto_approve"):
+        if receiver_ref is None or not receiver_ref.reference_dict.get("auto_approve"):
             return
 
         action_obj = RequestActions.get_action(action.request, "accept")
