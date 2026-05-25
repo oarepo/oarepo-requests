@@ -555,7 +555,7 @@ class RequestsWithSystemIdentity(WorkflowRequestPolicy):
 
 
 class RequestsWithNoRecipients(WorkflowRequestPolicy):
-    """Test requests workflow with publish only by system identity."""
+    """Test requests workflow with no recipients."""
 
     no_receiver_rt = WorkflowRequest(
         requesters=[AuthenticatedUser()],
