@@ -114,7 +114,7 @@ class OARepoRequestsService(RequestsService):
         )
         if hasattr(type_, "can_create"):
             # raise exception if can't
-            type_.can_create(identity, data, receiver, topic, creator)
+            type_.can_create(identity, data, receiver, topic, creator)  # type: ignore[reportAttributeAccessIssue]
         # TODO: typing does not allow receiver to be None even though invenio code suggests it
         result = super().create(
             identity=identity,
