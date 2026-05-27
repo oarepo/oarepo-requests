@@ -101,6 +101,3 @@ build-backend = "hatchling.build"
 include = [
     "/oarepo_requests",
 ]
-
-[tool.uv.sources]
-pytest-oarepo = { path = "/tmp/pytest-oarepo" }
