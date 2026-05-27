@@ -59,9 +59,9 @@ def test_publish_notifications(
         # check notification is build on submit
         assert len(outbox) == 1
         sent_mail = outbox[0]
-        assert "Request to publish record blabla" in sent_mail.subject
-        assert 'You have been asked to publish record "blabla".' in sent_mail.body
-        assert 'You have been asked to publish record "blabla".' in sent_mail.html
+        assert "Request to publish record Test Dataset" in sent_mail.subject
+        assert 'You have been asked to publish record "Test Dataset".' in sent_mail.body
+        assert 'You have been asked to publish record "Test Dataset".' in sent_mail.html
 
     record = receiver_client.get(f"{urls['BASE_URL']}/{draft1['id']}/draft?expand=true")
 
@@ -73,9 +73,9 @@ def test_publish_notifications(
         # check notification is build on submit
         assert len(outbox) == 1
         sent_mail = outbox[0]
-        assert "Record 'blabla' has been published" in sent_mail.subject
-        assert 'Your record "blabla" has been published. You can see the record at' in sent_mail.body
-        assert 'Your record "blabla" has been published. You can see the record at' in sent_mail.html
+        assert "Record 'Test Dataset' has been published" in sent_mail.subject
+        assert 'Your record "Test Dataset" has been published. You can see the record at' in sent_mail.body
+        assert 'Your record "Test Dataset" has been published. You can see the record at' in sent_mail.html
 
     draft1 = draft_factory(creator.identity)
     submit_request_on_draft(creator.identity, draft1["id"], "publish_draft")
@@ -90,7 +90,7 @@ def test_publish_notifications(
         # check notification is build on submit
         assert len(outbox) == 1
         sent_mail = outbox[0]
-        assert "Request for publishing of record 'blabla' was declined" in sent_mail.subject
+        assert "Request for publishing of record 'Test Dataset' was declined" in sent_mail.subject
         # assert request_html_link in sent_mail.html
         # assert request_html_link in sent_mail.body
 
@@ -123,7 +123,7 @@ def test_delete_published_notifications(
         # check notification is build on submit
         assert len(outbox) == 1
         sent_mail = outbox[0]
-        assert "Request to delete published record blabla" in sent_mail.subject
+        assert "Request to delete published record Test Dataset" in sent_mail.subject
 
     with mail.record_messages() as outbox:
         record = receiver_client.get(f"{urls['BASE_URL']}/{record1['id']}?expand=true")
@@ -163,7 +163,7 @@ def test_delete_published_notifications(
         assert len(outbox) == 1
         sent_mail = outbox[0]
 
-        assert "Request for deletion of record 'blabla' was declined" in sent_mail.subject
+        assert "Request for deletion of record 'Test Dataset' was declined" in sent_mail.subject
         # assert request_html_link in sent_mail.html
         # assert request_html_link in sent_mail.body
 
@@ -276,9 +276,9 @@ def test_locale(
         # check notification is build on submit
         assert len(outbox) == 1
         sent_mail = outbox[0]
-        assert "Žádost o publikování záznamu blabla" in sent_mail.subject
-        assert 'Byli jste požádáni o publikování záznamu "blabla".' in sent_mail.body
-        assert 'Byli jste požádáni o publikování záznamu "blabla".' in sent_mail.body
+        assert "Žádost o publikování záznamu Test Dataset" in sent_mail.subject
+        assert 'Byli jste požádáni o publikování záznamu "Test Dataset".' in sent_mail.body
+        assert 'Byli jste požádáni o publikování záznamu "Test Dataset".' in sent_mail.body
 
     record = receiver_client.get(f"{urls['BASE_URL']}/{draft1['id']}/draft?expand=true")
 
@@ -290,9 +290,9 @@ def test_locale(
         # check notification is build on submit
         assert len(outbox) == 1
         sent_mail = outbox[0]
-        assert "Record 'blabla' has been published" in sent_mail.subject
-        assert 'Your record "blabla" has been published. You can see the record at' in sent_mail.body
-        assert 'Your record "blabla" has been published. You can see the record at' in sent_mail.html
+        assert "Record 'Test Dataset' has been published" in sent_mail.subject
+        assert 'Your record "Test Dataset" has been published. You can see the record at' in sent_mail.body
+        assert 'Your record "Test Dataset" has been published. You can see the record at' in sent_mail.html
 
 
 def test_locale_multiple_recipients(
@@ -325,8 +325,8 @@ def test_locale_multiple_recipients(
         sent_mail_cz = [mail for mail in outbox if mail.recipients[0] == cs_receiver.user.email]
         sent_mail_en = [mail for mail in outbox if mail.recipients[0] == users[0].user.email]
         assert len(sent_mail_cz) == len(sent_mail_en) == 1
-        assert sent_mail_cz[0].subject == "❗️ Žádost o smazání vypublikovaného záznamu blabla"
-        assert sent_mail_en[0].subject == "❗️ Request to delete published record blabla"
+        assert sent_mail_cz[0].subject == "❗️ Žádost o smazání vypublikovaného záznamu Test Dataset"
+        assert sent_mail_en[0].subject == "❗️ Request to delete published record Test Dataset"
 
 
 def test_comment_notifications(
@@ -416,7 +416,9 @@ def test_lazy_string_parsing(app, users, logged_client, draft_factory, create_re
         {LazyPublishDraftRequestSubmitNotificationBuilder.type: LazyPublishDraftRequestSubmitNotificationBuilder},
     )
 
-    notification = LazyPublishDraftRequestSubmitNotificationBuilder.build(request=request._obj)  # noqa: SLF001
+    notification = LazyPublishDraftRequestSubmitNotificationBuilder.build(
+        request=request._obj  # noqa: SLF001
+    )
     mail = app.extensions.get("mail")
     with mail.record_messages() as outbox:
         manager.handle_broadcast(notification)

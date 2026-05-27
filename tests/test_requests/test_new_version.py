@@ -165,7 +165,10 @@ def test_publish(
     )
     # publish the new draft
     new_id = resp_request.data["expanded"]["payload"]["created_topic"]["id"]["id"]
-    creator_client.put(f"{urls['BASE_URL']}/{new_id}/draft", json={"metadata": {"title": "edited"}})
+    creator_client.put(
+        f"{urls['BASE_URL']}/{new_id}/draft",
+        json={"metadata": {**record1["metadata"], "title": "edited"}},
+    )
     publish_request = submit_request_on_draft(creator.identity, new_id, "publish_new_version")
     receiver_request = receiver_client.get(f"{urls['BASE_URL_REQUESTS']}{publish_request['id']}")
     receiver_client.post(link2testclient(receiver_request.json["links"]["actions"]["accept"]))

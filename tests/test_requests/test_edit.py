@@ -74,7 +74,10 @@ def test_publish(
 
     submit_request_on_record(creator.identity, id_, "edit_published_record")
 
-    creator_client.put(f"{urls['BASE_URL']}/{id_}/draft", json={"metadata": {"title": "edited"}})
+    creator_client.put(
+        f"{urls['BASE_URL']}/{id_}/draft",
+        json={"metadata": {**record1["metadata"], "title": "edited"}},
+    )
     publish_request = submit_request_on_draft(creator.identity, id_, "publish_changed_metadata")
     receiver_request = receiver_client.get(f"{urls['BASE_URL_REQUESTS']}{publish_request['id']}")
     receiver_client.post(link2testclient(receiver_request.json["links"]["actions"]["accept"]))
