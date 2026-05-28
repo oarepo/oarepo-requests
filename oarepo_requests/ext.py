@@ -9,10 +9,11 @@
 
 from __future__ import annotations
 
-from functools import cached_property
+from functools import cached_property, partial
 from typing import TYPE_CHECKING, Protocol, cast
 
 from deepmerge import conservative_merger
+from flask import current_app
 from invenio_base.utils import obj_or_import_string
 from invenio_requests.customizations import EventType
 from invenio_requests.proxies import (
@@ -20,6 +21,7 @@ from invenio_requests.proxies import (
     current_request_type_registry,
 )
 from invenio_requests.records import Request
+from invenio_search_ui.searchconfig import search_app_config
 
 from oarepo_requests.records.dumpers import RecordReferenceDumperExt
 
@@ -199,3 +201,22 @@ def finalize_app(app: Flask) -> None:
     dumper_extensions = Request.dumper._extensions  # noqa SLF001 # type: ignore[reportAttributeAccessIssue]
     if not any(isinstance(e, RecordReferenceDumperExt) for e in dumper_extensions):
         dumper_extensions.append(RecordReferenceDumperExt())
+
+    def custom_search_app_context() -> dict:
+        return {  # pragma: no cover
+            "search_app_rdm_user_requests_config": partial(
+                search_app_config,
+                "RDM_SEARCH_USER_REQUESTS",
+                current_app.config["REQUESTS_FACETS"],
+                current_app.config["RDM_SORT_OPTIONS"],
+                "/api/user/requests",
+                {"Accept": "application/vnd.inveniordm.v1+json"},
+                initial_filters=[
+                    ["is_open", "true"],
+                    ["shared_with_me", "false"],
+                ],
+                hidden_params=[["expand", "1"]],
+            ),
+        }
+
+    app.context_processor(custom_search_app_context)

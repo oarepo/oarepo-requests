@@ -30,7 +30,7 @@ from invenio_requests.services.generators import Receiver
 from invenio_requests.services.permissions import (
     PermissionPolicy as InvenioRequestsPermissionPolicy,
 )
-from oarepo_rdm import rdm_minimal_preset
+from oarepo_rdm import rdm_basic_preset
 from oarepo_workflows import (
     AutoApprove,
     AutoRequest,
@@ -83,6 +83,7 @@ pytest_plugins = [
     "pytest_oarepo.users",
     "pytest_oarepo.files",
     "pytest_oarepo.roles",
+    "pytest_oarepo.vocabularies.fixtures",
 ]
 
 
@@ -845,14 +846,6 @@ def model_types():
         "Metadata": {
             "properties": {
                 "title": {"type": "fulltext+keyword", "required": True},
-                "creators": {
-                    "type": "array",
-                    "items": {"type": "keyword"},
-                },
-                "contributors": {
-                    "type": "array",
-                    "items": {"type": "keyword"},
-                },
             }
         }
     }
@@ -868,7 +861,7 @@ def requests_model(model_types):
         name="requests_test",
         version="1.0.0",
         presets=[
-            rdm_minimal_preset,
+            rdm_basic_preset,
             workflows_preset,
             requests_preset,
         ],
@@ -918,3 +911,25 @@ def get_action_url(find_request_type, link2testclient):
 def reset_default_request_receiver_function_cache(app):
     with contextlib.suppress(AttributeError):
         del app.extensions["oarepo-requests"].default_request_receiver_function
+
+
+@pytest.fixture
+def default_record_json(default_record_json, resourcetype_dataset) -> dict[str, Any]:
+    """Return default data for creating a record, without default workflow."""
+    return {
+        **default_record_json,
+        "metadata": {
+            "resource_type": {"id": "dataset"},
+            "publication_date": "2026-01-01",
+            "creators": [
+                {
+                    "person_or_org": {
+                        "type": "personal",
+                        "family_name": "Doe",
+                        "given_name": "John",
+                    },
+                }
+            ],
+            "title": "Test Dataset",
+        },
+    }
