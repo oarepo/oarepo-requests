@@ -50,6 +50,25 @@ def test_publish_service(
     record_service.read(creator.identity, draft["id"])  # will throw exception if record isn't published
 
 
+def test_submit_title_falls_back_to_stateful_name_when_topic_has_no_title(
+    requests_model,
+    users,
+    draft_factory,
+    create_request_on_draft,
+    requests_service,
+    search_clear,
+):
+    """Submit falls back to request type's stateful_name when neither request nor topic has a title."""
+    creator = users[0]
+    draft = draft_factory(creator.identity, custom_data={"metadata": {}}, custom_workflow="with_approve")
+    request = create_request_on_draft(creator.identity, draft["id"], "approve_draft")
+    requests_model.Draft.index.refresh()
+
+    submitted = requests_service.execute_action(creator.identity, request["id"], "submit").to_dict()
+
+    assert submitted["title"] == "Approve draft"
+
+
 def test_publish(
     requests_model,
     logged_client,

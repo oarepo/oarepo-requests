@@ -94,6 +94,19 @@ class OARepoGenericActionMixin(RequestAction):
             identity.provides.add(request_active)
         try:
             self.apply(identity, uow, *args, **kwargs)  # execute the action itself
+            if not self.request.get("title"):
+                # RDM convention: each request type writes its own title (e.g.
+                # community_submission sets it from draft.metadata["title"]).
+                # Fall back to topic title, then to the type's stateful_name,
+                # so the dashboard never shows an empty header.
+                topic_metadata = getattr(self.topic, "metadata", None) or {}
+                title = topic_metadata.get("title")
+                if not title:
+                    stateful_name = getattr(self.request.type, "stateful_name", None)
+                    if stateful_name is not None:
+                        title = stateful_name(identity, topic=self.topic, request=self.request)
+                if title:
+                    self.request["title"] = str(title)
             super().execute(identity, uow, *args, **kwargs)
             for component in self.components:
                 if hasattr(component, self.type_id):

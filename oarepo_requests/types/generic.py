@@ -10,8 +10,9 @@
 from __future__ import annotations
 
 from abc import abstractmethod
-from typing import TYPE_CHECKING, Any, cast
+from typing import TYPE_CHECKING, Any, ClassVar, cast
 
+from invenio_records_resources.services.base.links import EndpointLink
 from invenio_records_resources.services.errors import PermissionDeniedError
 from invenio_requests.customizations import RequestType
 from invenio_requests.customizations.states import RequestState
@@ -63,6 +64,18 @@ class OARepoRequestType(RequestType):
 
     editable: bool | None = None
     """Whether the request type can be edited multiple times before it is submitted."""
+
+    # Resolved by RequestTypeDependentEndpointLink in the requests service config
+    # (invenio_requests/services/requests/config.py). All oarepo request types
+    # surface their UI on the user-dashboard detail route; subclasses can override
+    # if they ever need to live under a different blueprint (e.g. community-side).
+    links_item: ClassVar[dict[str, EndpointLink]] = {
+        "self_html": EndpointLink(
+            "invenio_app_rdm_requests.user_dashboard_request_view",
+            params=["request_pid_value"],
+            vars=lambda obj, vars: vars.update(request_pid_value=vars["request"].id),  # noqa: ARG005, A006
+        ),
+    }
 
     @classproperty
     def allowed_receiver_ref_types(cls) -> list[str]:  # type: ignore[reportIncompatibleVariableOverride] # noqa N805
