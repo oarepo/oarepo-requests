@@ -4,14 +4,26 @@
 import React from "react";
 import { Icon } from "semantic-ui-react";
 
-const makeTypeIcon = (name) =>
-  function TypeIcon() {
-    return <Icon name={name} className="neutral" />;
-  };
+export const IconTypePublishDraft = () => (
+  <Icon name="cloud upload" className="neutral" />
+);
 
-export const IconTypePublishDraft = makeTypeIcon("cloud upload");
-export const IconTypeNewVersion = makeTypeIcon("code branch");
-export const IconTypePublishNewVersion = makeTypeIcon("cloud upload");
-export const IconTypePublishChangedMetadata = makeTypeIcon("edit");
-export const IconTypeDeletePublishedRecord = makeTypeIcon("trash");
-export const IconTypeEditPublishedRecord = makeTypeIcon("edit");
+export const IconTypeNewVersion = () => (
+  <Icon name="code branch" className="neutral" />
+);
+
+export const IconTypePublishNewVersion = () => (
+  <Icon name="cloud upload" className="neutral" />
+);
+
+export const IconTypePublishChangedMetadata = () => (
+  <Icon name="edit" className="neutral" />
+);
+
+export const IconTypeDeletePublishedRecord = () => (
+  <Icon name="trash" className="neutral" />
+);
+
+export const IconTypeEditPublishedRecord = () => (
+  <Icon name="edit" className="neutral" />
+);

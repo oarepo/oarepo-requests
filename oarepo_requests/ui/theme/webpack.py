@@ -20,6 +20,7 @@ theme = WebpackThemeBundle(  # pragma: no cover
             "devDependencies": {},
             "aliases": {
                 "@js/oarepo_requests": "js/oarepo_requests",
+                "@translations/oarepo_requests_ui": "translations/oarepo_requests_ui",
             },
         }
     },

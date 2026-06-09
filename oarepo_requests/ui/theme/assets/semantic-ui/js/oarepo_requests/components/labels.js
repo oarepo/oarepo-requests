@@ -1,24 +1,43 @@
 // Copyright (c) 2024 CESNET
 // SPDX-License-Identifier: MIT
 
-import { i18next } from "@translations/invenio_requests/i18next";
+import { i18next } from "@translations/oarepo_requests_ui/i18next";
 import React from "react";
 import { Label } from "semantic-ui-react";
 
-const makeTypeLabel = (text) =>
-  function TypeLabel() {
-    return (
-      <Label horizontal className="primary theme-secondary" size="small">
-        {i18next.t(text)}
-      </Label>
-    );
-  };
-
-export const LabelTypePublishDraft = makeTypeLabel("Publish draft");
-export const LabelTypeNewVersion = makeTypeLabel("New version");
-export const LabelTypePublishNewVersion = makeTypeLabel("Publish new version");
-export const LabelTypePublishChangedMetadata = makeTypeLabel(
-  "Publish changed metadata"
+// using plain functions, so that string extraction would work correctly with i18next-scanner
+export const LabelTypePublishDraft = () => (
+  <Label horizontal className="primary theme-secondary" size="small">
+    {i18next.t("Publish draft")}
+  </Label>
 );
-export const LabelTypeDeletePublishedRecord = makeTypeLabel("Record deletion");
-export const LabelTypeEditPublishedRecord = makeTypeLabel("Edit published record");
+
+export const LabelTypeNewVersion = () => (
+  <Label horizontal className="primary theme-secondary" size="small">
+    {i18next.t("New version")}
+  </Label>
+);
+
+export const LabelTypePublishNewVersion = () => (
+  <Label horizontal className="primary theme-secondary" size="small">
+    {i18next.t("Publish new version")}
+  </Label>
+);
+
+export const LabelTypePublishChangedMetadata = () => (
+  <Label horizontal className="primary theme-secondary" size="small">
+    {i18next.t("Publish changed metadata")}
+  </Label>
+);
+
+export const LabelTypeDeletePublishedRecord = () => (
+  <Label horizontal className="primary theme-secondary" size="small">
+    {i18next.t("Record deletion")}
+  </Label>
+);
+
+export const LabelTypeEditPublishedRecord = () => (
+  <Label horizontal className="primary theme-secondary" size="small">
+    {i18next.t("Edit published record")}
+  </Label>
+);
