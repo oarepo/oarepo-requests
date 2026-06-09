@@ -1,7 +1,9 @@
-// This file is part of React-Invenio-Deposit
-// Copyright (C) 2021 Graz University of Technology.
 //
-// Invenio-app-rdm is free software; you can redistribute it and/or modify it
+// Copyright (c) 2025 CESNET z.s.p.o.
+//
+// This file is a part of oarepo-requests (see https://github.com/oarepo/oarepo-requests).
+//
+// oarepo-requests is free software; you can redistribute it and/or modify it
 // under the terms of the MIT License; see LICENSE file for more details.
 
 import i18n from "i18next";

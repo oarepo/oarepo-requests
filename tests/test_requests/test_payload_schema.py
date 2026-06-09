@@ -15,5 +15,5 @@ def test_publish_request_payload_schema(app, db):
     assert ma_schema().dump({"payload": {"version": "v1"}}) == {
         "payload": {"version": "v1"},
         "links": {},
-        "title": "",
+        "title": "Publish draft",
     }

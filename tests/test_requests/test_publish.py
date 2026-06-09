@@ -50,7 +50,7 @@ def test_publish_service(
     record_service.read(creator.identity, draft["id"])  # will throw exception if record isn't published
 
 
-def test_submit_title_falls_back_to_stateful_name_when_topic_has_no_title(
+def test_submit_title_includes_request_type_name(
     requests_model,
     users,
     draft_factory,
@@ -58,7 +58,14 @@ def test_submit_title_falls_back_to_stateful_name_when_topic_has_no_title(
     requests_service,
     search_clear,
 ):
-    """Submit falls back to request type's stateful_name when neither request nor topic has a title."""
+    """Submit falls back to request type's name when the topic has no title.
+
+    The schema's post_dump fills `title` from the request type's `name` class
+    attribute when neither the request nor the topic has a title. We assert
+    the type name appears in the title (rather than equality) so a type that
+    later overrides `_create_marshmallow_schema` to produce e.g.
+    ``"Approve draft (<topic>)"`` still passes this contract.
+    """
     creator = users[0]
     draft = draft_factory(creator.identity, custom_data={"metadata": {}}, custom_workflow="with_approve")
     request = create_request_on_draft(creator.identity, draft["id"], "approve_draft")
@@ -66,7 +73,48 @@ def test_submit_title_falls_back_to_stateful_name_when_topic_has_no_title(
 
     submitted = requests_service.execute_action(creator.identity, request["id"], "submit").to_dict()
 
-    assert submitted["title"] == "Approve draft"
+    assert "Approve draft" in submitted["title"]
+
+
+def test_publish_draft_stateful_name_appends_topic_title(
+    requests_model,
+    users,
+    record_service,
+    default_record_with_workflow_json,
+    search_clear,
+):
+    """stateful_name resolves the topic from the request and appends its title.
+
+    Covers the `topic is None` resolution branch and the
+    ``f"{base} ({title})"`` formatting in
+    `PublishDraftRequestType.stateful_name`. The default record fixture sets
+    `metadata.title = "blabla"`, so we expect that to appear in the returned
+    string wrapped in parentheses.
+    """
+    from invenio_requests.proxies import current_requests_service
+    from invenio_requests.records.api import Request
+
+    creator = users[0]
+    draft = record_service.create(creator.identity, default_record_with_workflow_json)
+    request_item = current_requests_service.create(
+        identity=creator.identity,
+        data={"payload": {"version": "1.0"}},
+        request_type="publish_draft",
+        topic=draft._record,  # noqa SLF001
+    )
+    requests_model.Draft.index.refresh()
+    request_record = Request.get_record(request_item.id)
+
+    result = str(
+        request_record.type.stateful_name(
+            creator.identity,
+            topic=None,
+            request=request_record,
+        )
+    )
+
+    expected_title = draft["metadata"]["title"]
+    assert f"({expected_title})" in result
 
 
 def test_publish(

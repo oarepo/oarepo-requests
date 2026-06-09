@@ -110,7 +110,7 @@ class OARepoRequestType(RequestType):
         base_schema = super()._create_marshmallow_schema()
         # TODO: idk why .fields
         if cls.payload_schema is not None and hasattr(base_schema, "fields") and "payload" in base_schema.fields:  # type: ignore[reportAttributeAccessIssue]
-            base_schema.fields["payload"].required = True  # type: ignore[reportAttributeAccessIssue]
+            base_schema.fields["payload"].required = True  # type: ignore[reportAttributeAccessIssue] #pragma: no cover
 
         request_type_cls = cls
 
