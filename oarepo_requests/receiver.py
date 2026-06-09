@@ -11,7 +11,11 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING, Any, cast
 
-from oarepo_workflows.errors import RequestTypeNotInWorkflowError
+from oarepo_workflows.errors import (
+    InvalidWorkflowError,
+    MissingWorkflowError,
+    RequestTypeNotInWorkflowError,
+)
 
 from oarepo_requests.errors import ReceiverNonReferencableError
 
@@ -36,9 +40,18 @@ def default_workflow_receiver_function(
     """
     from oarepo_workflows.proxies import current_oarepo_workflows
 
-    workflow = current_oarepo_workflows.get_workflow(record)
+    try:
+        workflow = current_oarepo_workflows.get_workflow(record)
+    except MissingWorkflowError, InvalidWorkflowError:
+        # if the record does not have a workflow, we cannot determine the receiver
+        # so we return None
+        # a case when it happens is when the record == community and the request
+        # is invitation request -> the community itself is not governed by a workflow
+        # so we return None
+        return None
+
     if not workflow:
-        return None  # exception?
+        return None
 
     try:
         request: WorkflowRequest = workflow.requests().requests_by_id[request_type.type_id]
