@@ -216,7 +216,7 @@ msgstr "Upravit záznam"
 
 #: /Users/miroslavbauer/Code/github.com/oarepo/oarepo-requests/oarepo_requests/types/publish_draft.py:12
 msgid "Publish draft"
-msgstr "Publikovat"
+msgstr "Publikovat koncept"
 
 msgid "Close"
 msgstr "Zavřít"
@@ -1505,3 +1505,18 @@ msgstr "Změněno"
 
 msgid "Value"
 msgstr "Hodnota"
+
+#: /Users/dusanstojanovic/Projects/oarepo-requests/oarepo_requests/types/edit_record.py:75
+#: /Users/dusanstojanovic/Projects/oarepo-requests/oarepo_requests/types/new_version.py:71
+#: /Users/dusanstojanovic/Projects/oarepo-requests/oarepo_requests/types/new_version.py:80
+msgid "Trying to create edit request on record without draft support"
+msgstr "Pokus o vytvoření žádosti o úpravu záznamu bez podpory konceptů"
+
+msgid "New version"
+msgstr "Nová verze"
+
+msgid "Record deletion"
+msgstr "Smazání záznamu"
+
+msgid "Edit published record"
+msgstr "Upravit publikovaný záznam"

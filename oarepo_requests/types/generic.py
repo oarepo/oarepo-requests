@@ -10,12 +10,14 @@
 from __future__ import annotations
 
 from abc import abstractmethod
-from typing import TYPE_CHECKING, Any, cast
+from typing import TYPE_CHECKING, Any, ClassVar, cast
 
+from invenio_records_resources.services.base.links import EndpointLink
 from invenio_records_resources.services.errors import PermissionDeniedError
 from invenio_requests.customizations import RequestType
 from invenio_requests.customizations.states import RequestState
 from invenio_requests.proxies import current_requests_service
+from marshmallow import post_dump
 
 from oarepo_requests.errors import OpenRequestAlreadyExistsError
 from oarepo_requests.notifications.builders.comment import (
@@ -64,6 +66,18 @@ class OARepoRequestType(RequestType):
     editable: bool | None = None
     """Whether the request type can be edited multiple times before it is submitted."""
 
+    # Resolved by RequestTypeDependentEndpointLink in the requests service config
+    # (invenio_requests/services/requests/config.py). All oarepo request types
+    # surface their UI on the user-dashboard detail route; subclasses can override
+    # if they ever need to live under a different blueprint (e.g. community-side).
+    links_item: ClassVar[dict[str, EndpointLink]] = {
+        "self_html": EndpointLink(
+            "invenio_app_rdm_requests.user_dashboard_request_view",
+            params=["request_pid_value"],
+            vars=lambda obj, vars: vars.update(request_pid_value=vars["request"].id),  # noqa: ARG005, A006
+        ),
+    }
+
     @classproperty
     def allowed_receiver_ref_types(cls) -> list[str]:  # type: ignore[reportIncompatibleVariableOverride] # noqa N805
         return current_oarepo_requests.allowed_receiver_ref_types
@@ -93,12 +107,40 @@ class OARepoRequestType(RequestType):
     @classmethod
     def _create_marshmallow_schema(cls) -> type[Schema]:
         """Create a marshmallow schema for this request type with required payload field."""
-        schema = super()._create_marshmallow_schema()
+        base_schema = super()._create_marshmallow_schema()
         # TODO: idk why .fields
-        if cls.payload_schema is not None and hasattr(schema, "fields") and "payload" in schema.fields:  # type: ignore[reportAttributeAccessIssue]
-            schema.fields["payload"].required = True  # type: ignore[reportAttributeAccessIssue]
+        if cls.payload_schema is not None and hasattr(base_schema, "fields") and "payload" in base_schema.fields:  # type: ignore[reportAttributeAccessIssue]
+            base_schema.fields["payload"].required = True  # type: ignore[reportAttributeAccessIssue] #pragma: no cover
 
-        return cast("type[Schema]", schema)
+        request_type_cls = cls
+
+        class SchemaWithTitleFallback(base_schema):  # type: ignore[misc, valid-type]
+            # We deliberately fall back to the static `cls.name` here instead of
+            # calling `stateful_name(...)`. `stateful_name` -> `string_by_state`
+            # transitively calls `has_rights_to_accept_request` and
+            # `request_identity_matches`, which require:
+            #   * a live `Identity` on `g.identity` (absent in notifications,
+            #     Celery jobs, system flows and many tests),
+            #   * `request.created_by` still in `{"user": "1"}` reference-dict
+            #     form (by post_dump time upstream service code has often
+            #     swapped it for a live `UserProxy`, which then blows up inside
+            #     `ResolverRegistry.resolve_entity_proxy` -> `_parse_ref_dict`
+            #     with `'UserProxy' object has no attribute 'keys'`),
+            #   * `original` being a real `Request` object (in some test paths
+            #     it's a plain dict, and `string_by_state`'s `match request.status`
+            #     then fails with `'dict' object has no attribute 'status'`).
+            # A post_dump must be safe in every dump context, so we restrict
+            # ourselves to a side-effect-free read of the class attribute.
+            # Request types that need a richer state-aware title (e.g. publish_draft)
+            # do their own override of `_create_marshmallow_schema` and resolve
+            # the topic safely from the already-serialized `data["topic"]`.
+            @post_dump
+            def _ensure_title(self, data: dict[str, Any], **kwargs: Any) -> dict[str, Any]:  # noqa ARG002
+                if not data.get("title"):
+                    data["title"] = str(request_type_cls.name)
+                return data
+
+        return cast("type[Schema]", SchemaWithTitleFallback)
 
     def can_create(
         self,
