@@ -45,15 +45,18 @@ class PublishRequestType(NonDuplicableOARepoRecordRequestType):
     allowed_on_published = False
     receiver_can_be_none = True
     editable = False
+    submit_action = PublishDraftSubmitAction
+    accept_action = PublishDraftAcceptAction
+    decline_action = PublishDraftDeclineAction
 
     @classproperty
     def available_actions(cls) -> dict[str, type[RequestAction]]:  # noqa N805
         """Return available actions for the request type."""
         return {
             **super().available_actions,
-            "submit": PublishDraftSubmitAction,
-            "accept": PublishDraftAcceptAction,
-            "decline": PublishDraftDeclineAction,
+            "submit": cls.submit_action,
+            "accept": cls.accept_action,
+            "decline": cls.decline_action,
         }
 
     @override
