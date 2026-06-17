@@ -1,0 +1,14 @@
+{# -*- coding: utf-8 -*-
+
+  Copyright (C) 2026 CESNET.
+
+  oarepo-requests is free software; you can redistribute it and/or modify it
+  under the terms of the MIT License; see LICENSE file for more details.
+#}
+
+{% extends "semantic-ui/invenio_requests/community-submission/index.html" %}
+
+{% block javascript %}
+  {{ super() }}
+  {{ webpack['oarepo-requests-tabs.js'] }}
+{% endblock %}
