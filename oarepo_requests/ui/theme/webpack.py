@@ -15,7 +15,9 @@ theme = WebpackThemeBundle(  # pragma: no cover
     default="semantic-ui",
     themes={
         "semantic-ui": {
-            "entry": {},
+            "entry": {
+                "oarepo-requests-tabs": "./js/oarepo_requests/tabs.js",
+            },
             "dependencies": {},
             "devDependencies": {},
             "aliases": {
