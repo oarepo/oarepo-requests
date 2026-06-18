@@ -66,12 +66,8 @@ class PublishDraftRequestType(PublishRequestType):
         request: Request | None = None,
         **kwargs: Any,
     ) -> str | LazyString:
-        """Return the stateful name of the request, with the topic title appended when available."""
-        if topic is None and request is not None:
-            topic_ref = getattr(request, "topic", None)
-            if topic_ref is not None:
-                topic = topic_ref.resolve()
-        base = self.string_by_state(
+        """Return the stateful name of the request."""
+        return self.string_by_state(  # pragma: no cover
             identity=identity,
             topic=topic,
             request=request,
@@ -86,11 +82,6 @@ class PublishDraftRequestType(PublishRequestType):
             cancelled=gettext("Draft publication cancelled"),
             created=gettext("Submit for review"),
         )
-        topic_metadata = getattr(topic, "metadata", None) or {}
-        title = topic_metadata.get("title")
-        if title:
-            return f"{base} ({title})"
-        return base
 
     @override
     def stateful_description(

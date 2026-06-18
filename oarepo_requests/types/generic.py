@@ -115,29 +115,28 @@ class OARepoRequestType(RequestType):
         request_type_cls = cls
 
         class SchemaWithTitleFallback(base_schema):  # type: ignore[misc, valid-type]
-            # We deliberately fall back to the static `cls.name` here instead of
-            # calling `stateful_name(...)`. `stateful_name` -> `string_by_state`
-            # transitively calls `has_rights_to_accept_request` and
-            # `request_identity_matches`, which require:
-            #   * a live `Identity` on `g.identity` (absent in notifications,
-            #     Celery jobs, system flows and many tests),
-            #   * `request.created_by` still in `{"user": "1"}` reference-dict
-            #     form (by post_dump time upstream service code has often
-            #     swapped it for a live `UserProxy`, which then blows up inside
-            #     `ResolverRegistry.resolve_entity_proxy` -> `_parse_ref_dict`
-            #     with `'UserProxy' object has no attribute 'keys'`),
-            #   * `original` being a real `Request` object (in some test paths
-            #     it's a plain dict, and `string_by_state`'s `match request.status`
-            #     then fails with `'dict' object has no attribute 'status'`).
-            # A post_dump must be safe in every dump context, so we restrict
-            # ourselves to a side-effect-free read of the class attribute.
-            # Request types that need a richer state-aware title (e.g. publish_draft)
-            # do their own override of `_create_marshmallow_schema` and resolve
-            # the topic safely from the already-serialized `data["topic"]`.
-            @post_dump
-            def _ensure_title(self, data: dict[str, Any], **kwargs: Any) -> dict[str, Any]:  # noqa ARG002
-                if not data.get("title"):
-                    data["title"] = str(request_type_cls.name)
+            # Set the request title to "<type name> (<topic title>)" when the
+            # topic resolves and has a metadata title; otherwise fall back to
+            # the static type name. We deliberately do NOT call stateful_name
+            # here — string_by_state crashes when request.created_by has been
+            # lazy-swapped to an EntityProxy (`'UserProxy' object has no
+            # attribute 'keys'` inside request_identity_matches).
+            @post_dump(pass_original=True)
+            def _ensure_title(self, data: dict[str, Any], original: Any, **kwargs: Any) -> dict[str, Any]:  # noqa ARG002
+                if data.get("title"):
+                    return data  # honor an explicitly persisted title
+                title = str(request_type_cls.name)
+                topic_proxy = getattr(original, "topic", None)
+                if topic_proxy is not None:
+                    try:
+                        topic = topic_proxy.resolve()
+                        metadata = getattr(topic, "metadata", None) if topic else None
+                        topic_title = metadata.get("title") if isinstance(metadata, dict) else None
+                        if topic_title:
+                            title = f"{title} ({topic_title})"
+                    except Exception:  # noqa: S110 BLE001 pragma: no cover
+                        pass  # keep static fallback on any resolution failure #pragma: no cover
+                data["title"] = title
                 return data
 
         return cast("type[Schema]", SchemaWithTitleFallback)

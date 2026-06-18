@@ -76,45 +76,34 @@ def test_submit_title_includes_request_type_name(
     assert "Approve draft" in submitted["title"]
 
 
-def test_publish_draft_stateful_name_appends_topic_title(
+def test_dump_title_appends_topic_title(
     requests_model,
     users,
     record_service,
     default_record_with_workflow_json,
     search_clear,
 ):
-    """stateful_name resolves the topic from the request and appends its title.
+    """The dumped request title is "<type name> (<topic title>)".
 
-    Covers the `topic is None` resolution branch and the
-    ``f"{base} ({title})"`` formatting in
-    `PublishDraftRequestType.stateful_name`. The default record fixture sets
-    `metadata.title = "blabla"`, so we expect that to appear in the returned
-    string wrapped in parentheses.
+    Exercises `SchemaWithTitleFallback._ensure_title` in
+    `OARepoRequestType._create_marshmallow_schema`: the post_dump resolves
+    `data["topic"]` and appends the resolved record's `metadata.title` to
+    the static type name.
     """
     from invenio_requests.proxies import current_requests_service
-    from invenio_requests.records.api import Request
 
     creator = users[0]
     draft = record_service.create(creator.identity, default_record_with_workflow_json)
-    request_item = current_requests_service.create(
+    topic_title = draft["metadata"]["title"]
+
+    created = current_requests_service.create(
         identity=creator.identity,
         data={"payload": {"version": "1.0"}},
         request_type="publish_draft",
         topic=draft._record,  # noqa SLF001
-    )
-    requests_model.Draft.index.refresh()
-    request_record = Request.get_record(request_item.id)
+    ).to_dict()
 
-    result = str(
-        request_record.type.stateful_name(
-            creator.identity,
-            topic=None,
-            request=request_record,
-        )
-    )
-
-    expected_title = draft["metadata"]["title"]
-    assert f"({expected_title})" in result
+    assert created["title"] == f"Publish draft ({topic_title})"
 
 
 def test_publish(
