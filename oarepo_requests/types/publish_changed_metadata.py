@@ -29,6 +29,25 @@ class PublishChangedMetadataRequestType(PublishRequestType):
     type_id = "publish_changed_metadata"
     name = _("Publish changed metadata")
 
+    @override
+    def can_create(
+        self,
+        identity: Identity,
+        data: dict,
+        receiver: dict[str, str],
+        topic: Record,
+        creator: dict[str, str],
+        *args: Any,
+        **kwargs: Any,
+    ) -> None:
+        """Check if the request can be created."""
+        topic = self._convert_to_draft(identity, topic)
+        if self.topic_type(topic) != "metadata":
+            raise ValueError(
+                f"Topic type {self.topic_type(topic)} is not a draft for changed metadata of a published record"
+            )
+        super().can_create(identity, data, receiver, topic, creator, *args, **kwargs)
+
     @classmethod
     def is_applicable_to(cls, identity: Identity, topic: Record, *args: Any, **kwargs: Any) -> bool:
         """Check if the request type is applicable to the topic."""

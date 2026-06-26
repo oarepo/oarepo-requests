@@ -62,6 +62,10 @@ class PublishNewVersionRequestType(PublishRequestType):
         **kwargs: Any,
     ) -> None:
         """Check if the request can be created."""
+        topic = self._convert_to_draft(identity, topic)
+        if self.topic_type(topic) != "new_version":
+            raise ValueError(f"Topic type {self.topic_type(topic)} is not a draft of a new version of a record")
+
         topic_service = get_draft_record_service(topic)
         # Only needed in case of new version as when you are publishing
         # draft for the first time, there are no previous versions with
