@@ -21,6 +21,7 @@ from oarepo_runtime.typing import record_from_result
 
 from oarepo_requests.actions.publish_draft import (
     PublishDraftAcceptAction,
+    PublishDraftCancelAction,
     PublishDraftDeclineAction,
     PublishDraftSubmitAction,
 )
@@ -52,6 +53,7 @@ class PublishRequestType(NonDuplicableOARepoRecordRequestType):
     submit_action = PublishDraftSubmitAction
     accept_action = PublishDraftAcceptAction
     decline_action = PublishDraftDeclineAction
+    cancel_action = PublishDraftCancelAction
 
     @classproperty
     def available_actions(cls) -> dict[str, type[RequestAction]]:  # noqa N805
@@ -75,7 +77,7 @@ class PublishRequestType(NonDuplicableOARepoRecordRequestType):
         **kwargs: Any,
     ) -> None:
         """Check if the request can be created."""
-        topic = self._convert_to_draft(identity, topic)
+        topic = self.convert_topic(identity, topic)
         self.assert_no_pending_requests(topic)
         super().can_create(identity, data, receiver, topic, creator, *args, **kwargs)
         self.validate_topic(identity, topic)
@@ -84,11 +86,11 @@ class PublishRequestType(NonDuplicableOARepoRecordRequestType):
     @override
     def is_applicable_to(cls, identity: Identity, topic: Record, *args: Any, **kwargs: Any) -> bool:
         """Check if the request type is applicable to the topic."""
-        topic = cls._convert_to_draft(identity, topic)
+        topic = cls.convert_topic(identity, topic)
         return super().is_applicable_to(identity, topic, *args, **kwargs)
 
     @classmethod
-    def _convert_to_draft(cls, identity: Identity, topic: Record) -> Draft:
+    def convert_topic(cls, identity: Identity, topic: Record) -> Draft:
         """Convert the topic to a draft."""
         if not isinstance(topic, RecordWithDraft):
             raise TypeError(f"Topic type {type(topic)} does not support drafts")
