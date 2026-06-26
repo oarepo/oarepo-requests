@@ -80,6 +80,7 @@ class PublishNewVersionRequestType(PublishRequestType):
     @classmethod
     def is_applicable_to(cls, identity: Identity, topic: Record, *args: Any, **kwargs: Any) -> bool:
         """Check if the request type is applicable to the topic."""
+        topic = cls._convert_to_draft(identity, topic)
         if cls.topic_type(topic) != "new_version":
             return False
 
