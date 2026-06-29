@@ -27,6 +27,7 @@ from ..notifications.builders.publish import (
 from ..utils import get_draft_record_service, search_requests
 from .generic import (
     OARepoAcceptAction,
+    OARepoCancelAction,
     OARepoDeclineAction,
     OARepoSubmitAction,
 )
@@ -37,6 +38,22 @@ if TYPE_CHECKING:
     from invenio_requests.customizations import RequestAction
 else:
     RequestAction = object
+
+
+class MakeTopicDraftMixin(RequestAction):
+    """Mixin for converting the topic to a draft topic before executing the action."""
+
+    def execute(self, identity: Identity, uow: UnitOfWork, *args: Any, **kwargs: Any) -> None:
+        """Convert the topic to the draft topic.
+
+        This is needed for publish_changed_metadata where the topic is a published record
+        - invenio resolves the topic to a published record, but we need the draft topic
+        """
+        # preventing circular imports
+        from oarepo_requests.types import PublishDraftRequestType
+
+        self.topic = PublishDraftRequestType.convert_topic(identity, self.topic)  # type: ignore[has-type]
+        super().execute(identity, uow, *args, **kwargs)
 
 
 class PublishMixin(RequestAction):
@@ -58,7 +75,7 @@ class PublishMixin(RequestAction):
 
 
 # TODO: snapshot
-class PublishDraftSubmitAction(PublishMixin, OARepoSubmitAction):
+class PublishDraftSubmitAction(MakeTopicDraftMixin, PublishMixin, OARepoSubmitAction):  # type: ignore[misc]
     """Submit action for publishing draft requests."""
 
     @override
@@ -82,7 +99,7 @@ class PublishDraftSubmitAction(PublishMixin, OARepoSubmitAction):
         uow.register(NotificationOp(PublishDraftRequestSubmitNotificationBuilder.build(request=self.request)))
 
 
-class PublishDraftAcceptAction(PublishMixin, OARepoAcceptAction):
+class PublishDraftAcceptAction(MakeTopicDraftMixin, PublishMixin, OARepoAcceptAction):  # type: ignore[misc]
     """Accept action for publishing draft requests."""
 
     name = _("Publish")
@@ -121,7 +138,7 @@ class PublishDraftAcceptAction(PublishMixin, OARepoAcceptAction):
         uow.register(NotificationOp(PublishDraftRequestAcceptNotificationBuilder.build(request=self.request)))
 
 
-class PublishDraftDeclineAction(OARepoDeclineAction):
+class PublishDraftDeclineAction(MakeTopicDraftMixin, OARepoDeclineAction):  # type: ignore[misc]
     """Decline action for publishing draft requests."""
 
     name = _("Return for correction")
@@ -136,3 +153,9 @@ class PublishDraftDeclineAction(OARepoDeclineAction):
     ) -> None:
         """Publish the draft."""
         uow.register(NotificationOp(PublishDraftRequestDeclineNotificationBuilder.build(request=self.request)))
+
+
+class PublishDraftCancelAction(MakeTopicDraftMixin, OARepoCancelAction):  # type: ignore[misc]
+    """Cancel action for publishing draft requests."""
+
+    name = _("Cancel")

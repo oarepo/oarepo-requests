@@ -41,7 +41,7 @@ class PublishChangedMetadataRequestType(PublishRequestType):
         **kwargs: Any,
     ) -> None:
         """Check if the request can be created."""
-        topic = self._convert_to_draft(identity, topic)
+        topic = self.convert_topic(identity, topic)
         if self.topic_type(topic) != "metadata":
             raise ValueError(
                 f"Topic type {self.topic_type(topic)} is not a draft for changed metadata of a published record"
@@ -51,7 +51,7 @@ class PublishChangedMetadataRequestType(PublishRequestType):
     @classmethod
     def is_applicable_to(cls, identity: Identity, topic: Record, *args: Any, **kwargs: Any) -> bool:
         """Check if the request type is applicable to the topic."""
-        topic = cls._convert_to_draft(identity, topic)
+        topic = cls.convert_topic(identity, topic)
         if cls.topic_type(topic) != "metadata":
             return False
 
