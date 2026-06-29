@@ -116,7 +116,7 @@ class OARepoRequestsService(RequestsService):
         # ask to convert the topic. For example, for publish_metadata, the topic here is the previously published record
         # but we need the draft that we are publishing.
         if hasattr(type_, "convert_topic"):
-            topic = type_.convert_topic(identity, topic)
+            topic = type_.convert_topic(identity, topic)  # type: ignore[reportAttributeAccessIssue]
 
         if hasattr(type_, "can_create"):
             # raise exception if can't

@@ -52,7 +52,7 @@ class MakeTopicDraftMixin(RequestAction):
         # preventing circular imports
         from oarepo_requests.types import PublishDraftRequestType
 
-        self.topic = PublishDraftRequestType.convert_topic(identity, self.topic)
+        self.topic = PublishDraftRequestType.convert_topic(identity, self.topic)  # type: ignore[has-type]
         super().execute(identity, uow, *args, **kwargs)
 
 
@@ -75,7 +75,7 @@ class PublishMixin(RequestAction):
 
 
 # TODO: snapshot
-class PublishDraftSubmitAction(MakeTopicDraftMixin, PublishMixin, OARepoSubmitAction):
+class PublishDraftSubmitAction(MakeTopicDraftMixin, PublishMixin, OARepoSubmitAction):  # type: ignore[misc]
     """Submit action for publishing draft requests."""
 
     @override
@@ -99,7 +99,7 @@ class PublishDraftSubmitAction(MakeTopicDraftMixin, PublishMixin, OARepoSubmitAc
         uow.register(NotificationOp(PublishDraftRequestSubmitNotificationBuilder.build(request=self.request)))
 
 
-class PublishDraftAcceptAction(MakeTopicDraftMixin, PublishMixin, OARepoAcceptAction):
+class PublishDraftAcceptAction(MakeTopicDraftMixin, PublishMixin, OARepoAcceptAction):  # type: ignore[misc]
     """Accept action for publishing draft requests."""
 
     name = _("Publish")
@@ -138,7 +138,7 @@ class PublishDraftAcceptAction(MakeTopicDraftMixin, PublishMixin, OARepoAcceptAc
         uow.register(NotificationOp(PublishDraftRequestAcceptNotificationBuilder.build(request=self.request)))
 
 
-class PublishDraftDeclineAction(MakeTopicDraftMixin, OARepoDeclineAction):
+class PublishDraftDeclineAction(MakeTopicDraftMixin, OARepoDeclineAction):  # type: ignore[misc]
     """Decline action for publishing draft requests."""
 
     name = _("Return for correction")
@@ -155,7 +155,7 @@ class PublishDraftDeclineAction(MakeTopicDraftMixin, OARepoDeclineAction):
         uow.register(NotificationOp(PublishDraftRequestDeclineNotificationBuilder.build(request=self.request)))
 
 
-class PublishDraftCancelAction(MakeTopicDraftMixin, OARepoCancelAction):
+class PublishDraftCancelAction(MakeTopicDraftMixin, OARepoCancelAction):  # type: ignore[misc]
     """Cancel action for publishing draft requests."""
 
     name = _("Cancel")
