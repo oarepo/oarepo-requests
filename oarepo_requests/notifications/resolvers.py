@@ -13,9 +13,13 @@ from __future__ import annotations
 import json
 from typing import Any, cast, override
 
-from invenio_access.permissions import system_user_id
+from invenio_access.permissions import system_identity, system_user_id
 from invenio_notifications.registry import EntityResolverRegistry
-from invenio_rdm_records.requests.entity_resolvers import RDMRecordServiceResultResolver
+from invenio_pidstore.errors import PIDDoesNotExistError
+from invenio_rdm_records.requests.entity_resolvers import (
+    RDMRecordServiceResultProxy,
+    RDMRecordServiceResultResolver,
+)
 from invenio_records_resources.references import EntityResolver
 from invenio_records_resources.references.entity_resolvers import (
     EntityProxy,
@@ -28,6 +32,42 @@ from oarepo_workflows.resolvers.multiple_entities import (
     MultipleEntitiesProxy,
     MultipleEntitiesResolver,
 )
+from sqlalchemy.exc import NoResultFound
+
+
+class NotificationRecordProxy(RDMRecordServiceResultProxy):
+    """Resolve records for notifications without building record links."""
+
+    def _resolve(self) -> Any:
+        pid_value = self._parse_ref_dict_id()
+
+        try:
+            result = self.service.read_draft(system_identity, pid_value)  # pyright: ignore[reportAttributeAccessIssue]
+
+        except PIDDoesNotExistError:
+            result = self._get_record(pid_value)
+        except NoResultFound:
+            result = self._get_record(pid_value)
+        else:
+            if result._record.is_published:  # noqa: SLF001
+                result = self._get_record(pid_value)
+
+        result._links_tpl = None  # noqa: SLF001
+        result._nested_links_item = None  # noqa: SLF001
+
+        data = result.to_dict()
+        data["links"] = {}
+
+        return data
+
+
+class NotificationRecordResolver(RDMRecordServiceResultResolver):
+    """Record resolver for notifications."""
+
+    def __init__(self):
+        """Initialize the resolver."""
+        super().__init__()
+        self.proxy_cls = NotificationRecordProxy
 
 
 class UserNotificationProxy(ServiceResultProxy):
@@ -111,9 +151,9 @@ def multiple_entities_resolver() -> MultipleEntitiesNotificationResolver:
     return MultipleEntitiesNotificationResolver()
 
 
-def record_resolver() -> RDMRecordServiceResultResolver:
-    """Return community role notification resolver."""
-    return RDMRecordServiceResultResolver()
+def record_resolver() -> NotificationRecordResolver:
+    """Return record notification resolver."""
+    return NotificationRecordResolver()
 
 
 def group_resolver() -> ServiceResultResolver:
