@@ -168,16 +168,6 @@ class OARepoRequests:
             config.NOTIFICATION_RECIPIENTS_RESOLVERS,
         )
 
-        app_notification_builders = app.config.setdefault("NOTIFICATIONS_BUILDERS", {})
-        app_notification_backends = app.config.setdefault("NOTIFICATIONS_BACKENDS", {})
-
-        app.config["NOTIFICATIONS_BUILDERS"] = conservative_merger.merge(
-            app_notification_builders, config.NOTIFICATIONS_BUILDERS
-        )
-        app.config["NOTIFICATIONS_BACKENDS"] = conservative_merger.merge(
-            app_notification_backends, config.NOTIFICATIONS_BACKENDS
-        )
-
 
 def api_finalize_app(app: Flask) -> None:
     """Finalize app."""

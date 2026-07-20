@@ -9,8 +9,6 @@
 
 from __future__ import annotations
 
-from invenio_app_rdm.config import NOTIFICATIONS_BUILDERS as RDM_NOTIFICATIONS_BUILDERS
-from invenio_notifications.backends.email import EmailNotificationBackend
 from invenio_requests.customizations import CommentEventType, LogEventType
 from invenio_requests.services.permissions import (
     PermissionPolicy as InvenioRequestsPermissionPolicy,
@@ -22,19 +20,6 @@ from oarepo_requests.actions.components import (
     AutoAcceptComponent,
     RequestActionComponent,
     WorkflowTransitionComponent,
-)
-from oarepo_requests.notifications.builders.comment import (
-    CommentRequestEventCreateNotificationBuilder,
-)
-from oarepo_requests.notifications.builders.delete_published_record import (
-    DeletePublishedRecordRequestAcceptNotificationBuilder,
-    DeletePublishedRecordRequestDeclineNotificationBuilder,
-    DeletePublishedRecordRequestSubmitNotificationBuilder,
-)
-from oarepo_requests.notifications.builders.publish import (
-    PublishDraftRequestAcceptNotificationBuilder,
-    PublishDraftRequestDeclineNotificationBuilder,
-    PublishDraftRequestSubmitNotificationBuilder,
 )
 from oarepo_requests.notifications.generators import MultipleRecipients
 from oarepo_requests.notifications.generators.recipients import GroupRecipient
@@ -60,19 +45,4 @@ NOTIFICATION_RECIPIENTS_RESOLVERS = {
     "user": lambda key, notification: UserRecipient(key),  # noqa ARG005
     "multiple": lambda key, notification: MultipleRecipients(key),  # noqa ARG005
     "group": lambda key, notification: GroupRecipient(key),  # noqa ARG005
-}
-
-NOTIFICATIONS_BACKENDS = {
-    EmailNotificationBackend.id: EmailNotificationBackend(),
-}
-
-NOTIFICATIONS_BUILDERS = {
-    **RDM_NOTIFICATIONS_BUILDERS,
-    DeletePublishedRecordRequestSubmitNotificationBuilder.type: DeletePublishedRecordRequestSubmitNotificationBuilder,
-    DeletePublishedRecordRequestAcceptNotificationBuilder.type: DeletePublishedRecordRequestAcceptNotificationBuilder,
-    DeletePublishedRecordRequestDeclineNotificationBuilder.type: DeletePublishedRecordRequestDeclineNotificationBuilder,
-    PublishDraftRequestSubmitNotificationBuilder.type: PublishDraftRequestSubmitNotificationBuilder,
-    PublishDraftRequestAcceptNotificationBuilder.type: PublishDraftRequestAcceptNotificationBuilder,
-    PublishDraftRequestDeclineNotificationBuilder.type: PublishDraftRequestDeclineNotificationBuilder,
-    CommentRequestEventCreateNotificationBuilder.type: CommentRequestEventCreateNotificationBuilder,
 }
