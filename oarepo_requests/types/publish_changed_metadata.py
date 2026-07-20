@@ -51,7 +51,10 @@ class PublishChangedMetadataRequestType(PublishRequestType):
     @classmethod
     def is_applicable_to(cls, identity: Identity, topic: Record, *args: Any, **kwargs: Any) -> bool:
         """Check if the request type is applicable to the topic."""
-        topic = cls.convert_topic(identity, topic)
+        try:
+            topic = cls.convert_topic(identity, topic)
+        except ValueError:
+            return False
         if cls.topic_type(topic) != "metadata":
             return False
 
