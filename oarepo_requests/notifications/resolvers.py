@@ -15,7 +15,8 @@ from typing import Any, cast, override
 
 from invenio_access.permissions import system_identity, system_user_id
 from invenio_notifications.registry import EntityResolverRegistry
-from invenio_rdm_records.requests.entity_resolvers import RDMRecordServiceResultResolver
+from invenio_pidstore.errors import PIDDoesNotExistError
+from invenio_rdm_records.requests.entity_resolvers import RDMRecordServiceResultProxy, RDMRecordServiceResultResolver
 from invenio_records_resources.references import EntityResolver
 from invenio_records_resources.references.entity_resolvers import (
     EntityProxy,
@@ -34,6 +35,7 @@ class NotificationRecordProxy(RDMRecordServiceResultProxy):
     """Resolve records for notifications without building record links."""
 
     def _resolve(self) -> Any:
+
         pid_value = self._parse_ref_dict_id()
 
         try:
