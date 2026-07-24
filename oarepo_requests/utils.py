@@ -45,7 +45,7 @@ if TYPE_CHECKING:
 
     from oarepo_requests.services.results import RequestTypesList
 
-type JsonValue = str | LazyString | int | float | bool | None | dict[str, JsonValue] | list[JsonValue]
+type JsonValue = str | LazyString | int | float | bool | dict[str, JsonValue] | list[JsonValue] | None
 
 
 # TODO: move to runtime; typing issues
