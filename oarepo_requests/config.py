@@ -45,3 +45,4 @@ NOTIFICATION_RECIPIENTS_RESOLVERS = {
     "group": lambda key, notification: UserRecipient(key),  # noqa ARG005
     "multiple": lambda key, notification: MultipleRecipients(key),  # noqa ARG005
 }
+NOTIFICATIONS_MANAGER_CLS = "oarepo_requests.notifications.manager.NotificationManager"

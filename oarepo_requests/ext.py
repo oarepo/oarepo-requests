@@ -152,6 +152,7 @@ class OARepoRequests:
         app.config.setdefault("REQUESTS_ALLOWED_RECEIVERS", []).extend(config.REQUESTS_ALLOWED_RECEIVERS)
 
         app.config.setdefault("PUBLISH_REQUEST_TYPES", config.PUBLISH_REQUEST_TYPES)
+        app.config.setdefault("NOTIFICATIONS_MANAGER_CLS", config.NOTIFICATIONS_MANAGER_CLS)
 
         # do not overwrite user's stuff
         app_default_workflow_events = app.config.setdefault("DEFAULT_WORKFLOW_EVENTS", {})
@@ -184,9 +185,6 @@ def finalize_app(app: Flask) -> None:
 
     ext = app.extensions["oarepo-requests"]
     ext.notification_recipients_resolvers_registry = app.config["NOTIFICATION_RECIPIENTS_RESOLVERS"]
-
-    invenio_notifications = app.extensions["invenio-notifications"]
-    invenio_notifications.init_manager(app)
 
     dumper_extensions = Request.dumper._extensions  # noqa SLF001 # type: ignore[reportAttributeAccessIssue]
     if not any(isinstance(e, RecordReferenceDumperExt) for e in dumper_extensions):

@@ -10,10 +10,10 @@
 from __future__ import annotations
 
 from invenio_app_rdm.config import NOTIFICATIONS_BUILDERS as RDM_NOTIFICATIONS_BUILDERS
+from invenio_notifications.backends import EmailNotificationBackend
 from invenio_rdm_records.requests.entity_resolvers import RDMRecordServiceResultResolver
 from invenio_records_resources.references.entity_resolvers import ServiceResultResolver
 
-from oarepo_requests.notifications.backends.email import EmailNotificationBackend
 from oarepo_requests.notifications.builders.comment import (
     CommentRequestEventCreateNotificationBuilder,
 )
