@@ -9,30 +9,30 @@
 
 from __future__ import annotations
 
-import copy
-from typing import cast
+from typing import TYPE_CHECKING, cast
 
 from flask import current_app
 from flask_babel import LazyString, force_locale
+from invenio_i18n.proxies import current_i18n
 from invenio_notifications.manager import NotificationManager as InvenioNotificationManager
 from invenio_notifications.models import Notification, Recipient
 from invenio_notifications.tasks import dispatch_notification
 
 from oarepo_requests.notifications.utils import group_users, is_group
 
+if TYPE_CHECKING:
+    from oarepo_requests.utils import JsonValue
+
 
 def get_locale(recipient: Recipient) -> str:
-    """Get recipient locale."""
-    locale = None
-    if isinstance(recipient, dict):
-        locale = recipient.get("data", {}).get("preferences", {}).get("locale")
-    return locale or cast("str", current_app.config.get("BABEL_DEFAULT_LOCALE", "en"))
+    """Get the locale the notification should be resolved in."""
+    locale = recipient.data.get("preferences", {}).get("locale")
+    if not current_i18n.is_locale_available(locale):
+        return cast("str", current_app.config.get("BABEL_DEFAULT_LOCALE", "en"))
+    return cast("str", locale)
 
 
-type LazyJSON = dict[str, LazyJSON] | list[LazyJSON] | LazyString | str | int | float | bool | None
-
-
-def resolve_lazy_strings(data: LazyJSON) -> LazyJSON:
+def resolve_lazy_strings(data: JsonValue) -> JsonValue:
     """Resolve lazy strings in recipient data."""
     if isinstance(data, dict):
         return {key: resolve_lazy_strings(value) for key, value in data.items()}
@@ -45,12 +45,11 @@ def resolve_lazy_strings(data: LazyJSON) -> LazyJSON:
 
 def expand_recipients(recipients: dict[str, Recipient]) -> dict[str, Recipient]:
     """Expand notification recipients."""
-    keys = copy.deepcopy(list(recipients.keys()))
-    for k in keys:
+    for k in list(recipients):
         recipient = recipients[k]
         if is_group(recipient):
-            recipients.update({u["id"]: Recipient(data=u) for u in group_users(recipient.data["name"])})
             del recipients[k]
+            recipients.update({u["id"]: Recipient(data=u) for u in group_users(recipient.data["name"])})
     return recipients
 
 
@@ -70,11 +69,13 @@ class NotificationManager(InvenioNotificationManager):
         recipients = builder.build_recipients(notification)
         recipients = expand_recipients(recipients)
         recipients = builder.filter_recipients(notification, recipients)
+        context = notification.context
         for recipient in recipients.values():
+            # lazy strings have to be resolved before the <x>.dumps() serialization later
             locale = get_locale(recipient)
             with force_locale(locale):
                 recipient.data = cast("dict", resolve_lazy_strings(recipient.data))
-                notification.context = cast("dict", resolve_lazy_strings(notification.context))
+                notification.context = cast("dict", resolve_lazy_strings(context))
             recipient_backends = builder.build_recipient_backends(notification, recipient)
             for backend in recipient_backends:
                 dispatch_notification.delay(

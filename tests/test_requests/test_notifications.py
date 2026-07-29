@@ -360,9 +360,13 @@ def test_comment_notifications(
         assert content in outbox[0].body
 
 
+# machine-readable values that a builder would never wrap in a lazy string
+NON_TRANSLATABLE_KEYS = {"preferences"}
+
+
 def make_lazy(data):
     if isinstance(data, dict):
-        return {key: make_lazy(value) for key, value in data.items()}
+        return {key: value if key in NON_TRANSLATABLE_KEYS else make_lazy(value) for key, value in data.items()}
     if isinstance(data, list):
         return [make_lazy(item) for item in data]
     if isinstance(data, str):
@@ -435,13 +439,7 @@ def test_group_expansion_does_not_duplicate_recipients(
     role,
     urls,
 ):
-    """A user who is both a direct receiver and a member of a receiver group gets one mail.
-
-    Receiver = [user users[0]] + [group it-dep] where users[0] is a member of it-dep.
-    Expected: users[0] is addressed exactly once.
-    Actual (bug): users[0] gets two mails, because the group is expanded in ``send()``
-    after the recipient dict (keyed by entity id) has already been built.
-    """
+    """A user who is both a direct receiver and a member of a receiver group gets one mail."""
     mail = app.extensions.get("mail")
     config_restore = app.config["OAREPO_REQUESTS_DEFAULT_RECEIVER"]
     add_user_in_role(users[0], role)
@@ -481,13 +479,7 @@ def test_group_member_comment_author_not_self_notified(
     role,
     urls,
 ):
-    """A comment author who is a member of the receiver group is not notified of their own comment.
-
-    ``UserRecipientFilter(key="request_event.created_by")`` removes the comment author from
-    recipients -- but only the *direct* recipient. When the author is reached through a group
-    receiver, the group is still opaque at filter time and only expanded later in ``send()``,
-    so the author is notified about their own comment.
-    """
+    """A comment author who is a member of the receiver group is not notified of their own comment."""
     mail = app.extensions.get("mail")
     config_restore = app.config["OAREPO_REQUESTS_DEFAULT_RECEIVER"]
     add_user_in_role(users[0], role)

@@ -22,7 +22,10 @@ if TYPE_CHECKING:
 
 
 def is_group(recipient: Recipient) -> bool:
-    """Check if recipient is a group."""
+    """Check if recipient is a group.
+
+    Taken from invenio_notifications.backends.email.EmailNotificationBackend._resolve_email.
+    """
     email = recipient.data.get("email") or recipient.data.get("email_hidden")
     if email:
         return False
