@@ -140,11 +140,10 @@ Example workflow request configuration:
 from oarepo_workflows import WorkflowRequest, WorkflowTransitions, AutoApprove
 from oarepo_requests.services.permissions import IfRequestedBy
 
+
 class MyWorkflowRequests(WorkflowRequestPolicy):
     publish_request = WorkflowRequest(
-        requesters=[
-            IfInState("draft", then_=[RecordOwners(), CommunityRole("curator")])
-        ],
+        requesters=[IfInState("draft", then_=[RecordOwners(), CommunityRole("curator")])],
         recipients=[
             IfRequestedBy(
                 CommunityRole("curator"),
@@ -152,11 +151,7 @@ class MyWorkflowRequests(WorkflowRequestPolicy):
                 else_=[CommunityRole("curator")],
             )
         ],
-        transitions=WorkflowTransitions(
-            submitted="submitted",
-            accepted="published",
-            declined="draft"
-        ),
+        transitions=WorkflowTransitions(submitted="submitted", accepted="published", declined="draft"),
     )
 ```
 
@@ -178,7 +173,7 @@ class MyWorkflowPermissions(RequestBasedWorkflowPermissions):
 - Used in workflow recipient configuration
 
 ```python
-recipients=[
+recipients = [
     IfRequestedBy(
         CommunityRole("curator"),
         then_=[AutoApprove()],
@@ -197,12 +192,12 @@ Base properties inherited by all request types:
 
 ```python
 class OARepoRequestType(RequestType):
-    dangerous = False              # Marks destructive operations
-    allowed_on_draft = True        # Can be created on draft records
-    allowed_on_published = True    # Can be created on published records
-    editable = None                # Whether request can be edited before submission
-    receiver_can_be_none = False   # Whether auto-approval is allowed
-    payload_schema = {...}         # Marshmallow schema for request payload
+    dangerous = False  # Marks destructive operations
+    allowed_on_draft = True  # Can be created on draft records
+    allowed_on_published = True  # Can be created on published records
+    editable = None  # Whether request can be edited before submission
+    receiver_can_be_none = False  # Whether auto-approval is allowed
+    payload_schema = {...}  # Marshmallow schema for request payload
 ```
 
 Request types also implement:
@@ -306,14 +301,10 @@ result = current_requests_service.create(
 from invenio_requests.proxies import current_requests_service
 
 # Submit request
-current_requests_service.execute_action(
-    identity, request_id, "submit"
-)
+current_requests_service.execute_action(identity, request_id, "submit")
 
 # Accept request
-current_requests_service.execute_action(
-    identity, request_id, "accept"
-)
+current_requests_service.execute_action(identity, request_id, "accept")
 ```
 
 ### Custom Request Types
@@ -322,15 +313,16 @@ current_requests_service.execute_action(
 from oarepo_requests.types.generic import NonDuplicableOARepoRecordRequestType
 from oarepo_requests.actions.generic import OARepoAcceptAction
 
+
 class MyRequestType(NonDuplicableOARepoRecordRequestType):
     type_id = "my_request"
     name = _("My Request")
     description = _("Description of my request")
-    
+
     payload_schema = {
         "my_field": ma.fields.Str(required=True),
     }
-    
+
     @classproperty
     def available_actions(cls):
         return {
@@ -338,9 +330,10 @@ class MyRequestType(NonDuplicableOARepoRecordRequestType):
             "accept": MyAcceptAction,
         }
 
+
 class MyAcceptAction(OARepoAcceptAction):
     name = _("Accept")
-    
+
     def apply(self, identity, uow, *args, **kwargs):
         # Custom acceptance logic
         pass
@@ -357,6 +350,7 @@ my_request = "myapp.requests:MyRequestType"
 
 ```python
 from oarepo_requests.actions.components import RequestActionComponent
+
 
 class MyComponent(RequestActionComponent):
     def accept(self, identity, action, uow, *args, **kwargs):

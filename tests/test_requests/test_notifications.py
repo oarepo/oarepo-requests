@@ -12,7 +12,6 @@ from typing import Any
 import pytest
 from invenio_i18n import lazy_gettext as _
 from invenio_notifications.backends import EmailNotificationBackend
-from invenio_notifications.manager import NotificationManager
 from invenio_notifications.models import Recipient
 from invenio_notifications.services.generators import EntityResolve
 from invenio_records.dictutils import dict_lookup, dict_set
@@ -28,6 +27,7 @@ from oarepo_workflows.resolvers.multiple_entities import (
 from oarepo_requests.notifications.builders.publish import (
     PublishDraftRequestSubmitNotificationBuilder,
 )
+from oarepo_requests.notifications.manager import NotificationManager
 
 
 @pytest.fixture
@@ -360,9 +360,13 @@ def test_comment_notifications(
         assert content in outbox[0].body
 
 
+# machine-readable values that a builder would never wrap in a lazy string
+NON_TRANSLATABLE_KEYS = {"preferences"}
+
+
 def make_lazy(data):
     if isinstance(data, dict):
-        return {key: make_lazy(value) for key, value in data.items()}
+        return {key: value if key in NON_TRANSLATABLE_KEYS else make_lazy(value) for key, value in data.items()}
     if isinstance(data, list):
         return [make_lazy(item) for item in data]
     if isinstance(data, str):
@@ -423,3 +427,87 @@ def test_lazy_string_parsing(app, users, logged_client, draft_factory, create_re
     with mail.record_messages() as outbox:
         manager.handle_broadcast(notification)
         assert len(outbox) == 1
+
+
+def test_group_expansion_does_not_duplicate_recipients(
+    app,
+    users,
+    logged_client,
+    draft_factory,
+    submit_request_on_draft,
+    add_user_in_role,
+    role,
+    urls,
+):
+    """A user who is both a direct receiver and a member of a receiver group gets one mail."""
+    mail = app.extensions.get("mail")
+    config_restore = app.config["OAREPO_REQUESTS_DEFAULT_RECEIVER"]
+    add_user_in_role(users[0], role)
+    add_user_in_role(users[1], role)
+
+    def current_receiver(record=None, request_type=None, **kwargs: Any) -> Any:
+        if request_type.type_id == "publish_draft":
+            return MultipleEntitiesProxy(
+                MultipleEntitiesResolver(),
+                {"multiple": MultipleEntitiesEntity.create_id([{"user": users[0].id}, {"group": "it-dep"}])},
+            ).resolve()
+        return config_restore(record, request_type, **kwargs)
+
+    try:
+        app.config["OAREPO_REQUESTS_DEFAULT_RECEIVER"] = current_receiver
+
+        # submit as a third user so the creator is not itself a recipient
+        draft1 = draft_factory(users[2].identity)
+
+        with mail.record_messages() as outbox:
+            submit_request_on_draft(users[2].identity, draft1["id"], "publish_draft")
+
+            recipients = [addr for message in outbox for addr in message.recipients]
+            assert sorted(recipients) == ["user1@example.org", "user2@example.org"]
+            assert len(recipients) == len(set(recipients)), f"duplicate mail sent: {recipients}"
+    finally:
+        app.config["OAREPO_REQUESTS_DEFAULT_RECEIVER"] = config_restore
+
+
+def test_group_member_comment_author_not_self_notified(
+    app,
+    users,
+    logged_client,
+    draft_factory,
+    submit_request_on_draft,
+    add_user_in_role,
+    role,
+    urls,
+):
+    """A comment author who is a member of the receiver group is not notified of their own comment."""
+    mail = app.extensions.get("mail")
+    config_restore = app.config["OAREPO_REQUESTS_DEFAULT_RECEIVER"]
+    add_user_in_role(users[0], role)
+    add_user_in_role(users[1], role)
+
+    def current_receiver(record=None, request_type=None, **kwargs: Any) -> Any:
+        if request_type.type_id == "publish_draft":
+            return role
+        return config_restore(record, request_type, **kwargs)
+
+    try:
+        app.config["OAREPO_REQUESTS_DEFAULT_RECEIVER"] = current_receiver
+
+        author = users[0]  # member of it-dep
+        draft1 = draft_factory(author.identity)
+        submit = submit_request_on_draft(author.identity, draft1["id"], "publish_draft")
+
+        with mail.record_messages() as outbox:
+            current_events_service.create(
+                author.identity,
+                submit["id"],
+                {"payload": {"content": "ceci n'est pas un commentaire"}},
+                CommentEventType,
+            )
+
+            recipients = [addr for message in outbox for addr in message.recipients]
+            # only the other group member should hear about the comment
+            assert "user1@example.org" not in recipients, f"comment author self-notified: {recipients}"
+            assert set(recipients) == {"user2@example.org"}
+    finally:
+        app.config["OAREPO_REQUESTS_DEFAULT_RECEIVER"] = config_restore
