@@ -11,7 +11,7 @@ from __future__ import annotations
 
 from invenio_app_rdm.config import NOTIFICATIONS_BUILDERS as RDM_NOTIFICATIONS_BUILDERS
 from invenio_notifications.backends import EmailNotificationBackend
-from invenio_rdm_records.requests.entity_resolvers import RDMRecordServiceResultResolver
+from invenio_rdm_records.requests.entity_resolvers import EmailResolver, RDMRecordServiceResultResolver
 from invenio_records_resources.references.entity_resolvers import ServiceResultResolver
 
 from oarepo_requests.notifications.builders.comment import (
@@ -54,11 +54,21 @@ NOTIFICATIONS_BACKENDS = {
     EmailNotificationBackend.id: EmailNotificationBackend(),
 }
 
-NOTIFICATIONS_ENTITY_RESOLVERS = {
+# from invenio_app_rdm.config import NOTIFICATIONS_ENTITY_RESOLVERS as RDM_NOTIFICATIONS_ENTITY_RESOLVERS # noqa: ERA001
+
+NOTIFICATIONS_ENTITY_RESOLVERS = [
+    # *RDM_NOTIFICATIONS_ENTITY_RESOLVERS,
+    # these are from RDM directly
     ServiceResultResolver(service_id="requests", type_key="request"),
     ServiceResultResolver(service_id="request_events", type_key="request_event"),
-    ServiceResultResolver(service_id="users", type_key="user", proxy_cls=UserNotificationProxy),
-    MultipleEntitiesNotificationResolver(),
     RDMRecordServiceResultResolver(),
     ServiceResultResolver(service_id="groups", type_key="group"),
-}
+    EmailResolver(),
+    ServiceResultResolver(service_id="communities", type_key="community"),
+    # this is from RDM but has overwritten proxy class.
+    # TODO: We should find a better way to patch this
+    # without discarding the original RDM config
+    ServiceResultResolver(service_id="users", type_key="user", proxy_cls=UserNotificationProxy),
+    # this is our own addon resolver
+    MultipleEntitiesNotificationResolver(),
+]
