@@ -7,41 +7,33 @@
 #}
 {% set invenio_request = notification.context.request %}
 {% set invenio_request_event = notification.context.request_event %}
-{% set invenio_topic = invenio_request.topic or {} %}
 
 {# created_by is either a resolved user or an email (for guests) #}
 {% set event_creator_name = (invenio_request_event.created_by.profile and invenio_request_event.created_by.profile.full_name) or invenio_request_event.created_by.username or invenio_request_event.created_by.email or (invenio_request_event.created_by if invenio_request_event.created_by is string else _("User {user_id}").format(user_id=invenio_request_event.created_by.id)) %}
 {% set request_id = invenio_request.id %}
 {% set request_event_content = invenio_request_event.payload.content | safe %}
 {% set request_title = invenio_request.title | safe %}
-{% set topic_title = ( invenio_topic.title or invenio_topic.metadata.title ) | safe %}
+{% set reply_id = invenio_request_event.id %}
 
 {% set request_link = invenio_request_event.links.self_html %}
+
+{% set reply_link = "{ui}/me/requests/{id}#replyevent-{reply_id}".format(
+    ui=config.SITE_UI_URL, id=request_id, reply_id=reply_id
+    )
+%}
 {% set account_settings_link = "{ui}/account/settings/notifications".format(
     ui=config.SITE_UI_URL
     )
 %}
 
 {%- block subject -%}
-{%- if topic_title -%}
-{{ _("💬 New comment on '{request_title}' for '{topic_title}'").format(request_title=request_title, topic_title=topic_title) }}
-{%- elif request_title -%}
-{{ _("💬 New comment on '{request_title}'").format(request_title=request_title) }}
-{%- else -%}
-{{ _("💬 New comment") }}
-{%- endif -%}
+{{ _("💬 New reply on '{request_title}'").format(request_title=request_title) }}
 {%- endblock subject -%}
 
 {%- block html_body -%}
 <table style="font-family:'Lato',Helvetica,Arial,sans-serif;border-spacing:15px">
     <tr>
-        {% if topic_title %}
-        <td>{{ _("'{user_name}' commented on '{request_title}' for '{topic_title}':").format(user_name=event_creator_name, request_title=request_title, topic_title=topic_title) }}</td>
-        {% elif request_title %}
-        <td>{{ _("'{user_name}' commented on '{request_title}':").format(user_name=event_creator_name, request_title=request_title) }}</td>
-        {% else %}
-        <td>{{ _("'{user_name}' commented:").format(user_name=event_creator_name) }}</td>
-        {% endif %}
+        <td>{{ _("'@{user_name}' replied on <a href='{reply_link}'>comment</a>:").format(user_name=event_creator_name, reply_link=reply_link) | safe }}</td>
     </tr>
     <tr>
         <td><em>{{ request_event_content }}</em></td>
@@ -59,17 +51,18 @@
 {%- endblock html_body %}
 
 {%- block plain_body -%}
-{{ _("@{user_name} commented on '{request_title}'").format(user_name=event_creator_name, request_title=request_title) }}.
+{{ _("@{user_name} replied on comment").format(user_name=event_creator_name) }}.
 
 {{ request_event_content }}
 
+{{ _("View reply: {reply_link}").format(reply_link=reply_link) }}
 {{ _("Check out the request: {request_link}").format(request_link=request_link) }}
 
 {%- endblock plain_body %}
 
 {# Markdown for Slack/Mattermost/chat #}
 {%- block md_body -%}
-{{ _("*@{user_name}* commented on *{request_title}*").format(user_name=event_creator_name, request_title=request_title) }}.
+{{ _("*@{user_name}* replied on [comment]({reply_link})").format(user_name=event_creator_name, reply_link=reply_link) }}.
 
 {{ request_event_content }}
 

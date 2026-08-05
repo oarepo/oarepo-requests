@@ -1269,17 +1269,6 @@ msgstr ""
 msgid "Trying to create publish request on published record"
 msgstr ""
 
-#: /home/dusanst/Projects/oarepo-requests/oarepo_requests/services/oarepo/service.py:88
-#: /Users/m/w/cesnet/oarepo-requests/oarepo_requests/templates/oarepo/invenio_notifications/comment-request-event.create.jinja:24
-#, python-brace-format
-msgid "💬 New comment on on '{request_title}' for '{topic_title}'"
-msgstr ""
-
-#: /Users/m/w/cesnet/oarepo-requests/oarepo_requests/templates/oarepo/invenio_notifications/comment-request-event.create.jinja:26
-#, python-brace-format
-msgid "💬 New comment on on '{request_title}'"
-msgstr ""
-
 #: /Users/m/w/cesnet/oarepo-requests/oarepo_requests/templates/oarepo/invenio_notifications/comment-request-event.create.jinja:28
 msgid "💬 New comment"
 msgstr ""
@@ -1397,6 +1386,57 @@ msgid "Record deletion"
 msgstr ""
 
 msgid "Edit published record"
+msgstr ""
+
+#: /Users/dusanstojanovic/Projects/oarepo-requests/oarepo_requests/templates/oarepo/invenio_notifications/comment-request-event.create.jinja:20
+#, python-brace-format
+msgid "💬 New comment on '{request_title}' for '{topic_title}'"
+msgstr ""
+
+#: /Users/dusanstojanovic/Projects/oarepo-requests/oarepo_requests/templates/oarepo/invenio_notifications/comment-request-event.create.jinja:22
+#: /Users/dusanstojanovic/Projects/oarepo-requests/oarepo_requests/templates/oarepo/invenio_notifications/comment-subcommunity-invitation-request.create.jinja:25
+#: /Users/dusanstojanovic/Projects/oarepo-requests/oarepo_requests/templates/oarepo/invenio_notifications/comment-subcommunity-request.create.jinja:24
+#, python-brace-format
+msgid "💬 New comment on '{request_title}'"
+msgstr ""
+
+#: /Users/dusanstojanovic/Projects/oarepo-requests/oarepo_requests/templates/oarepo/invenio_notifications/comment-request-event.reply.jinja:27
+#, python-brace-format
+msgid "💬 New reply on '{request_title}'"
+msgstr ""
+
+#: /Users/dusanstojanovic/Projects/oarepo-requests/oarepo_requests/templates/oarepo/invenio_notifications/comment-request-event.reply.jinja:33
+#, python-brace-format
+msgid "'@{user_name}' replied on <a href='{reply_link}'>comment</a>:"
+msgstr ""
+
+#: /Users/dusanstojanovic/Projects/oarepo-requests/oarepo_requests/templates/oarepo/invenio_notifications/comment-request-event.reply.jinja:51
+#, python-brace-format
+msgid "@{user_name} replied on comment"
+msgstr ""
+
+#: /Users/dusanstojanovic/Projects/oarepo-requests/oarepo_requests/templates/oarepo/invenio_notifications/comment-request-event.reply.jinja:55
+#, python-brace-format
+msgid "View reply: {reply_link}"
+msgstr ""
+
+#: /Users/dusanstojanovic/Projects/oarepo-requests/oarepo_requests/templates/oarepo/invenio_notifications/comment-request-event.reply.jinja:62
+#, python-brace-format
+msgid "*@{user_name}* replied on [comment]({reply_link})"
+msgstr ""
+
+#: /Users/dusanstojanovic/Projects/oarepo-requests/oarepo_requests/templates/oarepo/invenio_notifications/comment-subcommunity-invitation-request.create.jinja:31
+#: /Users/dusanstojanovic/Projects/oarepo-requests/oarepo_requests/templates/oarepo/invenio_notifications/comment-subcommunity-request.create.jinja:30
+#, python-brace-format
+msgid "'@{user_name}' commented on '{request_title}':"
+msgstr ""
+
+#: /Users/dusanstojanovic/Projects/oarepo-requests/oarepo_requests/templates/oarepo/invenio_notifications/comment-request-event.create.jinja:14
+#: /Users/dusanstojanovic/Projects/oarepo-requests/oarepo_requests/templates/oarepo/invenio_notifications/comment-request-event.reply.jinja:13
+#: /Users/dusanstojanovic/Projects/oarepo-requests/oarepo_requests/templates/oarepo/invenio_notifications/comment-subcommunity-invitation-request.create.jinja:14
+#: /Users/dusanstojanovic/Projects/oarepo-requests/oarepo_requests/templates/oarepo/invenio_notifications/comment-subcommunity-request.create.jinja:14
+#, python-brace-format
+msgid "User {user_id}"
 msgstr ""
 
 #~ msgid "No status"
