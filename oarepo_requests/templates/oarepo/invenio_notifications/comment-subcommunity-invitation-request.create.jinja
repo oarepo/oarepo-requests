@@ -7,41 +7,30 @@
 #}
 {% set invenio_request = notification.context.request %}
 {% set invenio_request_event = notification.context.request_event %}
-{% set invenio_topic = invenio_request.topic or {} %}
 
 {# created_by is either a resolved user or an email (for guests) #}
 {% set event_creator_name = (invenio_request_event.created_by.profile and invenio_request_event.created_by.profile.full_name) or invenio_request_event.created_by.username or invenio_request_event.created_by.email or (invenio_request_event.created_by if invenio_request_event.created_by is string else _("User {user_id}").format(user_id=invenio_request_event.created_by.id)) %}
 {% set request_id = invenio_request.id %}
 {% set request_event_content = invenio_request_event.payload.content | safe %}
 {% set request_title = invenio_request.title | safe %}
-{% set topic_title = ( invenio_topic.title or invenio_topic.metadata.title ) | safe %}
+{# It would be more natural to send to receiver, but for now we send to parent #}
+{% set parent_community = invenio_request.created_by.slug %}
 
-{% set request_link = invenio_request_event.links.self_html %}
-{% set account_settings_link = "{ui}/account/settings/notifications".format(
-    ui=config.SITE_UI_URL
+{# TODO: use request.links.self_html when issue issue is resolved: https://github.com/inveniosoftware/invenio-rdm-records/issues/1327 #}
+{% set request_link = "{ui}/communities/{parent_community}/requests/{request_id}".format(
+    ui=config.SITE_UI_URL, parent_community=parent_community, request_id=request_id
     )
 %}
+{% set account_settings_link = invenio_url_for("invenio_notifications_settings.index") %}
 
 {%- block subject -%}
-{%- if topic_title -%}
-{{ _("💬 New comment on '{request_title}' for '{topic_title}'").format(request_title=request_title, topic_title=topic_title) }}
-{%- elif request_title -%}
 {{ _("💬 New comment on '{request_title}'").format(request_title=request_title) }}
-{%- else -%}
-{{ _("💬 New comment") }}
-{%- endif -%}
 {%- endblock subject -%}
 
 {%- block html_body -%}
 <table style="font-family:'Lato',Helvetica,Arial,sans-serif;border-spacing:15px">
     <tr>
-        {% if topic_title %}
-        <td>{{ _("'{user_name}' commented on '{request_title}' for '{topic_title}':").format(user_name=event_creator_name, request_title=request_title, topic_title=topic_title) }}</td>
-        {% elif request_title %}
-        <td>{{ _("'{user_name}' commented on '{request_title}':").format(user_name=event_creator_name, request_title=request_title) }}</td>
-        {% else %}
-        <td>{{ _("'{user_name}' commented:").format(user_name=event_creator_name) }}</td>
-        {% endif %}
+        <td>{{ _("'@{user_name}' commented on '{request_title}':").format(user_name=event_creator_name, request_title=request_title) }}</td>
     </tr>
     <tr>
         <td><em>{{ request_event_content }}</em></td>

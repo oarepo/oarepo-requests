@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2026-06-09 10:33+0200\n"
+"POT-Creation-Date: 2026-08-05 14:24+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -67,135 +67,196 @@ msgstr ""
 msgid "Keep the record"
 msgstr ""
 
-#: /Users/dusanstojanovic/Projects/oarepo-requests/oarepo_requests/actions/generic.py:124
+#: /Users/dusanstojanovic/Projects/oarepo-requests/oarepo_requests/actions/generic.py:111
 #: /Users/dusanstojanovic/Projects/oarepo-requests/oarepo_requests/translations/_only_for_translations.py:32
 msgid "Submit"
 msgstr ""
 
-#: /Users/dusanstojanovic/Projects/oarepo-requests/oarepo_requests/actions/generic.py:131
+#: /Users/dusanstojanovic/Projects/oarepo-requests/oarepo_requests/actions/generic.py:118
 #: /Users/dusanstojanovic/Projects/oarepo-requests/oarepo_requests/translations/_only_for_translations.py:28
 msgid "Decline"
 msgstr ""
 
-#: /Users/dusanstojanovic/Projects/oarepo-requests/oarepo_requests/actions/generic.py:138
+#: /Users/dusanstojanovic/Projects/oarepo-requests/oarepo_requests/actions/generic.py:125
 #: /Users/dusanstojanovic/Projects/oarepo-requests/oarepo_requests/translations/_only_for_translations.py:26
 msgid "Accept"
 msgstr ""
 
-#: /Users/dusanstojanovic/Projects/oarepo-requests/oarepo_requests/actions/generic.py:145
+#: /Users/dusanstojanovic/Projects/oarepo-requests/oarepo_requests/actions/generic.py:132
+#: /Users/dusanstojanovic/Projects/oarepo-requests/oarepo_requests/actions/publish_draft.py:161
 #: /Users/dusanstojanovic/Projects/oarepo-requests/oarepo_requests/translations/_only_for_translations.py:19
 msgid "Cancel"
 msgstr ""
 
-#: /Users/dusanstojanovic/Projects/oarepo-requests/oarepo_requests/actions/publish_draft.py:88
+#: /Users/dusanstojanovic/Projects/oarepo-requests/oarepo_requests/actions/publish_draft.py:105
 #: /Users/dusanstojanovic/Projects/oarepo-requests/oarepo_requests/actions/publish_new_version.py:30
 msgid "Publish"
 msgstr ""
 
-#: /Users/dusanstojanovic/Projects/oarepo-requests/oarepo_requests/actions/publish_draft.py:127
+#: /Users/dusanstojanovic/Projects/oarepo-requests/oarepo_requests/actions/publish_draft.py:144
 msgid "Return for correction"
 msgstr ""
 
-#: /Users/dusanstojanovic/Projects/oarepo-requests/oarepo_requests/templates/oarepo/invenio_notifications/comment-request-event.create.jinja:24
+#: /Users/dusanstojanovic/Projects/oarepo-requests/oarepo_requests/templates/oarepo/invenio_notifications/comment-request-event.create.jinja:13
+#: /Users/dusanstojanovic/Projects/oarepo-requests/oarepo_requests/templates/oarepo/invenio_notifications/comment-request-event.reply.jinja:12
+#: /Users/dusanstojanovic/Projects/oarepo-requests/oarepo_requests/templates/oarepo/invenio_notifications/comment-subcommunity-invitation-request.create.jinja:12
+#: /Users/dusanstojanovic/Projects/oarepo-requests/oarepo_requests/templates/oarepo/invenio_notifications/comment-subcommunity-request.create.jinja:12
 #, python-brace-format
-msgid "💬 New comment on on '{request_title}' for '{topic_title}'"
+msgid "User {user_id}"
 msgstr ""
 
-#: /Users/dusanstojanovic/Projects/oarepo-requests/oarepo_requests/templates/oarepo/invenio_notifications/comment-request-event.create.jinja:26
+#: /Users/dusanstojanovic/Projects/oarepo-requests/oarepo_requests/templates/oarepo/invenio_notifications/comment-request-event.create.jinja:27
 #, python-brace-format
-msgid "💬 New comment on on '{request_title}'"
+msgid "💬 New comment on '{request_title}' for '{topic_title}'"
 msgstr ""
 
-#: /Users/dusanstojanovic/Projects/oarepo-requests/oarepo_requests/templates/oarepo/invenio_notifications/comment-request-event.create.jinja:28
+#: /Users/dusanstojanovic/Projects/oarepo-requests/oarepo_requests/templates/oarepo/invenio_notifications/comment-request-event.create.jinja:29
+#: /Users/dusanstojanovic/Projects/oarepo-requests/oarepo_requests/templates/oarepo/invenio_notifications/comment-subcommunity-invitation-request.create.jinja:27
+#: /Users/dusanstojanovic/Projects/oarepo-requests/oarepo_requests/templates/oarepo/invenio_notifications/comment-subcommunity-request.create.jinja:26
+#, python-brace-format
+msgid "💬 New comment on '{request_title}'"
+msgstr ""
+
+#: /Users/dusanstojanovic/Projects/oarepo-requests/oarepo_requests/templates/oarepo/invenio_notifications/comment-request-event.create.jinja:31
 msgid "💬 New comment"
 msgstr ""
 
-#: /Users/dusanstojanovic/Projects/oarepo-requests/oarepo_requests/templates/oarepo/invenio_notifications/comment-request-event.create.jinja:36
+#: /Users/dusanstojanovic/Projects/oarepo-requests/oarepo_requests/templates/oarepo/invenio_notifications/comment-request-event.create.jinja:39
 #, python-brace-format
 msgid "'{user_name}' commented on '{request_title}' for '{topic_title}':"
 msgstr ""
 
-#: /Users/dusanstojanovic/Projects/oarepo-requests/oarepo_requests/templates/oarepo/invenio_notifications/comment-request-event.create.jinja:38
+#: /Users/dusanstojanovic/Projects/oarepo-requests/oarepo_requests/templates/oarepo/invenio_notifications/comment-request-event.create.jinja:41
 #, python-brace-format
 msgid "'{user_name}' commented on '{request_title}':"
 msgstr ""
 
-#: /Users/dusanstojanovic/Projects/oarepo-requests/oarepo_requests/templates/oarepo/invenio_notifications/comment-request-event.create.jinja:40
+#: /Users/dusanstojanovic/Projects/oarepo-requests/oarepo_requests/templates/oarepo/invenio_notifications/comment-request-event.create.jinja:43
 #, python-brace-format
 msgid "'{user_name}' commented:"
 msgstr ""
 
-#: /Users/dusanstojanovic/Projects/oarepo-requests/oarepo_requests/templates/oarepo/invenio_notifications/comment-request-event.create.jinja:47
-#: /Users/dusanstojanovic/Projects/oarepo-requests/oarepo_requests/templates/oarepo/invenio_notifications/comment-request-event.create.jinja:73
+#: /Users/dusanstojanovic/Projects/oarepo-requests/oarepo_requests/templates/oarepo/invenio_notifications/comment-request-event.create.jinja:50
+#: /Users/dusanstojanovic/Projects/oarepo-requests/oarepo_requests/templates/oarepo/invenio_notifications/comment-request-event.create.jinja:76
+#: /Users/dusanstojanovic/Projects/oarepo-requests/oarepo_requests/templates/oarepo/invenio_notifications/comment-request-event.reply.jinja:42
+#: /Users/dusanstojanovic/Projects/oarepo-requests/oarepo_requests/templates/oarepo/invenio_notifications/comment-request-event.reply.jinja:69
+#: /Users/dusanstojanovic/Projects/oarepo-requests/oarepo_requests/templates/oarepo/invenio_notifications/comment-subcommunity-invitation-request.create.jinja:39
+#: /Users/dusanstojanovic/Projects/oarepo-requests/oarepo_requests/templates/oarepo/invenio_notifications/comment-subcommunity-invitation-request.create.jinja:65
+#: /Users/dusanstojanovic/Projects/oarepo-requests/oarepo_requests/templates/oarepo/invenio_notifications/comment-subcommunity-request.create.jinja:38
+#: /Users/dusanstojanovic/Projects/oarepo-requests/oarepo_requests/templates/oarepo/invenio_notifications/comment-subcommunity-request.create.jinja:64
 msgid "Check out the request"
 msgstr ""
 
-#: /Users/dusanstojanovic/Projects/oarepo-requests/oarepo_requests/templates/oarepo/invenio_notifications/comment-request-event.create.jinja:53
-#: /Users/dusanstojanovic/Projects/oarepo-requests/oarepo_requests/templates/semantic-ui/invenio_notifications/delete-published-record-request-event.accept.jinja:15
-#: /Users/dusanstojanovic/Projects/oarepo-requests/oarepo_requests/templates/semantic-ui/invenio_notifications/delete-published-record-request-event.decline.jinja:21
-#: /Users/dusanstojanovic/Projects/oarepo-requests/oarepo_requests/templates/semantic-ui/invenio_notifications/delete-published-record-request-event.submit.jinja:23
-#: /Users/dusanstojanovic/Projects/oarepo-requests/oarepo_requests/templates/semantic-ui/invenio_notifications/publish-draft-request-event.accept.jinja:21
-#: /Users/dusanstojanovic/Projects/oarepo-requests/oarepo_requests/templates/semantic-ui/invenio_notifications/publish-draft-request-event.decline.jinja:21
-#: /Users/dusanstojanovic/Projects/oarepo-requests/oarepo_requests/templates/semantic-ui/invenio_notifications/publish-draft-request-event.submit.jinja:23
+#: /Users/dusanstojanovic/Projects/oarepo-requests/oarepo_requests/templates/oarepo/invenio_notifications/comment-request-event.create.jinja:56
+#: /Users/dusanstojanovic/Projects/oarepo-requests/oarepo_requests/templates/oarepo/invenio_notifications/comment-request-event.reply.jinja:48
+#: /Users/dusanstojanovic/Projects/oarepo-requests/oarepo_requests/templates/oarepo/invenio_notifications/comment-subcommunity-invitation-request.create.jinja:45
+#: /Users/dusanstojanovic/Projects/oarepo-requests/oarepo_requests/templates/oarepo/invenio_notifications/comment-subcommunity-request.create.jinja:44
+#: /Users/dusanstojanovic/Projects/oarepo-requests/oarepo_requests/templates/semantic-ui/invenio_notifications/delete-published-record-request-event.accept.jinja:22
+#: /Users/dusanstojanovic/Projects/oarepo-requests/oarepo_requests/templates/semantic-ui/invenio_notifications/delete-published-record-request-event.decline.jinja:28
+#: /Users/dusanstojanovic/Projects/oarepo-requests/oarepo_requests/templates/semantic-ui/invenio_notifications/delete-published-record-request-event.submit.jinja:30
+#: /Users/dusanstojanovic/Projects/oarepo-requests/oarepo_requests/templates/semantic-ui/invenio_notifications/publish-draft-request-event.accept.jinja:28
+#: /Users/dusanstojanovic/Projects/oarepo-requests/oarepo_requests/templates/semantic-ui/invenio_notifications/publish-draft-request-event.decline.jinja:28
+#: /Users/dusanstojanovic/Projects/oarepo-requests/oarepo_requests/templates/semantic-ui/invenio_notifications/publish-draft-request-event.submit.jinja:30
 msgid "This is an auto-generated message. To manage notifications, visit your"
 msgstr ""
 
-#: /Users/dusanstojanovic/Projects/oarepo-requests/oarepo_requests/templates/oarepo/invenio_notifications/comment-request-event.create.jinja:53
-#: /Users/dusanstojanovic/Projects/oarepo-requests/oarepo_requests/templates/semantic-ui/invenio_notifications/delete-published-record-request-event.accept.jinja:15
-#: /Users/dusanstojanovic/Projects/oarepo-requests/oarepo_requests/templates/semantic-ui/invenio_notifications/delete-published-record-request-event.decline.jinja:21
-#: /Users/dusanstojanovic/Projects/oarepo-requests/oarepo_requests/templates/semantic-ui/invenio_notifications/delete-published-record-request-event.submit.jinja:23
-#: /Users/dusanstojanovic/Projects/oarepo-requests/oarepo_requests/templates/semantic-ui/invenio_notifications/publish-draft-request-event.accept.jinja:21
-#: /Users/dusanstojanovic/Projects/oarepo-requests/oarepo_requests/templates/semantic-ui/invenio_notifications/publish-draft-request-event.decline.jinja:21
-#: /Users/dusanstojanovic/Projects/oarepo-requests/oarepo_requests/templates/semantic-ui/invenio_notifications/publish-draft-request-event.submit.jinja:23
+#: /Users/dusanstojanovic/Projects/oarepo-requests/oarepo_requests/templates/oarepo/invenio_notifications/comment-request-event.create.jinja:56
+#: /Users/dusanstojanovic/Projects/oarepo-requests/oarepo_requests/templates/oarepo/invenio_notifications/comment-request-event.reply.jinja:48
+#: /Users/dusanstojanovic/Projects/oarepo-requests/oarepo_requests/templates/oarepo/invenio_notifications/comment-subcommunity-invitation-request.create.jinja:45
+#: /Users/dusanstojanovic/Projects/oarepo-requests/oarepo_requests/templates/oarepo/invenio_notifications/comment-subcommunity-request.create.jinja:44
+#: /Users/dusanstojanovic/Projects/oarepo-requests/oarepo_requests/templates/semantic-ui/invenio_notifications/delete-published-record-request-event.accept.jinja:22
+#: /Users/dusanstojanovic/Projects/oarepo-requests/oarepo_requests/templates/semantic-ui/invenio_notifications/delete-published-record-request-event.decline.jinja:28
+#: /Users/dusanstojanovic/Projects/oarepo-requests/oarepo_requests/templates/semantic-ui/invenio_notifications/delete-published-record-request-event.submit.jinja:30
+#: /Users/dusanstojanovic/Projects/oarepo-requests/oarepo_requests/templates/semantic-ui/invenio_notifications/publish-draft-request-event.accept.jinja:28
+#: /Users/dusanstojanovic/Projects/oarepo-requests/oarepo_requests/templates/semantic-ui/invenio_notifications/publish-draft-request-event.decline.jinja:28
+#: /Users/dusanstojanovic/Projects/oarepo-requests/oarepo_requests/templates/semantic-ui/invenio_notifications/publish-draft-request-event.submit.jinja:30
 msgid "account settings"
 msgstr ""
 
-#: /Users/dusanstojanovic/Projects/oarepo-requests/oarepo_requests/templates/oarepo/invenio_notifications/comment-request-event.create.jinja:59
+#: /Users/dusanstojanovic/Projects/oarepo-requests/oarepo_requests/templates/oarepo/invenio_notifications/comment-request-event.create.jinja:62
+#: /Users/dusanstojanovic/Projects/oarepo-requests/oarepo_requests/templates/oarepo/invenio_notifications/comment-subcommunity-invitation-request.create.jinja:51
+#: /Users/dusanstojanovic/Projects/oarepo-requests/oarepo_requests/templates/oarepo/invenio_notifications/comment-subcommunity-request.create.jinja:50
 #, python-brace-format
 msgid "@{user_name} commented on '{request_title}'"
 msgstr ""
 
-#: /Users/dusanstojanovic/Projects/oarepo-requests/oarepo_requests/templates/oarepo/invenio_notifications/comment-request-event.create.jinja:63
+#: /Users/dusanstojanovic/Projects/oarepo-requests/oarepo_requests/templates/oarepo/invenio_notifications/comment-request-event.create.jinja:66
+#: /Users/dusanstojanovic/Projects/oarepo-requests/oarepo_requests/templates/oarepo/invenio_notifications/comment-request-event.reply.jinja:59
+#: /Users/dusanstojanovic/Projects/oarepo-requests/oarepo_requests/templates/oarepo/invenio_notifications/comment-subcommunity-invitation-request.create.jinja:55
+#: /Users/dusanstojanovic/Projects/oarepo-requests/oarepo_requests/templates/oarepo/invenio_notifications/comment-subcommunity-request.create.jinja:54
 #, python-brace-format
 msgid "Check out the request: {request_link}"
 msgstr ""
 
-#: /Users/dusanstojanovic/Projects/oarepo-requests/oarepo_requests/templates/oarepo/invenio_notifications/comment-request-event.create.jinja:69
+#: /Users/dusanstojanovic/Projects/oarepo-requests/oarepo_requests/templates/oarepo/invenio_notifications/comment-request-event.create.jinja:72
+#: /Users/dusanstojanovic/Projects/oarepo-requests/oarepo_requests/templates/oarepo/invenio_notifications/comment-subcommunity-invitation-request.create.jinja:61
+#: /Users/dusanstojanovic/Projects/oarepo-requests/oarepo_requests/templates/oarepo/invenio_notifications/comment-subcommunity-request.create.jinja:60
 #, python-brace-format
 msgid "*@{user_name}* commented on *{request_title}*"
 msgstr ""
 
-#: /Users/dusanstojanovic/Projects/oarepo-requests/oarepo_requests/templates/semantic-ui/invenio_notifications/delete-published-record-request-event.accept.jinja:7
+#: /Users/dusanstojanovic/Projects/oarepo-requests/oarepo_requests/templates/oarepo/invenio_notifications/comment-request-event.reply.jinja:30
+#, python-brace-format
+msgid "💬 New reply on '{request_title}'"
+msgstr ""
+
+#: /Users/dusanstojanovic/Projects/oarepo-requests/oarepo_requests/templates/oarepo/invenio_notifications/comment-request-event.reply.jinja:36
+#, python-brace-format
+msgid "'@{user_name}' replied on <a href='{reply_link}'>comment</a>:"
+msgstr ""
+
+#: /Users/dusanstojanovic/Projects/oarepo-requests/oarepo_requests/templates/oarepo/invenio_notifications/comment-request-event.reply.jinja:54
+#, python-brace-format
+msgid "@{user_name} replied on comment"
+msgstr ""
+
+#: /Users/dusanstojanovic/Projects/oarepo-requests/oarepo_requests/templates/oarepo/invenio_notifications/comment-request-event.reply.jinja:58
+#, python-brace-format
+msgid "View reply: {reply_link}"
+msgstr ""
+
+#: /Users/dusanstojanovic/Projects/oarepo-requests/oarepo_requests/templates/oarepo/invenio_notifications/comment-request-event.reply.jinja:65
+#, python-brace-format
+msgid "*@{user_name}* replied on [comment]({reply_link})"
+msgstr ""
+
+#: /Users/dusanstojanovic/Projects/oarepo-requests/oarepo_requests/templates/oarepo/invenio_notifications/comment-subcommunity-invitation-request.create.jinja:33
+#: /Users/dusanstojanovic/Projects/oarepo-requests/oarepo_requests/templates/oarepo/invenio_notifications/comment-subcommunity-request.create.jinja:32
+#, python-brace-format
+msgid "'@{user_name}' commented on '{request_title}':"
+msgstr ""
+
+#: /Users/dusanstojanovic/Projects/oarepo-requests/oarepo_requests/templates/semantic-ui/invenio_notifications/delete-published-record-request-event.accept.jinja:14
 msgid "❗️ Published record has been deleted"
 msgstr ""
 
-#: /Users/dusanstojanovic/Projects/oarepo-requests/oarepo_requests/templates/semantic-ui/invenio_notifications/delete-published-record-request-event.accept.jinja:11
-#: /Users/dusanstojanovic/Projects/oarepo-requests/oarepo_requests/templates/semantic-ui/invenio_notifications/delete-published-record-request-event.accept.jinja:21
+#: /Users/dusanstojanovic/Projects/oarepo-requests/oarepo_requests/templates/semantic-ui/invenio_notifications/delete-published-record-request-event.accept.jinja:18
+#: /Users/dusanstojanovic/Projects/oarepo-requests/oarepo_requests/templates/semantic-ui/invenio_notifications/delete-published-record-request-event.accept.jinja:28
 msgid "The published record has been deleted."
 msgstr ""
 
-#: /Users/dusanstojanovic/Projects/oarepo-requests/oarepo_requests/templates/semantic-ui/invenio_notifications/delete-published-record-request-event.accept.jinja:12
+#: /Users/dusanstojanovic/Projects/oarepo-requests/oarepo_requests/templates/semantic-ui/invenio_notifications/delete-published-record-request-event.accept.jinja:19
 #, python-format
 msgid "For more information head to the <a href='%(link)s'>request page</a>."
 msgstr ""
 
-#: /Users/dusanstojanovic/Projects/oarepo-requests/oarepo_requests/templates/semantic-ui/invenio_notifications/delete-published-record-request-event.accept.jinja:22
+#: /Users/dusanstojanovic/Projects/oarepo-requests/oarepo_requests/templates/semantic-ui/invenio_notifications/delete-published-record-request-event.accept.jinja:29
 #, python-format
 msgid "For more information head to the %(link)s"
 msgstr ""
 
-#: /Users/dusanstojanovic/Projects/oarepo-requests/oarepo_requests/templates/semantic-ui/invenio_notifications/delete-published-record-request-event.accept.jinja:24
+#: /Users/dusanstojanovic/Projects/oarepo-requests/oarepo_requests/templates/semantic-ui/invenio_notifications/delete-published-record-request-event.accept.jinja:31
 msgid ""
 "This is an auto-generated message. To manage notifications, visit your "
 "account settings"
 msgstr ""
 
-#: /Users/dusanstojanovic/Projects/oarepo-requests/oarepo_requests/templates/semantic-ui/invenio_notifications/delete-published-record-request-event.decline.jinja:9
+#: /Users/dusanstojanovic/Projects/oarepo-requests/oarepo_requests/templates/semantic-ui/invenio_notifications/delete-published-record-request-event.decline.jinja:16
 #, python-brace-format
 msgid "Request for deletion of record '{topic_title}' was declined"
 msgstr ""
 
-#: /Users/dusanstojanovic/Projects/oarepo-requests/oarepo_requests/templates/semantic-ui/invenio_notifications/delete-published-record-request-event.decline.jinja:13
+#: /Users/dusanstojanovic/Projects/oarepo-requests/oarepo_requests/templates/semantic-ui/invenio_notifications/delete-published-record-request-event.decline.jinja:20
 #, python-format
 msgid ""
 "\n"
@@ -206,7 +267,7 @@ msgid ""
 "    "
 msgstr ""
 
-#: /Users/dusanstojanovic/Projects/oarepo-requests/oarepo_requests/templates/semantic-ui/invenio_notifications/delete-published-record-request-event.decline.jinja:27
+#: /Users/dusanstojanovic/Projects/oarepo-requests/oarepo_requests/templates/semantic-ui/invenio_notifications/delete-published-record-request-event.decline.jinja:34
 #, python-format
 msgid ""
 "\n"
@@ -215,12 +276,12 @@ msgid ""
 "    "
 msgstr ""
 
-#: /Users/dusanstojanovic/Projects/oarepo-requests/oarepo_requests/templates/semantic-ui/invenio_notifications/delete-published-record-request-event.submit.jinja:8
+#: /Users/dusanstojanovic/Projects/oarepo-requests/oarepo_requests/templates/semantic-ui/invenio_notifications/delete-published-record-request-event.submit.jinja:15
 #, python-brace-format
 msgid "❗️ Request to delete published record {topic_title}"
 msgstr ""
 
-#: /Users/dusanstojanovic/Projects/oarepo-requests/oarepo_requests/templates/semantic-ui/invenio_notifications/delete-published-record-request-event.submit.jinja:13
+#: /Users/dusanstojanovic/Projects/oarepo-requests/oarepo_requests/templates/semantic-ui/invenio_notifications/delete-published-record-request-event.submit.jinja:20
 #, python-format
 msgid ""
 "\n"
@@ -233,7 +294,7 @@ msgid ""
 "    "
 msgstr ""
 
-#: /Users/dusanstojanovic/Projects/oarepo-requests/oarepo_requests/templates/semantic-ui/invenio_notifications/delete-published-record-request-event.submit.jinja:29
+#: /Users/dusanstojanovic/Projects/oarepo-requests/oarepo_requests/templates/semantic-ui/invenio_notifications/delete-published-record-request-event.submit.jinja:36
 #, python-format
 msgid ""
 "\n"
@@ -242,12 +303,12 @@ msgid ""
 "    "
 msgstr ""
 
-#: /Users/dusanstojanovic/Projects/oarepo-requests/oarepo_requests/templates/semantic-ui/invenio_notifications/publish-draft-request-event.accept.jinja:9
+#: /Users/dusanstojanovic/Projects/oarepo-requests/oarepo_requests/templates/semantic-ui/invenio_notifications/publish-draft-request-event.accept.jinja:16
 #, python-brace-format
 msgid "Record '{topic_title}' has been published"
 msgstr ""
 
-#: /Users/dusanstojanovic/Projects/oarepo-requests/oarepo_requests/templates/semantic-ui/invenio_notifications/publish-draft-request-event.accept.jinja:13
+#: /Users/dusanstojanovic/Projects/oarepo-requests/oarepo_requests/templates/semantic-ui/invenio_notifications/publish-draft-request-event.accept.jinja:20
 #, python-format
 msgid ""
 "\n"
@@ -258,7 +319,7 @@ msgid ""
 "    "
 msgstr ""
 
-#: /Users/dusanstojanovic/Projects/oarepo-requests/oarepo_requests/templates/semantic-ui/invenio_notifications/publish-draft-request-event.accept.jinja:27
+#: /Users/dusanstojanovic/Projects/oarepo-requests/oarepo_requests/templates/semantic-ui/invenio_notifications/publish-draft-request-event.accept.jinja:34
 #, python-format
 msgid ""
 "\n"
@@ -267,12 +328,12 @@ msgid ""
 "    "
 msgstr ""
 
-#: /Users/dusanstojanovic/Projects/oarepo-requests/oarepo_requests/templates/semantic-ui/invenio_notifications/publish-draft-request-event.decline.jinja:9
+#: /Users/dusanstojanovic/Projects/oarepo-requests/oarepo_requests/templates/semantic-ui/invenio_notifications/publish-draft-request-event.decline.jinja:16
 #, python-brace-format
 msgid "Request for publishing of record '{topic_title}' was declined"
 msgstr ""
 
-#: /Users/dusanstojanovic/Projects/oarepo-requests/oarepo_requests/templates/semantic-ui/invenio_notifications/publish-draft-request-event.decline.jinja:13
+#: /Users/dusanstojanovic/Projects/oarepo-requests/oarepo_requests/templates/semantic-ui/invenio_notifications/publish-draft-request-event.decline.jinja:20
 #, python-format
 msgid ""
 "\n"
@@ -283,7 +344,7 @@ msgid ""
 "    "
 msgstr ""
 
-#: /Users/dusanstojanovic/Projects/oarepo-requests/oarepo_requests/templates/semantic-ui/invenio_notifications/publish-draft-request-event.decline.jinja:27
+#: /Users/dusanstojanovic/Projects/oarepo-requests/oarepo_requests/templates/semantic-ui/invenio_notifications/publish-draft-request-event.decline.jinja:34
 #, python-format
 msgid ""
 "\n"
@@ -292,12 +353,12 @@ msgid ""
 "    "
 msgstr ""
 
-#: /Users/dusanstojanovic/Projects/oarepo-requests/oarepo_requests/templates/semantic-ui/invenio_notifications/publish-draft-request-event.submit.jinja:8
+#: /Users/dusanstojanovic/Projects/oarepo-requests/oarepo_requests/templates/semantic-ui/invenio_notifications/publish-draft-request-event.submit.jinja:15
 #, python-brace-format
 msgid "Request to publish record {topic_title}"
 msgstr ""
 
-#: /Users/dusanstojanovic/Projects/oarepo-requests/oarepo_requests/templates/semantic-ui/invenio_notifications/publish-draft-request-event.submit.jinja:12
+#: /Users/dusanstojanovic/Projects/oarepo-requests/oarepo_requests/templates/semantic-ui/invenio_notifications/publish-draft-request-event.submit.jinja:19
 #, python-format
 msgid ""
 "\n"
@@ -310,7 +371,7 @@ msgid ""
 "    "
 msgstr ""
 
-#: /Users/dusanstojanovic/Projects/oarepo-requests/oarepo_requests/templates/semantic-ui/invenio_notifications/publish-draft-request-event.submit.jinja:29
+#: /Users/dusanstojanovic/Projects/oarepo-requests/oarepo_requests/templates/semantic-ui/invenio_notifications/publish-draft-request-event.submit.jinja:36
 #, python-format
 msgid ""
 "\n"
@@ -618,62 +679,62 @@ msgstr ""
 msgid "You do not have permission to update the record."
 msgstr ""
 
-#: /Users/dusanstojanovic/Projects/oarepo-requests/oarepo_requests/types/publish_base.py:44
+#: /Users/dusanstojanovic/Projects/oarepo-requests/oarepo_requests/types/publish_base.py:49
 msgid "Request to publish a draft"
 msgstr ""
 
-#: /Users/dusanstojanovic/Projects/oarepo-requests/oarepo_requests/types/publish_base.py:125
+#: /Users/dusanstojanovic/Projects/oarepo-requests/oarepo_requests/types/publish_base.py:148
 msgid ""
 "Missing uploaded files. To disable files for this record please mark it as "
 "metadata-only."
 msgstr ""
 
-#: /Users/dusanstojanovic/Projects/oarepo-requests/oarepo_requests/types/publish_base.py:128
+#: /Users/dusanstojanovic/Projects/oarepo-requests/oarepo_requests/types/publish_base.py:151
 msgid "Missing uploaded files."
 msgstr ""
 
 #: /Users/dusanstojanovic/Projects/oarepo-requests/oarepo_requests/types/publish_changed_metadata.py:30
-#: /Users/dusanstojanovic/Projects/oarepo-requests/oarepo_requests/types/publish_changed_metadata.py:56
+#: /Users/dusanstojanovic/Projects/oarepo-requests/oarepo_requests/types/publish_changed_metadata.py:79
 msgid "Publish changed metadata"
 msgstr ""
 
-#: /Users/dusanstojanovic/Projects/oarepo-requests/oarepo_requests/types/publish_changed_metadata.py:55
-#: /Users/dusanstojanovic/Projects/oarepo-requests/oarepo_requests/types/publish_changed_metadata.py:57
-#: /Users/dusanstojanovic/Projects/oarepo-requests/oarepo_requests/types/publish_changed_metadata.py:64
-#: /Users/dusanstojanovic/Projects/oarepo-requests/oarepo_requests/types/publish_draft.py:74
-#: /Users/dusanstojanovic/Projects/oarepo-requests/oarepo_requests/types/publish_draft.py:76
-#: /Users/dusanstojanovic/Projects/oarepo-requests/oarepo_requests/types/publish_draft.py:83
-#: /Users/dusanstojanovic/Projects/oarepo-requests/oarepo_requests/types/publish_new_version.py:124
-#: /Users/dusanstojanovic/Projects/oarepo-requests/oarepo_requests/types/publish_new_version.py:126
-#: /Users/dusanstojanovic/Projects/oarepo-requests/oarepo_requests/types/publish_new_version.py:133
+#: /Users/dusanstojanovic/Projects/oarepo-requests/oarepo_requests/types/publish_changed_metadata.py:78
+#: /Users/dusanstojanovic/Projects/oarepo-requests/oarepo_requests/types/publish_changed_metadata.py:80
+#: /Users/dusanstojanovic/Projects/oarepo-requests/oarepo_requests/types/publish_changed_metadata.py:87
+#: /Users/dusanstojanovic/Projects/oarepo-requests/oarepo_requests/types/publish_draft.py:95
+#: /Users/dusanstojanovic/Projects/oarepo-requests/oarepo_requests/types/publish_draft.py:97
+#: /Users/dusanstojanovic/Projects/oarepo-requests/oarepo_requests/types/publish_draft.py:104
+#: /Users/dusanstojanovic/Projects/oarepo-requests/oarepo_requests/types/publish_new_version.py:132
+#: /Users/dusanstojanovic/Projects/oarepo-requests/oarepo_requests/types/publish_new_version.py:134
+#: /Users/dusanstojanovic/Projects/oarepo-requests/oarepo_requests/types/publish_new_version.py:141
 msgid "Submit for review"
 msgstr ""
 
-#: /Users/dusanstojanovic/Projects/oarepo-requests/oarepo_requests/types/publish_changed_metadata.py:58
+#: /Users/dusanstojanovic/Projects/oarepo-requests/oarepo_requests/types/publish_changed_metadata.py:81
 msgid "Review and publish changed metadata"
 msgstr ""
 
-#: /Users/dusanstojanovic/Projects/oarepo-requests/oarepo_requests/types/publish_changed_metadata.py:59
-#: /Users/dusanstojanovic/Projects/oarepo-requests/oarepo_requests/types/publish_changed_metadata.py:60
+#: /Users/dusanstojanovic/Projects/oarepo-requests/oarepo_requests/types/publish_changed_metadata.py:82
+#: /Users/dusanstojanovic/Projects/oarepo-requests/oarepo_requests/types/publish_changed_metadata.py:83
 msgid "Changed metadata submitted for review"
 msgstr ""
 
-#: /Users/dusanstojanovic/Projects/oarepo-requests/oarepo_requests/types/publish_changed_metadata.py:61
-#: /Users/dusanstojanovic/Projects/oarepo-requests/oarepo_requests/types/publish_changed_metadata.py:106
+#: /Users/dusanstojanovic/Projects/oarepo-requests/oarepo_requests/types/publish_changed_metadata.py:84
+#: /Users/dusanstojanovic/Projects/oarepo-requests/oarepo_requests/types/publish_changed_metadata.py:129
 msgid "Accepted changed metadata publication"
 msgstr ""
 
-#: /Users/dusanstojanovic/Projects/oarepo-requests/oarepo_requests/types/publish_changed_metadata.py:62
-#: /Users/dusanstojanovic/Projects/oarepo-requests/oarepo_requests/types/publish_changed_metadata.py:107
+#: /Users/dusanstojanovic/Projects/oarepo-requests/oarepo_requests/types/publish_changed_metadata.py:85
+#: /Users/dusanstojanovic/Projects/oarepo-requests/oarepo_requests/types/publish_changed_metadata.py:130
 msgid "Declined changed metadata publication"
 msgstr ""
 
-#: /Users/dusanstojanovic/Projects/oarepo-requests/oarepo_requests/types/publish_changed_metadata.py:63
-#: /Users/dusanstojanovic/Projects/oarepo-requests/oarepo_requests/types/publish_changed_metadata.py:108
+#: /Users/dusanstojanovic/Projects/oarepo-requests/oarepo_requests/types/publish_changed_metadata.py:86
+#: /Users/dusanstojanovic/Projects/oarepo-requests/oarepo_requests/types/publish_changed_metadata.py:131
 msgid "Cancelled changed metadata publication"
 msgstr ""
 
-#: /Users/dusanstojanovic/Projects/oarepo-requests/oarepo_requests/types/publish_changed_metadata.py:82
+#: /Users/dusanstojanovic/Projects/oarepo-requests/oarepo_requests/types/publish_changed_metadata.py:105
 msgid ""
 "By submitting the changed metadata for review you are requesting the "
 "publication of the changed metadata. The draft will become locked and no "
@@ -681,77 +742,77 @@ msgid ""
 "You will be notified about the decision by email."
 msgstr ""
 
-#: /Users/dusanstojanovic/Projects/oarepo-requests/oarepo_requests/types/publish_changed_metadata.py:88
+#: /Users/dusanstojanovic/Projects/oarepo-requests/oarepo_requests/types/publish_changed_metadata.py:111
 msgid ""
 "Click to immediately publish the changed metadata. The draft will be a "
 "subject to embargo as requested in the side panel. Note: The action is "
 "irreversible."
 msgstr ""
 
-#: /Users/dusanstojanovic/Projects/oarepo-requests/oarepo_requests/types/publish_changed_metadata.py:93
+#: /Users/dusanstojanovic/Projects/oarepo-requests/oarepo_requests/types/publish_changed_metadata.py:116
 msgid ""
 "Submit for review. After submitting the changed metadata for review, it will"
 " be locked and no further modifications will be possible."
 msgstr ""
 
-#: /Users/dusanstojanovic/Projects/oarepo-requests/oarepo_requests/types/publish_changed_metadata.py:97
+#: /Users/dusanstojanovic/Projects/oarepo-requests/oarepo_requests/types/publish_changed_metadata.py:120
 msgid ""
 "The record with changed metadata has been submitted for review. You can now "
 "accept or decline the request."
 msgstr ""
 
-#: /Users/dusanstojanovic/Projects/oarepo-requests/oarepo_requests/types/publish_changed_metadata.py:101
+#: /Users/dusanstojanovic/Projects/oarepo-requests/oarepo_requests/types/publish_changed_metadata.py:124
 msgid ""
 "The record with changed metadata has been submitted for review. It is now "
 "locked and no further changes are possible. You will be notified about the "
 "decision by email."
 msgstr ""
 
-#: /Users/dusanstojanovic/Projects/oarepo-requests/oarepo_requests/types/publish_changed_metadata.py:105
+#: /Users/dusanstojanovic/Projects/oarepo-requests/oarepo_requests/types/publish_changed_metadata.py:128
 msgid "The record with changed metadata has been submitted for review. "
 msgstr ""
 
-#: /Users/dusanstojanovic/Projects/oarepo-requests/oarepo_requests/types/publish_changed_metadata.py:109
+#: /Users/dusanstojanovic/Projects/oarepo-requests/oarepo_requests/types/publish_changed_metadata.py:132
 msgid "Waiting for finishing the changed metadata publication request."
 msgstr ""
 
 #: /Users/dusanstojanovic/Projects/oarepo-requests/oarepo_requests/types/publish_draft.py:35
-#: /Users/dusanstojanovic/Projects/oarepo-requests/oarepo_requests/types/publish_draft.py:75
+#: /Users/dusanstojanovic/Projects/oarepo-requests/oarepo_requests/types/publish_draft.py:96
 msgid "Publish draft"
 msgstr ""
 
-#: /Users/dusanstojanovic/Projects/oarepo-requests/oarepo_requests/types/publish_draft.py:54
-#: /Users/dusanstojanovic/Projects/oarepo-requests/oarepo_requests/types/publish_new_version.py:94
+#: /Users/dusanstojanovic/Projects/oarepo-requests/oarepo_requests/types/publish_draft.py:75
+#: /Users/dusanstojanovic/Projects/oarepo-requests/oarepo_requests/types/publish_new_version.py:102
 msgid "Resource version"
 msgstr ""
 
-#: /Users/dusanstojanovic/Projects/oarepo-requests/oarepo_requests/types/publish_draft.py:55
-#: /Users/dusanstojanovic/Projects/oarepo-requests/oarepo_requests/types/publish_new_version.py:95
+#: /Users/dusanstojanovic/Projects/oarepo-requests/oarepo_requests/types/publish_draft.py:76
+#: /Users/dusanstojanovic/Projects/oarepo-requests/oarepo_requests/types/publish_new_version.py:103
 msgid "Write down the version (first, second…)."
 msgstr ""
 
-#: /Users/dusanstojanovic/Projects/oarepo-requests/oarepo_requests/types/publish_draft.py:77
+#: /Users/dusanstojanovic/Projects/oarepo-requests/oarepo_requests/types/publish_draft.py:98
 msgid "Review and publish draft"
 msgstr ""
 
-#: /Users/dusanstojanovic/Projects/oarepo-requests/oarepo_requests/types/publish_draft.py:78
-#: /Users/dusanstojanovic/Projects/oarepo-requests/oarepo_requests/types/publish_draft.py:79
+#: /Users/dusanstojanovic/Projects/oarepo-requests/oarepo_requests/types/publish_draft.py:99
+#: /Users/dusanstojanovic/Projects/oarepo-requests/oarepo_requests/types/publish_draft.py:100
 msgid "Draft submitted for review"
 msgstr ""
 
-#: /Users/dusanstojanovic/Projects/oarepo-requests/oarepo_requests/types/publish_draft.py:80
+#: /Users/dusanstojanovic/Projects/oarepo-requests/oarepo_requests/types/publish_draft.py:101
 msgid "Draft published"
 msgstr ""
 
-#: /Users/dusanstojanovic/Projects/oarepo-requests/oarepo_requests/types/publish_draft.py:81
+#: /Users/dusanstojanovic/Projects/oarepo-requests/oarepo_requests/types/publish_draft.py:102
 msgid "Draft publication declined"
 msgstr ""
 
-#: /Users/dusanstojanovic/Projects/oarepo-requests/oarepo_requests/types/publish_draft.py:82
+#: /Users/dusanstojanovic/Projects/oarepo-requests/oarepo_requests/types/publish_draft.py:103
 msgid "Draft publication cancelled"
 msgstr ""
 
-#: /Users/dusanstojanovic/Projects/oarepo-requests/oarepo_requests/types/publish_draft.py:101
+#: /Users/dusanstojanovic/Projects/oarepo-requests/oarepo_requests/types/publish_draft.py:122
 msgid ""
 "By submitting the draft for review you are requesting the publication of the"
 " draft. The draft will become locked and no further changes will be possible"
@@ -759,52 +820,52 @@ msgid ""
 "decision by email."
 msgstr ""
 
-#: /Users/dusanstojanovic/Projects/oarepo-requests/oarepo_requests/types/publish_draft.py:106
+#: /Users/dusanstojanovic/Projects/oarepo-requests/oarepo_requests/types/publish_draft.py:127
 msgid ""
 "Click to immediately publish the draft. The draft will be a subject to "
 "embargo as requested in the side panel. Note: The action is irreversible."
 msgstr ""
 
-#: /Users/dusanstojanovic/Projects/oarepo-requests/oarepo_requests/types/publish_draft.py:111
+#: /Users/dusanstojanovic/Projects/oarepo-requests/oarepo_requests/types/publish_draft.py:132
 msgid ""
 "Submit for review. After submitting the draft for review, it will be locked "
 "and no further modifications will be possible."
 msgstr ""
 
-#: /Users/dusanstojanovic/Projects/oarepo-requests/oarepo_requests/types/publish_draft.py:115
+#: /Users/dusanstojanovic/Projects/oarepo-requests/oarepo_requests/types/publish_draft.py:136
 msgid ""
 "The draft has been submitted for review. You can now accept or decline the "
 "request."
 msgstr ""
 
-#: /Users/dusanstojanovic/Projects/oarepo-requests/oarepo_requests/types/publish_draft.py:118
+#: /Users/dusanstojanovic/Projects/oarepo-requests/oarepo_requests/types/publish_draft.py:139
 msgid ""
 "The draft has been submitted for review. It is now locked and no further "
 "changes are possible. You will be notified about the decision by email."
 msgstr ""
 
-#: /Users/dusanstojanovic/Projects/oarepo-requests/oarepo_requests/types/publish_draft.py:122
+#: /Users/dusanstojanovic/Projects/oarepo-requests/oarepo_requests/types/publish_draft.py:143
 msgid "The draft has been submitted for review. "
 msgstr ""
 
-#: /Users/dusanstojanovic/Projects/oarepo-requests/oarepo_requests/types/publish_draft.py:123
+#: /Users/dusanstojanovic/Projects/oarepo-requests/oarepo_requests/types/publish_draft.py:144
 msgid "The draft has been published. "
 msgstr ""
 
-#: /Users/dusanstojanovic/Projects/oarepo-requests/oarepo_requests/types/publish_draft.py:124
+#: /Users/dusanstojanovic/Projects/oarepo-requests/oarepo_requests/types/publish_draft.py:145
 msgid "Publication of the draft has been declined."
 msgstr ""
 
-#: /Users/dusanstojanovic/Projects/oarepo-requests/oarepo_requests/types/publish_draft.py:125
+#: /Users/dusanstojanovic/Projects/oarepo-requests/oarepo_requests/types/publish_draft.py:146
 msgid "The draft has been cancelled. "
 msgstr ""
 
-#: /Users/dusanstojanovic/Projects/oarepo-requests/oarepo_requests/types/publish_draft.py:126
+#: /Users/dusanstojanovic/Projects/oarepo-requests/oarepo_requests/types/publish_draft.py:147
 msgid "Waiting for finishing the draft publication request."
 msgstr ""
 
 #: /Users/dusanstojanovic/Projects/oarepo-requests/oarepo_requests/types/publish_new_version.py:45
-#: /Users/dusanstojanovic/Projects/oarepo-requests/oarepo_requests/types/publish_new_version.py:125
+#: /Users/dusanstojanovic/Projects/oarepo-requests/oarepo_requests/types/publish_new_version.py:133
 msgid "Publish new version"
 msgstr ""
 
@@ -812,28 +873,28 @@ msgstr ""
 msgid "Request publishing of a draft"
 msgstr ""
 
-#: /Users/dusanstojanovic/Projects/oarepo-requests/oarepo_requests/types/publish_new_version.py:127
+#: /Users/dusanstojanovic/Projects/oarepo-requests/oarepo_requests/types/publish_new_version.py:135
 msgid "Review and publish new version"
 msgstr ""
 
-#: /Users/dusanstojanovic/Projects/oarepo-requests/oarepo_requests/types/publish_new_version.py:128
-#: /Users/dusanstojanovic/Projects/oarepo-requests/oarepo_requests/types/publish_new_version.py:129
+#: /Users/dusanstojanovic/Projects/oarepo-requests/oarepo_requests/types/publish_new_version.py:136
+#: /Users/dusanstojanovic/Projects/oarepo-requests/oarepo_requests/types/publish_new_version.py:137
 msgid "New version submitted for review"
 msgstr ""
 
-#: /Users/dusanstojanovic/Projects/oarepo-requests/oarepo_requests/types/publish_new_version.py:130
+#: /Users/dusanstojanovic/Projects/oarepo-requests/oarepo_requests/types/publish_new_version.py:138
 msgid "New version published"
 msgstr ""
 
-#: /Users/dusanstojanovic/Projects/oarepo-requests/oarepo_requests/types/publish_new_version.py:131
+#: /Users/dusanstojanovic/Projects/oarepo-requests/oarepo_requests/types/publish_new_version.py:139
 msgid "New version publication declined"
 msgstr ""
 
-#: /Users/dusanstojanovic/Projects/oarepo-requests/oarepo_requests/types/publish_new_version.py:132
+#: /Users/dusanstojanovic/Projects/oarepo-requests/oarepo_requests/types/publish_new_version.py:140
 msgid "New version publication cancelled"
 msgstr ""
 
-#: /Users/dusanstojanovic/Projects/oarepo-requests/oarepo_requests/types/publish_new_version.py:151
+#: /Users/dusanstojanovic/Projects/oarepo-requests/oarepo_requests/types/publish_new_version.py:159
 msgid ""
 "By submitting the new version for review you are requesting the publication "
 "of the new version. The draft will become locked and no further changes will"
@@ -841,49 +902,49 @@ msgid ""
 " about the decision by email."
 msgstr ""
 
-#: /Users/dusanstojanovic/Projects/oarepo-requests/oarepo_requests/types/publish_new_version.py:156
+#: /Users/dusanstojanovic/Projects/oarepo-requests/oarepo_requests/types/publish_new_version.py:164
 msgid ""
 "Click to immediately publish the new version. The new version will be a "
 "subject to embargo as requested in the side panel. Note: The action is "
 "irreversible."
 msgstr ""
 
-#: /Users/dusanstojanovic/Projects/oarepo-requests/oarepo_requests/types/publish_new_version.py:161
+#: /Users/dusanstojanovic/Projects/oarepo-requests/oarepo_requests/types/publish_new_version.py:169
 msgid ""
 "Submit for review. After submitting the new version for review, it will be "
 "locked and no further modifications will be possible."
 msgstr ""
 
-#: /Users/dusanstojanovic/Projects/oarepo-requests/oarepo_requests/types/publish_new_version.py:165
+#: /Users/dusanstojanovic/Projects/oarepo-requests/oarepo_requests/types/publish_new_version.py:173
 msgid ""
 "The new version has been submitted for review. You can now accept or decline"
 " the request."
 msgstr ""
 
-#: /Users/dusanstojanovic/Projects/oarepo-requests/oarepo_requests/types/publish_new_version.py:168
+#: /Users/dusanstojanovic/Projects/oarepo-requests/oarepo_requests/types/publish_new_version.py:176
 msgid ""
 "The new version has been submitted for review. It is now locked and no "
 "further changes are possible. You will be notified about the decision by "
 "email."
 msgstr ""
 
-#: /Users/dusanstojanovic/Projects/oarepo-requests/oarepo_requests/types/publish_new_version.py:172
+#: /Users/dusanstojanovic/Projects/oarepo-requests/oarepo_requests/types/publish_new_version.py:180
 msgid "The new version has been submitted for review. "
 msgstr ""
 
-#: /Users/dusanstojanovic/Projects/oarepo-requests/oarepo_requests/types/publish_new_version.py:173
+#: /Users/dusanstojanovic/Projects/oarepo-requests/oarepo_requests/types/publish_new_version.py:181
 msgid "The new version has been published. "
 msgstr ""
 
-#: /Users/dusanstojanovic/Projects/oarepo-requests/oarepo_requests/types/publish_new_version.py:174
+#: /Users/dusanstojanovic/Projects/oarepo-requests/oarepo_requests/types/publish_new_version.py:182
 msgid "Publication of the new version has been declined."
 msgstr ""
 
-#: /Users/dusanstojanovic/Projects/oarepo-requests/oarepo_requests/types/publish_new_version.py:175
+#: /Users/dusanstojanovic/Projects/oarepo-requests/oarepo_requests/types/publish_new_version.py:183
 msgid "The new version has been cancelled. "
 msgstr ""
 
-#: /Users/dusanstojanovic/Projects/oarepo-requests/oarepo_requests/types/publish_new_version.py:176
+#: /Users/dusanstojanovic/Projects/oarepo-requests/oarepo_requests/types/publish_new_version.py:184
 msgid "Waiting for finishing the new version publication request."
 msgstr ""
 

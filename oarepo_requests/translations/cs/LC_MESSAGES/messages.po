@@ -1389,16 +1389,6 @@ msgid ""
 "errors."
 msgstr "Akci nelze provést kvůli chybám při validaci polí požadavku."
 
-#: /Users/m/w/cesnet/oarepo-requests/oarepo_requests/templates/oarepo/invenio_notifications/comment-request-event.create.jinja:24
-#, python-brace-format
-msgid "💬 New comment on on '{request_title}' for '{topic_title}'"
-msgstr "💬 Nový komentář k '{request_title}' pro '{topic_title}'"
-
-#: /Users/m/w/cesnet/oarepo-requests/oarepo_requests/templates/oarepo/invenio_notifications/comment-request-event.create.jinja:26
-#, python-brace-format
-msgid "💬 New comment on on '{request_title}'"
-msgstr "💬 Nový komentář k '{request_title}'"
-
 #: /Users/m/w/cesnet/oarepo-requests/oarepo_requests/templates/oarepo/invenio_notifications/comment-request-event.create.jinja:28
 msgid "💬 New comment"
 msgstr "💬 Nový komentář"
@@ -1520,3 +1510,54 @@ msgstr "Smazání záznamu"
 
 msgid "Edit published record"
 msgstr "Upravit publikovaný záznam"
+
+#: /Users/dusanstojanovic/Projects/oarepo-requests/oarepo_requests/templates/oarepo/invenio_notifications/comment-request-event.create.jinja:20
+#, python-brace-format
+msgid "💬 New comment on '{request_title}' for '{topic_title}'"
+msgstr "💬 Nový komentář k '{request_title}' pro '{topic_title}'"
+
+#: /Users/dusanstojanovic/Projects/oarepo-requests/oarepo_requests/templates/oarepo/invenio_notifications/comment-request-event.create.jinja:22
+#: /Users/dusanstojanovic/Projects/oarepo-requests/oarepo_requests/templates/oarepo/invenio_notifications/comment-subcommunity-invitation-request.create.jinja:25
+#: /Users/dusanstojanovic/Projects/oarepo-requests/oarepo_requests/templates/oarepo/invenio_notifications/comment-subcommunity-request.create.jinja:24
+#, python-brace-format
+msgid "💬 New comment on '{request_title}'"
+msgstr "💬 Nový komentář k '{request_title}'"
+
+#: /Users/dusanstojanovic/Projects/oarepo-requests/oarepo_requests/templates/oarepo/invenio_notifications/comment-request-event.reply.jinja:27
+#, python-brace-format
+msgid "💬 New reply on '{request_title}'"
+msgstr "💬 Nová odpověď k '{request_title}'"
+
+#: /Users/dusanstojanovic/Projects/oarepo-requests/oarepo_requests/templates/oarepo/invenio_notifications/comment-request-event.reply.jinja:33
+#, python-brace-format
+msgid "'@{user_name}' replied on <a href='{reply_link}'>comment</a>:"
+msgstr "'@{user_name}' odpověděl(a) na <a href='{reply_link}'>komentář</a>:"
+
+#: /Users/dusanstojanovic/Projects/oarepo-requests/oarepo_requests/templates/oarepo/invenio_notifications/comment-request-event.reply.jinja:51
+#, python-brace-format
+msgid "@{user_name} replied on comment"
+msgstr "@{user_name} odpověděl(a) na komentář"
+
+#: /Users/dusanstojanovic/Projects/oarepo-requests/oarepo_requests/templates/oarepo/invenio_notifications/comment-request-event.reply.jinja:55
+#, python-brace-format
+msgid "View reply: {reply_link}"
+msgstr "Zobrazit odpověď: {reply_link}"
+
+#: /Users/dusanstojanovic/Projects/oarepo-requests/oarepo_requests/templates/oarepo/invenio_notifications/comment-request-event.reply.jinja:62
+#, python-brace-format
+msgid "*@{user_name}* replied on [comment]({reply_link})"
+msgstr "*@{user_name}* odpověděl(a) na [komentář]({reply_link})"
+
+#: /Users/dusanstojanovic/Projects/oarepo-requests/oarepo_requests/templates/oarepo/invenio_notifications/comment-subcommunity-invitation-request.create.jinja:31
+#: /Users/dusanstojanovic/Projects/oarepo-requests/oarepo_requests/templates/oarepo/invenio_notifications/comment-subcommunity-request.create.jinja:30
+#, python-brace-format
+msgid "'@{user_name}' commented on '{request_title}':"
+msgstr "'@{user_name}' komentoval(a) žádost '{request_title}':"
+
+#: /Users/dusanstojanovic/Projects/oarepo-requests/oarepo_requests/templates/oarepo/invenio_notifications/comment-request-event.create.jinja:14
+#: /Users/dusanstojanovic/Projects/oarepo-requests/oarepo_requests/templates/oarepo/invenio_notifications/comment-request-event.reply.jinja:13
+#: /Users/dusanstojanovic/Projects/oarepo-requests/oarepo_requests/templates/oarepo/invenio_notifications/comment-subcommunity-invitation-request.create.jinja:14
+#: /Users/dusanstojanovic/Projects/oarepo-requests/oarepo_requests/templates/oarepo/invenio_notifications/comment-subcommunity-request.create.jinja:14
+#, python-brace-format
+msgid "User {user_id}"
+msgstr "Uživatel {user_id}"
