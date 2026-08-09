@@ -16,11 +16,6 @@
 
 from __future__ import annotations
 
-import sqlalchemy as sa
-import sqlalchemy_utils
-from alembic import op
-from sqlalchemy.dialects import postgresql
-
 # revision identifiers, used by Alembic.
 revision = "57aebe908bcb"
 down_revision = "985368490c5b"

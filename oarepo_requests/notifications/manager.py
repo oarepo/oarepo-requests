@@ -14,7 +14,9 @@ from typing import TYPE_CHECKING, Any, cast
 from flask import current_app
 from flask_babel import LazyString, force_locale
 from invenio_i18n.proxies import current_i18n
-from invenio_notifications.manager import NotificationManager as InvenioNotificationManager
+from invenio_notifications.manager import (
+    NotificationManager as InvenioNotificationManager,
+)
 from invenio_notifications.models import Notification, Recipient
 from invenio_notifications.tasks import dispatch_notification
 

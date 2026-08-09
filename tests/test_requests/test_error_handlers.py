@@ -175,7 +175,10 @@ def test_create_request_failed_on_validation(
     draft = draft_factory(creator.identity)
     draft_id = draft["id"]
 
-    resp = creator_client.post(f"{urls['BASE_URL_REQUESTS']}record:{draft_id}/publish_draft", json={"blabla": "lala"})
+    resp = creator_client.post(
+        f"{urls['BASE_URL_REQUESTS']}record:{draft_id}/publish_draft",
+        json={"blabla": "lala"},
+    )
     assert resp.status_code == 400
 
     body = resp.json
@@ -202,7 +205,8 @@ def test_receiver_not_referencable_error(
     assert resp.status_code == 400
     assert (
         ReceiverNonReferencableError(
-            "generic", record_from_result(current_rdm_records_service.read_draft(system_identity, draft_id))
+            "generic",
+            record_from_result(current_rdm_records_service.read_draft(system_identity, draft_id)),
         ).description
         in resp.json["message"]
     )

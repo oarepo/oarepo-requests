@@ -28,11 +28,16 @@ def test_search_by_topic_model_type(
         identity=creator.identity,
         data={"payload": {"version": "1.0"}},
         request_type="publish_draft",
-        topic=draft._record,  # noqa SLF001
+        topic=draft._record,  # noqa: SLF001
         expand=True,
     )
     assert (
-        len(current_requests_service.search(system_identity, extra_filter=dsl.Q("exists", field="topic.requests_test")))
+        len(
+            current_requests_service.search(
+                system_identity,
+                extra_filter=dsl.Q("exists", field="topic.requests_test"),
+            )
+        )
         == 1
     )
 
@@ -52,7 +57,7 @@ def test_model_topic_reference_popped(
         identity=creator.identity,
         data={"payload": {"version": "1.0"}},
         request_type="publish_draft",
-        topic=draft._record,  # noqa SLF001
+        topic=draft._record,  # noqa: SLF001
         expand=True,
     )
     search = current_requests_service.search(system_identity)

@@ -16,6 +16,6 @@ if TYPE_CHECKING:
     from flask import Flask
 
 
-def finalize_app(app: Flask) -> None:  # noqa: ARG001  # pragma: no cover
+def finalize_app(_app: Flask) -> None:  # pragma: no cover
     """Register per-request-type Label/Icon React overrides on every page that renders request UIs."""
     register_request_ui_overrides()

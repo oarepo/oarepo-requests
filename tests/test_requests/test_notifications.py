@@ -83,7 +83,7 @@ def test_publish_notifications(
     with mail.record_messages() as outbox:
         # Validate that email was sent
         # TODO: has to be defined on request type
-        # request_html_link = record.json["expanded"]["requests"][0]["links"]["self_html"] # noqa
+        # request_html_link = record.json["expanded"]["requests"][0]["links"]["self_html"] # noqa ERA001
         receiver_client.post(
             link2testclient(record.json["expanded"]["requests"][0]["links"]["actions"]["decline"]),
         )
@@ -132,7 +132,7 @@ def test_delete_published_notifications(
     with mail.record_messages() as outbox:
         # Validate that email was sent
         # TODO: has to be defined on request type
-        # request_html_link = record.json["expanded"]["requests"][0]["links"]["self_html"] # noqa
+        # request_html_link = record.json["expanded"]["requests"][0]["links"]["self_html"] # noqa ERA001
         receiver_client.post(
             link2testclient(record.json["expanded"]["requests"][0]["links"]["actions"]["accept"]),
         )
@@ -155,7 +155,7 @@ def test_delete_published_notifications(
     with mail.record_messages() as outbox:
         # Validate that email was sent
         # TODO: has to be defined on request type
-        # request_html_link = record.json["expanded"]["requests"][0]["links"]["self_html"] # noqa
+        # request_html_link = record.json["expanded"]["requests"][0]["links"]["self_html"] # noqa: ERA001
         receiver_client.post(
             link2testclient(record.json["expanded"]["requests"][0]["links"]["actions"]["decline"]),
         )
@@ -420,9 +420,7 @@ def test_lazy_string_parsing(app, users, logged_client, draft_factory, create_re
         {LazyPublishDraftRequestSubmitNotificationBuilder.type: LazyPublishDraftRequestSubmitNotificationBuilder},
     )
 
-    notification = LazyPublishDraftRequestSubmitNotificationBuilder.build(
-        request=request._obj  # noqa: SLF001
-    )
+    notification = LazyPublishDraftRequestSubmitNotificationBuilder.build(request=request._obj)  # noqa: SLF001
     mail = app.extensions.get("mail")
     with mail.record_messages() as outbox:
         manager.handle_broadcast(notification)

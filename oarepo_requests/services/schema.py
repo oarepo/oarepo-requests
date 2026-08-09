@@ -42,7 +42,7 @@ class RequestTypeSchema(ma.Schema):
     """Links to the request type."""
 
     @ma.post_dump
-    def _create_link(self, data: dict, **kwargs: Any) -> dict:  # noqa ARG002
+    def _create_link(self, data: dict, **_kwargs: Any) -> dict:
         if "links" in data:
             return data
         type_id = data["type_id"]

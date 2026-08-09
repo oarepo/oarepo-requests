@@ -11,7 +11,10 @@ from __future__ import annotations
 
 from invenio_app_rdm.config import NOTIFICATIONS_BUILDERS as RDM_NOTIFICATIONS_BUILDERS
 from invenio_notifications.backends import EmailNotificationBackend
-from invenio_rdm_records.requests.entity_resolvers import EmailResolver, RDMRecordServiceResultResolver
+from invenio_rdm_records.requests.entity_resolvers import (
+    EmailResolver,
+    RDMRecordServiceResultResolver,
+)
 from invenio_records_resources.references.entity_resolvers import ServiceResultResolver
 
 from oarepo_requests.notifications.builders.comment import (
@@ -27,7 +30,10 @@ from oarepo_requests.notifications.builders.publish import (
     PublishDraftRequestDeclineNotificationBuilder,
     PublishDraftRequestSubmitNotificationBuilder,
 )
-from oarepo_requests.notifications.resolvers import MultipleEntitiesNotificationResolver, UserNotificationProxy
+from oarepo_requests.notifications.resolvers import (
+    MultipleEntitiesNotificationResolver,
+    UserNotificationProxy,
+)
 from oarepo_requests.resources.oarepo.config import OARepoRequestsResourceConfig
 from oarepo_requests.resources.oarepo.resource import OARepoRequestsResource
 from oarepo_requests.services.oarepo.config import OARepoRequestsServiceConfig
@@ -53,8 +59,6 @@ NOTIFICATIONS_BUILDERS = {
 NOTIFICATIONS_BACKENDS = {
     EmailNotificationBackend.id: EmailNotificationBackend(),
 }
-
-# from invenio_app_rdm.config import NOTIFICATIONS_ENTITY_RESOLVERS as RDM_NOTIFICATIONS_ENTITY_RESOLVERS # noqa: ERA001
 
 NOTIFICATIONS_ENTITY_RESOLVERS = [
     # *RDM_NOTIFICATIONS_ENTITY_RESOLVERS,

@@ -49,7 +49,7 @@ class NewVersionRequestType(NonDuplicableOARepoRecordRequestType):
 
     @classproperty
     @override
-    def available_actions(cls) -> dict[str, type[RequestAction]]:  # noqa N805 type: ignore[reportIncompatibleVariableOverride]
+    def available_actions(cls) -> dict[str, type[RequestAction]]:  # noqa N805
         """Return available actions for the request type."""
         return {
             **super().available_actions,
@@ -122,7 +122,7 @@ class NewVersionRequestType(NonDuplicableOARepoRecordRequestType):
                 return gettext("Request new version access")
 
     @override
-    def stateful_description(  # noqa PLR0911
+    def stateful_description(  # noqa: PLR0911
         self,
         identity: Identity,
         *,

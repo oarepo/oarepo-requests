@@ -63,7 +63,7 @@ class OARepoGenericActionMixin(RequestAction):
         self._request = value
 
     @classmethod
-    def stateful_name(cls, identity: Identity, **kwargs: Any) -> str | LazyString:  # noqa ARG003
+    def stateful_name(cls, identity: Identity, **kwargs: Any) -> str | LazyString:  # noqa: ARG003
         """Return the name of the action.
 
         The name can be a lazy multilingual string and may depend on the state of the action,
