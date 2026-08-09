@@ -123,7 +123,7 @@ class DeletePublishedRecordRequestType(NonDuplicableOARepoRecordRequestType):
                 return gettext("Request record deletion")
 
     @override
-    def stateful_description(  # noqa PLR0911
+    def stateful_description(  # noqa: PLR0911
         self,
         identity: Identity,
         *,

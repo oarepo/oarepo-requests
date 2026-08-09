@@ -112,7 +112,7 @@ class PublishRequestType(NonDuplicableOARepoRecordRequestType):
         """Assert that there are no pending requests on the topic."""
         requests = search_requests(system_identity, topic)
 
-        for result in requests._results:  # noqa SLF001
+        for result in requests._results:  # noqa: SLF001
             # note: we can not use solely the result.is_open because changes may not be committed yet
             # to opensearch index. That's why we need to get the record from DB and re-check.
             if (

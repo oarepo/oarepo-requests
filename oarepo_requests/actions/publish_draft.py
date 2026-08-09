@@ -115,7 +115,7 @@ class PublishDraftAcceptAction(MakeTopicDraftMixin, PublishMixin, OARepoAcceptAc
         topic_service = get_draft_record_service(self.topic)
         requests = search_requests(system_identity, self.topic)
 
-        for result in requests._results:  # noqa SLF001
+        for result in requests._results:  # noqa: SLF001
             if (
                 result.type
                 not in [

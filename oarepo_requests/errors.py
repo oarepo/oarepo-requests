@@ -10,6 +10,7 @@
 from __future__ import annotations
 
 import json
+from http import HTTPStatus
 from typing import TYPE_CHECKING, Any, cast, override
 
 from flask import g
@@ -60,7 +61,7 @@ class CustomHTTPJSONException(HTTPJSONException):
         if self.request_payload_errors:
             body["request_payload_errors"] = self.request_payload_errors
 
-        if self.code and (self.code >= 500) and hasattr(g, "sentry_event_id"):  # noqa PLR2004
+        if self.code and (self.code >= HTTPStatus.INTERNAL_SERVER_ERROR) and hasattr(g, "sentry_event_id"):
             body["error_id"] = str(g.sentry_event_id)
 
         return json.dumps(body, cls=JSONEncoder)

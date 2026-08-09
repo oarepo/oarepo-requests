@@ -41,8 +41,8 @@ PUBLISH_REQUEST_TYPES = ["publish_draft", "publish_new_version"]
 
 
 NOTIFICATION_RECIPIENTS_RESOLVERS = {
-    "user": lambda key, notification: UserRecipient(key),  # noqa ARG005
-    "group": lambda key, notification: UserRecipient(key),  # noqa ARG005
-    "multiple": lambda key, notification: MultipleRecipients(key),  # noqa ARG005
+    "user": lambda key, _notification: UserRecipient(key),
+    "group": lambda key, _notification: UserRecipient(key),
+    "multiple": lambda key, _notification: MultipleRecipients(key),
 }
 NOTIFICATIONS_MANAGER_CLS = "oarepo_requests.notifications.manager.NotificationManager"

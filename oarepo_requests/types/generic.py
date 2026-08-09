@@ -74,12 +74,12 @@ class OARepoRequestType(RequestType):
         "self_html": EndpointLink(
             "invenio_app_rdm_requests.user_dashboard_request_view",
             params=["request_pid_value"],
-            vars=lambda obj, vars: vars.update(request_pid_value=vars["request"].id),  # noqa: ARG005, A006
+            vars=lambda obj, vars: vars.update(request_pid_value=vars["request"].id),  # noqa: A006,ARG005
         ),
     }
 
     @classproperty
-    def allowed_receiver_ref_types(cls) -> list[str]:  # type: ignore[reportIncompatibleVariableOverride] # noqa N805
+    def allowed_receiver_ref_types(cls) -> list[str]:  # noqa N805 # type: ignore[reportIncompatibleVariableOverride]
         return current_oarepo_requests.allowed_receiver_ref_types
 
     comment_notification_builder = CommentRequestEventCreateNotificationBuilder
@@ -97,7 +97,7 @@ class OARepoRequestType(RequestType):
         return cls.has_form
 
     @classproperty
-    def available_statuses(cls) -> dict[str, RequestState]:  # type: ignore[reportIncompatibleVariableOverride] # noqa N805
+    def available_statuses(cls) -> dict[str, RequestState]:  # noqa N805 # type: ignore[reportIncompatibleVariableOverride]
         """Return available statuses for the request type.
 
         The status (open, closed, undefined) are used for request filtering.
@@ -122,7 +122,7 @@ class OARepoRequestType(RequestType):
             # lazy-swapped to an EntityProxy (`'UserProxy' object has no
             # attribute 'keys'` inside request_identity_matches).
             @post_dump(pass_original=True)
-            def _ensure_title(self, data: dict[str, Any], original: Any, **kwargs: Any) -> dict[str, Any]:  # noqa ARG002
+            def _ensure_title(self, data: dict[str, Any], original: Any, **_kwargs: Any) -> dict[str, Any]:
                 if data.get("title"):
                     return data  # honor an explicitly persisted title
                 title = str(request_type_cls.name)
@@ -144,11 +144,11 @@ class OARepoRequestType(RequestType):
     def can_create(
         self,
         identity: Identity,
-        data: dict[str, Any],  # noqa ARG002
-        receiver: dict[str, str],  # noqa ARG002
+        data: dict[str, Any],  # noqa: ARG002
+        receiver: dict[str, str],  # noqa: ARG002
         topic: Record,
-        creator: dict[str, str],  # noqa ARG002
-        *args: Any,  # noqa ARG002
+        creator: dict[str, str],  # noqa: ARG002
+        *args: Any,  # noqa: ARG002
         **kwargs: Any,
     ) -> None:
         """Check if the request can be created.
@@ -164,7 +164,7 @@ class OARepoRequestType(RequestType):
         current_requests_service.require_permission(identity, "create", record=topic, request_type=self, **kwargs)
 
     @classmethod
-    def is_applicable_to(cls, identity: Identity, topic: Record, *args: Any, **kwargs: Any) -> bool:  # noqa ARG002
+    def is_applicable_to(cls, identity: Identity, topic: Record, *_args: Any, **kwargs: Any) -> bool:
         """Check if the request type is applicable to the topic.
 
         Used for checking whether there is any situation where the client can create
@@ -194,11 +194,11 @@ class OARepoRequestType(RequestType):
     # TODO: move these to RecordRequestType too?
     def stateful_name(
         self,
-        identity: Identity,  # noqa ARG002
+        identity: Identity,  # noqa: ARG002
         *,
-        topic: Record,  # noqa ARG002
-        request: Request | None = None,  # noqa ARG002
-        **kwargs: Any,  # noqa ARG002
+        topic: Record,  # noqa: ARG002
+        request: Request | None = None,  # noqa: ARG002
+        **kwargs: Any,  # noqa: ARG002
     ) -> str | LazyString:
         """Return the name of the request that reflects its current state.
 
@@ -210,11 +210,11 @@ class OARepoRequestType(RequestType):
 
     def stateful_description(
         self,
-        identity: Identity,  # noqa ARG002
+        identity: Identity,  # noqa: ARG002
         *,
-        topic: Record,  # noqa ARG002
-        request: Request | None = None,  # noqa ARG002
-        **kwargs: Any,  # noqa ARG002
+        topic: Record,  # noqa: ARG002
+        request: Request | None = None,  # noqa: ARG002
+        **kwargs: Any,  # noqa: ARG002
     ) -> str | LazyString:
         """Return the description of the request that reflects its current state.
 
@@ -224,7 +224,7 @@ class OARepoRequestType(RequestType):
         """
         return self.description
 
-    def string_by_state(  # noqa C901, PLR0913, PLR0911
+    def string_by_state(  # noqa: PLR0911,C901,PLR0913
         self,
         identity: Identity,
         *,

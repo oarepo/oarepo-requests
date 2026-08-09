@@ -46,7 +46,7 @@ def test_publish_with_workflows(
     assert resp_request_submit.status_code == 200
 
     # test state of the record is changed to published
-    draft_with_submitted_request = record_service.read_draft(creator.identity, draft1_id)._record  # noqa SLF001
+    draft_with_submitted_request = record_service.read_draft(creator.identity, draft1_id)._record  # noqa: SLF001
     assert draft_with_submitted_request["state"] == "publishing"
 
     record_creator = creator_client.get(f"{urls['BASE_URL']}/{draft1_id}/draft?expand=true").json

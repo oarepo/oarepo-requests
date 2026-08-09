@@ -25,4 +25,7 @@ def test_request_ui_overrides_registered(app):
         for type_id in REQUEST_TYPE_LABELS:
             assert (endpoint, f"RequestTypeLabel.layout.{type_id}") in registered
         for type_id in REQUEST_TYPE_ICONS:
-            assert (endpoint, f"InvenioRequests.RequestTypeIcon.layout.{type_id}") in registered
+            assert (
+                endpoint,
+                f"InvenioRequests.RequestTypeIcon.layout.{type_id}",
+            ) in registered

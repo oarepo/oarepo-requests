@@ -180,13 +180,13 @@ def finalize_app(app: Flask) -> None:
     # TODO: temporary before invenio fix
     to_remove = [t for t in current_request_type_registry if isinstance(t, EventType)]
     for type_ in to_remove:
-        current_request_type_registry._registered_types.pop(type_.type_id)  # noqa SLF001 # type: ignore[reportAttributeAccessIssue]
+        current_request_type_registry._registered_types.pop(type_.type_id)  # noqa: SLF001 # type: ignore[reportAttributeAccessIssue]
         current_event_type_registry.register_type(type_)
 
     ext = app.extensions["oarepo-requests"]
     ext.notification_recipients_resolvers_registry = app.config["NOTIFICATION_RECIPIENTS_RESOLVERS"]
 
-    dumper_extensions = Request.dumper._extensions  # noqa SLF001 # type: ignore[reportAttributeAccessIssue]
+    dumper_extensions = Request.dumper._extensions  # noqa: SLF001 # type: ignore[reportAttributeAccessIssue]
     if not any(isinstance(e, RecordReferenceDumperExt) for e in dumper_extensions):
         dumper_extensions.append(RecordReferenceDumperExt())
 
