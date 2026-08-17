@@ -17,11 +17,13 @@ theme = WebpackThemeBundle(  # pragma: no cover
         "semantic-ui": {
             "entry": {
                 "oarepo-requests-tabs": "./js/oarepo_requests/tabs.js",
+                "oarepo-requests-get-access": "./js/oarepo_requests/get_access/index.js",
             },
             "dependencies": {},
             "devDependencies": {},
             "aliases": {
                 "@js/oarepo_requests": "js/oarepo_requests",
+                "@js/oarepo_requests/get_access": "js/oarepo_requests/get_access",
                 "@translations/oarepo_requests_ui": "translations/oarepo_requests_ui",
             },
         }
