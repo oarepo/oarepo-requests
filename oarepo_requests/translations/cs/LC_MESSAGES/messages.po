@@ -1561,3 +1561,236 @@ msgstr "'@{user_name}' komentoval(a) žádost '{request_title}':"
 #, python-brace-format
 msgid "User {user_id}"
 msgstr "Uživatel {user_id}"
+
+#: /Users/m/Workspaces/oarepo-libs/feat-remove-einfra-integraton/oarepo-requests/oarepo_requests/actions/group_membership.py:42
+msgid "Accept group membership"
+msgstr "Přijmout žádost o členství ve skupině"
+
+#: /Users/m/Workspaces/oarepo-libs/feat-remove-einfra-integraton/oarepo-requests/oarepo_requests/actions/group_membership.py:66
+msgid "Decline group membership"
+msgstr "Zamítnout žádost o členství ve skupině"
+
+#: /Users/m/Workspaces/oarepo-libs/feat-remove-einfra-integraton/oarepo-requests/oarepo_requests/actions/group_membership.py:77
+msgid "Submit group membership"
+msgstr "Odeslat žádost o členství ve skupině"
+
+#: /Users/m/Workspaces/oarepo-libs/feat-remove-einfra-integraton/oarepo-requests/oarepo_requests/templates/semantic-ui/invenio_notifications/group-membership-request-event.accept.jinja:14
+#, python-brace-format
+msgid "Your request to join group '{topic_name}' has been accepted"
+msgstr "Vaše žádost o členství ve skupině '{topic_name}' byla přijata"
+
+#: /Users/m/Workspaces/oarepo-libs/feat-remove-einfra-integraton/oarepo-requests/oarepo_requests/templates/semantic-ui/invenio_notifications/group-membership-request-event.accept.jinja:18
+#, python-format
+msgid ""
+"\n"
+"<p>\n"
+"Your request to join the group \"%(topic_name)s\" has been accepted. You are now a member of the group. You can see the request at\n"
+"<a href=\"%(link)s\">%(link)s</a>\n"
+"</p>\n"
+"    "
+msgstr ""
+"\n"
+"<p>\n"
+"Vaše žádost o členství ve skupině \"%(topic_name)s\" byla přijata. Nyní jste členem skupiny. Žádost můžete zobrazit na adrese\n"
+"<a href=\"%(link)s\">%(link)s</a>\n"
+"</p>\n"
+"    "
+
+#: /Users/m/Workspaces/oarepo-libs/feat-remove-einfra-integraton/oarepo-requests/oarepo_requests/templates/semantic-ui/invenio_notifications/group-membership-request-event.accept.jinja:32
+#, python-format
+msgid ""
+"\n"
+"Your request to join the group \"%(topic_name)s\" has been accepted. You are now a member of the group. You can see the request at\n"
+"%(link)s\n"
+"    "
+msgstr ""
+"\n"
+"Vaše žádost o členství ve skupině \"%(topic_name)s\" byla přijata. Nyní jste členem skupiny. Žádost můžete zobrazit na adrese\n"
+"%(link)s\n"
+"    "
+
+#: /Users/m/Workspaces/oarepo-libs/feat-remove-einfra-integraton/oarepo-requests/oarepo_requests/templates/semantic-ui/invenio_notifications/group-membership-request-event.decline.jinja:14
+#, python-brace-format
+msgid "Your request to join group '{topic_name}' was declined"
+msgstr "Vaše žádost o členství ve skupině '{topic_name}' byla zamítnuta"
+
+#: /Users/m/Workspaces/oarepo-libs/feat-remove-einfra-integraton/oarepo-requests/oarepo_requests/templates/semantic-ui/invenio_notifications/group-membership-request-event.decline.jinja:18
+#, python-format
+msgid ""
+"\n"
+"<p>\n"
+"Your request to join the group \"%(topic_name)s\" was declined. You can see the request at\n"
+"<a href=\"%(link)s\">%(link)s</a>\n"
+"</p>\n"
+"    "
+msgstr ""
+"\n"
+"<p>\n"
+"Vaše žádost o členství ve skupině \"%(topic_name)s\" byla zamítnuta. Žádost můžete zobrazit na adrese\n"
+"<a href=\"%(link)s\">%(link)s</a>\n"
+"</p>\n"
+"    "
+
+#: /Users/m/Workspaces/oarepo-libs/feat-remove-einfra-integraton/oarepo-requests/oarepo_requests/templates/semantic-ui/invenio_notifications/group-membership-request-event.decline.jinja:32
+#, python-format
+msgid ""
+"\n"
+"Your request to join the group \"%(topic_name)s\" was declined. You can see the request at\n"
+"%(link)s\n"
+"    "
+msgstr ""
+"\n"
+"Vaše žádost o členství ve skupině \"%(topic_name)s\" byla zamítnuta. Žádost můžete zobrazit na adrese\n"
+"%(link)s\n"
+"    "
+
+#: /Users/m/Workspaces/oarepo-libs/feat-remove-einfra-integraton/oarepo-requests/oarepo_requests/templates/semantic-ui/invenio_notifications/group-membership-request-event.submit.jinja:14
+#, python-brace-format
+msgid "Request for group membership: {topic_name}"
+msgstr "Žádost o členství ve skupině: {topic_name}"
+
+#: /Users/m/Workspaces/oarepo-libs/feat-remove-einfra-integraton/oarepo-requests/oarepo_requests/templates/semantic-ui/invenio_notifications/group-membership-request-event.submit.jinja:18
+#, python-format
+msgid ""
+"\n"
+"    <p>\n"
+"    A request has been made to join the group \"%(topic_name)s\".\n"
+"    </p>\n"
+"    <p>\n"
+"        <a type=\"button\" href='%(link)s'>Accept or Decline the request</a>\n"
+"    </p>\n"
+"    "
+msgstr ""
+"\n"
+"    <p>\n"
+"    Byla podána žádost o členství ve skupině \"%(topic_name)s\".\n"
+"    </p>\n"
+"    <p>\n"
+"        <a type=\"button\" href='%(link)s'>Přijmout nebo zamítnout žádost</a>\n"
+"    </p>\n"
+"    "
+
+#: /Users/m/Workspaces/oarepo-libs/feat-remove-einfra-integraton/oarepo-requests/oarepo_requests/templates/semantic-ui/invenio_notifications/group-membership-request-event.submit.jinja:34
+#, python-format
+msgid ""
+"\n"
+"    A request has been made to join the group \"%(topic_name)s\".\n"
+"    Accept or Decline the request at %(link)s\n"
+"    "
+msgstr ""
+"\n"
+"    Byla podána žádost o členství ve skupině \"%(topic_name)s\".\n"
+"    Přijměte nebo zamítněte žádost na %(link)s\n"
+"    "
+
+#: /Users/m/Workspaces/oarepo-libs/feat-remove-einfra-integraton/oarepo-requests/oarepo_requests/templates/semantic-ui/invenio_requests/group_membership/index.html:29
+msgid "Requester:"
+msgstr "Žadatel:"
+
+#: /Users/m/Workspaces/oarepo-libs/feat-remove-einfra-integraton/oarepo-requests/oarepo_requests/templates/semantic-ui/invenio_requests/group_membership/index.html:35
+msgid "Full name:"
+msgstr "Celé jméno:"
+
+#: /Users/m/Workspaces/oarepo-libs/feat-remove-einfra-integraton/oarepo-requests/oarepo_requests/templates/semantic-ui/invenio_requests/group_membership/index.html:41
+msgid "Organization:"
+msgstr "Organizace:"
+
+#: /Users/m/Workspaces/oarepo-libs/feat-remove-einfra-integraton/oarepo-requests/oarepo_requests/templates/semantic-ui/invenio_requests/group_membership/index.html:46
+msgid "Requested role:"
+msgstr "Požadovaná role:"
+
+#: /Users/m/Workspaces/oarepo-libs/feat-remove-einfra-integraton/oarepo-requests/oarepo_requests/templates/semantic-ui/invenio_requests/group_membership/index.html:51
+msgid "Justification:"
+msgstr "Zdůvodnění:"
+
+#: /Users/m/Workspaces/oarepo-libs/feat-remove-einfra-integraton/oarepo-requests/oarepo_requests/types/group_membership.py:42
+msgid "Request group membership"
+msgstr "Požádat o členství ve skupině"
+
+#: /Users/m/Workspaces/oarepo-libs/feat-remove-einfra-integraton/oarepo-requests/oarepo_requests/types/group_membership.py:43
+msgid "Request membership in a group"
+msgstr "Žádost o členství ve skupině"
+
+#: /Users/m/Workspaces/oarepo-libs/feat-remove-einfra-integraton/oarepo-requests/oarepo_requests/types/group_membership.py:91
+#: /Users/m/Workspaces/oarepo-libs/feat-remove-einfra-integraton/oarepo-requests/oarepo_requests/types/group_membership.py:96
+#, python-format
+msgid "Request membership in group '%(group)s'"
+msgstr "Žádost o členství ve skupině '%(group)s'"
+
+#: /Users/m/Workspaces/oarepo-libs/feat-remove-einfra-integraton/oarepo-requests/oarepo_requests/types/group_membership.py:94
+#, python-format
+msgid "Membership in group '%(group)s' requested"
+msgstr "Zažádáno o členství ve skupině '%(group)s'"
+
+#: /Users/m/Workspaces/oarepo-libs/feat-remove-einfra-integraton/oarepo-requests/oarepo_requests/types/group_membership.py:112
+#, python-format
+msgid ""
+"Request membership in group '%(group)s'. You will be notified about the "
+"decision by email."
+msgstr ""
+"Žádost o členství ve skupině '%(group)s'. O rozhodnutí budete informováni "
+"e-mailem."
+
+#: /Users/m/Workspaces/oarepo-libs/feat-remove-einfra-integraton/oarepo-requests/oarepo_requests/types/group_membership.py:118
+#, python-format
+msgid ""
+"Membership in group '%(group)s' requested. You will be notified about the "
+"decision by email."
+msgstr ""
+"Zažádáno o členství ve skupině '%(group)s'. O rozhodnutí budete informováni "
+"e-mailem."
+
+#: /Users/m/Workspaces/oarepo-libs/feat-remove-einfra-integraton/oarepo-requests/oarepo_requests/types/group_membership.py:123
+#, python-format
+msgid ""
+"You have been asked to approve the request for membership in group "
+"'%(group)s'. You can approve or reject the request."
+msgstr ""
+"Byli jste požádáni o schválení žádosti o členství ve skupině '%(group)s'. "
+"Žádost můžete přijmout nebo zamítnout."
+
+#: /Users/m/Workspaces/oarepo-libs/feat-remove-einfra-integraton/oarepo-requests/oarepo_requests/types/group_membership.py:126
+#, python-format
+msgid "Membership in group '%(group)s' requested."
+msgstr "Zažádáno o členství ve skupině '%(group)s'."
+
+#: /Users/m/Workspaces/oarepo-libs/feat-remove-einfra-integraton/oarepo-requests/oarepo_requests/types/group_membership.py:129
+#, python-format
+msgid "Submit request to join group '%(group)s'."
+msgstr "Odeslat žádost o členství ve skupině '%(group)s'."
+
+#: /Users/m/Workspaces/oarepo-libs/feat-remove-einfra-integraton/oarepo-requests/oarepo_requests/types/group_membership.py:130
+#, python-format
+msgid "You do not have permission to manage membership in group '%(group)s'."
+msgstr "Nemáte právo spravovat členství ve skupině '%(group)s'."
+
+msgid "No submit link found."
+msgstr "Nebyl nalezen odkaz pro odeslání žádosti."
+
+msgid "Something went wrong while submitting your request."
+msgstr "Při odesílání žádosti došlo k chybě."
+
+msgid "Get Access"
+msgstr "Získat přístup"
+
+msgid "Request submitted"
+msgstr "Žádost odeslána"
+
+msgid ""
+"Your request for standalone submitter access has been submitted. Please wait"
+" for it to be reviewed - you will receive an email notification once it has "
+"been processed."
+msgstr ""
+"Vaše žádost o samostatný přístup pro vkládání záznamů byla odeslána. "
+"Počkejte prosím na její vyřízení - jakmile bude zpracována, obdržíte "
+"e-mailové oznámení."
+
+msgid ""
+"Please describe how you intend to use your membership in the group "
+"\"{{groupName}}\"."
+msgstr ""
+"Popište prosím, k čemu chcete členství ve skupině \"{{groupName}}\" "
+"využívat."
+
+msgid "Intended use"
+msgstr "Zamýšlené využití"
