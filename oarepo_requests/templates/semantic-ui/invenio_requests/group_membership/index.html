@@ -1,0 +1,58 @@
+{# -*- coding: utf-8 -*-
+
+  Copyright (C) 2026 CESNET z.s.p.o.
+
+  oarepo-requests is free software; you can redistribute it and/or modify it
+  under the terms of the MIT License; see LICENSE file for more details.
+#}
+
+{#
+  Renders the request details page for a request to join a group.
+
+  Unlike most other request types here, this is not a community submission
+  (its topic is a group, not a record), so it extends the generic request
+  details template directly instead of "invenio_requests/community-submission/index.html".
+#}
+
+{% extends "invenio_requests/details/index.html" %}
+
+{% block request_header %}
+  {{ super() }}
+
+  {% set requester = invenio_request.expanded.created_by %}
+  {% set role = topic %}
+  {% set requester_name = requester.profile.full_name or requester.username or requester.email %}
+  {% set role_title = role.description or role.name or invenio_request.expanded.topic.name %}
+
+  <div class="rel-mt-1">
+    <p>
+      <strong>{{ _("Requester:") }}</strong>
+      {{ requester_name }}
+      {%- if requester.email and requester.email != requester_name %} ({{ requester.email }}){% endif %}
+    </p>
+    {%- if requester.profile.full_name %}
+      <p>
+        <strong>{{ _("Full name:") }}</strong>
+        {{ requester.profile.full_name }}
+      </p>
+    {%- endif %}
+    {%- if requester.profile.affiliations %}
+      <p>
+        <strong>{{ _("Organization:") }}</strong>
+        {{ requester.profile.affiliations }}
+      </p>
+    {%- endif %}
+    <p>
+      <strong>{{ _("Requested role:") }}</strong>
+      {{ role_title }}
+    </p>
+    {%- if invenio_request.payload.justification %}
+      <p>
+        <strong>{{ _("Justification:") }}</strong>
+        {{ invenio_request.payload.justification }}
+      </p>
+    {%- endif %}
+  </div>
+
+  <div class="ui divider"></div>
+{% endblock request_header %}
