@@ -1600,7 +1600,8 @@ msgstr ""
 
 #: /Users/m/Workspaces/oarepo-libs/feat-remove-einfra-integraton/oarepo-requests/oarepo_requests/types/group_membership.py:130
 #, python-format
-msgid "You do not have permission to manage membership in group '%(group)s'."
+msgid ""
+"This request for membership in group '%(group)s' has not yet been submitted."
 msgstr ""
 
 msgid "No submit link found."
@@ -1627,6 +1628,9 @@ msgid ""
 msgstr ""
 
 msgid "Intended use"
+msgstr ""
+
+msgid "Submitters"
 msgstr ""
 
 #~ msgid "No status"
