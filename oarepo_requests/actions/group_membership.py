@@ -11,7 +11,6 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING, override
 
-from flask import g
 from invenio_notifications.services.uow import NotificationOp
 from invenio_requests.customizations import CommentEventType
 from invenio_requests.proxies import current_events_service
@@ -43,8 +42,9 @@ class GroupMembershipAcceptAction(actions.AcceptAction):
 
     @override
     def execute(self, identity: Identity, uow: UnitOfWork) -> None:
-        group_id = next(iter(self.request.topic.resolve().values()))
-        current_users_service.add_group(identity, g.current_user.id, group_id, uow=uow)
+        group_id = next(iter(self.request["topic"].values()))
+        requester_id = next(iter(self.request["created_by"].values()))
+        current_users_service.add_group(identity, requester_id, group_id, uow=uow)
 
         justification = self.request.get("payload", {}).get("justification")
         if justification:

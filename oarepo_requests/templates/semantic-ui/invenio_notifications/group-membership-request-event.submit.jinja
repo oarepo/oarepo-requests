@@ -7,7 +7,7 @@
 #}
 {% set request = notification.context.request %}
 {% set topic = request.topic %}
-{% set topic_name = topic.get("description") or topic.get("name", topic.id) %}
+{% set topic_name = topic.description or topic.name or topic.id %}
 {% set request_html_page = request.links.self_html %}
 
 {%- block subject -%}
