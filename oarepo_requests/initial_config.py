@@ -25,6 +25,11 @@ from oarepo_requests.notifications.builders.delete_published_record import (
     DeletePublishedRecordRequestDeclineNotificationBuilder,
     DeletePublishedRecordRequestSubmitNotificationBuilder,
 )
+from oarepo_requests.notifications.builders.group_membership import (
+    GroupMembershipRequestAcceptNotificationBuilder,
+    GroupMembershipRequestDeclineNotificationBuilder,
+    GroupMembershipRequestSubmitNotificationBuilder,
+)
 from oarepo_requests.notifications.builders.publish import (
     PublishDraftRequestAcceptNotificationBuilder,
     PublishDraftRequestDeclineNotificationBuilder,
@@ -53,6 +58,9 @@ NOTIFICATIONS_BUILDERS = {
     PublishDraftRequestSubmitNotificationBuilder.type: PublishDraftRequestSubmitNotificationBuilder,
     PublishDraftRequestAcceptNotificationBuilder.type: PublishDraftRequestAcceptNotificationBuilder,
     PublishDraftRequestDeclineNotificationBuilder.type: PublishDraftRequestDeclineNotificationBuilder,
+    GroupMembershipRequestSubmitNotificationBuilder.type: GroupMembershipRequestSubmitNotificationBuilder,
+    GroupMembershipRequestAcceptNotificationBuilder.type: GroupMembershipRequestAcceptNotificationBuilder,
+    GroupMembershipRequestDeclineNotificationBuilder.type: GroupMembershipRequestDeclineNotificationBuilder,
     CommentRequestEventCreateNotificationBuilder.type: CommentRequestEventCreateNotificationBuilder,
 }
 
