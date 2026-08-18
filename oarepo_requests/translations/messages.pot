@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2026-08-17 18:35+0200\n"
+"POT-Creation-Date: 2026-08-18 12:13+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -88,15 +88,15 @@ msgstr ""
 msgid "Cancel"
 msgstr ""
 
-#: /Users/m/Workspaces/oarepo-libs/feat-remove-einfra-integraton/oarepo-requests/oarepo_requests/actions/group_membership.py:42
+#: /Users/m/Workspaces/oarepo-libs/feat-remove-einfra-integraton/oarepo-requests/oarepo_requests/actions/group_membership.py:39
 msgid "Accept group membership"
 msgstr ""
 
-#: /Users/m/Workspaces/oarepo-libs/feat-remove-einfra-integraton/oarepo-requests/oarepo_requests/actions/group_membership.py:66
+#: /Users/m/Workspaces/oarepo-libs/feat-remove-einfra-integraton/oarepo-requests/oarepo_requests/actions/group_membership.py:54
 msgid "Decline group membership"
 msgstr ""
 
-#: /Users/m/Workspaces/oarepo-libs/feat-remove-einfra-integraton/oarepo-requests/oarepo_requests/actions/group_membership.py:77
+#: /Users/m/Workspaces/oarepo-libs/feat-remove-einfra-integraton/oarepo-requests/oarepo_requests/actions/group_membership.py:65
 msgid "Submit group membership"
 msgstr ""
 
@@ -168,7 +168,7 @@ msgstr ""
 #: /Users/m/Workspaces/oarepo-libs/feat-remove-einfra-integraton/oarepo-requests/oarepo_requests/templates/semantic-ui/invenio_notifications/delete-published-record-request-event.submit.jinja:30
 #: /Users/m/Workspaces/oarepo-libs/feat-remove-einfra-integraton/oarepo-requests/oarepo_requests/templates/semantic-ui/invenio_notifications/group-membership-request-event.accept.jinja:26
 #: /Users/m/Workspaces/oarepo-libs/feat-remove-einfra-integraton/oarepo-requests/oarepo_requests/templates/semantic-ui/invenio_notifications/group-membership-request-event.decline.jinja:26
-#: /Users/m/Workspaces/oarepo-libs/feat-remove-einfra-integraton/oarepo-requests/oarepo_requests/templates/semantic-ui/invenio_notifications/group-membership-request-event.submit.jinja:28
+#: /Users/m/Workspaces/oarepo-libs/feat-remove-einfra-integraton/oarepo-requests/oarepo_requests/templates/semantic-ui/invenio_notifications/group-membership-request-event.submit.jinja:34
 #: /Users/m/Workspaces/oarepo-libs/feat-remove-einfra-integraton/oarepo-requests/oarepo_requests/templates/semantic-ui/invenio_notifications/publish-draft-request-event.accept.jinja:28
 #: /Users/m/Workspaces/oarepo-libs/feat-remove-einfra-integraton/oarepo-requests/oarepo_requests/templates/semantic-ui/invenio_notifications/publish-draft-request-event.decline.jinja:28
 #: /Users/m/Workspaces/oarepo-libs/feat-remove-einfra-integraton/oarepo-requests/oarepo_requests/templates/semantic-ui/invenio_notifications/publish-draft-request-event.submit.jinja:30
@@ -184,7 +184,7 @@ msgstr ""
 #: /Users/m/Workspaces/oarepo-libs/feat-remove-einfra-integraton/oarepo-requests/oarepo_requests/templates/semantic-ui/invenio_notifications/delete-published-record-request-event.submit.jinja:30
 #: /Users/m/Workspaces/oarepo-libs/feat-remove-einfra-integraton/oarepo-requests/oarepo_requests/templates/semantic-ui/invenio_notifications/group-membership-request-event.accept.jinja:26
 #: /Users/m/Workspaces/oarepo-libs/feat-remove-einfra-integraton/oarepo-requests/oarepo_requests/templates/semantic-ui/invenio_notifications/group-membership-request-event.decline.jinja:26
-#: /Users/m/Workspaces/oarepo-libs/feat-remove-einfra-integraton/oarepo-requests/oarepo_requests/templates/semantic-ui/invenio_notifications/group-membership-request-event.submit.jinja:28
+#: /Users/m/Workspaces/oarepo-libs/feat-remove-einfra-integraton/oarepo-requests/oarepo_requests/templates/semantic-ui/invenio_notifications/group-membership-request-event.submit.jinja:34
 #: /Users/m/Workspaces/oarepo-libs/feat-remove-einfra-integraton/oarepo-requests/oarepo_requests/templates/semantic-ui/invenio_notifications/publish-draft-request-event.accept.jinja:28
 #: /Users/m/Workspaces/oarepo-libs/feat-remove-einfra-integraton/oarepo-requests/oarepo_requests/templates/semantic-ui/invenio_notifications/publish-draft-request-event.decline.jinja:28
 #: /Users/m/Workspaces/oarepo-libs/feat-remove-einfra-integraton/oarepo-requests/oarepo_requests/templates/semantic-ui/invenio_notifications/publish-draft-request-event.submit.jinja:30
@@ -371,12 +371,12 @@ msgid ""
 "    "
 msgstr ""
 
-#: /Users/m/Workspaces/oarepo-libs/feat-remove-einfra-integraton/oarepo-requests/oarepo_requests/templates/semantic-ui/invenio_notifications/group-membership-request-event.submit.jinja:14
+#: /Users/m/Workspaces/oarepo-libs/feat-remove-einfra-integraton/oarepo-requests/oarepo_requests/templates/semantic-ui/invenio_notifications/group-membership-request-event.submit.jinja:15
 #, python-brace-format
 msgid "Request for group membership: {topic_name}"
 msgstr ""
 
-#: /Users/m/Workspaces/oarepo-libs/feat-remove-einfra-integraton/oarepo-requests/oarepo_requests/templates/semantic-ui/invenio_notifications/group-membership-request-event.submit.jinja:18
+#: /Users/m/Workspaces/oarepo-libs/feat-remove-einfra-integraton/oarepo-requests/oarepo_requests/templates/semantic-ui/invenio_notifications/group-membership-request-event.submit.jinja:19
 #, python-format
 msgid ""
 "\n"
@@ -389,7 +389,13 @@ msgid ""
 "    "
 msgstr ""
 
-#: /Users/m/Workspaces/oarepo-libs/feat-remove-einfra-integraton/oarepo-requests/oarepo_requests/templates/semantic-ui/invenio_notifications/group-membership-request-event.submit.jinja:34
+#: /Users/m/Workspaces/oarepo-libs/feat-remove-einfra-integraton/oarepo-requests/oarepo_requests/templates/semantic-ui/invenio_notifications/group-membership-request-event.submit.jinja:29
+#: /Users/m/Workspaces/oarepo-libs/feat-remove-einfra-integraton/oarepo-requests/oarepo_requests/templates/semantic-ui/invenio_notifications/group-membership-request-event.submit.jinja:45
+#: /Users/m/Workspaces/oarepo-libs/feat-remove-einfra-integraton/oarepo-requests/oarepo_requests/templates/semantic-ui/invenio_requests/group_membership/index.html:51
+msgid "Justification:"
+msgstr ""
+
+#: /Users/m/Workspaces/oarepo-libs/feat-remove-einfra-integraton/oarepo-requests/oarepo_requests/templates/semantic-ui/invenio_notifications/group-membership-request-event.submit.jinja:40
 #, python-format
 msgid ""
 "\n"
@@ -489,10 +495,6 @@ msgstr ""
 
 #: /Users/m/Workspaces/oarepo-libs/feat-remove-einfra-integraton/oarepo-requests/oarepo_requests/templates/semantic-ui/invenio_requests/group_membership/index.html:46
 msgid "Requested role:"
-msgstr ""
-
-#: /Users/m/Workspaces/oarepo-libs/feat-remove-einfra-integraton/oarepo-requests/oarepo_requests/templates/semantic-ui/invenio_requests/group_membership/index.html:51
-msgid "Justification:"
 msgstr ""
 
 #: /Users/m/Workspaces/oarepo-libs/feat-remove-einfra-integraton/oarepo-requests/oarepo_requests/translations/_only_for_translations.py:13
@@ -720,59 +722,60 @@ msgstr ""
 msgid "Edit access requested."
 msgstr ""
 
-#: /Users/m/Workspaces/oarepo-libs/feat-remove-einfra-integraton/oarepo-requests/oarepo_requests/types/group_membership.py:42
+#: /Users/m/Workspaces/oarepo-libs/feat-remove-einfra-integraton/oarepo-requests/oarepo_requests/types/group_membership.py:44
 msgid "Request group membership"
 msgstr ""
 
-#: /Users/m/Workspaces/oarepo-libs/feat-remove-einfra-integraton/oarepo-requests/oarepo_requests/types/group_membership.py:43
+#: /Users/m/Workspaces/oarepo-libs/feat-remove-einfra-integraton/oarepo-requests/oarepo_requests/types/group_membership.py:45
 msgid "Request membership in a group"
 msgstr ""
 
-#: /Users/m/Workspaces/oarepo-libs/feat-remove-einfra-integraton/oarepo-requests/oarepo_requests/types/group_membership.py:91
-#: /Users/m/Workspaces/oarepo-libs/feat-remove-einfra-integraton/oarepo-requests/oarepo_requests/types/group_membership.py:96
+#: /Users/m/Workspaces/oarepo-libs/feat-remove-einfra-integraton/oarepo-requests/oarepo_requests/types/group_membership.py:94
+#: /Users/m/Workspaces/oarepo-libs/feat-remove-einfra-integraton/oarepo-requests/oarepo_requests/types/group_membership.py:99
 #, python-format
 msgid "Request membership in group '%(group)s'"
 msgstr ""
 
-#: /Users/m/Workspaces/oarepo-libs/feat-remove-einfra-integraton/oarepo-requests/oarepo_requests/types/group_membership.py:94
+#: /Users/m/Workspaces/oarepo-libs/feat-remove-einfra-integraton/oarepo-requests/oarepo_requests/types/group_membership.py:97
 #, python-format
 msgid "Membership in group '%(group)s' requested"
 msgstr ""
 
-#: /Users/m/Workspaces/oarepo-libs/feat-remove-einfra-integraton/oarepo-requests/oarepo_requests/types/group_membership.py:112
+#: /Users/m/Workspaces/oarepo-libs/feat-remove-einfra-integraton/oarepo-requests/oarepo_requests/types/group_membership.py:115
 #, python-format
 msgid ""
 "Request membership in group '%(group)s'. You will be notified about the "
 "decision by email."
 msgstr ""
 
-#: /Users/m/Workspaces/oarepo-libs/feat-remove-einfra-integraton/oarepo-requests/oarepo_requests/types/group_membership.py:118
+#: /Users/m/Workspaces/oarepo-libs/feat-remove-einfra-integraton/oarepo-requests/oarepo_requests/types/group_membership.py:121
 #, python-format
 msgid ""
 "Membership in group '%(group)s' requested. You will be notified about the "
 "decision by email."
 msgstr ""
 
-#: /Users/m/Workspaces/oarepo-libs/feat-remove-einfra-integraton/oarepo-requests/oarepo_requests/types/group_membership.py:123
+#: /Users/m/Workspaces/oarepo-libs/feat-remove-einfra-integraton/oarepo-requests/oarepo_requests/types/group_membership.py:125
 #, python-format
 msgid ""
 "You have been asked to approve the request for membership in group "
 "'%(group)s'. You can approve or reject the request."
 msgstr ""
 
-#: /Users/m/Workspaces/oarepo-libs/feat-remove-einfra-integraton/oarepo-requests/oarepo_requests/types/group_membership.py:126
+#: /Users/m/Workspaces/oarepo-libs/feat-remove-einfra-integraton/oarepo-requests/oarepo_requests/types/group_membership.py:128
 #, python-format
 msgid "Membership in group '%(group)s' requested."
 msgstr ""
 
-#: /Users/m/Workspaces/oarepo-libs/feat-remove-einfra-integraton/oarepo-requests/oarepo_requests/types/group_membership.py:129
+#: /Users/m/Workspaces/oarepo-libs/feat-remove-einfra-integraton/oarepo-requests/oarepo_requests/types/group_membership.py:131
 #, python-format
 msgid "Submit request to join group '%(group)s'."
 msgstr ""
 
-#: /Users/m/Workspaces/oarepo-libs/feat-remove-einfra-integraton/oarepo-requests/oarepo_requests/types/group_membership.py:130
+#: /Users/m/Workspaces/oarepo-libs/feat-remove-einfra-integraton/oarepo-requests/oarepo_requests/types/group_membership.py:132
 #, python-format
-msgid "You do not have permission to manage membership in group '%(group)s'."
+msgid ""
+"This request for membership in group '%(group)s' has not yet been submitted."
 msgstr ""
 
 #: /Users/m/Workspaces/oarepo-libs/feat-remove-einfra-integraton/oarepo-requests/oarepo_requests/types/new_version.py:41
@@ -1125,6 +1128,9 @@ msgid "Record deletion"
 msgstr ""
 
 msgid "Edit published record"
+msgstr ""
+
+msgid "Submitters"
 msgstr ""
 
 msgid "No submit link found."

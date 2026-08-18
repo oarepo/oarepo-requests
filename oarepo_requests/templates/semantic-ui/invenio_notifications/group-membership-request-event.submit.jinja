@@ -9,6 +9,7 @@
 {% set topic = request.topic %}
 {% set topic_name = topic.description or topic.name or topic.id %}
 {% set request_html_page = request.links.self_html %}
+{% set justification = request.payload.justification %}
 
 {%- block subject -%}
     {{ _("Request for group membership: {topic_name}").format(topic_name=topic_name) }}
@@ -23,6 +24,11 @@
         <a type="button" href='{{link}}'>Accept or Decline the request</a>
     </p>
     {% endtrans %}
+    {%- if justification %}
+    <p>
+        <strong>{{ _("Justification:") }}</strong> {{ justification }}
+    </p>
+    {%- endif %}
     <table style="font-family:'Lato',Helvetica,Arial,sans-serif;border-spacing:15px">
         <tr>
             <td style="font-size:smaller">{{ _("This is an auto-generated message. To manage notifications, visit your")}} <a href="{{account_settings_link}}">{{ _("account settings")}}</a>.</td>
@@ -35,4 +41,7 @@
     A request has been made to join the group "{{topic_name}}".
     Accept or Decline the request at {{link}}
     {% endtrans %}
+    {%- if justification %}
+    {{ _("Justification:") }} {{ justification }}
+    {%- endif %}
 {%- endblock plain_body -%}

@@ -13,6 +13,7 @@ from typing import TYPE_CHECKING
 
 import pytest
 from invenio_access import ActionRoles
+from invenio_access.permissions import system_identity
 from invenio_accounts.proxies import current_datastore
 from invenio_users_resources.proxies import current_groups_service
 
@@ -68,7 +69,7 @@ def test_group_membership_notifications(
 
     create_response = requests_service.create(
         requester.identity,
-        data={"payload": {"justification": ""}},
+        data={"payload": {"justification": "I need to submit datasets for my research group."}},
         request_type="group_membership",
         topic=submitters_role,
     )
@@ -85,6 +86,8 @@ def test_group_membership_notifications(
         assert "Request for group membership: Submitters" in sent_mail.subject
         assert 'A request has been made to join the group "Submitters".' in sent_mail.body
         assert 'A request has been made to join the group "Submitters".' in sent_mail.html
+        assert "I need to submit datasets for my research group." in sent_mail.body
+        assert "I need to submit datasets for my research group." in sent_mail.html
 
     with mail.record_messages() as outbox:
         requests_service.execute_action(administrator.identity, id_=submit_response["id"], action="accept")
@@ -121,7 +124,7 @@ def test_group_membership_notifications_declined(
 
     create_response = requests_service.create(
         requester.identity,
-        data={"payload": {"justification": ""}},
+        data={"payload": {"justification": "I need to submit datasets for my research group."}},
         request_type="group_membership",
         topic=submitters_role,
     )
@@ -132,7 +135,9 @@ def test_group_membership_notifications_declined(
         )
         # the administrator (member of the "administration" group) is notified
         assert len(outbox) == 1
-        assert outbox[0].recipients == [administrator.email]
+        sent_mail = outbox[0]
+        assert sent_mail.recipients == [administrator.email]
+        assert "I need to submit datasets for my research group." in sent_mail.body
 
     with mail.record_messages() as outbox:
         requests_service.execute_action(administrator.identity, id_=submit_response["id"], action="decline")
@@ -143,3 +148,85 @@ def test_group_membership_notifications_declined(
         assert "Your request to join group 'Submitters' was declined" in sent_mail.subject
         assert 'Your request to join the group "Submitters" was declined' in sent_mail.body
         assert 'Your request to join the group "Submitters" was declined' in sent_mail.html
+
+
+def test_group_membership_stateful_name_and_description(
+    users,
+    requests_service,
+    administration_role,
+    submitters_role,
+    add_user_in_role,
+):
+    """Check stateful_name/stateful_description texts for the group_membership request type."""
+    requester = users[0]
+    administrator = users[1]
+    other = users[2]
+    add_user_in_role(administrator, administration_role)
+
+    # resolved topic, as used elsewhere (notifications, UI) - a dict with the group's description/name
+    topic = current_groups_service.read(system_identity, submitters_role.id).to_dict()
+
+    create_response = requests_service.create(
+        requester.identity,
+        data={"payload": {"justification": "I need to submit datasets for my research group."}},
+        request_type="group_membership",
+        topic=submitters_role,
+    )
+    request = create_response._request  # noqa: SLF001
+    request_type = request.type
+
+    # no request created yet
+    assert (
+        request_type.stateful_name(requester.identity, topic=topic, request=None)
+        == "Request membership in group 'Submitters'"
+    )
+    assert (
+        request_type.stateful_description(requester.identity, topic=topic, request=None)
+        == "Request membership in group 'Submitters'. You will be notified about the decision by email."
+    )
+
+    # request created but not yet submitted
+    assert (
+        request_type.stateful_name(requester.identity, topic=topic, request=request)
+        == "Request membership in group 'Submitters'"
+    )
+    assert (
+        request_type.stateful_description(requester.identity, topic=topic, request=request)
+        == "Submit request to join group 'Submitters'."
+    )
+    # the administrator can manage group membership in general, but there's nothing
+    # for them to act on yet since the request hasn't been submitted
+    assert (
+        request_type.stateful_description(administrator.identity, topic=topic, request=request)
+        == "This request for membership in group 'Submitters' has not yet been submitted."
+    )
+
+    submit_response = requests_service.execute_action(requester.identity, id_=create_response["id"], action="submit")
+    submitted_request = submit_response._request  # noqa: SLF001
+
+    # submitted: as the requester
+    assert (
+        request_type.stateful_name(requester.identity, topic=topic, request=submitted_request)
+        == "Membership in group 'Submitters' requested"
+    )
+    assert (
+        request_type.stateful_description(requester.identity, topic=topic, request=submitted_request)
+        == "Membership in group 'Submitters' requested. You will be notified about the decision by email."
+    )
+
+    # submitted: as the administrator (receiver)
+    assert (
+        request_type.stateful_name(administrator.identity, topic=topic, request=submitted_request)
+        == "Membership in group 'Submitters' requested"
+    )
+    assert (
+        request_type.stateful_description(administrator.identity, topic=topic, request=submitted_request)
+        == "You have been asked to approve the request for membership in group 'Submitters'. "
+        "You can approve or reject the request."
+    )
+
+    # submitted: as an unrelated user
+    assert (
+        request_type.stateful_description(other.identity, topic=topic, request=submitted_request)
+        == "Membership in group 'Submitters' requested."
+    )

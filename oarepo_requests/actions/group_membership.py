@@ -12,8 +12,6 @@ from __future__ import annotations
 from typing import TYPE_CHECKING, override
 
 from invenio_notifications.services.uow import NotificationOp
-from invenio_requests.customizations import CommentEventType
-from invenio_requests.proxies import current_events_service
 
 from ..notifications.builders.group_membership import (
     GroupMembershipRequestAcceptNotificationBuilder,
@@ -45,16 +43,6 @@ class GroupMembershipAcceptAction(actions.AcceptAction):
         group_id = next(iter(self.request["topic"].values()))
         requester_id = next(iter(self.request["created_by"].values()))
         current_users_service.add_group(identity, requester_id, group_id, uow=uow)
-
-        justification = self.request.get("payload", {}).get("justification")
-        if justification:
-            current_events_service.create(
-                identity,
-                self.request.id,  # type: ignore[reportArgumentType]
-                {"payload": {"content": justification}},
-                CommentEventType,
-                uow=uow,
-            )
 
         uow.register(NotificationOp(GroupMembershipRequestAcceptNotificationBuilder.build(request=self.request)))
         super().execute(identity, uow)

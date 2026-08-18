@@ -1761,8 +1761,9 @@ msgstr "Odeslat žádost o členství ve skupině '%(group)s'."
 
 #: /Users/m/Workspaces/oarepo-libs/feat-remove-einfra-integraton/oarepo-requests/oarepo_requests/types/group_membership.py:130
 #, python-format
-msgid "You do not have permission to manage membership in group '%(group)s'."
-msgstr "Nemáte právo spravovat členství ve skupině '%(group)s'."
+msgid ""
+"This request for membership in group '%(group)s' has not yet been submitted."
+msgstr "Tato žádost o členství ve skupině '%(group)s' ještě nebyla odeslána."
 
 msgid "No submit link found."
 msgstr "Nebyl nalezen odkaz pro odeslání žádosti."
@@ -1794,3 +1795,6 @@ msgstr ""
 
 msgid "Intended use"
 msgstr "Zamýšlené využití"
+
+msgid "Submitters"
+msgstr "Vkladatelé"

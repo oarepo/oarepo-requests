@@ -116,19 +116,19 @@ class GroupMembershipRequestType(DefaultReceiverMixin, OARepoRequestType):
             ) % {"group": group_title}
         match request.status:
             case "submitted":
-                if request_identity_matches(request.created_by, identity):
+                if request_identity_matches(request["created_by"], identity):
                     return gettext(
                         "Membership in group '%(group)s' requested. You will be notified about the decision by email."
                     ) % {"group": group_title}
-                if request_identity_matches(request.receiver, identity):
+                if request_identity_matches(request["receiver"], identity):
                     return gettext(
                         "You have been asked to approve the request for membership in group '%(group)s'. "
                         "You can approve or reject the request."
                     ) % {"group": group_title}
                 return gettext("Membership in group '%(group)s' requested.") % {"group": group_title}
             case _:
-                if request_identity_matches(request.created_by, identity):
+                if request_identity_matches(request["created_by"], identity):
                     return gettext("Submit request to join group '%(group)s'.") % {"group": group_title}
-                return gettext("You do not have permission to manage membership in group '%(group)s'.") % {
+                return gettext("This request for membership in group '%(group)s' has not yet been submitted.") % {
                     "group": group_title
                 }
