@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: MIT
 
 import React, { useState } from "react";
+import PropTypes from "prop-types";
 import { Formik } from "formik";
 import { Button, Form, Message, Modal } from "semantic-ui-react";
 import { TextAreaField, http } from "react-invenio-forms";
@@ -56,7 +57,9 @@ export const GetAccessModal = ({ isOpen, onClose, groupId, groupName }) => {
           <Modal.Content>
             {isSubmitted ? (
               <Message positive>
-                <Message.Header>{i18next.t("Request submitted")}</Message.Header>
+                <Message.Header>
+                  {i18next.t("Request submitted")}
+                </Message.Header>
                 <p>
                   {i18next.t(
                     "Your request for standalone submitter access has been submitted. Please wait for it to be reviewed - you will receive an email notification once it has been processed."
@@ -75,7 +78,10 @@ export const GetAccessModal = ({ isOpen, onClose, groupId, groupName }) => {
                   )}
                 </p>
                 <Form>
-                  <TextAreaField fieldPath="reason" label={i18next.t("Intended use")} />
+                  <TextAreaField
+                    fieldPath="reason"
+                    label={i18next.t("Intended use")}
+                  />
                 </Form>
               </>
             )}
@@ -107,6 +113,13 @@ export const GetAccessModal = ({ isOpen, onClose, groupId, groupName }) => {
   );
 };
 
+GetAccessModal.propTypes = {
+  isOpen: PropTypes.bool.isRequired,
+  onClose: PropTypes.func.isRequired,
+  groupId: PropTypes.string.isRequired,
+  groupName: PropTypes.string.isRequired,
+};
+
 export const GetAccessButton = ({ groupId, groupName }) => {
   const [isModalOpen, setModalOpen] = useState(false);
 
@@ -127,4 +140,9 @@ export const GetAccessButton = ({ groupId, groupName }) => {
       )}
     </>
   );
+};
+
+GetAccessButton.propTypes = {
+  groupId: PropTypes.string.isRequired,
+  groupName: PropTypes.string.isRequired,
 };
