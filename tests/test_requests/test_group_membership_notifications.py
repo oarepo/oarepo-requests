@@ -9,13 +9,18 @@
 
 from __future__ import annotations
 
+from typing import TYPE_CHECKING
+
 import pytest
 from invenio_access import ActionRoles
 from invenio_accounts.proxies import current_datastore
 from invenio_users_resources.proxies import current_groups_service
 
+if TYPE_CHECKING:
+    from invenio_accounts.models import Role
 
-def _create_role(id_, name, description):
+
+def _create_role(id_: str, name: str, description: str) -> Role:
     """Create a role/group, mirroring pytest_oarepo.roles._create_role."""
     role = current_datastore.create_role(id=id_, name=name, description=description, is_managed=False)
     current_datastore.commit()

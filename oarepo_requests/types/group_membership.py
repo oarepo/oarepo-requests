@@ -11,11 +11,9 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING, Any, override
 
-import marshmallow
-from flask_principal import Identity
+import marshmallow as ma
 from invenio_i18n import gettext
 from invenio_i18n import lazy_gettext as _
-from invenio_records import Record
 
 from oarepo_requests.actions.group_membership import (
     GroupMembershipAcceptAction,
@@ -30,7 +28,11 @@ from ..utils import (
 )
 
 if TYPE_CHECKING:
+    from collections.abc import Mapping
+
     from flask_babel.speaklater import LazyString
+    from flask_principal import Identity
+    from invenio_records import Record
     from invenio_requests.customizations.actions import RequestAction
     from invenio_requests.records.api import Request
 
@@ -45,10 +47,10 @@ class GroupMembershipRequestType(DefaultReceiverMixin, OARepoRequestType):
     receiver_can_be_none = True
 
     allowed_topic_ref_types = ["group"]  # noqa RUFF012
-    allowed_receiver_ref_types = ["group"]  # noqa RUFF012
+    allowed_receiver_ref_types = ["group"]  # noqa RUFF012 # type: ignore[reportAssignmentType]
 
     @classproperty
-    def available_actions(cls) -> dict[str, type[RequestAction]]:  # noqa N805
+    def available_actions(cls) -> dict[str, type[RequestAction]]:  # noqa N805 # type: ignore[reportIncompatibleVariableOverride]
         """Return available actions for the request type."""
         return {
             **super().available_actions,
@@ -58,6 +60,7 @@ class GroupMembershipRequestType(DefaultReceiverMixin, OARepoRequestType):
         }
 
     @override
+    @classmethod
     def default_request_receiver(
         cls,
         identity: Identity,
@@ -67,14 +70,14 @@ class GroupMembershipRequestType(DefaultReceiverMixin, OARepoRequestType):
     ) -> dict[str, str] | None:
         return {"group": "administration"}
 
-    payload_schema = {
-        "justification": marshmallow.fields.String(),
+    payload_schema: Mapping[str, ma.fields.Field] | None = {
+        "justification": ma.fields.String(),
     }
 
     @staticmethod
     def _group_title(topic: Record) -> str:
         """Return the group's title - its description, falling back to its name."""
-        return topic.get("description") or topic.get("name")
+        return str(topic.get("description") or topic.get("name"))
 
     @override
     def stateful_name(
@@ -96,7 +99,7 @@ class GroupMembershipRequestType(DefaultReceiverMixin, OARepoRequestType):
                 return gettext("Request membership in group '%(group)s'") % {"group": group_title}
 
     @override
-    def stateful_description(  # noqa: PLR0911
+    def stateful_description(
         self,
         identity: Identity,
         *,
@@ -115,8 +118,7 @@ class GroupMembershipRequestType(DefaultReceiverMixin, OARepoRequestType):
             case "submitted":
                 if request_identity_matches(request.created_by, identity):
                     return gettext(
-                        "Membership in group '%(group)s' requested. "
-                        "You will be notified about the decision by email."
+                        "Membership in group '%(group)s' requested. You will be notified about the decision by email."
                     ) % {"group": group_title}
                 if request_identity_matches(request.receiver, identity):
                     return gettext(

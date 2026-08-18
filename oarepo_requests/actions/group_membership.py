@@ -50,14 +50,14 @@ class GroupMembershipAcceptAction(actions.AcceptAction):
         if justification:
             current_events_service.create(
                 identity,
-                self.request.id,
+                self.request.id,  # type: ignore[reportArgumentType]
                 {"payload": {"content": justification}},
                 CommentEventType,
                 uow=uow,
             )
 
         uow.register(NotificationOp(GroupMembershipRequestAcceptNotificationBuilder.build(request=self.request)))
-        return super().execute(identity, uow)
+        super().execute(identity, uow)
 
 
 class GroupMembershipDeclineAction(actions.DeclineAction):
@@ -68,7 +68,7 @@ class GroupMembershipDeclineAction(actions.DeclineAction):
     @override
     def execute(self, identity: Identity, uow: UnitOfWork) -> None:
         uow.register(NotificationOp(GroupMembershipRequestDeclineNotificationBuilder.build(request=self.request)))
-        return super().execute(identity, uow)
+        super().execute(identity, uow)
 
 
 class GroupMembershipSubmitAction(actions.SubmitAction):
@@ -79,4 +79,4 @@ class GroupMembershipSubmitAction(actions.SubmitAction):
     @override
     def execute(self, identity: Identity, uow: UnitOfWork) -> None:
         uow.register(NotificationOp(GroupMembershipRequestSubmitNotificationBuilder.build(request=self.request)))
-        return super().execute(identity, uow)
+        super().execute(identity, uow)
