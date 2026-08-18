@@ -1,6 +1,32 @@
 // Copyright (c) 2026 CESNET
 // SPDX-License-Identifier: MIT
 
+// Components for requesting membership in a group ("get access" to the repository).
+//
+// - GetAccessButton: a button that, when clicked, opens GetAccessModal. This
+//   is the component consuming apps should use.
+// - GetAccessModal: the modal with the request form itself. Exported mainly
+//   so it can be tested/reused directly; normally you don't need it.
+//
+// Both take `groupId` (the technical group/role identifier used in the
+// request payload, e.g. "submitters") and `groupName` (the human-readable
+// name shown to the user in the form) as required props. This module does
+// not mount itself - consuming apps import GetAccessButton and render it
+// into their own page, e.g.:
+//
+//   import React from "react";
+//   import ReactDOM from "react-dom";
+//   import { GetAccessButton } from "@js/oarepo_requests/get_access";
+//   import { i18next } from "@translations/i18next";
+//
+//   const domContainer = document.getElementById("standalone_submitter_application");
+//   if (domContainer) {
+//     ReactDOM.render(
+//       <GetAccessButton groupId="submitters" groupName={i18next.t("Submitters")} />,
+//       domContainer
+//     );
+//   }
+
 import React, { useState } from "react";
 import PropTypes from "prop-types";
 import { Formik } from "formik";
