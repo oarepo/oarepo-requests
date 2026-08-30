@@ -79,7 +79,7 @@ export const GetAccessModal = ({ isOpen, onClose, groupId, groupName }) => {
           closeIcon
           closeOnDimmerClick={false}
         >
-          <Modal.Header>{i18next.t("Get Access")}</Modal.Header>
+          <Modal.Header>{i18next.t("Apply for Write Access")}</Modal.Header>
           <Modal.Content>
             {isSubmitted ? (
               <Message positive>
@@ -128,7 +128,7 @@ export const GetAccessModal = ({ isOpen, onClose, groupId, groupName }) => {
                   loading={isSubmitting}
                   disabled={isSubmitting || !values.reason}
                   onClick={submitForm}
-                  content={i18next.t("Get Access")}
+                  content={i18next.t("Apply for Write Access")}
                 />
               </>
             )}
@@ -153,7 +153,7 @@ export const GetAccessButton = ({ groupId, groupName }) => {
     <>
       <Button
         positive
-        content={i18next.t("Get Access")}
+        content={i18next.t("Apply for Write Access")}
         onClick={() => setModalOpen(true)}
       />
       {isModalOpen && (

@@ -1139,7 +1139,7 @@ msgstr ""
 msgid "Something went wrong while submitting your request."
 msgstr ""
 
-msgid "Get Access"
+msgid "Apply for Write Access"
 msgstr ""
 
 msgid "Request submitted"
