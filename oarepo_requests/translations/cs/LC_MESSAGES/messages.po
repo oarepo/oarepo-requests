@@ -1771,8 +1771,8 @@ msgstr "Nebyl nalezen odkaz pro odeslání žádosti."
 msgid "Something went wrong while submitting your request."
 msgstr "Při odesílání žádosti došlo k chybě."
 
-msgid "Get Access"
-msgstr "Získat přístup"
+msgid "Apply for Write Access"
+msgstr "Požádat o oprávnění k zápisu"
 
 msgid "Request submitted"
 msgstr "Žádost odeslána"
