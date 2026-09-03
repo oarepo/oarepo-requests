@@ -14,6 +14,7 @@ from typing import TYPE_CHECKING, Any, override
 import marshmallow as ma
 from invenio_i18n import gettext
 from invenio_i18n import lazy_gettext as _
+from invenio_requests.customizations.actions import CancelAction
 
 from oarepo_requests.actions.group_membership import (
     GroupMembershipAcceptAction,
@@ -57,6 +58,8 @@ class GroupMembershipRequestType(DefaultReceiverMixin, OARepoRequestType):
             "accept": GroupMembershipAcceptAction,
             "submit": GroupMembershipSubmitAction,
             "decline": GroupMembershipDeclineAction,
+            # OARepoRequestType uses OARepoCancelAction using workflow; workflows are not supported for group topic
+            "cancel": CancelAction,
         }
 
     @override
