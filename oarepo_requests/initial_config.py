@@ -31,9 +31,15 @@ from oarepo_requests.notifications.builders.group_membership import (
     GroupMembershipRequestSubmitNotificationBuilder,
 )
 from oarepo_requests.notifications.builders.publish import (
+    PublishChangedMetadataRequestAcceptNotificationBuilder,
+    PublishChangedMetadataRequestDeclineNotificationBuilder,
+    PublishChangedMetadataRequestSubmitNotificationBuilder,
     PublishDraftRequestAcceptNotificationBuilder,
     PublishDraftRequestDeclineNotificationBuilder,
     PublishDraftRequestSubmitNotificationBuilder,
+    PublishNewVersionRequestAcceptNotificationBuilder,
+    PublishNewVersionRequestDeclineNotificationBuilder,
+    PublishNewVersionRequestSubmitNotificationBuilder,
 )
 from oarepo_requests.notifications.resolvers import (
     MultipleEntitiesNotificationResolver,
@@ -58,6 +64,12 @@ NOTIFICATIONS_BUILDERS = {
     PublishDraftRequestSubmitNotificationBuilder.type: PublishDraftRequestSubmitNotificationBuilder,
     PublishDraftRequestAcceptNotificationBuilder.type: PublishDraftRequestAcceptNotificationBuilder,
     PublishDraftRequestDeclineNotificationBuilder.type: PublishDraftRequestDeclineNotificationBuilder,
+    PublishChangedMetadataRequestSubmitNotificationBuilder.type: PublishChangedMetadataRequestSubmitNotificationBuilder,
+    PublishChangedMetadataRequestAcceptNotificationBuilder.type: PublishChangedMetadataRequestAcceptNotificationBuilder,
+    PublishChangedMetadataRequestDeclineNotificationBuilder.type: PublishChangedMetadataRequestDeclineNotificationBuilder,  # noqa
+    PublishNewVersionRequestSubmitNotificationBuilder.type: PublishNewVersionRequestSubmitNotificationBuilder,
+    PublishNewVersionRequestAcceptNotificationBuilder.type: PublishNewVersionRequestAcceptNotificationBuilder,
+    PublishNewVersionRequestDeclineNotificationBuilder.type: PublishNewVersionRequestDeclineNotificationBuilder,
     GroupMembershipRequestSubmitNotificationBuilder.type: GroupMembershipRequestSubmitNotificationBuilder,
     GroupMembershipRequestAcceptNotificationBuilder.type: GroupMembershipRequestAcceptNotificationBuilder,
     GroupMembershipRequestDeclineNotificationBuilder.type: GroupMembershipRequestDeclineNotificationBuilder,

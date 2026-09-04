@@ -14,6 +14,7 @@ from typing import TYPE_CHECKING, Any, cast
 
 from flask_babel.speaklater import LazyString
 from invenio_access.permissions import system_identity
+from invenio_drafts_resources.records import Draft
 from invenio_drafts_resources.records import Record as RecordWithDraft
 from invenio_drafts_resources.services import RecordService as DraftRecordService
 from invenio_pidstore.errors import PersistentIdentifierError
@@ -21,6 +22,7 @@ from invenio_requests.proxies import current_request_type_registry
 from invenio_requests.resolvers.registry import ResolverRegistry
 from invenio_search.engine import dsl
 from oarepo_runtime import current_runtime
+from oarepo_runtime.typing import record_from_result
 from oarepo_workflows import (
     AutoApprove,
     Workflow,
@@ -354,3 +356,16 @@ def get_draft_record_service(record: Record) -> DraftRecordService:
     if not isinstance(topic_service, DraftRecordService):
         raise TypeError("Draft service required for editing records.")
     return topic_service
+
+
+def convert_topic(identity: Identity, topic: Record) -> Draft:
+    """Convert the topic to a draft."""
+    if not isinstance(topic, RecordWithDraft):
+        raise TypeError(f"Topic type {type(topic)} does not support drafts")
+    if isinstance(topic, Draft):
+        return topic
+    service = cast("RecordService", current_runtime.get_record_service_for_record(topic))
+    try:
+        return cast("Draft", record_from_result(service.read_draft(identity, topic["id"])))
+    except Exception as e:
+        raise ValueError(f"Failed to read draft for topic {topic}") from e

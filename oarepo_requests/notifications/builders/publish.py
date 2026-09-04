@@ -10,14 +10,29 @@
 
 from __future__ import annotations
 
-from ..generators import EntityRecipientGenerator
+from typing import TYPE_CHECKING
+
+from ..generators import EntityRecipientGenerator, ReferenceSavingEntityResolve
+from ..generators.context import ReferenceSavingEntityResolveWithDraft
 from .base import RequestActionNotificationBuilder
+
+if TYPE_CHECKING:
+    from invenio_notifications.services import ContextGenerator
+
+ctx: tuple[ContextGenerator, ...] = (
+    ReferenceSavingEntityResolve(key="request"),
+    ReferenceSavingEntityResolveWithDraft(key="request.topic"),
+    ReferenceSavingEntityResolve(key="request.created_by"),
+    ReferenceSavingEntityResolve(key="request.receiver"),
+)
 
 
 class PublishDraftRequestSubmitNotificationBuilder(RequestActionNotificationBuilder):
     """Notification builder for publish draft request submit event."""
 
     type = "publish-draft-request-event.submit"
+
+    context = ctx
 
     recipients = (EntityRecipientGenerator(key="request.receiver"),)  # email only
 
@@ -27,6 +42,8 @@ class PublishDraftRequestAcceptNotificationBuilder(RequestActionNotificationBuil
 
     type = "publish-draft-request-event.accept"
 
+    context = ctx
+
     recipients = (EntityRecipientGenerator(key="request.created_by"),)
 
 
@@ -35,4 +52,42 @@ class PublishDraftRequestDeclineNotificationBuilder(RequestActionNotificationBui
 
     type = "publish-draft-request-event.decline"
 
+    context = ctx
+
     recipients = (EntityRecipientGenerator(key="request.created_by"),)
+
+
+class PublishChangedMetadataRequestSubmitNotificationBuilder(PublishDraftRequestSubmitNotificationBuilder):
+    """Notification builder for publish draft request submit event."""
+
+    type = "publish-changed-metadata-request-event.submit"
+
+
+class PublishChangedMetadataRequestAcceptNotificationBuilder(PublishDraftRequestAcceptNotificationBuilder):
+    """Notification builder for publish draft request accept event."""
+
+    type = "publish-changed-metadata-request-event.accept"
+
+
+class PublishChangedMetadataRequestDeclineNotificationBuilder(PublishDraftRequestDeclineNotificationBuilder):
+    """Notification builder for publish draft request decline event."""
+
+    type = "publish-changed-metadata-request-event.decline"
+
+
+class PublishNewVersionRequestSubmitNotificationBuilder(PublishDraftRequestSubmitNotificationBuilder):
+    """Notification builder for publish draft request submit event."""
+
+    type = "publish-new-version-request-event.submit"
+
+
+class PublishNewVersionRequestAcceptNotificationBuilder(PublishDraftRequestAcceptNotificationBuilder):
+    """Notification builder for publish draft request accept event."""
+
+    type = "publish-new-version-request-event.accept"
+
+
+class PublishNewVersionRequestDeclineNotificationBuilder(PublishDraftRequestDeclineNotificationBuilder):
+    """Notification builder for publish draft request decline event."""
+
+    type = "publish-new-version-request-event.decline"

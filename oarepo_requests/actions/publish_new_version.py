@@ -20,14 +20,24 @@ if TYPE_CHECKING:
     from flask_principal import Identity
     from invenio_db.uow import UnitOfWork
 
-
-from .publish_draft import PublishDraftAcceptAction
+from oarepo_requests.actions.publish_draft import (
+    PublishDraftAcceptAction,
+    PublishDraftDeclineAction,
+    PublishDraftSubmitAction,
+)
+from oarepo_requests.notifications.builders.publish import (
+    PublishNewVersionRequestAcceptNotificationBuilder,
+    PublishNewVersionRequestDeclineNotificationBuilder,
+    PublishNewVersionRequestSubmitNotificationBuilder,
+)
 
 
 class PublishNewVersionAcceptAction(PublishDraftAcceptAction):
     """Accept action for publishing new version draft requests."""
 
     name = _("Publish")
+
+    notification_builder = PublishNewVersionRequestAcceptNotificationBuilder
 
     @override
     def apply(
@@ -42,3 +52,15 @@ class PublishNewVersionAcceptAction(PublishDraftAcceptAction):
             self.topic.metadata["version"] = self.request["payload"]["version"]
             uow.register(RecordCommitOp(self.topic, indexer=topic_service.indexer))
         super().apply(identity, uow, *args, **kwargs)
+
+
+class PublishNewVersionSubmitAction(PublishDraftSubmitAction):  # type: ignore[misc]
+    """Accept action for publishing draft requests."""
+
+    notification_builder = PublishNewVersionRequestSubmitNotificationBuilder
+
+
+class PublishNewVersionDeclineAction(PublishDraftDeclineAction):  # type: ignore[misc]
+    """Decline action for publishing draft requests."""
+
+    notification_builder = PublishNewVersionRequestDeclineNotificationBuilder
