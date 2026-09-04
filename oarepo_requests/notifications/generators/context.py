@@ -13,8 +13,11 @@ from typing import TYPE_CHECKING, Any, override
 
 from invenio_access.permissions import system_identity
 from invenio_notifications.services.generators import EntityResolve
-from invenio_records.dictutils import dict_lookup
+from invenio_pidstore.errors import PIDDoesNotExistError
+from invenio_rdm_records.proxies import current_rdm_records_service
+from invenio_records.dictutils import dict_lookup, dict_set
 from invenio_requests.records import Request
+from sqlalchemy.exc import NoResultFound
 
 if TYPE_CHECKING:
     from invenio_notifications.models import Notification
@@ -50,6 +53,26 @@ class ReferenceSavingEntityResolve(EntityResolve):
         if entity_ref is None:
             return notification
         notification = super().__call__(notification)
+        notification.context = NotificationCtxWithReference(entity_ref, self.key, notification.context)
+        return notification
+
+
+class ReferenceSavingEntityResolveWithDraft(ReferenceSavingEntityResolve):
+    """Entity resolver that saves the reference in the context."""
+
+    @override
+    def __call__(self, notification: Notification):
+        entity_ref = dict_lookup(notification.context, self.key)
+        pid_value = next(iter(entity_ref.values()))
+        # TODO: hack
+        # invenio_rdm_records.requests.entity_resolvers.RDMRecordServiceResultProxy
+        # preferentially returns published record
+        service = current_rdm_records_service
+        try:
+            record_item = service.read_draft(system_identity, pid_value)
+        except PIDDoesNotExistError, NoResultFound:
+            record_item = service.read(system_identity, pid_value)
+        dict_set(notification.context, self.key, record_item.to_dict())
         notification.context = NotificationCtxWithReference(entity_ref, self.key, notification.context)
         return notification
 

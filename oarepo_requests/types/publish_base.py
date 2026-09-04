@@ -9,15 +9,13 @@
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Any, Literal, cast, override
+from typing import TYPE_CHECKING, Any, Literal, override
 
 import marshmallow as ma
 from invenio_drafts_resources.records import Draft
 from invenio_drafts_resources.records import Record as RecordWithDraft
 from invenio_i18n import gettext
 from invenio_i18n import lazy_gettext as _
-from oarepo_runtime.proxies import current_runtime
-from oarepo_runtime.typing import record_from_result
 
 from oarepo_requests.actions.publish_draft import (
     PublishDraftAcceptAction,
@@ -26,12 +24,11 @@ from oarepo_requests.actions.publish_draft import (
     PublishDraftSubmitAction,
 )
 
-from ..utils import classproperty, get_draft_record_service, search_requests
+from ..utils import classproperty, convert_topic, get_draft_record_service, search_requests
 from .generic import NonDuplicableOARepoRecordRequestType
 
 if TYPE_CHECKING:
     from flask_principal import Identity
-    from invenio_drafts_resources.services import RecordService
     from invenio_records_resources.records import Record
     from invenio_requests.customizations.actions import RequestAction
     from invenio_requests.records.api import Request
@@ -95,15 +92,7 @@ class PublishRequestType(NonDuplicableOARepoRecordRequestType):
     @classmethod
     def convert_topic(cls, identity: Identity, topic: Record) -> Draft:
         """Convert the topic to a draft."""
-        if not isinstance(topic, RecordWithDraft):
-            raise TypeError(f"Topic type {type(topic)} does not support drafts")
-        if isinstance(topic, Draft):
-            return topic
-        service = cast("RecordService", current_runtime.get_record_service_for_record(topic))
-        try:
-            return cast("Draft", record_from_result(service.read_draft(identity, topic["id"])))
-        except Exception as e:
-            raise ValueError(f"Failed to read draft for topic {topic}") from e
+        return convert_topic(identity, topic)
 
     def assert_no_pending_requests(
         self,

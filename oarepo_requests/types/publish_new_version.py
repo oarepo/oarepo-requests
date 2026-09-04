@@ -16,13 +16,13 @@ from invenio_i18n import gettext
 from invenio_i18n import lazy_gettext as _
 from invenio_requests.records.api import Request
 
-from oarepo_requests.actions.publish_draft import (
-    PublishDraftDeclineAction,
-    PublishDraftSubmitAction,
-)
 from oarepo_requests.errors import VersionAlreadyExists
 
-from ..actions.publish_new_version import PublishNewVersionAcceptAction
+from ..actions.publish_new_version import (
+    PublishNewVersionAcceptAction,
+    PublishNewVersionDeclineAction,
+    PublishNewVersionSubmitAction,
+)
 from ..utils import classproperty, get_draft_record_service
 from .publish_base import PublishRequestType
 
@@ -110,9 +110,9 @@ class PublishNewVersionRequestType(PublishRequestType):
         """Return available actions for the request type."""
         return {
             **super().available_actions,
-            "submit": PublishDraftSubmitAction,
+            "submit": PublishNewVersionSubmitAction,
             "accept": PublishNewVersionAcceptAction,
-            "decline": PublishDraftDeclineAction,
+            "decline": PublishNewVersionDeclineAction,
         }
 
     @override

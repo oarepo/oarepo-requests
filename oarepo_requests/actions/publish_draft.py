@@ -78,6 +78,8 @@ class PublishMixin(RequestAction):
 class PublishDraftSubmitAction(MakeTopicDraftMixin, PublishMixin, OARepoSubmitAction):  # type: ignore[misc]
     """Submit action for publishing draft requests."""
 
+    notification_builder = PublishDraftRequestSubmitNotificationBuilder
+
     @override
     def apply(
         self,
@@ -96,13 +98,15 @@ class PublishDraftSubmitAction(MakeTopicDraftMixin, PublishMixin, OARepoSubmitAc
                     if version == self.request["payload"]["version"]:
                         raise VersionAlreadyExists
             self.topic.metadata["version"] = self.request["payload"]["version"]
-        uow.register(NotificationOp(PublishDraftRequestSubmitNotificationBuilder.build(request=self.request)))
+        uow.register(NotificationOp(self.notification_builder.build(request=self.request)))
 
 
 class PublishDraftAcceptAction(MakeTopicDraftMixin, PublishMixin, OARepoAcceptAction):  # type: ignore[misc]
     """Accept action for publishing draft requests."""
 
     name = _("Publish")
+
+    notification_builder = PublishDraftRequestAcceptNotificationBuilder
 
     @override
     def apply(
@@ -135,13 +139,15 @@ class PublishDraftAcceptAction(MakeTopicDraftMixin, PublishMixin, OARepoAcceptAc
                 raise UnresolvedRequestsError(action=str(self.name))
         id_ = self.topic["id"]
         self.topic = record_from_result(topic_service.publish(identity, id_, *args, uow=uow, expand=False, **kwargs))
-        uow.register(NotificationOp(PublishDraftRequestAcceptNotificationBuilder.build(request=self.request)))
+        uow.register(NotificationOp(self.notification_builder.build(request=self.request)))
 
 
 class PublishDraftDeclineAction(MakeTopicDraftMixin, OARepoDeclineAction):  # type: ignore[misc]
     """Decline action for publishing draft requests."""
 
     name = _("Return for correction")
+
+    notification_builder = PublishDraftRequestDeclineNotificationBuilder
 
     @override
     def apply(
@@ -152,7 +158,7 @@ class PublishDraftDeclineAction(MakeTopicDraftMixin, OARepoDeclineAction):  # ty
         **kwargs: Any,
     ) -> None:
         """Publish the draft."""
-        uow.register(NotificationOp(PublishDraftRequestDeclineNotificationBuilder.build(request=self.request)))
+        uow.register(NotificationOp(self.notification_builder.build(request=self.request)))
 
 
 class PublishDraftCancelAction(MakeTopicDraftMixin, OARepoCancelAction):  # type: ignore[misc]

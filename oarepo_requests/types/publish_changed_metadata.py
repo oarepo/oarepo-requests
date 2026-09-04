@@ -14,6 +14,11 @@ from typing import TYPE_CHECKING, Any, override
 from invenio_i18n import gettext
 from invenio_i18n import lazy_gettext as _
 
+from ..actions.publish_changed_metadata import (
+    PublishChangedMetadataAcceptAction,
+    PublishChangedMetadataDeclineAction,
+    PublishChangedMetadataSubmitAction,
+)
 from .publish_base import PublishRequestType
 
 if TYPE_CHECKING:
@@ -28,6 +33,10 @@ class PublishChangedMetadataRequestType(PublishRequestType):
 
     type_id = "publish_changed_metadata"
     name = _("Publish changed metadata")
+
+    submit_action = PublishChangedMetadataSubmitAction
+    accept_action = PublishChangedMetadataAcceptAction
+    decline_action = PublishChangedMetadataDeclineAction
 
     @override
     def can_create(
