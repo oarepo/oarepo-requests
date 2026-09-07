@@ -13,7 +13,7 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 
 from ..generators import EntityRecipientGenerator, ReferenceSavingEntityResolve
-from ..generators.context import ReferenceSavingEntityResolveWithDraft
+from ..generators.context import ReferenceSavingDraftResolve
 from .base import RequestActionNotificationBuilder
 
 if TYPE_CHECKING:
@@ -21,7 +21,7 @@ if TYPE_CHECKING:
 
 ctx: tuple[ContextGenerator, ...] = (
     ReferenceSavingEntityResolve(key="request"),
-    ReferenceSavingEntityResolveWithDraft(key="request.topic"),
+    ReferenceSavingDraftResolve(key="request.topic"),
     ReferenceSavingEntityResolve(key="request.created_by"),
     ReferenceSavingEntityResolve(key="request.receiver"),
 )
@@ -41,8 +41,6 @@ class PublishDraftRequestAcceptNotificationBuilder(RequestActionNotificationBuil
     """Notification builder for publish draft request accept event."""
 
     type = "publish-draft-request-event.accept"
-
-    context = ctx
 
     recipients = (EntityRecipientGenerator(key="request.created_by"),)
 

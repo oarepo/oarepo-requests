@@ -23,7 +23,7 @@ from ..actions.publish_new_version import (
     PublishNewVersionDeclineAction,
     PublishNewVersionSubmitAction,
 )
-from ..utils import classproperty, get_draft_record_service
+from ..utils import get_draft_record_service
 from .publish_base import PublishRequestType
 
 if TYPE_CHECKING:
@@ -32,7 +32,6 @@ if TYPE_CHECKING:
     from flask_babel.speaklater import LazyString
     from flask_principal import Identity
     from invenio_records_resources.records import Record
-    from invenio_requests.customizations.actions import RequestAction
     from invenio_requests.records.api import Request
 
     from ..utils import JsonValue
@@ -46,6 +45,10 @@ class PublishNewVersionRequestType(PublishRequestType):
     description = _("Request publishing of a draft")
     receiver_can_be_none = True
     editable = False
+
+    submit_action = PublishNewVersionSubmitAction
+    accept_action = PublishNewVersionAcceptAction
+    decline_action = PublishNewVersionDeclineAction
 
     payload_schema: Mapping[str, ma.fields.Field] | None = {
         "version": ma.fields.Str(),
@@ -104,16 +107,6 @@ class PublishNewVersionRequestType(PublishRequestType):
             "required": False,
         },
     }
-
-    @classproperty
-    def available_actions(cls) -> dict[str, type[RequestAction]]:  # noqa N805
-        """Return available actions for the request type."""
-        return {
-            **super().available_actions,
-            "submit": PublishNewVersionSubmitAction,
-            "accept": PublishNewVersionAcceptAction,
-            "decline": PublishNewVersionDeclineAction,
-        }
 
     @override
     def stateful_name(
