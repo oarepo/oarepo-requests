@@ -1,3 +1,4 @@
+# noqa: INP001
 #
 # Copyright (C) 2024 CESNET z.s.p.o.
 #

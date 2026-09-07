@@ -67,9 +67,9 @@ class ReferenceSavingEntityResolve(EntityResolverContextGenerator):
 
     @override
     @save_reference
-    def __call__(self, notification: Notification) -> Notification:
+    def __call__(self, notification: Notification) -> Notification:  # type: ignore[reportIncompatibleMethodOverride]
         """Resolve the entity and save its reference."""
-        return super().__call__(notification=notification)
+        return super().__call__(notification)
 
 
 class ReferenceSavingDraftResolve(EntityResolverContextGenerator):
@@ -77,7 +77,7 @@ class ReferenceSavingDraftResolve(EntityResolverContextGenerator):
 
     @override
     @save_reference
-    def __call__(self, notification: Notification) -> Notification:
+    def __call__(self, notification: Notification) -> Notification:  # type: ignore[reportIncompatibleMethodOverride]
         """Resolve a draft and save its reference."""
         entity_ref = dict_lookup(notification.context, self.key)
         record_item = current_rdm_records_service.read_draft(system_identity, next(iter(entity_ref.values())))

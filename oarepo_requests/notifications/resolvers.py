@@ -79,7 +79,7 @@ class MultipleEntitiesNotificationResolver(EntityResolver):
     type_key = MultipleEntitiesResolver.type_id
     matches_reference_dict = MultipleEntitiesResolver.matches_reference_dict
     matches_entity = MultipleEntitiesResolver.matches_entity
-    _reference_entity = MultipleEntitiesResolver._reference_entity
+    _reference_entity = MultipleEntitiesResolver._reference_entity  # noqa SLF001
 
     def __init__(self) -> None:
         """Initialize the resolver."""
