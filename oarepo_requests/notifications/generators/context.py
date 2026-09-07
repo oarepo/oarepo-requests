@@ -9,17 +9,18 @@
 
 from __future__ import annotations
 
+from functools import wraps
 from typing import TYPE_CHECKING, Any, override
 
 from invenio_access.permissions import system_identity
-from invenio_notifications.services.generators import EntityResolve
-from invenio_pidstore.errors import PIDDoesNotExistError
+from invenio_notifications.services import EntityResolverContextGenerator
 from invenio_rdm_records.proxies import current_rdm_records_service
 from invenio_records.dictutils import dict_lookup, dict_set
 from invenio_requests.records import Request
-from sqlalchemy.exc import NoResultFound
 
 if TYPE_CHECKING:
+    from collections.abc import Callable
+
     from invenio_notifications.models import Notification
 
 
@@ -44,36 +45,43 @@ class NotificationCtxWithReference(dict):
         return next(iter(self.references[key].keys()))
 
 
-class ReferenceSavingEntityResolve(EntityResolve):
-    """Entity resolver that saves the reference in the context."""
+def save_reference[GeneratorT: EntityResolverContextGenerator](
+    func: Callable[[GeneratorT, Notification], Notification],
+) -> Callable[[GeneratorT, Notification], Notification]:
+    """Save an entity reference after resolving it."""
 
-    @override
-    def __call__(self, notification: Notification):
+    @wraps(func)
+    def wrapped(self: GeneratorT, notification: Notification) -> Notification:
         entity_ref = dict_lookup(notification.context, self.key)
         if entity_ref is None:
             return notification
-        notification = super().__call__(notification)
+        notification = func(self, notification)
         notification.context = NotificationCtxWithReference(entity_ref, self.key, notification.context)
         return notification
 
+    return wrapped
 
-class ReferenceSavingEntityResolveWithDraft(ReferenceSavingEntityResolve):
+
+class ReferenceSavingEntityResolve(EntityResolverContextGenerator):
     """Entity resolver that saves the reference in the context."""
 
     @override
-    def __call__(self, notification: Notification):
+    @save_reference
+    def __call__(self, notification: Notification) -> Notification:
+        """Resolve the entity and save its reference."""
+        return super().__call__(notification=notification)
+
+
+class ReferenceSavingDraftResolve(EntityResolverContextGenerator):
+    """Entity resolver that saves the reference in the context."""
+
+    @override
+    @save_reference
+    def __call__(self, notification: Notification) -> Notification:
+        """Resolve a draft and save its reference."""
         entity_ref = dict_lookup(notification.context, self.key)
-        pid_value = next(iter(entity_ref.values()))
-        # TODO: hack
-        # invenio_rdm_records.requests.entity_resolvers.RDMRecordServiceResultProxy
-        # preferentially returns published record
-        service = current_rdm_records_service
-        try:
-            record_item = service.read_draft(system_identity, pid_value)
-        except PIDDoesNotExistError, NoResultFound:
-            record_item = service.read(system_identity, pid_value)
+        record_item = current_rdm_records_service.read_draft(system_identity, next(iter(entity_ref.values())))
         dict_set(notification.context, self.key, record_item.to_dict())
-        notification.context = NotificationCtxWithReference(entity_ref, self.key, notification.context)
         return notification
 
 

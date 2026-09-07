@@ -896,6 +896,56 @@ msgid ""
 "    "
 msgstr ""
 
+#: oarepo_requests/templates/semantic-ui/invenio_notifications/publish-changed-metadata-request-event.accept.jinja:16
+#, python-brace-format
+msgid "Metadata of record '{topic_title}' has been updated"
+msgstr ""
+
+#: oarepo_requests/templates/semantic-ui/invenio_notifications/publish-changed-metadata-request-event.accept.jinja:20
+#, python-format
+msgid ""
+"\n"
+"<p>\n"
+"Metadata of your record \"%(topic_title)s\" has been updated. You can see the record at\n"
+"<a href=\"%(link)s\">%(link)s</a>\n"
+"</p>\n"
+"    "
+msgstr ""
+
+#: oarepo_requests/templates/semantic-ui/invenio_notifications/publish-changed-metadata-request-event.accept.jinja:34
+#, python-format
+msgid ""
+"\n"
+"Metadata of your record \"%(topic_title)s\" has been updated. You can see the record at\n"
+"%(link)s\n"
+"    "
+msgstr ""
+
+#: oarepo_requests/templates/semantic-ui/invenio_notifications/publish-new-version-request-event.accept.jinja:17
+#, python-brace-format
+msgid "New version '{version}' of record '{topic_title}' has been published"
+msgstr ""
+
+#: oarepo_requests/templates/semantic-ui/invenio_notifications/publish-new-version-request-event.accept.jinja:21
+#, python-brace-format, python-format
+msgid ""
+"\n"
+"<p>\n"
+"New version '{version}' of record \"%(topic_title)s\" has been published. You can see the record at\n"
+"<a href=\"%(link)s\">%(link)s</a>\n"
+"</p>\n"
+"    "
+msgstr ""
+
+#: oarepo_requests/templates/semantic-ui/invenio_notifications/publish-new-version-request-event.accept.jinja:35
+#, python-brace-format, python-format
+msgid ""
+"\n"
+"New version '{version}' of record \"%(topic_title)s\" has been published. You can see the record at\n"
+"%(link)s\n"
+"    "
+msgstr ""
+
 #: /Users/m/w/cesnet/oarepo-requests/oarepo_requests/templates/semantic-ui/invenio_notifications/publish-draft-request-event.submit.jinja:8
 #, python-brace-format
 msgid "Request to publish record {topic_title}"

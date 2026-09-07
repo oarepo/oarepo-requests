@@ -95,6 +95,67 @@ def test_publish_notifications(
         # assert request_html_link in sent_mail.body
 
 
+@pytest.fixture
+def accepted_new_version_notification(
+    app,
+    users,
+    logged_client,
+    record_factory,
+    submit_request_on_record,
+    submit_request_on_draft,
+    link2testclient,
+    urls,
+):
+    def _accept(version: str | None) -> tuple[Any, str, str]:
+        creator = users[0]
+        record = record_factory(creator.identity)
+        new_version_request = submit_request_on_record(
+            creator.identity,
+            record["id"],
+            "new_version",
+            expand=True,
+        )
+        new_id = new_version_request.data["expanded"]["payload"]["created_topic"]["id"]["id"]
+        additional_data = {"payload": {"version": version}} if version is not None else None
+        publish_request = submit_request_on_draft(
+            creator.identity,
+            new_id,
+            "publish_new_version",
+            create_additional_data=additional_data,
+        )
+
+        receiver_client = logged_client(users[1])
+        request = receiver_client.get(f"{urls['BASE_URL_REQUESTS']}{publish_request['id']}")
+        mail = app.extensions["mail"]
+        with mail.record_messages() as outbox:
+            receiver_client.post(link2testclient(request.json["links"]["actions"]["accept"]))
+            assert len(outbox) == 1
+
+        new_record = receiver_client.get(f"{urls['BASE_URL']}/{new_id}").json
+        return outbox[0], record["links"]["self_html"], new_record["links"]["self_html"]
+
+    return _accept
+
+
+# TODO: version also in submit/decline?
+def test_publish_new_version_accept_notification(accepted_new_version_notification):
+    sent_mail, old_link, new_link = accepted_new_version_notification("2.0")
+
+    assert sent_mail.subject == "New version '2.0' of record 'Test Dataset' has been published"
+    assert new_link in sent_mail.body
+    assert new_link in sent_mail.html
+    assert old_link not in sent_mail.body
+    assert old_link not in sent_mail.html
+
+
+def test_publish_new_version_accept_notification_without_version(accepted_new_version_notification):
+    sent_mail, _, _ = accepted_new_version_notification(None)
+
+    assert sent_mail.subject == "New version of record 'Test Dataset' has been published"
+    assert 'New version of record "Test Dataset" has been published.' in sent_mail.body
+    assert 'New version of record "Test Dataset" has been published.' in sent_mail.html
+
+
 def test_delete_published_notifications(
     app,
     users,
