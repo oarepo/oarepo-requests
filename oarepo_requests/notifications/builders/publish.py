@@ -13,7 +13,7 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 
 from ..generators import EntityRecipientGenerator, ReferenceSavingEntityResolve
-from ..generators.context import ReferenceSavingDraftResolve
+from ..generators.context import RequestTypeAwareEntityResolve
 from .base import RequestActionNotificationBuilder
 
 if TYPE_CHECKING:
@@ -21,7 +21,7 @@ if TYPE_CHECKING:
 
 ctx: tuple[ContextGenerator, ...] = (
     ReferenceSavingEntityResolve(key="request"),
-    ReferenceSavingDraftResolve(key="request.topic"),
+    RequestTypeAwareEntityResolve(key="request.topic"),
     ReferenceSavingEntityResolve(key="request.created_by"),
     ReferenceSavingEntityResolve(key="request.receiver"),
 )

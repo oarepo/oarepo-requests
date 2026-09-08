@@ -16,6 +16,7 @@ from invenio_drafts_resources.records import Draft
 from invenio_drafts_resources.records import Record as RecordWithDraft
 from invenio_i18n import gettext
 from invenio_i18n import lazy_gettext as _
+from invenio_rdm_records.proxies import current_rdm_records_service
 from oarepo_runtime.proxies import current_runtime
 from oarepo_runtime.typing import record_from_result
 
@@ -104,6 +105,14 @@ class PublishRequestType(NonDuplicableOARepoRecordRequestType):
             return cast("Draft", record_from_result(service.read_draft(identity, topic["id"])))
         except Exception as e:
             raise ValueError(f"Failed to read draft for topic {topic}") from e
+
+    @classmethod
+    def convert_topic_notifications(cls, topic_ref: dict[str, Any]) -> dict[str, Any]:
+        """Convert the topic dict to a draft."""
+        return cast(
+            "dict[str, Any]",
+            current_rdm_records_service.read_draft(system_identity, next(iter(topic_ref.values()))).to_dict(),
+        )
 
     def assert_no_pending_requests(
         self,
