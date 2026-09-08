@@ -11,16 +11,15 @@
 {% set topic_title = topic.get("metadata", {}).get("title", topic_id) %}
 {% set request_html_page = request.links.self_html %}
 {% set topic_html_page = topic.get("links", {}).get("self_html") %}
-{% set version = topic.get("metadata", {}).get("version", "") %}
 
 {%- block subject -%}
-    {{ _("New version '{version}' of record '{topic_title}' has been published").format(version=version, topic_title=topic_title) }}
+    {{ _("New version of record '{topic_title}' has been published").format(version=version, topic_title=topic_title) }}
 {%- endblock subject -%}
 
 {%- block html_body -%}
     {% trans topic_title=topic_title, link=topic_html_page %}
 <p>
-New version '{version}' of record "{{topic_title}}" has been published. You can see the record at
+New version of record "{{topic_title}}" has been published. You can see the record at
 <a href="{{link}}">{{link}}</a>
 </p>
     {% endtrans %}
@@ -33,7 +32,7 @@ New version '{version}' of record "{{topic_title}}" has been published. You can 
 
 {%- block plain_body -%}
     {% trans topic_title=topic_title, link=topic_html_page %}
-New version '{version}' of record "{{topic_title}}" has been published. You can see the record at
+New version of record "{{topic_title}}" has been published. You can see the record at
 {{link}}
     {% endtrans %}
 
