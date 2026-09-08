@@ -10,12 +10,25 @@
 {% set topic_id = request.topic.id %}
 {% set topic_title = topic.get("metadata", {}).get("title", topic_id) %}
 {% set request_html_page = request.links.self_html %}
+{% set creator_id = request.created_by.get("id", "") %}
+{% set recipient_id = recipient.data.get("id", "") %}
 
 {%- block subject -%}
     {{ _("Request to publish record {topic_title}").format(topic_title=topic_title) }}
 {%- endblock subject -%}
 
 {%- block html_body -%}
+    {% if creator_id == recipient_id %}
+    {% trans topic_title=topic_title, link=request_html_page %}
+    <p>
+    Wait for invenio checks to finish.
+    Then publish the request at {{ link }}.
+    </p>
+    <p>
+        <a type="button" href='{{link}}'>Accept or Decline the request</a>
+    </p>
+    {% endtrans %}
+    {% else %}
     {% trans topic_title=topic_title, link=request_html_page %}
     <p>
     You have been asked to publish record "{{topic_title}}".
@@ -24,6 +37,7 @@
         <a type="button" href='{{link}}'>Accept or Decline the request</a>
     </p>
     {% endtrans %}
+    {% endif %}
 
     <table style="font-family:'Lato',Helvetica,Arial,sans-serif;border-spacing:15px">
         <tr>
@@ -33,8 +47,15 @@
 {%- endblock html_body -%}
 
 {%- block plain_body -%}
+    {% if creator_id == recipient_id %}
+    {% trans topic_title=topic_title, link=request_html_page %}
+    Wait for invenio checks to finish.
+    Then publish the request at {{ link }}.
+    {% endtrans %}
+    {% else %}
     {% trans topic_title=topic_title, link=request_html_page %}
     You have been asked to publish record "{{topic_title}}".
     Accept or Decline the request at {{link}}
     {% endtrans %}
+    {% endif %}
 {%- endblock plain_body -%}

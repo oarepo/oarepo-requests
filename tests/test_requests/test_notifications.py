@@ -95,136 +95,40 @@ def test_publish_notifications(
         # assert request_html_link in sent_mail.body
 
 
-def test_publish_changed_metadata_submit_notification_uses_draft_title(
+def test_publish_submit_notification_when_creator_is_receiver(
     app,
     users,
-    logged_client,
-    record_with_files_factory,
-    submit_request_on_record,
+    draft_factory,
     submit_request_on_draft,
-    urls,
+    monkeypatch,
 ):
+    """Tell a creator who is also the receiver to wait for the checks."""
     mail = app.extensions["mail"]
     creator = users[0]
-    creator_client = logged_client(creator)
-    record = record_with_files_factory(creator.identity)
+    original_receiver = app.config["OAREPO_REQUESTS_DEFAULT_RECEIVER"]
 
-    submit_request_on_record(creator.identity, record["id"], "edit_published_record")
-    creator_client.put(
-        f"{urls['BASE_URL']}/{record['id']}/draft",
-        json={"metadata": {**record["metadata"], "title": "Edited Dataset"}},
+    def creator_as_receiver(record=None, request_type=None, **kwargs: Any) -> Any:
+        if request_type.type_id == "publish_draft":
+            return {"user": str(creator.id)}
+        return original_receiver(record, request_type, **kwargs)
+
+    monkeypatch.setitem(
+        app.config,
+        "OAREPO_REQUESTS_DEFAULT_RECEIVER",
+        creator_as_receiver,
     )
+    draft = draft_factory(creator.identity)
 
     with mail.record_messages() as outbox:
-        submit_request_on_draft(creator.identity, record["id"], "publish_changed_metadata")
+        submit_request_on_draft(creator.identity, draft["id"], "publish_draft")
+
         assert len(outbox) == 1
-
-    sent_mail = outbox[0]
-    assert sent_mail.subject == "Request to publish changed metadata on record Edited Dataset"
-    assert 'changed metadata on record "Edited Dataset"' in sent_mail.body
-    assert 'changed metadata on record "Edited Dataset"' in sent_mail.html
-    assert "Test Dataset" not in sent_mail.subject
-    assert "Test Dataset" not in sent_mail.body
-    assert "Test Dataset" not in sent_mail.html
-
-
-def test_publish_changed_metadata_comment_notification_uses_draft_title(
-    app,
-    users,
-    logged_client,
-    record_with_files_factory,
-    submit_request_on_record,
-    submit_request_on_draft,
-    urls,
-):
-    mail = app.extensions["mail"]
-    creator = users[0]
-    creator_client = logged_client(creator)
-    record = record_with_files_factory(creator.identity)
-
-    submit_request_on_record(creator.identity, record["id"], "edit_published_record")
-    creator_client.put(
-        f"{urls['BASE_URL']}/{record['id']}/draft",
-        json={"metadata": {**record["metadata"], "title": "Edited Dataset"}},
-    )
-    publish_request = submit_request_on_draft(
-        creator.identity,
-        record["id"],
-        "publish_changed_metadata",
-    )
-
-    with mail.record_messages() as outbox:
-        current_events_service.create(
-            creator.identity,
-            publish_request["id"],
-            {"payload": {"content": "Please review the changed metadata."}},
-            CommentEventType,
-        )
-        assert len(outbox) == 1
-
-    sent_mail = outbox[0]
-    assert "Edited Dataset" in sent_mail.subject
-
-
-@pytest.fixture
-def accepted_new_version_notification(
-    app,
-    users,
-    logged_client,
-    record_factory,
-    submit_request_on_record,
-    submit_request_on_draft,
-    link2testclient,
-    urls,
-):
-    def _accept(version: str | None) -> tuple[Any, str, str]:
-        creator = users[0]
-        record = record_factory(creator.identity)
-        new_version_request = submit_request_on_record(
-            creator.identity,
-            record["id"],
-            "new_version",
-            expand=True,
-        )
-        new_id = new_version_request.data["expanded"]["payload"]["created_topic"]["id"]["id"]
-        additional_data = {"payload": {"version": version}} if version is not None else None
-        publish_request = submit_request_on_draft(
-            creator.identity,
-            new_id,
-            "publish_new_version",
-            create_additional_data=additional_data,
-        )
-
-        receiver_client = logged_client(users[1])
-        request = receiver_client.get(f"{urls['BASE_URL_REQUESTS']}{publish_request['id']}")
-        mail = app.extensions["mail"]
-        with mail.record_messages() as outbox:
-            receiver_client.post(link2testclient(request.json["links"]["actions"]["accept"]))
-            assert len(outbox) == 1
-
-        new_record = receiver_client.get(f"{urls['BASE_URL']}/{new_id}").json
-        return outbox[0], record["links"]["self_html"], new_record["links"]["self_html"]
-
-    return _accept
-
-
-# TODO: version also in submit/decline?
-def test_publish_new_version_accept_notification(accepted_new_version_notification):
-    sent_mail, old_link, new_link = accepted_new_version_notification("2.0")
-
-    assert sent_mail.subject == "New version '2.0' of record 'Test Dataset' has been published"
-    assert new_link in sent_mail.body
-    assert new_link in sent_mail.html
-    assert old_link not in sent_mail.body
-    assert old_link not in sent_mail.html
-
-
-def test_publish_new_version_accept_notification_without_version(accepted_new_version_notification):
-    sent_mail, _, _ = accepted_new_version_notification(None)
-
-    assert sent_mail.subject == "New version of record 'Test Dataset' has been published"
-    assert 'New version of record "Test Dataset" has been published.' in sent_mail.body
-    assert 'New version of record "Test Dataset" has been published.' in sent_mail.html
+        sent_mail = outbox[0]
+        assert sent_mail.recipients == [creator.user.email]
+        for body in (sent_mail.body, sent_mail.html):
+            assert "Wait for invenio checks to finish." in body
+            assert "Then publish the request at" in body
+            assert "You have been asked to publish record" not in body
 
 
 def test_delete_published_notifications(

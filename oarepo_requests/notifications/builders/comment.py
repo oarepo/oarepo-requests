@@ -27,7 +27,7 @@ from oarepo_requests.notifications.generators import (
     GeneralRequestParticipantsRecipient,
     RequestEntityResolve,
 )
-from oarepo_requests.notifications.generators.context import ReferenceSavingEntityResolve, RequestTypeAwareEntityResolve
+from oarepo_requests.notifications.generators.context import ReferenceSavingEntityResolve
 from oarepo_requests.utils import classproperty
 
 if TYPE_CHECKING:
@@ -45,7 +45,7 @@ class CommentRequestEventCreateNotificationBuilder(InvenioCommentRequestEventCre
             if isinstance(r, EntityResolve):
                 replacement_cls = RequestEntityResolve if r.key == "request" else ReferenceSavingEntityResolve
                 invenio[idx] = replacement_cls(key=r.key)
-        return *invenio, RequestTypeAwareEntityResolve(key="request.topic")
+        return *invenio, ReferenceSavingEntityResolve(key="request.topic")
 
     @classproperty
     def recipients(self) -> tuple[RecipientGenerator, ...]:  # type: ignore[reportIncompatibleVariableOverride]

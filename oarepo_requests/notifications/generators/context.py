@@ -9,21 +9,14 @@
 
 from __future__ import annotations
 
-import logging
-from functools import wraps
 from typing import TYPE_CHECKING, Any, override
 
 from invenio_access.permissions import system_identity
-from invenio_notifications.services import EntityResolverContextGenerator
-from invenio_records.dictutils import dict_lookup, dict_set
-from invenio_requests import current_request_type_registry
+from invenio_notifications.services.generators import EntityResolve
+from invenio_records.dictutils import dict_lookup
 from invenio_requests.records import Request
 
-logger = logging.getLogger(__name__)  # TODO: correct celery logging?
-
 if TYPE_CHECKING:
-    from collections.abc import Callable
-
     from invenio_notifications.models import Notification
 
 
@@ -48,53 +41,16 @@ class NotificationCtxWithReference(dict):
         return next(iter(self.references[key].keys()))
 
 
-def save_reference[GeneratorT: EntityResolverContextGenerator](
-    func: Callable[[GeneratorT, Notification], Notification],
-) -> Callable[[GeneratorT, Notification], Notification]:
-    """Save an entity reference after resolving it."""
+class ReferenceSavingEntityResolve(EntityResolve):
+    """Entity resolver that saves the reference in the context."""
 
-    @wraps(func)
-    def wrapped(self: GeneratorT, notification: Notification) -> Notification:
+    @override
+    def __call__(self, notification: Notification):
         entity_ref = dict_lookup(notification.context, self.key)
         if entity_ref is None:
             return notification
-        notification = func(self, notification)
+        notification = super().__call__(notification)
         notification.context = NotificationCtxWithReference(entity_ref, self.key, notification.context)
-        return notification
-
-    return wrapped
-
-
-class ReferenceSavingEntityResolve(EntityResolverContextGenerator):
-    """Entity resolver that saves the reference in the context."""
-
-    @override
-    @save_reference
-    def __call__(self, notification: Notification) -> Notification:  # type: ignore[reportIncompatibleMethodOverride]
-        """Resolve the entity and save its reference."""
-        return super().__call__(notification)
-
-
-class RequestTypeAwareEntityResolve(EntityResolverContextGenerator):
-    """Entity resolver that saves the reference in the context."""
-
-    @override
-    @save_reference
-    def __call__(self, notification: Notification) -> Notification:  # type: ignore[reportIncompatibleMethodOverride]
-        """Resolve a draft and save its reference."""
-        request = dict_lookup(notification.context, "request")
-        if not request:
-            logger.warning(
-                "No request in notification context, the generator is probably used before the request is saved."
-            )
-        request_type = current_request_type_registry.lookup(request["type"], quiet=True)
-
-        if not hasattr(request_type, "convert_topic_notifications"):
-            return super().__call__(notification)
-
-        entity_ref = dict_lookup(notification.context, self.key)
-        entity_dict = request_type.convert_topic_notifications(entity_ref)
-        dict_set(notification.context, self.key, entity_dict)
         return notification
 
 
