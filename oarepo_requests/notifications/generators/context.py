@@ -9,14 +9,17 @@
 
 from __future__ import annotations
 
+import logging
 from functools import wraps
 from typing import TYPE_CHECKING, Any, override
 
 from invenio_access.permissions import system_identity
 from invenio_notifications.services import EntityResolverContextGenerator
-from invenio_rdm_records.proxies import current_rdm_records_service
 from invenio_records.dictutils import dict_lookup, dict_set
+from invenio_requests import current_request_type_registry
 from invenio_requests.records import Request
+
+logger = logging.getLogger(__name__)  # TODO: correct celery logging?
 
 if TYPE_CHECKING:
     from collections.abc import Callable
@@ -72,16 +75,26 @@ class ReferenceSavingEntityResolve(EntityResolverContextGenerator):
         return super().__call__(notification)
 
 
-class ReferenceSavingDraftResolve(EntityResolverContextGenerator):
+class RequestTypeAwareEntityResolve(EntityResolverContextGenerator):
     """Entity resolver that saves the reference in the context."""
 
     @override
     @save_reference
     def __call__(self, notification: Notification) -> Notification:  # type: ignore[reportIncompatibleMethodOverride]
         """Resolve a draft and save its reference."""
+        request = dict_lookup(notification.context, "request")
+        if not request:
+            logger.warning(
+                "No request in notification context, the generator is probably used before the request is saved."
+            )
+        request_type = current_request_type_registry.lookup(request["type"], quiet=True)
+
+        if not hasattr(request_type, "convert_topic_notifications"):
+            return super().__call__(notification)
+
         entity_ref = dict_lookup(notification.context, self.key)
-        record_item = current_rdm_records_service.read_draft(system_identity, next(iter(entity_ref.values())))
-        dict_set(notification.context, self.key, record_item.to_dict())
+        entity_dict = request_type.convert_topic_notifications(entity_ref)
+        dict_set(notification.context, self.key, entity_dict)
         return notification
 
 

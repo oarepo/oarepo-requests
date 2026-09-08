@@ -95,6 +95,77 @@ def test_publish_notifications(
         # assert request_html_link in sent_mail.body
 
 
+def test_publish_changed_metadata_submit_notification_uses_draft_title(
+    app,
+    users,
+    logged_client,
+    record_with_files_factory,
+    submit_request_on_record,
+    submit_request_on_draft,
+    urls,
+):
+    mail = app.extensions["mail"]
+    creator = users[0]
+    creator_client = logged_client(creator)
+    record = record_with_files_factory(creator.identity)
+
+    submit_request_on_record(creator.identity, record["id"], "edit_published_record")
+    creator_client.put(
+        f"{urls['BASE_URL']}/{record['id']}/draft",
+        json={"metadata": {**record["metadata"], "title": "Edited Dataset"}},
+    )
+
+    with mail.record_messages() as outbox:
+        submit_request_on_draft(creator.identity, record["id"], "publish_changed_metadata")
+        assert len(outbox) == 1
+
+    sent_mail = outbox[0]
+    assert sent_mail.subject == "Request to publish changed metadata on record Edited Dataset"
+    assert 'changed metadata on record "Edited Dataset"' in sent_mail.body
+    assert 'changed metadata on record "Edited Dataset"' in sent_mail.html
+    assert "Test Dataset" not in sent_mail.subject
+    assert "Test Dataset" not in sent_mail.body
+    assert "Test Dataset" not in sent_mail.html
+
+
+def test_publish_changed_metadata_comment_notification_uses_draft_title(
+    app,
+    users,
+    logged_client,
+    record_with_files_factory,
+    submit_request_on_record,
+    submit_request_on_draft,
+    urls,
+):
+    mail = app.extensions["mail"]
+    creator = users[0]
+    creator_client = logged_client(creator)
+    record = record_with_files_factory(creator.identity)
+
+    submit_request_on_record(creator.identity, record["id"], "edit_published_record")
+    creator_client.put(
+        f"{urls['BASE_URL']}/{record['id']}/draft",
+        json={"metadata": {**record["metadata"], "title": "Edited Dataset"}},
+    )
+    publish_request = submit_request_on_draft(
+        creator.identity,
+        record["id"],
+        "publish_changed_metadata",
+    )
+
+    with mail.record_messages() as outbox:
+        current_events_service.create(
+            creator.identity,
+            publish_request["id"],
+            {"payload": {"content": "Please review the changed metadata."}},
+            CommentEventType,
+        )
+        assert len(outbox) == 1
+
+    sent_mail = outbox[0]
+    assert "Edited Dataset" in sent_mail.subject
+
+
 @pytest.fixture
 def accepted_new_version_notification(
     app,
