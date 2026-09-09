@@ -14,11 +14,11 @@
 {% set recipient_id = recipient.data.get("id", "") %}
 
 {%- block subject -%}
-    {% if creator_id == recipient_id %}
+    {%- if creator_id == recipient_id -%}
     {{ _("You are publishing new version of record {topic_title}").format(topic_title=topic_title) }}
-    {% else %}
+    {%- else -%}
     {{ _("Request to publish new version of record {topic_title}").format(topic_title=topic_title) }}
-    {% endif %}
+    {%- endif -%}
 {%- endblock subject -%}
 
 {%- block html_body -%}

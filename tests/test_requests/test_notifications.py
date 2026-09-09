@@ -59,7 +59,7 @@ def test_publish_notifications(
         # check notification is build on submit
         assert len(outbox) == 1
         sent_mail = outbox[0]
-        assert "Request to publish record Test Dataset" in sent_mail.subject
+        assert sent_mail.subject == "Request to publish record Test Dataset"
         assert 'You have been asked to publish record "Test Dataset".' in sent_mail.body
         assert 'You have been asked to publish record "Test Dataset".' in sent_mail.html
 
@@ -152,6 +152,7 @@ def test_publish_submit_notification_when_creator_is_receiver(
                 creator.identity,
                 record["id"],
                 "new_version",
+                create_additional_data={"payload": {"keep_files": "yes"}},
                 expand=True,
             )
             draft_id = new_version_request.data["expanded"]["payload"]["created_topic"]["id"]["id"]
@@ -162,7 +163,7 @@ def test_publish_submit_notification_when_creator_is_receiver(
         assert len(outbox) == 1
         sent_mail = outbox[0]
         assert sent_mail.recipients == [creator.user.email]
-        assert expected_subject in sent_mail.subject
+        assert sent_mail.subject == expected_subject
         assert "Request to publish" not in sent_mail.subject
         for body in (sent_mail.body, sent_mail.html):
             assert "Wait for invenio checks to finish" in body
