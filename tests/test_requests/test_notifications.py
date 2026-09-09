@@ -95,12 +95,30 @@ def test_publish_notifications(
         # assert request_html_link in sent_mail.body
 
 
+@pytest.mark.parametrize(
+    ("request_type", "expected_subject"),
+    [
+        ("publish_draft", "You are publishing record Test Dataset"),
+        (
+            "publish_changed_metadata",
+            "You are publishing changed metadata on record Test Dataset",
+        ),
+        (
+            "publish_new_version",
+            "You are publishing new version of record Test Dataset",
+        ),
+    ],
+)
 def test_publish_submit_notification_when_creator_is_receiver(
     app,
     users,
     draft_factory,
+    record_with_files_factory,
+    submit_request_on_record,
     submit_request_on_draft,
     monkeypatch,
+    request_type,
+    expected_subject,
 ):
     """Tell a creator who is also the receiver to wait for the checks."""
     mail = app.extensions["mail"]
@@ -108,7 +126,11 @@ def test_publish_submit_notification_when_creator_is_receiver(
     original_receiver = app.config["OAREPO_REQUESTS_DEFAULT_RECEIVER"]
 
     def creator_as_receiver(record=None, request_type=None, **kwargs: Any) -> Any:
-        if request_type.type_id == "publish_draft":
+        if request_type.type_id in {
+            "publish_draft",
+            "publish_changed_metadata",
+            "publish_new_version",
+        }:
             return {"user": str(creator.id)}
         return original_receiver(record, request_type, **kwargs)
 
@@ -117,18 +139,34 @@ def test_publish_submit_notification_when_creator_is_receiver(
         "OAREPO_REQUESTS_DEFAULT_RECEIVER",
         creator_as_receiver,
     )
-    draft = draft_factory(creator.identity)
+
+    if request_type == "publish_draft":
+        draft_id = draft_factory(creator.identity)["id"]
+    else:
+        record = record_with_files_factory(creator.identity)
+        if request_type == "publish_changed_metadata":
+            submit_request_on_record(creator.identity, record["id"], "edit_published_record")
+            draft_id = record["id"]
+        else:
+            new_version_request = submit_request_on_record(
+                creator.identity,
+                record["id"],
+                "new_version",
+                expand=True,
+            )
+            draft_id = new_version_request.data["expanded"]["payload"]["created_topic"]["id"]["id"]
 
     with mail.record_messages() as outbox:
-        submit_request_on_draft(creator.identity, draft["id"], "publish_draft")
+        submit_request_on_draft(creator.identity, draft_id, request_type)
 
         assert len(outbox) == 1
         sent_mail = outbox[0]
         assert sent_mail.recipients == [creator.user.email]
+        assert expected_subject in sent_mail.subject
+        assert "Request to publish" not in sent_mail.subject
         for body in (sent_mail.body, sent_mail.html):
-            assert "Wait for invenio checks to finish." in body
-            assert "Then publish the request at" in body
-            assert "You have been asked to publish record" not in body
+            assert "Wait for invenio checks to finish" in body
+            assert "You have been asked to publish" not in body
 
 
 def test_delete_published_notifications(
