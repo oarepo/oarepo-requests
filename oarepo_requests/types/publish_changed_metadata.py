@@ -28,6 +28,7 @@ if TYPE_CHECKING:
     from invenio_requests.records.api import Request
 
 
+# Incorrectly resolving published record instead of draft in notifications is a known unfixed issue for now.
 class PublishChangedMetadataRequestType(PublishRequestType):
     """Request type for publication of changed metadata."""
 
