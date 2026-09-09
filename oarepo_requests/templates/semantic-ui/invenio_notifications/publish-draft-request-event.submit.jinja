@@ -14,15 +14,19 @@
 {% set recipient_id = recipient.data.get("id", "") %}
 
 {%- block subject -%}
+    {% if creator_id == recipient_id %}
+    {{ _("You are publishing record {topic_title}").format(topic_title=topic_title) }}
+    {% else %}
     {{ _("Request to publish record {topic_title}").format(topic_title=topic_title) }}
+    {% endif %}
 {%- endblock subject -%}
 
 {%- block html_body -%}
     {% if creator_id == recipient_id %}
     {% trans topic_title=topic_title, link=request_html_page %}
     <p>
-    Wait for invenio checks to finish.
-    Then publish the request at {{ link }}.
+    You are publishing record {{topic_title}}.
+    Wait for invenio checks to finish, then accept the request or consider suggestions.
     </p>
     <p>
         <a type="button" href='{{link}}'>Accept or Decline the request</a>
@@ -49,8 +53,9 @@
 {%- block plain_body -%}
     {% if creator_id == recipient_id %}
     {% trans topic_title=topic_title, link=request_html_page %}
+    You are publishing record {{topic_title}}.
     Wait for invenio checks to finish.
-    Then publish the request at {{ link }}.
+    Then accept the request at {{ link }} or consider suggestions.
     {% endtrans %}
     {% else %}
     {% trans topic_title=topic_title, link=request_html_page %}

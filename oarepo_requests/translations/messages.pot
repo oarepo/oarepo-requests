@@ -454,31 +454,6 @@ msgid ""
 "    "
 msgstr ""
 
-#: oarepo_requests/templates/semantic-ui/invenio_notifications/publish-new-version-request-event.accept.jinja:17
-#, python-brace-format
-msgid "New version '{version}' of record '{topic_title}' has been published"
-msgstr ""
-
-#: oarepo_requests/templates/semantic-ui/invenio_notifications/publish-new-version-request-event.accept.jinja:21
-#, python-brace-format, python-format
-msgid ""
-"\n"
-"<p>\n"
-"New version '{version}' of record \"%(topic_title)s\" has been published. You can see the record at\n"
-"<a href=\"%(link)s\">%(link)s</a>\n"
-"</p>\n"
-"    "
-msgstr ""
-
-#: oarepo_requests/templates/semantic-ui/invenio_notifications/publish-new-version-request-event.accept.jinja:35
-#, python-brace-format, python-format
-msgid ""
-"\n"
-"New version '{version}' of record \"%(topic_title)s\" has been published. You can see the record at\n"
-"%(link)s\n"
-"    "
-msgstr ""
-
 #: /Users/m/Workspaces/oarepo-libs/feat-remove-einfra-integraton/oarepo-requests/oarepo_requests/templates/semantic-ui/invenio_notifications/publish-draft-request-event.decline.jinja:16
 #, python-brace-format
 msgid "Request for publishing of record '{topic_title}' was declined"
@@ -1210,4 +1185,222 @@ msgid "Intended use"
 msgstr ""
 
 msgid "Close"
+msgstr ""
+
+#: oarepo_requests/templates/semantic-ui/invenio_notifications/publish-changed-metadata-request-event.submit.jinja:18
+#, python-brace-format
+msgid "You are publishing changed metadata on record {topic_title}"
+msgstr ""
+
+#: oarepo_requests/templates/semantic-ui/invenio_notifications/publish-changed-metadata-request-event.submit.jinja:26
+#, python-format
+msgid ""
+"\n"
+"    <p>\n"
+"    You are publishing changed metadata on record %(topic_title)s.\n"
+"    Wait for invenio checks to finish, then accept the request or consider suggestions.\n"
+"    </p>\n"
+"    <p>\n"
+"        <a type=\"button\" href='%(link)s'>Accept or Decline the request</a>\n"
+"    </p>\n"
+"    "
+msgstr ""
+
+#: oarepo_requests/templates/semantic-ui/invenio_notifications/publish-changed-metadata-request-event.submit.jinja:55
+#, python-format
+msgid ""
+"\n"
+"    You are publishing changed metadata on record %(topic_title)s.\n"
+"    Wait for invenio checks to finish.\n"
+"    Then accept the request at %(link)s or consider suggestions.\n"
+"    "
+msgstr ""
+
+#: oarepo_requests/templates/semantic-ui/invenio_notifications/publish-draft-request-event.submit.jinja:18
+#, python-brace-format
+msgid "You are publishing record {topic_title}"
+msgstr ""
+
+#: oarepo_requests/templates/semantic-ui/invenio_notifications/publish-draft-request-event.submit.jinja:26
+#, python-format
+msgid ""
+"\n"
+"    <p>\n"
+"    You are publishing record %(topic_title)s.\n"
+"    Wait for invenio checks to finish, then accept the request or consider suggestions.\n"
+"    </p>\n"
+"    <p>\n"
+"        <a type=\"button\" href='%(link)s'>Accept or Decline the request</a>\n"
+"    </p>\n"
+"    "
+msgstr ""
+
+#: oarepo_requests/templates/semantic-ui/invenio_notifications/publish-draft-request-event.submit.jinja:55
+#, python-format
+msgid ""
+"\n"
+"    You are publishing record %(topic_title)s.\n"
+"    Wait for invenio checks to finish.\n"
+"    Then accept the request at %(link)s or consider suggestions.\n"
+"    "
+msgstr ""
+
+#: oarepo_requests/templates/semantic-ui/invenio_notifications/publish-new-version-request-event.submit.jinja:18
+#, python-brace-format
+msgid "You are publishing new version of record {topic_title}"
+msgstr ""
+
+#: oarepo_requests/templates/semantic-ui/invenio_notifications/publish-new-version-request-event.submit.jinja:26
+#, python-format
+msgid ""
+"\n"
+"    <p>\n"
+"    You are publishing new version of record %(topic_title)s.\n"
+"    Wait for invenio checks to finish, then accept the request or consider suggestions.\n"
+"    </p>\n"
+"    <p>\n"
+"        <a type=\"button\" href='%(link)s'>Accept or Decline the request</a>\n"
+"    </p>\n"
+"    "
+msgstr ""
+
+#: oarepo_requests/templates/semantic-ui/invenio_notifications/publish-new-version-request-event.submit.jinja:55
+#, python-format
+msgid ""
+"\n"
+"    You are publishing new version of record %(topic_title)s.\n"
+"    Wait for invenio checks to finish.\n"
+"    Then accept the request at %(link)s or consider suggestions.\n"
+"    "
+msgstr ""
+
+
+
+#: oarepo_requests/templates/semantic-ui/invenio_notifications/publish-changed-metadata-request-event.decline.jinja:16
+#, python-brace-format
+msgid "Request for metadata update for record '{topic_title}' was declined"
+msgstr ""
+
+#: oarepo_requests/templates/semantic-ui/invenio_notifications/publish-changed-metadata-request-event.decline.jinja:20
+#, python-format
+msgid ""
+"\n"
+"<p>\n"
+"Request for metadata update for record \"%(topic_title)s\" was declined. You can see the request at\n"
+"<a href=\"%(link)s\">%(link)s</a>\n"
+"</p>\n"
+"    "
+msgstr ""
+
+#: oarepo_requests/templates/semantic-ui/invenio_notifications/publish-changed-metadata-request-event.decline.jinja:34
+#, python-format
+msgid ""
+"\n"
+"Request for metadata update for record \"%(topic_title)s\" was declined. You can see the request at\n"
+"%(link)s\n"
+"    "
+msgstr ""
+
+#: oarepo_requests/templates/semantic-ui/invenio_notifications/publish-changed-metadata-request-event.submit.jinja:15
+#, python-brace-format
+msgid "Request to publish changed metadata on record {topic_title}"
+msgstr ""
+
+#: oarepo_requests/templates/semantic-ui/invenio_notifications/publish-changed-metadata-request-event.submit.jinja:19
+#, python-format
+msgid ""
+"\n"
+"    <p>\n"
+"    You have been asked to publish changed metadata on record \"%(topic_title)s\".\n"
+"    </p>\n"
+"    <p>\n"
+"        <a type=\"button\" href='%(link)s'>Accept or Decline the request</a>\n"
+"    </p>\n"
+"    "
+msgstr ""
+
+#: oarepo_requests/templates/semantic-ui/invenio_notifications/publish-changed-metadata-request-event.submit.jinja:36
+#, python-format
+msgid ""
+"\n"
+"    You have been asked to publish changed metadata on record \"%(topic_title)s\".\n"
+"    Accept or Decline the request at %(link)s\n"
+"    "
+msgstr ""
+
+#: oarepo_requests/templates/semantic-ui/invenio_notifications/publish-new-version-request-event.accept.jinja:16
+#, python-brace-format
+msgid "New version of record '{topic_title}' has been published"
+msgstr ""
+
+#: oarepo_requests/templates/semantic-ui/invenio_notifications/publish-new-version-request-event.accept.jinja:20
+#, python-format
+msgid ""
+"\n"
+"<p>\n"
+"New version of record \"%(topic_title)s\" has been published. You can see the record at\n"
+"<a href=\"%(link)s\">%(link)s</a>\n"
+"</p>\n"
+"    "
+msgstr ""
+
+#: oarepo_requests/templates/semantic-ui/invenio_notifications/publish-new-version-request-event.accept.jinja:34
+#, python-format
+msgid ""
+"\n"
+"New version of record \"%(topic_title)s\" has been published. You can see the record at\n"
+"%(link)s\n"
+"    "
+msgstr ""
+
+#: oarepo_requests/templates/semantic-ui/invenio_notifications/publish-new-version-request-event.decline.jinja:16
+#, python-brace-format
+msgid "Request for new version of record '{topic_title}' was declined"
+msgstr ""
+
+#: oarepo_requests/templates/semantic-ui/invenio_notifications/publish-new-version-request-event.decline.jinja:20
+#, python-format
+msgid ""
+"\n"
+"<p>\n"
+"Request for new version of record \"%(topic_title)s\" was declined. You can see the request at\n"
+"<a href=\"%(link)s\">%(link)s</a>\n"
+"</p>\n"
+"    "
+msgstr ""
+
+#: oarepo_requests/templates/semantic-ui/invenio_notifications/publish-new-version-request-event.decline.jinja:34
+#, python-format
+msgid ""
+"\n"
+"Request for new version of record \"%(topic_title)s\" was declined. You can see the request at\n"
+"%(link)s\n"
+"    "
+msgstr ""
+
+#: oarepo_requests/templates/semantic-ui/invenio_notifications/publish-new-version-request-event.submit.jinja:15
+#, python-brace-format
+msgid "Request to publish new version of record {topic_title}"
+msgstr ""
+
+#: oarepo_requests/templates/semantic-ui/invenio_notifications/publish-new-version-request-event.submit.jinja:19
+#, python-format
+msgid ""
+"\n"
+"    <p>\n"
+"    You have been asked to publish new version of record \"%(topic_title)s\".\n"
+"    </p>\n"
+"    <p>\n"
+"        <a type=\"button\" href='%(link)s'>Accept or Decline the request</a>\n"
+"    </p>\n"
+"    "
+msgstr ""
+
+#: oarepo_requests/templates/semantic-ui/invenio_notifications/publish-new-version-request-event.submit.jinja:36
+#, python-format
+msgid ""
+"\n"
+"    You have been asked to publish new version of record \"%(topic_title)s\".\n"
+"    Accept or Decline the request at %(link)s\n"
+"    "
 msgstr ""
