@@ -23,6 +23,7 @@ from invenio_requests.proxies import (
 from invenio_requests.records import Request
 from invenio_search_ui.searchconfig import search_app_config
 
+from oarepo_requests.notifications.jinja import get_request_user_name
 from oarepo_requests.records.dumpers import RecordReferenceDumperExt
 
 if TYPE_CHECKING:
@@ -139,6 +140,7 @@ class OARepoRequests:
         """
         self.init_config(app)
         state = _OARepoRequestsState(app)
+        app.add_template_global(get_request_user_name)
         self._state = app.extensions["oarepo-requests"] = state
 
     def __getattr__(self, name: str):
