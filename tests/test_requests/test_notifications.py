@@ -27,6 +27,7 @@ from oarepo_workflows.resolvers.multiple_entities import (
 from oarepo_requests.notifications.builders.publish import (
     PublishDraftRequestSubmitNotificationBuilder,
 )
+from oarepo_requests.notifications.jinja import get_request_user_name
 from oarepo_requests.notifications.manager import NotificationManager
 
 
@@ -433,6 +434,61 @@ def test_comment_notifications(
         receivers = outbox[0].recipients
         assert set(receivers) == {"user2@example.org"}
         assert content in outbox[0].body
+
+
+def test_comment_event_create_renders_creator_name(
+    app,
+    users,
+    draft_factory,
+    submit_request_on_draft,
+):
+    """Render the creator name in a notification for a live comment event."""
+    mail = app.extensions["mail"]
+    creator = users[2]
+    draft = draft_factory(creator.identity)
+    request = submit_request_on_draft(creator.identity, draft["id"], "publish_draft")
+
+    with mail.record_messages() as outbox:
+        current_events_service.create(
+            creator.identity,
+            request["id"],
+            {"payload": {"content": "A comment from a named user"}},
+            CommentEventType,
+        )
+
+        assert len(outbox) == 1
+        sent_mail = outbox[0]
+        assert "💬 New comment" in sent_mail.subject
+        assert "@Maxipes Fik commented on" in sent_mail.body
+        assert "'Maxipes Fik' commented on" in sent_mail.html
+
+
+def test_get_request_user_name(app, users):
+    """Use the best available name for registered users and guests."""
+
+    def resolved_user(user) -> dict[str, Any]:
+        return {
+            "id": user.id,
+            "profile": user.user.user_profile,
+            "username": user.username,
+            "email": user.email,
+        }
+
+    email_user, username_user, full_name_user = users[:3]
+    assert email_user.user.email and not email_user.user.username and not email_user.user.user_profile.get("full_name")  # noqa PT018
+    assert username_user.user.username and not username_user.user.user_profile.get("full_name")  # noqa PT018
+    assert full_name_user.user.user_profile.get("full_name")
+    cases = [
+        (resolved_user(full_name_user), "Maxipes Fik"),
+        (resolved_user(username_user), "beetlesmasher"),
+        (resolved_user(email_user), "user1@example.org"),
+        ("guest@example.org", "guest@example.org"),
+        ({"id": email_user.id}, f"User {email_user.id}"),
+    ]
+
+    with app.app_context():
+        for user, expected_name in cases:
+            assert get_request_user_name(user) == expected_name
 
 
 # machine-readable values that a builder would never wrap in a lazy string
