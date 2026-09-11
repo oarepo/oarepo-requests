@@ -14,7 +14,7 @@
 {% set community_title = community.metadata.title %}
 {% set record_title = record.metadata.title %}
 {% set cancel_name = get_request_user_name(executing_user) %}
-
+{% set record_link = record.links.self_html %}
 {# TODO: use request.links.self_html when issue issue is resolved: https://github.com/inveniosoftware/invenio-rdm-records/issues/1327 #}
 {% set request_link = "{ui}/me/requests/{id}".format(
     ui=config.SITE_UI_URL, id=request_id

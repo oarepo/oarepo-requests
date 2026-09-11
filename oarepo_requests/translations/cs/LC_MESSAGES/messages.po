@@ -1581,8 +1581,8 @@ msgstr "Zobrazit žádost"
 
 #: /Users/m/w/cesnet/oarepo-requests/oarepo_requests/templates/oarepo/invenio_notifications/comment-request-event.create.jinja:59
 #, python-brace-format
-msgid "@{user_name} commented on '{request_title}'"
-msgstr "@{user_name} komentoval(a) žádost '{request_title}'"
+msgid "{user_name} commented on '{request_title}'"
+msgstr "{user_name} komentoval(a) žádost '{request_title}'"
 
 #: /Users/m/w/cesnet/oarepo-requests/oarepo_requests/templates/oarepo/invenio_notifications/comment-request-event.create.jinja:63
 #, python-brace-format
@@ -1591,12 +1591,12 @@ msgstr "Zobrazit žádost: {request_link}"
 
 #: /Users/m/w/cesnet/oarepo-requests/oarepo_requests/templates/oarepo/invenio_notifications/comment-request-event.create.jinja:69
 #, python-brace-format
-msgid "*@{user_name}* commented on *{request_title}*"
-msgstr "*@{user_name}* komentoval(a) žádost *{request_title}*"
+msgid "*{user_name}* commented on *{request_title}*"
+msgstr "*{user_name}* komentoval(a) žádost *{request_title}*"
 
 #, python-brace-format
-msgid "*@{user_name}* commented on *{request_title}*"
-msgstr "*@{user_name}* komentoval(a) žádost *{request_title}*"
+msgid "*{user_name}* commented on *{request_title}*"
+msgstr "*{user_name}* komentoval(a) žádost *{request_title}*"
 
 msgid ""
 "Record has validation errors. Please click the 'Edit metadata' button and "
@@ -1695,13 +1695,13 @@ msgstr "💬 Nová odpověď k '{request_title}'"
 
 #: /Users/dusanstojanovic/Projects/oarepo-requests/oarepo_requests/templates/oarepo/invenio_notifications/comment-request-event.reply.jinja:33
 #, python-brace-format
-msgid "'@{user_name}' replied on <a href='{reply_link}'>comment</a>:"
-msgstr "'@{user_name}' odpověděl(a) na <a href='{reply_link}'>komentář</a>:"
+msgid "'{user_name}' replied on <a href='{reply_link}'>comment</a>:"
+msgstr "'{user_name}' odpověděl(a) na <a href='{reply_link}'>komentář</a>:"
 
 #: /Users/dusanstojanovic/Projects/oarepo-requests/oarepo_requests/templates/oarepo/invenio_notifications/comment-request-event.reply.jinja:51
 #, python-brace-format
-msgid "@{user_name} replied on comment"
-msgstr "@{user_name} odpověděl(a) na komentář"
+msgid "{user_name} replied on comment"
+msgstr "{user_name} odpověděl(a) na komentář"
 
 #: /Users/dusanstojanovic/Projects/oarepo-requests/oarepo_requests/templates/oarepo/invenio_notifications/comment-request-event.reply.jinja:55
 #, python-brace-format
@@ -1710,14 +1710,14 @@ msgstr "Zobrazit odpověď: {reply_link}"
 
 #: /Users/dusanstojanovic/Projects/oarepo-requests/oarepo_requests/templates/oarepo/invenio_notifications/comment-request-event.reply.jinja:62
 #, python-brace-format
-msgid "*@{user_name}* replied on [comment]({reply_link})"
-msgstr "*@{user_name}* odpověděl(a) na [komentář]({reply_link})"
+msgid "*{user_name}* replied on [comment]({reply_link})"
+msgstr "*{user_name}* odpověděl(a) na [komentář]({reply_link})"
 
 #: /Users/dusanstojanovic/Projects/oarepo-requests/oarepo_requests/templates/oarepo/invenio_notifications/comment-subcommunity-invitation-request.create.jinja:31
 #: /Users/dusanstojanovic/Projects/oarepo-requests/oarepo_requests/templates/oarepo/invenio_notifications/comment-subcommunity-request.create.jinja:30
 #, python-brace-format
-msgid "'@{user_name}' commented on '{request_title}':"
-msgstr "'@{user_name}' komentoval(a) žádost '{request_title}':"
+msgid "'{user_name}' commented on '{request_title}':"
+msgstr "'{user_name}' komentoval(a) žádost '{request_title}':"
 
 #: /Users/dusanstojanovic/Projects/oarepo-requests/oarepo_requests/templates/oarepo/invenio_notifications/comment-request-event.create.jinja:14
 #: /Users/dusanstojanovic/Projects/oarepo-requests/oarepo_requests/templates/oarepo/invenio_notifications/comment-request-event.reply.jinja:13

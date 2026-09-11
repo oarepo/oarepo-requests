@@ -195,7 +195,7 @@ msgstr ""
 #: /Users/m/Workspaces/oarepo-libs/feat-remove-einfra-integraton/oarepo-requests/oarepo_requests/templates/oarepo/invenio_notifications/comment-subcommunity-invitation-request.create.jinja:51
 #: /Users/m/Workspaces/oarepo-libs/feat-remove-einfra-integraton/oarepo-requests/oarepo_requests/templates/oarepo/invenio_notifications/comment-subcommunity-request.create.jinja:50
 #, python-brace-format
-msgid "@{user_name} commented on '{request_title}'"
+msgid "{user_name} commented on '{request_title}'"
 msgstr ""
 
 #: /Users/m/Workspaces/oarepo-libs/feat-remove-einfra-integraton/oarepo-requests/oarepo_requests/templates/oarepo/invenio_notifications/comment-request-event.create.jinja:66
@@ -210,7 +210,7 @@ msgstr ""
 #: /Users/m/Workspaces/oarepo-libs/feat-remove-einfra-integraton/oarepo-requests/oarepo_requests/templates/oarepo/invenio_notifications/comment-subcommunity-invitation-request.create.jinja:61
 #: /Users/m/Workspaces/oarepo-libs/feat-remove-einfra-integraton/oarepo-requests/oarepo_requests/templates/oarepo/invenio_notifications/comment-subcommunity-request.create.jinja:60
 #, python-brace-format
-msgid "*@{user_name}* commented on *{request_title}*"
+msgid "*{user_name}* commented on *{request_title}*"
 msgstr ""
 
 #: /Users/m/Workspaces/oarepo-libs/feat-remove-einfra-integraton/oarepo-requests/oarepo_requests/templates/oarepo/invenio_notifications/comment-request-event.reply.jinja:30
@@ -220,12 +220,12 @@ msgstr ""
 
 #: /Users/m/Workspaces/oarepo-libs/feat-remove-einfra-integraton/oarepo-requests/oarepo_requests/templates/oarepo/invenio_notifications/comment-request-event.reply.jinja:36
 #, python-brace-format
-msgid "'@{user_name}' replied on <a href='{reply_link}'>comment</a>:"
+msgid "'{user_name}' replied on <a href='{reply_link}'>comment</a>:"
 msgstr ""
 
 #: /Users/m/Workspaces/oarepo-libs/feat-remove-einfra-integraton/oarepo-requests/oarepo_requests/templates/oarepo/invenio_notifications/comment-request-event.reply.jinja:54
 #, python-brace-format
-msgid "@{user_name} replied on comment"
+msgid "{user_name} replied on comment"
 msgstr ""
 
 #: /Users/m/Workspaces/oarepo-libs/feat-remove-einfra-integraton/oarepo-requests/oarepo_requests/templates/oarepo/invenio_notifications/comment-request-event.reply.jinja:58
@@ -235,13 +235,13 @@ msgstr ""
 
 #: /Users/m/Workspaces/oarepo-libs/feat-remove-einfra-integraton/oarepo-requests/oarepo_requests/templates/oarepo/invenio_notifications/comment-request-event.reply.jinja:65
 #, python-brace-format
-msgid "*@{user_name}* replied on [comment]({reply_link})"
+msgid "*{user_name}* replied on [comment]({reply_link})"
 msgstr ""
 
 #: /Users/m/Workspaces/oarepo-libs/feat-remove-einfra-integraton/oarepo-requests/oarepo_requests/templates/oarepo/invenio_notifications/comment-subcommunity-invitation-request.create.jinja:33
 #: /Users/m/Workspaces/oarepo-libs/feat-remove-einfra-integraton/oarepo-requests/oarepo_requests/templates/oarepo/invenio_notifications/comment-subcommunity-request.create.jinja:32
 #, python-brace-format
-msgid "'@{user_name}' commented on '{request_title}':"
+msgid "'{user_name}' commented on '{request_title}':"
 msgstr ""
 
 #: /Users/m/Workspaces/oarepo-libs/feat-remove-einfra-integraton/oarepo-requests/oarepo_requests/templates/semantic-ui/invenio_notifications/delete-published-record-request-event.accept.jinja:14
