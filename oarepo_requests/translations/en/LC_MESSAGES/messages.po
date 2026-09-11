@@ -304,7 +304,6 @@ msgid ""
 "    "
 msgstr ""
 
-
 #: /Users/miroslavbauer/Code/github.com/oarepo/oarepo-requests/oarepo_requests/ui/templates/semantic-ui/oarepo_requests_ui/RequestDetail.jinja:3
 msgid "Request"
 msgstr ""
@@ -1746,7 +1745,6 @@ msgstr ""
 msgid "Submitters"
 msgstr ""
 
-
 #: oarepo_requests/templates/semantic-ui/invenio_notifications/publish-changed-metadata-request-event.decline.jinja:16
 #, python-brace-format
 msgid "Request for metadata update for record '{topic_title}' was declined"
@@ -1876,6 +1874,56 @@ msgid ""
 "    "
 msgstr ""
 
+#: /home/ron/prace/oarepo-requests/oarepo_requests/templates/oarepo/invenio_notifications/user-access-request.cancel.jinja:26
+msgid "❌ Access request canceled"
+msgstr ""
+
+#: /home/ron/prace/oarepo-requests/oarepo_requests/templates/oarepo/invenio_notifications/user-access-request.cancel.jinja:32
+#: /home/ron/prace/oarepo-requests/oarepo_requests/templates/oarepo/invenio_notifications/user-access-request.cancel.jinja:56
+#: /home/ron/prace/oarepo-requests/oarepo_requests/templates/oarepo/invenio_notifications/user-access-request.cancel.jinja:70
+#, python-brace-format
+msgid "Your access request has been canceled by {cancel_name}"
+msgstr ""
+
+#: /home/ron/prace/oarepo-requests/oarepo_requests/templates/oarepo/invenio_notifications/user-access-request.cancel.jinja:34
+#: /home/ron/prace/oarepo-requests/oarepo_requests/templates/oarepo/invenio_notifications/user-access-request.decline.jinja:31
+msgid " with the following message:"
+msgstr ""
+
+#: /home/ron/prace/oarepo-requests/oarepo_requests/templates/oarepo/invenio_notifications/user-access-request.cancel.jinja:44
+#: /home/ron/prace/oarepo-requests/oarepo_requests/templates/oarepo/invenio_notifications/user-access-request.cancel.jinja:63
+#: /home/ron/prace/oarepo-requests/oarepo_requests/templates/oarepo/invenio_notifications/user-access-request.cancel.jinja:77
+#: /home/ron/prace/oarepo-requests/oarepo_requests/templates/oarepo/invenio_notifications/user-access-request.decline.jinja:41
+#: /home/ron/prace/oarepo-requests/oarepo_requests/templates/oarepo/invenio_notifications/user-access-request.decline.jinja:60
+#: /home/ron/prace/oarepo-requests/oarepo_requests/templates/oarepo/invenio_notifications/user-access-request.decline.jinja:74
+msgid "View the record"
+msgstr ""
+
+#: /home/ron/prace/oarepo-requests/oarepo_requests/templates/oarepo/invenio_notifications/user-access-request.cancel.jinja:59
+#: /home/ron/prace/oarepo-requests/oarepo_requests/templates/oarepo/invenio_notifications/user-access-request.cancel.jinja:73
+#: /home/ron/prace/oarepo-requests/oarepo_requests/templates/oarepo/invenio_notifications/user-access-request.decline.jinja:56
+#: /home/ron/prace/oarepo-requests/oarepo_requests/templates/oarepo/invenio_notifications/user-access-request.decline.jinja:70
+msgid "with the following message:"
+msgstr ""
+
+#: /home/ron/prace/oarepo-requests/oarepo_requests/templates/oarepo/invenio_notifications/user-access-request.decline.jinja:23
+msgid "⛔️ Access request declined"
+msgstr ""
+
+#: /home/ron/prace/oarepo-requests/oarepo_requests/templates/oarepo/invenio_notifications/user-access-request.decline.jinja:29
+#, python-brace-format
+msgid "The owner of '{record_title}' has declined your access request"
+msgstr ""
+
+#: /home/ron/prace/oarepo-requests/oarepo_requests/templates/oarepo/invenio_notifications/user-access-request.decline.jinja:53
+#, python-brace-format
+msgid "The owner of '{record_title}' has rejected your access request"
+msgstr ""
+
+#: /home/ron/prace/oarepo-requests/oarepo_requests/templates/oarepo/invenio_notifications/user-access-request.decline.jinja:67
+#, python-brace-format
+msgid "The owner of *{record_title}* has rejected your access request"
+msgstr ""
 
 #~ msgid "No status"
 #~ msgstr ""
