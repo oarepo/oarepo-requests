@@ -13,6 +13,7 @@ import pytest
 from invenio_i18n import lazy_gettext as _
 from invenio_notifications.backends import EmailNotificationBackend
 from invenio_notifications.models import Recipient
+from invenio_notifications.registry import EntityResolverRegistry
 from invenio_notifications.services.generators import EntityResolve
 from invenio_records.dictutils import dict_lookup, dict_set
 from invenio_requests.customizations.event_types import CommentEventType
@@ -467,22 +468,37 @@ def test_get_request_user_name(app, users):
     """Use the best available name for registered users and guests."""
 
     def resolved_user(user) -> dict[str, Any]:
-        return {
-            "id": user.id,
-            "profile": user.user.user_profile,
-            "username": user.username,
-            "email": user.email,
-        }
+        with app.app_context():
+            return EntityResolverRegistry.resolve_entity({"user": user.id})
 
-    email_user, username_user, full_name_user = users[:3]
+    email_user, email_username_user, full_name_user = users[:3]
     assert email_user.user.email and not email_user.user.username and not email_user.user.user_profile.get("full_name")  # noqa PT018
-    assert username_user.user.username and not username_user.user.user_profile.get("full_name")  # noqa PT018
+    assert email_username_user.user.username and not email_username_user.user.user_profile.get("full_name")  # noqa PT018
     assert full_name_user.user.user_profile.get("full_name")
     cases = [
-        (resolved_user(full_name_user), "Maxipes Fik"),
-        (resolved_user(username_user), "beetlesmasher"),
-        (resolved_user(email_user), "user1@example.org"),
-        ("guest@example.org", "guest@example.org"),
+        (resolved_user(full_name_user.user), "Maxipes Fik"),
+        (
+            resolved_user(email_username_user.user),
+            "beetlesmasher",
+        ),  # username but email_visibility not set in preferences
+        (resolved_user(email_user.user), f"User {email_user.id}"),  # no and email_visibility not set in preferences
+        (
+            {"preferences": {"email_visibility": "public"}, "username": "beetlesmasher", "email": "lala@trala.org"},
+            "lala@trala.org",
+        ),
+        (
+            {"preferences": {"email_visibility": "restricted"}, "username": "beetlesmasher", "email": "lala@trala.org"},
+            "beetlesmasher",
+        ),
+        (
+            {
+                "profile": {"full_name": "Maxipes Fik"},
+                "preferences": {"email_visibility": "public"},
+                "username": "beetlesmasher",
+                "email": "lala@trala.org",
+            },
+            "Maxipes Fik",  # full_name takes precedence over email
+        ),
         ({"id": email_user.id}, f"User {email_user.id}"),
     ]
 

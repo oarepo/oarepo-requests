@@ -16,10 +16,14 @@ from invenio_i18n import gettext as _
 
 def get_request_user_name(user: dict[str, Any] | str) -> str:
     """Return the best available display name for user in request."""
+    # TODO: for consideration: this was in the original string but imo it should not happen in the intended use case
     if isinstance(user, str):
         return user
 
     if full_name := user.get("profile", {}).get("full_name"):
         return cast("str", full_name)
 
-    return cast("str", user.get("username") or user.get("email") or _("User {user_id}").format(user_id=user.get("id")))
+    if user.get("preferences", {}).get("email_visibility") == "public" and user.get("email"):
+        return cast("str", user.get("email"))
+
+    return cast("str", user.get("username") or _("User {user_id}").format(user_id=user.get("id")))
