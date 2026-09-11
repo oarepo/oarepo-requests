@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2026-08-18 12:13+0200\n"
+"POT-Creation-Date: 2026-09-11 10:24+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -17,366 +17,411 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 2.18.0\n"
 
-#: /Users/m/Workspaces/oarepo-libs/feat-remove-einfra-integraton/oarepo-requests/oarepo_requests/errors.py:87
+#: /home/ron/prace/oarepo-requests/oarepo_requests/errors.py:87
 #, python-format
 msgid "There is already an open request of %(request_type)s on %(record_id)s."
 msgstr ""
 
-#: /Users/m/Workspaces/oarepo-libs/feat-remove-einfra-integraton/oarepo-requests/oarepo_requests/errors.py:101
+#: /home/ron/prace/oarepo-requests/oarepo_requests/errors.py:101
 msgid "All open requests must be closed first."
 msgstr ""
 
-#: /Users/m/Workspaces/oarepo-libs/feat-remove-einfra-integraton/oarepo-requests/oarepo_requests/errors.py:105
+#: /home/ron/prace/oarepo-requests/oarepo_requests/errors.py:105
 #, python-format
 msgid "Cannot %(action)s: %(reason)s"
 msgstr ""
 
-#: /Users/m/Workspaces/oarepo-libs/feat-remove-einfra-integraton/oarepo-requests/oarepo_requests/errors.py:121
+#: /home/ron/prace/oarepo-requests/oarepo_requests/errors.py:121
 #, python-format
 msgid "Unknown request type %(request_type)s."
 msgstr ""
 
-#: /Users/m/Workspaces/oarepo-libs/feat-remove-einfra-integraton/oarepo-requests/oarepo_requests/errors.py:139
+#: /home/ron/prace/oarepo-requests/oarepo_requests/errors.py:139
 #, python-format
 msgid ""
 "Receiver for request type %(request_type)s is required but wasn't "
 "successfully referenced on record %(record_id)s."
 msgstr ""
 
-#: /Users/m/Workspaces/oarepo-libs/feat-remove-einfra-integraton/oarepo-requests/oarepo_requests/errors.py:146
+#: /home/ron/prace/oarepo-requests/oarepo_requests/errors.py:146
 msgid ""
 "\n"
 " Additional keyword arguments:"
 msgstr ""
 
-#: /Users/m/Workspaces/oarepo-libs/feat-remove-einfra-integraton/oarepo-requests/oarepo_requests/errors.py:156
+#: /home/ron/prace/oarepo-requests/oarepo_requests/errors.py:156
 msgid "There is already a record version with this version tag."
 msgstr ""
 
-#: /Users/m/Workspaces/oarepo-libs/feat-remove-einfra-integraton/oarepo-requests/oarepo_requests/errors.py:162
+#: /home/ron/prace/oarepo-requests/oarepo_requests/errors.py:162
 msgid ""
 "There is already a record version with this version tag. Please use a "
 "different version tag."
 msgstr ""
 
-#: /Users/m/Workspaces/oarepo-libs/feat-remove-einfra-integraton/oarepo-requests/oarepo_requests/actions/delete_published_record.py:60
+#: /home/ron/prace/oarepo-requests/oarepo_requests/actions/delete_published_record.py:60
 msgid "Permanently delete"
 msgstr ""
 
-#: /Users/m/Workspaces/oarepo-libs/feat-remove-einfra-integraton/oarepo-requests/oarepo_requests/actions/delete_published_record.py:105
+#: /home/ron/prace/oarepo-requests/oarepo_requests/actions/delete_published_record.py:104
 msgid "Keep the record"
 msgstr ""
 
-#: /Users/m/Workspaces/oarepo-libs/feat-remove-einfra-integraton/oarepo-requests/oarepo_requests/actions/generic.py:111
-#: /Users/m/Workspaces/oarepo-libs/feat-remove-einfra-integraton/oarepo-requests/oarepo_requests/translations/_only_for_translations.py:31
+#: /home/ron/prace/oarepo-requests/oarepo_requests/actions/generic.py:111
+#: /home/ron/prace/oarepo-requests/oarepo_requests/translations/_only_for_translations.py:31
 msgid "Submit"
 msgstr ""
 
-#: /Users/m/Workspaces/oarepo-libs/feat-remove-einfra-integraton/oarepo-requests/oarepo_requests/actions/generic.py:118
-#: /Users/m/Workspaces/oarepo-libs/feat-remove-einfra-integraton/oarepo-requests/oarepo_requests/translations/_only_for_translations.py:27
+#: /home/ron/prace/oarepo-requests/oarepo_requests/actions/generic.py:118
+#: /home/ron/prace/oarepo-requests/oarepo_requests/translations/_only_for_translations.py:27
 msgid "Decline"
 msgstr ""
 
-#: /Users/m/Workspaces/oarepo-libs/feat-remove-einfra-integraton/oarepo-requests/oarepo_requests/actions/generic.py:125
-#: /Users/m/Workspaces/oarepo-libs/feat-remove-einfra-integraton/oarepo-requests/oarepo_requests/translations/_only_for_translations.py:25
+#: /home/ron/prace/oarepo-requests/oarepo_requests/actions/generic.py:125
+#: /home/ron/prace/oarepo-requests/oarepo_requests/translations/_only_for_translations.py:25
 msgid "Accept"
 msgstr ""
 
-#: /Users/m/Workspaces/oarepo-libs/feat-remove-einfra-integraton/oarepo-requests/oarepo_requests/actions/generic.py:132
-#: /Users/m/Workspaces/oarepo-libs/feat-remove-einfra-integraton/oarepo-requests/oarepo_requests/actions/publish_draft.py:161
-#: /Users/m/Workspaces/oarepo-libs/feat-remove-einfra-integraton/oarepo-requests/oarepo_requests/translations/_only_for_translations.py:18
+#: /home/ron/prace/oarepo-requests/oarepo_requests/actions/generic.py:132
+#: /home/ron/prace/oarepo-requests/oarepo_requests/actions/publish_draft.py:166
+#: /home/ron/prace/oarepo-requests/oarepo_requests/translations/_only_for_translations.py:18
 msgid "Cancel"
 msgstr ""
 
-#: /Users/m/Workspaces/oarepo-libs/feat-remove-einfra-integraton/oarepo-requests/oarepo_requests/actions/group_membership.py:39
+#: /home/ron/prace/oarepo-requests/oarepo_requests/actions/group_membership.py:39
 msgid "Accept group membership"
 msgstr ""
 
-#: /Users/m/Workspaces/oarepo-libs/feat-remove-einfra-integraton/oarepo-requests/oarepo_requests/actions/group_membership.py:54
+#: /home/ron/prace/oarepo-requests/oarepo_requests/actions/group_membership.py:54
 msgid "Decline group membership"
 msgstr ""
 
-#: /Users/m/Workspaces/oarepo-libs/feat-remove-einfra-integraton/oarepo-requests/oarepo_requests/actions/group_membership.py:65
+#: /home/ron/prace/oarepo-requests/oarepo_requests/actions/group_membership.py:65
 msgid "Submit group membership"
 msgstr ""
 
-#: /Users/m/Workspaces/oarepo-libs/feat-remove-einfra-integraton/oarepo-requests/oarepo_requests/actions/publish_draft.py:105
-#: /Users/m/Workspaces/oarepo-libs/feat-remove-einfra-integraton/oarepo-requests/oarepo_requests/actions/publish_new_version.py:30
+#: /home/ron/prace/oarepo-requests/oarepo_requests/actions/publish_draft.py:106
+#: /home/ron/prace/oarepo-requests/oarepo_requests/actions/publish_new_version.py:38
 msgid "Publish"
 msgstr ""
 
-#: /Users/m/Workspaces/oarepo-libs/feat-remove-einfra-integraton/oarepo-requests/oarepo_requests/actions/publish_draft.py:144
+#: /home/ron/prace/oarepo-requests/oarepo_requests/actions/publish_draft.py:147
 msgid "Return for correction"
 msgstr ""
 
-#: /Users/m/Workspaces/oarepo-libs/feat-remove-einfra-integraton/oarepo-requests/oarepo_requests/templates/oarepo/invenio_notifications/comment-request-event.create.jinja:13
-#: /Users/m/Workspaces/oarepo-libs/feat-remove-einfra-integraton/oarepo-requests/oarepo_requests/templates/oarepo/invenio_notifications/comment-request-event.reply.jinja:12
-#: /Users/m/Workspaces/oarepo-libs/feat-remove-einfra-integraton/oarepo-requests/oarepo_requests/templates/oarepo/invenio_notifications/comment-subcommunity-invitation-request.create.jinja:12
-#: /Users/m/Workspaces/oarepo-libs/feat-remove-einfra-integraton/oarepo-requests/oarepo_requests/templates/oarepo/invenio_notifications/comment-subcommunity-request.create.jinja:12
+#: /home/ron/prace/oarepo-requests/oarepo_requests/notifications/jinja.py:29
 #, python-brace-format
 msgid "User {user_id}"
 msgstr ""
 
-#: /Users/m/Workspaces/oarepo-libs/feat-remove-einfra-integraton/oarepo-requests/oarepo_requests/templates/oarepo/invenio_notifications/comment-request-event.create.jinja:27
-#, python-brace-format
-msgid "💬 New comment on '{request_title}' for '{topic_title}'"
-msgstr ""
-
-#: /Users/m/Workspaces/oarepo-libs/feat-remove-einfra-integraton/oarepo-requests/oarepo_requests/templates/oarepo/invenio_notifications/comment-request-event.create.jinja:29
-#: /Users/m/Workspaces/oarepo-libs/feat-remove-einfra-integraton/oarepo-requests/oarepo_requests/templates/oarepo/invenio_notifications/comment-subcommunity-invitation-request.create.jinja:27
-#: /Users/m/Workspaces/oarepo-libs/feat-remove-einfra-integraton/oarepo-requests/oarepo_requests/templates/oarepo/invenio_notifications/comment-subcommunity-request.create.jinja:26
+#: /home/ron/prace/oarepo-requests/oarepo_requests/templates/oarepo/invenio_notifications/comment-request-event.create.jinja:25
 #, python-brace-format
 msgid "💬 New comment on '{request_title}'"
 msgstr ""
 
-#: /Users/m/Workspaces/oarepo-libs/feat-remove-einfra-integraton/oarepo-requests/oarepo_requests/templates/oarepo/invenio_notifications/comment-request-event.create.jinja:31
+#: /home/ron/prace/oarepo-requests/oarepo_requests/templates/oarepo/invenio_notifications/comment-request-event.create.jinja:27
 msgid "💬 New comment"
 msgstr ""
 
-#: /Users/m/Workspaces/oarepo-libs/feat-remove-einfra-integraton/oarepo-requests/oarepo_requests/templates/oarepo/invenio_notifications/comment-request-event.create.jinja:39
-#, python-brace-format
-msgid "'{user_name}' commented on '{request_title}' for '{topic_title}':"
-msgstr ""
-
-#: /Users/m/Workspaces/oarepo-libs/feat-remove-einfra-integraton/oarepo-requests/oarepo_requests/templates/oarepo/invenio_notifications/comment-request-event.create.jinja:41
+#: /home/ron/prace/oarepo-requests/oarepo_requests/templates/oarepo/invenio_notifications/comment-request-event.create.jinja:35
 #, python-brace-format
 msgid "'{user_name}' commented on '{request_title}':"
 msgstr ""
 
-#: /Users/m/Workspaces/oarepo-libs/feat-remove-einfra-integraton/oarepo-requests/oarepo_requests/templates/oarepo/invenio_notifications/comment-request-event.create.jinja:43
+#: /home/ron/prace/oarepo-requests/oarepo_requests/templates/oarepo/invenio_notifications/comment-request-event.create.jinja:37
 #, python-brace-format
 msgid "'{user_name}' commented:"
 msgstr ""
 
-#: /Users/m/Workspaces/oarepo-libs/feat-remove-einfra-integraton/oarepo-requests/oarepo_requests/templates/oarepo/invenio_notifications/comment-request-event.create.jinja:50
-#: /Users/m/Workspaces/oarepo-libs/feat-remove-einfra-integraton/oarepo-requests/oarepo_requests/templates/oarepo/invenio_notifications/comment-request-event.create.jinja:76
-#: /Users/m/Workspaces/oarepo-libs/feat-remove-einfra-integraton/oarepo-requests/oarepo_requests/templates/oarepo/invenio_notifications/comment-request-event.reply.jinja:42
-#: /Users/m/Workspaces/oarepo-libs/feat-remove-einfra-integraton/oarepo-requests/oarepo_requests/templates/oarepo/invenio_notifications/comment-request-event.reply.jinja:69
-#: /Users/m/Workspaces/oarepo-libs/feat-remove-einfra-integraton/oarepo-requests/oarepo_requests/templates/oarepo/invenio_notifications/comment-subcommunity-invitation-request.create.jinja:39
-#: /Users/m/Workspaces/oarepo-libs/feat-remove-einfra-integraton/oarepo-requests/oarepo_requests/templates/oarepo/invenio_notifications/comment-subcommunity-invitation-request.create.jinja:65
-#: /Users/m/Workspaces/oarepo-libs/feat-remove-einfra-integraton/oarepo-requests/oarepo_requests/templates/oarepo/invenio_notifications/comment-subcommunity-request.create.jinja:38
-#: /Users/m/Workspaces/oarepo-libs/feat-remove-einfra-integraton/oarepo-requests/oarepo_requests/templates/oarepo/invenio_notifications/comment-subcommunity-request.create.jinja:64
+#: /home/ron/prace/oarepo-requests/oarepo_requests/templates/oarepo/invenio_notifications/comment-request-event.create.jinja:44
+#: /home/ron/prace/oarepo-requests/oarepo_requests/templates/oarepo/invenio_notifications/comment-request-event.create.jinja:70
+#: /home/ron/prace/oarepo-requests/oarepo_requests/templates/oarepo/invenio_notifications/comment-request-event.reply.jinja:42
+#: /home/ron/prace/oarepo-requests/oarepo_requests/templates/oarepo/invenio_notifications/comment-request-event.reply.jinja:69
 msgid "Check out the request"
 msgstr ""
 
-#: /Users/m/Workspaces/oarepo-libs/feat-remove-einfra-integraton/oarepo-requests/oarepo_requests/templates/oarepo/invenio_notifications/comment-request-event.create.jinja:56
-#: /Users/m/Workspaces/oarepo-libs/feat-remove-einfra-integraton/oarepo-requests/oarepo_requests/templates/oarepo/invenio_notifications/comment-request-event.reply.jinja:48
-#: /Users/m/Workspaces/oarepo-libs/feat-remove-einfra-integraton/oarepo-requests/oarepo_requests/templates/oarepo/invenio_notifications/comment-subcommunity-invitation-request.create.jinja:45
-#: /Users/m/Workspaces/oarepo-libs/feat-remove-einfra-integraton/oarepo-requests/oarepo_requests/templates/oarepo/invenio_notifications/comment-subcommunity-request.create.jinja:44
-#: /Users/m/Workspaces/oarepo-libs/feat-remove-einfra-integraton/oarepo-requests/oarepo_requests/templates/semantic-ui/invenio_notifications/delete-published-record-request-event.accept.jinja:22
-#: /Users/m/Workspaces/oarepo-libs/feat-remove-einfra-integraton/oarepo-requests/oarepo_requests/templates/semantic-ui/invenio_notifications/delete-published-record-request-event.decline.jinja:28
-#: /Users/m/Workspaces/oarepo-libs/feat-remove-einfra-integraton/oarepo-requests/oarepo_requests/templates/semantic-ui/invenio_notifications/delete-published-record-request-event.submit.jinja:30
-#: /Users/m/Workspaces/oarepo-libs/feat-remove-einfra-integraton/oarepo-requests/oarepo_requests/templates/semantic-ui/invenio_notifications/group-membership-request-event.accept.jinja:26
-#: /Users/m/Workspaces/oarepo-libs/feat-remove-einfra-integraton/oarepo-requests/oarepo_requests/templates/semantic-ui/invenio_notifications/group-membership-request-event.decline.jinja:26
-#: /Users/m/Workspaces/oarepo-libs/feat-remove-einfra-integraton/oarepo-requests/oarepo_requests/templates/semantic-ui/invenio_notifications/group-membership-request-event.submit.jinja:34
-#: /Users/m/Workspaces/oarepo-libs/feat-remove-einfra-integraton/oarepo-requests/oarepo_requests/templates/semantic-ui/invenio_notifications/publish-draft-request-event.accept.jinja:28
-#: /Users/m/Workspaces/oarepo-libs/feat-remove-einfra-integraton/oarepo-requests/oarepo_requests/templates/semantic-ui/invenio_notifications/publish-draft-request-event.decline.jinja:28
-#: /Users/m/Workspaces/oarepo-libs/feat-remove-einfra-integraton/oarepo-requests/oarepo_requests/templates/semantic-ui/invenio_notifications/publish-draft-request-event.submit.jinja:30
+#: /home/ron/prace/oarepo-requests/oarepo_requests/templates/oarepo/invenio_notifications/comment-request-event.create.jinja:50
+#: /home/ron/prace/oarepo-requests/oarepo_requests/templates/oarepo/invenio_notifications/comment-request-event.reply.jinja:48
+#: /home/ron/prace/oarepo-requests/oarepo_requests/templates/oarepo/invenio_notifications/user-access-request.cancel.jinja:50
+#: /home/ron/prace/oarepo-requests/oarepo_requests/templates/oarepo/invenio_notifications/user-access-request.decline.jinja:47
+#: /home/ron/prace/oarepo-requests/oarepo_requests/templates/semantic-ui/invenio_notifications/delete-published-record-request-event.accept.jinja:22
+#: /home/ron/prace/oarepo-requests/oarepo_requests/templates/semantic-ui/invenio_notifications/delete-published-record-request-event.decline.jinja:28
+#: /home/ron/prace/oarepo-requests/oarepo_requests/templates/semantic-ui/invenio_notifications/delete-published-record-request-event.submit.jinja:30
+#: /home/ron/prace/oarepo-requests/oarepo_requests/templates/semantic-ui/invenio_notifications/group-membership-request-event.accept.jinja:26
+#: /home/ron/prace/oarepo-requests/oarepo_requests/templates/semantic-ui/invenio_notifications/group-membership-request-event.decline.jinja:26
+#: /home/ron/prace/oarepo-requests/oarepo_requests/templates/semantic-ui/invenio_notifications/group-membership-request-event.submit.jinja:34
+#: /home/ron/prace/oarepo-requests/oarepo_requests/templates/semantic-ui/invenio_notifications/publish-changed-metadata-request-event.accept.jinja:28
+#: /home/ron/prace/oarepo-requests/oarepo_requests/templates/semantic-ui/invenio_notifications/publish-changed-metadata-request-event.decline.jinja:28
+#: /home/ron/prace/oarepo-requests/oarepo_requests/templates/semantic-ui/invenio_notifications/publish-changed-metadata-request-event.submit.jinja:48
+#: /home/ron/prace/oarepo-requests/oarepo_requests/templates/semantic-ui/invenio_notifications/publish-draft-request-event.accept.jinja:28
+#: /home/ron/prace/oarepo-requests/oarepo_requests/templates/semantic-ui/invenio_notifications/publish-draft-request-event.decline.jinja:28
+#: /home/ron/prace/oarepo-requests/oarepo_requests/templates/semantic-ui/invenio_notifications/publish-draft-request-event.submit.jinja:48
+#: /home/ron/prace/oarepo-requests/oarepo_requests/templates/semantic-ui/invenio_notifications/publish-new-version-request-event.accept.jinja:28
+#: /home/ron/prace/oarepo-requests/oarepo_requests/templates/semantic-ui/invenio_notifications/publish-new-version-request-event.decline.jinja:28
+#: /home/ron/prace/oarepo-requests/oarepo_requests/templates/semantic-ui/invenio_notifications/publish-new-version-request-event.submit.jinja:48
 msgid "This is an auto-generated message. To manage notifications, visit your"
 msgstr ""
 
-#: /Users/m/Workspaces/oarepo-libs/feat-remove-einfra-integraton/oarepo-requests/oarepo_requests/templates/oarepo/invenio_notifications/comment-request-event.create.jinja:56
-#: /Users/m/Workspaces/oarepo-libs/feat-remove-einfra-integraton/oarepo-requests/oarepo_requests/templates/oarepo/invenio_notifications/comment-request-event.reply.jinja:48
-#: /Users/m/Workspaces/oarepo-libs/feat-remove-einfra-integraton/oarepo-requests/oarepo_requests/templates/oarepo/invenio_notifications/comment-subcommunity-invitation-request.create.jinja:45
-#: /Users/m/Workspaces/oarepo-libs/feat-remove-einfra-integraton/oarepo-requests/oarepo_requests/templates/oarepo/invenio_notifications/comment-subcommunity-request.create.jinja:44
-#: /Users/m/Workspaces/oarepo-libs/feat-remove-einfra-integraton/oarepo-requests/oarepo_requests/templates/semantic-ui/invenio_notifications/delete-published-record-request-event.accept.jinja:22
-#: /Users/m/Workspaces/oarepo-libs/feat-remove-einfra-integraton/oarepo-requests/oarepo_requests/templates/semantic-ui/invenio_notifications/delete-published-record-request-event.decline.jinja:28
-#: /Users/m/Workspaces/oarepo-libs/feat-remove-einfra-integraton/oarepo-requests/oarepo_requests/templates/semantic-ui/invenio_notifications/delete-published-record-request-event.submit.jinja:30
-#: /Users/m/Workspaces/oarepo-libs/feat-remove-einfra-integraton/oarepo-requests/oarepo_requests/templates/semantic-ui/invenio_notifications/group-membership-request-event.accept.jinja:26
-#: /Users/m/Workspaces/oarepo-libs/feat-remove-einfra-integraton/oarepo-requests/oarepo_requests/templates/semantic-ui/invenio_notifications/group-membership-request-event.decline.jinja:26
-#: /Users/m/Workspaces/oarepo-libs/feat-remove-einfra-integraton/oarepo-requests/oarepo_requests/templates/semantic-ui/invenio_notifications/group-membership-request-event.submit.jinja:34
-#: /Users/m/Workspaces/oarepo-libs/feat-remove-einfra-integraton/oarepo-requests/oarepo_requests/templates/semantic-ui/invenio_notifications/publish-draft-request-event.accept.jinja:28
-#: /Users/m/Workspaces/oarepo-libs/feat-remove-einfra-integraton/oarepo-requests/oarepo_requests/templates/semantic-ui/invenio_notifications/publish-draft-request-event.decline.jinja:28
-#: /Users/m/Workspaces/oarepo-libs/feat-remove-einfra-integraton/oarepo-requests/oarepo_requests/templates/semantic-ui/invenio_notifications/publish-draft-request-event.submit.jinja:30
+#: /home/ron/prace/oarepo-requests/oarepo_requests/templates/oarepo/invenio_notifications/comment-request-event.create.jinja:50
+#: /home/ron/prace/oarepo-requests/oarepo_requests/templates/oarepo/invenio_notifications/comment-request-event.reply.jinja:48
+#: /home/ron/prace/oarepo-requests/oarepo_requests/templates/oarepo/invenio_notifications/user-access-request.cancel.jinja:50
+#: /home/ron/prace/oarepo-requests/oarepo_requests/templates/oarepo/invenio_notifications/user-access-request.decline.jinja:47
+#: /home/ron/prace/oarepo-requests/oarepo_requests/templates/semantic-ui/invenio_notifications/delete-published-record-request-event.accept.jinja:22
+#: /home/ron/prace/oarepo-requests/oarepo_requests/templates/semantic-ui/invenio_notifications/delete-published-record-request-event.decline.jinja:28
+#: /home/ron/prace/oarepo-requests/oarepo_requests/templates/semantic-ui/invenio_notifications/delete-published-record-request-event.submit.jinja:30
+#: /home/ron/prace/oarepo-requests/oarepo_requests/templates/semantic-ui/invenio_notifications/group-membership-request-event.accept.jinja:26
+#: /home/ron/prace/oarepo-requests/oarepo_requests/templates/semantic-ui/invenio_notifications/group-membership-request-event.decline.jinja:26
+#: /home/ron/prace/oarepo-requests/oarepo_requests/templates/semantic-ui/invenio_notifications/group-membership-request-event.submit.jinja:34
+#: /home/ron/prace/oarepo-requests/oarepo_requests/templates/semantic-ui/invenio_notifications/publish-changed-metadata-request-event.accept.jinja:28
+#: /home/ron/prace/oarepo-requests/oarepo_requests/templates/semantic-ui/invenio_notifications/publish-changed-metadata-request-event.decline.jinja:28
+#: /home/ron/prace/oarepo-requests/oarepo_requests/templates/semantic-ui/invenio_notifications/publish-changed-metadata-request-event.submit.jinja:48
+#: /home/ron/prace/oarepo-requests/oarepo_requests/templates/semantic-ui/invenio_notifications/publish-draft-request-event.accept.jinja:28
+#: /home/ron/prace/oarepo-requests/oarepo_requests/templates/semantic-ui/invenio_notifications/publish-draft-request-event.decline.jinja:28
+#: /home/ron/prace/oarepo-requests/oarepo_requests/templates/semantic-ui/invenio_notifications/publish-draft-request-event.submit.jinja:48
+#: /home/ron/prace/oarepo-requests/oarepo_requests/templates/semantic-ui/invenio_notifications/publish-new-version-request-event.accept.jinja:28
+#: /home/ron/prace/oarepo-requests/oarepo_requests/templates/semantic-ui/invenio_notifications/publish-new-version-request-event.decline.jinja:28
+#: /home/ron/prace/oarepo-requests/oarepo_requests/templates/semantic-ui/invenio_notifications/publish-new-version-request-event.submit.jinja:48
 msgid "account settings"
 msgstr ""
 
-#: /Users/m/Workspaces/oarepo-libs/feat-remove-einfra-integraton/oarepo-requests/oarepo_requests/templates/oarepo/invenio_notifications/comment-request-event.create.jinja:62
-#: /Users/m/Workspaces/oarepo-libs/feat-remove-einfra-integraton/oarepo-requests/oarepo_requests/templates/oarepo/invenio_notifications/comment-subcommunity-invitation-request.create.jinja:51
-#: /Users/m/Workspaces/oarepo-libs/feat-remove-einfra-integraton/oarepo-requests/oarepo_requests/templates/oarepo/invenio_notifications/comment-subcommunity-request.create.jinja:50
+#: /home/ron/prace/oarepo-requests/oarepo_requests/templates/oarepo/invenio_notifications/comment-request-event.create.jinja:56
 #, python-brace-format
 msgid "{user_name} commented on '{request_title}'"
 msgstr ""
 
-#: /Users/m/Workspaces/oarepo-libs/feat-remove-einfra-integraton/oarepo-requests/oarepo_requests/templates/oarepo/invenio_notifications/comment-request-event.create.jinja:66
-#: /Users/m/Workspaces/oarepo-libs/feat-remove-einfra-integraton/oarepo-requests/oarepo_requests/templates/oarepo/invenio_notifications/comment-request-event.reply.jinja:59
-#: /Users/m/Workspaces/oarepo-libs/feat-remove-einfra-integraton/oarepo-requests/oarepo_requests/templates/oarepo/invenio_notifications/comment-subcommunity-invitation-request.create.jinja:55
-#: /Users/m/Workspaces/oarepo-libs/feat-remove-einfra-integraton/oarepo-requests/oarepo_requests/templates/oarepo/invenio_notifications/comment-subcommunity-request.create.jinja:54
+#: /home/ron/prace/oarepo-requests/oarepo_requests/templates/oarepo/invenio_notifications/comment-request-event.create.jinja:60
+#: /home/ron/prace/oarepo-requests/oarepo_requests/templates/oarepo/invenio_notifications/comment-request-event.reply.jinja:59
 #, python-brace-format
 msgid "Check out the request: {request_link}"
 msgstr ""
 
-#: /Users/m/Workspaces/oarepo-libs/feat-remove-einfra-integraton/oarepo-requests/oarepo_requests/templates/oarepo/invenio_notifications/comment-request-event.create.jinja:72
-#: /Users/m/Workspaces/oarepo-libs/feat-remove-einfra-integraton/oarepo-requests/oarepo_requests/templates/oarepo/invenio_notifications/comment-subcommunity-invitation-request.create.jinja:61
-#: /Users/m/Workspaces/oarepo-libs/feat-remove-einfra-integraton/oarepo-requests/oarepo_requests/templates/oarepo/invenio_notifications/comment-subcommunity-request.create.jinja:60
+#: /home/ron/prace/oarepo-requests/oarepo_requests/templates/oarepo/invenio_notifications/comment-request-event.create.jinja:66
 #, python-brace-format
 msgid "*{user_name}* commented on *{request_title}*"
 msgstr ""
 
-#: /Users/m/Workspaces/oarepo-libs/feat-remove-einfra-integraton/oarepo-requests/oarepo_requests/templates/oarepo/invenio_notifications/comment-request-event.reply.jinja:30
+#: /home/ron/prace/oarepo-requests/oarepo_requests/templates/oarepo/invenio_notifications/comment-request-event.reply.jinja:30
 #, python-brace-format
 msgid "💬 New reply on '{request_title}'"
 msgstr ""
 
-#: /Users/m/Workspaces/oarepo-libs/feat-remove-einfra-integraton/oarepo-requests/oarepo_requests/templates/oarepo/invenio_notifications/comment-request-event.reply.jinja:36
+#: /home/ron/prace/oarepo-requests/oarepo_requests/templates/oarepo/invenio_notifications/comment-request-event.reply.jinja:36
 #, python-brace-format
 msgid "'{user_name}' replied on <a href='{reply_link}'>comment</a>:"
 msgstr ""
 
-#: /Users/m/Workspaces/oarepo-libs/feat-remove-einfra-integraton/oarepo-requests/oarepo_requests/templates/oarepo/invenio_notifications/comment-request-event.reply.jinja:54
+#: /home/ron/prace/oarepo-requests/oarepo_requests/templates/oarepo/invenio_notifications/comment-request-event.reply.jinja:54
 #, python-brace-format
 msgid "{user_name} replied on comment"
 msgstr ""
 
-#: /Users/m/Workspaces/oarepo-libs/feat-remove-einfra-integraton/oarepo-requests/oarepo_requests/templates/oarepo/invenio_notifications/comment-request-event.reply.jinja:58
+#: /home/ron/prace/oarepo-requests/oarepo_requests/templates/oarepo/invenio_notifications/comment-request-event.reply.jinja:58
 #, python-brace-format
 msgid "View reply: {reply_link}"
 msgstr ""
 
-#: /Users/m/Workspaces/oarepo-libs/feat-remove-einfra-integraton/oarepo-requests/oarepo_requests/templates/oarepo/invenio_notifications/comment-request-event.reply.jinja:65
+#: /home/ron/prace/oarepo-requests/oarepo_requests/templates/oarepo/invenio_notifications/comment-request-event.reply.jinja:65
 #, python-brace-format
 msgid "*{user_name}* replied on [comment]({reply_link})"
 msgstr ""
 
-#: /Users/m/Workspaces/oarepo-libs/feat-remove-einfra-integraton/oarepo-requests/oarepo_requests/templates/oarepo/invenio_notifications/comment-subcommunity-invitation-request.create.jinja:33
-#: /Users/m/Workspaces/oarepo-libs/feat-remove-einfra-integraton/oarepo-requests/oarepo_requests/templates/oarepo/invenio_notifications/comment-subcommunity-request.create.jinja:32
+#: /home/ron/prace/oarepo-requests/oarepo_requests/templates/oarepo/invenio_notifications/user-access-request.cancel.jinja:26
+msgid "❌ Access request canceled"
+msgstr ""
+
+#: /home/ron/prace/oarepo-requests/oarepo_requests/templates/oarepo/invenio_notifications/user-access-request.cancel.jinja:32
+#: /home/ron/prace/oarepo-requests/oarepo_requests/templates/oarepo/invenio_notifications/user-access-request.cancel.jinja:56
+#: /home/ron/prace/oarepo-requests/oarepo_requests/templates/oarepo/invenio_notifications/user-access-request.cancel.jinja:70
 #, python-brace-format
-msgid "'{user_name}' commented on '{request_title}':"
+msgid "Your access request has been canceled by {cancel_name}"
 msgstr ""
 
-#: /Users/m/Workspaces/oarepo-libs/feat-remove-einfra-integraton/oarepo-requests/oarepo_requests/templates/semantic-ui/invenio_notifications/delete-published-record-request-event.accept.jinja:14
-msgid "❗️ Published record has been deleted"
+#: /home/ron/prace/oarepo-requests/oarepo_requests/templates/oarepo/invenio_notifications/user-access-request.cancel.jinja:34
+#: /home/ron/prace/oarepo-requests/oarepo_requests/templates/oarepo/invenio_notifications/user-access-request.decline.jinja:31
+msgid " with the following message:"
 msgstr ""
 
-#: /Users/m/Workspaces/oarepo-libs/feat-remove-einfra-integraton/oarepo-requests/oarepo_requests/templates/semantic-ui/invenio_notifications/delete-published-record-request-event.accept.jinja:18
-#: /Users/m/Workspaces/oarepo-libs/feat-remove-einfra-integraton/oarepo-requests/oarepo_requests/templates/semantic-ui/invenio_notifications/delete-published-record-request-event.accept.jinja:28
-msgid "The published record has been deleted."
+#: /home/ron/prace/oarepo-requests/oarepo_requests/templates/oarepo/invenio_notifications/user-access-request.cancel.jinja:44
+#: /home/ron/prace/oarepo-requests/oarepo_requests/templates/oarepo/invenio_notifications/user-access-request.cancel.jinja:63
+#: /home/ron/prace/oarepo-requests/oarepo_requests/templates/oarepo/invenio_notifications/user-access-request.cancel.jinja:77
+#: /home/ron/prace/oarepo-requests/oarepo_requests/templates/oarepo/invenio_notifications/user-access-request.decline.jinja:41
+#: /home/ron/prace/oarepo-requests/oarepo_requests/templates/oarepo/invenio_notifications/user-access-request.decline.jinja:60
+#: /home/ron/prace/oarepo-requests/oarepo_requests/templates/oarepo/invenio_notifications/user-access-request.decline.jinja:74
+msgid "View the record"
 msgstr ""
 
-#: /Users/m/Workspaces/oarepo-libs/feat-remove-einfra-integraton/oarepo-requests/oarepo_requests/templates/semantic-ui/invenio_notifications/delete-published-record-request-event.accept.jinja:19
-#, python-format
-msgid "For more information head to the <a href='%(link)s'>request page</a>."
+#: /home/ron/prace/oarepo-requests/oarepo_requests/templates/oarepo/invenio_notifications/user-access-request.cancel.jinja:59
+#: /home/ron/prace/oarepo-requests/oarepo_requests/templates/oarepo/invenio_notifications/user-access-request.cancel.jinja:73
+#: /home/ron/prace/oarepo-requests/oarepo_requests/templates/oarepo/invenio_notifications/user-access-request.decline.jinja:56
+#: /home/ron/prace/oarepo-requests/oarepo_requests/templates/oarepo/invenio_notifications/user-access-request.decline.jinja:70
+msgid "with the following message:"
 msgstr ""
 
-#: /Users/m/Workspaces/oarepo-libs/feat-remove-einfra-integraton/oarepo-requests/oarepo_requests/templates/semantic-ui/invenio_notifications/delete-published-record-request-event.accept.jinja:29
-#, python-format
-msgid "For more information head to the %(link)s"
-msgstr ""
-
-#: /Users/m/Workspaces/oarepo-libs/feat-remove-einfra-integraton/oarepo-requests/oarepo_requests/templates/semantic-ui/invenio_notifications/delete-published-record-request-event.accept.jinja:31
+#: /home/ron/prace/oarepo-requests/oarepo_requests/templates/oarepo/invenio_notifications/user-access-request.cancel.jinja:65
+#: /home/ron/prace/oarepo-requests/oarepo_requests/templates/oarepo/invenio_notifications/user-access-request.cancel.jinja:79
+#: /home/ron/prace/oarepo-requests/oarepo_requests/templates/oarepo/invenio_notifications/user-access-request.decline.jinja:62
+#: /home/ron/prace/oarepo-requests/oarepo_requests/templates/oarepo/invenio_notifications/user-access-request.decline.jinja:76
+#: /home/ron/prace/oarepo-requests/oarepo_requests/templates/semantic-ui/invenio_notifications/delete-published-record-request-event.accept.jinja:31
 msgid ""
 "This is an auto-generated message. To manage notifications, visit your "
 "account settings"
 msgstr ""
 
-#: /Users/m/Workspaces/oarepo-libs/feat-remove-einfra-integraton/oarepo-requests/oarepo_requests/templates/semantic-ui/invenio_notifications/delete-published-record-request-event.decline.jinja:16
+#: /home/ron/prace/oarepo-requests/oarepo_requests/templates/oarepo/invenio_notifications/user-access-request.decline.jinja:23
+msgid "⛔️ Access request declined"
+msgstr ""
+
+#: /home/ron/prace/oarepo-requests/oarepo_requests/templates/oarepo/invenio_notifications/user-access-request.decline.jinja:29
+#, python-brace-format
+msgid "The owner of '{record_title}' has declined your access request"
+msgstr ""
+
+#: /home/ron/prace/oarepo-requests/oarepo_requests/templates/oarepo/invenio_notifications/user-access-request.decline.jinja:53
+#, python-brace-format
+msgid "The owner of '{record_title}' has rejected your access request"
+msgstr ""
+
+#: /home/ron/prace/oarepo-requests/oarepo_requests/templates/oarepo/invenio_notifications/user-access-request.decline.jinja:67
+#, python-brace-format
+msgid "The owner of *{record_title}* has rejected your access request"
+msgstr ""
+
+#: /home/ron/prace/oarepo-requests/oarepo_requests/templates/semantic-ui/invenio_notifications/delete-published-record-request-event.accept.jinja:14
+msgid "❗️ Published record has been deleted"
+msgstr ""
+
+#: /home/ron/prace/oarepo-requests/oarepo_requests/templates/semantic-ui/invenio_notifications/delete-published-record-request-event.accept.jinja:18
+#: /home/ron/prace/oarepo-requests/oarepo_requests/templates/semantic-ui/invenio_notifications/delete-published-record-request-event.accept.jinja:28
+msgid "The published record has been deleted."
+msgstr ""
+
+#: /home/ron/prace/oarepo-requests/oarepo_requests/templates/semantic-ui/invenio_notifications/delete-published-record-request-event.accept.jinja:19
+#, python-format
+msgid "For more information head to the <a href='%(link)s'>request page</a>."
+msgstr ""
+
+#: /home/ron/prace/oarepo-requests/oarepo_requests/templates/semantic-ui/invenio_notifications/delete-published-record-request-event.accept.jinja:29
+#, python-format
+msgid "For more information head to the %(link)s"
+msgstr ""
+
+#: /home/ron/prace/oarepo-requests/oarepo_requests/templates/semantic-ui/invenio_notifications/delete-published-record-request-event.decline.jinja:16
 #, python-brace-format
 msgid "Request for deletion of record '{topic_title}' was declined"
 msgstr ""
 
-#: /Users/m/Workspaces/oarepo-libs/feat-remove-einfra-integraton/oarepo-requests/oarepo_requests/templates/semantic-ui/invenio_notifications/delete-published-record-request-event.decline.jinja:20
+#: /home/ron/prace/oarepo-requests/oarepo_requests/templates/semantic-ui/invenio_notifications/delete-published-record-request-event.decline.jinja:20
 #, python-format
 msgid ""
 "\n"
 "<p>\n"
-"Request for deletion of record \"%(topic_title)s\" was declined. You can see the request at\n"
+"Request for deletion of record \"%(topic_title)s\" was declined. You can "
+"see the request at\n"
 "<a href=\"%(link)s\">%(link)s</a>\n"
 "</p>\n"
 "    "
 msgstr ""
 
-#: /Users/m/Workspaces/oarepo-libs/feat-remove-einfra-integraton/oarepo-requests/oarepo_requests/templates/semantic-ui/invenio_notifications/delete-published-record-request-event.decline.jinja:34
+#: /home/ron/prace/oarepo-requests/oarepo_requests/templates/semantic-ui/invenio_notifications/delete-published-record-request-event.decline.jinja:34
 #, python-format
 msgid ""
 "\n"
-"Request for deletion of record \"%(topic_title)s\" was declined. You can see the request at\n"
+"Request for deletion of record \"%(topic_title)s\" was declined. You can "
+"see the request at\n"
 "%(link)s\n"
 "    "
 msgstr ""
 
-#: /Users/m/Workspaces/oarepo-libs/feat-remove-einfra-integraton/oarepo-requests/oarepo_requests/templates/semantic-ui/invenio_notifications/delete-published-record-request-event.submit.jinja:15
+#: /home/ron/prace/oarepo-requests/oarepo_requests/templates/semantic-ui/invenio_notifications/delete-published-record-request-event.submit.jinja:15
 #, python-brace-format
 msgid "❗️ Request to delete published record {topic_title}"
 msgstr ""
 
-#: /Users/m/Workspaces/oarepo-libs/feat-remove-einfra-integraton/oarepo-requests/oarepo_requests/templates/semantic-ui/invenio_notifications/delete-published-record-request-event.submit.jinja:20
+#: /home/ron/prace/oarepo-requests/oarepo_requests/templates/semantic-ui/invenio_notifications/delete-published-record-request-event.submit.jinja:20
 #, python-format
 msgid ""
 "\n"
 "    <p>\n"
-"    You have been asked to approve deletion of a published record \"%(topic_title)s\".\n"
+"    You have been asked to approve deletion of a published record "
+"\"%(topic_title)s\".\n"
 "    </p>\n"
 "    <p>\n"
-"        <a type=\"button\" href='%(link)s'>Accept or Decline the request</a>\n"
+"        <a type=\"button\" href='%(link)s'>Accept or Decline the "
+"request</a>\n"
 "    </p>\n"
 "    "
 msgstr ""
 
-#: /Users/m/Workspaces/oarepo-libs/feat-remove-einfra-integraton/oarepo-requests/oarepo_requests/templates/semantic-ui/invenio_notifications/delete-published-record-request-event.submit.jinja:36
+#: /home/ron/prace/oarepo-requests/oarepo_requests/templates/semantic-ui/invenio_notifications/delete-published-record-request-event.submit.jinja:36
 #, python-format
 msgid ""
 "\n"
-"    You have been asked to approve deletion of a published record \"%(topic_title)s\".\n"
+"    You have been asked to approve deletion of a published record "
+"\"%(topic_title)s\".\n"
 "    Accept or Decline the request at %(link)s\n"
 "    "
 msgstr ""
 
-#: /Users/m/Workspaces/oarepo-libs/feat-remove-einfra-integraton/oarepo-requests/oarepo_requests/templates/semantic-ui/invenio_notifications/group-membership-request-event.accept.jinja:14
+#: /home/ron/prace/oarepo-requests/oarepo_requests/templates/semantic-ui/invenio_notifications/group-membership-request-event.accept.jinja:14
 #, python-brace-format
 msgid "Your request to join group '{topic_name}' has been accepted"
 msgstr ""
 
-#: /Users/m/Workspaces/oarepo-libs/feat-remove-einfra-integraton/oarepo-requests/oarepo_requests/templates/semantic-ui/invenio_notifications/group-membership-request-event.accept.jinja:18
+#: /home/ron/prace/oarepo-requests/oarepo_requests/templates/semantic-ui/invenio_notifications/group-membership-request-event.accept.jinja:18
 #, python-format
 msgid ""
 "\n"
 "<p>\n"
-"Your request to join the group \"%(topic_name)s\" has been accepted. You are now a member of the group. You can see the request at\n"
+"Your request to join the group \"%(topic_name)s\" has been accepted. You "
+"are now a member of the group. You can see the request at\n"
 "<a href=\"%(link)s\">%(link)s</a>\n"
 "</p>\n"
 "    "
 msgstr ""
 
-#: /Users/m/Workspaces/oarepo-libs/feat-remove-einfra-integraton/oarepo-requests/oarepo_requests/templates/semantic-ui/invenio_notifications/group-membership-request-event.accept.jinja:32
+#: /home/ron/prace/oarepo-requests/oarepo_requests/templates/semantic-ui/invenio_notifications/group-membership-request-event.accept.jinja:32
 #, python-format
 msgid ""
 "\n"
-"Your request to join the group \"%(topic_name)s\" has been accepted. You are now a member of the group. You can see the request at\n"
+"Your request to join the group \"%(topic_name)s\" has been accepted. You "
+"are now a member of the group. You can see the request at\n"
 "%(link)s\n"
 "    "
 msgstr ""
 
-#: /Users/m/Workspaces/oarepo-libs/feat-remove-einfra-integraton/oarepo-requests/oarepo_requests/templates/semantic-ui/invenio_notifications/group-membership-request-event.decline.jinja:14
+#: /home/ron/prace/oarepo-requests/oarepo_requests/templates/semantic-ui/invenio_notifications/group-membership-request-event.decline.jinja:14
 #, python-brace-format
 msgid "Your request to join group '{topic_name}' was declined"
 msgstr ""
 
-#: /Users/m/Workspaces/oarepo-libs/feat-remove-einfra-integraton/oarepo-requests/oarepo_requests/templates/semantic-ui/invenio_notifications/group-membership-request-event.decline.jinja:18
+#: /home/ron/prace/oarepo-requests/oarepo_requests/templates/semantic-ui/invenio_notifications/group-membership-request-event.decline.jinja:18
 #, python-format
 msgid ""
 "\n"
 "<p>\n"
-"Your request to join the group \"%(topic_name)s\" was declined. You can see the request at\n"
+"Your request to join the group \"%(topic_name)s\" was declined. You can "
+"see the request at\n"
 "<a href=\"%(link)s\">%(link)s</a>\n"
 "</p>\n"
 "    "
 msgstr ""
 
-#: /Users/m/Workspaces/oarepo-libs/feat-remove-einfra-integraton/oarepo-requests/oarepo_requests/templates/semantic-ui/invenio_notifications/group-membership-request-event.decline.jinja:32
+#: /home/ron/prace/oarepo-requests/oarepo_requests/templates/semantic-ui/invenio_notifications/group-membership-request-event.decline.jinja:32
 #, python-format
 msgid ""
 "\n"
-"Your request to join the group \"%(topic_name)s\" was declined. You can see the request at\n"
+"Your request to join the group \"%(topic_name)s\" was declined. You can "
+"see the request at\n"
 "%(link)s\n"
 "    "
 msgstr ""
 
-#: /Users/m/Workspaces/oarepo-libs/feat-remove-einfra-integraton/oarepo-requests/oarepo_requests/templates/semantic-ui/invenio_notifications/group-membership-request-event.submit.jinja:15
+#: /home/ron/prace/oarepo-requests/oarepo_requests/templates/semantic-ui/invenio_notifications/group-membership-request-event.submit.jinja:15
 #, python-brace-format
 msgid "Request for group membership: {topic_name}"
 msgstr ""
 
-#: /Users/m/Workspaces/oarepo-libs/feat-remove-einfra-integraton/oarepo-requests/oarepo_requests/templates/semantic-ui/invenio_notifications/group-membership-request-event.submit.jinja:19
+#: /home/ron/prace/oarepo-requests/oarepo_requests/templates/semantic-ui/invenio_notifications/group-membership-request-event.submit.jinja:19
 #, python-format
 msgid ""
 "\n"
@@ -384,18 +429,19 @@ msgid ""
 "    A request has been made to join the group \"%(topic_name)s\".\n"
 "    </p>\n"
 "    <p>\n"
-"        <a type=\"button\" href='%(link)s'>Accept or Decline the request</a>\n"
+"        <a type=\"button\" href='%(link)s'>Accept or Decline the "
+"request</a>\n"
 "    </p>\n"
 "    "
 msgstr ""
 
-#: /Users/m/Workspaces/oarepo-libs/feat-remove-einfra-integraton/oarepo-requests/oarepo_requests/templates/semantic-ui/invenio_notifications/group-membership-request-event.submit.jinja:29
-#: /Users/m/Workspaces/oarepo-libs/feat-remove-einfra-integraton/oarepo-requests/oarepo_requests/templates/semantic-ui/invenio_notifications/group-membership-request-event.submit.jinja:45
-#: /Users/m/Workspaces/oarepo-libs/feat-remove-einfra-integraton/oarepo-requests/oarepo_requests/templates/semantic-ui/invenio_requests/group_membership/index.html:51
+#: /home/ron/prace/oarepo-requests/oarepo_requests/templates/semantic-ui/invenio_notifications/group-membership-request-event.submit.jinja:29
+#: /home/ron/prace/oarepo-requests/oarepo_requests/templates/semantic-ui/invenio_notifications/group-membership-request-event.submit.jinja:45
+#: /home/ron/prace/oarepo-requests/oarepo_requests/templates/semantic-ui/invenio_requests/group_membership/index.html:51
 msgid "Justification:"
 msgstr ""
 
-#: /Users/m/Workspaces/oarepo-libs/feat-remove-einfra-integraton/oarepo-requests/oarepo_requests/templates/semantic-ui/invenio_notifications/group-membership-request-event.submit.jinja:40
+#: /home/ron/prace/oarepo-requests/oarepo_requests/templates/semantic-ui/invenio_notifications/group-membership-request-event.submit.jinja:40
 #, python-format
 msgid ""
 "\n"
@@ -404,87 +450,202 @@ msgid ""
 "    "
 msgstr ""
 
-#: /Users/m/Workspaces/oarepo-libs/feat-remove-einfra-integraton/oarepo-requests/oarepo_requests/templates/semantic-ui/invenio_notifications/publish-draft-request-event.accept.jinja:16
-#, python-brace-format
-msgid "Record '{topic_title}' has been published"
-msgstr ""
-
-#: /Users/m/Workspaces/oarepo-libs/feat-remove-einfra-integraton/oarepo-requests/oarepo_requests/templates/semantic-ui/invenio_notifications/publish-draft-request-event.accept.jinja:20
-#, python-format
-msgid ""
-"\n"
-"<p>\n"
-"Your record \"%(topic_title)s\" has been published. You can see the record at\n"
-"<a href=\"%(link)s\">%(link)s</a>\n"
-"</p>\n"
-"    "
-msgstr ""
-
-#: /Users/m/Workspaces/oarepo-libs/feat-remove-einfra-integraton/oarepo-requests/oarepo_requests/templates/semantic-ui/invenio_notifications/publish-draft-request-event.accept.jinja:34
-#, python-format
-msgid ""
-"\n"
-"Your record \"%(topic_title)s\" has been published. You can see the record at\n"
-"%(link)s\n"
-"    "
-msgstr ""
-
-#: oarepo_requests/templates/semantic-ui/invenio_notifications/publish-changed-metadata-request-event.accept.jinja:16
+#: /home/ron/prace/oarepo-requests/oarepo_requests/templates/semantic-ui/invenio_notifications/publish-changed-metadata-request-event.accept.jinja:16
 #, python-brace-format
 msgid "Metadata of record '{topic_title}' has been updated"
 msgstr ""
 
-#: oarepo_requests/templates/semantic-ui/invenio_notifications/publish-changed-metadata-request-event.accept.jinja:20
+#: /home/ron/prace/oarepo-requests/oarepo_requests/templates/semantic-ui/invenio_notifications/publish-changed-metadata-request-event.accept.jinja:20
 #, python-format
 msgid ""
 "\n"
 "<p>\n"
-"Metadata of your record \"%(topic_title)s\" has been updated. You can see the record at\n"
+"Metadata of your record \"%(topic_title)s\" has been updated. You can see"
+" the record at\n"
 "<a href=\"%(link)s\">%(link)s</a>\n"
 "</p>\n"
 "    "
 msgstr ""
 
-#: oarepo_requests/templates/semantic-ui/invenio_notifications/publish-changed-metadata-request-event.accept.jinja:34
+#: /home/ron/prace/oarepo-requests/oarepo_requests/templates/semantic-ui/invenio_notifications/publish-changed-metadata-request-event.accept.jinja:34
 #, python-format
 msgid ""
 "\n"
-"Metadata of your record \"%(topic_title)s\" has been updated. You can see the record at\n"
+"Metadata of your record \"%(topic_title)s\" has been updated. You can see"
+" the record at\n"
 "%(link)s\n"
 "    "
 msgstr ""
 
-#: /Users/m/Workspaces/oarepo-libs/feat-remove-einfra-integraton/oarepo-requests/oarepo_requests/templates/semantic-ui/invenio_notifications/publish-draft-request-event.decline.jinja:16
+#: /home/ron/prace/oarepo-requests/oarepo_requests/templates/semantic-ui/invenio_notifications/publish-changed-metadata-request-event.decline.jinja:16
+#, python-brace-format
+msgid "Request for metadata update for record '{topic_title}' was declined"
+msgstr ""
+
+#: /home/ron/prace/oarepo-requests/oarepo_requests/templates/semantic-ui/invenio_notifications/publish-changed-metadata-request-event.decline.jinja:20
+#, python-format
+msgid ""
+"\n"
+"<p>\n"
+"Request for metadata update for record \"%(topic_title)s\" was declined. "
+"You can see the request at\n"
+"<a href=\"%(link)s\">%(link)s</a>\n"
+"</p>\n"
+"    "
+msgstr ""
+
+#: /home/ron/prace/oarepo-requests/oarepo_requests/templates/semantic-ui/invenio_notifications/publish-changed-metadata-request-event.decline.jinja:34
+#, python-format
+msgid ""
+"\n"
+"Request for metadata update for record \"%(topic_title)s\" was declined. "
+"You can see the request at\n"
+"%(link)s\n"
+"    "
+msgstr ""
+
+#: /home/ron/prace/oarepo-requests/oarepo_requests/templates/semantic-ui/invenio_notifications/publish-changed-metadata-request-event.submit.jinja:18
+#, python-brace-format
+msgid "You are publishing changed metadata on record {topic_title}"
+msgstr ""
+
+#: /home/ron/prace/oarepo-requests/oarepo_requests/templates/semantic-ui/invenio_notifications/publish-changed-metadata-request-event.submit.jinja:20
+#, python-brace-format
+msgid "Request to publish changed metadata on record {topic_title}"
+msgstr ""
+
+#: /home/ron/prace/oarepo-requests/oarepo_requests/templates/semantic-ui/invenio_notifications/publish-changed-metadata-request-event.submit.jinja:26
+#, python-format
+msgid ""
+"\n"
+"    <p>\n"
+"    You are publishing changed metadata on record %(topic_title)s.\n"
+"    Wait for invenio checks to finish, then accept the request or "
+"consider suggestions.\n"
+"    </p>\n"
+"    <p>\n"
+"        <a type=\"button\" href='%(link)s'>Accept or Decline the "
+"request</a>\n"
+"    </p>\n"
+"    "
+msgstr ""
+
+#: /home/ron/prace/oarepo-requests/oarepo_requests/templates/semantic-ui/invenio_notifications/publish-changed-metadata-request-event.submit.jinja:36
+#, python-format
+msgid ""
+"\n"
+"    <p>\n"
+"    You have been asked to publish changed metadata on record "
+"\"%(topic_title)s\".\n"
+"    </p>\n"
+"    <p>\n"
+"        <a type=\"button\" href='%(link)s'>Accept or Decline the "
+"request</a>\n"
+"    </p>\n"
+"    "
+msgstr ""
+
+#: /home/ron/prace/oarepo-requests/oarepo_requests/templates/semantic-ui/invenio_notifications/publish-changed-metadata-request-event.submit.jinja:55
+#, python-format
+msgid ""
+"\n"
+"    You are publishing changed metadata on record %(topic_title)s.\n"
+"    Wait for invenio checks to finish.\n"
+"    Then accept the request at %(link)s or consider suggestions.\n"
+"    "
+msgstr ""
+
+#: /home/ron/prace/oarepo-requests/oarepo_requests/templates/semantic-ui/invenio_notifications/publish-changed-metadata-request-event.submit.jinja:61
+#, python-format
+msgid ""
+"\n"
+"    You have been asked to publish changed metadata on record "
+"\"%(topic_title)s\".\n"
+"    Accept or Decline the request at %(link)s\n"
+"    "
+msgstr ""
+
+#: /home/ron/prace/oarepo-requests/oarepo_requests/templates/semantic-ui/invenio_notifications/publish-draft-request-event.accept.jinja:16
+#, python-brace-format
+msgid "Record '{topic_title}' has been published"
+msgstr ""
+
+#: /home/ron/prace/oarepo-requests/oarepo_requests/templates/semantic-ui/invenio_notifications/publish-draft-request-event.accept.jinja:20
+#, python-format
+msgid ""
+"\n"
+"<p>\n"
+"Your record \"%(topic_title)s\" has been published. You can see the "
+"record at\n"
+"<a href=\"%(link)s\">%(link)s</a>\n"
+"</p>\n"
+"    "
+msgstr ""
+
+#: /home/ron/prace/oarepo-requests/oarepo_requests/templates/semantic-ui/invenio_notifications/publish-draft-request-event.accept.jinja:34
+#, python-format
+msgid ""
+"\n"
+"Your record \"%(topic_title)s\" has been published. You can see the "
+"record at\n"
+"%(link)s\n"
+"    "
+msgstr ""
+
+#: /home/ron/prace/oarepo-requests/oarepo_requests/templates/semantic-ui/invenio_notifications/publish-draft-request-event.decline.jinja:16
 #, python-brace-format
 msgid "Request for publishing of record '{topic_title}' was declined"
 msgstr ""
 
-#: /Users/m/Workspaces/oarepo-libs/feat-remove-einfra-integraton/oarepo-requests/oarepo_requests/templates/semantic-ui/invenio_notifications/publish-draft-request-event.decline.jinja:20
+#: /home/ron/prace/oarepo-requests/oarepo_requests/templates/semantic-ui/invenio_notifications/publish-draft-request-event.decline.jinja:20
 #, python-format
 msgid ""
 "\n"
 "<p>\n"
-"Request for publishing of record \"%(topic_title)s\" was declined. You can see the request at\n"
+"Request for publishing of record \"%(topic_title)s\" was declined. You "
+"can see the request at\n"
 "<a href=\"%(link)s\">%(link)s</a>\n"
 "</p>\n"
 "    "
 msgstr ""
 
-#: /Users/m/Workspaces/oarepo-libs/feat-remove-einfra-integraton/oarepo-requests/oarepo_requests/templates/semantic-ui/invenio_notifications/publish-draft-request-event.decline.jinja:34
+#: /home/ron/prace/oarepo-requests/oarepo_requests/templates/semantic-ui/invenio_notifications/publish-draft-request-event.decline.jinja:34
 #, python-format
 msgid ""
 "\n"
-"Request for publishing of record \"%(topic_title)s\" was declined. You can see the request at\n"
+"Request for publishing of record \"%(topic_title)s\" was declined. You "
+"can see the request at\n"
 "%(link)s\n"
 "    "
 msgstr ""
 
-#: /Users/m/Workspaces/oarepo-libs/feat-remove-einfra-integraton/oarepo-requests/oarepo_requests/templates/semantic-ui/invenio_notifications/publish-draft-request-event.submit.jinja:15
+#: /home/ron/prace/oarepo-requests/oarepo_requests/templates/semantic-ui/invenio_notifications/publish-draft-request-event.submit.jinja:18
+#, python-brace-format
+msgid "You are publishing record {topic_title}"
+msgstr ""
+
+#: /home/ron/prace/oarepo-requests/oarepo_requests/templates/semantic-ui/invenio_notifications/publish-draft-request-event.submit.jinja:20
 #, python-brace-format
 msgid "Request to publish record {topic_title}"
 msgstr ""
 
-#: /Users/m/Workspaces/oarepo-libs/feat-remove-einfra-integraton/oarepo-requests/oarepo_requests/templates/semantic-ui/invenio_notifications/publish-draft-request-event.submit.jinja:19
+#: /home/ron/prace/oarepo-requests/oarepo_requests/templates/semantic-ui/invenio_notifications/publish-draft-request-event.submit.jinja:26
+#, python-format
+msgid ""
+"\n"
+"    <p>\n"
+"    You are publishing record %(topic_title)s.\n"
+"    Wait for invenio checks to finish, then accept the request or "
+"consider suggestions.\n"
+"    </p>\n"
+"    <p>\n"
+"        <a type=\"button\" href='%(link)s'>Accept or Decline the "
+"request</a>\n"
+"    </p>\n"
+"    "
+msgstr ""
+
+#: /home/ron/prace/oarepo-requests/oarepo_requests/templates/semantic-ui/invenio_notifications/publish-draft-request-event.submit.jinja:36
 #, python-format
 msgid ""
 "\n"
@@ -492,12 +653,23 @@ msgid ""
 "    You have been asked to publish record \"%(topic_title)s\".\n"
 "    </p>\n"
 "    <p>\n"
-"        <a type=\"button\" href='%(link)s'>Accept or Decline the request</a>\n"
+"        <a type=\"button\" href='%(link)s'>Accept or Decline the "
+"request</a>\n"
 "    </p>\n"
 "    "
 msgstr ""
 
-#: /Users/m/Workspaces/oarepo-libs/feat-remove-einfra-integraton/oarepo-requests/oarepo_requests/templates/semantic-ui/invenio_notifications/publish-draft-request-event.submit.jinja:36
+#: /home/ron/prace/oarepo-requests/oarepo_requests/templates/semantic-ui/invenio_notifications/publish-draft-request-event.submit.jinja:55
+#, python-format
+msgid ""
+"\n"
+"    You are publishing record %(topic_title)s.\n"
+"    Wait for invenio checks to finish.\n"
+"    Then accept the request at %(link)s or consider suggestions.\n"
+"    "
+msgstr ""
+
+#: /home/ron/prace/oarepo-requests/oarepo_requests/templates/semantic-ui/invenio_notifications/publish-draft-request-event.submit.jinja:61
 #, python-format
 msgid ""
 "\n"
@@ -506,901 +678,757 @@ msgid ""
 "    "
 msgstr ""
 
-#: /Users/m/Workspaces/oarepo-libs/feat-remove-einfra-integraton/oarepo-requests/oarepo_requests/templates/semantic-ui/invenio_requests/group_membership/index.html:29
+#: /home/ron/prace/oarepo-requests/oarepo_requests/templates/semantic-ui/invenio_notifications/publish-new-version-request-event.accept.jinja:16
+#, python-brace-format
+msgid "New version of record '{topic_title}' has been published"
+msgstr ""
+
+#: /home/ron/prace/oarepo-requests/oarepo_requests/templates/semantic-ui/invenio_notifications/publish-new-version-request-event.accept.jinja:20
+#, python-format
+msgid ""
+"\n"
+"<p>\n"
+"New version of record \"%(topic_title)s\" has been published. You can see"
+" the record at\n"
+"<a href=\"%(link)s\">%(link)s</a>\n"
+"</p>\n"
+"    "
+msgstr ""
+
+#: /home/ron/prace/oarepo-requests/oarepo_requests/templates/semantic-ui/invenio_notifications/publish-new-version-request-event.accept.jinja:34
+#, python-format
+msgid ""
+"\n"
+"New version of record \"%(topic_title)s\" has been published. You can see"
+" the record at\n"
+"%(link)s\n"
+"    "
+msgstr ""
+
+#: /home/ron/prace/oarepo-requests/oarepo_requests/templates/semantic-ui/invenio_notifications/publish-new-version-request-event.decline.jinja:16
+#, python-brace-format
+msgid "Request for new version of record '{topic_title}' was declined"
+msgstr ""
+
+#: /home/ron/prace/oarepo-requests/oarepo_requests/templates/semantic-ui/invenio_notifications/publish-new-version-request-event.decline.jinja:20
+#, python-format
+msgid ""
+"\n"
+"<p>\n"
+"Request for new version of record \"%(topic_title)s\" was declined. You "
+"can see the request at\n"
+"<a href=\"%(link)s\">%(link)s</a>\n"
+"</p>\n"
+"    "
+msgstr ""
+
+#: /home/ron/prace/oarepo-requests/oarepo_requests/templates/semantic-ui/invenio_notifications/publish-new-version-request-event.decline.jinja:34
+#, python-format
+msgid ""
+"\n"
+"Request for new version of record \"%(topic_title)s\" was declined. You "
+"can see the request at\n"
+"%(link)s\n"
+"    "
+msgstr ""
+
+#: /home/ron/prace/oarepo-requests/oarepo_requests/templates/semantic-ui/invenio_notifications/publish-new-version-request-event.submit.jinja:18
+#, python-brace-format
+msgid "You are publishing new version of record {topic_title}"
+msgstr ""
+
+#: /home/ron/prace/oarepo-requests/oarepo_requests/templates/semantic-ui/invenio_notifications/publish-new-version-request-event.submit.jinja:20
+#, python-brace-format
+msgid "Request to publish new version of record {topic_title}"
+msgstr ""
+
+#: /home/ron/prace/oarepo-requests/oarepo_requests/templates/semantic-ui/invenio_notifications/publish-new-version-request-event.submit.jinja:26
+#, python-format
+msgid ""
+"\n"
+"    <p>\n"
+"    You are publishing new version of record %(topic_title)s.\n"
+"    Wait for invenio checks to finish, then accept the request or "
+"consider suggestions.\n"
+"    </p>\n"
+"    <p>\n"
+"        <a type=\"button\" href='%(link)s'>Accept or Decline the "
+"request</a>\n"
+"    </p>\n"
+"    "
+msgstr ""
+
+#: /home/ron/prace/oarepo-requests/oarepo_requests/templates/semantic-ui/invenio_notifications/publish-new-version-request-event.submit.jinja:36
+#, python-format
+msgid ""
+"\n"
+"    <p>\n"
+"    You have been asked to publish new version of record "
+"\"%(topic_title)s\".\n"
+"    </p>\n"
+"    <p>\n"
+"        <a type=\"button\" href='%(link)s'>Accept or Decline the "
+"request</a>\n"
+"    </p>\n"
+"    "
+msgstr ""
+
+#: /home/ron/prace/oarepo-requests/oarepo_requests/templates/semantic-ui/invenio_notifications/publish-new-version-request-event.submit.jinja:55
+#, python-format
+msgid ""
+"\n"
+"    You are publishing new version of record %(topic_title)s.\n"
+"    Wait for invenio checks to finish.\n"
+"    Then accept the request at %(link)s or consider suggestions.\n"
+"    "
+msgstr ""
+
+#: /home/ron/prace/oarepo-requests/oarepo_requests/templates/semantic-ui/invenio_notifications/publish-new-version-request-event.submit.jinja:61
+#, python-format
+msgid ""
+"\n"
+"    You have been asked to publish new version of record "
+"\"%(topic_title)s\".\n"
+"    Accept or Decline the request at %(link)s\n"
+"    "
+msgstr ""
+
+#: /home/ron/prace/oarepo-requests/oarepo_requests/templates/semantic-ui/invenio_requests/group_membership/index.html:29
 msgid "Requester:"
 msgstr ""
 
-#: /Users/m/Workspaces/oarepo-libs/feat-remove-einfra-integraton/oarepo-requests/oarepo_requests/templates/semantic-ui/invenio_requests/group_membership/index.html:35
+#: /home/ron/prace/oarepo-requests/oarepo_requests/templates/semantic-ui/invenio_requests/group_membership/index.html:35
 msgid "Full name:"
 msgstr ""
 
-#: /Users/m/Workspaces/oarepo-libs/feat-remove-einfra-integraton/oarepo-requests/oarepo_requests/templates/semantic-ui/invenio_requests/group_membership/index.html:41
+#: /home/ron/prace/oarepo-requests/oarepo_requests/templates/semantic-ui/invenio_requests/group_membership/index.html:41
 msgid "Organization:"
 msgstr ""
 
-#: /Users/m/Workspaces/oarepo-libs/feat-remove-einfra-integraton/oarepo-requests/oarepo_requests/templates/semantic-ui/invenio_requests/group_membership/index.html:46
+#: /home/ron/prace/oarepo-requests/oarepo_requests/templates/semantic-ui/invenio_requests/group_membership/index.html:46
 msgid "Requested role:"
 msgstr ""
 
-#: /Users/m/Workspaces/oarepo-libs/feat-remove-einfra-integraton/oarepo-requests/oarepo_requests/translations/_only_for_translations.py:13
+#: /home/ron/prace/oarepo-requests/oarepo_requests/translations/_only_for_translations.py:13
 msgid "Create Request"
 msgstr ""
 
-#: /Users/m/Workspaces/oarepo-libs/feat-remove-einfra-integraton/oarepo-requests/oarepo_requests/translations/_only_for_translations.py:14
+#: /home/ron/prace/oarepo-requests/oarepo_requests/translations/_only_for_translations.py:14
 msgid "Open dialog for request"
 msgstr ""
 
-#: /Users/m/Workspaces/oarepo-libs/feat-remove-einfra-integraton/oarepo-requests/oarepo_requests/translations/_only_for_translations.py:15
+#: /home/ron/prace/oarepo-requests/oarepo_requests/translations/_only_for_translations.py:15
 msgid "My Requests"
 msgstr ""
 
-#: /Users/m/Workspaces/oarepo-libs/feat-remove-einfra-integraton/oarepo-requests/oarepo_requests/translations/_only_for_translations.py:16
+#: /home/ron/prace/oarepo-requests/oarepo_requests/translations/_only_for_translations.py:16
 msgid "Requests to Approve"
 msgstr ""
 
-#: /Users/m/Workspaces/oarepo-libs/feat-remove-einfra-integraton/oarepo-requests/oarepo_requests/translations/_only_for_translations.py:17
+#: /home/ron/prace/oarepo-requests/oarepo_requests/translations/_only_for_translations.py:17
 msgid "Are you sure?"
 msgstr ""
 
-#: /Users/m/Workspaces/oarepo-libs/feat-remove-einfra-integraton/oarepo-requests/oarepo_requests/translations/_only_for_translations.py:19
+#: /home/ron/prace/oarepo-requests/oarepo_requests/translations/_only_for_translations.py:19
 msgid "OK"
 msgstr ""
 
-#: /Users/m/Workspaces/oarepo-libs/feat-remove-einfra-integraton/oarepo-requests/oarepo_requests/translations/_only_for_translations.py:20
+#: /home/ron/prace/oarepo-requests/oarepo_requests/translations/_only_for_translations.py:20
 msgid "Create request"
 msgstr ""
 
-#: /Users/m/Workspaces/oarepo-libs/feat-remove-einfra-integraton/oarepo-requests/oarepo_requests/translations/_only_for_translations.py:21
+#: /home/ron/prace/oarepo-requests/oarepo_requests/translations/_only_for_translations.py:21
 msgid "Submit request"
 msgstr ""
 
-#: /Users/m/Workspaces/oarepo-libs/feat-remove-einfra-integraton/oarepo-requests/oarepo_requests/translations/_only_for_translations.py:22
+#: /home/ron/prace/oarepo-requests/oarepo_requests/translations/_only_for_translations.py:22
 msgid "Delete request"
 msgstr ""
 
-#: /Users/m/Workspaces/oarepo-libs/feat-remove-einfra-integraton/oarepo-requests/oarepo_requests/translations/_only_for_translations.py:23
+#: /home/ron/prace/oarepo-requests/oarepo_requests/translations/_only_for_translations.py:23
 msgid "Delete"
 msgstr ""
 
-#: /Users/m/Workspaces/oarepo-libs/feat-remove-einfra-integraton/oarepo-requests/oarepo_requests/translations/_only_for_translations.py:24
+#: /home/ron/prace/oarepo-requests/oarepo_requests/translations/_only_for_translations.py:24
 msgid "Accept request"
 msgstr ""
 
-#: /Users/m/Workspaces/oarepo-libs/feat-remove-einfra-integraton/oarepo-requests/oarepo_requests/translations/_only_for_translations.py:26
+#: /home/ron/prace/oarepo-requests/oarepo_requests/translations/_only_for_translations.py:26
 msgid "Decline request"
 msgstr ""
 
-#: /Users/m/Workspaces/oarepo-libs/feat-remove-einfra-integraton/oarepo-requests/oarepo_requests/translations/_only_for_translations.py:28
+#: /home/ron/prace/oarepo-requests/oarepo_requests/translations/_only_for_translations.py:28
 msgid "Create and submit request"
 msgstr ""
 
-#: /Users/m/Workspaces/oarepo-libs/feat-remove-einfra-integraton/oarepo-requests/oarepo_requests/translations/_only_for_translations.py:29
+#: /home/ron/prace/oarepo-requests/oarepo_requests/translations/_only_for_translations.py:29
 msgid "Create and submit"
 msgstr ""
 
-#: /Users/m/Workspaces/oarepo-libs/feat-remove-einfra-integraton/oarepo-requests/oarepo_requests/translations/_only_for_translations.py:30
+#: /home/ron/prace/oarepo-requests/oarepo_requests/translations/_only_for_translations.py:30
 msgid "Error sending request"
 msgstr ""
 
-#: /Users/m/Workspaces/oarepo-libs/feat-remove-einfra-integraton/oarepo-requests/oarepo_requests/translations/_only_for_translations.py:32
+#: /home/ron/prace/oarepo-requests/oarepo_requests/translations/_only_for_translations.py:32
 msgid "Save drafted request"
 msgstr ""
 
-#: /Users/m/Workspaces/oarepo-libs/feat-remove-einfra-integraton/oarepo-requests/oarepo_requests/translations/_only_for_translations.py:33
+#: /home/ron/prace/oarepo-requests/oarepo_requests/translations/_only_for_translations.py:33
 msgid "Save"
 msgstr ""
 
-#: /Users/m/Workspaces/oarepo-libs/feat-remove-einfra-integraton/oarepo-requests/oarepo_requests/translations/_only_for_translations.py:34
+#: /home/ron/prace/oarepo-requests/oarepo_requests/translations/_only_for_translations.py:34
 msgid "Create"
 msgstr ""
 
-#: /Users/m/Workspaces/oarepo-libs/feat-remove-einfra-integraton/oarepo-requests/oarepo_requests/translations/_only_for_translations.py:35
+#: /home/ron/prace/oarepo-requests/oarepo_requests/translations/_only_for_translations.py:35
 msgid "Creator"
 msgstr ""
 
-#: /Users/m/Workspaces/oarepo-libs/feat-remove-einfra-integraton/oarepo-requests/oarepo_requests/translations/_only_for_translations.py:36
+#: /home/ron/prace/oarepo-requests/oarepo_requests/translations/_only_for_translations.py:36
 msgid "Receiver"
 msgstr ""
 
-#: /Users/m/Workspaces/oarepo-libs/feat-remove-einfra-integraton/oarepo-requests/oarepo_requests/translations/_only_for_translations.py:37
+#: /home/ron/prace/oarepo-requests/oarepo_requests/translations/_only_for_translations.py:37
 msgid "Request type"
 msgstr ""
 
-#: /Users/m/Workspaces/oarepo-libs/feat-remove-einfra-integraton/oarepo-requests/oarepo_requests/translations/_only_for_translations.py:38
+#: /home/ron/prace/oarepo-requests/oarepo_requests/translations/_only_for_translations.py:38
 msgid "Created"
 msgstr ""
 
-#: /Users/m/Workspaces/oarepo-libs/feat-remove-einfra-integraton/oarepo-requests/oarepo_requests/translations/_only_for_translations.py:39
+#: /home/ron/prace/oarepo-requests/oarepo_requests/translations/_only_for_translations.py:39
 msgid "Timeline"
 msgstr ""
 
-#: /Users/m/Workspaces/oarepo-libs/feat-remove-einfra-integraton/oarepo-requests/oarepo_requests/translations/_only_for_translations.py:40
+#: /home/ron/prace/oarepo-requests/oarepo_requests/translations/_only_for_translations.py:40
 msgid "Submit event"
 msgstr ""
 
-#: /Users/m/Workspaces/oarepo-libs/feat-remove-einfra-integraton/oarepo-requests/oarepo_requests/translations/_only_for_translations.py:41
+#: /home/ron/prace/oarepo-requests/oarepo_requests/translations/_only_for_translations.py:41
 msgid "No requests to show"
 msgstr ""
 
-#: /Users/m/Workspaces/oarepo-libs/feat-remove-einfra-integraton/oarepo-requests/oarepo_requests/translations/_only_for_translations.py:42
+#: /home/ron/prace/oarepo-requests/oarepo_requests/translations/_only_for_translations.py:42
 msgid "api.requests"
 msgstr ""
 
-#: /Users/m/Workspaces/oarepo-libs/feat-remove-einfra-integraton/oarepo-requests/oarepo_requests/translations/_only_for_translations.py:43
+#: /home/ron/prace/oarepo-requests/oarepo_requests/translations/_only_for_translations.py:43
 msgid "api.applicable-requests"
 msgstr ""
 
-#: /Users/m/Workspaces/oarepo-libs/feat-remove-einfra-integraton/oarepo-requests/oarepo_requests/types/delete_published_record.py:48
+#: /home/ron/prace/oarepo-requests/oarepo_requests/types/delete_published_record.py:48
 msgid "Delete record"
 msgstr ""
 
-#: /Users/m/Workspaces/oarepo-libs/feat-remove-einfra-integraton/oarepo-requests/oarepo_requests/types/delete_published_record.py:49
+#: /home/ron/prace/oarepo-requests/oarepo_requests/types/delete_published_record.py:49
 msgid "Request deletion of published record"
 msgstr ""
 
-#: /Users/m/Workspaces/oarepo-libs/feat-remove-einfra-integraton/oarepo-requests/oarepo_requests/types/delete_published_record.py:86
+#: /home/ron/prace/oarepo-requests/oarepo_requests/types/delete_published_record.py:86
 msgid "Removal Reason"
 msgstr ""
 
-#: /Users/m/Workspaces/oarepo-libs/feat-remove-einfra-integraton/oarepo-requests/oarepo_requests/types/delete_published_record.py:87
+#: /home/ron/prace/oarepo-requests/oarepo_requests/types/delete_published_record.py:87
 msgid "Write down the removal reason."
 msgstr ""
 
-#: /Users/m/Workspaces/oarepo-libs/feat-remove-einfra-integraton/oarepo-requests/oarepo_requests/types/delete_published_record.py:96
+#: /home/ron/prace/oarepo-requests/oarepo_requests/types/delete_published_record.py:96
 msgid "Note"
 msgstr ""
 
-#: /Users/m/Workspaces/oarepo-libs/feat-remove-einfra-integraton/oarepo-requests/oarepo_requests/types/delete_published_record.py:97
+#: /home/ron/prace/oarepo-requests/oarepo_requests/types/delete_published_record.py:97
 msgid "Write down the additional note."
 msgstr ""
 
-#: /Users/m/Workspaces/oarepo-libs/feat-remove-einfra-integraton/oarepo-requests/oarepo_requests/types/delete_published_record.py:118
-#: /Users/m/Workspaces/oarepo-libs/feat-remove-einfra-integraton/oarepo-requests/oarepo_requests/types/delete_published_record.py:123
+#: /home/ron/prace/oarepo-requests/oarepo_requests/types/delete_published_record.py:118
+#: /home/ron/prace/oarepo-requests/oarepo_requests/types/delete_published_record.py:123
 msgid "Request record deletion"
 msgstr ""
 
-#: /Users/m/Workspaces/oarepo-libs/feat-remove-einfra-integraton/oarepo-requests/oarepo_requests/types/delete_published_record.py:121
+#: /home/ron/prace/oarepo-requests/oarepo_requests/types/delete_published_record.py:121
 msgid "Record deletion requested"
 msgstr ""
 
-#: /Users/m/Workspaces/oarepo-libs/feat-remove-einfra-integraton/oarepo-requests/oarepo_requests/types/delete_published_record.py:136
+#: /home/ron/prace/oarepo-requests/oarepo_requests/types/delete_published_record.py:136
 msgid "Click to permanently delete the record."
 msgstr ""
 
-#: /Users/m/Workspaces/oarepo-libs/feat-remove-einfra-integraton/oarepo-requests/oarepo_requests/types/delete_published_record.py:139
+#: /home/ron/prace/oarepo-requests/oarepo_requests/types/delete_published_record.py:139
 msgid "Request permission to delete the record."
 msgstr ""
 
-#: /Users/m/Workspaces/oarepo-libs/feat-remove-einfra-integraton/oarepo-requests/oarepo_requests/types/delete_published_record.py:144
+#: /home/ron/prace/oarepo-requests/oarepo_requests/types/delete_published_record.py:144
 msgid ""
 "Permission to delete record requested. You will be notified about the "
 "decision by email."
 msgstr ""
 
-#: /Users/m/Workspaces/oarepo-libs/feat-remove-einfra-integraton/oarepo-requests/oarepo_requests/types/delete_published_record.py:148
+#: /home/ron/prace/oarepo-requests/oarepo_requests/types/delete_published_record.py:148
 msgid ""
-"You have been asked to approve the request to permanently delete the record."
-" You can approve or reject the request."
+"You have been asked to approve the request to permanently delete the "
+"record. You can approve or reject the request."
 msgstr ""
 
-#: /Users/m/Workspaces/oarepo-libs/feat-remove-einfra-integraton/oarepo-requests/oarepo_requests/types/delete_published_record.py:151
+#: /home/ron/prace/oarepo-requests/oarepo_requests/types/delete_published_record.py:151
 msgid "Permission to delete record (including files) requested. "
 msgstr ""
 
-#: /Users/m/Workspaces/oarepo-libs/feat-remove-einfra-integraton/oarepo-requests/oarepo_requests/types/delete_published_record.py:154
+#: /home/ron/prace/oarepo-requests/oarepo_requests/types/delete_published_record.py:154
 msgid "Submit request to get permission to delete the record."
 msgstr ""
 
-#: /Users/m/Workspaces/oarepo-libs/feat-remove-einfra-integraton/oarepo-requests/oarepo_requests/types/delete_published_record.py:155
+#: /home/ron/prace/oarepo-requests/oarepo_requests/types/delete_published_record.py:155
 msgid "You do not have permission to delete the record."
 msgstr ""
 
-#: /Users/m/Workspaces/oarepo-libs/feat-remove-einfra-integraton/oarepo-requests/oarepo_requests/types/edit_record.py:41
+#: /home/ron/prace/oarepo-requests/oarepo_requests/types/edit_record.py:41
 msgid "Edit metadata"
 msgstr ""
 
-#: /Users/m/Workspaces/oarepo-libs/feat-remove-einfra-integraton/oarepo-requests/oarepo_requests/types/edit_record.py:42
+#: /home/ron/prace/oarepo-requests/oarepo_requests/types/edit_record.py:42
 msgid "Request re-opening of published record"
 msgstr ""
 
-#: /Users/m/Workspaces/oarepo-libs/feat-remove-einfra-integraton/oarepo-requests/oarepo_requests/types/edit_record.py:75
-#: /Users/m/Workspaces/oarepo-libs/feat-remove-einfra-integraton/oarepo-requests/oarepo_requests/types/new_version.py:71
-#: /Users/m/Workspaces/oarepo-libs/feat-remove-einfra-integraton/oarepo-requests/oarepo_requests/types/new_version.py:80
+#: /home/ron/prace/oarepo-requests/oarepo_requests/types/edit_record.py:75
+#: /home/ron/prace/oarepo-requests/oarepo_requests/types/new_version.py:71
+#: /home/ron/prace/oarepo-requests/oarepo_requests/types/new_version.py:80
 msgid "Trying to create edit request on record without draft support"
 msgstr ""
 
-#: /Users/m/Workspaces/oarepo-libs/feat-remove-einfra-integraton/oarepo-requests/oarepo_requests/types/edit_record.py:77
-#: /Users/m/Workspaces/oarepo-libs/feat-remove-einfra-integraton/oarepo-requests/oarepo_requests/types/new_version.py:73
+#: /home/ron/prace/oarepo-requests/oarepo_requests/types/edit_record.py:77
+#: /home/ron/prace/oarepo-requests/oarepo_requests/types/new_version.py:73
 msgid "Trying to create edit request on record with draft"
 msgstr ""
 
-#: /Users/m/Workspaces/oarepo-libs/feat-remove-einfra-integraton/oarepo-requests/oarepo_requests/types/edit_record.py:104
-#: /Users/m/Workspaces/oarepo-libs/feat-remove-einfra-integraton/oarepo-requests/oarepo_requests/types/edit_record.py:109
+#: /home/ron/prace/oarepo-requests/oarepo_requests/types/edit_record.py:104
+#: /home/ron/prace/oarepo-requests/oarepo_requests/types/edit_record.py:109
 msgid "Request edit access"
 msgstr ""
 
-#: /Users/m/Workspaces/oarepo-libs/feat-remove-einfra-integraton/oarepo-requests/oarepo_requests/types/edit_record.py:107
+#: /home/ron/prace/oarepo-requests/oarepo_requests/types/edit_record.py:107
 msgid "Edit access requested"
 msgstr ""
 
-#: /Users/m/Workspaces/oarepo-libs/feat-remove-einfra-integraton/oarepo-requests/oarepo_requests/types/edit_record.py:122
+#: /home/ron/prace/oarepo-requests/oarepo_requests/types/edit_record.py:122
 msgid "Click to start editing the metadata of the record."
 msgstr ""
 
-#: /Users/m/Workspaces/oarepo-libs/feat-remove-einfra-integraton/oarepo-requests/oarepo_requests/types/edit_record.py:125
-#: /Users/m/Workspaces/oarepo-libs/feat-remove-einfra-integraton/oarepo-requests/oarepo_requests/types/edit_record.py:134
+#: /home/ron/prace/oarepo-requests/oarepo_requests/types/edit_record.py:125
+#: /home/ron/prace/oarepo-requests/oarepo_requests/types/edit_record.py:134
 msgid ""
-"Request edit access to the record. You will be notified about the decision "
-"by email."
+"Request edit access to the record. You will be notified about the "
+"decision by email."
 msgstr ""
 
-#: /Users/m/Workspaces/oarepo-libs/feat-remove-einfra-integraton/oarepo-requests/oarepo_requests/types/edit_record.py:129
-msgid ""
-"Edit access requested. You will be notified about the decision by email."
+#: /home/ron/prace/oarepo-requests/oarepo_requests/types/edit_record.py:129
+msgid "Edit access requested. You will be notified about the decision by email."
 msgstr ""
 
-#: /Users/m/Workspaces/oarepo-libs/feat-remove-einfra-integraton/oarepo-requests/oarepo_requests/types/edit_record.py:131
+#: /home/ron/prace/oarepo-requests/oarepo_requests/types/edit_record.py:131
 msgid "You have been requested to grant edit access to the record."
 msgstr ""
 
-#: /Users/m/Workspaces/oarepo-libs/feat-remove-einfra-integraton/oarepo-requests/oarepo_requests/types/edit_record.py:132
+#: /home/ron/prace/oarepo-requests/oarepo_requests/types/edit_record.py:132
 msgid "Edit access requested."
 msgstr ""
 
-#: /Users/m/Workspaces/oarepo-libs/feat-remove-einfra-integraton/oarepo-requests/oarepo_requests/types/group_membership.py:44
+#: /home/ron/prace/oarepo-requests/oarepo_requests/types/group_membership.py:45
 msgid "Request group membership"
 msgstr ""
 
-#: /Users/m/Workspaces/oarepo-libs/feat-remove-einfra-integraton/oarepo-requests/oarepo_requests/types/group_membership.py:45
+#: /home/ron/prace/oarepo-requests/oarepo_requests/types/group_membership.py:46
 msgid "Request membership in a group"
 msgstr ""
 
-#: /Users/m/Workspaces/oarepo-libs/feat-remove-einfra-integraton/oarepo-requests/oarepo_requests/types/group_membership.py:94
-#: /Users/m/Workspaces/oarepo-libs/feat-remove-einfra-integraton/oarepo-requests/oarepo_requests/types/group_membership.py:99
+#: /home/ron/prace/oarepo-requests/oarepo_requests/types/group_membership.py:97
+#: /home/ron/prace/oarepo-requests/oarepo_requests/types/group_membership.py:102
 #, python-format
 msgid "Request membership in group '%(group)s'"
 msgstr ""
 
-#: /Users/m/Workspaces/oarepo-libs/feat-remove-einfra-integraton/oarepo-requests/oarepo_requests/types/group_membership.py:97
+#: /home/ron/prace/oarepo-requests/oarepo_requests/types/group_membership.py:100
 #, python-format
 msgid "Membership in group '%(group)s' requested"
 msgstr ""
 
-#: /Users/m/Workspaces/oarepo-libs/feat-remove-einfra-integraton/oarepo-requests/oarepo_requests/types/group_membership.py:115
+#: /home/ron/prace/oarepo-requests/oarepo_requests/types/group_membership.py:118
 #, python-format
 msgid ""
 "Request membership in group '%(group)s'. You will be notified about the "
 "decision by email."
 msgstr ""
 
-#: /Users/m/Workspaces/oarepo-libs/feat-remove-einfra-integraton/oarepo-requests/oarepo_requests/types/group_membership.py:121
+#: /home/ron/prace/oarepo-requests/oarepo_requests/types/group_membership.py:124
 #, python-format
 msgid ""
-"Membership in group '%(group)s' requested. You will be notified about the "
-"decision by email."
+"Membership in group '%(group)s' requested. You will be notified about the"
+" decision by email."
 msgstr ""
 
-#: /Users/m/Workspaces/oarepo-libs/feat-remove-einfra-integraton/oarepo-requests/oarepo_requests/types/group_membership.py:125
+#: /home/ron/prace/oarepo-requests/oarepo_requests/types/group_membership.py:128
 #, python-format
 msgid ""
 "You have been asked to approve the request for membership in group "
 "'%(group)s'. You can approve or reject the request."
 msgstr ""
 
-#: /Users/m/Workspaces/oarepo-libs/feat-remove-einfra-integraton/oarepo-requests/oarepo_requests/types/group_membership.py:128
+#: /home/ron/prace/oarepo-requests/oarepo_requests/types/group_membership.py:131
 #, python-format
 msgid "Membership in group '%(group)s' requested."
 msgstr ""
 
-#: /Users/m/Workspaces/oarepo-libs/feat-remove-einfra-integraton/oarepo-requests/oarepo_requests/types/group_membership.py:131
+#: /home/ron/prace/oarepo-requests/oarepo_requests/types/group_membership.py:134
 #, python-format
 msgid "Submit request to join group '%(group)s'."
 msgstr ""
 
-#: /Users/m/Workspaces/oarepo-libs/feat-remove-einfra-integraton/oarepo-requests/oarepo_requests/types/group_membership.py:132
+#: /home/ron/prace/oarepo-requests/oarepo_requests/types/group_membership.py:135
 #, python-format
 msgid ""
-"This request for membership in group '%(group)s' has not yet been submitted."
+"This request for membership in group '%(group)s' has not yet been "
+"submitted."
 msgstr ""
 
-#: /Users/m/Workspaces/oarepo-libs/feat-remove-einfra-integraton/oarepo-requests/oarepo_requests/types/new_version.py:41
+#: /home/ron/prace/oarepo-requests/oarepo_requests/types/new_version.py:41
 msgid "New Version"
 msgstr ""
 
-#: /Users/m/Workspaces/oarepo-libs/feat-remove-einfra-integraton/oarepo-requests/oarepo_requests/types/new_version.py:42
+#: /home/ron/prace/oarepo-requests/oarepo_requests/types/new_version.py:42
 msgid "Request requesting creation of new version of a published record."
 msgstr ""
 
-#: /Users/m/Workspaces/oarepo-libs/feat-remove-einfra-integraton/oarepo-requests/oarepo_requests/types/new_version.py:91
+#: /home/ron/prace/oarepo-requests/oarepo_requests/types/new_version.py:91
 msgid "Keep files"
 msgstr ""
 
-#: /Users/m/Workspaces/oarepo-libs/feat-remove-einfra-integraton/oarepo-requests/oarepo_requests/types/new_version.py:92
+#: /home/ron/prace/oarepo-requests/oarepo_requests/types/new_version.py:92
 msgid "Yes or no"
 msgstr ""
 
-#: /Users/m/Workspaces/oarepo-libs/feat-remove-einfra-integraton/oarepo-requests/oarepo_requests/types/new_version.py:94
+#: /home/ron/prace/oarepo-requests/oarepo_requests/types/new_version.py:94
 msgid ""
 "If you choose yes, the current record's files will be linked to the new "
 "version of the record. Then you will be able to add/remove files in the "
 "form."
 msgstr ""
 
-#: /Users/m/Workspaces/oarepo-libs/feat-remove-einfra-integraton/oarepo-requests/oarepo_requests/types/new_version.py:98
+#: /home/ron/prace/oarepo-requests/oarepo_requests/types/new_version.py:98
 msgid "Yes"
 msgstr ""
 
-#: /Users/m/Workspaces/oarepo-libs/feat-remove-einfra-integraton/oarepo-requests/oarepo_requests/types/new_version.py:99
+#: /home/ron/prace/oarepo-requests/oarepo_requests/types/new_version.py:99
 msgid "No"
 msgstr ""
 
-#: /Users/m/Workspaces/oarepo-libs/feat-remove-einfra-integraton/oarepo-requests/oarepo_requests/types/new_version.py:117
-#: /Users/m/Workspaces/oarepo-libs/feat-remove-einfra-integraton/oarepo-requests/oarepo_requests/types/new_version.py:122
+#: /home/ron/prace/oarepo-requests/oarepo_requests/types/new_version.py:117
+#: /home/ron/prace/oarepo-requests/oarepo_requests/types/new_version.py:122
 msgid "Request new version access"
 msgstr ""
 
-#: /Users/m/Workspaces/oarepo-libs/feat-remove-einfra-integraton/oarepo-requests/oarepo_requests/types/new_version.py:120
+#: /home/ron/prace/oarepo-requests/oarepo_requests/types/new_version.py:120
 msgid "New version access requested"
 msgstr ""
 
-#: /Users/m/Workspaces/oarepo-libs/feat-remove-einfra-integraton/oarepo-requests/oarepo_requests/types/new_version.py:135
+#: /home/ron/prace/oarepo-requests/oarepo_requests/types/new_version.py:135
 msgid "Click to start creating a new version of the record."
 msgstr ""
 
-#: /Users/m/Workspaces/oarepo-libs/feat-remove-einfra-integraton/oarepo-requests/oarepo_requests/types/new_version.py:139
+#: /home/ron/prace/oarepo-requests/oarepo_requests/types/new_version.py:139
 msgid ""
-"Request permission to update record (including files). You will be notified "
-"about the decision by email."
+"Request permission to update record (including files). You will be "
+"notified about the decision by email."
 msgstr ""
 
-#: /Users/m/Workspaces/oarepo-libs/feat-remove-einfra-integraton/oarepo-requests/oarepo_requests/types/new_version.py:146
+#: /home/ron/prace/oarepo-requests/oarepo_requests/types/new_version.py:146
 msgid ""
 "Permission to update record (including files) requested. You will be "
 "notified about the decision by email."
 msgstr ""
 
-#: /Users/m/Workspaces/oarepo-libs/feat-remove-einfra-integraton/oarepo-requests/oarepo_requests/types/new_version.py:151
+#: /home/ron/prace/oarepo-requests/oarepo_requests/types/new_version.py:151
 msgid ""
 "You have been asked to approve the request to update the record. You can "
 "approve or reject the request."
 msgstr ""
 
-#: /Users/m/Workspaces/oarepo-libs/feat-remove-einfra-integraton/oarepo-requests/oarepo_requests/types/new_version.py:154
+#: /home/ron/prace/oarepo-requests/oarepo_requests/types/new_version.py:154
 msgid "Permission to update record (including files) requested. "
 msgstr ""
 
-#: /Users/m/Workspaces/oarepo-libs/feat-remove-einfra-integraton/oarepo-requests/oarepo_requests/types/new_version.py:157
+#: /home/ron/prace/oarepo-requests/oarepo_requests/types/new_version.py:157
 msgid "Submit request to get edit access to the record."
 msgstr ""
 
-#: /Users/m/Workspaces/oarepo-libs/feat-remove-einfra-integraton/oarepo-requests/oarepo_requests/types/new_version.py:158
+#: /home/ron/prace/oarepo-requests/oarepo_requests/types/new_version.py:158
 msgid "You do not have permission to update the record."
 msgstr ""
 
-#: /Users/m/Workspaces/oarepo-libs/feat-remove-einfra-integraton/oarepo-requests/oarepo_requests/types/publish_base.py:49
+#: /home/ron/prace/oarepo-requests/oarepo_requests/types/publish_base.py:49
 msgid "Request to publish a draft"
 msgstr ""
 
-#: /Users/m/Workspaces/oarepo-libs/feat-remove-einfra-integraton/oarepo-requests/oarepo_requests/types/publish_base.py:148
+#: /home/ron/prace/oarepo-requests/oarepo_requests/types/publish_base.py:148
 msgid ""
-"Missing uploaded files. To disable files for this record please mark it as "
-"metadata-only."
+"Missing uploaded files. To disable files for this record please mark it "
+"as metadata-only."
 msgstr ""
 
-#: /Users/m/Workspaces/oarepo-libs/feat-remove-einfra-integraton/oarepo-requests/oarepo_requests/types/publish_base.py:151
+#: /home/ron/prace/oarepo-requests/oarepo_requests/types/publish_base.py:151
 msgid "Missing uploaded files."
 msgstr ""
 
-#: /Users/m/Workspaces/oarepo-libs/feat-remove-einfra-integraton/oarepo-requests/oarepo_requests/types/publish_changed_metadata.py:30
-#: /Users/m/Workspaces/oarepo-libs/feat-remove-einfra-integraton/oarepo-requests/oarepo_requests/types/publish_changed_metadata.py:79
+#: /home/ron/prace/oarepo-requests/oarepo_requests/types/publish_changed_metadata.py:36
+#: /home/ron/prace/oarepo-requests/oarepo_requests/types/publish_changed_metadata.py:89
 msgid "Publish changed metadata"
 msgstr ""
 
-#: /Users/m/Workspaces/oarepo-libs/feat-remove-einfra-integraton/oarepo-requests/oarepo_requests/types/publish_changed_metadata.py:78
-#: /Users/m/Workspaces/oarepo-libs/feat-remove-einfra-integraton/oarepo-requests/oarepo_requests/types/publish_changed_metadata.py:80
-#: /Users/m/Workspaces/oarepo-libs/feat-remove-einfra-integraton/oarepo-requests/oarepo_requests/types/publish_changed_metadata.py:87
-#: /Users/m/Workspaces/oarepo-libs/feat-remove-einfra-integraton/oarepo-requests/oarepo_requests/types/publish_draft.py:95
-#: /Users/m/Workspaces/oarepo-libs/feat-remove-einfra-integraton/oarepo-requests/oarepo_requests/types/publish_draft.py:97
-#: /Users/m/Workspaces/oarepo-libs/feat-remove-einfra-integraton/oarepo-requests/oarepo_requests/types/publish_draft.py:104
-#: /Users/m/Workspaces/oarepo-libs/feat-remove-einfra-integraton/oarepo-requests/oarepo_requests/types/publish_new_version.py:132
-#: /Users/m/Workspaces/oarepo-libs/feat-remove-einfra-integraton/oarepo-requests/oarepo_requests/types/publish_new_version.py:134
-#: /Users/m/Workspaces/oarepo-libs/feat-remove-einfra-integraton/oarepo-requests/oarepo_requests/types/publish_new_version.py:141
+#: /home/ron/prace/oarepo-requests/oarepo_requests/types/publish_changed_metadata.py:88
+#: /home/ron/prace/oarepo-requests/oarepo_requests/types/publish_changed_metadata.py:90
+#: /home/ron/prace/oarepo-requests/oarepo_requests/types/publish_changed_metadata.py:97
+#: /home/ron/prace/oarepo-requests/oarepo_requests/types/publish_draft.py:95
+#: /home/ron/prace/oarepo-requests/oarepo_requests/types/publish_draft.py:97
+#: /home/ron/prace/oarepo-requests/oarepo_requests/types/publish_draft.py:104
+#: /home/ron/prace/oarepo-requests/oarepo_requests/types/publish_new_version.py:125
+#: /home/ron/prace/oarepo-requests/oarepo_requests/types/publish_new_version.py:127
+#: /home/ron/prace/oarepo-requests/oarepo_requests/types/publish_new_version.py:134
 msgid "Submit for review"
 msgstr ""
 
-#: /Users/m/Workspaces/oarepo-libs/feat-remove-einfra-integraton/oarepo-requests/oarepo_requests/types/publish_changed_metadata.py:81
+#: /home/ron/prace/oarepo-requests/oarepo_requests/types/publish_changed_metadata.py:91
 msgid "Review and publish changed metadata"
 msgstr ""
 
-#: /Users/m/Workspaces/oarepo-libs/feat-remove-einfra-integraton/oarepo-requests/oarepo_requests/types/publish_changed_metadata.py:82
-#: /Users/m/Workspaces/oarepo-libs/feat-remove-einfra-integraton/oarepo-requests/oarepo_requests/types/publish_changed_metadata.py:83
+#: /home/ron/prace/oarepo-requests/oarepo_requests/types/publish_changed_metadata.py:92
+#: /home/ron/prace/oarepo-requests/oarepo_requests/types/publish_changed_metadata.py:93
 msgid "Changed metadata submitted for review"
 msgstr ""
 
-#: /Users/m/Workspaces/oarepo-libs/feat-remove-einfra-integraton/oarepo-requests/oarepo_requests/types/publish_changed_metadata.py:84
-#: /Users/m/Workspaces/oarepo-libs/feat-remove-einfra-integraton/oarepo-requests/oarepo_requests/types/publish_changed_metadata.py:129
+#: /home/ron/prace/oarepo-requests/oarepo_requests/types/publish_changed_metadata.py:94
+#: /home/ron/prace/oarepo-requests/oarepo_requests/types/publish_changed_metadata.py:139
 msgid "Accepted changed metadata publication"
 msgstr ""
 
-#: /Users/m/Workspaces/oarepo-libs/feat-remove-einfra-integraton/oarepo-requests/oarepo_requests/types/publish_changed_metadata.py:85
-#: /Users/m/Workspaces/oarepo-libs/feat-remove-einfra-integraton/oarepo-requests/oarepo_requests/types/publish_changed_metadata.py:130
+#: /home/ron/prace/oarepo-requests/oarepo_requests/types/publish_changed_metadata.py:95
+#: /home/ron/prace/oarepo-requests/oarepo_requests/types/publish_changed_metadata.py:140
 msgid "Declined changed metadata publication"
 msgstr ""
 
-#: /Users/m/Workspaces/oarepo-libs/feat-remove-einfra-integraton/oarepo-requests/oarepo_requests/types/publish_changed_metadata.py:86
-#: /Users/m/Workspaces/oarepo-libs/feat-remove-einfra-integraton/oarepo-requests/oarepo_requests/types/publish_changed_metadata.py:131
+#: /home/ron/prace/oarepo-requests/oarepo_requests/types/publish_changed_metadata.py:96
+#: /home/ron/prace/oarepo-requests/oarepo_requests/types/publish_changed_metadata.py:141
 msgid "Cancelled changed metadata publication"
 msgstr ""
 
-#: /Users/m/Workspaces/oarepo-libs/feat-remove-einfra-integraton/oarepo-requests/oarepo_requests/types/publish_changed_metadata.py:105
+#: /home/ron/prace/oarepo-requests/oarepo_requests/types/publish_changed_metadata.py:115
 msgid ""
 "By submitting the changed metadata for review you are requesting the "
 "publication of the changed metadata. The draft will become locked and no "
-"further changes will be possible until the request is accepted or declined. "
-"You will be notified about the decision by email."
+"further changes will be possible until the request is accepted or "
+"declined. You will be notified about the decision by email."
 msgstr ""
 
-#: /Users/m/Workspaces/oarepo-libs/feat-remove-einfra-integraton/oarepo-requests/oarepo_requests/types/publish_changed_metadata.py:111
+#: /home/ron/prace/oarepo-requests/oarepo_requests/types/publish_changed_metadata.py:121
 msgid ""
 "Click to immediately publish the changed metadata. The draft will be a "
 "subject to embargo as requested in the side panel. Note: The action is "
 "irreversible."
 msgstr ""
 
-#: /Users/m/Workspaces/oarepo-libs/feat-remove-einfra-integraton/oarepo-requests/oarepo_requests/types/publish_changed_metadata.py:116
+#: /home/ron/prace/oarepo-requests/oarepo_requests/types/publish_changed_metadata.py:126
 msgid ""
-"Submit for review. After submitting the changed metadata for review, it will"
-" be locked and no further modifications will be possible."
+"Submit for review. After submitting the changed metadata for review, it "
+"will be locked and no further modifications will be possible."
 msgstr ""
 
-#: /Users/m/Workspaces/oarepo-libs/feat-remove-einfra-integraton/oarepo-requests/oarepo_requests/types/publish_changed_metadata.py:120
+#: /home/ron/prace/oarepo-requests/oarepo_requests/types/publish_changed_metadata.py:130
 msgid ""
-"The record with changed metadata has been submitted for review. You can now "
-"accept or decline the request."
+"The record with changed metadata has been submitted for review. You can "
+"now accept or decline the request."
 msgstr ""
 
-#: /Users/m/Workspaces/oarepo-libs/feat-remove-einfra-integraton/oarepo-requests/oarepo_requests/types/publish_changed_metadata.py:124
+#: /home/ron/prace/oarepo-requests/oarepo_requests/types/publish_changed_metadata.py:134
 msgid ""
-"The record with changed metadata has been submitted for review. It is now "
-"locked and no further changes are possible. You will be notified about the "
-"decision by email."
+"The record with changed metadata has been submitted for review. It is now"
+" locked and no further changes are possible. You will be notified about "
+"the decision by email."
 msgstr ""
 
-#: /Users/m/Workspaces/oarepo-libs/feat-remove-einfra-integraton/oarepo-requests/oarepo_requests/types/publish_changed_metadata.py:128
+#: /home/ron/prace/oarepo-requests/oarepo_requests/types/publish_changed_metadata.py:138
 msgid "The record with changed metadata has been submitted for review. "
 msgstr ""
 
-#: /Users/m/Workspaces/oarepo-libs/feat-remove-einfra-integraton/oarepo-requests/oarepo_requests/types/publish_changed_metadata.py:132
+#: /home/ron/prace/oarepo-requests/oarepo_requests/types/publish_changed_metadata.py:142
 msgid "Waiting for finishing the changed metadata publication request."
 msgstr ""
 
-#: /Users/m/Workspaces/oarepo-libs/feat-remove-einfra-integraton/oarepo-requests/oarepo_requests/types/publish_draft.py:35
-#: /Users/m/Workspaces/oarepo-libs/feat-remove-einfra-integraton/oarepo-requests/oarepo_requests/types/publish_draft.py:96
+#: /home/ron/prace/oarepo-requests/oarepo_requests/types/publish_draft.py:35
+#: /home/ron/prace/oarepo-requests/oarepo_requests/types/publish_draft.py:96
 msgid "Publish draft"
 msgstr ""
 
-#: /Users/m/Workspaces/oarepo-libs/feat-remove-einfra-integraton/oarepo-requests/oarepo_requests/types/publish_draft.py:75
-#: /Users/m/Workspaces/oarepo-libs/feat-remove-einfra-integraton/oarepo-requests/oarepo_requests/types/publish_new_version.py:102
+#: /home/ron/prace/oarepo-requests/oarepo_requests/types/publish_draft.py:75
+#: /home/ron/prace/oarepo-requests/oarepo_requests/types/publish_new_version.py:105
 msgid "Resource version"
 msgstr ""
 
-#: /Users/m/Workspaces/oarepo-libs/feat-remove-einfra-integraton/oarepo-requests/oarepo_requests/types/publish_draft.py:76
-#: /Users/m/Workspaces/oarepo-libs/feat-remove-einfra-integraton/oarepo-requests/oarepo_requests/types/publish_new_version.py:103
+#: /home/ron/prace/oarepo-requests/oarepo_requests/types/publish_draft.py:76
+#: /home/ron/prace/oarepo-requests/oarepo_requests/types/publish_new_version.py:106
 msgid "Write down the version (first, second…)."
 msgstr ""
 
-#: /Users/m/Workspaces/oarepo-libs/feat-remove-einfra-integraton/oarepo-requests/oarepo_requests/types/publish_draft.py:98
+#: /home/ron/prace/oarepo-requests/oarepo_requests/types/publish_draft.py:98
 msgid "Review and publish draft"
 msgstr ""
 
-#: /Users/m/Workspaces/oarepo-libs/feat-remove-einfra-integraton/oarepo-requests/oarepo_requests/types/publish_draft.py:99
-#: /Users/m/Workspaces/oarepo-libs/feat-remove-einfra-integraton/oarepo-requests/oarepo_requests/types/publish_draft.py:100
+#: /home/ron/prace/oarepo-requests/oarepo_requests/types/publish_draft.py:99
+#: /home/ron/prace/oarepo-requests/oarepo_requests/types/publish_draft.py:100
 msgid "Draft submitted for review"
 msgstr ""
 
-#: /Users/m/Workspaces/oarepo-libs/feat-remove-einfra-integraton/oarepo-requests/oarepo_requests/types/publish_draft.py:101
+#: /home/ron/prace/oarepo-requests/oarepo_requests/types/publish_draft.py:101
 msgid "Draft published"
 msgstr ""
 
-#: /Users/m/Workspaces/oarepo-libs/feat-remove-einfra-integraton/oarepo-requests/oarepo_requests/types/publish_draft.py:102
+#: /home/ron/prace/oarepo-requests/oarepo_requests/types/publish_draft.py:102
 msgid "Draft publication declined"
 msgstr ""
 
-#: /Users/m/Workspaces/oarepo-libs/feat-remove-einfra-integraton/oarepo-requests/oarepo_requests/types/publish_draft.py:103
+#: /home/ron/prace/oarepo-requests/oarepo_requests/types/publish_draft.py:103
 msgid "Draft publication cancelled"
 msgstr ""
 
-#: /Users/m/Workspaces/oarepo-libs/feat-remove-einfra-integraton/oarepo-requests/oarepo_requests/types/publish_draft.py:122
+#: /home/ron/prace/oarepo-requests/oarepo_requests/types/publish_draft.py:122
 msgid ""
-"By submitting the draft for review you are requesting the publication of the"
-" draft. The draft will become locked and no further changes will be possible"
-" until the request is accepted or declined. You will be notified about the "
-"decision by email."
+"By submitting the draft for review you are requesting the publication of "
+"the draft. The draft will become locked and no further changes will be "
+"possible until the request is accepted or declined. You will be notified "
+"about the decision by email."
 msgstr ""
 
-#: /Users/m/Workspaces/oarepo-libs/feat-remove-einfra-integraton/oarepo-requests/oarepo_requests/types/publish_draft.py:127
+#: /home/ron/prace/oarepo-requests/oarepo_requests/types/publish_draft.py:127
 msgid ""
 "Click to immediately publish the draft. The draft will be a subject to "
 "embargo as requested in the side panel. Note: The action is irreversible."
 msgstr ""
 
-#: /Users/m/Workspaces/oarepo-libs/feat-remove-einfra-integraton/oarepo-requests/oarepo_requests/types/publish_draft.py:132
+#: /home/ron/prace/oarepo-requests/oarepo_requests/types/publish_draft.py:132
 msgid ""
-"Submit for review. After submitting the draft for review, it will be locked "
-"and no further modifications will be possible."
+"Submit for review. After submitting the draft for review, it will be "
+"locked and no further modifications will be possible."
 msgstr ""
 
-#: /Users/m/Workspaces/oarepo-libs/feat-remove-einfra-integraton/oarepo-requests/oarepo_requests/types/publish_draft.py:136
+#: /home/ron/prace/oarepo-requests/oarepo_requests/types/publish_draft.py:136
 msgid ""
-"The draft has been submitted for review. You can now accept or decline the "
-"request."
+"The draft has been submitted for review. You can now accept or decline "
+"the request."
 msgstr ""
 
-#: /Users/m/Workspaces/oarepo-libs/feat-remove-einfra-integraton/oarepo-requests/oarepo_requests/types/publish_draft.py:139
+#: /home/ron/prace/oarepo-requests/oarepo_requests/types/publish_draft.py:139
 msgid ""
 "The draft has been submitted for review. It is now locked and no further "
 "changes are possible. You will be notified about the decision by email."
 msgstr ""
 
-#: /Users/m/Workspaces/oarepo-libs/feat-remove-einfra-integraton/oarepo-requests/oarepo_requests/types/publish_draft.py:143
+#: /home/ron/prace/oarepo-requests/oarepo_requests/types/publish_draft.py:143
 msgid "The draft has been submitted for review. "
 msgstr ""
 
-#: /Users/m/Workspaces/oarepo-libs/feat-remove-einfra-integraton/oarepo-requests/oarepo_requests/types/publish_draft.py:144
+#: /home/ron/prace/oarepo-requests/oarepo_requests/types/publish_draft.py:144
 msgid "The draft has been published. "
 msgstr ""
 
-#: /Users/m/Workspaces/oarepo-libs/feat-remove-einfra-integraton/oarepo-requests/oarepo_requests/types/publish_draft.py:145
+#: /home/ron/prace/oarepo-requests/oarepo_requests/types/publish_draft.py:145
 msgid "Publication of the draft has been declined."
 msgstr ""
 
-#: /Users/m/Workspaces/oarepo-libs/feat-remove-einfra-integraton/oarepo-requests/oarepo_requests/types/publish_draft.py:146
+#: /home/ron/prace/oarepo-requests/oarepo_requests/types/publish_draft.py:146
 msgid "The draft has been cancelled. "
 msgstr ""
 
-#: /Users/m/Workspaces/oarepo-libs/feat-remove-einfra-integraton/oarepo-requests/oarepo_requests/types/publish_draft.py:147
+#: /home/ron/prace/oarepo-requests/oarepo_requests/types/publish_draft.py:147
 msgid "Waiting for finishing the draft publication request."
 msgstr ""
 
-#: /Users/m/Workspaces/oarepo-libs/feat-remove-einfra-integraton/oarepo-requests/oarepo_requests/types/publish_new_version.py:45
-#: /Users/m/Workspaces/oarepo-libs/feat-remove-einfra-integraton/oarepo-requests/oarepo_requests/types/publish_new_version.py:133
+#: /home/ron/prace/oarepo-requests/oarepo_requests/types/publish_new_version.py:44
+#: /home/ron/prace/oarepo-requests/oarepo_requests/types/publish_new_version.py:126
 msgid "Publish new version"
 msgstr ""
 
-#: /Users/m/Workspaces/oarepo-libs/feat-remove-einfra-integraton/oarepo-requests/oarepo_requests/types/publish_new_version.py:46
+#: /home/ron/prace/oarepo-requests/oarepo_requests/types/publish_new_version.py:45
 msgid "Request publishing of a draft"
 msgstr ""
 
-#: /Users/m/Workspaces/oarepo-libs/feat-remove-einfra-integraton/oarepo-requests/oarepo_requests/types/publish_new_version.py:135
+#: /home/ron/prace/oarepo-requests/oarepo_requests/types/publish_new_version.py:128
 msgid "Review and publish new version"
 msgstr ""
 
-#: /Users/m/Workspaces/oarepo-libs/feat-remove-einfra-integraton/oarepo-requests/oarepo_requests/types/publish_new_version.py:136
-#: /Users/m/Workspaces/oarepo-libs/feat-remove-einfra-integraton/oarepo-requests/oarepo_requests/types/publish_new_version.py:137
+#: /home/ron/prace/oarepo-requests/oarepo_requests/types/publish_new_version.py:129
+#: /home/ron/prace/oarepo-requests/oarepo_requests/types/publish_new_version.py:130
 msgid "New version submitted for review"
 msgstr ""
 
-#: /Users/m/Workspaces/oarepo-libs/feat-remove-einfra-integraton/oarepo-requests/oarepo_requests/types/publish_new_version.py:138
+#: /home/ron/prace/oarepo-requests/oarepo_requests/types/publish_new_version.py:131
 msgid "New version published"
 msgstr ""
 
-#: /Users/m/Workspaces/oarepo-libs/feat-remove-einfra-integraton/oarepo-requests/oarepo_requests/types/publish_new_version.py:139
+#: /home/ron/prace/oarepo-requests/oarepo_requests/types/publish_new_version.py:132
 msgid "New version publication declined"
 msgstr ""
 
-#: /Users/m/Workspaces/oarepo-libs/feat-remove-einfra-integraton/oarepo-requests/oarepo_requests/types/publish_new_version.py:140
+#: /home/ron/prace/oarepo-requests/oarepo_requests/types/publish_new_version.py:133
 msgid "New version publication cancelled"
 msgstr ""
 
-#: /Users/m/Workspaces/oarepo-libs/feat-remove-einfra-integraton/oarepo-requests/oarepo_requests/types/publish_new_version.py:159
+#: /home/ron/prace/oarepo-requests/oarepo_requests/types/publish_new_version.py:152
 msgid ""
-"By submitting the new version for review you are requesting the publication "
-"of the new version. The draft will become locked and no further changes will"
-" be possible until the request is accepted or declined. You will be notified"
-" about the decision by email."
+"By submitting the new version for review you are requesting the "
+"publication of the new version. The draft will become locked and no "
+"further changes will be possible until the request is accepted or "
+"declined. You will be notified about the decision by email."
 msgstr ""
 
-#: /Users/m/Workspaces/oarepo-libs/feat-remove-einfra-integraton/oarepo-requests/oarepo_requests/types/publish_new_version.py:164
+#: /home/ron/prace/oarepo-requests/oarepo_requests/types/publish_new_version.py:157
 msgid ""
 "Click to immediately publish the new version. The new version will be a "
 "subject to embargo as requested in the side panel. Note: The action is "
 "irreversible."
 msgstr ""
 
-#: /Users/m/Workspaces/oarepo-libs/feat-remove-einfra-integraton/oarepo-requests/oarepo_requests/types/publish_new_version.py:169
+#: /home/ron/prace/oarepo-requests/oarepo_requests/types/publish_new_version.py:162
 msgid ""
-"Submit for review. After submitting the new version for review, it will be "
-"locked and no further modifications will be possible."
+"Submit for review. After submitting the new version for review, it will "
+"be locked and no further modifications will be possible."
 msgstr ""
 
-#: /Users/m/Workspaces/oarepo-libs/feat-remove-einfra-integraton/oarepo-requests/oarepo_requests/types/publish_new_version.py:173
+#: /home/ron/prace/oarepo-requests/oarepo_requests/types/publish_new_version.py:166
 msgid ""
-"The new version has been submitted for review. You can now accept or decline"
-" the request."
+"The new version has been submitted for review. You can now accept or "
+"decline the request."
 msgstr ""
 
-#: /Users/m/Workspaces/oarepo-libs/feat-remove-einfra-integraton/oarepo-requests/oarepo_requests/types/publish_new_version.py:176
+#: /home/ron/prace/oarepo-requests/oarepo_requests/types/publish_new_version.py:169
 msgid ""
 "The new version has been submitted for review. It is now locked and no "
 "further changes are possible. You will be notified about the decision by "
 "email."
 msgstr ""
 
-#: /Users/m/Workspaces/oarepo-libs/feat-remove-einfra-integraton/oarepo-requests/oarepo_requests/types/publish_new_version.py:180
+#: /home/ron/prace/oarepo-requests/oarepo_requests/types/publish_new_version.py:173
 msgid "The new version has been submitted for review. "
 msgstr ""
 
-#: /Users/m/Workspaces/oarepo-libs/feat-remove-einfra-integraton/oarepo-requests/oarepo_requests/types/publish_new_version.py:181
+#: /home/ron/prace/oarepo-requests/oarepo_requests/types/publish_new_version.py:174
 msgid "The new version has been published. "
 msgstr ""
 
-#: /Users/m/Workspaces/oarepo-libs/feat-remove-einfra-integraton/oarepo-requests/oarepo_requests/types/publish_new_version.py:182
+#: /home/ron/prace/oarepo-requests/oarepo_requests/types/publish_new_version.py:175
 msgid "Publication of the new version has been declined."
 msgstr ""
 
-#: /Users/m/Workspaces/oarepo-libs/feat-remove-einfra-integraton/oarepo-requests/oarepo_requests/types/publish_new_version.py:183
+#: /home/ron/prace/oarepo-requests/oarepo_requests/types/publish_new_version.py:176
 msgid "The new version has been cancelled. "
 msgstr ""
 
-#: /Users/m/Workspaces/oarepo-libs/feat-remove-einfra-integraton/oarepo-requests/oarepo_requests/types/publish_new_version.py:184
+#: /home/ron/prace/oarepo-requests/oarepo_requests/types/publish_new_version.py:177
 msgid "Waiting for finishing the new version publication request."
-msgstr ""
-
-msgid "New version"
-msgstr ""
-
-msgid "Record deletion"
-msgstr ""
-
-msgid "Edit published record"
-msgstr ""
-
-msgid "Submitters"
-msgstr ""
-
-msgid "No submit link found."
-msgstr ""
-
-msgid "Something went wrong while submitting your request."
-msgstr ""
-
-msgid "Apply for Write Access"
-msgstr ""
-
-msgid "Request submitted"
-msgstr ""
-
-msgid ""
-"Your request for standalone submitter access has been submitted. Please wait"
-" for it to be reviewed - you will receive an email notification once it has "
-"been processed."
-msgstr ""
-
-msgid ""
-"Please describe how you intend to use your membership in the group "
-"\"{{groupName}}\"."
-msgstr ""
-
-msgid "Intended use"
-msgstr ""
-
-msgid "Close"
-msgstr ""
-
-#: oarepo_requests/templates/semantic-ui/invenio_notifications/publish-changed-metadata-request-event.submit.jinja:18
-#, python-brace-format
-msgid "You are publishing changed metadata on record {topic_title}"
-msgstr ""
-
-#: oarepo_requests/templates/semantic-ui/invenio_notifications/publish-changed-metadata-request-event.submit.jinja:26
-#, python-format
-msgid ""
-"\n"
-"    <p>\n"
-"    You are publishing changed metadata on record %(topic_title)s.\n"
-"    Wait for invenio checks to finish, then accept the request or consider suggestions.\n"
-"    </p>\n"
-"    <p>\n"
-"        <a type=\"button\" href='%(link)s'>Accept or Decline the request</a>\n"
-"    </p>\n"
-"    "
-msgstr ""
-
-#: oarepo_requests/templates/semantic-ui/invenio_notifications/publish-changed-metadata-request-event.submit.jinja:55
-#, python-format
-msgid ""
-"\n"
-"    You are publishing changed metadata on record %(topic_title)s.\n"
-"    Wait for invenio checks to finish.\n"
-"    Then accept the request at %(link)s or consider suggestions.\n"
-"    "
-msgstr ""
-
-#: oarepo_requests/templates/semantic-ui/invenio_notifications/publish-draft-request-event.submit.jinja:18
-#, python-brace-format
-msgid "You are publishing record {topic_title}"
-msgstr ""
-
-#: oarepo_requests/templates/semantic-ui/invenio_notifications/publish-draft-request-event.submit.jinja:26
-#, python-format
-msgid ""
-"\n"
-"    <p>\n"
-"    You are publishing record %(topic_title)s.\n"
-"    Wait for invenio checks to finish, then accept the request or consider suggestions.\n"
-"    </p>\n"
-"    <p>\n"
-"        <a type=\"button\" href='%(link)s'>Accept or Decline the request</a>\n"
-"    </p>\n"
-"    "
-msgstr ""
-
-#: oarepo_requests/templates/semantic-ui/invenio_notifications/publish-draft-request-event.submit.jinja:55
-#, python-format
-msgid ""
-"\n"
-"    You are publishing record %(topic_title)s.\n"
-"    Wait for invenio checks to finish.\n"
-"    Then accept the request at %(link)s or consider suggestions.\n"
-"    "
-msgstr ""
-
-#: oarepo_requests/templates/semantic-ui/invenio_notifications/publish-new-version-request-event.submit.jinja:18
-#, python-brace-format
-msgid "You are publishing new version of record {topic_title}"
-msgstr ""
-
-#: oarepo_requests/templates/semantic-ui/invenio_notifications/publish-new-version-request-event.submit.jinja:26
-#, python-format
-msgid ""
-"\n"
-"    <p>\n"
-"    You are publishing new version of record %(topic_title)s.\n"
-"    Wait for invenio checks to finish, then accept the request or consider suggestions.\n"
-"    </p>\n"
-"    <p>\n"
-"        <a type=\"button\" href='%(link)s'>Accept or Decline the request</a>\n"
-"    </p>\n"
-"    "
-msgstr ""
-
-#: oarepo_requests/templates/semantic-ui/invenio_notifications/publish-new-version-request-event.submit.jinja:55
-#, python-format
-msgid ""
-"\n"
-"    You are publishing new version of record %(topic_title)s.\n"
-"    Wait for invenio checks to finish.\n"
-"    Then accept the request at %(link)s or consider suggestions.\n"
-"    "
-msgstr ""
-
-
-
-#: oarepo_requests/templates/semantic-ui/invenio_notifications/publish-changed-metadata-request-event.decline.jinja:16
-#, python-brace-format
-msgid "Request for metadata update for record '{topic_title}' was declined"
-msgstr ""
-
-#: oarepo_requests/templates/semantic-ui/invenio_notifications/publish-changed-metadata-request-event.decline.jinja:20
-#, python-format
-msgid ""
-"\n"
-"<p>\n"
-"Request for metadata update for record \"%(topic_title)s\" was declined. You can see the request at\n"
-"<a href=\"%(link)s\">%(link)s</a>\n"
-"</p>\n"
-"    "
-msgstr ""
-
-#: oarepo_requests/templates/semantic-ui/invenio_notifications/publish-changed-metadata-request-event.decline.jinja:34
-#, python-format
-msgid ""
-"\n"
-"Request for metadata update for record \"%(topic_title)s\" was declined. You can see the request at\n"
-"%(link)s\n"
-"    "
-msgstr ""
-
-#: oarepo_requests/templates/semantic-ui/invenio_notifications/publish-changed-metadata-request-event.submit.jinja:15
-#, python-brace-format
-msgid "Request to publish changed metadata on record {topic_title}"
-msgstr ""
-
-#: oarepo_requests/templates/semantic-ui/invenio_notifications/publish-changed-metadata-request-event.submit.jinja:19
-#, python-format
-msgid ""
-"\n"
-"    <p>\n"
-"    You have been asked to publish changed metadata on record \"%(topic_title)s\".\n"
-"    </p>\n"
-"    <p>\n"
-"        <a type=\"button\" href='%(link)s'>Accept or Decline the request</a>\n"
-"    </p>\n"
-"    "
-msgstr ""
-
-#: oarepo_requests/templates/semantic-ui/invenio_notifications/publish-changed-metadata-request-event.submit.jinja:36
-#, python-format
-msgid ""
-"\n"
-"    You have been asked to publish changed metadata on record \"%(topic_title)s\".\n"
-"    Accept or Decline the request at %(link)s\n"
-"    "
-msgstr ""
-
-#: oarepo_requests/templates/semantic-ui/invenio_notifications/publish-new-version-request-event.accept.jinja:16
-#, python-brace-format
-msgid "New version of record '{topic_title}' has been published"
-msgstr ""
-
-#: oarepo_requests/templates/semantic-ui/invenio_notifications/publish-new-version-request-event.accept.jinja:20
-#, python-format
-msgid ""
-"\n"
-"<p>\n"
-"New version of record \"%(topic_title)s\" has been published. You can see the record at\n"
-"<a href=\"%(link)s\">%(link)s</a>\n"
-"</p>\n"
-"    "
-msgstr ""
-
-#: oarepo_requests/templates/semantic-ui/invenio_notifications/publish-new-version-request-event.accept.jinja:34
-#, python-format
-msgid ""
-"\n"
-"New version of record \"%(topic_title)s\" has been published. You can see the record at\n"
-"%(link)s\n"
-"    "
-msgstr ""
-
-#: oarepo_requests/templates/semantic-ui/invenio_notifications/publish-new-version-request-event.decline.jinja:16
-#, python-brace-format
-msgid "Request for new version of record '{topic_title}' was declined"
-msgstr ""
-
-#: oarepo_requests/templates/semantic-ui/invenio_notifications/publish-new-version-request-event.decline.jinja:20
-#, python-format
-msgid ""
-"\n"
-"<p>\n"
-"Request for new version of record \"%(topic_title)s\" was declined. You can see the request at\n"
-"<a href=\"%(link)s\">%(link)s</a>\n"
-"</p>\n"
-"    "
-msgstr ""
-
-#: oarepo_requests/templates/semantic-ui/invenio_notifications/publish-new-version-request-event.decline.jinja:34
-#, python-format
-msgid ""
-"\n"
-"Request for new version of record \"%(topic_title)s\" was declined. You can see the request at\n"
-"%(link)s\n"
-"    "
-msgstr ""
-
-#: oarepo_requests/templates/semantic-ui/invenio_notifications/publish-new-version-request-event.submit.jinja:15
-#, python-brace-format
-msgid "Request to publish new version of record {topic_title}"
-msgstr ""
-
-#: oarepo_requests/templates/semantic-ui/invenio_notifications/publish-new-version-request-event.submit.jinja:19
-#, python-format
-msgid ""
-"\n"
-"    <p>\n"
-"    You have been asked to publish new version of record \"%(topic_title)s\".\n"
-"    </p>\n"
-"    <p>\n"
-"        <a type=\"button\" href='%(link)s'>Accept or Decline the request</a>\n"
-"    </p>\n"
-"    "
-msgstr ""
-
-#: oarepo_requests/templates/semantic-ui/invenio_notifications/publish-new-version-request-event.submit.jinja:36
-#, python-format
-msgid ""
-"\n"
-"    You have been asked to publish new version of record \"%(topic_title)s\".\n"
-"    Accept or Decline the request at %(link)s\n"
-"    "
 msgstr ""
