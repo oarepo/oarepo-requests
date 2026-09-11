@@ -1408,7 +1408,7 @@ msgstr ""
 
 #: /Users/m/w/cesnet/oarepo-requests/oarepo_requests/templates/oarepo/invenio_notifications/comment-request-event.create.jinja:59
 #, python-brace-format
-msgid "@{user_name} commented on '{request_title}'"
+msgid "{user_name} commented on '{request_title}'"
 msgstr ""
 
 #: /Users/m/w/cesnet/oarepo-requests/oarepo_requests/templates/oarepo/invenio_notifications/comment-request-event.create.jinja:63
@@ -1418,7 +1418,7 @@ msgstr ""
 
 #: /Users/m/w/cesnet/oarepo-requests/oarepo_requests/templates/oarepo/invenio_notifications/comment-request-event.create.jinja:69
 #, python-brace-format
-msgid "*@{user_name}* commented on *{request_title}*"
+msgid "*{user_name}* commented on *{request_title}*"
 msgstr ""
 
 #: /home/dusanst/Projects/oarepo-requests/oarepo_requests/services/oarepo/service.py:88
@@ -1520,12 +1520,12 @@ msgstr ""
 
 #: /Users/dusanstojanovic/Projects/oarepo-requests/oarepo_requests/templates/oarepo/invenio_notifications/comment-request-event.reply.jinja:33
 #, python-brace-format
-msgid "'@{user_name}' replied on <a href='{reply_link}'>comment</a>:"
+msgid "'{user_name}' replied on <a href='{reply_link}'>comment</a>:"
 msgstr ""
 
 #: /Users/dusanstojanovic/Projects/oarepo-requests/oarepo_requests/templates/oarepo/invenio_notifications/comment-request-event.reply.jinja:51
 #, python-brace-format
-msgid "@{user_name} replied on comment"
+msgid "{user_name} replied on comment"
 msgstr ""
 
 #: /Users/dusanstojanovic/Projects/oarepo-requests/oarepo_requests/templates/oarepo/invenio_notifications/comment-request-event.reply.jinja:55
@@ -1535,13 +1535,13 @@ msgstr ""
 
 #: /Users/dusanstojanovic/Projects/oarepo-requests/oarepo_requests/templates/oarepo/invenio_notifications/comment-request-event.reply.jinja:62
 #, python-brace-format
-msgid "*@{user_name}* replied on [comment]({reply_link})"
+msgid "*{user_name}* replied on [comment]({reply_link})"
 msgstr ""
 
 #: /Users/dusanstojanovic/Projects/oarepo-requests/oarepo_requests/templates/oarepo/invenio_notifications/comment-subcommunity-invitation-request.create.jinja:31
 #: /Users/dusanstojanovic/Projects/oarepo-requests/oarepo_requests/templates/oarepo/invenio_notifications/comment-subcommunity-request.create.jinja:30
 #, python-brace-format
-msgid "'@{user_name}' commented on '{request_title}':"
+msgid "'{user_name}' commented on '{request_title}':"
 msgstr ""
 
 #: /Users/dusanstojanovic/Projects/oarepo-requests/oarepo_requests/templates/oarepo/invenio_notifications/comment-request-event.create.jinja:14

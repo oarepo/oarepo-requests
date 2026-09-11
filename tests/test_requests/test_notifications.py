@@ -460,7 +460,7 @@ def test_comment_event_create_renders_creator_name(
         assert len(outbox) == 1
         sent_mail = outbox[0]
         assert "💬 New comment" in sent_mail.subject
-        assert "@Maxipes Fik commented on" in sent_mail.body
+        assert "Maxipes Fik commented on" in sent_mail.body
         assert "'Maxipes Fik' commented on" in sent_mail.html
 
 
