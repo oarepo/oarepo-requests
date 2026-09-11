@@ -1566,7 +1566,7 @@ msgstr ""
 #: /Users/m/w/cesnet/oarepo-requests/oarepo_requests/templates/oarepo/invenio_notifications/comment-request-event.create.jinja:38
 #, python-brace-format
 msgid "'{user_name}' commented on '{request_title}':"
-msgstr "'{user_name}' komentoval(a) žádost '{request_title}':"
+msgstr "'{user_name}' komentoval(a) '{request_title}':"
 
 #: /Users/m/w/cesnet/oarepo-requests/oarepo_requests/templates/oarepo/invenio_notifications/comment-request-event.create.jinja:40
 #, python-brace-format
@@ -1581,7 +1581,7 @@ msgstr "Zobrazit žádost"
 #: /Users/m/w/cesnet/oarepo-requests/oarepo_requests/templates/oarepo/invenio_notifications/comment-request-event.create.jinja:59
 #, python-brace-format
 msgid "{user_name} commented on '{request_title}'"
-msgstr "{user_name} komentoval(a) žádost '{request_title}'"
+msgstr "{user_name} komentoval(a) '{request_title}'"
 
 #: /Users/m/w/cesnet/oarepo-requests/oarepo_requests/templates/oarepo/invenio_notifications/comment-request-event.create.jinja:63
 #, python-brace-format
@@ -1591,11 +1591,11 @@ msgstr "Zobrazit žádost: {request_link}"
 #: /Users/m/w/cesnet/oarepo-requests/oarepo_requests/templates/oarepo/invenio_notifications/comment-request-event.create.jinja:69
 #, python-brace-format
 msgid "*{user_name}* commented on *{request_title}*"
-msgstr "*{user_name}* komentoval(a) žádost *{request_title}*"
+msgstr "*{user_name}* komentoval(a) *{request_title}*"
 
 #, python-brace-format
 msgid "*{user_name}* commented on *{request_title}*"
-msgstr "*{user_name}* komentoval(a) žádost *{request_title}*"
+msgstr "*{user_name}* komentoval(a) *{request_title}*"
 
 msgid ""
 "Record has validation errors. Please click the 'Edit metadata' button and "
@@ -1716,7 +1716,7 @@ msgstr "*{user_name}* odpověděl(a) na [komentář]({reply_link})"
 #: /Users/dusanstojanovic/Projects/oarepo-requests/oarepo_requests/templates/oarepo/invenio_notifications/comment-subcommunity-request.create.jinja:30
 #, python-brace-format
 msgid "'{user_name}' commented on '{request_title}':"
-msgstr "'{user_name}' komentoval(a) žádost '{request_title}':"
+msgstr "'{user_name}' komentoval(a) '{request_title}':"
 
 #: /Users/dusanstojanovic/Projects/oarepo-requests/oarepo_requests/templates/oarepo/invenio_notifications/comment-request-event.create.jinja:14
 #: /Users/dusanstojanovic/Projects/oarepo-requests/oarepo_requests/templates/oarepo/invenio_notifications/comment-request-event.reply.jinja:13
