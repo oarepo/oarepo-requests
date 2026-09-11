@@ -2155,7 +2155,7 @@ msgstr "❌ Žádost o přístup byla zrušena"
 #: /home/ron/prace/oarepo-requests/oarepo_requests/templates/oarepo/invenio_notifications/user-access-request.cancel.jinja:70
 #, python-brace-format
 msgid "Your access request has been canceled by {cancel_name}"
-msgstr "Vaše žádost o přístup byla zrušena {cancel_name}"
+msgstr "Vaše žádost o přístup byla zrušena uživatelem {cancel_name}"
 
 #: /home/ron/prace/oarepo-requests/oarepo_requests/templates/oarepo/invenio_notifications/user-access-request.cancel.jinja:34
 #: /home/ron/prace/oarepo-requests/oarepo_requests/templates/oarepo/invenio_notifications/user-access-request.decline.jinja:31
