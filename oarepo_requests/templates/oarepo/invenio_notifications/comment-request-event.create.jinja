@@ -59,7 +59,7 @@
 {%- endblock html_body %}
 
 {%- block plain_body -%}
-{{ _("@{user_name} commented on '{request_title}'").format(user_name=event_creator_name, request_title=request_title) }}.
+{{ _("{user_name} commented on '{request_title}'").format(user_name=event_creator_name, request_title=request_title) }}.
 
 {{ request_event_content }}
 
@@ -69,7 +69,7 @@
 
 {# Markdown for Slack/Mattermost/chat #}
 {%- block md_body -%}
-{{ _("*@{user_name}* commented on *{request_title}*").format(user_name=event_creator_name, request_title=request_title) }}.
+{{ _("*{user_name}* commented on *{request_title}*").format(user_name=event_creator_name, request_title=request_title) }}.
 
 {{ request_event_content }}
 

@@ -33,7 +33,7 @@
 {%- block html_body -%}
 <table style="font-family:'Lato',Helvetica,Arial,sans-serif;border-spacing:15px">
     <tr>
-        <td>{{ _("'@{user_name}' replied on <a href='{reply_link}'>comment</a>:").format(user_name=event_creator_name, reply_link=reply_link) | safe }}</td>
+        <td>{{ _("'{user_name}' replied on <a href='{reply_link}'>comment</a>:").format(user_name=event_creator_name, reply_link=reply_link) | safe }}</td>
     </tr>
     <tr>
         <td><em>{{ request_event_content }}</em></td>
@@ -51,7 +51,7 @@
 {%- endblock html_body %}
 
 {%- block plain_body -%}
-{{ _("@{user_name} replied on comment").format(user_name=event_creator_name) }}.
+{{ _("{user_name} replied on comment").format(user_name=event_creator_name) }}.
 
 {{ request_event_content }}
 
@@ -62,7 +62,7 @@
 
 {# Markdown for Slack/Mattermost/chat #}
 {%- block md_body -%}
-{{ _("*@{user_name}* replied on [comment]({reply_link})").format(user_name=event_creator_name, reply_link=reply_link) }}.
+{{ _("*{user_name}* replied on [comment]({reply_link})").format(user_name=event_creator_name, reply_link=reply_link) }}.
 
 {{ request_event_content }}
 
