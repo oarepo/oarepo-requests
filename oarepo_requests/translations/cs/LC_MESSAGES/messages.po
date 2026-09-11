@@ -2148,19 +2148,19 @@ msgstr ""
 
 #: /home/ron/prace/oarepo-requests/oarepo_requests/templates/oarepo/invenio_notifications/user-access-request.cancel.jinja:26
 msgid "❌ Access request canceled"
-msgstr ""
+msgstr "❌ Žádost o přístup byla zrušena"
 
 #: /home/ron/prace/oarepo-requests/oarepo_requests/templates/oarepo/invenio_notifications/user-access-request.cancel.jinja:32
 #: /home/ron/prace/oarepo-requests/oarepo_requests/templates/oarepo/invenio_notifications/user-access-request.cancel.jinja:56
 #: /home/ron/prace/oarepo-requests/oarepo_requests/templates/oarepo/invenio_notifications/user-access-request.cancel.jinja:70
 #, python-brace-format
 msgid "Your access request has been canceled by {cancel_name}"
-msgstr ""
+msgstr "Vaše žádost o přístup byla zrušena {cancel_name}"
 
 #: /home/ron/prace/oarepo-requests/oarepo_requests/templates/oarepo/invenio_notifications/user-access-request.cancel.jinja:34
 #: /home/ron/prace/oarepo-requests/oarepo_requests/templates/oarepo/invenio_notifications/user-access-request.decline.jinja:31
 msgid " with the following message:"
-msgstr ""
+msgstr "s následující  zprávou:"
 
 #: /home/ron/prace/oarepo-requests/oarepo_requests/templates/oarepo/invenio_notifications/user-access-request.cancel.jinja:44
 #: /home/ron/prace/oarepo-requests/oarepo_requests/templates/oarepo/invenio_notifications/user-access-request.cancel.jinja:63
@@ -2169,30 +2169,30 @@ msgstr ""
 #: /home/ron/prace/oarepo-requests/oarepo_requests/templates/oarepo/invenio_notifications/user-access-request.decline.jinja:60
 #: /home/ron/prace/oarepo-requests/oarepo_requests/templates/oarepo/invenio_notifications/user-access-request.decline.jinja:74
 msgid "View the record"
-msgstr ""
+msgstr "Zobrazit záznam"
 
 #: /home/ron/prace/oarepo-requests/oarepo_requests/templates/oarepo/invenio_notifications/user-access-request.cancel.jinja:59
 #: /home/ron/prace/oarepo-requests/oarepo_requests/templates/oarepo/invenio_notifications/user-access-request.cancel.jinja:73
 #: /home/ron/prace/oarepo-requests/oarepo_requests/templates/oarepo/invenio_notifications/user-access-request.decline.jinja:56
 #: /home/ron/prace/oarepo-requests/oarepo_requests/templates/oarepo/invenio_notifications/user-access-request.decline.jinja:70
 msgid "with the following message:"
-msgstr ""
+msgstr "s následující  zprávou:"
 
 #: /home/ron/prace/oarepo-requests/oarepo_requests/templates/oarepo/invenio_notifications/user-access-request.decline.jinja:23
 msgid "⛔️ Access request declined"
-msgstr ""
+msgstr "⛔️ Žádost o přístup byla odmítnuta"
 
 #: /home/ron/prace/oarepo-requests/oarepo_requests/templates/oarepo/invenio_notifications/user-access-request.decline.jinja:29
 #, python-brace-format
 msgid "The owner of '{record_title}' has declined your access request"
-msgstr ""
+msgstr "Vlastník záznamu '{record_title}' odmítl vaši žádost o přístup"
 
 #: /home/ron/prace/oarepo-requests/oarepo_requests/templates/oarepo/invenio_notifications/user-access-request.decline.jinja:53
 #, python-brace-format
 msgid "The owner of '{record_title}' has rejected your access request"
-msgstr ""
+msgstr "Vlastník záznamu '{record_title}' zamítl vaši žádost o přístup"
 
 #: /home/ron/prace/oarepo-requests/oarepo_requests/templates/oarepo/invenio_notifications/user-access-request.decline.jinja:67
 #, python-brace-format
 msgid "The owner of *{record_title}* has rejected your access request"
-msgstr ""
+msgstr "Vlastník záznamu *{record_title}* zamítl vaši žádost o přístup"
