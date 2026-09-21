@@ -108,7 +108,10 @@ class OARepoRequestType(RequestType):
     def _create_marshmallow_schema(cls) -> type[Schema]:
         """Create a marshmallow schema for this request type with required payload field."""
         base_schema = super()._create_marshmallow_schema()
-        # TODO: idk why .fields
+        # REVIEW: this is on instance of a schema but base_schema is SchemaMeta with fields saved in ._declared_fields
+        # Consider whether this is necessary - supposed use case? - "removal_reason" is required for request deletion
+        # and schema without the Nested being required would allow for creation of requests without payload
+        # but this seems to be already checked in oarepo_requests.services.oarepo.service.OARepoRequestsService.create:107
         if cls.payload_schema is not None and hasattr(base_schema, "fields") and "payload" in base_schema.fields:  # type: ignore[reportAttributeAccessIssue]
             base_schema.fields["payload"].required = True  # type: ignore[reportAttributeAccessIssue] #pragma: no cover
 
@@ -129,6 +132,9 @@ class OARepoRequestType(RequestType):
                 topic_proxy = getattr(original, "topic", None)
                 if topic_proxy is not None:
                     try:
+                        # REVIEW: convert topic should be called here
+                        # (PublishChangedMetadata resolves title of the published record instead of
+                        # potentially changed one in draft)
                         topic = topic_proxy.resolve()
                         metadata = getattr(topic, "metadata", None) if topic else None
                         topic_title = metadata.get("title") if isinstance(metadata, dict) else None
@@ -192,6 +198,7 @@ class OARepoRequestType(RequestType):
         }
 
     # TODO: move these to RecordRequestType too?
+    # also; if i am to trust codex, they were used in rdm-12 but not now; though new request still define them
     def stateful_name(
         self,
         identity: Identity,  # noqa: ARG002
@@ -224,6 +231,7 @@ class OARepoRequestType(RequestType):
         """
         return self.description
 
+    # REVIEW: where is this used?
     def string_by_state(  # noqa: PLR0911,C901,PLR0913
         self,
         identity: Identity,

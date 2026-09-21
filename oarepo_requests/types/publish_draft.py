@@ -33,39 +33,10 @@ class PublishDraftRequestType(PublishRequestType):
 
     type_id = "publish_draft"
     name = _("Publish draft")
-
+    topic_type = "initial"
     payload_schema: Mapping[str, ma.fields.Field] | None = {
         "version": ma.fields.Str(),
     }
-
-    @override
-    def can_create(
-        self,
-        identity: Identity,
-        data: dict,
-        receiver: dict[str, str],
-        topic: Record,
-        creator: dict[str, str],
-        *args: Any,
-        **kwargs: Any,
-    ) -> None:
-        """Check if the request can be created."""
-        topic = self.convert_topic(identity, topic)
-        if self.topic_type(topic) != "initial":
-            raise ValueError(f"Topic type {self.topic_type(topic)} is not the initial unpublished draft")
-        super().can_create(identity, data, receiver, topic, creator, *args, **kwargs)
-
-    @classmethod
-    def is_applicable_to(cls, identity: Identity, topic: Record, *args: Any, **kwargs: Any) -> bool:
-        """Check if the request type is applicable to the topic."""
-        try:
-            topic = cls.convert_topic(identity, topic)
-        except ValueError:
-            return False
-        if cls.topic_type(topic) != "initial":
-            return False
-
-        return super().is_applicable_to(identity, topic, *args, **kwargs)
 
     # TODO: used in ui
     form: ClassVar[JsonValue] = {

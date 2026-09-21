@@ -67,6 +67,7 @@ class NotificationManager(InvenioNotificationManager):
                     notification.dumps(),
                 )
 
+    # REVIEW: seems like pointless method extraction
     @classmethod
     def build_recipient_backends(
         cls,

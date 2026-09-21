@@ -38,6 +38,7 @@ if TYPE_CHECKING:
     from invenio_requests.records.api import Request
 
 
+# REVIEW: make non-duplicable (consider splitting [NonDuplicable/Record]OARepoRequestType into mixins)
 class GroupMembershipRequestType(DefaultReceiverMixin, OARepoRequestType):
     """Request type for requesting membership in a group."""
 
@@ -59,7 +60,7 @@ class GroupMembershipRequestType(DefaultReceiverMixin, OARepoRequestType):
             "submit": GroupMembershipSubmitAction,
             "decline": GroupMembershipDeclineAction,
             # OARepoRequestType uses OARepoCancelAction using workflow; workflows are not supported for group topic
-            "cancel": CancelAction,
+            "cancel": CancelAction,  # REVIEW: workflow transitions only work for record topics; consider moving the use of TransitionComponent outside vanilla OARepoRequestType - so it does work by default with non-record topics
         }
 
     @override

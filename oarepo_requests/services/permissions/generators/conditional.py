@@ -60,9 +60,9 @@ class IfRequestedBy(RecipientGeneratorMixin, ConditionalGenerator):
                 creator = ResolverRegistry.reference_entity(creator)
             needs = creator.get_needs()
 
-        for condition in self.requesters:
-            condition_needs = set(condition.needs(request_type=request_type, creator=creator, **kwargs))
-            condition_excludes = set(condition.excludes(request_type=request_type, creator=creator, **kwargs))
+        for requester_generator in self.requesters:
+            condition_needs = set(requester_generator.needs(request_type=request_type, creator=creator, **kwargs))
+            condition_excludes = set(requester_generator.excludes(request_type=request_type, creator=creator, **kwargs))
 
             if not condition_needs.intersection(needs):
                 continue
@@ -71,6 +71,7 @@ class IfRequestedBy(RecipientGeneratorMixin, ConditionalGenerator):
             return True
         return False
 
+    # REVIEW: seems generic enough to be extracted
     def reference_receivers(
         self,
         record: Record | None = None,

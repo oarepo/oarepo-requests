@@ -28,7 +28,7 @@ class RequestActionComponent:
     """Abstract request action component.
 
     Implementation warning: calling actions reloading and recommiting request or topic (eg. topic publish) within
-    components may cause incorrect behavior due to the fact that changes on the new (reloaded) instance do not
+    components may cause incorrect behavior because changes on the new (reloaded) instance do not
     propagate to commit ops in the stack below.
     """
 

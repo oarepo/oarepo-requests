@@ -3,8 +3,8 @@
 #
 # oarepo-requests is free software; you can redistribute it and/or
 # modify it under the terms of the MIT License; see LICENSE file for more
-# details.
 #
+# details.
 """Utility functions for the requests module."""
 
 from __future__ import annotations
@@ -82,7 +82,7 @@ def allowed_request_types_for_record(identity: Identity, record: Record) -> dict
         # so returning all matching request types
         pass
 
-    record_ref = next(iter(reference_entity(record).keys()))
+    record_ref = next(iter(reference_entity(record).keys()))  # REVIEW: since we now use only 'record'?
 
     ret = {}
     for rt in current_request_type_registry:
@@ -339,13 +339,13 @@ def search_requests(identity: Identity, record: RecordWithDraft | dict[str, str]
         current_requests_service.search(identity, topic=topic_ref, expand=expand),
     )
 
-
+# REVIEW: seems to be only used in tests?
 def applicable_requests(identity: Identity, record: RecordWithDraft | dict[str, str]) -> RequestTypesList:
     """Get applicable request types for a record."""
     topic_ref = reference_entity(record) if isinstance(record, RecordWithDraft) else record
     return current_requests_service.applicable_request_types(identity, topic=topic_ref)
 
-
+# REVIEW: move to runtime if necessary
 def get_draft_record_service(record: Record) -> DraftRecordService:
     """Get the draft record service for a record and checks it supports drafts."""
     topic_service = current_runtime.get_record_service_for_record(record)

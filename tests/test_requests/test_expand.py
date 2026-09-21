@@ -38,6 +38,32 @@ def test_requests_field(
     assert "requests" in expanded_record.json["expanded"]
 
 
+def test_request_types_serialize_correctly(
+    logged_client,
+    users,
+    urls,
+    draft_factory,
+    search_clear,
+):
+    creator = users[0]
+    creator_client = logged_client(creator)
+    draft = draft_factory(creator.identity)
+
+    response = creator_client.get(f"{urls['BASE_URL']}/{draft['id']}/draft?expand=true")
+
+    assert response.status_code == 200
+    assert response.json["expanded"]["request_types"] == [
+        {
+            "type_id": "publish_draft",
+            "links": {
+                "actions": {
+                    "create": f"https://127.0.0.1:5000/api/requests/record:{draft['id']}/publish_draft"
+                }
+            },
+        }
+    ]
+
+
 def test_autoaccept_receiver(
     logged_client,
     users,

@@ -21,7 +21,6 @@ if TYPE_CHECKING:
     from invenio_db.uow import UnitOfWork
 
 
-# TODO: snapshot
 class EditTopicAcceptAction(OARepoAcceptAction):
     """Accept creation of a draft of a published record for editing metadata."""
 
