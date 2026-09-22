@@ -11,6 +11,33 @@ as required by `/home/ron/prace/AGENTS.md` for code reviews. The validation case
 are proposed regression tests, not claims of successful reproduction. P1 means
 high priority; P2 means normal priority; P3 means minor.
 
+## Regression reproducers
+
+[tests/test_requests/test_review_regressions.py](tests/test_requests/test_review_regressions.py)
+contains 16 numbered tests (21 parametrized cases). Tests 01--13 correspond to
+the numbered findings below; 14--16 cover the three smaller issues in order.
+Each asserts the intended behavior, so unfixed bugs produce ordinary test
+failures rather than expected-failure marks. The `keep_files=no` and new-format
+topic cases are working controls.
+
+The transaction, persistence, and pagination cases use the existing app,
+database, search, and record fixtures. Pagination uses a one-result page so only
+two historical records are needed. Notification task dispatch is disabled in
+this module; notification-generator/filter tests exercise their code directly.
+
+Run the reproducers with the standard runner:
+
+```bash
+SQLALCHEMY_DATABASE_URI=postgresql+psycopg2://invenio:invenio@localhost:5432/invenio \
+  ./run.sh test tests/test_requests/test_review_regressions.py -q
+```
+
+Add `-k review_02` to run just the deletion rollback reproducer, for example.
+The current working tree contains the resource-config `fields` import fix
+mentioned below; a clean checkout also needs that fix to get past app imports.
+The tests have been syntax-checked and passed file-scoped Ruff lint/format
+checks, but have not been executed, following the workspace's review instruction.
+
 ## 1. [P1, branch regression] New-version publication disappears from applicable requests
 
 Location: [types/publish_new_version.py:90](oarepo_requests/types/publish_new_version.py#L90).
