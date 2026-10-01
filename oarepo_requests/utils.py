@@ -12,6 +12,7 @@ from __future__ import annotations
 import copy
 from typing import TYPE_CHECKING, Any, cast
 
+import opensearch_dsl
 from flask_babel.speaklater import LazyString
 from invenio_access.permissions import system_identity
 from invenio_drafts_resources.records import Record as RecordWithDraft
@@ -30,6 +31,7 @@ from oarepo_workflows import (
 from oarepo_workflows.errors import MissingWorkflowError
 from oarepo_workflows.proxies import current_oarepo_workflows
 
+from oarepo_requests.errors import VersionAlreadyExists
 from oarepo_requests.proxies import current_requests_service
 
 if TYPE_CHECKING:
@@ -336,7 +338,7 @@ def search_requests(identity: Identity, record: RecordWithDraft | dict[str, str]
     topic_ref = reference_entity(record) if isinstance(record, RecordWithDraft) else record
     return cast(
         "RequestList",
-        current_requests_service.search(identity, topic=topic_ref, expand=expand),
+        current_requests_service.scan(identity, topic=topic_ref, expand=expand),
     )
 
 # REVIEW: seems to be only used in tests?

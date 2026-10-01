@@ -168,14 +168,13 @@ class PublishRequestType(NonDuplicableOARepoRecordRequestType):
         if not isinstance(topic, RecordWithDraft):
             raise TypeError(f"Topic type {type(topic)} does not support drafts")
         index = topic.versions.index
-        is_latest = topic.versions.is_latest
+        latest_index = topic.versions.latest_index # The version index of the latest published record/draft
         is_draft = topic.is_draft
 
         if not is_draft:
             return "published"
-
-        if index == 1 and not is_latest:
+        if latest_index is None:
             return "initial"
-        if index > 1 and not is_latest:
+        if index > latest_index:
             return "new_version"
         return "metadata"

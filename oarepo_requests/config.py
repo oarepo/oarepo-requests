@@ -24,20 +24,20 @@ from oarepo_requests.actions.components import (
 from oarepo_requests.notifications.generators import MultipleRecipients
 
 # check individual receivers in multiple?
-REQUESTS_ALLOWED_RECEIVERS = ["user", "group", "auto_approve"]
+REQUESTS_ALLOWED_RECEIVERS = ["user", "group", "auto_approve"] # REVIEW: still used?
 
 DEFAULT_WORKFLOW_EVENTS = {
     CommentEventType.type_id: WorkflowEvent(submitters=InvenioRequestsPermissionPolicy.can_create_comment),
     LogEventType.type_id: WorkflowEvent(submitters=InvenioRequestsPermissionPolicy.can_create_comment),
-}
+} # REVIEW: still used?
 
 REQUESTS_ACTION_COMPONENTS: tuple[type[RequestActionComponent], ...] = (
-    WorkflowTransitionComponent,
+    WorkflowTransitionComponent, # REVIEW: consider this might crash oarepo requests with topics without workflow
     AutoAcceptComponent,
 )
 
 # TODO: possibly not used outside ui
-PUBLISH_REQUEST_TYPES = ["publish_draft", "publish_new_version"]
+PUBLISH_REQUEST_TYPES = ["publish_draft", "publish_new_version"] # REVIEW: still used?
 
 
 NOTIFICATION_RECIPIENTS_RESOLVERS = {

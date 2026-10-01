@@ -72,7 +72,7 @@ class DeletePublishedRecordAcceptAction(OARepoAcceptAction):
         if not topic_service:
             raise KeyError(f"topic {topic} service not found")
         if hasattr(topic_service, "delete_record"):
-            topic_service = cast("RDMRecordService", topic_service)  # REVIEW: why not just use type(topic)?
+            topic_service = cast("RDMRecordService", topic_service)
             resource_config = current_runtime.models_by_record_class[topic_service.record_cls].resource_config
             citation_text = "Citation unavailable."
             if (
@@ -87,8 +87,7 @@ class DeletePublishedRecordAcceptAction(OARepoAcceptAction):
                 "note": self.request["payload"].get("note", ""),
                 "is_visible": True,
             }
-            self.topic = record_from_result(topic_service.delete_record(identity, topic["id"], data))
-            db.session.commit()
+            self.topic = record_from_result(topic_service.delete_record(identity, topic["id"], data, uow=uow))
         else:
             topic_service.delete(identity, topic["id"], *args, uow=uow, **kwargs)
 

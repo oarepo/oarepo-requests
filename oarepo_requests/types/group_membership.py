@@ -59,8 +59,6 @@ class GroupMembershipRequestType(DefaultReceiverMixin, OARepoRequestType):
             "accept": GroupMembershipAcceptAction,
             "submit": GroupMembershipSubmitAction,
             "decline": GroupMembershipDeclineAction,
-            # OARepoRequestType uses OARepoCancelAction using workflow; workflows are not supported for group topic
-            "cancel": CancelAction,  # REVIEW: workflow transitions only work for record topics; consider moving the use of TransitionComponent outside vanilla OARepoRequestType - so it does work by default with non-record topics
         }
 
     @override

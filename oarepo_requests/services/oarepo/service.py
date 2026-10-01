@@ -103,14 +103,6 @@ class OARepoRequestsService(RequestsService):
         if not type_:
             raise UnknownRequestTypeError(request_type)
         data = data or {}
-        if receiver is None:
-            if isinstance(type_, DefaultReceiverMixin):
-                receiver = type_.default_request_receiver(identity, topic, creator or identity, data)
-            else:
-                # if explicit receiver is not passed, use current identity - this is in sync with invenio_requests
-                receiver = current_oarepo_requests.default_request_receiver(
-                    identity, type_, topic, creator or identity, data
-                )
         if "payload" not in data and type_.payload_schema:
             data["payload"] = {}
         schema = self._wrap_schema(type_.marshmallow_schema())
@@ -119,11 +111,20 @@ class OARepoRequestsService(RequestsService):
             context={"identity": identity},
             raise_errors=True,
         )
-
         # ask to convert the topic. For example, for publish_metadata, the topic here is the previously published record
         # but we need the draft that we are publishing.
         if hasattr(type_, "convert_topic"):
             topic = type_.convert_topic(identity, topic)  # type: ignore[reportAttributeAccessIssue]
+
+        if receiver is None:
+            if isinstance(type_, DefaultReceiverMixin):
+                receiver = type_.default_request_receiver(identity, topic, creator or identity, data)
+            else:
+                # if explicit receiver is not passed, use current identity - this is in sync with invenio_requests
+                receiver = current_oarepo_requests.default_request_receiver(
+                    identity, type_, topic, creator or identity, data
+                )
+
 
         if hasattr(type_, "can_create"):
             # raise exception if can't
@@ -136,8 +137,9 @@ class OARepoRequestsService(RequestsService):
             receiver=receiver,  # type: ignore[reportArgumentType]
             creator=creator,
             topic=topic,
-            expand=expand,
+            expires_at=expires_at,
             uow=uow,
+            expand=expand,
         )
         uow.register(IndexRefreshOp(indexer=self.indexer, index=self.record_cls.index))  # type: ignore[reportArgumentType]
         return result

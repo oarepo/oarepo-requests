@@ -19,6 +19,7 @@ from invenio_requests.resources import RequestsResourceConfig
 from invenio_requests.resources.requests.config import RequestSearchRequestArgsSchema
 
 from oarepo_requests.errors import oarepo_requests_error_handlers
+from marshmallow import fields
 
 if TYPE_CHECKING:
     from collections.abc import Callable, Mapping
@@ -26,7 +27,7 @@ if TYPE_CHECKING:
 
     from flask import Response
     from flask_resources import ResponseHandler
-    from marshmallow import fields
+
 
 class ExtendedRequestSearchRequestArgsSchema(RequestSearchRequestArgsSchema):
     """Marshmallow schema for the extra filters."""

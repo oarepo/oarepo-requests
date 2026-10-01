@@ -14,15 +14,13 @@ from typing import TYPE_CHECKING, Any, ClassVar, override
 import marshmallow as ma
 from invenio_i18n import gettext
 from invenio_i18n import lazy_gettext as _
-from invenio_requests.records.api import Request
-
-from oarepo_requests.errors import VersionAlreadyExists
-
+from invenio_search.engine import dsl
 from ..actions.publish_new_version import (
     PublishNewVersionAcceptAction,
     PublishNewVersionDeclineAction,
     PublishNewVersionSubmitAction,
 )
+from ..errors import VersionAlreadyExists
 from ..utils import get_draft_record_service
 from .publish_base import PublishRequestType
 
@@ -67,30 +65,16 @@ class PublishNewVersionRequestType(PublishRequestType):
     ) -> None:
         """Check if the request can be created."""
         super().can_create(identity, data, receiver, topic, creator, *args, **kwargs)
-        topic_service = get_draft_record_service(topic)
         # Only needed in case of new version as when you are publishing
         # draft for the first time, there are no previous versions with
         # which you can have collision
-        if "payload" in data and "version" in data["payload"]:
-            versions = topic_service.search_versions(identity, topic.pid.pid_value)
-            versions_hits = versions.to_dict()["hits"]["hits"]
-            for rec in versions_hits:
-                if "version" in rec["metadata"]:
-                    version = rec["metadata"]["version"]
-                    if version == data["payload"]["version"]:
-                        raise VersionAlreadyExists
-
-    @classmethod
-    def is_applicable_to(cls, identity: Identity, topic: Record, *args: Any, **kwargs: Any) -> bool:
-        """Check if the request type is applicable to the topic."""
-        try:
-            topic = cls.convert_topic(identity, topic)
-        except ValueError:
-            return False
-        if cls.topic_type(topic) != "new_version":
-            return False
-
-        return super().is_applicable_to(identity, topic, *args, **kwargs)
+        if payload_version := data.get("payload", {}).get("version"):
+            topic_service = get_draft_record_service(topic)
+            versions = topic_service.search_versions(
+                identity, topic.pid.pid_value, extra_filter=dsl.Q("term", **{"metadata.version": payload_version})
+            )
+            if versions.total > 0:
+                raise VersionAlreadyExists
 
     # TODO: used in ui
     form: ClassVar[JsonValue] = {

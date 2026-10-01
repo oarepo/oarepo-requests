@@ -37,6 +37,8 @@ class EntityRecipientGenerator(RecipientGenerator):
                 "Using EntityRecipientGenerator on notification without saved reference dictionary to the entity."
             )
         entity_type = notification.context.get_reference_type(self.key)
+        if entity_type is None:
+            return
         generator = current_notification_recipient_generators_registry[entity_type](self.key, notification)
         generator(notification, recipients)
 

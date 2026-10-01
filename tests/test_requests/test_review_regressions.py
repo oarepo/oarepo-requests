@@ -332,7 +332,7 @@ def test_review_13_duplicate_version_label_beyond_first_page_is_rejected(
     record_service.update_draft(
         system_identity,
         second.id,
-        {"metadata": {**first["metadata"], "version": "review-v2"}},
+        {"metadata": {**first["metadata"], "version": "review-v2"}, "files": first["files"]},
     )
     record_service.publish(system_identity, second.id)
     record_service.record_cls.index.refresh()
@@ -396,3 +396,25 @@ def test_review_16_invalid_topic_error_names_actual_type(record_factory, record_
 
     with pytest.raises(ValueError, match="Topic type new_version"):
         PublishDraftRequestType().can_create(system_identity, {}, {}, draft, {})
+
+
+def test_review_17_new_version_of_older_version_follows_latest(
+    record_factory,
+    record_service,
+    submit_request_on_record,
+    users,
+):
+    """A new version requested on v1 after v2 was published becomes v3 of the same record."""
+    first = record_factory(users[0].identity)
+    second = record_service.new_version(system_identity, first["id"])
+    record_service.publish(system_identity, second.id)
+    assert not record_service.record_cls.pid.resolve(first["id"]).versions.is_latest
+
+    request = submit_request_on_record(users[0].identity, first["id"], "new_version")
+
+    assert request.to_dict()["status"] == "accepted"
+    created_id = request.to_dict()["payload"]["created_topic"].split(":")[1]
+    created = record_from_result(record_service.read_draft(system_identity, created_id))
+    assert created.parent.id == record_service.record_cls.pid.resolve(first["id"]).parent.id
+    assert created.versions.index == 3
+    assert created.versions.next_draft_id == created.id

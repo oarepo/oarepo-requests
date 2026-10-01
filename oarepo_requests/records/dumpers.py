@@ -34,4 +34,5 @@ class RecordReferenceDumperExt(SearchDumperExt):
     @override
     def load(self, data: dict[str, Any], record_cls: type) -> None:
         """Remove the record type reference."""
-        data["topic"] = data["topic"][0]
+        if isinstance(data["topic"], list):
+            data["topic"] = data["topic"][0]

@@ -48,18 +48,12 @@ class IfRequestedBy(RecipientGeneratorMixin, ConditionalGenerator):
         self,
         *,
         request_type: RequestType,
-        creator: Identity | EntityProxy | Any,
+        creator: Identity | EntityProxy,
         **kwargs: Any,
     ) -> bool:
         """Condition to choose generators set."""
         # get needs
-        if isinstance(creator, Identity):
-            needs = creator.provides
-        else:
-            if not isinstance(creator, EntityProxy):
-                creator = ResolverRegistry.reference_entity(creator)
-            needs = creator.get_needs()
-
+        needs = creator.provides if isinstance(creator, Identity) else creator.get_needs()
         for requester_generator in self.requesters:
             condition_needs = set(requester_generator.needs(request_type=request_type, creator=creator, **kwargs))
             condition_excludes = set(requester_generator.excludes(request_type=request_type, creator=creator, **kwargs))
