@@ -32,7 +32,7 @@ DEFAULT_WORKFLOW_EVENTS = {
 } # REVIEW: still used?
 
 REQUESTS_ACTION_COMPONENTS: tuple[type[RequestActionComponent], ...] = (
-    WorkflowTransitionComponent, # REVIEW: consider this might crash oarepo requests with topics without workflow
+    WorkflowTransitionComponent,
     AutoAcceptComponent,
 )
 

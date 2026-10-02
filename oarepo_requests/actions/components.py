@@ -12,7 +12,6 @@ from __future__ import annotations
 import logging
 from typing import TYPE_CHECKING, Any, override
 
-from invenio_drafts_resources.records import Record as RecordWithDrafts
 from invenio_requests.customizations import RequestActions
 from invenio_requests.errors import CannotExecuteActionError
 from oarepo_workflows.errors import MissingWorkflowError, InvalidWorkflowError

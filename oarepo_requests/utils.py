@@ -147,8 +147,8 @@ def open_request_exists(topic_or_reference: Record | dict[str, str], type_id: st
     """
     topic_reference = ResolverRegistry.reference_entity(topic_or_reference, raise_=True)
     base_filter = search_requests_filter(type_id=type_id, topic_reference=topic_reference, is_open=True)
-    results = current_requests_service.search(system_identity, extra_filter=base_filter).hits
-    return bool(list(results))
+    results = current_requests_service.search(system_identity, extra_filter=base_filter)
+    return results.total > 0 # REVIEW: there was an issue with search sync -> look whether it's relevant also here
 
 
 def resolve_reference_dict(reference_dict: dict[str, str]) -> Any:
@@ -334,11 +334,20 @@ def has_rights_to_submit_request(request: Request, identity: Identity) -> bool:
 
 
 def search_requests(identity: Identity, record: RecordWithDraft | dict[str, str], expand: bool = False) -> RequestList:
-    """Search requests for a given record."""
+    """Search the first page of requests for a given record, newest first."""
     topic_ref = reference_entity(record) if isinstance(record, RecordWithDraft) else record
     return cast(
         "RequestList",
-        current_requests_service.scan(identity, topic=topic_ref, expand=expand),
+        current_requests_service.search(identity, topic=topic_ref, expand=expand),
+    )
+
+
+def scan_requests(identity: Identity, record: RecordWithDraft | dict[str, str]) -> RequestList:
+    """Scan all requests for a given record, unordered; iterate its raw hits rather than serializing them."""
+    topic_ref = reference_entity(record) if isinstance(record, RecordWithDraft) else record
+    return cast(
+        "RequestList",
+        current_requests_service.scan(identity, topic=topic_ref),
     )
 
 # REVIEW: seems to be only used in tests?

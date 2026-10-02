@@ -345,3 +345,419 @@ Suggested implementation order: fix the applicability regression and both
 transaction boundaries first, then make publication blockers and duplicate
 prevention authoritative, followed by the remaining routing, persistence,
 notification, and compatibility fixes.
+
+# Follow-up review (2026-10-01)
+
+Second pass against `library-review-ps1-deeper-review` (`eb5e18cf`) plus the
+uncommitted working tree. It covers the branch's fixes for the findings above,
+all inline `REVIEW` comments, and the whole package traced into the installed
+Invenio and oarepo dependencies. No reproducer tests were added for this pass;
+the **Validation** paragraphs describe proposed tests.
+
+Two items were confirmed by running code: N1 with a temporary test (removed
+afterwards) and B1 with a standalone script. The root cause of N2 was confirmed
+with a marshmallow snippet. Everything else comes from static tracing.
+
+B-items concern the branch's own changes. N-items are pre-existing issues not
+mentioned above or in the inline comments.
+
+## Status of the branch's fixes
+
+### B1. [P2, branch] The fix for finding 11 is ineffective
+
+Locations: [notifications/generators/context.py:41](oarepo_requests/notifications/generators/context.py#L41)
+and [notifications/generators/recipients.py:40](oarepo_requests/notifications/generators/recipients.py#L40).
+
+`EntityRecipientGenerator` now returns early when `get_reference_type()` yields
+`None`. However, `get_reference_type()` indexes `self.references[key]`, which
+raises `KeyError` whenever `ReferenceSavingEntityResolve` skipped a null
+receiver, so the guard is never reached. A standalone run raised
+`KeyError: 'request.receiver'`; `test_review_11` still fails.
+
+**Suggestion:** make `get_reference_type()` return `None` for an unknown key
+(`self.references.get(key)`) and keep the guard.
+
+### B2. [P2, branch] Finding 8 is still open
+
+Location: [services/permissions/generators/conditional.py:56](oarepo_requests/services/permissions/generators/conditional.py#L56).
+
+The change narrows the `creator` annotation to `Identity | EntityProxy`, but
+`OARepoRequestsService.create()` still forwards reference dictionaries and
+entities unchanged. Both reach `.get_needs()` and raise `AttributeError`, so
+`test_review_08` still fails. The suggestion under finding 8 still applies.
+
+### B3. [P2, branch] `scan()` in `search_requests` changes record expansion
+
+Locations: [utils.py:341](oarepo_requests/utils.py#L341) and
+[services/components/results.py:57](oarepo_requests/services/components/results.py#L57).
+
+Switching to `scan()` makes the publication guards exhaustive, which is part of
+finding 4. However, `RequestsComponent` uses the same helper. Every `?expand`
+read of a record now serializes all historical requests of that record:
+
+- in `_doc` order instead of newest first;
+- each with full link rendering, which is expensive (see N1);
+- through a new scroll context on each read.
+
+**Suggestion:** keep `scan()` for the guards, which only read raw hits, and use
+a sorted, paginated `search()` for expansion, through two separate helpers.
+
+**Validation:** create more than one page of requests on a record, read it with
+`expand`, and assert that the list is bounded and ordered newest first.
+
+### B4. [P3, branch] Cancelling a publish request converts the topic before elevation
+
+Locations: [types/publish_base.py:67](oarepo_requests/types/publish_base.py#L67),
+[actions/publish_draft.py:56](oarepo_requests/actions/publish_draft.py#L56) and
+[actions/generic.py:94](oarepo_requests/actions/generic.py#L94).
+
+Adding `"cancel": cls.cancel_action` routes cancellation through
+`MakeTopicDraftMixin`. That mixin calls `read_draft(identity)` before
+`OARepoGenericActionMixin.execute()` adds `request_active`, so `RequestActive()`
+grants on `can_read_draft` do not apply to the conversion. Decline already
+behaved this way.
+
+For `publish_changed_metadata`, a missing or unreadable edit draft now makes
+cancellation raise `ValueError`, which surfaces as HTTP 500. The previous plain
+cancel action did not need the draft.
+
+**Suggestion:** convert the topic inside the elevated scope, and let
+cancellation succeed when the draft no longer exists.
+
+**Validation:** cancel a `publish_changed_metadata` request after its edit draft
+was discarded. Repeat with a workflow that grants `can_read_draft` only through
+`RequestActive()`.
+
+### B5. [P3] Remaining items
+
+Still unchanged by the branch: finding 5 and the three smaller issues (tests
+14--16). The walrus expression at
+[types/publish_base.py:83](oarepo_requests/types/publish_base.py#L83) still
+produces `Topic type True`. Finding 4 is fixed only in part: the guards are now
+exhaustive, but they still consult only the search index.
+
+Ruff reports these new unused imports:
+
+- `opensearch_dsl`, which is also not a declared dependency, and
+  `VersionAlreadyExists`, both in `utils.py`;
+- `db` in `actions/delete_published_record.py`;
+- `ConfiguratorMixin` in `resources/oarepo/config.py`;
+- `ResolverRegistry` in `conditional.py`;
+- `CancelAction` in `types/group_membership.py`.
+
+## New findings
+
+### N1. [P1, existing] An unresolvable topic breaks every read and listing that includes the request
+
+Locations: [actions/generic.py:43](oarepo_requests/actions/generic.py#L43) and
+[records/dumpers.py:27](oarepo_requests/records/dumpers.py#L27).
+
+`OARepoGenericActionMixin.__init__` resolves the topic eagerly. Invenio's
+request links call `_is_action_available()`, then `RequestActions.can_execute()`,
+then `get_action()` for every available action of every serialized request,
+whatever its status. Serializing a request therefore constructs every action,
+and each construction resolves the topic.
+
+When the topic no longer exists, `PIDDoesNotExistError` propagates:
+
+- reading the request fails (404 at the API);
+- every listing that contains the request fails, including the user requests
+  dashboard, curator dashboards and record `?expand`;
+- no action can be executed, not even cancel.
+
+A temporary test reproduced this: create a `publish_draft` request, call
+`delete_draft`, then `requests_service.read()`. The traceback runs through
+`_is_action_available` into `actions/generic.py:43`.
+
+The default workflow permissions make this easy to reach. A declined publish
+request returns the draft to `draft`, where `can_delete_draft` lets the owner
+discard it. The same happens with a created but unsubmitted request, and with a
+discarded new-version draft. Nothing in the library closes open requests when a
+draft is discarded.
+
+`RecordReferenceDumperExt.dump()` also resolves the topic on every (re)index.
+For example, commenting on such a request reindexes it and fails after the
+database commit.
+
+**Suggestion:**
+
+- resolve the action topic lazily;
+- let `can_execute()` and the dumper tolerate an unresolvable topic;
+- add a `delete_draft` service component that cancels or deletes the draft's
+  requests (compare RDM's `ReviewComponent.delete_draft`).
+
+**Validation:** decline a publish request and discard the draft. Assert that the
+request can be read, appears in the user's request search, and accepts a
+comment. Separately, discard a draft that has a `created` request and verify
+that the request is closed.
+
+### N2. [P2, existing] Non-string payload fields are silently dropped on creation
+
+Locations: [services/oarepo/service.py:109](oarepo_requests/services/oarepo/service.py#L109)
+and [services/oarepo/service.py:133](oarepo_requests/services/oarepo/service.py#L133).
+
+`OARepoRequestsService.create()` loads `data` with the request type's schema
+and passes the *loaded* data to `RequestsService.create()`, which loads it again
+with `raise_errors=False`. Fields whose deserialized value is not valid input
+fail the second load and are left out of the stored payload, for example `Date`,
+`DateTime`, and nested schemas with `post_load`.
+
+The same double load in plain marshmallow produced
+`{'payload': {'deadline': ['Not a valid date.']}}` and kept only the string
+field. Built-in types use string payloads only, so custom request types are the
+ones affected.
+
+**Suggestion:** pass the original input to `super().create()`, and use the
+loaded data only for receiver selection and `can_create()`.
+
+**Validation:** define a test request type with a `Date` payload field, create a
+request, and assert that the stored payload contains the date and the result
+reports no errors.
+
+### N3. [P2, existing] Expiration skips components and leaves the topic in its submitted state
+
+Locations: [actions/components.py:180](oarepo_requests/actions/components.py#L180)
+and [actions/components.py:235](oarepo_requests/actions/components.py#L235).
+
+`expire` is still Invenio's `ExpireAction`, which does not include
+`OARepoGenericActionMixin`, so no component runs: no workflow transition and no
+notification. `WorkflowTransitions` has no `expired` key.
+`WorkflowTransitionComponent.create()` and `.expire()` are unreachable; if they
+ran, they would raise `KeyError` from `WorkflowTransitions.__getitem__`. The same
+holds for `create`, which uses Invenio's `CreateAction`.
+
+Finding 9 is now fixed, so `expires_at` is stored, and RDM schedules
+`check_expired_requests`. An expired, submitted publish request therefore leaves
+the draft in its submitted state (`publishing` in the test workflows) with no
+open request. If requesters are gated on `IfInState("draft")`, the owner cannot
+create a new request.
+
+Separately, `created` is an open status for oarepo types, but `ExpireAction`
+accepts only `submitted`. The periodic task therefore logs
+`CannotExecuteActionError` on every run for expired `created` requests.
+
+**Suggestion:**
+
+- provide an oarepo expire action;
+- support an expiry transition, either in oarepo-workflows or by mapping it to
+  `cancelled`;
+- remove or fix the dead hooks;
+- define what expiry means for `created` requests.
+
+**Validation:** submit a publish request with a past `expires_at`, run
+`check_expired_requests`, and assert that the request is expired and the draft
+is editable again.
+
+### N4. [P2, existing] `payload.created_topic` is client-writable and can break expanded listings
+
+Locations: [types/new_version.py:46](oarepo_requests/types/new_version.py#L46),
+[services/results.py:38](oarepo_requests/services/results.py#L38) and
+[utils.py:194](oarepo_requests/utils.py#L194).
+
+`created_topic` is part of `NewVersionRequestType.payload_schema`, so a
+requester can set it at creation. It is expanded through
+`StringEntityResolverExpandableField`, which fails on bad values:
+
+- `string_to_reference()` raises `IndexError` for a value without `:`;
+- an unknown reference type makes `resolve_entity_proxy()` return `None`, which
+  then raises `AttributeError`.
+
+The expansion resolver catches neither, so any `expand=1` response that includes
+the request returns 500. The user requests search always sends `expand=1`
+([ext.py:206](oarepo_requests/ext.py#L206)). In a workflow where `new_version`
+requires approval, a requester can break the receiver's dashboard until the
+request is accepted; acceptance overwrites the value.
+
+**Suggestion:** remove `created_topic` from the loadable payload, so that only
+the action sets it. Also validate its format and make the expandable field skip
+malformed values.
+
+**Validation:** under an approval workflow, create a `new_version` request with
+`{"created_topic": "garbage"}`. Either creation is rejected, or the receiver's
+expanded search still succeeds.
+
+### N5. [P3, existing] Notification recipient lookup and the comment builder
+
+Locations: [notifications/generators/recipients.py:42](oarepo_requests/notifications/generators/recipients.py#L42)
+and [notifications/builders/comment.py:43](oarepo_requests/notifications/builders/comment.py#L43).
+
+- **No fallback for unknown entity types.** The default registry has generators
+  only for `user`, `group` and `multiple`, and the lookup
+  `current_notification_recipient_generators_registry[entity_type]` has no
+  fallback.
+  - An `auto_approve` receiver raises `KeyError`. `PublishDraftSubmitAction.apply`
+    registers a submit notification unconditionally, so the notification for every
+    auto-approved publish request fails in Celery.
+  - `community` and `email` references fail the same way unless another package
+    registers generators for them. This matters because the oarepo comment builder
+    serves comments of all request types, including Invenio's own.
+- **Topic resolution in comments.** The comment builder adds
+  `ReferenceSavingEntityResolve("request.topic")`. Comments on an accepted
+  `delete_published_record` request therefore fail with `RecordDeletedException`.
+  That failure is exactly why the delete-accept builder
+  ([builders/delete_published_record.py:32](oarepo_requests/notifications/builders/delete_published_record.py#L32))
+  leaves the topic out.
+- **Shared lists mutated in place.** `super().context` and `super().recipients`
+  return Invenio's class-level lists, which this code then mutates in place. The
+  change leaks into Invenio's `CommentRequestEventCreateNotificationBuilder` and
+  into `CommentRequestEventReplyNotificationBuilder`, which shares the inherited
+  `context` list.
+
+**Suggestion:** skip (and log) entity types without a recipient generator, make
+topic resolution in the comment context tolerant, and build new tuples instead
+of mutating the inherited lists.
+
+### N6. [P3, existing] Expected client errors return HTTP 500
+
+None of the following exceptions has an error handler:
+
+- `ValueError` and `TypeError` from `PublishRequestType.convert_topic()`
+  ([types/publish_base.py:107](oarepo_requests/types/publish_base.py#L107),
+  [:114](oarepo_requests/types/publish_base.py#L114)), and the topic-type mismatch
+  ([:84](oarepo_requests/types/publish_base.py#L84));
+- the draft checks in `EditPublishedRecordRequestType.can_create()` and
+  `NewVersionRequestType.can_create()`
+  ([types/edit_record.py:75](oarepo_requests/types/edit_record.py#L75),
+  [types/new_version.py:71](oarepo_requests/types/new_version.py#L71));
+- `raise ValueError("")` for a missing topic
+  ([services/oarepo/service.py:97](oarepo_requests/services/oarepo/service.py#L97));
+- malformed topic strings in `string_to_reference()`, which raise `IndexError`;
+  this also affects `POST /requests/<topic>/<request_type>`;
+- `GET /requests/applicable` without `topic`
+  ([resources/oarepo/resource.py:112](oarepo_requests/resources/oarepo/resource.py#L112),
+  `KeyError`), or with a group topic
+  ([services/oarepo/service.py:151](oarepo_requests/services/oarepo/service.py#L151),
+  `TypeError`), even though `group_membership` is a group-topic type;
+- following the `self` link of `RequestTypesList`
+  ([services/oarepo/service.py:158](oarepo_requests/services/oarepo/service.py#L158)),
+  which omits `topic`.
+
+**Suggestion:** raise or map these as 400-level or validation errors, validate
+the topic argument, and include `topic` in the `self` link.
+
+### N7. [P3, existing] `open_request_exists()` serializes a page of hits to test existence
+
+Location: [utils.py:150](oarepo_requests/utils.py#L150).
+
+`bool(list(search(...).hits))` loads and dumps up to a full page of requests,
+including link rendering. That means constructing every action and resolving
+the topic for each, plus `validate_draft()` for open publish requests through
+`PublishMixin.can_execute()`. It runs for each non-duplicable type in
+`is_applicable_to()` on every record expansion, and again in `can_create()`.
+Reading `total` (or calling `count()` on the search) is enough.
+
+Related: `_ensure_title`
+([types/generic.py:138](oarepo_requests/types/generic.py#L138)) resolves the
+topic for every dumped request, which costs one extra query per hit. B3 makes
+the number of hits unbounded.
+
+### N8. [P3, existing] Workflow configuration drift
+
+- `allowed_request_types_for_record()` and `get_receiver_for_request_type()`
+  ([utils.py:82](oarepo_requests/utils.py#L82), [:224](oarepo_requests/utils.py#L224))
+  catch `MissingWorkflowError` but not `InvalidWorkflowError`. A record whose
+  workflow code was removed from configuration therefore returns 500 on
+  `?expand`. `WorkflowTransitionComponent` and `receiver.py` catch both.
+- `WorkflowTransitionComponent`
+  ([actions/components.py:165](oarepo_requests/actions/components.py#L165)) does
+  not handle `RequestTypeNotInWorkflowError`. A request whose type is no longer
+  in the record's workflow cannot be cancelled or declined.
+- Without a workflow, `allowed_request_types_for_record()` returns every
+  record-topic request type, with no `is_applicable_to()` or permission checks.
+  That contradicts its docstring.
+
+### N9. [P3, existing] Action keyword arguments cannot be forwarded
+
+Locations: [actions/generic.py:97](oarepo_requests/actions/generic.py#L97) and
+[actions/publish_draft.py:140](oarepo_requests/actions/publish_draft.py#L140).
+
+`OARepoGenericActionMixin.execute()` passes `*args, **kwargs` to Invenio's
+`RequestAction.execute(identity, uow)`, which accepts neither. Any extra keyword
+passed to `execute_action()` raises `TypeError`, so `PublishDraftAcceptAction`
+can never actually forward keyword arguments to `publish()`. This is related to
+`execute-action-wrapper.patch`.
+
+### N10. [P3, existing] Config initialisation
+
+Locations: [ext.py:152](oarepo_requests/ext.py#L152), [:164](oarepo_requests/ext.py#L164)
+and [config.py:34](oarepo_requests/config.py#L34).
+
+`init_config()` calls `.extend()` on the user's `REQUESTS_ACTION_COMPONENTS` and
+`REQUESTS_ALLOWED_RECEIVERS`.
+
+- A tuple, which is the type of the library's own default, crashes app
+  start-up.
+- The defaults are always appended, so users can neither remove nor reorder
+  them, despite the "let the user override" comment.
+- Listing the defaults explicitly duplicates them.
+
+### N11. [P3, existing] Version-label uniqueness covers only the payload path
+
+Locations: `PublishDraftSubmitAction.apply()` and
+`PublishNewVersionRequestType.can_create()`.
+
+Uniqueness is checked only for `payload.version`, at creation and submission.
+The following are never checked:
+
+- setting `metadata.version` directly in a draft;
+- publishing, through `publish_changed_metadata`, an edit of an older version
+  that carries another version's label.
+
+The label is also not rechecked at acceptance.
+
+### N12. [P3, existing] `NewVersionAcceptAction` keeps the published record as the topic
+
+Location: [actions/new_version.py:37](oarepo_requests/actions/new_version.py#L37).
+
+`EditTopicAcceptAction` switches `self.topic` to the new draft, but the
+new-version accept action leaves the published record as `self.topic`. An
+`accepted` transition configured for `new_version` would therefore change the
+published record's state. This is latent, because the test workflows define no
+transitions for `new_version`.
+
+### N13. [P3, existing] `PublishMixin.can_execute()` swallows all exceptions
+
+Location: [actions/publish_draft.py:73](oarepo_requests/actions/publish_draft.py#L73).
+
+The bare `except:` has three effects:
+
+- draft validation failures at submit or accept become a generic "cannot
+  execute" 400 without field errors;
+- database errors are swallowed too, which may leave the session in a failed
+  state;
+- the full `validate_draft()` it runs is part of link rendering for every open
+  publish request.
+
+### N14. [P3] Smaller items
+
+- `current_oarepo_requests_resource`
+  ([proxies.py:30](oarepo_requests/proxies.py#L30)) reads `requests_resource`,
+  which the state object does not have.
+- `OARepoRequests.__getattr__` ([ext.py:144](oarepo_requests/ext.py#L144))
+  returns `None` for any missing attribute, which hides typos.
+- `merge_resource_configs()` and `reference_to_tuple()` in `utils.py` are
+  unused.
+- `OARepoGenericActionMixin.execute()` adds and removes `request_active` on the
+  identity it is given. That includes the process-global `system_identity`,
+  where it is pointless, since that identity already passes every check, and is
+  not thread-safe. The grant is also not scoped to the request's topic.
+
+## Answers to remaining REVIEW questions
+
+- **`types/generic.py:234`, `string_by_state()`.** Only `stateful_name()` and
+  `stateful_description()` call it. Those are used only by tests and by the
+  title fallback in `RequestEntityResolve`. That fallback never runs, because
+  `_ensure_title` always sets `title`. When `request.created_by` is an entity
+  proxy, it also crashes in `request_identity_matches()`, as the comment in
+  `_ensure_title` notes. It is a candidate for removal.
+- **`utils.py:344`, `applicable_requests()`.** Only tests use it.
+- **`services/results.py:85`.** `applicable_request_types()` never passes
+  `links_item_tpl`, so this branch is dead.
+- **`config.py:40`, `PUBLISH_REQUEST_TYPES`.** Nothing in the library or the
+  installed dependencies reads it; only `init_config()` sets it.
+- **`types/publish_base.py:116`.** Deletion neither checks nor closes other open
+  requests on the record. On soft-deleted RDM records those requests stay
+  actionable; on discarded drafts they turn into N1.
+
+Suggested order for this pass: N1 and B1, then B2, N2--N4 and B3, then the P3
+items.

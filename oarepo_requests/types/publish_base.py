@@ -26,7 +26,7 @@ from oarepo_requests.actions.publish_draft import (
     PublishDraftSubmitAction,
 )
 
-from ..utils import classproperty, get_draft_record_service, search_requests
+from ..utils import classproperty, get_draft_record_service, scan_requests
 from .generic import NonDuplicableOARepoRecordRequestType
 
 if TYPE_CHECKING:
@@ -80,7 +80,8 @@ class PublishRequestType(NonDuplicableOARepoRecordRequestType):
     ) -> None:
         """Check if the request can be created."""
         topic = self.convert_topic(identity, topic)
-        if topic_type := self.get_topic_type(topic) != self.topic_type:
+        topic_type = self.get_topic_type(topic)
+        if topic_type != self.topic_type:
             raise ValueError(f"Topic type {topic_type} is not the request's {self.topic_type}")
         self.assert_no_pending_requests(topic)
         super().can_create(identity, data, receiver, topic, creator, *args, **kwargs)
@@ -120,7 +121,7 @@ class PublishRequestType(NonDuplicableOARepoRecordRequestType):
         topic: Record,
     ) -> None:
         """Assert that there are no pending requests on the topic."""
-        requests = search_requests(system_identity, topic)
+        requests = scan_requests(system_identity, topic)
 
         for result in requests._results:  # noqa: SLF001
             # note: we can not use solely the result.is_open because changes may not be committed yet

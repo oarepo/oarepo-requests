@@ -25,7 +25,7 @@ from ..notifications.builders.publish import (
     PublishDraftRequestDeclineNotificationBuilder,
     PublishDraftRequestSubmitNotificationBuilder,
 )
-from ..utils import get_draft_record_service, search_requests
+from ..utils import get_draft_record_service, scan_requests
 from .generic import (
     OARepoAcceptAction,
     OARepoCancelAction,
@@ -116,7 +116,7 @@ class PublishDraftAcceptAction(MakeTopicDraftMixin, PublishMixin, OARepoAcceptAc
         **kwargs: Any,
     ) -> None:
         topic_service = get_draft_record_service(self.topic)
-        requests = search_requests(system_identity, self.topic)
+        requests = scan_requests(system_identity, self.topic)
 
         for result in requests._results:  # noqa: SLF001
             if (
