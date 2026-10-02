@@ -71,7 +71,7 @@ class EditPublishedRecordRequestType(NonDuplicableOARepoRecordRequestType):
         :param args:            additional arguments
         :param kwargs:          additional keyword arguments
         """
-        if not isinstance(topic, RecordWithDraft):
+        if not isinstance(topic, RecordWithDraft):  # REVIEW: gettext + could also be refactored into some mixin
             raise TypeError(gettext("Trying to create edit request on record without draft support"))
         if has_draft(topic):
             raise ValueError(gettext("Trying to create edit request on record with draft"))

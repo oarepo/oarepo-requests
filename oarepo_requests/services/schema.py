@@ -9,7 +9,6 @@
 
 from __future__ import annotations
 
-from contextvars import ContextVar
 from typing import Any
 
 import marshmallow as ma
@@ -20,16 +19,9 @@ from invenio_records_resources.services.base.links import (
 )
 from invenio_requests.services.schemas import GenericRequestSchema
 from marshmallow import fields
+from marshmallow_utils.context import context_schema
 
 from oarepo_requests.utils import ref_to_str, reference_entity
-
-request_type_identity_ctx: ContextVar[Any] = ContextVar("oarepo_requests.request_type_identity", default=None)
-request_type_record_ctx: ContextVar[Any] = ContextVar("oarepo_requests.request_type_record", default=None)
-
-
-def get_links_schema() -> ma.fields.Dict:
-    """Get links schema."""
-    return ma.fields.Dict(keys=ma.fields.String())  # value is either string or dict of strings (for actions)
 
 
 class RequestTypeSchema(ma.Schema):
@@ -38,7 +30,7 @@ class RequestTypeSchema(ma.Schema):
     type_id = ma.fields.String()
     """Type ID of the request type."""
 
-    links = get_links_schema()
+    links = ma.fields.Dict(keys=ma.fields.String())
     """Links to the request type."""
 
     @ma.post_dump
@@ -46,8 +38,8 @@ class RequestTypeSchema(ma.Schema):
         if "links" in data:
             return data
         type_id = data["type_id"]
-        identity = request_type_identity_ctx.get()
-        record = request_type_record_ctx.get()
+        identity = context_schema.get()["identity"]
+        record = context_schema.get()["record"]
         topic_ref = ref_to_str(reference_entity(record) if isinstance(record, Record) else record)
         link = EndpointLink("requests.create_via_url", params=["topic", "request_type"])
         template = LinksTemplate({"create": link}, context={"topic": topic_ref, "request_type": type_id})
@@ -61,6 +53,7 @@ class NoReceiverAllowedGenericRequestSchema(GenericRequestSchema):
     receiver = fields.Dict(allow_none=True)
 
 
+# REVIEW: links on request type but not on request?"
 class RequestsSchemaMixin:
     """A mixin that allows serialization of requests together with their request type."""
 

@@ -57,6 +57,7 @@ class DeletePublishedRecordRequestType(NonDuplicableOARepoRecordRequestType):
         "note": ma.fields.Str(),
     }
 
+    # REVIEW: delete, copy-paste of superclass method
     @classmethod
     def is_applicable_to(cls, identity: Identity, topic: Record, *args: Any, **kwargs: Any) -> bool:
         """Check if the request type is applicable to the topic."""
@@ -75,6 +76,7 @@ class DeletePublishedRecordRequestType(NonDuplicableOARepoRecordRequestType):
         }
 
     # TODO: used in ui
+    # REVIEW: still used?
     form: ClassVar[JsonValue] = [
         {
             "section": "",
@@ -115,7 +117,9 @@ class DeletePublishedRecordRequestType(NonDuplicableOARepoRecordRequestType):
         if is_auto_approved(self, identity=identity, topic=topic):
             return self.name
         if not request:
-            return gettext("Request record deletion")
+            return gettext(
+                "Request record deletion"
+            )  # REVIEW: any reason for not using invenio_i18n or is this just ancient code?; - wrong, it's just gettext vs lazy_gettext difference - try to understand the use cases
         match request.status:
             case "submitted":
                 return gettext("Record deletion requested")

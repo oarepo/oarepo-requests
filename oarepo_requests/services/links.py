@@ -15,6 +15,8 @@ from typing import TYPE_CHECKING, Any, override
 from invenio_records_resources.services.base.links import EndpointLink
 from invenio_requests.resolvers.registry import ResolverRegistry
 
+from oarepo_requests.utils import ref_to_str
+
 if TYPE_CHECKING:
     from collections.abc import Callable
 
@@ -50,4 +52,4 @@ class RefEndpointLink(EndpointLink):
         topic_ref = ResolverRegistry.reference_entity(obj)
         if topic_ref is None:
             raise ValueError(f"Can't create link with unresolvable entity {obj}")
-        return f"{ret}?{self._ref_querystring}={next(iter(topic_ref.keys()))}:{next(iter(topic_ref.values()))}"
+        return f"{ret}?{self._ref_querystring}={ref_to_str(topic_ref)}"

@@ -3,8 +3,8 @@
 #
 # oarepo-requests is free software; you can redistribute it and/or
 # modify it under the terms of the MIT License; see LICENSE file for more
-# details.
 #
+# details.
 """Utility functions for the requests module."""
 
 from __future__ import annotations
@@ -12,6 +12,7 @@ from __future__ import annotations
 import copy
 from typing import TYPE_CHECKING, Any, cast
 
+import opensearch_dsl
 from flask_babel.speaklater import LazyString
 from invenio_access.permissions import system_identity
 from invenio_drafts_resources.records import Record as RecordWithDraft
@@ -30,6 +31,7 @@ from oarepo_workflows import (
 from oarepo_workflows.errors import MissingWorkflowError
 from oarepo_workflows.proxies import current_oarepo_workflows
 
+from oarepo_requests.errors import VersionAlreadyExists
 from oarepo_requests.proxies import current_requests_service
 
 if TYPE_CHECKING:
@@ -82,7 +84,7 @@ def allowed_request_types_for_record(identity: Identity, record: Record) -> dict
         # so returning all matching request types
         pass
 
-    record_ref = next(iter(reference_entity(record).keys()))
+    record_ref = next(iter(reference_entity(record).keys()))  # REVIEW: since we now use only 'record'?
 
     ret = {}
     for rt in current_request_type_registry:
@@ -145,8 +147,8 @@ def open_request_exists(topic_or_reference: Record | dict[str, str], type_id: st
     """
     topic_reference = ResolverRegistry.reference_entity(topic_or_reference, raise_=True)
     base_filter = search_requests_filter(type_id=type_id, topic_reference=topic_reference, is_open=True)
-    results = current_requests_service.search(system_identity, extra_filter=base_filter).hits
-    return bool(list(results))
+    results = current_requests_service.search(system_identity, extra_filter=base_filter)
+    return results.total > 0 # REVIEW: there was an issue with search sync -> look whether it's relevant also here
 
 
 def resolve_reference_dict(reference_dict: dict[str, str]) -> Any:
@@ -332,7 +334,7 @@ def has_rights_to_submit_request(request: Request, identity: Identity) -> bool:
 
 
 def search_requests(identity: Identity, record: RecordWithDraft | dict[str, str], expand: bool = False) -> RequestList:
-    """Search requests for a given record."""
+    """Search the first page of requests for a given record, newest first."""
     topic_ref = reference_entity(record) if isinstance(record, RecordWithDraft) else record
     return cast(
         "RequestList",
@@ -340,12 +342,21 @@ def search_requests(identity: Identity, record: RecordWithDraft | dict[str, str]
     )
 
 
+def scan_requests(identity: Identity, record: RecordWithDraft | dict[str, str]) -> RequestList:
+    """Scan all requests for a given record, unordered; iterate its raw hits rather than serializing them."""
+    topic_ref = reference_entity(record) if isinstance(record, RecordWithDraft) else record
+    return cast(
+        "RequestList",
+        current_requests_service.scan(identity, topic=topic_ref),
+    )
+
+# REVIEW: seems to be only used in tests?
 def applicable_requests(identity: Identity, record: RecordWithDraft | dict[str, str]) -> RequestTypesList:
     """Get applicable request types for a record."""
     topic_ref = reference_entity(record) if isinstance(record, RecordWithDraft) else record
     return current_requests_service.applicable_request_types(identity, topic=topic_ref)
 
-
+# REVIEW: move to runtime if necessary
 def get_draft_record_service(record: Record) -> DraftRecordService:
     """Get the draft record service for a record and checks it supports drafts."""
     topic_service = current_runtime.get_record_service_for_record(record)

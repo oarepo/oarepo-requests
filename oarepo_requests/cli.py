@@ -22,3 +22,4 @@ def oarepo_requests() -> None:
 
 
 # TODO: escalate_requests
+# REVIEW: are we still planning to implement request escalation functionality?

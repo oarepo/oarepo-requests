@@ -90,11 +90,11 @@ class OARepoGenericActionMixin(RequestAction):
     def execute(self, identity: Identity, uow: UnitOfWork, *args: Any, **kwargs: Any) -> None:
         """Execute the action."""
         was_request_active = request_active in identity.provides
-        if not was_request_active:
+        if not was_request_active: # REVIEW: context manager?
             identity.provides.add(request_active)
         try:
             self.apply(identity, uow, *args, **kwargs)  # execute the action itself
-            super().execute(identity, uow, *args, **kwargs)
+            super().execute(identity, uow)
             for component in self.components:
                 if hasattr(component, self.type_id):
                     getattr(component, self.type_id)(identity, self, uow, *args, **kwargs)

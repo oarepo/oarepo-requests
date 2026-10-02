@@ -21,7 +21,6 @@ if TYPE_CHECKING:
     from invenio_db.uow import UnitOfWork
 
 
-# TODO: snapshot
 class NewVersionAcceptAction(OARepoAcceptAction):
     """Accept creation of a new version of a published record."""
 
@@ -42,7 +41,7 @@ class NewVersionAcceptAction(OARepoAcceptAction):
             and "keep_files" in self.request["payload"]
             and self.request["payload"]["keep_files"] == "yes"
         ):
-            topic_service.import_files(identity, new_version_topic.id)
+            topic_service.import_files(identity, new_version_topic.id, uow=uow)
         if "payload" not in self.request:
             self.request["payload"] = {}
         # payload only allows strings

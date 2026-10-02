@@ -26,7 +26,7 @@ from oarepo_requests.actions.publish_draft import (
     PublishDraftSubmitAction,
 )
 
-from ..utils import classproperty, get_draft_record_service, search_requests
+from ..utils import classproperty, get_draft_record_service, scan_requests
 from .generic import NonDuplicableOARepoRecordRequestType
 
 if TYPE_CHECKING:
@@ -54,6 +54,7 @@ class PublishRequestType(NonDuplicableOARepoRecordRequestType):
     accept_action = PublishDraftAcceptAction
     decline_action = PublishDraftDeclineAction
     cancel_action = PublishDraftCancelAction
+    topic_type: str
 
     @classproperty
     def available_actions(cls) -> dict[str, type[RequestAction]]:  # noqa N805
@@ -63,6 +64,7 @@ class PublishRequestType(NonDuplicableOARepoRecordRequestType):
             "submit": cls.submit_action,
             "accept": cls.accept_action,
             "decline": cls.decline_action,
+            "cancel": cls.cancel_action,  # REVIEW
         }
 
     @override
@@ -78,6 +80,9 @@ class PublishRequestType(NonDuplicableOARepoRecordRequestType):
     ) -> None:
         """Check if the request can be created."""
         topic = self.convert_topic(identity, topic)
+        topic_type = self.get_topic_type(topic)
+        if topic_type != self.topic_type:
+            raise ValueError(f"Topic type {topic_type} is not the request's {self.topic_type}")
         self.assert_no_pending_requests(topic)
         super().can_create(identity, data, receiver, topic, creator, *args, **kwargs)
         self.validate_topic(identity, topic)
@@ -87,8 +92,12 @@ class PublishRequestType(NonDuplicableOARepoRecordRequestType):
     def is_applicable_to(cls, identity: Identity, topic: Record, *args: Any, **kwargs: Any) -> bool:
         """Check if the request type is applicable to the topic."""
         try:
-            topic = cls.convert_topic(identity, topic)
+            topic = cls.convert_topic(
+                identity, topic
+            )  # REVIEW: review the necessite of exception vs. bool as return between this and can_create
         except ValueError:
+            return False
+        if cls.get_topic_type(topic) != cls.topic_type:
             return False
         return super().is_applicable_to(identity, topic, *args, **kwargs)
 
@@ -105,12 +114,14 @@ class PublishRequestType(NonDuplicableOARepoRecordRequestType):
         except Exception as e:
             raise ValueError(f"Failed to read draft for topic {topic}") from e
 
+    # REVIEW: this could also -more so- make sense for delete?
+    # do we have use-cases/means for deleting topic with open requests?
     def assert_no_pending_requests(
         self,
         topic: Record,
     ) -> None:
         """Assert that there are no pending requests on the topic."""
-        requests = search_requests(system_identity, topic)
+        requests = scan_requests(system_identity, topic)
 
         for result in requests._results:  # noqa: SLF001
             # note: we can not use solely the result.is_open because changes may not be committed yet
@@ -153,19 +164,18 @@ class PublishRequestType(NonDuplicableOARepoRecordRequestType):
                 raise ma.ValidationError({"files.enabled": [my_message]})
 
     @classmethod
-    def topic_type(cls, topic: Record) -> Literal["initial", "new_version", "metadata", "published"]:
+    def get_topic_type(cls, topic: Record) -> Literal["initial", "new_version", "metadata", "published"]:
         """Return publish status type of the topic."""
         if not isinstance(topic, RecordWithDraft):
             raise TypeError(f"Topic type {type(topic)} does not support drafts")
         index = topic.versions.index
-        is_latest = topic.versions.is_latest
+        latest_index = topic.versions.latest_index # The version index of the latest published record/draft
         is_draft = topic.is_draft
 
         if not is_draft:
             return "published"
-
-        if index == 1 and not is_latest:
+        if latest_index is None:
             return "initial"
-        if index > 1 and not is_latest:
+        if index > latest_index:
             return "new_version"
         return "metadata"

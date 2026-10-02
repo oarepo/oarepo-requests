@@ -12,7 +12,7 @@ from __future__ import annotations
 from typing import TYPE_CHECKING, Any, override
 
 from invenio_drafts_resources.records.api import Record
-from invenio_records_resources.services import LinksTemplate
+from invenio_records_resources.services import LinksTemplate, ServiceSchemaWrapper
 from invenio_records_resources.services.base.links import EndpointLink
 from invenio_records_resources.services.uow import IndexRefreshOp, unit_of_work
 from invenio_requests import current_request_type_registry
@@ -24,6 +24,7 @@ from oarepo_requests.services.results import (
     RequestTypesList,
     StringEntityResolverExpandableField,
 )
+from oarepo_requests.services.schema import RequestTypeSchema
 from oarepo_requests.types import DefaultReceiverMixin
 from oarepo_requests.utils import (
     allowed_request_types_for_record,
@@ -52,8 +53,13 @@ class OARepoRequestsService(RequestsService):
         """Get expandable fields."""
         return [
             *super().expandable_fields,
-            StringEntityResolverExpandableField("payload.created_topic"),
+            StringEntityResolverExpandableField("payload.created_topic"),  # REVIEW: still used?
         ]
+
+    @property
+    def request_type_schema(self) -> ServiceSchemaWrapper:
+        """Request type schema."""
+        return ServiceSchemaWrapper(self, RequestTypeSchema)
 
     @unit_of_work()
     @override
@@ -86,6 +92,7 @@ class OARepoRequestsService(RequestsService):
         :param kwargs: Additional keyword arguments.
         """
         # TODO: invenio suggest None topic can be here but we do not expect it
+        # seems we have topic_can_be_none inherited as true - so either change that or allow nones here
         if topic is None:
             raise ValueError("")
         type_ = (
@@ -96,14 +103,6 @@ class OARepoRequestsService(RequestsService):
         if not type_:
             raise UnknownRequestTypeError(request_type)
         data = data or {}
-        if receiver is None:
-            if isinstance(type_, DefaultReceiverMixin):
-                receiver = type_.default_request_receiver(identity, topic, creator or identity, data)
-            else:
-                # if explicit creator is not passed, use current identity - this is in sync with invenio_requests
-                receiver = current_oarepo_requests.default_request_receiver(
-                    identity, type_, topic, creator or identity, data
-                )
         if "payload" not in data and type_.payload_schema:
             data["payload"] = {}
         schema = self._wrap_schema(type_.marshmallow_schema())
@@ -112,11 +111,20 @@ class OARepoRequestsService(RequestsService):
             context={"identity": identity},
             raise_errors=True,
         )
-
         # ask to convert the topic. For example, for publish_metadata, the topic here is the previously published record
         # but we need the draft that we are publishing.
         if hasattr(type_, "convert_topic"):
             topic = type_.convert_topic(identity, topic)  # type: ignore[reportAttributeAccessIssue]
+
+        if receiver is None:
+            if isinstance(type_, DefaultReceiverMixin):
+                receiver = type_.default_request_receiver(identity, topic, creator or identity, data)
+            else:
+                # if explicit receiver is not passed, use current identity - this is in sync with invenio_requests
+                receiver = current_oarepo_requests.default_request_receiver(
+                    identity, type_, topic, creator or identity, data
+                )
+
 
         if hasattr(type_, "can_create"):
             # raise exception if can't
@@ -129,8 +137,9 @@ class OARepoRequestsService(RequestsService):
             receiver=receiver,  # type: ignore[reportArgumentType]
             creator=creator,
             topic=topic,
-            expand=expand,
+            expires_at=expires_at,
             uow=uow,
+            expand=expand,
         )
         uow.register(IndexRefreshOp(indexer=self.indexer, index=self.record_cls.index))  # type: ignore[reportArgumentType]
         return result

@@ -14,6 +14,7 @@ from typing import TYPE_CHECKING, Any, override
 
 from invenio_requests.customizations import RequestActions
 from invenio_requests.errors import CannotExecuteActionError
+from oarepo_workflows.errors import MissingWorkflowError, InvalidWorkflowError
 
 if TYPE_CHECKING:
     from flask_principal import Identity
@@ -28,7 +29,7 @@ class RequestActionComponent:
     """Abstract request action component.
 
     Implementation warning: calling actions reloading and recommiting request or topic (eg. topic publish) within
-    components may cause incorrect behavior due to the fact that changes on the new (reloaded) instance do not
+    components may cause incorrect behavior because changes on the new (reloaded) instance do not
     propagate to commit ops in the stack below.
     """
 
@@ -160,7 +161,11 @@ class WorkflowTransitionComponent(RequestActionComponent):
 
         topic = action.topic
         request = action.request
-        transitions = current_oarepo_workflows.get_workflow(topic).requests()[request.type.type_id].transitions
+        try:
+            transitions = current_oarepo_workflows.get_workflow(topic).requests()[request.type.type_id].transitions
+        except MissingWorkflowError, InvalidWorkflowError:
+            return # REVIEW: not all OARepoRequests have record topic with workflow; consider structural alternatives
+            # to address this
         target_state = transitions[action.status_to]
         if target_state and not topic.is_deleted:
             current_oarepo_workflows.set_state(

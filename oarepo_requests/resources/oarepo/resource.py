@@ -67,6 +67,7 @@ class OARepoRequestsResource(RequestsResource, ErrorHandlersMixin):
         """
         request_type_id = resource_requestctx.data.pop("request_type", None)
         topic = resource_requestctx.data.pop("topic", None)
+        # REVIEW: does it even make sense to be anything else on resource level? (none cases should go for both lines)
         if isinstance(topic, str):
             topic = string_to_reference(topic)
         topic = resolve_reference_dict(topic)
