@@ -1,4 +1,4 @@
-// Copyright (c) 2024 CESNET
+// SPDX-FileCopyrightText: 2024 CESNET
 // SPDX-License-Identifier: MIT
 
 import React from "react";

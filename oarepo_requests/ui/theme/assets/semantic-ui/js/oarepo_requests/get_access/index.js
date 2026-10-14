@@ -1,4 +1,4 @@
-// Copyright (c) 2026 CESNET
+// SPDX-FileCopyrightText: 2026 CESNET
 // SPDX-License-Identifier: MIT
 
 // Components for requesting membership in a group ("get access" to the repository).

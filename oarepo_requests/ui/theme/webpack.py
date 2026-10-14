@@ -1,7 +1,5 @@
-# Copyright (c) 2024 CESNET
-#
-# This software is released under the MIT License.
-# https://opensource.org/licenses/MIT
+# SPDX-FileCopyrightText: 2024 CESNET
+# SPDX-License-Identifier: MIT
 
 """JS/CSS bundles for oarepo-requests."""
 
