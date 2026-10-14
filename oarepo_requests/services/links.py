@@ -9,6 +9,7 @@ from typing import TYPE_CHECKING, Any, override
 
 from invenio_records_resources.services.base.links import EndpointLink
 from invenio_requests.resolvers.registry import ResolverRegistry
+from oarepo_runtime.typing import require_kwargs
 
 if TYPE_CHECKING:
     from collections.abc import Callable
@@ -17,6 +18,7 @@ if TYPE_CHECKING:
 class RefEndpointLink(EndpointLink):
     """Endpoint link that adds reference query string parameter to the URL."""
 
+    @require_kwargs("ref_querystring")
     @override
     def __init__(
         self,

@@ -22,7 +22,7 @@ def test_publish_service(
         identity=creator.identity,
         data={"payload": {"version": "1.0"}},
         request_type="publish_draft",
-        topic=draft._record,  # noqa: SLF001
+        topic=draft._record,
         expand=True,
     )
     requests_model.Draft.index.refresh()
@@ -96,7 +96,7 @@ def test_dump_title_appends_topic_title(
         identity=creator.identity,
         data={"payload": {"version": "1.0"}},
         request_type="publish_draft",
-        topic=draft._record,  # noqa: SLF001
+        topic=draft._record,
     ).to_dict()
 
     assert created["title"] == f"Publish draft ({topic_title})"

@@ -9,8 +9,6 @@ from typing import TYPE_CHECKING, Any, override
 
 from flask_principal import Identity
 from invenio_records_permissions.generators import ConditionalGenerator, Generator
-from invenio_records_resources.references.entity_resolvers import EntityProxy
-from invenio_requests.resolvers.registry import ResolverRegistry
 from oarepo_runtime.proxies import current_runtime
 from oarepo_runtime.typing import require_kwargs
 from oarepo_workflows.requests import RecipientGeneratorMixin
@@ -21,6 +19,7 @@ if TYPE_CHECKING:
 
     from invenio_drafts_resources.records import Record as DraftRecord
     from invenio_records_resources.records import Record
+    from invenio_records_resources.references.entity_resolvers import EntityProxy
     from invenio_requests.customizations import RequestType
     from opensearch_dsl.query import Query
 
@@ -40,21 +39,19 @@ class IfRequestedBy(RecipientGeneratorMixin, ConditionalGenerator):
             requesters = [requesters]
         self.requesters = requesters
 
+    @require_kwargs("request_type", "creator")
     def _condition(
         self,
         *,
         request_type: RequestType,
-        creator: Identity | EntityProxy | Any,
+        creator: Identity | EntityProxy,
         **kwargs: Any,
     ) -> bool:
         """Condition to choose generators set."""
         # get needs
-        if isinstance(creator, Identity):
-            needs = creator.provides
-        else:
-            if not isinstance(creator, EntityProxy):
-                creator = ResolverRegistry.reference_entity(creator)
-            needs = creator.get_needs()
+        # TODO: there was a bug in the original code but since it wasn't a problem for now, i guess
+        # it's not a valid usecase anyway
+        needs = creator.provides if isinstance(creator, Identity) else creator.get_needs()
 
         for condition in self.requesters:
             condition_needs = set(condition.needs(request_type=request_type, creator=creator, **kwargs))

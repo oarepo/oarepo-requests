@@ -112,23 +112,24 @@ class OARepoRequestsService(RequestsService):
         # ask to convert the topic. For example, for publish_metadata, the topic here is the previously published record
         # but we need the draft that we are publishing.
         if hasattr(type_, "convert_topic"):
-            topic = type_.convert_topic(identity, topic)  # type: ignore[reportAttributeAccessIssue]
+            topic = type_.convert_topic(identity, topic)
 
         if hasattr(type_, "can_create"):
             # raise exception if can't
-            type_.can_create(identity, data, receiver, topic, creator)  # type: ignore[reportAttributeAccessIssue]
-        # TODO: typing does not allow receiver to be None even though invenio code suggests it
+            type_.can_create(identity, data, receiver, topic, creator)
+
         result = super().create(
             identity=identity,
             data=data,
             request_type=type_,
-            receiver=receiver,  # type: ignore[reportArgumentType]
+            receiver=receiver,
             creator=creator,
             topic=topic,
             expand=expand,
             uow=uow,
         )
-        uow.register(IndexRefreshOp(indexer=self.indexer, index=self.record_cls.index))  # type: ignore[reportArgumentType]
+        # TODO: another "specific non-rdm record is untyped" issue
+        uow.register(IndexRefreshOp(indexer=self.indexer, index=self.record_cls.index))
         return result
 
     def applicable_request_types(self, identity: Identity, topic: Record | dict[str, str]) -> RequestTypesList:

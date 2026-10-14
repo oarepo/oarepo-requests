@@ -17,19 +17,19 @@ from oarepo_requests.notifications.builders.publish import (
 )
 
 
-class PublishChangedMetadataSubmitAction(PublishDraftSubmitAction):  # type: ignore[misc]
+class PublishChangedMetadataSubmitAction(PublishDraftSubmitAction):
     """Submit action for publishing draft requests."""
 
     notification_builder = PublishChangedMetadataRequestSubmitNotificationBuilder
 
 
-class PublishChangedMetadataAcceptAction(PublishDraftAcceptAction):  # type: ignore[misc]
+class PublishChangedMetadataAcceptAction(PublishDraftAcceptAction):
     """Accept action for publishing draft requests."""
 
     notification_builder = PublishChangedMetadataRequestAcceptNotificationBuilder
 
 
-class PublishChangedMetadataDeclineAction(PublishDraftDeclineAction):  # type: ignore[misc]
+class PublishChangedMetadataDeclineAction(PublishDraftDeclineAction):
     """Decline action for publishing draft requests."""
 
     notification_builder = PublishChangedMetadataRequestDeclineNotificationBuilder

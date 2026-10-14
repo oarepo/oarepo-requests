@@ -36,25 +36,24 @@ class OARepoRequestsResourceConfig(RequestsResourceConfig, ConfiguratorMixin):
 
     request_search_args = ExtendedRequestSearchRequestArgsSchema
 
-    @property
-    def request_view_args(self) -> Mapping[str, fields.Field]:  # type: ignore[reportIncompatibleVariableOverride]
-        """Request view args for the requests API."""
-        return {
-            **super().request_view_args,
+    request_view_args: Mapping[str, fields.Field] = MappingProxyType(
+        {
+            **RequestsResourceConfig.request_view_args,
             "topic": ma.fields.String(),
             "request_type": ma.fields.String(),
         }
+    )
 
-    @property
-    def response_handlers(self) -> Mapping[str, ResponseHandler]:  # type: ignore[reportIncompatibleVariableOverride]
-        """Response handlers for the extended requests API."""
-        return {
+    response_handlers: Mapping[str, ResponseHandler] = MappingProxyType(
+        {
             # TODO: UI serialization
-            **super().response_handlers,
+            **RequestsResourceConfig.response_handlers,
         }
+    )
 
+    # base is a FromConfig descriptor and entry points must load lazily, so this has to stay a property
     @property
-    def error_handlers(  # type: ignore[reportIncompatibleVariableOverride]
+    def error_handlers(  # ty: ignore[invalid-property-type-override]
         self,
     ) -> Mapping[
         type[HTTPException | BaseException] | int,
@@ -64,4 +63,4 @@ class OARepoRequestsResourceConfig(RequestsResourceConfig, ConfiguratorMixin):
         error_handlers = dict(super().error_handlers) | oarepo_requests_error_handlers
         for x in importlib_metadata.entry_points(group="oarepo_requests.error_handlers"):
             error_handlers.update(x.load())
-        return MappingProxyType(error_handlers)  # type: ignore[reportReturnType]
+        return MappingProxyType(error_handlers)

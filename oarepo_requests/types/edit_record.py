@@ -35,7 +35,7 @@ class EditPublishedRecordRequestType(NonDuplicableOARepoRecordRequestType):
 
     type_id = "edit_published_record"
     name = _("Edit metadata")
-    description = _("Request re-opening of published record")  # type: ignore[reportAssignmentType]
+    description = _("Request re-opening of published record")
     allowed_on_draft = False
     receiver_can_be_none = True
 

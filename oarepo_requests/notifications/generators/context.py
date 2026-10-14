@@ -55,15 +55,20 @@ class RequestEntityResolve(ReferenceSavingEntityResolve):
 
     @override
     def __call__(self, notification: Notification):
+        # request types import notification builders, which import this module
+        from oarepo_requests.types import OARepoRequestType
+
         notification = super().__call__(notification)
         request_dict = notification.context["request"]
         if request_dict.get("title"):
             return request_dict
 
         request = Request.get_record(request_dict["id"])
-        if hasattr(request.type, "stateful_name"):
+        if isinstance(request.type, OARepoRequestType):
             # If the request type has a stateful name, use it
             # note: do not have better identity here, so using system_identity
             # as a fallback
-            request_dict["title"] = request.type.stateful_name(system_identity, topic=None)  # type: ignore[reportAttributeAccessIssue]
+            # TODO: is the topic=None correct?? - technically we could do this after topic resolving
+            # with separate generator
+            request_dict["title"] = request.type.stateful_name(system_identity, topic=None)  # ty: ignore[invalid-argument-type]
         return notification

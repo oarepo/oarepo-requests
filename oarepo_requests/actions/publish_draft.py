@@ -48,7 +48,7 @@ class MakeTopicDraftMixin(RequestAction):
         # preventing circular imports
         from oarepo_requests.types import PublishDraftRequestType
 
-        self.topic = PublishDraftRequestType.convert_topic(identity, self.topic)  # type: ignore[has-type]
+        self.topic = PublishDraftRequestType.convert_topic(identity, self.topic)
         super().execute(identity, uow, *args, **kwargs)
 
 
@@ -65,13 +65,13 @@ class PublishMixin(RequestAction):
 
             topic = self.request.topic.resolve()
             PublishDraftRequestType.validate_topic(system_identity, topic)
-        except:  # noqa E722: used for displaying buttons, so ignore errors here
+        except:  # noqa E722 used for displaying buttons, so ignore errors here
             return False
         return True
 
 
 # TODO: snapshot
-class PublishDraftSubmitAction(MakeTopicDraftMixin, PublishMixin, OARepoSubmitAction):  # type: ignore[misc]
+class PublishDraftSubmitAction(MakeTopicDraftMixin, PublishMixin, OARepoSubmitAction):
     """Submit action for publishing draft requests."""
 
     notification_builder = PublishDraftRequestSubmitNotificationBuilder
@@ -97,7 +97,7 @@ class PublishDraftSubmitAction(MakeTopicDraftMixin, PublishMixin, OARepoSubmitAc
         uow.register(NotificationOp(self.notification_builder.build(request=self.request)))
 
 
-class PublishDraftAcceptAction(MakeTopicDraftMixin, PublishMixin, OARepoAcceptAction):  # type: ignore[misc]
+class PublishDraftAcceptAction(MakeTopicDraftMixin, PublishMixin, OARepoAcceptAction):
     """Accept action for publishing draft requests."""
 
     name = _("Publish")
@@ -115,7 +115,7 @@ class PublishDraftAcceptAction(MakeTopicDraftMixin, PublishMixin, OARepoAcceptAc
         topic_service = get_draft_record_service(self.topic)
         requests = search_requests(system_identity, self.topic)
 
-        for result in requests._results:  # noqa: SLF001
+        for result in requests._results:  # noqa SLF001
             if (
                 result.type
                 not in [
@@ -138,7 +138,7 @@ class PublishDraftAcceptAction(MakeTopicDraftMixin, PublishMixin, OARepoAcceptAc
         uow.register(NotificationOp(self.notification_builder.build(request=self.request)))
 
 
-class PublishDraftDeclineAction(MakeTopicDraftMixin, OARepoDeclineAction):  # type: ignore[misc]
+class PublishDraftDeclineAction(MakeTopicDraftMixin, OARepoDeclineAction):
     """Decline action for publishing draft requests."""
 
     name = _("Return for correction")
@@ -157,7 +157,7 @@ class PublishDraftDeclineAction(MakeTopicDraftMixin, OARepoDeclineAction):  # ty
         uow.register(NotificationOp(self.notification_builder.build(request=self.request)))
 
 
-class PublishDraftCancelAction(MakeTopicDraftMixin, OARepoCancelAction):  # type: ignore[misc]
+class PublishDraftCancelAction(MakeTopicDraftMixin, OARepoCancelAction):
     """Cancel action for publishing draft requests."""
 
     name = _("Cancel")

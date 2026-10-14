@@ -50,13 +50,13 @@ class PublishNewVersionAcceptAction(PublishDraftAcceptAction):
         super().apply(identity, uow, *args, **kwargs)
 
 
-class PublishNewVersionSubmitAction(PublishDraftSubmitAction):  # type: ignore[misc]
+class PublishNewVersionSubmitAction(PublishDraftSubmitAction):
     """Accept action for publishing draft requests."""
 
     notification_builder = PublishNewVersionRequestSubmitNotificationBuilder
 
 
-class PublishNewVersionDeclineAction(PublishDraftDeclineAction):  # type: ignore[misc]
+class PublishNewVersionDeclineAction(PublishDraftDeclineAction):
     """Decline action for publishing draft requests."""
 
     notification_builder = PublishNewVersionRequestDeclineNotificationBuilder

@@ -5,7 +5,7 @@
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, override
 
 from invenio_notifications.services.filters import RecipientFilter
 
@@ -16,9 +16,10 @@ if TYPE_CHECKING:
 class UsersWithNoMailRecipientFilter(RecipientFilter):
     """Recipient filter for filtering system user."""
 
+    @override
     def __call__(
         self,
-        notification: Notification,  # noqa: ARG002
+        notification: Notification,
         recipients: dict[str, Recipient],
     ):
         """Filter system recipient."""
@@ -28,9 +29,10 @@ class UsersWithNoMailRecipientFilter(RecipientFilter):
 class SystemUserRecipientFilter(RecipientFilter):
     """Recipient filter for filtering system user."""
 
+    @override
     def __call__(
         self,
-        notification: Notification,  # noqa: ARG002
+        notification: Notification,
         recipients: dict[str, Recipient],
     ):
         """Filter system recipient."""

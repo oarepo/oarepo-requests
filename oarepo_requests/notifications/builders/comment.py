@@ -26,33 +26,36 @@ from oarepo_requests.notifications.generators.context import ReferenceSavingEnti
 from oarepo_requests.utils import classproperty
 
 if TYPE_CHECKING:
+    from collections.abc import Sequence
+
     from invenio_notifications.services.filters import RecipientFilter
 
 
 class CommentRequestEventCreateNotificationBuilder(InvenioCommentRequestEventCreateNotificationBuilder):
     """Notification builder for comment event."""
 
+    # TODO: fix in stubs? (list vs tuple) - or is this
     @classproperty
-    def context(self) -> tuple[ContextGenerator, ...]:  # type: ignore[reportIncompatibleVariableOverride]
+    def context(self) -> Sequence[ContextGenerator]:
         """Get context for the notification builder."""
-        invenio = super().context
-        for idx, r in enumerate(list(invenio)):
+        invenio = list(super().context)
+        for idx, r in enumerate(invenio):
             if isinstance(r, EntityResolve):
                 replacement_cls = RequestEntityResolve if r.key == "request" else ReferenceSavingEntityResolve
                 invenio[idx] = replacement_cls(key=r.key)
         return *invenio, ReferenceSavingEntityResolve(key="request.topic")
 
     @classproperty
-    def recipients(self) -> tuple[RecipientGenerator, ...]:  # type: ignore[reportIncompatibleVariableOverride]
+    def recipients(self) -> Sequence[RecipientGenerator]:
         """Get recipients for the notification builder."""
-        invenio = super().recipients
-        for idx, r in enumerate(list(invenio)):
+        invenio = list(super().recipients)
+        for idx, r in enumerate(invenio):
             if isinstance(r, RequestParticipantsRecipient):
                 invenio[idx] = GeneralRequestParticipantsRecipient(key="request")
                 break
         return tuple(invenio)
 
     @classproperty
-    def recipient_filters(self) -> tuple[RecipientFilter, ...]:  # type: ignore[reportIncompatibleVariableOverride]
+    def recipient_filters(self) -> Sequence[RecipientFilter]:
         """Get recipient filters for the notification builder."""
         return *super().recipient_filters, UsersWithNoMailRecipientFilter()

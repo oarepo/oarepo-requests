@@ -38,16 +38,16 @@ class GroupMembershipRequestType(DefaultReceiverMixin, OARepoRequestType):
     """Request type for requesting membership in a group."""
 
     type_id = "group_membership"
-    name = _("Request group membership")  # type: ignore[reportAssignmentType]
-    description = _("Request membership in a group")  # type: ignore[reportAssignmentType]
+    name = _("Request group membership")
+    description = _("Request membership in a group")
     editable = False
     receiver_can_be_none = True
 
-    allowed_topic_ref_types = ["group"]  # noqa RUFF012
-    allowed_receiver_ref_types = ["group"]  # noqa RUFF012 # type: ignore[reportAssignmentType]
+    allowed_topic_ref_types = ("group",)  # TODO: fix typing
+    allowed_receiver_ref_types = ("group",)
 
     @classproperty
-    def available_actions(cls) -> dict[str, type[RequestAction]]:  # noqa N805 # type: ignore[reportIncompatibleVariableOverride]
+    def available_actions(cls) -> dict[str, type[RequestAction]]:  # noqa 805
         """Return available actions for the request type."""
         return {
             **super().available_actions,

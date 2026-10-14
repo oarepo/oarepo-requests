@@ -54,17 +54,18 @@ class OARepoGenericActionMixin(RequestAction):
         return self._request
 
     @request.setter
-    def request(self, value: Request) -> None:  # type: ignore[reportIncompatibleVariableOverride]
+    def request(self, value: Request) -> None:
         """Set the topic."""
         self._request = value
 
     @classmethod
-    def stateful_name(cls, identity: Identity, **kwargs: Any) -> str | LazyString:  # noqa: ARG003
+    def stateful_name(cls, identity: Identity, **kwargs: Any) -> str | LazyString:
         """Return the name of the action.
 
         The name can be a lazy multilingual string and may depend on the state of the action,
         request or identity of the caller.
         """
+        del identity, kwargs  # used in subclasses
         return cls.name
 
     def apply(
@@ -100,32 +101,32 @@ class OARepoGenericActionMixin(RequestAction):
                 identity.provides.remove(request_active)
 
 
-class OARepoSubmitAction(OARepoGenericActionMixin, actions.SubmitAction):  # type: ignore[reportIncompatibleVariableOverride]
+class OARepoSubmitAction(OARepoGenericActionMixin, actions.SubmitAction):
     """Submit action extended for oarepo requests."""
 
     type_id = "submit"
     name = _("Submit")
 
 
-class OARepoDeclineAction(OARepoGenericActionMixin, actions.DeclineAction):  # type: ignore[reportIncompatibleVariableOverride]
+class OARepoDeclineAction(OARepoGenericActionMixin, actions.DeclineAction):
     """Decline action extended for oarepo requests."""
 
     type_id = "decline"
     name = _("Decline")
 
 
-class OARepoAcceptAction(OARepoGenericActionMixin, actions.AcceptAction):  # type: ignore[reportIncompatibleVariableOverride]
+class OARepoAcceptAction(OARepoGenericActionMixin, actions.AcceptAction):
     """Accept action extended for oarepo requests."""
 
     type_id = "accept"
     name = _("Accept")
 
 
-class OARepoCancelAction(OARepoGenericActionMixin, actions.CancelAction):  # type: ignore[reportIncompatibleVariableOverride]
+class OARepoCancelAction(OARepoGenericActionMixin, actions.CancelAction):
     """Cancel action extended for oarepo requests."""
 
     type_id = "cancel"
     name = _("Cancel")
 
-    status_from = ("created", "submitted")  # type: ignore[reportAssignmentType]
+    status_from = ("created", "submitted")
     status_to = "cancelled"

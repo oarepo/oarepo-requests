@@ -11,11 +11,6 @@ from typing import TYPE_CHECKING, Protocol, cast
 from deepmerge import conservative_merger
 from flask import current_app
 from invenio_base.utils import obj_or_import_string
-from invenio_requests.customizations import EventType
-from invenio_requests.proxies import (
-    current_event_type_registry,
-    current_request_type_registry,
-)
 from invenio_requests.records import Request
 from invenio_search_ui.searchconfig import search_app_config
 
@@ -175,16 +170,10 @@ def api_finalize_app(app: Flask) -> None:
 
 def finalize_app(app: Flask) -> None:
     """Finalize app."""
-    # TODO: temporary before invenio fix
-    to_remove = [t for t in current_request_type_registry if isinstance(t, EventType)]
-    for type_ in to_remove:
-        current_request_type_registry._registered_types.pop(type_.type_id)  # noqa: SLF001 # type: ignore[reportAttributeAccessIssue]
-        current_event_type_registry.register_type(type_)
-
     ext = app.extensions["oarepo-requests"]
     ext.notification_recipients_resolvers_registry = app.config["NOTIFICATION_RECIPIENTS_RESOLVERS"]
-
-    dumper_extensions = Request.dumper._extensions  # noqa: SLF001 # type: ignore[reportAttributeAccessIssue]
+    # TODO: i assume we could cast to search and add _extensions but not worth it?
+    dumper_extensions = Request.dumper._extensions  # noqa: SLF001  # ty: ignore[unresolved-attribute]
     if not any(isinstance(e, RecordReferenceDumperExt) for e in dumper_extensions):
         dumper_extensions.append(RecordReferenceDumperExt())
 

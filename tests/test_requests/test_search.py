@@ -22,7 +22,7 @@ def test_search_by_topic_model_type(
         identity=creator.identity,
         data={"payload": {"version": "1.0"}},
         request_type="publish_draft",
-        topic=draft._record,  # noqa: SLF001
+        topic=draft._record,
         expand=True,
     )
     assert (
@@ -51,7 +51,7 @@ def test_model_topic_reference_popped(
         identity=creator.identity,
         data={"payload": {"version": "1.0"}},
         request_type="publish_draft",
-        topic=draft._record,  # noqa: SLF001
+        topic=draft._record,
         expand=True,
     )
     search = current_requests_service.search(system_identity)

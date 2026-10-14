@@ -35,7 +35,7 @@ class NewVersionRequestType(NonDuplicableOARepoRecordRequestType):
 
     type_id = "new_version"
     name = _("New Version")
-    description = _("Request requesting creation of new version of a published record.")  # type: ignore[reportAssignmentType]
+    description = _("Request requesting creation of new version of a published record.")
     allowed_on_draft = False
     editable = False
     payload_schema: Mapping[str, ma.fields.Field] | None = {
@@ -45,7 +45,7 @@ class NewVersionRequestType(NonDuplicableOARepoRecordRequestType):
 
     @classproperty
     @override
-    def available_actions(cls) -> dict[str, type[RequestAction]]:  # noqa N805
+    def available_actions(cls) -> dict[str, type[RequestAction]]:  # noqa 805
         """Return available actions for the request type."""
         return {
             **super().available_actions,
@@ -118,7 +118,7 @@ class NewVersionRequestType(NonDuplicableOARepoRecordRequestType):
                 return gettext("Request new version access")
 
     @override
-    def stateful_description(  # noqa: PLR0911
+    def stateful_description(  # noqa PLR0911
         self,
         identity: Identity,
         *,

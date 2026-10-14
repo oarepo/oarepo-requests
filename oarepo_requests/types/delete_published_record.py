@@ -41,8 +41,8 @@ class DeletePublishedRecordRequestType(NonDuplicableOARepoRecordRequestType):
     """Request type for requesting deletion of a published record."""
 
     type_id = "delete_published_record"
-    name = _("Delete record")  # type: ignore[reportAssignmentType]
-    description = _("Request deletion of published record")  # type: ignore[reportAssignmentType]
+    name = _("Delete record")
+    description = _("Request deletion of published record")
     allowed_on_draft = False
     editable = False
     dangerous = True
@@ -119,7 +119,7 @@ class DeletePublishedRecordRequestType(NonDuplicableOARepoRecordRequestType):
                 return gettext("Request record deletion")
 
     @override
-    def stateful_description(  # noqa: PLR0911
+    def stateful_description(  # noqa PLR0911
         self,
         identity: Identity,
         *,

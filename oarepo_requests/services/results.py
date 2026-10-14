@@ -36,7 +36,7 @@ class StringEntityResolverExpandableField(EntityResolverExpandableField):
     the referenced record.
     """
 
-    def get_value_service(self, value: str) -> tuple[str, RecordService]:  # type: ignore[override]
+    def get_value_service(self, value: str) -> tuple[str, RecordService]:
         """Return the value and the service via entity resolvers."""
         ref = string_to_reference(value)
         v, service = super().get_value_service(ref)

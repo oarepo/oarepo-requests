@@ -42,7 +42,7 @@ from ..errors import UnresolvedRequestsError
 class PublishRequestType(NonDuplicableOARepoRecordRequestType):
     """Publish draft request type."""
 
-    description = _("Request to publish a draft")  # type: ignore[reportAssignmentType]
+    description = _("Request to publish a draft")
     allowed_on_published = False
     receiver_can_be_none = True
     editable = False
@@ -52,7 +52,7 @@ class PublishRequestType(NonDuplicableOARepoRecordRequestType):
     cancel_action = PublishDraftCancelAction
 
     @classproperty
-    def available_actions(cls) -> dict[str, type[RequestAction]]:  # noqa N805
+    def available_actions(cls) -> dict[str, type[RequestAction]]:  # noqa 805
         """Return available actions for the request type."""
         return {
             **super().available_actions,
@@ -108,7 +108,7 @@ class PublishRequestType(NonDuplicableOARepoRecordRequestType):
         """Assert that there are no pending requests on the topic."""
         requests = search_requests(system_identity, topic)
 
-        for result in requests._results:  # noqa: SLF001
+        for result in requests._results:  # noqa SLF001
             # note: we can not use solely the result.is_open because changes may not be committed yet
             # to opensearch index. That's why we need to get the record from DB and re-check.
             if (
@@ -137,7 +137,9 @@ class PublishRequestType(NonDuplicableOARepoRecordRequestType):
         # if files support is enabled for this topic, check if there are any files
         if hasattr(topic, "files"):
             can_toggle_files = topic_service.check_permission(identity, "manage_files", record=topic)
-            draft_files = topic.files  # type: ignore[reportAttributeAccessIssue]
+            # TODO: we have typing record.files on RDMRecord - the "specific things expected on record that are set
+            #  only on specific instances" pattern
+            draft_files = topic.files
             if draft_files.enabled and not draft_files.items():
                 if can_toggle_files:
                     my_message = gettext(
