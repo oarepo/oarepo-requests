@@ -1,4 +1,4 @@
-// Copyright (c) 2026 CESNET
+// SPDX-FileCopyrightText: 2026 CESNET
 // SPDX-License-Identifier: MIT
 
 import $ from "jquery";

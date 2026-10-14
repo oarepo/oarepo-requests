@@ -1,16 +1,5 @@
-#
-# Copyright (C) 2025 CESNET z.s.p.o.
-#
-# oarepo-requests is free software; you can redistribute it and/or
-# modify it under the terms of the MIT License; see LICENSE file for more
-# details.
-#
-#
-# This file is part of Invenio.
-# Copyright (C) 2016-2018 CERN.
-#
-# Invenio is free software; you can redistribute it and/or modify it
-# under the terms of the MIT License; see LICENSE file for more details.
+# SPDX-FileCopyrightText: 2025 CESNET z.s.p.o
+# SPDX-License-Identifier: MIT
 
 """Create snapshot table."""
 
