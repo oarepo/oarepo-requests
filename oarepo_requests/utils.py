@@ -33,7 +33,6 @@ if TYPE_CHECKING:
 
     from flask_principal import Identity
     from invenio_records_resources.records import Record
-    from invenio_records_resources.references.entity_resolvers import EntityProxy
     from invenio_records_resources.services import RecordService
     from invenio_requests.customizations.request_types import RequestType
     from invenio_requests.records.api import Request
@@ -151,7 +150,7 @@ def resolve_reference_dict(reference_dict: dict[str, str]) -> Any:
 
     Raises ValueError if the reference cannot be resolved.
     """
-    return cast("EntityProxy", ResolverRegistry.resolve_entity_proxy(reference_dict, raise_=True)).resolve()
+    return ResolverRegistry.resolve_entity_proxy(reference_dict, raise_=True).resolve()
 
 
 def reference_entity(entity: Any) -> dict[str, str]:
@@ -159,7 +158,7 @@ def reference_entity(entity: Any) -> dict[str, str]:
 
     Raises ValueError if the reference cannot be resolved.
     """
-    return cast("dict[str, str]", ResolverRegistry.reference_entity(entity, raise_=True))
+    return ResolverRegistry.reference_entity(entity, raise_=True)
 
 
 # TODO: possibly not used
@@ -198,7 +197,7 @@ def ref_to_str(ref_dict: dict[str, str]) -> str:
 
 
 def get_receiver_for_request_type(
-    request_type: RequestType, identity: Identity, topic: Record
+    request_type: RequestType, identity: Identity, topic: Record | None
 ) -> Mapping[str, str] | None:
     """Get the default receiver for the request type, identity and topic.
 
@@ -234,7 +233,7 @@ def is_auto_approved(
     request_type: RequestType,
     *,
     identity: Identity,
-    topic: Record,
+    topic: Record | None,
 ) -> bool:
     """Check if the request should be auto-approved.
 

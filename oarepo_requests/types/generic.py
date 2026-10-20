@@ -6,7 +6,7 @@
 from __future__ import annotations
 
 from abc import abstractmethod
-from typing import TYPE_CHECKING, Any, ClassVar, cast
+from typing import TYPE_CHECKING, Any, ClassVar, Protocol, cast, runtime_checkable
 
 from flask_babel.speaklater import LazyString
 from invenio_records_resources.services.base.links import EndpointLink
@@ -15,6 +15,7 @@ from invenio_requests.customizations import RequestType
 from invenio_requests.customizations.states import RequestState
 from invenio_requests.proxies import current_requests_service
 from marshmallow import post_dump
+from oarepo_workflows.requests import RequestTypeWithCreationChecks
 
 from oarepo_requests.errors import OpenRequestAlreadyExistsError
 from oarepo_requests.notifications.builders.comment import (
@@ -49,7 +50,47 @@ else:
     TypingMixinRequestType = object
 
 
-class OARepoRequestType(RequestType):
+@runtime_checkable
+class TopicConvertingRequestType(Protocol):
+    """Requests requiring further topic conversion after dereference with standard resolver.
+
+    For example, the RDM record resolver returns a published record when the request requires draft.
+    """
+
+    @classmethod
+    def convert_topic(cls, identity: Identity, topic: Any) -> Any:
+        """Convert the topic."""
+        ...
+
+
+@runtime_checkable
+class RequestTypeWithStatefulName(Protocol):
+    """Request type with a stateful name and description."""
+
+    def stateful_name(
+        self,
+        identity: Identity,
+        *,
+        topic: Record | None,
+        request: Request | None = None,
+        **kwargs: Any,
+    ) -> str | LazyString:
+        """Return the stateful name of the request."""
+        ...
+
+    def stateful_description(
+        self,
+        identity: Identity,
+        *,
+        topic: Record | None,
+        request: Request | None = None,
+        **kwargs: Any,
+    ) -> str | LazyString:
+        """Return the description of the request that reflects its current state."""
+        ...
+
+
+class OARepoRequestType(RequestType, RequestTypeWithCreationChecks, RequestTypeWithStatefulName):
     """Base request type for OARepo requests."""
 
     description: str | LazyString = ""
@@ -105,27 +146,9 @@ class OARepoRequestType(RequestType):
     def _create_marshmallow_schema(cls) -> type[Schema]:
         """Create a marshmallow schema for this request type with required payload field."""
         base_schema = super()._create_marshmallow_schema()
-
-        # from the other review:
-        # TODO: this is on instance of a schema but base_schema is SchemaMeta with fields saved in ._declared_fields
-        # Consider whether this is necessary - supposed use case? - "removal_reason" is required for request deletion
-        # and schema without the Nested being required would allow for creation of requests without payload
-        # but this seems to be already checked in
-        # no-remove oarepo_requests.services.oarepo.service.OARepoRequestsService.create:107
-        # no-remove if cls.payload_schema is not None and hasattr(base_schema, "fields") and "payload"
-        # in base_schema.fields:
-        # no-remove base_schema.fields["payload"].required = True  # pragma: no cover
-
-        # correct version:
-        if (
-            cls.payload_schema is not None
-            and hasattr(base_schema, "_declared_fields")
-            and "payload" in base_schema._declared_fields  # noqa SLF001
-        ):
-            base_schema._declared_fields["payload"].required = True  # noqa SLF001
         request_type_cls = cls
 
-        class SchemaWithTitleFallback(base_schema):
+        class SchemaWithTitleFallback(base_schema):  # ty:ignore[unsupported-base]
             # Set the request title to "<type name> (<topic title>)" when the
             # topic resolves and has a metadata title; otherwise fall back to
             # the static type name. We deliberately do NOT call stateful_name
@@ -156,9 +179,9 @@ class OARepoRequestType(RequestType):
         self,
         identity: Identity,
         data: dict[str, Any],
-        receiver: dict[str, str],
+        receiver: dict[str, str] | Any | None,
         topic: Record,
-        creator: dict[str, str],
+        creator: dict[str, str] | Any | None,
         **kwargs: Any,
     ) -> None:
         """Check if the request can be created.
@@ -199,12 +222,11 @@ class OARepoRequestType(RequestType):
             "cancel": OARepoCancelAction,
         }
 
-    # TODO: move these to RecordRequestType too?
     def stateful_name(
         self,
         identity: Identity,
         *,
-        topic: Record,
+        topic: Record | None,
         request: Request | None = None,
         **kwargs: Any,
     ) -> str | LazyString:
@@ -221,7 +243,7 @@ class OARepoRequestType(RequestType):
         self,
         identity: Identity,
         *,
-        topic: Record,
+        topic: Record | None,
         request: Request | None = None,
         **kwargs: Any,
     ) -> str | LazyString:
@@ -240,19 +262,19 @@ class OARepoRequestType(RequestType):
         self,
         identity: Identity,
         *,
-        topic: Record,
+        topic: Any | None,
         request: Request | None = None,
         # strings
-        create: (str | LazyString | Callable[[Identity, Record, Request | None], str | LazyString]),
-        create_autoapproved: (str | LazyString | Callable[[Identity, Record, Request | None], str | LazyString]),
-        submit: (str | LazyString | Callable[[Identity, Record, Request | None], str | LazyString]),
-        submitted_receiver: (str | LazyString | Callable[[Identity, Record, Request | None], str | LazyString]),
-        submitted_creator: (str | LazyString | Callable[[Identity, Record, Request | None], str | LazyString]),
-        submitted_others: (str | LazyString | Callable[[Identity, Record, Request | None], str | LazyString]),
-        accepted: (str | LazyString | Callable[[Identity, Record, Request | None], str | LazyString]),
-        declined: (str | LazyString | Callable[[Identity, Record, Request | None], str | LazyString]),
-        cancelled: (str | LazyString | Callable[[Identity, Record, Request | None], str | LazyString]),
-        created: (str | LazyString | Callable[[Identity, Record, Request | None], str | LazyString]),
+        create: (str | LazyString | Callable[[Identity, Any | None, Request | None], str | LazyString]),
+        create_autoapproved: (str | LazyString | Callable[[Identity, Any | None, Request | None], str | LazyString]),
+        submit: (str | LazyString | Callable[[Identity, Any | None, Request | None], str | LazyString]),
+        submitted_receiver: (str | LazyString | Callable[[Identity, Any | None, Request | None], str | LazyString]),
+        submitted_creator: (str | LazyString | Callable[[Identity, Any | None, Request | None], str | LazyString]),
+        submitted_others: (str | LazyString | Callable[[Identity, Any | None, Request | None], str | LazyString]),
+        accepted: (str | LazyString | Callable[[Identity, Any | None, Request | None], str | LazyString]),
+        declined: (str | LazyString | Callable[[Identity, Any | None, Request | None], str | LazyString]),
+        cancelled: (str | LazyString | Callable[[Identity, Any | None, Request | None], str | LazyString]),
+        created: (str | LazyString | Callable[[Identity, Any | None, Request | None], str | LazyString]),
     ) -> str | LazyString:
         """Return a string that varies by the state of the request.
 
@@ -265,9 +287,9 @@ class OARepoRequestType(RequestType):
         """
 
         def get_string(
-            string: str | LazyString | Callable[[Identity, Record, Request | None], str | LazyString],
+            string: str | LazyString | Callable[[Identity, Record | None, Request | None], str | LazyString],
             identity: Identity,
-            topic: Record,
+            topic: Record | None,
             request: Request | None = None,
         ) -> str | LazyString:
             if isinstance(string, (str, LazyString)):
@@ -318,9 +340,9 @@ class OARepoRecordRequestType(OARepoRequestType):
         self,
         identity: Identity,
         data: dict[str, Any],
-        receiver: dict[str, str],
+        receiver: dict[str, str] | Any | None,
         topic: Record,
-        creator: dict[str, str],
+        creator: dict[str, str] | Any | None,
         **kwargs: Any,
     ) -> None:
         """Check if the request can be created.
@@ -362,9 +384,9 @@ class NonDuplicableOARepoRecordRequestType(OARepoRecordRequestType):
         self,
         identity: Identity,
         data: dict,
-        receiver: dict[str, str],
+        receiver: dict[str, str] | Any | None,
         topic: Record,
-        creator: dict[str, str],
+        creator: dict[str, str] | Any | None,
         *args: Any,
         **kwargs: Any,
     ) -> None:

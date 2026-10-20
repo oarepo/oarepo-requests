@@ -70,7 +70,6 @@ class PublishMixin(RequestAction):
         return True
 
 
-# TODO: snapshot
 class PublishDraftSubmitAction(MakeTopicDraftMixin, PublishMixin, OARepoSubmitAction):
     """Submit action for publishing draft requests."""
 

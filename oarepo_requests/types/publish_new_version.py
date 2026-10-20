@@ -54,9 +54,9 @@ class PublishNewVersionRequestType(PublishRequestType):
         self,
         identity: Identity,
         data: dict,
-        receiver: dict[str, str],
+        receiver: dict[str, str] | Any | None,
         topic: Record,
-        creator: dict[str, str],
+        creator: dict[str, str] | Any | None,
         *args: Any,
         **kwargs: Any,
     ) -> None:
@@ -109,7 +109,7 @@ class PublishNewVersionRequestType(PublishRequestType):
         self,
         identity: Identity,
         *,
-        topic: Record,
+        topic: Record | None,
         request: Request | None = None,
         **kwargs: Any,
     ) -> str | LazyString:
@@ -135,7 +135,7 @@ class PublishNewVersionRequestType(PublishRequestType):
         self,
         identity: Identity,
         *,
-        topic: Record,
+        topic: Record | None,
         request: Request | None = None,
         **kwargs: Any,
     ) -> str | LazyString:

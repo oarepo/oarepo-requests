@@ -11,6 +11,8 @@ from .generic import (
     DefaultReceiverMixin,
     NonDuplicableOARepoRecordRequestType,
     OARepoRequestType,
+    RequestTypeWithStatefulName,
+    TopicConvertingRequestType,
 )
 from .publish_changed_metadata import PublishChangedMetadataRequestType
 from .publish_draft import PublishDraftRequestType
@@ -25,4 +27,6 @@ __all__ = [
     "PublishChangedMetadataRequestType",
     "PublishDraftRequestType",
     "PublishNewVersionRequestType",
+    "RequestTypeWithStatefulName",
+    "TopicConvertingRequestType",
 ]

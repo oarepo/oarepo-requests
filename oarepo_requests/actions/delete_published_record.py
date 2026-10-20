@@ -21,7 +21,6 @@ if TYPE_CHECKING:
 
 from typing import TYPE_CHECKING
 
-from invenio_db import db
 from invenio_i18n import _
 from oarepo_runtime.proxies import current_runtime
 from oarepo_runtime.typing import record_from_result
@@ -86,8 +85,7 @@ class DeletePublishedRecordAcceptAction(OARepoAcceptAction):
                 "note": self.request["payload"].get("note", ""),
                 "is_visible": True,
             }
-            self.topic = record_from_result(topic_service.delete_record(identity, topic["id"], data))
-            db.session.commit()
+            self.topic = record_from_result(topic_service.delete_record(identity, topic["id"], data, uow=uow))
         else:
             topic_service.delete(identity, topic["id"], *args, uow=uow, **kwargs)
 

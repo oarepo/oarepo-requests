@@ -5,7 +5,7 @@
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, cast
 
 from flask import current_app
 from invenio_requests.proxies import (
@@ -18,10 +18,12 @@ if TYPE_CHECKING:
     from oarepo_requests.resources.oarepo.resource import OARepoRequestsResource
     from oarepo_requests.services.oarepo.service import OARepoRequestsService
 
-current_oarepo_requests: _OARepoRequestsState = LocalProxy(lambda: current_app.extensions["oarepo-requests"])  # ty: ignore[invalid-assignment]
-current_requests_service: OARepoRequestsService = current_invenio_requests_service  # ty: ignore[invalid-assignment]
-current_oarepo_requests_resource: OARepoRequestsResource = LocalProxy(  # ty: ignore[invalid-assignment]
-    lambda: current_app.extensions["oarepo-requests"].requests_resource
+current_oarepo_requests: _OARepoRequestsState = cast(
+    "_OARepoRequestsState", LocalProxy(lambda: current_app.extensions["oarepo-requests"])
+)
+current_requests_service: OARepoRequestsService = cast("OARepoRequestsService", current_invenio_requests_service)
+current_oarepo_requests_resource: OARepoRequestsResource = cast(
+    "OARepoRequestsResource", lambda: current_app.extensions["oarepo-requests"].requests_resource
 )
 
 current_notification_recipient_generators_registry = LocalProxy(

@@ -48,9 +48,6 @@ class IfRequestedBy(RecipientGeneratorMixin, ConditionalGenerator):
         **kwargs: Any,
     ) -> bool:
         """Condition to choose generators set."""
-        # get needs
-        # TODO: there was a bug in the original code but since it wasn't a problem for now, i guess
-        # it's not a valid usecase anyway
         needs = creator.provides if isinstance(creator, Identity) else creator.get_needs()
 
         for condition in self.requesters:

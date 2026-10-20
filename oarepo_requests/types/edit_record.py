@@ -51,9 +51,9 @@ class EditPublishedRecordRequestType(NonDuplicableOARepoRecordRequestType):
         self,
         identity: Identity,
         data: dict[str, Any],
-        receiver: dict[str, str],
+        receiver: dict[str, str] | Any | None,
         topic: Record,
-        creator: dict[str, str],
+        creator: dict[str, str] | Any | None,
         *args: Any,
         **kwargs: Any,
     ) -> None:
@@ -89,7 +89,7 @@ class EditPublishedRecordRequestType(NonDuplicableOARepoRecordRequestType):
         self,
         identity: Identity,
         *,
-        topic: Record,
+        topic: Record | None,
         request: Request | None = None,
         **kwargs: Any,
     ) -> str | LazyString:
@@ -109,7 +109,7 @@ class EditPublishedRecordRequestType(NonDuplicableOARepoRecordRequestType):
         self,
         identity: Identity,
         *,
-        topic: Record,
+        topic: Record | None,
         request: Request | None = None,
         **kwargs: Any,
     ) -> str | LazyString:

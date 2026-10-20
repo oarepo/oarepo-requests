@@ -13,6 +13,7 @@ from invenio_records_resources.services.base.links import EndpointLink
 from invenio_records_resources.services.uow import IndexRefreshOp, unit_of_work
 from invenio_requests import current_request_type_registry
 from invenio_requests.services import RequestsService
+from oarepo_workflows.requests import RequestTypeWithCreationChecks
 
 from oarepo_requests.errors import UnknownRequestTypeError
 from oarepo_requests.proxies import current_oarepo_requests
@@ -21,6 +22,7 @@ from oarepo_requests.services.results import (
     StringEntityResolverExpandableField,
 )
 from oarepo_requests.types import DefaultReceiverMixin
+from oarepo_requests.types.generic import TopicConvertingRequestType
 from oarepo_requests.utils import (
     allowed_request_types_for_record,
     resolve_reference_dict,
@@ -31,6 +33,7 @@ if TYPE_CHECKING:
 
     from flask_principal import Identity
     from invenio_db.uow import UnitOfWork
+    from invenio_requests.customizations import RequestType
     from invenio_requests.services.requests.results import RequestItem
     from invenio_requests.services.results import (
         EntityResolverExpandableField,
@@ -57,7 +60,7 @@ class OARepoRequestsService(RequestsService):
         self,
         identity: Identity,
         data: dict[str, Any] | None,
-        request_type: str,
+        request_type: str | RequestType,
         receiver: dict[str, str] | Any | None = None,
         creator: dict[str, str] | Any | None = None,
         topic: Record | None = None,
@@ -84,25 +87,23 @@ class OARepoRequestsService(RequestsService):
         # TODO: invenio suggest None topic can be here but we do not expect it
         if topic is None:
             raise ValueError("")
-        type_ = (
-            current_request_type_registry.lookup(request_type, quiet=True)
-            if isinstance(request_type, str)
-            else request_type
-        )
-        if not type_:
-            raise UnknownRequestTypeError(request_type)
+        if isinstance(request_type, str):
+            try:
+                request_type = current_request_type_registry.lookup(request_type)
+            except KeyError as exc:
+                raise UnknownRequestTypeError(request_type) from exc
         data = data or {}
         if receiver is None:
-            if isinstance(type_, DefaultReceiverMixin):
-                receiver = type_.default_request_receiver(identity, topic, creator or identity, data)
+            if isinstance(request_type, DefaultReceiverMixin):
+                receiver = request_type.default_request_receiver(identity, topic, creator or identity, data)
             else:
                 # if explicit creator is not passed, use current identity - this is in sync with invenio_requests
                 receiver = current_oarepo_requests.default_request_receiver(
-                    identity, type_, topic, creator or identity, data
+                    identity, request_type, topic, creator or identity, data
                 )
-        if "payload" not in data and type_.payload_schema:
+        if "payload" not in data and request_type.payload_schema:
             data["payload"] = {}
-        schema = self._wrap_schema(type_.marshmallow_schema())
+        schema = self._wrap_schema(request_type.marshmallow_schema())
         data, _ = schema.load(
             data,
             context={"identity": identity},
@@ -111,25 +112,24 @@ class OARepoRequestsService(RequestsService):
 
         # ask to convert the topic. For example, for publish_metadata, the topic here is the previously published record
         # but we need the draft that we are publishing.
-        if hasattr(type_, "convert_topic"):
-            topic = type_.convert_topic(identity, topic)
+        if isinstance(request_type, TopicConvertingRequestType):
+            topic = request_type.convert_topic(identity, topic)
 
-        if hasattr(type_, "can_create"):
+        if isinstance(request_type, RequestTypeWithCreationChecks):
             # raise exception if can't
-            type_.can_create(identity, data, receiver, topic, creator)
+            request_type.can_create(identity, data, receiver, topic, creator)
 
         result = super().create(
             identity=identity,
             data=data,
-            request_type=type_,
+            request_type=request_type,
             receiver=receiver,
             creator=creator,
             topic=topic,
             expand=expand,
             uow=uow,
         )
-        # TODO: another "specific non-rdm record is untyped" issue
-        uow.register(IndexRefreshOp(indexer=self.indexer, index=self.record_cls.index))
+        uow.register(IndexRefreshOp(indexer=self.indexer, index=self.record_cls.index))  # ty:ignore[unresolved-attribute]
         return result
 
     def applicable_request_types(self, identity: Identity, topic: Record | dict[str, str]) -> RequestTypesList:

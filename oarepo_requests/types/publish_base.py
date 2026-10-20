@@ -23,7 +23,7 @@ from oarepo_requests.actions.publish_draft import (
 )
 
 from ..utils import classproperty, get_draft_record_service, search_requests
-from .generic import NonDuplicableOARepoRecordRequestType
+from .generic import NonDuplicableOARepoRecordRequestType, TopicConvertingRequestType
 
 if TYPE_CHECKING:
     from flask_principal import Identity
@@ -39,7 +39,7 @@ from invenio_requests.records.api import Request
 from ..errors import UnresolvedRequestsError
 
 
-class PublishRequestType(NonDuplicableOARepoRecordRequestType):
+class PublishRequestType(NonDuplicableOARepoRecordRequestType, TopicConvertingRequestType):
     """Publish draft request type."""
 
     description = _("Request to publish a draft")
@@ -66,9 +66,9 @@ class PublishRequestType(NonDuplicableOARepoRecordRequestType):
         self,
         identity: Identity,
         data: dict,
-        receiver: dict[str, str],
-        topic: Record,
-        creator: dict[str, str],
+        receiver: dict[str, str] | Any | None,
+        topic: Any,
+        creator: dict[str, str] | Any | None,
         *args: Any,
         **kwargs: Any,
     ) -> None:
@@ -80,7 +80,7 @@ class PublishRequestType(NonDuplicableOARepoRecordRequestType):
 
     @classmethod
     @override
-    def is_applicable_to(cls, identity: Identity, topic: Record, *args: Any, **kwargs: Any) -> bool:
+    def is_applicable_to(cls, identity: Identity, topic: Any, *args: Any, **kwargs: Any) -> bool:
         """Check if the request type is applicable to the topic."""
         try:
             topic = cls.convert_topic(identity, topic)
@@ -137,10 +137,8 @@ class PublishRequestType(NonDuplicableOARepoRecordRequestType):
         # if files support is enabled for this topic, check if there are any files
         if hasattr(topic, "files"):
             can_toggle_files = topic_service.check_permission(identity, "manage_files", record=topic)
-            # TODO: we have typing record.files on RDMRecord - the "specific things expected on record that are set
-            #  only on specific instances" pattern
             draft_files = topic.files
-            if draft_files.enabled and not draft_files.items():
+            if draft_files.enabled and not draft_files.items():  # ty:ignore[unresolved-attribute]
                 if can_toggle_files:
                     my_message = gettext(
                         "Missing uploaded files. To disable files for this record please mark it as metadata-only."

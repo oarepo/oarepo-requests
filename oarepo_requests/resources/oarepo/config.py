@@ -1,3 +1,4 @@
+# ruff: noqa ERA001
 # SPDX-FileCopyrightText: 2024 CESNET z.s.p.o
 # SPDX-License-Identifier: MIT
 
@@ -5,7 +6,6 @@
 
 from __future__ import annotations
 
-from types import MappingProxyType
 from typing import TYPE_CHECKING
 
 import importlib_metadata
@@ -21,14 +21,13 @@ if TYPE_CHECKING:
     from http.client import HTTPException
 
     from flask import Response
-    from flask_resources import ResponseHandler
     from marshmallow import fields
 
 
 class OARepoRequestsResourceConfig(RequestsResourceConfig, ConfiguratorMixin):
     """Config for the oarepo requests API."""
 
-    routes: Mapping[str, str] = {
+    routes = {
         **RequestsResourceConfig.routes,
         "create": "/<topic>/<request_type>",
         "list-applicable": "/applicable",
@@ -36,20 +35,11 @@ class OARepoRequestsResourceConfig(RequestsResourceConfig, ConfiguratorMixin):
 
     request_search_args = ExtendedRequestSearchRequestArgsSchema
 
-    request_view_args: Mapping[str, fields.Field] = MappingProxyType(
-        {
-            **RequestsResourceConfig.request_view_args,
-            "topic": ma.fields.String(),
-            "request_type": ma.fields.String(),
-        }
-    )
-
-    response_handlers: Mapping[str, ResponseHandler] = MappingProxyType(
-        {
-            # TODO: UI serialization
-            **RequestsResourceConfig.response_handlers,
-        }
-    )
+    request_view_args = {
+        **RequestsResourceConfig.request_view_args,
+        "topic": ma.fields.String(),
+        "request_type": ma.fields.String(),
+    }
 
     # base is a FromConfig descriptor and entry points must load lazily, so this has to stay a property
     @property
@@ -63,4 +53,4 @@ class OARepoRequestsResourceConfig(RequestsResourceConfig, ConfiguratorMixin):
         error_handlers = dict(super().error_handlers) | oarepo_requests_error_handlers
         for x in importlib_metadata.entry_points(group="oarepo_requests.error_handlers"):
             error_handlers.update(x.load())
-        return MappingProxyType(error_handlers)
+        return error_handlers

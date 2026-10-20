@@ -43,7 +43,7 @@ class GroupMembershipRequestType(DefaultReceiverMixin, OARepoRequestType):
     editable = False
     receiver_can_be_none = True
 
-    allowed_topic_ref_types = ("group",)  # TODO: fix typing
+    allowed_topic_ref_types = ("group",)
     allowed_receiver_ref_types = ("group",)
 
     @classproperty
@@ -74,8 +74,10 @@ class GroupMembershipRequestType(DefaultReceiverMixin, OARepoRequestType):
     }
 
     @staticmethod
-    def _group_title(topic: Record) -> str:
+    def _group_title(topic: Record | None) -> str:
         """Return the group's title - its description, falling back to its name."""
+        if not topic:
+            return ""
         return str(topic.get("description") or topic.get("name"))
 
     @override
@@ -83,7 +85,7 @@ class GroupMembershipRequestType(DefaultReceiverMixin, OARepoRequestType):
         self,
         identity: Identity,
         *,
-        topic: Record,
+        topic: Record | None,
         request: Request | None = None,
         **kwargs: Any,
     ) -> str | LazyString:
@@ -102,7 +104,7 @@ class GroupMembershipRequestType(DefaultReceiverMixin, OARepoRequestType):
         self,
         identity: Identity,
         *,
-        topic: Record,
+        topic: Record | None,
         request: Request | None = None,
         **kwargs: Any,
     ) -> str | LazyString:

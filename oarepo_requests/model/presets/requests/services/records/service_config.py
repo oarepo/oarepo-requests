@@ -34,7 +34,6 @@ class RequestsServiceConfigPreset(Preset):
         model: InvenioModel,
         dependencies: dict[str, Any],
     ) -> Generator[Customization]:
-        # TODO: RecordSnapshotComponent
         yield AddToDictionary(
             "record_links_item",
             {"requests": RefEndpointLink("requests.search", ref_querystring="topic")},

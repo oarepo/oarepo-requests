@@ -34,7 +34,6 @@ if TYPE_CHECKING:
 class CommentRequestEventCreateNotificationBuilder(InvenioCommentRequestEventCreateNotificationBuilder):
     """Notification builder for comment event."""
 
-    # TODO: fix in stubs? (list vs tuple) - or is this
     @classproperty
     def context(self) -> Sequence[ContextGenerator]:
         """Get context for the notification builder."""
