@@ -8,7 +8,7 @@ from __future__ import annotations
 from typing import TYPE_CHECKING, Any, override
 
 from invenio_drafts_resources.records.api import Record
-from invenio_records_resources.services import LinksTemplate
+from invenio_records_resources.services import LinksTemplate, ServiceSchemaWrapper
 from invenio_records_resources.services.base.links import EndpointLink
 from invenio_records_resources.services.uow import IndexRefreshOp, unit_of_work
 from invenio_requests import current_request_type_registry
@@ -53,6 +53,11 @@ class OARepoRequestsService(RequestsService):
             *super().expandable_fields,
             StringEntityResolverExpandableField("payload.created_topic"),
         ]
+
+    @property
+    def request_type_schema(self) -> ServiceSchemaWrapper:
+        """Request type schema."""
+        return ServiceSchemaWrapper(self, self.config.request_type_schema)
 
     @unit_of_work()
     @override

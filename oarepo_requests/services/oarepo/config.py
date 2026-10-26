@@ -9,6 +9,7 @@ import logging
 
 from invenio_requests.services import RequestsServiceConfig
 
+from oarepo_requests.services.schema import RequestTypeSchema
 from oarepo_requests.services.search import EnhancedRequestSearchOptions
 
 log = logging.getLogger(__name__)
@@ -18,3 +19,4 @@ class OARepoRequestsServiceConfig(RequestsServiceConfig):
     """Configuration for the oarepo request service."""
 
     search = EnhancedRequestSearchOptions
+    request_type_schema = RequestTypeSchema
