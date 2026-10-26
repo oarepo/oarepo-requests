@@ -8,19 +8,22 @@ from __future__ import annotations
 from typing import TYPE_CHECKING, Any, override
 
 import marshmallow as ma
+from invenio_accounts.models import Role
 from invenio_i18n import gettext
 from invenio_i18n import lazy_gettext as _
 from invenio_requests.customizations.actions import CancelAction
+from invenio_requests.resolvers.registry import ResolverRegistry
 
 from oarepo_requests.actions.group_membership import (
     GroupMembershipAcceptAction,
     GroupMembershipDeclineAction,
     GroupMembershipSubmitAction,
 )
-from oarepo_requests.types import DefaultReceiverMixin, OARepoRequestType
+from oarepo_requests.types import DefaultReceiverMixin, NonDuplicableOARepoRequestType
 
 from ..utils import (
     classproperty,
+    open_request_exists,
     request_identity_matches,
 )
 
@@ -29,12 +32,11 @@ if TYPE_CHECKING:
 
     from flask_babel.speaklater import LazyString
     from flask_principal import Identity
-    from invenio_records import Record
     from invenio_requests.customizations.actions import RequestAction
     from invenio_requests.records.api import Request
 
 
-class GroupMembershipRequestType(DefaultReceiverMixin, OARepoRequestType):
+class GroupMembershipRequestType(DefaultReceiverMixin[Role], NonDuplicableOARepoRequestType[Role]):
     """Request type for requesting membership in a group."""
 
     type_id = "group_membership"
@@ -63,7 +65,7 @@ class GroupMembershipRequestType(DefaultReceiverMixin, OARepoRequestType):
     def default_request_receiver(
         cls,
         identity: Identity,
-        topic: Record,
+        topic: Role,
         creator: dict[str, str] | Identity,
         data: dict,
     ) -> dict[str, str] | None:
@@ -73,24 +75,39 @@ class GroupMembershipRequestType(DefaultReceiverMixin, OARepoRequestType):
         "justification": ma.fields.String(),
     }
 
+    @override
+    @classmethod
+    def open_request_exists(
+        cls, identity: Identity, topic: Role, creator: dict[str, str] | Any | None = None, **kwargs: Any
+    ) -> bool:
+        """Check whether the creator already has an open membership request for the group."""
+        # same fallback as invenio's RequestsService.create when no explicit creator is passed
+        if creator is None:
+            creator = ResolverRegistry.reference_identity(identity)
+        return open_request_exists(topic, cls.type_id, creator=creator)
+
+    @override
     @staticmethod
-    def _group_title(topic: Record | None) -> str:
+    def topic_title(topic: Role | Mapping[str, Any] | None) -> str:
         """Return the group's title - its description, falling back to its name."""
         if not topic:
             return ""
+        if isinstance(topic, Role):
+            return str(topic.description or topic.name)
         return str(topic.get("description") or topic.get("name"))
 
+    # UI and notifications pass the serialized group (a dict) instead of the resolved Role
     @override
     def stateful_name(
         self,
         identity: Identity,
         *,
-        topic: Record | None,
+        topic: Role | Mapping[str, Any] | None,
         request: Request | None = None,
         **kwargs: Any,
     ) -> str | LazyString:
         """Return the stateful name of the request."""
-        group_title = self._group_title(topic)
+        group_title = self.topic_title(topic)
         if not request:
             return gettext("Request membership in group '%(group)s'") % {"group": group_title}
         match request.status:
@@ -104,12 +121,12 @@ class GroupMembershipRequestType(DefaultReceiverMixin, OARepoRequestType):
         self,
         identity: Identity,
         *,
-        topic: Record | None,
+        topic: Role | Mapping[str, Any] | None,
         request: Request | None = None,
         **kwargs: Any,
     ) -> str | LazyString:
         """Return the stateful description of the request."""
-        group_title = self._group_title(topic)
+        group_title = self.topic_title(topic)
 
         if not request:
             return gettext(

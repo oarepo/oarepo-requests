@@ -63,7 +63,7 @@ class OARepoRequestsService(RequestsService):
         request_type: str | RequestType,
         receiver: dict[str, str] | Any | None = None,
         creator: dict[str, str] | Any | None = None,
-        topic: Record | None = None,
+        topic: Any | None = None,
         *args: Any,
         expires_at: datetime | None = None,
         uow: UnitOfWork,

@@ -68,10 +68,10 @@ class CustomHTTPJSONException(HTTPJSONException):
 class OpenRequestAlreadyExistsError(CannotExecuteActionError):
     """An open request already exists."""
 
-    def __init__(self, request_type: RequestType, record: Record) -> None:
+    def __init__(self, request_type: RequestType, topic: Any) -> None:
         """Initialize the exception."""
         self.request_type = request_type
-        self.record = record
+        self.topic = topic
 
     def __str__(self):
         """Return str representation."""
@@ -80,9 +80,11 @@ class OpenRequestAlreadyExistsError(CannotExecuteActionError):
     @property
     def description(self) -> str:
         """Exception's description."""
+        # plain invenio request types have no topic_title
+        topic_title = getattr(self.request_type, "topic_title", None)
         return gettext("There is already an open request of %(request_type)s on %(record_id)s.") % {
             "request_type": self.request_type.name,
-            "record_id": self.record.id,
+            "record_id": topic_title(self.topic) if topic_title else self.topic.id,
         }
 
 

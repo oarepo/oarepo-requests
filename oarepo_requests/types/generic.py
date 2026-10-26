@@ -9,6 +9,7 @@ from abc import abstractmethod
 from typing import TYPE_CHECKING, Any, ClassVar, Protocol, cast, runtime_checkable
 
 from flask_babel.speaklater import LazyString
+from invenio_records_resources.records import Record
 from invenio_records_resources.services.base.links import EndpointLink
 from invenio_records_resources.services.errors import PermissionDeniedError
 from invenio_requests.customizations import RequestType
@@ -41,13 +42,14 @@ if TYPE_CHECKING:
     from collections.abc import Callable
 
     from flask_principal import Identity
-    from invenio_records_resources.records import Record
     from invenio_requests.customizations import RequestType as TypingMixinRequestType
     from invenio_requests.customizations.actions import RequestAction
     from invenio_requests.records.api import Request
     from marshmallow.schema import Schema
 else:
-    TypingMixinRequestType = object
+
+    class TypingMixinRequestType:
+        """Runtime stand-in for RequestType; not `object`, as bases (object, Generic) have no consistent MRO."""
 
 
 @runtime_checkable
@@ -64,14 +66,14 @@ class TopicConvertingRequestType(Protocol):
 
 
 @runtime_checkable
-class RequestTypeWithStatefulName(Protocol):
+class RequestTypeWithStatefulName[T](Protocol):
     """Request type with a stateful name and description."""
 
     def stateful_name(
         self,
         identity: Identity,
         *,
-        topic: Record | None,
+        topic: T | None,
         request: Request | None = None,
         **kwargs: Any,
     ) -> str | LazyString:
@@ -82,7 +84,7 @@ class RequestTypeWithStatefulName(Protocol):
         self,
         identity: Identity,
         *,
-        topic: Record | None,
+        topic: T | None,
         request: Request | None = None,
         **kwargs: Any,
     ) -> str | LazyString:
@@ -90,8 +92,8 @@ class RequestTypeWithStatefulName(Protocol):
         ...
 
 
-class OARepoRequestType(RequestType, RequestTypeWithCreationChecks, RequestTypeWithStatefulName):
-    """Base request type for OARepo requests."""
+class OARepoRequestType[T](RequestType, RequestTypeWithCreationChecks[T], RequestTypeWithStatefulName[T]):
+    """Base request type for OARepo requests on a topic of type T (e.g. a record or a group)."""
 
     description: str | LazyString = ""
 
@@ -142,6 +144,15 @@ class OARepoRequestType(RequestType, RequestTypeWithCreationChecks, RequestTypeW
         """
         return {**super().available_statuses, "created": RequestState.OPEN}
 
+    @staticmethod
+    def topic_title(topic: T | dict[str, Any] | None) -> str:
+        """Return topic title."""
+        if id_ := getattr(topic, "id", None):
+            return str(id_)
+        if isinstance(topic, dict):
+            return topic.get("id", "")
+        return ""
+
     @classmethod
     def _create_marshmallow_schema(cls) -> type[Schema]:
         """Create a marshmallow schema for this request type with required payload field."""
@@ -180,7 +191,7 @@ class OARepoRequestType(RequestType, RequestTypeWithCreationChecks, RequestTypeW
         identity: Identity,
         data: dict[str, Any],
         receiver: dict[str, str] | Any | None,
-        topic: Record,
+        topic: T,
         creator: dict[str, str] | Any | None,
         **kwargs: Any,
     ) -> None:
@@ -198,7 +209,7 @@ class OARepoRequestType(RequestType, RequestTypeWithCreationChecks, RequestTypeW
         )
 
     @classmethod
-    def is_applicable_to(cls, identity: Identity, topic: Record, *_args: Any, **kwargs: Any) -> bool:
+    def is_applicable_to(cls, identity: Identity, topic: T, *_args: Any, **kwargs: Any) -> bool:
         """Check if the request type is applicable to the topic.
 
         Used for checking whether there is any situation where the client can create
@@ -226,7 +237,7 @@ class OARepoRequestType(RequestType, RequestTypeWithCreationChecks, RequestTypeW
         self,
         identity: Identity,
         *,
-        topic: Record | None,
+        topic: T | None,
         request: Request | None = None,
         **kwargs: Any,
     ) -> str | LazyString:
@@ -243,7 +254,7 @@ class OARepoRequestType(RequestType, RequestTypeWithCreationChecks, RequestTypeW
         self,
         identity: Identity,
         *,
-        topic: Record | None,
+        topic: T | None,
         request: Request | None = None,
         **kwargs: Any,
     ) -> str | LazyString:
@@ -262,19 +273,19 @@ class OARepoRequestType(RequestType, RequestTypeWithCreationChecks, RequestTypeW
         self,
         identity: Identity,
         *,
-        topic: Any | None,
+        topic: T | None,
         request: Request | None = None,
         # strings
-        create: (str | LazyString | Callable[[Identity, Any | None, Request | None], str | LazyString]),
-        create_autoapproved: (str | LazyString | Callable[[Identity, Any | None, Request | None], str | LazyString]),
-        submit: (str | LazyString | Callable[[Identity, Any | None, Request | None], str | LazyString]),
-        submitted_receiver: (str | LazyString | Callable[[Identity, Any | None, Request | None], str | LazyString]),
-        submitted_creator: (str | LazyString | Callable[[Identity, Any | None, Request | None], str | LazyString]),
-        submitted_others: (str | LazyString | Callable[[Identity, Any | None, Request | None], str | LazyString]),
-        accepted: (str | LazyString | Callable[[Identity, Any | None, Request | None], str | LazyString]),
-        declined: (str | LazyString | Callable[[Identity, Any | None, Request | None], str | LazyString]),
-        cancelled: (str | LazyString | Callable[[Identity, Any | None, Request | None], str | LazyString]),
-        created: (str | LazyString | Callable[[Identity, Any | None, Request | None], str | LazyString]),
+        create: (str | LazyString | Callable[[Identity, T | None, Request | None], str | LazyString]),
+        create_autoapproved: (str | LazyString | Callable[[Identity, T | None, Request | None], str | LazyString]),
+        submit: (str | LazyString | Callable[[Identity, T | None, Request | None], str | LazyString]),
+        submitted_receiver: (str | LazyString | Callable[[Identity, T | None, Request | None], str | LazyString]),
+        submitted_creator: (str | LazyString | Callable[[Identity, T | None, Request | None], str | LazyString]),
+        submitted_others: (str | LazyString | Callable[[Identity, T | None, Request | None], str | LazyString]),
+        accepted: (str | LazyString | Callable[[Identity, T | None, Request | None], str | LazyString]),
+        declined: (str | LazyString | Callable[[Identity, T | None, Request | None], str | LazyString]),
+        cancelled: (str | LazyString | Callable[[Identity, T | None, Request | None], str | LazyString]),
+        created: (str | LazyString | Callable[[Identity, T | None, Request | None], str | LazyString]),
     ) -> str | LazyString:
         """Return a string that varies by the state of the request.
 
@@ -287,9 +298,9 @@ class OARepoRequestType(RequestType, RequestTypeWithCreationChecks, RequestTypeW
         """
 
         def get_string(
-            string: str | LazyString | Callable[[Identity, Record | None, Request | None], str | LazyString],
+            string: str | LazyString | Callable[[Identity, T | None, Request | None], str | LazyString],
             identity: Identity,
-            topic: Record | None,
+            topic: T | None,
             request: Request | None = None,
         ) -> str | LazyString:
             if isinstance(string, (str, LazyString)):
@@ -322,7 +333,53 @@ class OARepoRequestType(RequestType, RequestTypeWithCreationChecks, RequestTypeW
         return get_string(create, identity, topic, request)
 
 
-class OARepoRecordRequestType(OARepoRequestType):
+class NonDuplicableOARepoRequestType[T](OARepoRequestType[T]):
+    """Base request type for OARepo requests that cannot be duplicated.
+
+    This means that on a single topic there can be only one open request of this type.
+    """
+
+    @classmethod
+    def open_request_exists(
+        cls, identity: Identity, topic: T, creator: dict[str, str] | Any | None = None, **kwargs: Any
+    ) -> bool:
+        """Check whether an open request of this type that a new one would duplicate exists."""
+        del identity, creator, kwargs  # used by subclasses that scope duplicates more narrowly
+        return open_request_exists(topic, cls.type_id)
+
+    def can_create(
+        self,
+        identity: Identity,
+        data: dict,
+        receiver: dict[str, str] | Any | None,
+        topic: T,
+        creator: dict[str, str] | Any | None,
+        *args: Any,
+        **kwargs: Any,
+    ) -> None:
+        """Check if the request can be created.
+
+        :param identity:        identity of the caller
+        :param data:            data of the request
+        :param receiver:        receiver of the request
+        :param topic:           topic of the request
+        :param creator:         creator of the request
+        :param args:            additional arguments
+        :param kwargs:          additional keyword arguments
+        """
+        if self.open_request_exists(identity, topic, creator, receiver=receiver, data=data, **kwargs):
+            raise OpenRequestAlreadyExistsError(self, topic)
+        super().can_create(identity, data, receiver, topic, creator, *args, **kwargs)
+
+    @classmethod
+    def is_applicable_to(cls, identity: Identity, topic: T, *args: Any, **kwargs: Any) -> bool:
+        """Check if the request type is applicable to the topic."""
+        if cls.open_request_exists(identity, topic, **kwargs):
+            return False
+        return super().is_applicable_to(identity, topic, *args, **kwargs)
+
+
+class OARepoRecordRequestType(OARepoRequestType[Record]):
     """Base request type for OARepo requests that can be created on a record."""
 
     allowed_topic_ref_types = ("record",)
@@ -374,45 +431,11 @@ class OARepoRecordRequestType(OARepoRequestType):
         return super().is_applicable_to(identity, topic, *args, **kwargs)
 
 
-class NonDuplicableOARepoRecordRequestType(OARepoRecordRequestType):
-    """Base request type for OARepo requests that cannot be duplicated.
-
-    This means that on a single topic there can be only one open request of this type.
-    """
-
-    def can_create(
-        self,
-        identity: Identity,
-        data: dict,
-        receiver: dict[str, str] | Any | None,
-        topic: Record,
-        creator: dict[str, str] | Any | None,
-        *args: Any,
-        **kwargs: Any,
-    ) -> None:
-        """Check if the request can be created.
-
-        :param identity:        identity of the caller
-        :param data:            data of the request
-        :param receiver:        receiver of the request
-        :param topic:           topic of the request
-        :param creator:         creator of the request
-        :param args:            additional arguments
-        :param kwargs:          additional keyword arguments
-        """
-        if open_request_exists(topic, self.type_id):
-            raise OpenRequestAlreadyExistsError(self, topic)
-        super().can_create(identity, data, receiver, topic, creator, *args, **kwargs)
-
-    @classmethod
-    def is_applicable_to(cls, identity: Identity, topic: Record, *args: Any, **kwargs: Any) -> bool:
-        """Check if the request type is applicable to the topic."""
-        if open_request_exists(topic, cls.type_id):
-            return False
-        return super().is_applicable_to(identity, topic, *args, **kwargs)
+class NonDuplicableOARepoRecordRequestType(NonDuplicableOARepoRequestType[Record], OARepoRecordRequestType):
+    """Base request type for OARepo record requests that cannot be duplicated."""
 
 
-class DefaultReceiverMixin(TypingMixinRequestType):
+class DefaultReceiverMixin[T](TypingMixinRequestType):
     """Mixin for request types that have a default request receiver."""
 
     @classmethod
@@ -420,7 +443,7 @@ class DefaultReceiverMixin(TypingMixinRequestType):
     def default_request_receiver(
         cls,
         identity: Identity,
-        topic: Record,
+        topic: T,
         creator: dict[str, str] | Identity,
         data: dict,
     ) -> dict[str, str] | None:

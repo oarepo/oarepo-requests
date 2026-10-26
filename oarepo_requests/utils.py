@@ -124,7 +124,7 @@ def search_requests_filter(
     if receiver_reference:
         must.append(create_query_term_for_reference("receiver", receiver_reference))
     if creator_reference:
-        must.append(create_query_term_for_reference("creator", creator_reference))
+        must.append(create_query_term_for_reference("created_by", creator_reference))
     if topic_reference:
         must.append(create_query_term_for_reference("topic", topic_reference))
 
@@ -133,16 +133,20 @@ def search_requests_filter(
     )
 
 
-def open_request_exists(topic_or_reference: Record | dict[str, str], type_id: str) -> bool:
+def open_request_exists(topic_or_reference: Any, type_id: str, creator: Any | None = None) -> bool:
     """Check if there is an open request of a given type for the topic.
 
-    :param topic_or_reference: Topic record or reference to the record in the form {"datasets": "id"}.
+    :param topic_or_reference: Topic entity or reference to it in the form {"datasets": "id"}.
     :param type_id: Request type id.
+    :param creator: If set, only requests created by this entity (or reference) are considered.
     """
     topic_reference = ResolverRegistry.reference_entity(topic_or_reference, raise_=True)
-    base_filter = search_requests_filter(type_id=type_id, topic_reference=topic_reference, is_open=True)
-    results = current_requests_service.search(system_identity, extra_filter=base_filter).hits
-    return bool(list(results))
+    creator_reference = ResolverRegistry.reference_entity(creator, raise_=True) if creator is not None else None
+    base_filter = search_requests_filter(
+        type_id=type_id, topic_reference=topic_reference, creator_reference=creator_reference, is_open=True
+    )
+    results = current_requests_service.search(system_identity, extra_filter=base_filter)
+    return bool(results.total)
 
 
 def resolve_reference_dict(reference_dict: dict[str, str]) -> Any:
@@ -233,7 +237,7 @@ def is_auto_approved(
     request_type: RequestType,
     *,
     identity: Identity,
-    topic: Record | None,
+    topic: Any | None,
 ) -> bool:
     """Check if the request should be auto-approved.
 

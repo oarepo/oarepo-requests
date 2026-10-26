@@ -13,6 +13,9 @@ from invenio_access.permissions import system_identity
 from invenio_accounts.proxies import current_datastore
 from invenio_users_resources.proxies import current_groups_service
 
+from oarepo_requests.errors import OpenRequestAlreadyExistsError
+from oarepo_requests.types.group_membership import GroupMembershipRequestType
+
 if TYPE_CHECKING:
     from invenio_accounts.models import Role
 
@@ -144,6 +147,29 @@ def test_group_membership_notifications_declined(
         assert "Your request to join group 'Submitters' was declined" in sent_mail.subject
         assert 'Your request to join the group "Submitters" was declined' in sent_mail.body
         assert 'Your request to join the group "Submitters" was declined' in sent_mail.html
+
+
+def test_group_membership_request_is_non_duplicable_per_requester(
+    users,
+    requests_service,
+    administration_role,
+    submitters_role,
+):
+    """A user can't open a second membership request for a group, but another user still can."""
+    requester = users[0]
+    other_user = users[1]
+    data = {"payload": {"justification": "I need to submit datasets for my research group."}}
+    requests_service.create(requester.identity, data=data, request_type="group_membership", topic=submitters_role)
+
+    with pytest.raises(OpenRequestAlreadyExistsError):
+        requests_service.create(requester.identity, data=data, request_type="group_membership", topic=submitters_role)
+    assert not GroupMembershipRequestType.is_applicable_to(requester.identity, submitters_role)
+
+    assert GroupMembershipRequestType.is_applicable_to(other_user.identity, submitters_role)
+    other_request = requests_service.create(
+        other_user.identity, data=data, request_type="group_membership", topic=submitters_role
+    )
+    assert other_request["topic"] == {"group": "submitters"}
 
 
 def test_group_membership_stateful_name_and_description(
