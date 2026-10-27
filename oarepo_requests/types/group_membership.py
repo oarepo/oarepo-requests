@@ -11,7 +11,6 @@ import marshmallow as ma
 from invenio_accounts.models import Role
 from invenio_i18n import gettext
 from invenio_i18n import lazy_gettext as _
-from invenio_requests.customizations.actions import CancelAction
 from invenio_requests.resolvers.registry import ResolverRegistry
 
 from oarepo_requests.actions.group_membership import (
@@ -56,8 +55,6 @@ class GroupMembershipRequestType(DefaultReceiverMixin[Role], NonDuplicableOARepo
             "accept": GroupMembershipAcceptAction,
             "submit": GroupMembershipSubmitAction,
             "decline": GroupMembershipDeclineAction,
-            # OARepoRequestType uses OARepoCancelAction using workflow; workflows are not supported for group topic
-            "cancel": CancelAction,
         }
 
     @override

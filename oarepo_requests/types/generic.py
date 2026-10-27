@@ -5,6 +5,7 @@
 
 from __future__ import annotations
 
+import contextlib
 from abc import abstractmethod
 from typing import TYPE_CHECKING, Any, ClassVar, Protocol, cast, runtime_checkable
 
@@ -16,6 +17,7 @@ from invenio_requests.customizations import RequestType
 from invenio_requests.customizations.states import RequestState
 from invenio_requests.proxies import current_requests_service
 from marshmallow import post_dump
+from marshmallow_utils.context import context_schema
 from oarepo_workflows.requests import RequestTypeWithCreationChecks
 
 from oarepo_requests.errors import OpenRequestAlreadyExistsError
@@ -160,12 +162,6 @@ class OARepoRequestType[T](RequestType, RequestTypeWithCreationChecks[T], Reques
         request_type_cls = cls
 
         class SchemaWithTitleFallback(base_schema):  # ty:ignore[unsupported-base]
-            # Set the request title to "<type name> (<topic title>)" when the
-            # topic resolves and has a metadata title; otherwise fall back to
-            # the static type name. We deliberately do NOT call stateful_name
-            # here — string_by_state crashes when request.created_by has been
-            # lazy-swapped to an EntityProxy (`'UserProxy' object has no
-            # attribute 'keys'` inside request_identity_matches).
             @post_dump(pass_original=True)
             def _ensure_title(self, data: dict[str, Any], original: Any, **_kwargs: Any) -> dict[str, Any]:
                 if data.get("title"):
@@ -175,6 +171,10 @@ class OARepoRequestType[T](RequestType, RequestTypeWithCreationChecks[T], Reques
                 if topic_proxy is not None:
                     try:
                         topic = topic_proxy.resolve()
+                        if issubclass(request_type_cls, TopicConvertingRequestType):
+                            # draft is gone once published, or the viewer may not read it
+                            with contextlib.suppress(ValueError):
+                                topic = request_type_cls.convert_topic(context_schema.get()["identity"], topic)
                         metadata = getattr(topic, "metadata", None) if topic else None
                         topic_title = metadata.get("title") if isinstance(metadata, dict) else None
                         if topic_title:
@@ -312,7 +312,7 @@ class OARepoRequestType[T](RequestType, RequestTypeWithCreationChecks[T], Reques
                 case "submitted":
                     if has_rights_to_accept_request(request, identity):
                         return get_string(submitted_receiver, identity, topic, request)
-                    if request_identity_matches(request.created_by, identity):
+                    if request_identity_matches(request["created_by"], identity):
                         return get_string(submitted_creator, identity, topic, request)
                     return get_string(submitted_others, identity, topic, request)
                 case "accepted":

@@ -137,18 +137,18 @@ class NewVersionRequestType(NonDuplicableOARepoRecordRequestType):
             )
         match request.status:
             case "submitted":
-                if request_identity_matches(request.created_by, identity):
+                if request_identity_matches(request["created_by"], identity):
                     return gettext(
                         "Permission to update record (including files) requested. "
                         "You will be notified about the decision by email."
                     )
-                if request_identity_matches(request.receiver, identity):
+                if request_identity_matches(request["receiver"], identity):
                     return gettext(
                         "You have been asked to approve the request to update the record. "
                         "You can approve or reject the request."
                     )
                 return gettext("Permission to update record (including files) requested. ")
             case _:
-                if request_identity_matches(request.created_by, identity):
+                if request_identity_matches(request["created_by"], identity):
                     return gettext("Submit request to get edit access to the record.")
                 return gettext("You do not have permission to update the record.")

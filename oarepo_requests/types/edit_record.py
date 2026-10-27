@@ -121,9 +121,9 @@ class EditPublishedRecordRequestType(NonDuplicableOARepoRecordRequestType):
             return gettext("Request edit access to the record. You will be notified about the decision by email.")
         match request.status:
             case "submitted":
-                if request_identity_matches(request.created_by, identity):
+                if request_identity_matches(request["created_by"], identity):
                     return gettext("Edit access requested. You will be notified about the decision by email.")
-                if request_identity_matches(request.receiver, identity):
+                if request_identity_matches(request["receiver"], identity):
                     return gettext("You have been requested to grant edit access to the record.")
                 return gettext("Edit access requested.")
             case _:
