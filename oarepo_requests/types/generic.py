@@ -149,10 +149,11 @@ class OARepoRequestType[T](RequestType, RequestTypeWithCreationChecks[T], Reques
     @staticmethod
     def topic_title(topic: T | dict[str, Any] | None) -> str:
         """Return topic title."""
+        # records are dicts whose `id` attribute is the db uuid; the public pid is under the "id" key
+        if isinstance(topic, dict):
+            return str(topic.get("id", ""))
         if id_ := getattr(topic, "id", None):
             return str(id_)
-        if isinstance(topic, dict):
-            return topic.get("id", "")
         return ""
 
     @classmethod
