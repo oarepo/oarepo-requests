@@ -23,8 +23,17 @@ from oarepo_workflows.errors import RequestTypeNotInWorkflowError
 if TYPE_CHECKING:
     from collections.abc import Callable
 
-    from invenio_records_resources.records import Record
     from invenio_requests.customizations import RequestType
+
+
+def get_topic_title_for_request_type(request_type: RequestType, topic: Any) -> str:
+    """Get topic title from request type."""
+    # local import - oarepo_requests.types.generic imports this module
+    from oarepo_requests.types.generic import OARepoRequestType
+
+    # plain invenio request types have no topic_title
+    topic_title = getattr(request_type, "topic_title", OARepoRequestType.topic_title)
+    return str(topic_title(topic))
 
 
 class CustomHTTPJSONException(HTTPJSONException):
@@ -80,11 +89,9 @@ class OpenRequestAlreadyExistsError(CannotExecuteActionError):
     @property
     def description(self) -> str:
         """Exception's description."""
-        # plain invenio request types have no topic_title
-        topic_title = getattr(self.request_type, "topic_title", None)
         return gettext("There is already an open request of %(request_type)s on %(record_id)s.") % {
             "request_type": self.request_type.name,
-            "record_id": topic_title(self.topic) if topic_title else self.topic.id,
+            "record_id": get_topic_title_for_request_type(self.request_type, self.topic),
         }
 
 
@@ -122,10 +129,10 @@ class UnknownRequestTypeError(Exception):
 class ReceiverNonReferencableError(Exception):
     """Raised when receiver is required but could not be estimated from the record/caller."""
 
-    def __init__(self, request_type: RequestType, record: Record, **kwargs: Any) -> None:
+    def __init__(self, request_type: RequestType, topic: Any, **kwargs: Any) -> None:
         """Initialize the exception."""
         self.request_type = request_type
-        self.record = record
+        self.topic = topic
         self.kwargs = kwargs
 
     @property
@@ -136,7 +143,7 @@ class ReceiverNonReferencableError(Exception):
             "referenced on record %(record_id)s."
         ) % {
             "request_type": self.request_type,
-            "record_id": self.record["id"],
+            "record_id": get_topic_title_for_request_type(self.request_type, self.topic),
         }
         if self.kwargs:
             message += gettext("\n Additional keyword arguments:")

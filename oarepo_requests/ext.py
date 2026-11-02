@@ -6,7 +6,7 @@
 from __future__ import annotations
 
 from functools import cached_property, partial
-from typing import TYPE_CHECKING, Protocol, cast
+from typing import TYPE_CHECKING, Any, Protocol, cast
 
 from deepmerge import conservative_merger
 from flask import current_app
@@ -20,7 +20,6 @@ from oarepo_requests.records.dumpers import RecordReferenceDumperExt
 if TYPE_CHECKING:
     from flask import Flask
     from flask_principal import Identity
-    from invenio_records_resources.records.api import Record
     from invenio_requests.customizations import RequestType
 
     from oarepo_requests.actions.components import RequestActionComponent
@@ -33,7 +32,7 @@ class DefaultRequestReceiverFunction(Protocol):
         self,
         identity: Identity,
         request_type: RequestType,
-        record: Record,
+        topic: Any,
         creator: dict[str, str] | Identity,
         data: dict,
     ) -> dict[str, str] | None:
@@ -87,7 +86,7 @@ class _OARepoRequestsState:
         self,
         identity: Identity,
         request_type: RequestType,
-        record: Record,
+        topic: Any,
         creator: dict[str, str] | Identity,
         data: dict,
     ) -> dict[str, str] | None:
@@ -100,7 +99,7 @@ class _OARepoRequestsState:
 
         :param identity: Identity of the user creating the request.
         :param request_type: Type of the request.
-        :param record: Record the request is about.
+        :param topic: Record the request is about.
         :param creator: Creator of the request.
         :param data: Payload of the request.
         """
@@ -110,7 +109,7 @@ class _OARepoRequestsState:
         return self.default_request_receiver_function(
             identity=identity,
             request_type=request_type,
-            record=record,
+            topic=topic,
             creator=creator,
             data=data,
         )
