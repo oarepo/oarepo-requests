@@ -131,6 +131,7 @@ class OARepoRequestsService(RequestsService):
             receiver=receiver,
             creator=creator,
             topic=topic,
+            expires_at=expires_at,
             expand=expand,
             uow=uow,
         )

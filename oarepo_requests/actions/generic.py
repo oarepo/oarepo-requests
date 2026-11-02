@@ -6,7 +6,7 @@
 from __future__ import annotations
 
 from functools import cached_property
-from typing import TYPE_CHECKING, Any
+from typing import TYPE_CHECKING, Any, override
 
 from invenio_i18n import _
 from invenio_requests.customizations import actions
@@ -84,6 +84,7 @@ class OARepoGenericActionMixin(RequestAction):
         """Return a list of components for this action."""
         return [component_cls() for component_cls in current_oarepo_requests.action_components()]
 
+    @override
     def execute(self, identity: Identity, uow: UnitOfWork, *args: Any, **kwargs: Any) -> None:
         """Execute the action."""
         was_request_active = request_active in identity.provides

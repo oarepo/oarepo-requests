@@ -50,9 +50,9 @@ class IfRequestedBy(RecipientGeneratorMixin, ConditionalGenerator):
         """Condition to choose generators set."""
         needs = creator.provides if isinstance(creator, Identity) else creator.get_needs()
 
-        for condition in self.requesters:
-            condition_needs = set(condition.needs(request_type=request_type, creator=creator, **kwargs))
-            condition_excludes = set(condition.excludes(request_type=request_type, creator=creator, **kwargs))
+        for requester_generator in self.requesters:
+            condition_needs = set(requester_generator.needs(request_type=request_type, creator=creator, **kwargs))
+            condition_excludes = set(requester_generator.excludes(request_type=request_type, creator=creator, **kwargs))
 
             if not condition_needs.intersection(needs):
                 continue

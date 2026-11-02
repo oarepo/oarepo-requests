@@ -5,9 +5,7 @@
 
 from __future__ import annotations
 
-from invenio_requests.resources.requests.config import RequestSearchRequestArgsSchema
 from invenio_requests.services.requests.config import RequestSearchOptions
-from marshmallow import fields
 
 from oarepo_requests.services.facets.params import (
     IsClosedParam,
@@ -27,12 +25,3 @@ class EnhancedRequestSearchOptions(RequestSearchOptions):
         RequestAllAvailableFilterParam.factory("all"),
         IsClosedParam.factory("is_closed"),
     )
-
-
-class ExtendedRequestSearchRequestArgsSchema(RequestSearchRequestArgsSchema):
-    """Marshmallow schema for the extra filters."""
-
-    mine = fields.Boolean()
-    assigned = fields.Boolean()
-    all = fields.Boolean()
-    is_closed = fields.Boolean()

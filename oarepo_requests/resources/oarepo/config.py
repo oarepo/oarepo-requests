@@ -1,4 +1,3 @@
-# ruff: noqa ERA001
 # SPDX-FileCopyrightText: 2024 CESNET z.s.p.o
 # SPDX-License-Identifier: MIT
 
@@ -10,24 +9,31 @@ from typing import TYPE_CHECKING
 
 import importlib_metadata
 import marshmallow as ma
-from invenio_records_resources.services.base.config import ConfiguratorMixin
 from invenio_requests.resources import RequestsResourceConfig
+from invenio_requests.resources.requests.config import RequestSearchRequestArgsSchema
 
 from oarepo_requests.errors import oarepo_requests_error_handlers
-from oarepo_requests.services.search import ExtendedRequestSearchRequestArgsSchema
 
 if TYPE_CHECKING:
     from collections.abc import Callable, Mapping
     from http.client import HTTPException
 
     from flask import Response
-    from marshmallow import fields
 
 
-class OARepoRequestsResourceConfig(RequestsResourceConfig, ConfiguratorMixin):
+class ExtendedRequestSearchRequestArgsSchema(RequestSearchRequestArgsSchema):
+    """Marshmallow schema for the extra filters."""
+
+    mine = ma.fields.Boolean()
+    assigned = ma.fields.Boolean()
+    all = ma.fields.Boolean()
+    is_closed = ma.fields.Boolean()
+
+
+class OARepoRequestsResourceConfig(RequestsResourceConfig):
     """Config for the oarepo requests API."""
 
-    routes = {
+    routes: Mapping[str, str] = {
         **RequestsResourceConfig.routes,
         "create": "/<topic>/<request_type>",
         "list-applicable": "/applicable",
@@ -35,7 +41,7 @@ class OARepoRequestsResourceConfig(RequestsResourceConfig, ConfiguratorMixin):
 
     request_search_args = ExtendedRequestSearchRequestArgsSchema
 
-    request_view_args = {
+    request_view_args: Mapping[str, ma.fields.Field] = {
         **RequestsResourceConfig.request_view_args,
         "topic": ma.fields.String(),
         "request_type": ma.fields.String(),

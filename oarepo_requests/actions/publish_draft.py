@@ -10,7 +10,9 @@ from typing import TYPE_CHECKING, Any, override
 from invenio_access.permissions import system_identity
 from invenio_i18n import _
 from invenio_notifications.services.uow import NotificationOp
+from invenio_records_resources.services.uow import RecordCommitOp
 from invenio_requests.records.api import Request
+from invenio_search.engine import dsl
 from oarepo_runtime.typing import record_from_result
 
 from oarepo_requests.errors import UnresolvedRequestsError, VersionAlreadyExists
@@ -20,7 +22,7 @@ from ..notifications.builders.publish import (
     PublishDraftRequestDeclineNotificationBuilder,
     PublishDraftRequestSubmitNotificationBuilder,
 )
-from ..utils import get_draft_record_service, search_requests
+from ..utils import get_draft_record_service, scan_requests
 from .generic import (
     OARepoAcceptAction,
     OARepoCancelAction,
@@ -39,6 +41,7 @@ else:
 class MakeTopicDraftMixin(RequestAction):
     """Mixin for converting the topic to a draft topic before executing the action."""
 
+    @override
     def execute(self, identity: Identity, uow: UnitOfWork, *args: Any, **kwargs: Any) -> None:
         """Convert the topic to the draft topic.
 
@@ -85,16 +88,17 @@ class PublishDraftSubmitAction(MakeTopicDraftMixin, PublishMixin, OARepoSubmitAc
         *args: Any,
         **kwargs: Any,
     ) -> None:
-        if "payload" in self.request and "version" in self.request["payload"]:
+        if payload_version := self.request.get("payload", {}).get("version"):
             topic_service = get_draft_record_service(self.topic)
-            versions = topic_service.search_versions(identity, self.topic.pid.pid_value)
-            versions_hits = versions.to_dict()["hits"]["hits"]
-            for rec in versions_hits:
-                if "version" in rec["metadata"]:
-                    version = rec["metadata"]["version"]
-                    if version == self.request["payload"]["version"]:
-                        raise VersionAlreadyExists
-            self.topic.metadata["version"] = self.request["payload"]["version"]
+            versions = topic_service.search_versions(
+                system_identity,
+                self.topic.pid.pid_value,
+                extra_filter=dsl.Q("term", **{"metadata.version": payload_version}),
+            )
+            if versions.total > 0:
+                raise VersionAlreadyExists
+            self.topic.metadata["version"] = payload_version
+            uow.register(RecordCommitOp(self.topic, indexer=topic_service.indexer))
         uow.register(NotificationOp(self.notification_builder.build(request=self.request)))
 
 
@@ -114,7 +118,7 @@ class PublishDraftAcceptAction(MakeTopicDraftMixin, PublishMixin, OARepoAcceptAc
         **kwargs: Any,
     ) -> None:
         topic_service = get_draft_record_service(self.topic)
-        requests = search_requests(system_identity, self.topic)
+        requests = scan_requests(system_identity, self.topic)  # write query?
 
         for result in requests._results:  # noqa SLF001
             if (

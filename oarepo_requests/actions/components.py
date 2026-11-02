@@ -8,9 +8,9 @@ from __future__ import annotations
 import logging
 from typing import TYPE_CHECKING, Any, override
 
+from invenio_drafts_resources.records.api import Record as RecordWithDraft
 from invenio_requests.customizations import RequestActions
 from invenio_requests.errors import CannotExecuteActionError
-from oarepo_workflows.errors import MissingWorkflowError
 
 if TYPE_CHECKING:
     from flask_principal import Identity
@@ -157,10 +157,9 @@ class WorkflowTransitionComponent(RequestActionComponent):
 
         topic = action.topic
         request = action.request
-        try:
-            transitions = current_oarepo_workflows.get_workflow(topic).requests()[request.type.type_id].transitions
-        except MissingWorkflowError:  # alternatively check record type
+        if not isinstance(topic, RecordWithDraft):  # can't have a workflow
             return
+        transitions = current_oarepo_workflows.get_workflow(topic).requests()[request.type.type_id].transitions
         target_state = transitions[action.status_to]
         if target_state and not topic.is_deleted:
             current_oarepo_workflows.set_state(

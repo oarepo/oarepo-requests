@@ -19,7 +19,7 @@ from oarepo_requests.actions.publish_draft import (
     PublishDraftSubmitAction,
 )
 
-from ..utils import classproperty, get_draft_record_service, search_requests
+from ..utils import classproperty, get_draft_record_service, scan_requests
 from .generic import NonDuplicableOARepoRecordRequestType
 
 if TYPE_CHECKING:
@@ -56,6 +56,7 @@ class PublishRequestType(NonDuplicableOARepoRecordRequestType):
             "submit": cls.submit_action,
             "accept": cls.accept_action,
             "decline": cls.decline_action,
+            "cancel": cls.cancel_action,
         }
 
     @override
@@ -90,7 +91,7 @@ class PublishRequestType(NonDuplicableOARepoRecordRequestType):
         topic: Record,
     ) -> None:
         """Assert that there are no pending requests on the topic."""
-        requests = search_requests(system_identity, topic)
+        requests = scan_requests(system_identity, topic)
 
         for result in requests._results:  # noqa SLF001
             # note: we can not use solely the result.is_open because changes may not be committed yet
