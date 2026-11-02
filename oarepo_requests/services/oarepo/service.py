@@ -98,14 +98,6 @@ class OARepoRequestsService(RequestsService):
             except KeyError as exc:
                 raise UnknownRequestTypeError(request_type) from exc
         data = data or {}
-        if receiver is None:
-            if isinstance(request_type, DefaultReceiverMixin):
-                receiver = request_type.default_request_receiver(identity, topic, creator or identity, data)
-            else:
-                # if explicit creator is not passed, use current identity - this is in sync with invenio_requests
-                receiver = current_oarepo_requests.default_request_receiver(
-                    identity, request_type, topic, creator or identity, data
-                )
         if "payload" not in data and request_type.payload_schema:
             data["payload"] = {}
         schema = self._wrap_schema(request_type.marshmallow_schema())
@@ -114,11 +106,19 @@ class OARepoRequestsService(RequestsService):
             context={"identity": identity},
             raise_errors=True,
         )
-
         # ask to convert the topic. For example, for publish_metadata, the topic here is the previously published record
         # but we need the draft that we are publishing.
         if isinstance(request_type, TopicConvertingRequestType):
             topic = request_type.convert_topic(identity, topic)
+
+        if receiver is None:
+            if isinstance(request_type, DefaultReceiverMixin):
+                receiver = request_type.default_request_receiver(identity, topic, creator or identity, data)
+            else:
+                # if explicit creator is not passed, use current identity - this is in sync with invenio_requests
+                receiver = current_oarepo_requests.default_request_receiver(
+                    identity, request_type, topic, creator or identity, data
+                )
 
         if isinstance(request_type, RequestTypeWithCreationChecks):
             # raise exception if can't
