@@ -18,15 +18,14 @@ from oarepo_requests.errors import ReceiverNonReferencableError
 if TYPE_CHECKING:
     from collections.abc import Mapping
 
-    from invenio_records_resources.records.api import Record
     from invenio_requests.customizations.request_types import RequestType
     from oarepo_workflows import WorkflowRequest
 
 
 def default_workflow_receiver_function(
-    record: Record,
+    topic: Any,
     request_type: RequestType,
-    **kwargs: Any,  # i suppose we can't have requests with None topic
+    **kwargs: Any,
 ) -> Mapping[str, str] | None:
     """Get the receiver of the request.
 
@@ -37,13 +36,9 @@ def default_workflow_receiver_function(
     from oarepo_workflows.proxies import current_oarepo_workflows
 
     try:
-        workflow = current_oarepo_workflows.get_workflow(record)
+        workflow = current_oarepo_workflows.get_workflow(topic)
     except MissingWorkflowError, InvalidWorkflowError:
         # if the record does not have a workflow, we cannot determine the receiver
-        # so we return None
-        # a case when it happens is when the record == community and the request
-        # is invitation request -> the community itself is not governed by a workflow
-        # so we return None
         return None
 
     if not workflow:
@@ -52,11 +47,9 @@ def default_workflow_receiver_function(
     try:
         request: WorkflowRequest = workflow.requests().requests_by_id[request_type.type_id]
     except KeyError as e:
-        raise RequestTypeNotInWorkflowError(
-            request_type.type_id, current_oarepo_workflows.get_workflow(record).code
-        ) from e
+        raise RequestTypeNotInWorkflowError(request_type.type_id, workflow.code) from e
 
-    receiver = request.recipient_entity_reference(record=record, request_type=request_type, **kwargs)
+    receiver = request.recipient_entity_reference(record=topic, request_type=request_type, **kwargs)
     if not request_type.receiver_can_be_none and not receiver:
-        raise ReceiverNonReferencableError(request_type=request_type, record=record, **kwargs)
-    return cast("Mapping[str, str]", receiver)  # TODO: unknown linter issue, possibly a bug
+        raise ReceiverNonReferencableError(request_type=request_type, topic=topic, **kwargs)
+    return cast("Mapping[str, str]", receiver)

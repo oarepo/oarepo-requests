@@ -122,14 +122,14 @@ def test_publish_submit_notification_when_creator_is_receiver(
     creator = users[0]
     original_receiver = app.config["OAREPO_REQUESTS_DEFAULT_RECEIVER"]
 
-    def creator_as_receiver(record=None, request_type=None, **kwargs: Any) -> Any:
+    def creator_as_receiver(topic=None, request_type=None, **kwargs: Any) -> Any:
         if request_type.type_id in {
             "publish_draft",
             "publish_changed_metadata",
             "publish_new_version",
         }:
             return {"user": str(creator.id)}
-        return original_receiver(record, request_type, **kwargs)
+        return original_receiver(topic, request_type, **kwargs)
 
     monkeypatch.setitem(
         app.config,
@@ -251,10 +251,10 @@ def test_group(
     add_user_in_role(users[0], role)
     add_user_in_role(users[1], role)
 
-    def current_receiver(record=None, request_type=None, **kwargs: Any) -> Any:
+    def current_receiver(topic=None, request_type=None, **kwargs: Any) -> Any:
         if request_type.type_id == "publish_draft":
             return role
-        return config_restore(record, request_type, **kwargs)
+        return config_restore(topic, request_type, **kwargs)
 
     try:
         app.config["OAREPO_REQUESTS_DEFAULT_RECEIVER"] = current_receiver
@@ -290,13 +290,13 @@ def test_group_multiple_recipients(
     add_user_in_role(users[0], role)
     add_user_in_role(users[1], role)
 
-    def current_receiver(record=None, request_type=None, **kwargs: Any) -> Any:
+    def current_receiver(topic=None, request_type=None, **kwargs: Any) -> Any:
         if request_type.type_id == "publish_draft":
             return MultipleEntitiesProxy(
                 MultipleEntitiesResolver(),
                 {"multiple": MultipleEntitiesEntity.create_id([{"user": users[2].id}, {"group": "it-dep"}])},
             ).resolve()
-        return config_restore(record, request_type, **kwargs)
+        return config_restore(topic, request_type, **kwargs)
 
     try:
         app.config["OAREPO_REQUESTS_DEFAULT_RECEIVER"] = current_receiver
@@ -582,13 +582,13 @@ def test_group_expansion_does_not_duplicate_recipients(
     add_user_in_role(users[0], role)
     add_user_in_role(users[1], role)
 
-    def current_receiver(record=None, request_type=None, **kwargs: Any) -> Any:
+    def current_receiver(topic=None, request_type=None, **kwargs: Any) -> Any:
         if request_type.type_id == "publish_draft":
             return MultipleEntitiesProxy(
                 MultipleEntitiesResolver(),
                 {"multiple": MultipleEntitiesEntity.create_id([{"user": users[0].id}, {"group": "it-dep"}])},
             ).resolve()
-        return config_restore(record, request_type, **kwargs)
+        return config_restore(topic, request_type, **kwargs)
 
     try:
         app.config["OAREPO_REQUESTS_DEFAULT_RECEIVER"] = current_receiver
@@ -622,10 +622,10 @@ def test_group_member_comment_author_not_self_notified(
     add_user_in_role(users[0], role)
     add_user_in_role(users[1], role)
 
-    def current_receiver(record=None, request_type=None, **kwargs: Any) -> Any:
+    def current_receiver(topic=None, request_type=None, **kwargs: Any) -> Any:
         if request_type.type_id == "publish_draft":
             return role
-        return config_restore(record, request_type, **kwargs)
+        return config_restore(topic, request_type, **kwargs)
 
     try:
         app.config["OAREPO_REQUESTS_DEFAULT_RECEIVER"] = current_receiver
