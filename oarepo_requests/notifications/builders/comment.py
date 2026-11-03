@@ -23,7 +23,6 @@ from oarepo_requests.notifications.generators import (
     RequestEntityResolve,
 )
 from oarepo_requests.notifications.generators.context import ReferenceSavingEntityResolve
-from oarepo_requests.utils import classproperty
 
 if TYPE_CHECKING:
     from collections.abc import Sequence
@@ -31,30 +30,28 @@ if TYPE_CHECKING:
     from invenio_notifications.services.filters import RecipientFilter
 
 
+def _oarepo_context_generator(generator: ContextGenerator) -> ContextGenerator:
+    if not isinstance(generator, EntityResolve):
+        return generator
+    if generator.key == "request":
+        return RequestEntityResolve(key=generator.key)
+    return ReferenceSavingEntityResolve(key=generator.key)
+
+
 class CommentRequestEventCreateNotificationBuilder(InvenioCommentRequestEventCreateNotificationBuilder):
     """Notification builder for comment event."""
 
-    @classproperty
-    def context(self) -> Sequence[ContextGenerator]:
-        """Get context for the notification builder."""
-        invenio = list(super().context)
-        for idx, r in enumerate(invenio):
-            if isinstance(r, EntityResolve):
-                replacement_cls = RequestEntityResolve if r.key == "request" else ReferenceSavingEntityResolve
-                invenio[idx] = replacement_cls(key=r.key)
-        return *invenio, ReferenceSavingEntityResolve(key="request.topic")
+    context: Sequence[ContextGenerator] = (
+        *map(_oarepo_context_generator, InvenioCommentRequestEventCreateNotificationBuilder.context),
+        ReferenceSavingEntityResolve(key="request.topic"),
+    )
 
-    @classproperty
-    def recipients(self) -> Sequence[RecipientGenerator]:
-        """Get recipients for the notification builder."""
-        invenio = list(super().recipients)
-        for idx, r in enumerate(invenio):
-            if isinstance(r, RequestParticipantsRecipient):
-                invenio[idx] = GeneralRequestParticipantsRecipient(key="request")
-                break
-        return tuple(invenio)
+    recipients: Sequence[RecipientGenerator] = tuple(
+        GeneralRequestParticipantsRecipient(key="request") if isinstance(r, RequestParticipantsRecipient) else r
+        for r in InvenioCommentRequestEventCreateNotificationBuilder.recipients
+    )
 
-    @classproperty
-    def recipient_filters(self) -> Sequence[RecipientFilter]:
-        """Get recipient filters for the notification builder."""
-        return *super().recipient_filters, UsersWithNoMailRecipientFilter()
+    recipient_filters: Sequence[RecipientFilter] = (
+        *InvenioCommentRequestEventCreateNotificationBuilder.recipient_filters,
+        UsersWithNoMailRecipientFilter(),
+    )

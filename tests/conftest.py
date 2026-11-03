@@ -29,7 +29,6 @@ from invenio_requests.services.permissions import (
 from oarepo_rdm import rdm_basic_preset
 from oarepo_workflows import (
     AutoApprove,
-    AutoRequest,
     IfInState,
     WorkflowRequest,
     WorkflowRequestEscalation,
@@ -425,7 +424,7 @@ class RequestsWithApproveWithoutGeneric(WorkflowRequestPolicy):
     """Publish needs approval before publishing test requests workflow."""
 
     publish_draft = WorkflowRequest(
-        requesters=[IfInState("approved", [AutoRequest()])],
+        requesters=[IfInState("approved", [RecordOwners()])],
         recipients=[UserGenerator("user1@example.org")],
         transitions=WorkflowTransitions(
             submitted="publishing",
@@ -470,7 +469,7 @@ class RequestsWithApprove(WorkflowRequestPolicy):
     """Publish needs approval before publishing test requests workflow."""
 
     publish_draft = WorkflowRequest(
-        requesters=[IfInState("approved", [AutoRequest()])],
+        requesters=[IfInState("approved", [RecordOwners()])],
         recipients=[UserGenerator("user1@example.org")],
         transitions=WorkflowTransitions(
             submitted="publishing",
@@ -481,7 +480,7 @@ class RequestsWithApprove(WorkflowRequestPolicy):
         events=events_only_receiver_can_comment,
     )
     generic = WorkflowRequest(
-        requesters=[IfInState("draft", [AutoRequest()])],
+        requesters=[IfInState("draft", [RecordOwners()])],
         recipients=[],
     )
     approve_draft = WorkflowRequest(

@@ -120,7 +120,7 @@ class OARepoRequestType[T](RequestType, RequestTypeWithCreationChecks[T], Reques
     }
 
     @classproperty
-    def allowed_receiver_ref_types(cls) -> list[str]:  # noqa N805
+    def allowed_receiver_ref_types(cls) -> list[str]:  # ty:ignore[invalid-mutable-override]  # noqa N805
         """Return allowed receiver reference types."""
         return current_oarepo_requests.allowed_receiver_ref_types
 
@@ -139,7 +139,7 @@ class OARepoRequestType[T](RequestType, RequestTypeWithCreationChecks[T], Reques
         return cls.has_form
 
     @classproperty
-    def available_statuses(cls) -> dict[str, RequestState]:  # noqa N805
+    def available_statuses(cls) -> dict[str, RequestState]:  # noqa 805 # ty:ignore[invalid-mutable-override]
         """Return available statuses for the request type.
 
         The status (open, closed, undefined) are used for request filtering.
@@ -222,7 +222,7 @@ class OARepoRequestType[T](RequestType, RequestTypeWithCreationChecks[T], Reques
         return current_requests_service.check_permission(identity, "create", record=topic, request_type=cls, **kwargs)
 
     @classproperty
-    def available_actions(
+    def available_actions(  # ty:ignore[invalid-mutable-override]
         self,
     ) -> dict[str, type[RequestAction]]:
         """Return available actions for the request type."""
