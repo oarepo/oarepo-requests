@@ -10,7 +10,6 @@ from typing import TYPE_CHECKING, Any, ClassVar, override
 import marshmallow as ma
 from invenio_i18n import gettext
 from invenio_i18n import lazy_gettext as _
-from invenio_requests.records.api import Request
 
 from oarepo_requests.errors import VersionAlreadyExists
 
@@ -41,6 +40,7 @@ class PublishNewVersionRequestType(PublishRequestType):
     description = _("Request publishing of a draft")
     receiver_can_be_none = True
     editable = False
+    topic_type = "new_version"
 
     submit_action = PublishNewVersionSubmitAction
     accept_action = PublishNewVersionAcceptAction
@@ -61,10 +61,7 @@ class PublishNewVersionRequestType(PublishRequestType):
         **kwargs: Any,
     ) -> None:
         """Check if the request can be created."""
-        topic = self.convert_topic(identity, topic)
-        if self.topic_type(topic) != "new_version":
-            raise ValueError(f"Topic type {self.topic_type(topic)} is not a draft of a new version of a record")
-
+        super().can_create(identity, data, receiver, topic, creator, *args, **kwargs)
         topic_service = get_draft_record_service(topic)
         # Only needed in case of new version as when you are publishing
         # draft for the first time, there are no previous versions with
@@ -77,20 +74,6 @@ class PublishNewVersionRequestType(PublishRequestType):
                     version = rec["metadata"]["version"]
                     if version == data["payload"]["version"]:
                         raise VersionAlreadyExists
-
-        super().can_create(identity, data, receiver, topic, creator, *args, **kwargs)
-
-    @classmethod
-    def is_applicable_to(cls, identity: Identity, topic: Record, *args: Any, **kwargs: Any) -> bool:
-        """Check if the request type is applicable to the topic."""
-        try:
-            topic = cls.convert_topic(identity, topic)
-        except ValueError:
-            return False
-        if cls.topic_type(topic) != "new_version":
-            return False
-
-        return super().is_applicable_to(identity, topic, *args, **kwargs)
 
     # TODO: used in ui
 

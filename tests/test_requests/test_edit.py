@@ -80,3 +80,25 @@ def test_publish(
     new_record = creator_client.get(f"{urls['BASE_URL']}/{id_}")
     assert new_record.status_code == 200
     assert new_record.json["metadata"]["title"] == "edited"
+
+
+def test_publish_changed_metadata_title_uses_draft_title(
+    logged_client,
+    users,
+    urls,
+    submit_request_on_record,
+    submit_request_on_draft,
+    record_with_files_factory,
+    search_clear,
+):
+    creator = users[0]
+    record = record_with_files_factory(creator.identity)
+    submit_request_on_record(creator.identity, record["id"], "edit_published_record")
+    logged_client(creator).put(
+        f"{urls['BASE_URL']}/{record['id']}/draft",
+        json={"metadata": {**record["metadata"], "title": "edited"}},
+    )
+
+    publish_request = submit_request_on_draft(creator.identity, record["id"], "publish_changed_metadata")
+
+    assert publish_request["title"] == "Publish changed metadata (edited)"

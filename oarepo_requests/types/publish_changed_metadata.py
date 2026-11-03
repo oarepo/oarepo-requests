@@ -5,27 +5,33 @@
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Any, override
+from typing import TYPE_CHECKING, Any, cast, override
 
+from invenio_drafts_resources.records import Draft
+from invenio_drafts_resources.records import Record as RecordWithDraft
 from invenio_i18n import gettext
 from invenio_i18n import lazy_gettext as _
+from oarepo_runtime.proxies import current_runtime
+from oarepo_runtime.typing import record_from_result
 
 from ..actions.publish_changed_metadata import (
     PublishChangedMetadataAcceptAction,
     PublishChangedMetadataDeclineAction,
     PublishChangedMetadataSubmitAction,
 )
+from .generic import TopicConvertingRequestType
 from .publish_base import PublishRequestType
 
 if TYPE_CHECKING:
     from flask_babel.speaklater import LazyString
     from flask_principal import Identity
+    from invenio_drafts_resources.services import RecordService
     from invenio_records_resources.records import Record
     from invenio_requests.records.api import Request
 
 
 # Incorrectly resolving published record instead of draft in notifications is a known unfixed issue for now.
-class PublishChangedMetadataRequestType(PublishRequestType):
+class PublishChangedMetadataRequestType(PublishRequestType, TopicConvertingRequestType):
     """Request type for publication of changed metadata."""
 
     type_id = "publish_changed_metadata"
@@ -34,6 +40,8 @@ class PublishChangedMetadataRequestType(PublishRequestType):
     submit_action = PublishChangedMetadataSubmitAction
     accept_action = PublishChangedMetadataAcceptAction
     decline_action = PublishChangedMetadataDeclineAction
+
+    topic_type = "metadata"
 
     @override
     def can_create(
@@ -48,23 +56,30 @@ class PublishChangedMetadataRequestType(PublishRequestType):
     ) -> None:
         """Check if the request can be created."""
         topic = self.convert_topic(identity, topic)
-        if self.topic_type(topic) != "metadata":
-            raise ValueError(
-                f"Topic type {self.topic_type(topic)} is not a draft for changed metadata of a published record"
-            )
         super().can_create(identity, data, receiver, topic, creator, *args, **kwargs)
 
     @classmethod
+    @override
     def is_applicable_to(cls, identity: Identity, topic: Any, *args: Any, **kwargs: Any) -> bool:
         """Check if the request type is applicable to the topic."""
         try:
             topic = cls.convert_topic(identity, topic)
         except ValueError:
             return False
-        if cls.topic_type(topic) != "metadata":
-            return False
-
         return super().is_applicable_to(identity, topic, *args, **kwargs)
+
+    @classmethod
+    def convert_topic(cls, identity: Identity, topic: Record) -> Draft:
+        """Convert the topic to a draft."""
+        if not isinstance(topic, RecordWithDraft):
+            raise TypeError(f"Topic type {type(topic)} does not support drafts")
+        if isinstance(topic, Draft):
+            return topic
+        service = cast("RecordService", current_runtime.get_record_service_for_record(topic))
+        try:
+            return cast("Draft", record_from_result(service.read_draft(identity, topic["id"])))
+        except Exception as e:
+            raise ValueError(f"Failed to read draft for topic {topic}") from e
 
     # TODO: used in ui
     @override
