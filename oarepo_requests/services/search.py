@@ -20,9 +20,7 @@ from oarepo_requests.services.facets.params import (
 class EnhancedRequestSearchOptions(RequestSearchOptions):
     """Searched options enhanced with additional filters."""
 
-    # TODO: params_interpreters_cls: tuple[type[ParamInterpreter], ...]
-    #  in stubs is not assignable to partial[ParamInterpreter]
-    params_interpreters_cls = (  # type: ignore[reportAssignmentType]
+    params_interpreters_cls = (
         *RequestSearchOptions.params_interpreters_cls,
         RequestOwnerFilterParam.factory("mine", "created_by.user"),
         RequestNotOwnerFilterParam.factory("assigned", "created_by.user"),

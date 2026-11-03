@@ -62,7 +62,7 @@ NOTIFICATIONS_BUILDERS = {
     PublishDraftRequestDeclineNotificationBuilder.type: PublishDraftRequestDeclineNotificationBuilder,
     PublishChangedMetadataRequestSubmitNotificationBuilder.type: PublishChangedMetadataRequestSubmitNotificationBuilder,
     PublishChangedMetadataRequestAcceptNotificationBuilder.type: PublishChangedMetadataRequestAcceptNotificationBuilder,
-    PublishChangedMetadataRequestDeclineNotificationBuilder.type: PublishChangedMetadataRequestDeclineNotificationBuilder,  # noqa
+    PublishChangedMetadataRequestDeclineNotificationBuilder.type: PublishChangedMetadataRequestDeclineNotificationBuilder,  # noqa E501
     PublishNewVersionRequestSubmitNotificationBuilder.type: PublishNewVersionRequestSubmitNotificationBuilder,
     PublishNewVersionRequestAcceptNotificationBuilder.type: PublishNewVersionRequestAcceptNotificationBuilder,
     PublishNewVersionRequestDeclineNotificationBuilder.type: PublishNewVersionRequestDeclineNotificationBuilder,

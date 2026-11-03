@@ -31,6 +31,7 @@ if TYPE_CHECKING:
 
     from flask_principal import Identity
     from invenio_db.uow import UnitOfWork
+    from invenio_requests.customizations import RequestType
     from invenio_requests.services.requests.results import RequestItem
     from invenio_requests.services.results import (
         EntityResolverExpandableField,
@@ -57,7 +58,7 @@ class OARepoRequestsService(RequestsService):
         self,
         identity: Identity,
         data: dict[str, Any] | None,
-        request_type: str,
+        request_type: str | RequestType,
         receiver: dict[str, str] | Any | None = None,
         creator: dict[str, str] | Any | None = None,
         topic: Record | None = None,
@@ -84,25 +85,23 @@ class OARepoRequestsService(RequestsService):
         # TODO: invenio suggest None topic can be here but we do not expect it
         if topic is None:
             raise ValueError("")
-        type_ = (
-            current_request_type_registry.lookup(request_type, quiet=True)
-            if isinstance(request_type, str)
-            else request_type
-        )
-        if not type_:
-            raise UnknownRequestTypeError(request_type)
+        if isinstance(request_type, str):
+            try:
+                request_type = current_request_type_registry.lookup(request_type)
+            except KeyError as exc:
+                raise UnknownRequestTypeError(request_type) from exc
         data = data or {}
         if receiver is None:
-            if isinstance(type_, DefaultReceiverMixin):
-                receiver = type_.default_request_receiver(identity, topic, creator or identity, data)
+            if isinstance(request_type, DefaultReceiverMixin):
+                receiver = request_type.default_request_receiver(identity, topic, creator or identity, data)
             else:
                 # if explicit creator is not passed, use current identity - this is in sync with invenio_requests
                 receiver = current_oarepo_requests.default_request_receiver(
-                    identity, type_, topic, creator or identity, data
+                    identity, request_type, topic, creator or identity, data
                 )
-        if "payload" not in data and type_.payload_schema:
+        if "payload" not in data and request_type.payload_schema:
             data["payload"] = {}
-        schema = self._wrap_schema(type_.marshmallow_schema())
+        schema = self._wrap_schema(request_type.marshmallow_schema())
         data, _ = schema.load(
             data,
             context={"identity": identity},
@@ -111,24 +110,24 @@ class OARepoRequestsService(RequestsService):
 
         # ask to convert the topic. For example, for publish_metadata, the topic here is the previously published record
         # but we need the draft that we are publishing.
-        if hasattr(type_, "convert_topic"):
-            topic = type_.convert_topic(identity, topic)  # type: ignore[reportAttributeAccessIssue]
+        if hasattr(request_type, "convert_topic"):
+            topic = request_type.convert_topic(identity, topic)  # type: ignore[reportAttributeAccessIssue]
 
-        if hasattr(type_, "can_create"):
+        if hasattr(request_type, "can_create"):
             # raise exception if can't
-            type_.can_create(identity, data, receiver, topic, creator)  # type: ignore[reportAttributeAccessIssue]
-        # TODO: typing does not allow receiver to be None even though invenio code suggests it
+            request_type.can_create(identity, data, receiver, topic, creator)  # type: ignore[reportAttributeAccessIssue]
+
         result = super().create(
             identity=identity,
             data=data,
-            request_type=type_,
-            receiver=receiver,  # type: ignore[reportArgumentType]
+            request_type=request_type,
+            receiver=receiver,
             creator=creator,
             topic=topic,
             expand=expand,
             uow=uow,
         )
-        uow.register(IndexRefreshOp(indexer=self.indexer, index=self.record_cls.index))  # type: ignore[reportArgumentType]
+        uow.register(IndexRefreshOp(indexer=self.indexer, index=self.record_cls.index))  # ty:ignore[unresolved-attribute]
         return result
 
     def applicable_request_types(self, identity: Identity, topic: Record | dict[str, str]) -> RequestTypesList:

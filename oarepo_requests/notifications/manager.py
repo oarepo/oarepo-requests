@@ -71,7 +71,7 @@ class NotificationManager(InvenioNotificationManager):
         recipient: Recipient,
     ) -> list[Any]:
         """Build recipient backends using the notification builder."""
-        return builder.build_recipient_backends(notification, recipient)  # type: ignore[no-any-return]
+        return builder.build_recipient_backends(notification, recipient)
 
     @classmethod
     def resolve_lazy_strings(cls, data: JsonValue) -> JsonValue:

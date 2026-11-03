@@ -17,7 +17,6 @@ if TYPE_CHECKING:
     from invenio_db.uow import UnitOfWork
 
 
-# TODO: snapshot
 class NewVersionAcceptAction(OARepoAcceptAction):
     """Accept creation of a new version of a published record."""
 
