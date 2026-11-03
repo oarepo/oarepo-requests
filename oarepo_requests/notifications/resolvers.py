@@ -33,11 +33,11 @@ class UserNotificationProxy(ServiceResultProxy):
         """Resolve the User from the proxy's reference dict, or system_identity."""
         user_id = self._parse_ref_dict_id()
         if user_id == system_user_id:  # system_user_id is a string: "system"
-            return self.system_record()  # type: ignore[no-any-return]
+            return self.system_record()
         try:
-            return super()._resolve()  # type: ignore[no-any-return]
+            return super()._resolve()
         except PermissionDeniedError:
-            return self.ghost_record({"id": user_id})  # type: ignore[no-any-return]
+            return self.ghost_record({"id": user_id})
 
 
 class MultipleEntitiesNotificationProxy(EntityProxy):
@@ -48,7 +48,7 @@ class MultipleEntitiesNotificationProxy(EntityProxy):
     pick_resolved_fields = MultipleEntitiesProxy.pick_resolved_fields
 
     @override
-    def _resolve(self) -> list[dict[str, dict[str, Any]]]:  # type: ignore[reportIncompatibleMethodOverride]
+    def _resolve(self) -> list[dict[str, dict[str, Any]]]:
         """Resolve the User from the proxy's reference dict, or system_identity."""
         entity_refs = json.loads(self._parse_ref_dict_id())
 
@@ -74,7 +74,7 @@ class MultipleEntitiesNotificationResolver(EntityResolver):
     type_key = MultipleEntitiesResolver.type_id
     matches_reference_dict = MultipleEntitiesResolver.matches_reference_dict
     matches_entity = MultipleEntitiesResolver.matches_entity
-    _reference_entity = MultipleEntitiesResolver._reference_entity  # noqa: SLF001
+    _reference_entity = MultipleEntitiesResolver._reference_entity  # noqa SLF001
 
     def __init__(self) -> None:
         """Initialize the resolver."""

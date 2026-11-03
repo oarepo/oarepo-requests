@@ -168,7 +168,7 @@ def test_group_membership_stateful_name_and_description(
         request_type="group_membership",
         topic=submitters_role,
     )
-    request = create_response._request  # noqa: SLF001
+    request = create_response._request
     request_type = request.type
 
     # no request created yet
@@ -198,7 +198,7 @@ def test_group_membership_stateful_name_and_description(
     )
 
     submit_response = requests_service.execute_action(requester.identity, id_=create_response["id"], action="submit")
-    submitted_request = submit_response._request  # noqa: SLF001
+    submitted_request = submit_response._request
 
     # submitted: as the requester
     assert (

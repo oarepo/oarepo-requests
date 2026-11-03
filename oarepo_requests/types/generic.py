@@ -8,6 +8,7 @@ from __future__ import annotations
 from abc import abstractmethod
 from typing import TYPE_CHECKING, Any, ClassVar, cast
 
+from flask_babel.speaklater import LazyString
 from invenio_records_resources.services.base.links import EndpointLink
 from invenio_records_resources.services.errors import PermissionDeniedError
 from invenio_requests.customizations import RequestType
@@ -38,7 +39,6 @@ from ..utils import (
 if TYPE_CHECKING:
     from collections.abc import Callable
 
-    from flask_babel.speaklater import LazyString
     from flask_principal import Identity
     from invenio_records_resources.records import Record
     from invenio_requests.customizations import RequestType as TypingMixinRequestType
@@ -52,7 +52,7 @@ else:
 class OARepoRequestType(RequestType):
     """Base request type for OARepo requests."""
 
-    description: str = ""
+    description: str | LazyString = ""
 
     dangerous = False
 
@@ -70,12 +70,13 @@ class OARepoRequestType(RequestType):
         "self_html": EndpointLink(
             "invenio_app_rdm_requests.user_dashboard_request_view",
             params=["request_pid_value"],
-            vars=lambda obj, vars: vars.update(request_pid_value=vars["request"].id),  # noqa: A006,ARG005
+            vars=lambda obj, vars_: vars_.update(request_pid_value=vars_["request"].id),  # noqa ARG005
         ),
     }
 
     @classproperty
-    def allowed_receiver_ref_types(cls) -> list[str]:  # noqa N805 # type: ignore[reportIncompatibleVariableOverride]
+    def allowed_receiver_ref_types(cls) -> list[str]:  # noqa N805
+        """Return allowed receiver reference types."""
         return current_oarepo_requests.allowed_receiver_ref_types
 
     comment_notification_builder = CommentRequestEventCreateNotificationBuilder
@@ -93,7 +94,7 @@ class OARepoRequestType(RequestType):
         return cls.has_form
 
     @classproperty
-    def available_statuses(cls) -> dict[str, RequestState]:  # noqa N805 # type: ignore[reportIncompatibleVariableOverride]
+    def available_statuses(cls) -> dict[str, RequestState]:  # noqa N805
         """Return available statuses for the request type.
 
         The status (open, closed, undefined) are used for request filtering.
@@ -104,13 +105,9 @@ class OARepoRequestType(RequestType):
     def _create_marshmallow_schema(cls) -> type[Schema]:
         """Create a marshmallow schema for this request type with required payload field."""
         base_schema = super()._create_marshmallow_schema()
-        # TODO: idk why .fields
-        if cls.payload_schema is not None and hasattr(base_schema, "fields") and "payload" in base_schema.fields:  # type: ignore[reportAttributeAccessIssue]
-            base_schema.fields["payload"].required = True  # type: ignore[reportAttributeAccessIssue] #pragma: no cover
-
         request_type_cls = cls
 
-        class SchemaWithTitleFallback(base_schema):  # type: ignore[misc, valid-type]
+        class SchemaWithTitleFallback(base_schema):  # ty:ignore[unsupported-base]
             # Set the request title to "<type name> (<topic title>)" when the
             # topic resolves and has a metadata title; otherwise fall back to
             # the static type name. We deliberately do NOT call stateful_name
@@ -130,7 +127,7 @@ class OARepoRequestType(RequestType):
                         topic_title = metadata.get("title") if isinstance(metadata, dict) else None
                         if topic_title:
                             title = f"{title} ({topic_title})"
-                    except Exception:  # noqa: S110 BLE001 pragma: no cover
+                    except Exception:  # pragma: no cover # noqa BLE001
                         pass  # keep static fallback on any resolution failure #pragma: no cover
                 data["title"] = title
                 return data
@@ -169,13 +166,10 @@ class OARepoRequestType(RequestType):
         method is used to check whether there is a possible situation a user might create
         this request eg. for the purpose of serializing a link on associated record
         """
-        return cast(
-            "bool",
-            current_requests_service.check_permission(identity, "create", record=topic, request_type=cls, **kwargs),
-        )
+        return current_requests_service.check_permission(identity, "create", record=topic, request_type=cls, **kwargs)
 
     @classproperty
-    def available_actions(  # type: ignore[reportIncompatibleVariableOverride]
+    def available_actions(
         self,
     ) -> dict[str, type[RequestAction]]:
         """Return available actions for the request type."""
@@ -190,11 +184,11 @@ class OARepoRequestType(RequestType):
     # TODO: move these to RecordRequestType too?
     def stateful_name(
         self,
-        identity: Identity,  # noqa: ARG002
+        identity: Identity,
         *,
-        topic: Record,  # noqa: ARG002
-        request: Request | None = None,  # noqa: ARG002
-        **kwargs: Any,  # noqa: ARG002
+        topic: Record,
+        request: Request | None = None,
+        **kwargs: Any,
     ) -> str | LazyString:
         """Return the name of the request that reflects its current state.
 
@@ -202,15 +196,16 @@ class OARepoRequestType(RequestType):
         :param request:         the request
         :param topic:           resolved request's topic
         """
+        del identity, topic, request, kwargs  # used by subclasses
         return self.name
 
     def stateful_description(
         self,
-        identity: Identity,  # noqa: ARG002
+        identity: Identity,
         *,
-        topic: Record,  # noqa: ARG002
-        request: Request | None = None,  # noqa: ARG002
-        **kwargs: Any,  # noqa: ARG002
+        topic: Record,
+        request: Request | None = None,
+        **kwargs: Any,
     ) -> str | LazyString:
         """Return the description of the request that reflects its current state.
 
@@ -218,9 +213,12 @@ class OARepoRequestType(RequestType):
         :param request:         the request
         :param topic:           resolved request's topic
         """
+        # used by subclasses - this is something google apparently does
+        # (https://google.github.io/styleguide/pyguide.html#214-decision)
+        del identity, topic, request, kwargs
         return self.description
 
-    def string_by_state(  # noqa: PLR0911,C901,PLR0913
+    def string_by_state(  # noqa PLR0911, PLR0913, C901
         self,
         identity: Identity,
         *,
@@ -254,9 +252,9 @@ class OARepoRequestType(RequestType):
             topic: Record,
             request: Request | None = None,
         ) -> str | LazyString:
-            if callable(string):
-                return string(identity, topic, request)
-            return string
+            if isinstance(string, (str, LazyString)):
+                return string
+            return string(identity, topic, request)
 
         if request:
             match request.status:
@@ -287,15 +285,15 @@ class OARepoRequestType(RequestType):
 class OARepoRecordRequestType(OARepoRequestType):
     """Base request type for OARepo requests that can be created on a record."""
 
-    allowed_topic_ref_types = ("record",)  # type: ignore[reportAssignmentType]
+    allowed_topic_ref_types = ("record",)
 
     @classmethod
     def _allowed_by_publication_status(cls, record: Record) -> bool:
         if not hasattr(record, "publication_status"):
             return bool(cls.allowed_on_published)
         return bool(
-            (cls.allowed_on_draft and record.publication_status == "draft")  # type: ignore[reportAttributeAccessIssue]
-            or (cls.allowed_on_published and record.publication_status == "published")  # type: ignore[reportAttributeAccessIssue]
+            (cls.allowed_on_draft and record.publication_status == "draft")
+            or (cls.allowed_on_published and record.publication_status == "published")
         )
 
     def can_create(

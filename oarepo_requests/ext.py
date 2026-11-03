@@ -183,8 +183,7 @@ def finalize_app(app: Flask) -> None:
 
     ext = app.extensions["oarepo-requests"]
     ext.notification_recipients_resolvers_registry = app.config["NOTIFICATION_RECIPIENTS_RESOLVERS"]
-
-    dumper_extensions = Request.dumper._extensions  # noqa: SLF001 # type: ignore[reportAttributeAccessIssue]
+    dumper_extensions = Request.dumper._extensions  # noqa: SLF001  # ty: ignore[unresolved-attribute]
     if not any(isinstance(e, RecordReferenceDumperExt) for e in dumper_extensions):
         dumper_extensions.append(RecordReferenceDumperExt())
 

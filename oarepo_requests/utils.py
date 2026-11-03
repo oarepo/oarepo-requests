@@ -150,7 +150,7 @@ def resolve_reference_dict(reference_dict: dict[str, str]) -> Any:
 
     Raises ValueError if the reference cannot be resolved.
     """
-    return ResolverRegistry.resolve_entity_proxy(reference_dict, raise_=True).resolve()  # type: ignore[reportOptionalMemberAccess]
+    return ResolverRegistry.resolve_entity_proxy(reference_dict, raise_=True).resolve()
 
 
 def reference_entity(entity: Any) -> dict[str, str]:
@@ -158,7 +158,7 @@ def reference_entity(entity: Any) -> dict[str, str]:
 
     Raises ValueError if the reference cannot be resolved.
     """
-    return cast("dict[str, str]", ResolverRegistry.reference_entity(entity, raise_=True))
+    return ResolverRegistry.reference_entity(entity, raise_=True)
 
 
 # TODO: possibly not used
@@ -223,7 +223,7 @@ def get_receiver_for_request_type(
     except KeyError:
         return None
 
-    return workflow_request.recipient_entity_reference(  # type: ignore[no-any-return]
+    return workflow_request.recipient_entity_reference(
         identity=identity, record=topic, request_type=request_type, creator=identity
     )
 
@@ -297,15 +297,12 @@ def has_rights_to_accept_request(request: Request, identity: Identity) -> bool:
     :param request: Request to check.
     :param identity: Identity to check.
     """
-    return cast(
-        "bool",
-        current_requests_service.check_permission(
-            identity,
-            "action_accept",
-            request=request,
-            record=request.topic,
-            request_type=request.type,
-        ),
+    return current_requests_service.check_permission(
+        identity,
+        "action_accept",
+        request=request,
+        record=request.topic,
+        request_type=request.type,
     )
 
 
@@ -315,15 +312,12 @@ def has_rights_to_submit_request(request: Request, identity: Identity) -> bool:
     :param request: Request to check.
     :param identity: Identity to check.
     """
-    return cast(
-        "bool",
-        current_requests_service.check_permission(
-            identity,
-            "action_submit",
-            request=request,
-            record=request.topic,
-            request_type=request.type,
-        ),
+    return current_requests_service.check_permission(
+        identity,
+        "action_submit",
+        request=request,
+        record=request.topic,
+        request_type=request.type,
     )
 
 
@@ -336,6 +330,7 @@ def search_requests(identity: Identity, record: RecordWithDraft | dict[str, str]
     )
 
 
+# REVIEW: seems to be only used in tests?
 def applicable_requests(identity: Identity, record: RecordWithDraft | dict[str, str]) -> RequestTypesList:
     """Get applicable request types for a record."""
     topic_ref = reference_entity(record) if isinstance(record, RecordWithDraft) else record

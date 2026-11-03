@@ -7,7 +7,7 @@ from __future__ import annotations
 
 import json
 from http import HTTPStatus
-from typing import TYPE_CHECKING, Any, cast, override
+from typing import TYPE_CHECKING, Any, override
 
 from flask import g
 from flask_resources import (
@@ -21,6 +21,8 @@ from invenio_requests.errors import CannotExecuteActionError
 from oarepo_workflows.errors import RequestTypeNotInWorkflowError
 
 if TYPE_CHECKING:
+    from collections.abc import Callable
+
     from invenio_records_resources.records import Record
     from invenio_requests.customizations import RequestType
 
@@ -78,14 +80,10 @@ class OpenRequestAlreadyExistsError(CannotExecuteActionError):
     @property
     def description(self) -> str:
         """Exception's description."""
-        return cast(
-            "str",
-            gettext("There is already an open request of %(request_type)s on %(record_id)s.")
-            % {
-                "request_type": self.request_type.name,
-                "record_id": self.record.id,
-            },
-        )
+        return gettext("There is already an open request of %(request_type)s on %(record_id)s.") % {
+            "request_type": self.request_type.name,
+            "record_id": self.record.id,
+        }
 
 
 class UnresolvedRequestsError(CannotExecuteActionError):
@@ -114,7 +112,7 @@ class UnknownRequestTypeError(Exception):
     @property
     def description(self) -> str:
         """Exception's description."""
-        return gettext("Unknown request type %(request_type)s.") % {  # type: ignore[no-any-return]
+        return gettext("Unknown request type %(request_type)s.") % {
             "request_type": self.request_type,
         }
 
@@ -141,7 +139,7 @@ class ReceiverNonReferencableError(Exception):
         if self.kwargs:
             message += gettext("\n Additional keyword arguments:")
             message += f"\n{', '.join(self.kwargs)}"
-        return message  # type: ignore[no-any-return]
+        return message
 
 
 class VersionAlreadyExists(CustomHTTPJSONException):
@@ -167,23 +165,20 @@ class VersionAlreadyExists(CustomHTTPJSONException):
         )
 
 
+def _http_exception_with_description(code: int) -> Callable[[Exception], HTTPJSONException]:
+    """Return a mapper converting an exception with a ``description`` to an HTTPJSONException."""
+
+    def mapper(e: Exception) -> HTTPJSONException:
+        # flask only passes the exception type the handler was registered for
+        if not hasattr(e, "description"):
+            raise ValueError("Exception must have a description")
+        return HTTPJSONException(code=code, description=e.description)
+
+    return mapper
+
+
 oarepo_requests_error_handlers = {
-    UnknownRequestTypeError: create_error_handler(
-        lambda e: HTTPJSONException(
-            code=400,
-            description=e.description,  # type: ignore[reportAttributeAccessIssue]
-        )
-    ),
-    ReceiverNonReferencableError: create_error_handler(
-        lambda e: HTTPJSONException(
-            code=400,
-            description=e.description,  # type: ignore[reportAttributeAccessIssue]
-        )
-    ),
-    RequestTypeNotInWorkflowError: create_error_handler(
-        lambda e: HTTPJSONException(
-            code=400,
-            description=e.description,  # type: ignore[reportAttributeAccessIssue]
-        )
-    ),
+    UnknownRequestTypeError: create_error_handler(_http_exception_with_description(400)),
+    ReceiverNonReferencableError: create_error_handler(_http_exception_with_description(400)),
+    RequestTypeNotInWorkflowError: create_error_handler(_http_exception_with_description(400)),
 }
