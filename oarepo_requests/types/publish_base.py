@@ -66,9 +66,9 @@ class PublishRequestType(NonDuplicableOARepoRecordRequestType):
         self,
         identity: Identity,
         data: dict,
-        receiver: dict[str, str],
-        topic: Record,
-        creator: dict[str, str],
+        receiver: dict[str, str] | Any | None,
+        topic: Any,
+        creator: dict[str, str] | Any | None,
         *args: Any,
         **kwargs: Any,
     ) -> None:
@@ -80,7 +80,7 @@ class PublishRequestType(NonDuplicableOARepoRecordRequestType):
 
     @classmethod
     @override
-    def is_applicable_to(cls, identity: Identity, topic: Record, *args: Any, **kwargs: Any) -> bool:
+    def is_applicable_to(cls, identity: Identity, topic: Any, *args: Any, **kwargs: Any) -> bool:
         """Check if the request type is applicable to the topic."""
         try:
             topic = cls.convert_topic(identity, topic)
