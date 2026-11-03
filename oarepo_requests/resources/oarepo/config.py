@@ -5,27 +5,32 @@
 
 from __future__ import annotations
 
-from types import MappingProxyType
 from typing import TYPE_CHECKING
 
 import importlib_metadata
 import marshmallow as ma
-from invenio_records_resources.services.base.config import ConfiguratorMixin
 from invenio_requests.resources import RequestsResourceConfig
+from invenio_requests.resources.requests.config import RequestSearchRequestArgsSchema
 
 from oarepo_requests.errors import oarepo_requests_error_handlers
-from oarepo_requests.services.search import ExtendedRequestSearchRequestArgsSchema
 
 if TYPE_CHECKING:
     from collections.abc import Callable, Mapping
     from http.client import HTTPException
 
     from flask import Response
-    from flask_resources import ResponseHandler
-    from marshmallow import fields
 
 
-class OARepoRequestsResourceConfig(RequestsResourceConfig, ConfiguratorMixin):
+class ExtendedRequestSearchRequestArgsSchema(RequestSearchRequestArgsSchema):
+    """Marshmallow schema for the extra filters."""
+
+    mine = ma.fields.Boolean()
+    assigned = ma.fields.Boolean()
+    all = ma.fields.Boolean()
+    is_closed = ma.fields.Boolean()
+
+
+class OARepoRequestsResourceConfig(RequestsResourceConfig):
     """Config for the oarepo requests API."""
 
     routes: Mapping[str, str] = {
@@ -36,25 +41,15 @@ class OARepoRequestsResourceConfig(RequestsResourceConfig, ConfiguratorMixin):
 
     request_search_args = ExtendedRequestSearchRequestArgsSchema
 
-    @property
-    def request_view_args(self) -> Mapping[str, fields.Field]:  # type: ignore[reportIncompatibleVariableOverride]
-        """Request view args for the requests API."""
-        return {
-            **super().request_view_args,
-            "topic": ma.fields.String(),
-            "request_type": ma.fields.String(),
-        }
+    request_view_args: Mapping[str, ma.fields.Field] = {
+        **RequestsResourceConfig.request_view_args,
+        "topic": ma.fields.String(),
+        "request_type": ma.fields.String(),
+    }
 
+    # base is a FromConfig descriptor and entry points must load lazily, so this has to stay a property
     @property
-    def response_handlers(self) -> Mapping[str, ResponseHandler]:  # type: ignore[reportIncompatibleVariableOverride]
-        """Response handlers for the extended requests API."""
-        return {
-            # TODO: UI serialization
-            **super().response_handlers,
-        }
-
-    @property
-    def error_handlers(  # type: ignore[reportIncompatibleVariableOverride]
+    def error_handlers(  # ty: ignore[invalid-property-type-override]
         self,
     ) -> Mapping[
         type[HTTPException | BaseException] | int,
@@ -64,4 +59,4 @@ class OARepoRequestsResourceConfig(RequestsResourceConfig, ConfiguratorMixin):
         error_handlers = dict(super().error_handlers) | oarepo_requests_error_handlers
         for x in importlib_metadata.entry_points(group="oarepo_requests.error_handlers"):
             error_handlers.update(x.load())
-        return MappingProxyType(error_handlers)  # type: ignore[reportReturnType]
+        return error_handlers
