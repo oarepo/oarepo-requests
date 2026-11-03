@@ -326,11 +326,20 @@ def has_rights_to_submit_request(request: Request, identity: Identity) -> bool:
 
 
 def search_requests(identity: Identity, record: RecordWithDraft | dict[str, str], expand: bool = False) -> RequestList:
-    """Search requests for a given record."""
+    """Search the first page of requests for a given record, newest first."""
     topic_ref = reference_entity(record) if isinstance(record, RecordWithDraft) else record
     return cast(
         "RequestList",
         current_requests_service.search(identity, topic=topic_ref, expand=expand),
+    )
+
+
+def scan_requests(identity: Identity, record: RecordWithDraft | dict[str, str]) -> RequestList:
+    """Scan all requests for a given record, unordered; iterate its raw hits rather than serializing them."""
+    topic_ref = reference_entity(record) if isinstance(record, RecordWithDraft) else record
+    return cast(
+        "RequestList",
+        current_requests_service.scan(identity, topic=topic_ref),
     )
 
 
