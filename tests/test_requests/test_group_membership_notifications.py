@@ -252,3 +252,23 @@ def test_group_membership_stateful_name_and_description(
         request_type.stateful_description(other.identity, topic=topic, request=submitted_request)
         == "Membership in group 'Submitters' requested."
     )
+
+
+def test_group_membership_request_can_be_cancelled_by_requester(
+    users,
+    requests_service,
+    administration_role,
+    submitters_role,
+):
+    requester = users[0]
+    data = {"payload": {"justification": "I need to submit datasets for my research group."}}
+    create_response = requests_service.create(
+        requester.identity, data=data, request_type="group_membership", topic=submitters_role
+    )
+    requests_service.execute_action(requester.identity, id_=create_response["id"], action="submit")
+
+    cancel_response = requests_service.execute_action(requester.identity, id_=create_response["id"], action="cancel")
+
+    assert cancel_response["status"] == "cancelled"
+    # a cancelled request no longer blocks opening a new one
+    assert GroupMembershipRequestType.is_applicable_to(requester.identity, submitters_role)
