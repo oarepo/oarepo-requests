@@ -10,6 +10,7 @@ from typing import TYPE_CHECKING, Any, override
 from invenio_access.permissions import system_identity
 from invenio_i18n import _
 from invenio_notifications.services.uow import NotificationOp
+from invenio_records_resources.services.uow import RecordCommitOp
 from invenio_requests.records.api import Request
 from oarepo_runtime.typing import record_from_result
 
@@ -94,6 +95,7 @@ class PublishDraftSubmitAction(MakeTopicDraftMixin, PublishMixin, OARepoSubmitAc
                     if version == self.request["payload"]["version"]:
                         raise VersionAlreadyExists
             self.topic.metadata["version"] = self.request["payload"]["version"]
+            uow.register(RecordCommitOp(self.topic, indexer=topic_service.indexer))
         uow.register(NotificationOp(self.notification_builder.build(request=self.request)))
 
 
