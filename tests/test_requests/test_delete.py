@@ -78,3 +78,31 @@ def test_delete(
     )
     canceled_request = creator_client.get(f"{urls['BASE_URL_REQUESTS']}{resp_request_submit['id']}")
     assert canceled_request.json["status"] == "cancelled"
+
+
+def test_submitted_delete_request_description_depends_on_viewer(
+    record_factory,
+    users,
+    submit_request_on_record,
+):
+    creator, receiver, other = users[0], users[1], users[2]
+    record = record_factory(creator.identity)
+    request = submit_request_on_record(
+        creator.identity,
+        record["id"],
+        "delete_published_record",
+        create_additional_data={"payload": {"removal_reason": "test reason"}},
+    )._request
+    topic = request.topic.resolve()
+
+    def description(user):
+        return request.type.stateful_description(user.identity, topic=topic, request=request)
+
+    assert description(creator) == (
+        "Permission to delete record requested. You will be notified about the decision by email."
+    )
+    assert description(receiver) == (
+        "You have been asked to approve the request to permanently delete the record. "
+        "You can approve or reject the request."
+    )
+    assert description(other) == "Permission to delete record (including files) requested. "

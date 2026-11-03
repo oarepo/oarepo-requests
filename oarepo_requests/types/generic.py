@@ -108,12 +108,6 @@ class OARepoRequestType(RequestType):
         request_type_cls = cls
 
         class SchemaWithTitleFallback(base_schema):  # ty:ignore[unsupported-base]
-            # Set the request title to "<type name> (<topic title>)" when the
-            # topic resolves and has a metadata title; otherwise fall back to
-            # the static type name. We deliberately do NOT call stateful_name
-            # here — string_by_state crashes when request.created_by has been
-            # lazy-swapped to an EntityProxy (`'UserProxy' object has no
-            # attribute 'keys'` inside request_identity_matches).
             @post_dump(pass_original=True)
             def _ensure_title(self, data: dict[str, Any], original: Any, **_kwargs: Any) -> dict[str, Any]:
                 if data.get("title"):
@@ -261,7 +255,7 @@ class OARepoRequestType(RequestType):
                 case "submitted":
                     if has_rights_to_accept_request(request, identity):
                         return get_string(submitted_receiver, identity, topic, request)
-                    if request_identity_matches(request.created_by, identity):
+                    if request_identity_matches(request["created_by"], identity):
                         return get_string(submitted_creator, identity, topic, request)
                     return get_string(submitted_others, identity, topic, request)
                 case "accepted":
