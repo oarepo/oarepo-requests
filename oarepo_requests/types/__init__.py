@@ -10,7 +10,11 @@ from .edit_record import EditPublishedRecordRequestType
 from .generic import (
     DefaultReceiverMixin,
     NonDuplicableOARepoRecordRequestType,
+    NonDuplicableOARepoRequestType,
+    OARepoRecordRequestType,
     OARepoRequestType,
+    RequestTypeWithStatefulName,
+    TopicConvertingRequestType,
 )
 from .publish_changed_metadata import PublishChangedMetadataRequestType
 from .publish_draft import PublishDraftRequestType
@@ -21,8 +25,12 @@ __all__ = [
     "DeletePublishedRecordRequestType",
     "EditPublishedRecordRequestType",
     "NonDuplicableOARepoRecordRequestType",
+    "NonDuplicableOARepoRequestType",
+    "OARepoRecordRequestType",
     "OARepoRequestType",
     "PublishChangedMetadataRequestType",
     "PublishDraftRequestType",
     "PublishNewVersionRequestType",
+    "RequestTypeWithStatefulName",
+    "TopicConvertingRequestType",
 ]

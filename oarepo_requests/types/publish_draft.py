@@ -79,7 +79,7 @@ class PublishDraftRequestType(PublishRequestType):
         self,
         identity: Identity,
         *,
-        topic: Record,
+        topic: Record | None,
         request: Request | None = None,
         **kwargs: Any,
     ) -> str | LazyString:
@@ -105,7 +105,7 @@ class PublishDraftRequestType(PublishRequestType):
         self,
         identity: Identity,
         *,
-        topic: Record,
+        topic: Record | None,
         request: Request | None = None,
         **kwargs: Any,
     ) -> str | LazyString:

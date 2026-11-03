@@ -197,7 +197,7 @@ def ref_to_str(ref_dict: dict[str, str]) -> str:
 
 
 def get_receiver_for_request_type(
-    request_type: RequestType, identity: Identity, topic: Record
+    request_type: RequestType, identity: Identity, topic: Record | None
 ) -> Mapping[str, str] | None:
     """Get the default receiver for the request type, identity and topic.
 
@@ -233,7 +233,7 @@ def is_auto_approved(
     request_type: RequestType,
     *,
     identity: Identity,
-    topic: Record,
+    topic: Any | None,
 ) -> bool:
     """Check if the request should be auto-approved.
 

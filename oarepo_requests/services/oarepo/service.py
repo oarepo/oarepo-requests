@@ -13,6 +13,7 @@ from invenio_records_resources.services.base.links import EndpointLink
 from invenio_records_resources.services.uow import IndexRefreshOp, unit_of_work
 from invenio_requests import current_request_type_registry
 from invenio_requests.services import RequestsService
+from oarepo_workflows.requests import RequestTypeWithCreationChecks
 
 from oarepo_requests.errors import UnknownRequestTypeError
 from oarepo_requests.proxies import current_oarepo_requests
@@ -21,6 +22,7 @@ from oarepo_requests.services.results import (
     StringEntityResolverExpandableField,
 )
 from oarepo_requests.types import DefaultReceiverMixin
+from oarepo_requests.types.generic import TopicConvertingRequestType
 from oarepo_requests.utils import (
     allowed_request_types_for_record,
     resolve_reference_dict,
@@ -66,7 +68,7 @@ class OARepoRequestsService(RequestsService):
         request_type: str | RequestType,
         receiver: dict[str, str] | Any | None = None,
         creator: dict[str, str] | Any | None = None,
-        topic: Record | None = None,
+        topic: Any | None = None,
         *args: Any,
         expires_at: datetime | None = None,
         uow: UnitOfWork,
@@ -115,12 +117,12 @@ class OARepoRequestsService(RequestsService):
 
         # ask to convert the topic. For example, for publish_metadata, the topic here is the previously published record
         # but we need the draft that we are publishing.
-        if hasattr(request_type, "convert_topic"):
-            topic = request_type.convert_topic(identity, topic)  # type: ignore[reportAttributeAccessIssue]
+        if isinstance(request_type, TopicConvertingRequestType):
+            topic = request_type.convert_topic(identity, topic)
 
-        if hasattr(request_type, "can_create"):
+        if isinstance(request_type, RequestTypeWithCreationChecks):
             # raise exception if can't
-            request_type.can_create(identity, data, receiver, topic, creator)  # type: ignore[reportAttributeAccessIssue]
+            request_type.can_create(identity, data, receiver, topic, creator)
 
         result = super().create(
             identity=identity,

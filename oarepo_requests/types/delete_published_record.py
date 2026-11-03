@@ -103,7 +103,7 @@ class DeletePublishedRecordRequestType(NonDuplicableOARepoRecordRequestType):
         self,
         identity: Identity,
         *,
-        topic: Record,
+        topic: Record | None,
         request: Request | None = None,
         **kwargs: Any,
     ) -> str | LazyString:
@@ -123,7 +123,7 @@ class DeletePublishedRecordRequestType(NonDuplicableOARepoRecordRequestType):
         self,
         identity: Identity,
         *,
-        topic: Record,
+        topic: Record | None,
         request: Request | None = None,
         **kwargs: Any,
     ) -> str | LazyString:
