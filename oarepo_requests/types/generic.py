@@ -137,11 +137,10 @@ class OARepoRequestType(RequestType):
     def can_create(
         self,
         identity: Identity,
-        data: dict[str, Any],  # noqa: ARG002
-        receiver: dict[str, str],  # noqa: ARG002
+        data: dict[str, Any],
+        receiver: dict[str, str],
         topic: Record,
-        creator: dict[str, str],  # noqa: ARG002
-        *args: Any,  # noqa: ARG002
+        creator: dict[str, str],
         **kwargs: Any,
     ) -> None:
         """Check if the request can be created.
@@ -151,10 +150,11 @@ class OARepoRequestType(RequestType):
         :param receiver:        receiver of the request
         :param topic:           topic of the request
         :param creator:         creator of the request
-        :param args:            additional arguments
         :param kwargs:          additional keyword arguments
         """
-        current_requests_service.require_permission(identity, "create", record=topic, request_type=self, **kwargs)
+        current_requests_service.require_permission(
+            identity, "create", data=data, receiver=receiver, record=topic, creator=creator, request_type=self, **kwargs
+        )
 
     @classmethod
     def is_applicable_to(cls, identity: Identity, topic: Record, *_args: Any, **kwargs: Any) -> bool:
@@ -303,7 +303,6 @@ class OARepoRecordRequestType(OARepoRequestType):
         receiver: dict[str, str],
         topic: Record,
         creator: dict[str, str],
-        *args: Any,
         **kwargs: Any,
     ) -> None:
         """Check if the request can be created.
@@ -318,7 +317,7 @@ class OARepoRecordRequestType(OARepoRequestType):
         """
         if not self._allowed_by_publication_status(record=topic):
             raise PermissionDeniedError("create")
-        super().can_create(identity, data, receiver, topic, creator, *args, **kwargs)
+        super().can_create(identity, data, receiver, topic, creator, **kwargs)
 
     @classmethod
     def is_applicable_to(cls, identity: Identity, topic: Record, *args: Any, **kwargs: Any) -> bool:
