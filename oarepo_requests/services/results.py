@@ -5,25 +5,20 @@
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Any, cast
+from typing import TYPE_CHECKING, Any
 
-from invenio_records_resources.records import Record
-from invenio_records_resources.services.records.schema import ServiceSchemaWrapper
 from invenio_requests.services.results import EntityResolverExpandableField
 from oarepo_runtime.services.results import RecordList
 
-from oarepo_requests.services.schema import (
-    RequestTypeSchema,
-    request_type_identity_ctx,
-    request_type_record_ctx,
-)
+from oarepo_requests.proxies import current_requests_service
 from oarepo_requests.utils import string_to_reference
 
 if TYPE_CHECKING:
     from collections.abc import Iterator
 
     from flask_principal import Identity
-    from invenio_records_resources.records.api import Record
+    from invenio_records_resources.records import Record
+    from invenio_records_resources.services.records.schema import ServiceSchemaWrapper
     from invenio_records_resources.services.records.service import RecordService
     from invenio_requests.customizations import RequestType
 
@@ -62,7 +57,7 @@ class RequestTypesList(RecordList):
         """Initialize the list of request types."""
         self._record = record
         super().__init__(*args, **kwargs)
-        self._schema = schema or ServiceSchemaWrapper(self._service, RequestTypeSchema)
+        self._schema = schema or self._service.request_type_schema  # ty:ignore[unresolved-attribute]
 
     def to_dict(self) -> dict:
         """Return result as a dictionary."""
@@ -82,18 +77,7 @@ class RequestTypesList(RecordList):
     def hits(self) -> Iterator[dict]:
         """Iterator over the hits."""
         for hit in self._results:
-            # Project the record
-            tok_identity = request_type_identity_ctx.set(self._identity)
-            tok_record = request_type_record_ctx.set(self._record)
-            try:
-                # identity in context is hardcoded in ServiceSchemaWrapper
-                # which we have to use if we want to subclass RecordList
-                projection = self._schema.dump(hit, context={"identity": self._identity})
-            finally:
-                # Reset contextvars to previous values to avoid leaking state
-                request_type_identity_ctx.reset(tok_identity)
-                request_type_record_ctx.reset(tok_record)
-
+            projection = self._schema.dump(hit, context={"record": self._record, "identity": self._identity})
             if self._links_item_tpl:
                 projection["links"] = self._links_item_tpl.expand(self._identity, hit)
             yield projection
@@ -114,14 +98,8 @@ def serialize_request_types(
     :param record: Record for which the request types are serialized.
     :return: List of serialized request types.
     """
-    # contextvars approach from gpt
-    tok_identity = request_type_identity_ctx.set(identity)
-    tok_record = request_type_record_ctx.set(record)
-    try:
-        return [
-            cast("dict[str, Any]", RequestTypeSchema().dump(request_type)) for request_type in request_types.values()
-        ]
-    finally:
-        # Reset contextvars to previous values to avoid leaking state
-        request_type_identity_ctx.reset(tok_identity)
-        request_type_record_ctx.reset(tok_record)
+    schema = current_requests_service.request_type_schema
+    return [
+        schema.dump(request_type, context={"record": record, "identity": identity})
+        for request_type in request_types.values()
+    ]
