@@ -12,16 +12,18 @@ from invenio_accounts.models import Role
 from invenio_i18n import gettext
 from invenio_i18n import lazy_gettext as _
 from invenio_requests.customizations.actions import CancelAction
+from invenio_requests.resolvers.registry import ResolverRegistry
 
 from oarepo_requests.actions.group_membership import (
     GroupMembershipAcceptAction,
     GroupMembershipDeclineAction,
     GroupMembershipSubmitAction,
 )
-from oarepo_requests.types import DefaultReceiverMixin, OARepoRequestType
+from oarepo_requests.types import DefaultReceiverMixin, NonDuplicableOARepoRequestType
 
 from ..utils import (
     classproperty,
+    open_request_exists,
     request_identity_matches,
 )
 
@@ -34,7 +36,7 @@ if TYPE_CHECKING:
     from invenio_requests.records.api import Request
 
 
-class GroupMembershipRequestType(DefaultReceiverMixin[Role], OARepoRequestType[Role]):
+class GroupMembershipRequestType(DefaultReceiverMixin[Role], NonDuplicableOARepoRequestType[Role]):
     """Request type for requesting membership in a group."""
 
     type_id = "group_membership"
@@ -72,6 +74,17 @@ class GroupMembershipRequestType(DefaultReceiverMixin[Role], OARepoRequestType[R
     payload_schema: Mapping[str, ma.fields.Field] | None = {
         "justification": ma.fields.String(),
     }
+
+    @override
+    @classmethod
+    def open_request_exists(
+        cls, identity: Identity, topic: Role, creator: dict[str, str] | Any | None = None, **kwargs: Any
+    ) -> bool:
+        """Check whether the creator already has an open membership request for the group."""
+        # same fallback as invenio's RequestsService.create when no explicit creator is passed
+        if creator is None:
+            creator = ResolverRegistry.reference_identity(identity)
+        return open_request_exists(topic, cls.type_id, creator=creator)
 
     @override
     @staticmethod
