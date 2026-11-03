@@ -56,6 +56,7 @@ class PublishRequestType(NonDuplicableOARepoRecordRequestType):
             "submit": cls.submit_action,
             "accept": cls.accept_action,
             "decline": cls.decline_action,
+            "cancel": cls.cancel_action,
         }
 
     @override
