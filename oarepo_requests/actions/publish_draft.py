@@ -48,9 +48,11 @@ class MakeTopicDraftMixin(RequestAction):
         - invenio resolves the topic to a published record, but we need the draft topic
         """
         # preventing circular imports
-        from oarepo_requests.types import PublishDraftRequestType
+        from oarepo_requests.types import TopicConvertingRequestType
 
-        self.topic = PublishDraftRequestType.convert_topic(identity, self.topic)  # type: ignore[has-type]
+        request_type = self.request.type
+        if isinstance(request_type, TopicConvertingRequestType):
+            self.topic = request_type.convert_topic(identity, self.topic)
         super().execute(identity, uow, *args, **kwargs)
 
 

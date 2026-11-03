@@ -5,6 +5,7 @@
 
 from __future__ import annotations
 
+import contextlib
 from abc import abstractmethod
 from typing import TYPE_CHECKING, Any, ClassVar, Protocol, cast, runtime_checkable
 
@@ -16,6 +17,7 @@ from invenio_requests.customizations import RequestType
 from invenio_requests.customizations.states import RequestState
 from invenio_requests.proxies import current_requests_service
 from marshmallow import post_dump
+from marshmallow_utils.context import context_schema
 from oarepo_workflows.requests import RequestTypeWithCreationChecks
 
 from oarepo_requests.errors import OpenRequestAlreadyExistsError
@@ -170,6 +172,10 @@ class OARepoRequestType[T](RequestType, RequestTypeWithCreationChecks[T], Reques
                 if topic_proxy is not None:
                     try:
                         topic = topic_proxy.resolve()
+                        if issubclass(request_type_cls, TopicConvertingRequestType):
+                            # draft is gone once published, or the viewer may not read it
+                            with contextlib.suppress(ValueError):
+                                topic = request_type_cls.convert_topic(context_schema.get()["identity"], topic)
                         metadata = getattr(topic, "metadata", None) if topic else None
                         topic_title = metadata.get("title") if isinstance(metadata, dict) else None
                         if topic_title:
