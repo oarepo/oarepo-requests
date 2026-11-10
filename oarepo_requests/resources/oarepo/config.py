@@ -49,7 +49,7 @@ class OARepoRequestsResourceConfig(RequestsResourceConfig):
 
     # base is a FromConfig descriptor and entry points must load lazily, so this has to stay a property
     @property
-    def error_handlers(  # ty: ignore[invalid-property-type-override]
+    def error_handlers(  # ty: ignore[incompatible-property-override]
         self,
     ) -> Mapping[
         type[HTTPException | BaseException] | int,

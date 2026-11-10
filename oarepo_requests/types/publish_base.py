@@ -123,7 +123,7 @@ class PublishRequestType(NonDuplicableOARepoRecordRequestType):
         if hasattr(topic, "files"):
             can_toggle_files = topic_service.check_permission(identity, "manage_files", record=topic)
             draft_files = topic.files
-            if draft_files.enabled and not draft_files.items():  # ty:ignore[unresolved-attribute]
+            if draft_files.enabled and not draft_files.items():  # ty:ignore[missing-attribute]
                 if can_toggle_files:
                     my_message = gettext(
                         "Missing uploaded files. To disable files for this record please mark it as metadata-only."
