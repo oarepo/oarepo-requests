@@ -104,48 +104,46 @@ class OARepoGenericActionMixin[T = Record](RequestAction):
                 identity.provides.remove(request_active)
 
 
-class OARepoSubmitActionMixin[T](OARepoGenericActionMixin[T]):
+class OARepoSubmitActionMixin[T = Record](OARepoGenericActionMixin[T]):
     """Oarepo extension for any invenio submit action."""
 
     type_id = "submit"
     name = _("Submit")
 
 
-class OARepoDeclineActionMixin[T](OARepoGenericActionMixin[T]):
+class OARepoDeclineActionMixin[T = Record](OARepoGenericActionMixin[T]):
     """Oarepo extension for any invenio decline action."""
 
     type_id = "decline"
     name = _("Decline")
 
 
-class OARepoAcceptActionMixin[T](OARepoGenericActionMixin[T]):
+class OARepoAcceptActionMixin[T = Record](OARepoGenericActionMixin[T]):
     """Oarepo extension for any invenio accept action."""
 
     type_id = "accept"
     name = _("Accept")
 
 
-class OARepoCancelActionMixin[T](OARepoGenericActionMixin[T]):
+class OARepoCancelActionMixin[T = Record](OARepoGenericActionMixin[T]):
     """Oarepo extension for any invenio cancel action."""
 
     type_id = "cancel"
     name = _("Cancel")
 
-    status_from = ("created", "submitted")
-    status_to = "cancelled"
 
-
-class OARepoSubmitAction[T](OARepoSubmitActionMixin[T], actions.SubmitAction):
+class OARepoSubmitAction[T = Record](OARepoSubmitActionMixin[T], actions.SubmitAction):
     """Submit action extended for oarepo requests."""
 
 
-class OARepoDeclineAction[T](OARepoDeclineActionMixin[T], actions.DeclineAction):
+class OARepoDeclineAction[T = Record](OARepoDeclineActionMixin[T], actions.DeclineAction):
     """Decline action extended for oarepo requests."""
 
 
-class OARepoAcceptAction[T](OARepoAcceptActionMixin[T], actions.AcceptAction):
+class OARepoAcceptAction[T = Record](OARepoAcceptActionMixin[T], actions.AcceptAction):
     """Accept action extended for oarepo requests."""
 
 
-class OARepoCancelAction[T](OARepoCancelActionMixin[T], actions.CancelAction):
+class OARepoCancelAction[T = Record](OARepoCancelActionMixin[T], actions.CancelAction):
     """Cancel action extended for oarepo requests."""
+    status_from = ("created", "submitted")
