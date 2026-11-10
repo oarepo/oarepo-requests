@@ -36,7 +36,7 @@ class DefaultRequestReceiverFunction(Protocol):
         creator: dict[str, str] | Identity,
         data: dict,
     ) -> dict[str, str] | None:
-        """Return the default request receiver reference for the given request type and record, or ``None``."""
+        """Return the default request receiver reference for the given request type and topic, or ``None``."""
 
 
 class _OARepoRequestsState:
@@ -92,14 +92,14 @@ class _OARepoRequestsState:
     ) -> dict[str, str] | None:
         """Return the default receiver for the request.
 
-        Gets the default receiver for the request based on the request type, record and data.
+        Gets the default receiver for the request based on the request type, topic and data.
         It is used when the receiver is not explicitly set when creating a request. It does so
         by taking a function from the configuration under the key OAREPO_REQUESTS_DEFAULT_RECEIVER
         and calling it with the given parameters.
 
         :param identity: Identity of the user creating the request.
         :param request_type: Type of the request.
-        :param topic: Record the request is about.
+        :param topic: Topic the request is about (e.g. a record or a group).
         :param creator: Creator of the request.
         :param data: Payload of the request.
         """

@@ -9,6 +9,7 @@ from functools import cached_property
 from typing import TYPE_CHECKING, Any, override
 
 from invenio_i18n import _
+from invenio_records_resources.records import Record
 from invenio_requests.customizations import actions
 
 from oarepo_requests.proxies import current_oarepo_requests
@@ -18,17 +19,18 @@ if TYPE_CHECKING:
     from flask_babel.speaklater import LazyString
     from flask_principal import Identity
     from invenio_db.uow import UnitOfWork
-    from invenio_records_resources.records import Record
     from invenio_requests.customizations import RequestAction
     from invenio_requests.records.api import Request
 
     from oarepo_requests.actions.components import RequestActionComponent
 else:
-    RequestAction = object
+
+    class RequestAction:
+        """Runtime stand-in for RequestAction; not `object`, as bases (object, Generic) have no consistent MRO."""
 
 
-class OARepoGenericActionMixin(RequestAction):
-    """Mixin for all oarepo actions."""
+class OARepoGenericActionMixin[T = Record](RequestAction):
+    """Mixin for all oarepo actions on a topic of type T (e.g. a record or a group)."""
 
     type_id: str
     name: str
@@ -39,12 +41,12 @@ class OARepoGenericActionMixin(RequestAction):
         self._topic = request.topic.resolve()
 
     @property
-    def topic(self) -> Record:
+    def topic(self) -> T:
         """Get the topic."""
         return self._topic
 
     @topic.setter
-    def topic(self, value: Record) -> None:
+    def topic(self, value: T) -> None:
         """Set the topic."""
         self._topic = value
 
@@ -102,32 +104,46 @@ class OARepoGenericActionMixin(RequestAction):
                 identity.provides.remove(request_active)
 
 
-class OARepoSubmitAction(OARepoGenericActionMixin, actions.SubmitAction):
-    """Submit action extended for oarepo requests."""
+class OARepoSubmitActionMixin[T](OARepoGenericActionMixin[T]):
+    """Oarepo extension for any invenio submit action."""
 
     type_id = "submit"
     name = _("Submit")
 
-
-class OARepoDeclineAction(OARepoGenericActionMixin, actions.DeclineAction):
-    """Decline action extended for oarepo requests."""
+class OARepoDeclineActionMixin[T](OARepoGenericActionMixin[T]):
+    """Oarepo extension for any invenio decline action."""
 
     type_id = "decline"
     name = _("Decline")
 
-
-class OARepoAcceptAction(OARepoGenericActionMixin, actions.AcceptAction):
-    """Accept action extended for oarepo requests."""
+class OARepoAcceptActionMixin[T](OARepoGenericActionMixin[T]):
+    """Oarepo extension for any invenio accept action."""
 
     type_id = "accept"
     name = _("Accept")
 
 
-class OARepoCancelAction(OARepoGenericActionMixin, actions.CancelAction):
-    """Cancel action extended for oarepo requests."""
+class OARepoCancelActionMixin[T](OARepoGenericActionMixin[T]):
+    """Oarepo extension for any invenio cancel action."""
 
     type_id = "cancel"
     name = _("Cancel")
 
     status_from = ("created", "submitted")
     status_to = "cancelled"
+
+
+class OARepoSubmitAction[T](OARepoSubmitActionMixin[T], actions.SubmitAction):
+    """Submit action extended for oarepo requests."""
+
+
+class OARepoDeclineAction[T](OARepoDeclineActionMixin[T], actions.DeclineAction):
+    """Decline action extended for oarepo requests."""
+
+
+class OARepoAcceptAction[T](OARepoAcceptActionMixin[T], actions.AcceptAction):
+    """Accept action extended for oarepo requests."""
+
+
+class OARepoCancelAction[T](OARepoCancelActionMixin[T], actions.CancelAction):
+    """Cancel action extended for oarepo requests."""
