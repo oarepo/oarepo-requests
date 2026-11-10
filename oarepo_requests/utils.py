@@ -201,7 +201,7 @@ def ref_to_str(ref_dict: dict[str, str]) -> str:
 
 
 def get_receiver_for_request_type(
-    request_type: RequestType, identity: Identity, topic: Record | None
+    request_type: RequestType, identity: Identity, topic: Any | None
 ) -> Mapping[str, str] | None:
     """Get the default receiver for the request type, identity and topic.
 
@@ -211,7 +211,7 @@ def get_receiver_for_request_type(
 
     :param request_type: Request type.
     :param identity: Identity of the caller who wants to create a request of this type
-    :param topic: Topic record for the request
+    :param topic: Topic of the request; topics that cannot have a workflow get no receiver
     :return: Receiver for the request type from workflow or None if no receiver
     """
     if not topic:
