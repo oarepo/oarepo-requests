@@ -57,7 +57,7 @@ class RequestTypesList(RecordList):
         """Initialize the list of request types."""
         self._record = record
         super().__init__(*args, **kwargs)
-        self._schema = schema or self._service.request_type_schema  # ty:ignore[unresolved-attribute]
+        self._schema = schema or self._service.request_type_schema  # ty:ignore[missing-attribute]
 
     def to_dict(self) -> dict:
         """Return result as a dictionary."""

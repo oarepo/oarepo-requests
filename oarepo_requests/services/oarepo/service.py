@@ -135,7 +135,7 @@ class OARepoRequestsService(RequestsService):
             expand=expand,
             uow=uow,
         )
-        uow.register(IndexRefreshOp(indexer=self.indexer, index=self.record_cls.index))  # ty:ignore[unresolved-attribute]
+        uow.register(IndexRefreshOp(indexer=self.indexer, index=self.record_cls.index))  # ty:ignore[missing-attribute]
         return result
 
     def applicable_request_types(self, identity: Identity, topic: Record | dict[str, str]) -> RequestTypesList:
