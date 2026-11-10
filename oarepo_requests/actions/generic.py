@@ -146,4 +146,5 @@ class OARepoAcceptAction[T = Record](OARepoAcceptActionMixin[T], actions.AcceptA
 
 class OARepoCancelAction[T = Record](OARepoCancelActionMixin[T], actions.CancelAction):
     """Cancel action extended for oarepo requests."""
+
     status_from = ("created", "submitted")
