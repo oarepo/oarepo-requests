@@ -110,11 +110,13 @@ class OARepoSubmitActionMixin[T](OARepoGenericActionMixin[T]):
     type_id = "submit"
     name = _("Submit")
 
+
 class OARepoDeclineActionMixin[T](OARepoGenericActionMixin[T]):
     """Oarepo extension for any invenio decline action."""
 
     type_id = "decline"
     name = _("Decline")
+
 
 class OARepoAcceptActionMixin[T](OARepoGenericActionMixin[T]):
     """Oarepo extension for any invenio accept action."""
