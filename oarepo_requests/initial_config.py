@@ -41,6 +41,7 @@ from oarepo_requests.notifications.resolvers import (
     MultipleEntitiesNotificationResolver,
     UserNotificationProxy,
 )
+from oarepo_requests.receiver import default_workflow_receiver_function
 from oarepo_requests.resources.oarepo.config import OARepoRequestsResourceConfig
 from oarepo_requests.resources.oarepo.resource import OARepoRequestsResource
 from oarepo_requests.services.oarepo.config import OARepoRequestsServiceConfig
@@ -51,7 +52,7 @@ REQUESTS_SERVICE_CONFIG_CLASS = OARepoRequestsServiceConfig
 REQUESTS_RESOURCE_CLASS = OARepoRequestsResource
 REQUESTS_RESOURCE_CONFIG_CLASS = OARepoRequestsResourceConfig
 REQUESTS_REVIEWERS_ENABLED = True
-OAREPO_REQUESTS_DEFAULT_RECEIVER = "oarepo_requests.receiver.default_workflow_receiver_function"
+OAREPO_REQUESTS_DEFAULT_RECEIVER = default_workflow_receiver_function
 NOTIFICATIONS_BUILDERS = {
     **RDM_NOTIFICATIONS_BUILDERS,
     DeletePublishedRecordRequestSubmitNotificationBuilder.type: DeletePublishedRecordRequestSubmitNotificationBuilder,
