@@ -51,7 +51,6 @@ from oarepo_requests.actions.generic import (
     OARepoSubmitAction,
 )
 from oarepo_requests.model.presets.requests import requests_preset
-from oarepo_requests.receiver import default_workflow_receiver_function
 from oarepo_requests.services.permissions.generators.conditional import (
     IfNoEditDraft,
     IfNoNewVersionDraft,
@@ -772,8 +771,6 @@ def app_config(app_config, requests_model):
     app_config["RECORDS_REFRESOLVER_CLS"] = "invenio_records.resolver.InvenioRefResolver"
     app_config["RECORDS_REFRESOLVER_STORE"] = "invenio_jsonschemas.proxies.current_refresolver_store"
     app_config["CACHE_TYPE"] = "SimpleCache"
-
-    app_config["OAREPO_REQUESTS_DEFAULT_RECEIVER"] = default_workflow_receiver_function
 
     app_config["WORKFLOWS"] = WORKFLOWS
     app_config["REQUESTS_REGISTERED_TYPES"] = [
