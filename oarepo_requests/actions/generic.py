@@ -38,11 +38,13 @@ class OARepoGenericActionMixin[T = Record](RequestAction):
     def __init__(self, request: Request):
         """Initialize the action."""
         super().__init__(request)
-        self._topic = request.topic.resolve()
+        self._topic: T | None = None
 
     @property
     def topic(self) -> T:
-        """Get the topic."""
+        """Get the topic, resolving it from the request on first access."""
+        if self._topic is None:
+            self._topic = self.request.topic.resolve()
         return self._topic
 
     @topic.setter
