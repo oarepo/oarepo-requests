@@ -204,3 +204,31 @@ def test_create_fails_if_draft_not_validated(
     assert resp_request_create.json["errors"] == [
         {"field": "metadata.title", "messages": ["Missing data for required field."]}
     ]
+
+
+def test_closed_request_of_deleted_draft_is_listed_without_actions(
+    requests_model,
+    users,
+    record_service,
+    requests_service,
+    default_record_with_workflow_json,
+    search_clear,
+):
+    from invenio_access.permissions import system_identity
+
+    creator = users[0]
+    draft = record_service.create(creator.identity, default_record_with_workflow_json)
+    request = requests_service.create(
+        identity=creator.identity,
+        data={"payload": {"version": "1.0"}},
+        request_type="publish_draft",
+        topic=draft._record,
+    )
+    requests_service.execute_action(creator.identity, request.id, "submit")
+    requests_service.execute_action(creator.identity, request.id, "cancel")
+    record_service.delete_draft(system_identity, draft["id"])
+    requests_service.indexer.refresh()
+
+    hits = requests_service.search_user_requests(creator.identity, params={"is_open": False}).to_dict()["hits"]["hits"]
+
+    assert [hit["links"]["actions"] for hit in hits if hit["id"] == request.id] == [{}]
